@@ -5,7 +5,7 @@
 
 #include "sidenav.h"
 
-namespace Hideo {
+namespace Karm::Kira {
 
 Ui::Child sidenav(Ui::Children children) {
     return Ui::vflow(8, children) |
@@ -70,4 +70,4 @@ Ui::Child sidenavItem(bool selected, Ui::OnPress onPress, Mdi::Icon icon, String
     );
 }
 
-} // namespace Hideo
+} // namespace Karm::Kira

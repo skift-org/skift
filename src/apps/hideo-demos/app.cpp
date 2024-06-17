@@ -1,5 +1,5 @@
 #include <hideo-base/scafold.h>
-#include <hideo-base/sidenav.h>
+#include <karm-kira/sidenav.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/reducer.h>
@@ -62,10 +62,10 @@ Ui::Child app() {
             .icon = Mdi::DUCK,
             .title = "Demos"s,
             .sidebar = [&] {
-                return Hideo::sidenav(
+                return Kr::sidenav(
                     iter(DEMOS)
                         .mapi([&](Demo const *demo, usize index) {
-                            return Hideo::sidenavItem(
+                            return Kr::sidenavItem(
                                 index == s.current,
                                 Model::bind<SwitchAction>(index),
                                 demo->icon,

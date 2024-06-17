@@ -1,5 +1,4 @@
 #include <hideo-base/scafold.h>
-#include <hideo-base/sidenav.h>
 
 #include "app.h"
 #include "model.h"
@@ -9,6 +8,7 @@
 #include "page-badge.h"
 #include "page-checkbox.h"
 #include "page-radio.h"
+#include "page-sidenav.h"
 #include "page-slider.h"
 #include "page-toggle.h"
 
@@ -18,6 +18,7 @@ static Array PAGES = {
     &PAGE_AVATAR,
     &PAGE_BADGE,
     &PAGE_CHECKBOX,
+    &PAGE_SIDENAV,
     &PAGE_SLIDER,
     &PAGE_RADIO,
     &PAGE_TOGGLE,
@@ -29,10 +30,10 @@ Ui::Child app() {
             .icon = Mdi::DUCK,
             .title = "Zoo"s,
             .sidebar = [&] {
-                return Hideo::sidenav(
+                return Kr::sidenav(
                     iter(PAGES)
                         .mapi([&](Page const *page, usize index) {
-                            return Hideo::sidenavItem(
+                            return Kr::sidenavItem(
                                 index == s.page,
                                 Model::bind<Switch>(index),
                                 page->icon,

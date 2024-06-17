@@ -1,6 +1,5 @@
 #include <hideo-base/scafold.h>
-#include <hideo-base/sidenav.h>
-#include <karm-ui/anim.h>
+#include <karm-kira/sidenav.h>
 #include <karm-ui/dialog.h>
 
 #include "model.h"
@@ -10,11 +9,11 @@ namespace Hideo::Files {
 
 Ui::Child sidenavItem(State const &s, Mdi::Icon icon, String title, Mime::Url url) {
     bool selected = url.isParentOf(s.currentUrl());
-    return Hideo::sidenavItem(selected, Model::bind<GoTo>(url), icon, title);
+    return Kr::sidenavItem(selected, Model::bind<GoTo>(url), icon, title);
 }
 
 Ui::Child sidebar(State const &s) {
-    return Hideo::sidenav({
+    return Kr::sidenav({
         sidenavItem(s, Mdi::HOME, "Home"s, "location://home"_url),
         sidenavItem(s, Mdi::FILE_DOCUMENT, "Documents"s, "location://documents"_url),
         sidenavItem(s, Mdi::IMAGE, "Pictures"s, "location://pictures"_url),

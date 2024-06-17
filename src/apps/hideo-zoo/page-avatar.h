@@ -12,7 +12,13 @@ static inline Page PAGE_AVATAR{
     "Avatar",
     "An image element with a fallback for representing the user.",
     [] {
-        return Kr::avatar("CV"s) | Ui::center();
+        return Ui::hflow(
+                   16,
+                   Kr::avatar(),
+                   Kr::avatar("CV"s),
+                   Kr::avatar(Mdi::CAT)
+               ) |
+               Ui::center();
     },
 };
 

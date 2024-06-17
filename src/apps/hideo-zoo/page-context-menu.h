@@ -16,7 +16,7 @@ static inline Page PAGE_CONTEXT_MENU{
                Ui::center() |
                Ui::bound() |
                Kr::contextMenu([] {
-                   return Kr::contextMenuList({
+                   return Kr::contextMenuContent({
                        Kr::contextMenuItem(Ui::NOP, Mdi::IMAGE, "Open"),
                        Kr::contextMenuItem(Ui::NOP, Mdi::FORMAT_LIST_BULLETED_SQUARE, "Open as..."),
                        Ui::separator(),

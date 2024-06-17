@@ -35,12 +35,13 @@ Ui::Child contextMenu(Ui::Child child, Ui::Slot menu) {
     return makeStrong<ContextMenu>(child, std::move(menu));
 }
 
-Ui::Child contextMenuList(Ui::Children children) {
+Ui::Child contextMenuContent(Ui::Children children) {
     return Ui::vflow(
                children
            ) |
            Ui::minSize({200, Ui::UNCONSTRAINED}) |
            Ui::box({
+               .margin = 4,
                .borderRadius = 6,
                .borderWidth = 1,
                .borderPaint = Ui::GRAY800,
@@ -56,7 +57,7 @@ Ui::Child contextMenuItem(Ui::OnPress onPress, Opt<Mdi::Icon> i, Str t) {
                i ? Ui::icon(*i) : Ui::empty(18),
                Ui::text(t)
            ) |
-           Ui::spacing({10, 6, 16, 6}) |
+           Ui::spacing({10, 6, 6, 6}) |
            Ui::minSize({Ui::UNCONSTRAINED, 36}) |
            Ui::button(
                [onPress = std::move(onPress)](auto &n) {

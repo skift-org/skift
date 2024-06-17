@@ -123,8 +123,15 @@ struct PopoverLayer : public LeafNode<PopoverLayer> {
         child().layout(r);
 
         if (popoverVisible()) {
-            auto popoverSize = (*_popover)->size(r.size(), Hint::MIN);
-            (*_popover)->layout({_popoverAt, popoverSize});
+            auto size = (*_popover)->size(r.size(), Hint::MIN);
+            auto pos = _popoverAt;
+            pos.y = clamp(pos.y, 0, r.size().y - size.y);
+
+            if (pos.x + size.x > r.end()) {
+                pos.x = pos.x - size.x;
+            }
+
+            (*_popover)->layout({pos, size});
         }
     }
 

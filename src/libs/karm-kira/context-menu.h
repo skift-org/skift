@@ -14,7 +14,7 @@ static inline auto contextMenu(Ui::Slot menu) {
     };
 }
 
-Ui::Child contextMenuList(Ui::Children children);
+Ui::Child contextMenuContent(Ui::Children children);
 
 Ui::Child contextMenuItem(Ui::OnPress onPress, Opt<Mdi::Icon> i, Str t);
 

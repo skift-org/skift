@@ -22,7 +22,7 @@ static Res<Gfx::Color> _parseHexColor(Io::SScan &s) {
         auto r = nextHex(1);
         auto g = nextHex(1);
         auto b = nextHex(1);
-        return Ok(Gfx::Color::fromRgb(r, g, b));
+        return Ok(Gfx::Color::fromRgb(r | (r << 4), g | (g << 4), b | (b << 4)));
     } else if (s.rem() == 4) {
         // #RGBA
         auto r = nextHex(1);

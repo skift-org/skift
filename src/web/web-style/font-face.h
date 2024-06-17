@@ -3,6 +3,7 @@
 #include <karm-base/range.h>
 #include <karm-base/string.h>
 #include <karm-base/vec.h>
+#include <karm-io/emit.h>
 #include <karm-mime/url.h>
 #include <web-base/angle.h>
 #include <web-base/percent.h>
@@ -80,6 +81,10 @@ struct FontStretch {
     auto val() const {
         return _val;
     }
+
+    void repr(Io::Emit &e) const {
+        e("{}", _val);
+    }
 };
 
 struct FontStyle {
@@ -107,6 +112,12 @@ struct FontStyle {
 
     FontStyle(Angle start, Angle end)
         : val(OBLIQUE), angles(Range<Angle>::fromStartEnd(start, end)) {}
+
+    void repr(Io::Emit &e) const {
+        e("{}", val);
+        if (val == OBLIQUE)
+            e(" {}", angles);
+    }
 };
 
 struct FontWeight {
@@ -137,6 +148,10 @@ struct FontWeight {
     FontWeight(u16 value)
         : val(value) {
     }
+
+    void repr(Io::Emit &e) const {
+        e("{}", val);
+    }
 };
 
 using FontTag = Array<char, 4>;
@@ -162,6 +177,10 @@ struct FontFeature {
     FontFeature(Str tag, _Value val)
         : tag(makeTag(tag)), val(static_cast<isize>(val)) {
     }
+
+    void repr(Io::Emit &e) const {
+        e("(font-feature {} {})", tag, val);
+    }
 };
 
 struct FontVariation {
@@ -171,11 +190,22 @@ struct FontVariation {
     FontVariation(Str tag, f64 val)
         : tag(makeTag(tag)), val(val) {
     }
+
+    void repr(Io::Emit &e) const {
+        e("(font-variation {} {})", tag, val);
+    }
 };
 
 struct FontSource {
     Mime::Url url;
     Opt<String> format;
+
+    void repr(Io::Emit &e) const {
+        e("(font-source {}", url);
+        if (format)
+            e(" format({})", *format);
+        e(")");
+    }
 };
 
 struct FontFace {

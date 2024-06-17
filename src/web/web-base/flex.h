@@ -18,4 +18,11 @@ enum struct FlexWrap {
     WRAP_REVERSE,
 };
 
+struct Flex {
+    FlexDirection direction = FlexDirection::ROW;
+    FlexWrap wrap = FlexWrap::NOWRAP;
+    f64 flexGrow = 0;
+    f64 flexShrink = 1;
+};
+
 } // namespace Web

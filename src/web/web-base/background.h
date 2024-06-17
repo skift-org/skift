@@ -3,6 +3,7 @@
 #include <karm-gfx/paint.h>
 #include <karm-mime/url.h>
 
+#include "color.h"
 #include "length.h"
 #include "percent.h"
 
@@ -46,6 +47,39 @@ struct BackgroundPosition {
     BackgroundPosition(HorizontalAnchor horizontalAnchor, PercentOr<Length> horizontal, VerticalPosition verticalAnchor, PercentOr<Length> vertical)
         : horizontalAnchor(horizontalAnchor), horizontal(horizontal), verticalAnchor(verticalAnchor), vertical(vertical) {
     }
+
+    void repr(Io::Emit &e) const {
+        switch (horizontalAnchor) {
+        case HorizontalAnchor::LEFT:
+            e("left");
+            break;
+        case HorizontalAnchor::CENTER:
+            e("center");
+            break;
+        case HorizontalAnchor::RIGHT:
+            e("right");
+            break;
+        }
+
+        e(" ");
+
+        switch (verticalAnchor) {
+        case VerticalPosition::TOP:
+            e("top");
+            break;
+        case VerticalPosition::CENTER:
+            e("center");
+            break;
+        case VerticalPosition::BOTTOM:
+            e("bottom");
+            break;
+        }
+
+        e(" ");
+        e("{}", horizontal);
+        e(" ");
+        e("{}", vertical);
+    }
 };
 
 struct BackgroundRepeat {
@@ -61,11 +95,23 @@ struct BackgroundRepeat {
     BackgroundRepeat(_Val val = REPEAT)
         : _val(static_cast<u8>(val)) {
     }
+
+    void repr(Io::Emit &e) const {
+        if (_val == NO) {
+            e("no-repeat");
+        } else if (_val == REPEAT) {
+            e("repeat");
+        } else {
+            if (_val & X)
+                e("repeat-x");
+            if (_val & Y)
+                e("repeat-y");
+        }
+    }
 };
 
 struct Background {
-    Gfx::Paint paint;
-    Opt<Mime::Url> image;
+    Color paint;
     BackgroundAttachment attachment;
     BackgroundPosition position;
     BackgroundRepeat repeat;

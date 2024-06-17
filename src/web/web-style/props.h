@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-io/emit.h>
 #include <karm-mime/url.h>
 #include <web-base/color.h>
 
@@ -11,19 +12,6 @@
 namespace Web::Style {
 
 // NOTE: This list should be kept alphabetically sorted.
-
-// https://drafts.csswg.org/css-fonts/#font-metrics-override-desc
-struct AscentOverrideProp {
-    Opt<Percent> value;
-
-    static Str name() { return "ascent-override"; }
-
-    static auto initial() { return NONE; }
-
-    void apply(FontFace &f) {
-        f.ascentOverride = value;
-    }
-};
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-attachment
 struct BackgroundAttachmentProp {
@@ -42,7 +30,7 @@ struct BackgroundAttachmentProp {
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-color
 struct BackgroundColorProp {
-    Vec<Gfx::Color> value;
+    Vec<Color> value;
 
     static Str name() { return "background-color"; }
 
@@ -113,7 +101,7 @@ struct BorderCollapseProp {
 
 // https://www.w3.org/TR/CSS22/box.html#propdef-border-color
 struct BorderColorProp {
-    Gfx::Color value;
+    Color value;
 
     static Str name() { return "border-color"; }
 
@@ -126,7 +114,7 @@ struct BorderColorProp {
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-color
 struct ColorProp {
-    Gfx::Color value;
+    Color value;
 
     static Str name() { return "color"; }
 
@@ -134,20 +122,6 @@ struct ColorProp {
 
     void apply(Computed &c) const {
         c.color = value;
-    }
-};
-
-// https://drafts.csswg.org/css-fonts/#font-metrics-override-desc
-
-struct DescentOverrideProp {
-    Opt<Percent> value;
-
-    static Str name() { return "descent-override"; }
-
-    static auto initial() { return NONE; }
-
-    void apply(FontFace &f) {
-        f.descentOverride = value;
     }
 };
 
@@ -164,6 +138,36 @@ struct DisplayProp {
     }
 };
 
+// MARK: FontFace --------------------------------------------------------------
+// https://drafts.csswg.org/css-fonts
+
+// https://drafts.csswg.org/css-fonts/#font-metrics-override-desc
+struct AscentOverrideProp {
+    Opt<Percent> value;
+
+    static Str name() { return "ascent-override"; }
+
+    static auto initial() { return NONE; }
+
+    void apply(FontFace &f) {
+        f.ascentOverride = value;
+    }
+};
+
+// https://drafts.csswg.org/css-fonts/#font-metrics-override-desc
+
+struct DescentOverrideProp {
+    Opt<Percent> value;
+
+    static Str name() { return "descent-override"; }
+
+    static auto initial() { return NONE; }
+
+    void apply(FontFace &f) const {
+        f.descentOverride = value;
+    }
+};
+
 // https://drafts.csswg.org/css-fonts/#font-display-desc
 struct FontDisplayProp {
     FontDisplay value;
@@ -172,7 +176,7 @@ struct FontDisplayProp {
 
     static auto initial() { return FontDisplay::AUTO; }
 
-    void apply(FontFace &f) {
+    void apply(FontFace &f) const {
         f.display = value;
     }
 };
@@ -185,7 +189,7 @@ struct FontFamilyProp {
 
     static auto initial() { return Vec<Str>{"serif"}; }
 
-    void apply(FontFace &f) {
+    void apply(FontFace &f) const {
         if (isEmpty(value))
             return;
         f.family = value[0];
@@ -200,7 +204,7 @@ struct FontStretchProp {
 
     static auto initial() { return FontStretch::NORMAL; }
 
-    void apply(FontFace &f) {
+    void apply(FontFace &f) const {
         f.stretch = value;
     }
 };
@@ -213,7 +217,7 @@ struct FontStyleProp {
 
     static auto initial() { return FontStyle::NORMAL; }
 
-    void apply(FontFace &f) {
+    void apply(FontFace &f) const {
         f.style = value;
     }
 };
@@ -226,7 +230,7 @@ struct FontWeightProp {
 
     static auto initial() { return FontWeight::NORMAL; }
 
-    void apply(FontFace &f) {
+    void apply(FontFace &f) const {
         f.weight = value;
     }
 };
@@ -239,7 +243,7 @@ struct FontFeatureSettingsProp {
 
     static Vec<FontFeature> initial() { return {}; }
 
-    void apply(FontFace &f) {
+    void apply(FontFace &f) const {
         f.features = value;
     }
 };
@@ -252,7 +256,7 @@ struct FontVariationSettingsProp {
 
     static Vec<FontVariation> initial() { return {}; }
 
-    void apply(FontFace &f) {
+    void apply(FontFace &f) const {
         f.variations = value;
     }
 };
@@ -265,7 +269,7 @@ struct LineGapOverrideProp {
 
     static auto initial() { return NONE; }
 
-    void apply(FontFace &f) {
+    void apply(FontFace &f) const {
         f.lineGapOverride = value;
     }
 };
@@ -315,8 +319,107 @@ struct UnicodeRangeProp {
     }
 };
 
+// MARK: Sizing ----------------------------------------------------------------
+// https://www.w3.org/TR/css-sizing-3
+
+// https://www.w3.org/TR/css-sizing-3/#box-sizing
+struct BoxSizingProp {
+    BoxSizing value;
+
+    static Str name() { return "box-sizing"; }
+
+    static auto initial() { return BoxSizing::CONTENT_BOX; }
+
+    void apply(Computed &c) const {
+        c.sizing.boxSizing = value;
+    }
+};
+
+// https://www.w3.org/TR/css-sizing-3/#propdef-width
+
+struct WidthProp {
+    Size value;
+
+    static Str name() { return "width"; }
+
+    static auto initial() { return Size::AUTO; }
+
+    void apply(Computed &c) const {
+        c.sizing.width = value;
+    }
+};
+
+// https://www.w3.org/TR/css-sizing-3/#propdef-height
+
+struct HeightProp {
+    Size value;
+
+    static Str name() { return "height"; }
+
+    static auto initial() { return Size::AUTO; }
+
+    void apply(Computed &c) const {
+        c.sizing.height = value;
+    }
+};
+
+// https://www.w3.org/TR/css-sizing-3/#propdef-min-width
+
+struct MinWidthProp {
+    Size value;
+
+    static Str name() { return "min-width"; }
+
+    static auto initial() { return Size::AUTO; }
+
+    void apply(Computed &c) const {
+        c.sizing.minWidth = value;
+    }
+};
+
+// https://www.w3.org/TR/css-sizing-3/#propdef-min-height
+
+struct MinHeightProp {
+    Size value;
+
+    static Str name() { return "min-height"; }
+
+    static auto initial() { return Size::AUTO; }
+
+    void apply(Computed &c) const {
+        c.sizing.minHeight = value;
+    }
+};
+
+// https://www.w3.org/TR/css-sizing-3/#propdef-max-width
+
+struct MaxWidthProp {
+    Size value;
+
+    static Str name() { return "max-width"; }
+
+    static auto initial() { return Size::NONE; }
+
+    void apply(Computed &c) const {
+        c.sizing.maxWidth = value;
+    }
+};
+
+// https://www.w3.org/TR/css-sizing-3/#propdef-max-height
+
+struct MaxHeightProp {
+    Size value;
+
+    static Str name() { return "max-height"; }
+
+    static auto initial() { return Size::NONE; }
+
+    void apply(Computed &c) const {
+        c.sizing.maxHeight = value;
+    }
+};
+
 using _Prop = Union<
-    AscentOverrideProp,
     BackgroundAttachmentProp,
     BackgroundColorProp,
     BackgroundImageProp,
@@ -324,6 +427,9 @@ using _Prop = Union<
     BackgroundRepeatProp,
     ColorProp,
     DisplayProp,
+
+    // FontFace
+    AscentOverrideProp,
     DescentOverrideProp,
     FontDisplayProp,
     FontFamilyProp,
@@ -335,7 +441,16 @@ using _Prop = Union<
     LineGapOverrideProp,
     SizeAdjustProp,
     SrcProp,
-    UnicodeRangeProp
+    UnicodeRangeProp,
+
+    // Sizing
+    BoxSizingProp,
+    WidthProp,
+    HeightProp,
+    MinWidthProp,
+    MinHeightProp,
+    MaxWidthProp,
+    MaxHeightProp
 
     /**/
     >;
@@ -349,6 +464,36 @@ enum struct Important {
 struct Prop : public _Prop {
     using _Prop::_Prop;
     Important important = Important::NO;
+
+    Str name() const {
+        return visit([](auto const &p) {
+            return p.name();
+        });
+    }
+
+    void apply(Computed &c) const {
+        visit([&](auto const &p) {
+            if constexpr (requires { p.apply(c); })
+                p.apply(c);
+        });
+    }
+
+    void apply(FontFace &f) const {
+        visit([&](auto const &p) {
+            if constexpr (requires { p.apply(f); })
+                p.apply(f);
+        });
+    }
+
+    void repr(Io::Emit &e) const {
+        e("({}", name());
+        visit([&](auto const &p) {
+            e(" {}", p.value);
+            if (important == Important::YES)
+                e(" !important");
+        });
+        e(")");
+    }
 };
 
 } // namespace Web::Style

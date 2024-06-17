@@ -147,6 +147,22 @@ struct Display {
     bool operator==(Internal internal) const {
         return is(Type::INTERNAL) and _internal == internal;
     }
+
+    void repr(Io::Emit &e) const {
+        switch (_type) {
+        case Type::DEFAULT:
+            e("(display inside: {}, outside: {}, item: {})", _inside, _outside, _item);
+            break;
+
+        case Type::INTERNAL:
+            e("(display internal: {})", _internal);
+            break;
+
+        case Type::BOX:
+            e("(display box: {})", _box);
+            break;
+        }
+    }
 };
 
 } // namespace Web

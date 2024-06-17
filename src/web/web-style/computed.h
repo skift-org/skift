@@ -7,6 +7,7 @@
 #include <web-base/display.h>
 #include <web-base/flex.h>
 #include <web-base/float.h>
+#include <web-base/sizing.h>
 #include <web-base/visibility.h>
 
 namespace Web::Style {
@@ -16,15 +17,7 @@ struct Computed {
 
     Vec<Background> backgrounds;
     Borders borders;
-
-    // CSS Box Sizing Module Level 4
-    // https://drafts.csswg.org/css-sizing-4/
-    Opt<Length> width;
-    Opt<Length> height;
-    Opt<Length> minWidth;
-    Opt<Length> minHeight;
-    Opt<Length> maxWidth;
-    Opt<Length> maxHeight;
+    Sizing sizing;
 
     // CSS Display Module Level 3
     // https://www.w3.org/TR/css-display-3
@@ -32,12 +25,7 @@ struct Computed {
     isize order = 0;
     Visibility visibility = Visibility::VISIBLE;
 
-    // CSS Flexible Box Layout Module Level 1
-    // https://www.w3.org/TR/css-flexbox-1
-    FlexDirection flexDirection = FlexDirection::ROW;
-    FlexWrap flexWrap = FlexWrap::NOWRAP;
-    f64 flexGrow = 0;
-    f64 flexShrink = 1;
+    Flex flex;
 
     Float float_ = Float::NONE;
     Clear clear = Clear::NONE;

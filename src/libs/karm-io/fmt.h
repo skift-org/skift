@@ -759,9 +759,11 @@ concept ReprMethod = requires(T t, Emit &emit) {
 };
 
 template <typename T>
-concept Reprable = ReprMethod<T> or requires(T t, Emit &emit) {
-    Repr<T>::repr(t, emit);
-};
+concept Reprable =
+    ReprMethod<T> or
+    requires(T t, Emit &emit) {
+        Repr<T>::repr(emit, t);
+    };
 
 template <Reflectable T>
     requires(not Reprable<T>)

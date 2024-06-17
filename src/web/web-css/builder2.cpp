@@ -4,9 +4,12 @@ namespace Web::Css {
 
 // MARK: Types -----------------------------------------------------------------
 
-// https://drafts.csswg.org/css-color/#hex-notation
+// NOTE: Please keep this alphabetically sorted.
 
-Res<Gfx::Color> _parseHexColor(Io::SScan &s) {
+// MARK: Color
+// https://drafts.csswg.org/css-color
+
+static Res<Gfx::Color> _parseHexColor(Io::SScan &s) {
     if (s.next() != '#')
         panic("expected '#'");
 
@@ -47,13 +50,15 @@ Res<Gfx::Color> _parseHexColor(Io::SScan &s) {
 
 Res<Color> parseColor(Cursor<Sst> &c) {
     if (c.peek() == Token::HASH) {
-        Io::SScan data = c->token.data;
-        return Ok(try$(_parseHexColor(data)));
+        Io::SScan scan = c->token.data;
+        return Ok(try$(_parseHexColor(scan)));
     } else if (c.peek() == Token::IDENT) {
         Str data = c->token.data;
+
         auto maybeColor = parseNamedColor(data);
         if (maybeColor)
             return Ok(maybeColor.unwrap());
+
         auto maybeSystemColor = parseSystemColor(data);
         if (maybeSystemColor)
             return Ok(maybeSystemColor.unwrap());
@@ -70,7 +75,90 @@ Res<Color> parseColor(Cursor<Sst> &c) {
     }
 }
 
-// NOTE: Please keep this alphabetically sorted.
+// MARK: Length
+// https://drafts.csswg.org/css-values/#lengths
+
+static Res<Length::Unit> _parseLengthUnit(Str unit) {
+#define LENGTH(NAME, ...)      \
+    if (eqCi(unit, #NAME ""s)) \
+        return Ok(Length::Unit::NAME);
+#include <web-base/defs/lengths.inc>
+#undef LENGTH
+
+    return Error::invalidData("unknown length unit");
+}
+
+Res<Length> parseLength(Cursor<Sst> &c) {
+    if (c.peek() == Token::DIMENSION) {
+        Io::SScan scan = c->token.data;
+        auto value = tryOr(Io::atof(scan), 0.0);
+        auto unit = try$(_parseLengthUnit(scan.remStr()));
+        return Ok(Length{value, unit});
+    } else {
+        return Error::invalidData("expected length");
+    }
+}
+
+// MARK: Size
+// https://drafts.csswg.org/css-sizing-4/#sizing-values
+
+Res<Size> parseSize(Cursor<Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("expected size");
+
+    auto sst = c.next();
+
+    if (sst == Token::IDENT) {
+        auto data = sst.token.data;
+        if (data == "auto") {
+            return Ok(Size::AUTO);
+        } else if (data == "none") {
+            return Ok(Size::NONE);
+        } else if (data == "min-content") {
+            return Ok(Size::MIN_CONTENT);
+        } else if (data == "max-content") {
+            return Ok(Size::MAX_CONTENT);
+        }
+    } else if (sst == Token::PERCENTAGE) {
+        return Ok(try$(parsePercentage(c)));
+    } else if (sst == Token::DIMENSION) {
+        return Ok(try$(parseLength(c)));
+    } else if (sst == Sst::FUNC) {
+        auto const &prefix = sst.prefix.unwrap();
+        auto prefixToken = prefix->token;
+        if (prefixToken.data == "fit-content") {
+            Cursor<Sst> content = prefix->content;
+            return Ok(Size{Size::FIT_CONTENT, try$(parseLength(content))});
+        }
+    }
+
+    return Error::invalidData("expected size");
+}
+
+// MARK: Percentage
+// https://drafts.csswg.org/css-values/#percentages
+
+Res<Percent> parsePercentage(Cursor<Sst> &c) {
+    if (c.peek() == Token::PERCENTAGE) {
+        Io::SScan scan = c->token.data;
+        auto value = tryOr(Io::atof(scan), 0.0);
+        if (scan.remStr() != "%")
+            return Error::invalidData("invalid percentage");
+
+        return Ok(Percent{value});
+    } else {
+        return Error::invalidData("expected percentage");
+    }
+}
+
+Res<PercentOr<Length>> parseLengthOrPercentage(Cursor<Sst> &c) {
+    if (c.peek() == Token::DIMENSION)
+        return Ok(try$(parseLength(c)));
+    else if (c.peek() == Token::PERCENTAGE)
+        return Ok(try$(parsePercentage(c)));
+    else
+        return Error::invalidData("expected length or percentage");
+}
 
 // MARK: Media Queries ---------------------------------------------------------
 
@@ -84,12 +172,14 @@ Style::Selector parseSelector(Cursor<Sst> &) {
     return {};
 }
 
-// MARK: Properties ------------------------------------------------------------TNNKBHHP
-
-void _parseProp(Cursor<Sst> &, Style::ColorProp &) {
-}
+// MARK: Properties ------------------------------------------------------------
 
 // NOTE: Please keep this alphabetically sorted.
+
+Res<> _parseProp(Cursor<Sst> &c, Style::ColorProp &p) {
+    p.value = try$(parseColor(c));
+    return Ok();
+}
 
 Res<Style::Prop> parseProperty(Sst const &sst) {
     if (sst != Sst::DECL)
@@ -100,9 +190,10 @@ Res<Style::Prop> parseProperty(Sst const &sst) {
 
     return Style::Prop::foreach([&]<typename T>(Meta::Type<T>) -> Res<Style::Prop> {
         if (sst.token.data == T::name()) {
-            if constexpr (requires(T &t) { _parseProp(sst.content, t); }) {
+            if constexpr (requires(Cursor<Sst> &c, T &t) { _parseProp(c, t); }) {
                 T prop;
-                _parseProp(sst.content, prop);
+                Cursor<Sst> c = sst.content;
+                try$(_parseProp(c, prop));
                 return Ok(prop);
             } else {
                 panic("missing parser for property");
@@ -120,6 +211,8 @@ Vec<Style::Prop> parseProperties(Sst const &sst) {
             auto prop = parseProperty(item);
             if (prop)
                 res.pushBack(prop.take());
+            else
+                logWarn("failed to parse property: {}", prop.none());
         } else {
             logWarn("unexpected item in properties: {}", item.type);
         }
@@ -150,6 +243,8 @@ Style::StyleRule parseStyleRule(Sst const &sst) {
             auto prop = parseProperty(item);
             if (prop)
                 res.props.pushBack(prop.take());
+            else
+                logWarn("failed to parse property: {}", prop.none());
         } else {
             logWarn("unexpected item in style rule: {}", item.type);
         }

@@ -1,16 +1,34 @@
 #pragma once
 
 #include <karm-gfx/colors.h>
+#include <karm-io/emit.h>
 
 // https://www.w3.org/TR/css-color-4
 
 namespace Web {
 
-enum struct SystemColor {
+enum struct SystemColor : u8 {
 #define COLOR(NAME, ...) NAME,
 #include "defs/system-colors.inc"
 #undef COLOR
+
+    _LEN
 };
+
+static inline Str toStr(SystemColor c) {
+    switch (c) {
+#define COLOR(NAME, STR, ...) \
+    case SystemColor::NAME:   \
+        return #STR;
+#include "defs/system-colors.inc"
+#undef COLOR
+
+    case SystemColor::_LEN:
+        break;
+    }
+
+    panic("invalid SystemColor");
+}
 
 struct Color {
     enum struct Type {
@@ -38,6 +56,44 @@ struct Color {
 
     Color(SystemColor system)
         : type(Type::SYSTEM), system(system) {}
+
+    void repr(Io::Emit &e) const {
+        switch (type) {
+        case Type::SRGB:
+            e("#{02x}{02x}{02x}{02x}", srgb.red, srgb.green, srgb.blue, srgb.alpha);
+            break;
+
+        case Type::SYSTEM:
+            e("{}", toStr(system));
+            break;
+
+        case Type::CURRENT:
+            e("currentColor");
+            break;
+        }
+    }
+};
+
+struct ColorContext {
+    Gfx::Color currentColor = Gfx::BLACK;
+    Array<Gfx::Color, static_cast<usize>(SystemColor::_LEN)> systemColors = {
+#define COLOR(NAME, _, VALUE) Gfx::Color::fromHex(VALUE),
+#include "defs/system-colors.inc"
+#undef COLOR
+    };
+
+    Gfx::Color resolve(Color const &c) const {
+        switch (c.type) {
+        case Color::Type::SRGB:
+            return c.srgb;
+
+        case Color::Type::SYSTEM:
+            return systemColors[static_cast<usize>(c.system)];
+
+        case Color::Type::CURRENT:
+            return currentColor;
+        }
+    }
 };
 
 inline constexpr Gfx::Color TRANSPARENT = Gfx::Color::fromRgba(0, 0, 0, 0);

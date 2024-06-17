@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-io/emit.h>
 #include <karm-math/const.h>
 
 namespace Web {
@@ -82,6 +83,23 @@ struct Angle {
 
     Angle operator-(Angle other) const {
         return fromRadian(toRadian() - other.toRadian());
+    }
+
+    void repr(Io::Emit &e) const {
+        switch (_unit) {
+        case Unit::DEGREE:
+            e("{}deg", _val);
+            break;
+        case Unit::RADIAN:
+            e("{}rad", _val);
+            break;
+        case Unit::GRAD:
+            e("{}grad", _val);
+            break;
+        case Unit::TURN:
+            e("{}turn", _val);
+            break;
+        }
     }
 };
 

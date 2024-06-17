@@ -24,77 +24,17 @@ using SpacingPx = Math::Spacing<Px>;
 
 struct Length {
     enum struct Unit : u16 {
-        VIEWPORT_NONE = 0b00 << 8,
-        VIEWPORT_SMALL = 0b01 << 8,
-        VIEWPORT_LARGE = 0b10 << 8,
-        VIEWPORT_DYNAMIC = 0b11 << 8,
-
-        AXIS_NONE = 0b000 << 10,
-        AXIS_INLINE = 0b001 << 10,
-        AXIS_BLOCK = 0b010 << 10,
-        AXIS_WIDTH = 0b011 << 10,
-        AXIS_HEIGHT = 0b100 << 10,
-
-        // Font-relative
-        EM = 0,
-        REM,
-        EX,
-        REX,
-        CAP,
-        RCAP,
-        CH,
-        RCH,
-        IC,
-        RIC,
-        LH,
-        RLH,
-
-        // Viewport-relative
-        VW,
-        SVW,
-        LVW,
-        DVW,
-
-        VH,
-        SVH,
-        LVH,
-        DVH,
-
-        VI,
-        SVI,
-        LVI,
-        DVI,
-
-        VB,
-        SVB,
-        LVB,
-        DVB,
-
-        VMIN,
-        SVMIN,
-        LVMIN,
-        DVMIN,
-
-        VMAX,
-        SVMAX,
-        LVMAX,
-        DVMAX,
-
-        // Absolute
-
-        CM, // centimeters
-        MM, // millimeters
-        Q,  // quarter-millimeters
-        IN, // inches
-        PT, // points
-        PC, // picas
-        PX, // pixels
+#define LENGTH(NAME, ...) NAME,
+#include "defs/lengths.inc"
+#undef LENGTH
     };
 
     using enum Unit;
 
     f64 _val;
     Unit _unit;
+
+    static Length const ZERO;
 
     f64 val() const {
         return _val;
@@ -104,12 +44,12 @@ struct Length {
         return _unit;
     }
 
-    Length() = default;
+    constexpr Length() = default;
 
-    Length(f64 val, Unit unit)
+    constexpr Length(f64 val, Unit unit)
         : _val(val), _unit(unit) {}
 
-    Length(Px val)
+    constexpr Length(Px val)
         : _val(val), _unit(Unit::PX) {}
 
     bool isAbsolute() const {
@@ -195,6 +135,8 @@ struct Length {
     }
 };
 
+constexpr Length Length::ZERO = Length(0, Length::Unit::PX);
+
 struct FontMetrics {
     Px fontSize;
     Px xHeight; //< height of the lowercase 'x'.
@@ -233,7 +175,7 @@ struct LengthContext {
     FontMetrics fontMetrics;
     FontMetrics rootFontMetrics;
 
-    Px toPx(Length const &l) const {
+    Px resolve(Length const &l) const {
         switch (l.unit()) {
             // Font-relative
 
@@ -353,20 +295,20 @@ struct LengthContext {
         case Length::Unit::VMIN:
         case Length::Unit::LVMIN:
             return min(
-                toPx(Length(l.val(), Length::Unit::VW)),
-                toPx(Length(l.val(), Length::Unit::VH))
+                resolve(Length(l.val(), Length::Unit::VW)),
+                resolve(Length(l.val(), Length::Unit::VH))
             );
 
         case Length::Unit::SVMIN:
             return min(
-                toPx(Length(l.val(), Length::Unit::SVW)),
-                toPx(Length(l.val(), Length::Unit::SVH))
+                resolve(Length(l.val(), Length::Unit::SVW)),
+                resolve(Length(l.val(), Length::Unit::SVH))
             );
 
         case Length::Unit::DVMIN:
             return min(
-                toPx(Length(l.val(), Length::Unit::DVW)),
-                toPx(Length(l.val(), Length::Unit::DVH))
+                resolve(Length(l.val(), Length::Unit::DVW)),
+                resolve(Length(l.val(), Length::Unit::DVH))
             );
 
         // https://drafts.csswg.org/css-values/#vmax
@@ -374,20 +316,20 @@ struct LengthContext {
         case Length::Unit::VMAX:
         case Length::Unit::LVMAX:
             return max(
-                toPx(Length(l.val(), Length::Unit::VW)),
-                toPx(Length(l.val(), Length::Unit::VH))
+                resolve(Length(l.val(), Length::Unit::VW)),
+                resolve(Length(l.val(), Length::Unit::VH))
             );
 
         case Length::Unit::DVMAX:
             return max(
-                toPx(Length(l.val(), Length::Unit::DVW)),
-                toPx(Length(l.val(), Length::Unit::DVH))
+                resolve(Length(l.val(), Length::Unit::DVW)),
+                resolve(Length(l.val(), Length::Unit::DVH))
             );
 
         case Length::Unit::SVMAX:
             return max(
-                toPx(Length(l.val(), Length::Unit::SVW)),
-                toPx(Length(l.val(), Length::Unit::SVH))
+                resolve(Length(l.val(), Length::Unit::SVW)),
+                resolve(Length(l.val(), Length::Unit::SVH))
             );
 
         // Absolute

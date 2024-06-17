@@ -13,14 +13,15 @@ static inline Page PAGE_BADGE{
     "Displays a badge or a component that looks like a badge.",
     [] {
         return Ui::vflow(
-            16,
-            Math::Align::CENTER,
-            Kr::badge(Kr::BadgeStyle::INFO, "Info"s),
-            Kr::badge(Kr::BadgeStyle::SUCCESS, "Success"s),
-            Kr::badge(Kr::BadgeStyle::WARNING, "Warning"s),
-            Kr::badge(Kr::BadgeStyle::ERROR, "Error"s),
-            Kr::badge(Gfx::GREEN, "New"s)
-        );
+                   16,
+                   Math::Align::CENTER,
+                   Kr::badge(Kr::BadgeStyle::INFO, "Info"s),
+                   Kr::badge(Kr::BadgeStyle::SUCCESS, "Success"s),
+                   Kr::badge(Kr::BadgeStyle::WARNING, "Warning"s),
+                   Kr::badge(Kr::BadgeStyle::ERROR, "Error"s),
+                   Kr::badge(Gfx::GREEN, "New"s)
+               ) |
+               Ui::center();
     },
 };
 

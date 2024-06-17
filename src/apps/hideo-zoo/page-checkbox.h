@@ -12,14 +12,11 @@ static inline Page PAGE_CHECKBOX{
     "Checkbox",
     "A control that allows the user to toggle between checked and not checked.",
     [] {
-        return Ui::vflow(
-            16,
-            Math::Align::CENTER,
-            Kr::checkbox(
-                true,
-                NONE
-            )
-        );
+        return Kr::checkbox(
+                   true,
+                   NONE
+               ) |
+               Ui::center();
     },
 };
 

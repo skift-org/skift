@@ -12,14 +12,11 @@ static inline Page PAGE_RADIO{
     "Radio",
     "A set of checkable buttons—known as radio buttons—where no more than one of the buttons can be checked at a time.",
     [] {
-        return Ui::vflow(
-            16,
-            Math::Align::CENTER,
-            Kr::radio(
-                true,
-                NONE
-            )
-        );
+        return Kr::radio(
+                   true,
+                   NONE
+               ) |
+               Ui::center();
     },
 };
 

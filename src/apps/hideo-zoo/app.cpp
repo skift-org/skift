@@ -48,20 +48,14 @@ Ui::Child app() {
             .body = [&] {
                 auto &page = PAGES[s.page];
                 return Ui::vflow(
-                           Ui::titleLarge(page->name),
-                           Ui::empty(4),
-                           Ui::bodyMedium(page->description),
-                           Ui::empty(16),
-                           page->build() |
-                               Ui::center() |
-                               Ui::minSize({Ui::UNCONSTRAINED, 320}) |
-                               Ui::box({
-                                   .borderRadius = 8,
-                                   .borderWidth = 1,
-                                   .borderPaint = Ui::GRAY800,
-                               })
-                       ) |
-                       Ui::spacing({16, 24});
+                    Ui::vflow(
+                        Ui::titleLarge(page->name),
+                        Ui::empty(4),
+                        Ui::bodyMedium(page->description)
+                    ) | Ui::spacing(16),
+                    Ui::separator(),
+                    page->build() | Ui::grow()
+                );
             },
         });
     });

@@ -12,14 +12,11 @@ static inline Page PAGE_TOGGLE{
     "Toggle",
     "A control that allows the user to toggle between checked and not checked.",
     [] {
-        return Ui::vflow(
-            16,
-            Math::Align::CENTER,
-            Kr::toggle(
-                true,
-                NONE
-            )
-        );
+        return Kr::toggle(
+                   true,
+                   NONE
+               ) |
+               Ui::center();
     },
 };
 

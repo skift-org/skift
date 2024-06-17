@@ -41,7 +41,7 @@ Ui::Child contextMenuList(Ui::Children children) {
            ) |
            Ui::minSize({200, Ui::UNCONSTRAINED}) |
            Ui::box({
-               .borderRadius = 4,
+               .borderRadius = 6,
                .borderWidth = 1,
                .borderPaint = Ui::GRAY800,
                .backgroundPaint = Ui::GRAY900,

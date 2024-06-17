@@ -2,8 +2,8 @@
 
 namespace Karm::Sys {
 
-Ctx &globalCtx() {
-    static Ctx ctx;
+Context &globalContext() {
+    static Context ctx;
     return ctx;
 }
 

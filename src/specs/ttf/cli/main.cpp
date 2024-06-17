@@ -36,7 +36,7 @@ void dumpGpos(Ttf::Gpos const &gpos) {
     Sys::println("  LookupList (len:{})", gpos.lookupList().len());
 }
 
-Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto &args = useArgs(ctx);
 
     if (args.len() == 0) {

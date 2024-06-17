@@ -14,7 +14,7 @@ struct Service : public Ipc::Object<Grund::IEcho> {
 
 } // namespace Grund::Echo
 
-Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto server = co_try$(Ipc::Server::create(ctx));
     Grund::Echo::Service service{server};
     co_return co_trya$(server.runAsync());

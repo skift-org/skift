@@ -289,31 +289,31 @@ Res<Strong<Hal::Vmm>> createVmm() {
 
 // MARK: Tasking ---------------------------------------------------------------
 
-struct Ctx : public Core::Ctx {
+struct Context : public Core::Context {
     usize _ksp;
     usize _usp;
 
     Frame _frame;
     Array<Byte, 1024> _simd __attribute__((aligned(16)));
 
-    Ctx(usize ksp)
+    Context(usize ksp)
         : _ksp(ksp), _usp(0) {
-        x86_64::simdInitCtx(_simd.buf());
+        x86_64::simdInitContext(_simd.buf());
     }
 
     virtual void save(Arch::Frame const &frame) {
-        x86_64::simdSaveCtx(_simd.buf());
+        x86_64::simdSaveContext(_simd.buf());
         _frame = frame;
     }
 
     virtual void load(Arch::Frame &frame) {
         frame = _frame;
-        x86_64::simdLoadCtx(_simd.buf());
+        x86_64::simdLoadContext(_simd.buf());
         x86_64::sysSetGs((usize)&_ksp);
     }
 };
 
-Res<Box<Core::Ctx>> createCtx(Core::Mode mode, usize ip, usize sp, usize ksp, Hj::Args args) {
+Res<Box<Core::Context>> createContext(Core::Mode mode, usize ip, usize sp, usize ksp, Hj::Args args) {
     Frame frame{
         .r15 = 0,
         .r14 = 0,
@@ -348,9 +348,9 @@ Res<Box<Core::Ctx>> createCtx(Core::Mode mode, usize ip, usize sp, usize ksp, Hj
         frame.ss = x86_64::Gdt::KDATA * 8;
     }
 
-    auto ctx = makeBox<Ctx>(ksp);
+    auto ctx = makeBox<Context>(ksp);
     ctx->_frame = frame;
-    return Ok<Box<Core::Ctx>>(std::move(ctx));
+    return Ok<Box<Core::Context>>(std::move(ctx));
 }
 
 } // namespace Hjert::Arch

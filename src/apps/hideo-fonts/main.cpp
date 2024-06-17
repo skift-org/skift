@@ -43,7 +43,7 @@ Ui::Child app(Res<Strong<Media::Fontface>> fontface) {
 
 } // namespace Hideo::Fonts
 
-Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto &args = useArgs(ctx);
     Res<Strong<Media::Fontface>> fontface = Error::invalidInput("No font provided");
 

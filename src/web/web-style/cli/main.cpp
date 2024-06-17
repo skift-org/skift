@@ -4,7 +4,7 @@
 #include <karm-sys/file.h>
 #include <web-style/props.h>
 
-Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto args = Sys::useArgs(ctx);
 
     if (args.len() != 1) {

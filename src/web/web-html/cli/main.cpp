@@ -4,7 +4,7 @@
 #include <web-html/lexer.h>
 #include <web-html/parser.h>
 
-Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto args = Sys::useArgs(ctx);
 
     if (args.len() != 2) {

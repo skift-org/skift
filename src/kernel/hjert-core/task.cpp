@@ -55,7 +55,7 @@ Res<> Task::pledge(Hj::Pledge pledge) {
 Res<> Task::ready(usize ip, usize sp, Hj::Args args) {
     logInfo("{} readying for execution (ip: {x}, sp: {x}) starting...", *this, ip, sp);
     ObjectLockScope scope(*this);
-    _ctx = try$(Arch::createCtx(_mode, ip, sp, stack().loadSp(), args));
+    _ctx = try$(Arch::createContext(_mode, ip, sp, stack().loadSp(), args));
     return Ok();
 }
 

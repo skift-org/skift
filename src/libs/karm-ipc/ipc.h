@@ -42,7 +42,7 @@ struct Server {
     Server(Sys::IpcConnection con)
         : _con(std::move(con)) {}
 
-    static Res<Server> create(Sys::Ctx &ctx);
+    static Res<Server> create(Sys::Context &ctx);
 
     void attach(_Object &obj);
 

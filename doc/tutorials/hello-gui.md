@@ -38,7 +38,7 @@ Update the `main.cpp` file in the project directory to create a text view with t
 #include <karm-ui/input.h>
 #include <karm-ui/view.h>
 
-Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
     // Create a text view with the message "Hello, GUI!"
     auto app = Ui::text("Hello, GUI!");
 
@@ -67,7 +67,7 @@ You might have noticed that the text is not centered in the window. To center th
 #include <karm-ui/input.h>
 #include <karm-ui/view.h>
 
-Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
     // Create a text view with the message "Hello, GUI!" and center it
     auto app = Ui::text("Hello, GUI!") | Ui::center();
 

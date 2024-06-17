@@ -6,7 +6,7 @@
 #include <karm-base/rc.h>
 #include <karm-io/traits.h>
 
-#include "ctx.h"
+#include "context.h"
 
 namespace Hjert::Core {
 
@@ -28,7 +28,7 @@ Hal::Vmm &globalVmm();
 
 Io::TextWriter &globalOut();
 
-Res<Box<Core::Ctx>> createCtx(Core::Mode mode, usize ip, usize sp, usize ksp, Hj::Args args);
+Res<Box<Core::Context>> createContext(Core::Mode mode, usize ip, usize sp, usize ksp, Hj::Args args);
 
 Res<Strong<Hal::Vmm>> createVmm();
 

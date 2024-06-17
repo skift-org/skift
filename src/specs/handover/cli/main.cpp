@@ -4,7 +4,7 @@
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
 
-Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto &args = useArgs(ctx);
 
     if (args.len() == 0) {

@@ -131,7 +131,7 @@ Res<String> readAllUtf8(Mime::Url const &url) {
 
 } // namespace Hideo::Text
 
-Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto &args = useArgs(ctx);
     Opt<Mime::Url> url;
     Res<String> text = Ok<String>();

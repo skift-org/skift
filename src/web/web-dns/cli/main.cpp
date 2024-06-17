@@ -1,7 +1,7 @@
 #include <karm-sys/entry.h>
 #include <web-dns/dns.h>
 
-Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto &args = Sys::useArgs(ctx);
     if (args.len() != 1) {
         Sys::println("usage: {} <domain>", args.self());

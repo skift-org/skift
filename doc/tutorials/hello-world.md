@@ -53,7 +53,7 @@ Create a `main.cpp` file in the project directory:
 #include <karm-sys/entry.h>
 
 // The entry point of the program, skiftOS doesn't use `main` function
-Async::Res<> entryPointAsync(Sys::Ctx &) {
+Async::Res<> entryPointAsync(Sys::Context &) {
     // Print "Hello, world!" to the console
     Sys::println("Hello, world!");
 

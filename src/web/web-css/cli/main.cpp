@@ -5,7 +5,7 @@
 #include <web-css/mod.h>
 #include <web-css/parser.h>
 
-Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto args = Sys::useArgs(ctx);
 
     if (args.len() != 2) {

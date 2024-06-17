@@ -8,7 +8,7 @@
 
 using namespace Grund::System;
 
-Res<> entryPoint(Sys::Ctx &ctx) {
+Res<> entryPoint(Sys::Context &ctx) {
     try$(Hj::Task::self().label("grund-system"));
 
     auto bus = try$(Bus::create(ctx));
@@ -20,7 +20,7 @@ Res<> entryPoint(Sys::Ctx &ctx) {
 
 // NOTE: We can't use the normal entryPointAsync because
 //       the kernel invoke us with a different signature.
-Async::Task<> entryPointAsync(Sys::Ctx &) {
+Async::Task<> entryPointAsync(Sys::Context &) {
     unreachable();
 }
 
@@ -30,7 +30,7 @@ extern "C" void __entryPoint(usize rawHandover) {
     Abi::SysV::init();
     Karm::registerPanicHandler(__panicHandler);
 
-    auto &ctx = Sys::globalCtx();
+    auto &ctx = Sys::globalContext();
     char const *argv[] = {"grund-system", nullptr};
     ctx.add<Sys::ArgsHook>(1, argv);
     ctx.add<HandoverHook>((Handover::Payload *)rawHandover);

@@ -37,7 +37,7 @@ inline void simdInit() {
     fninit();
 }
 
-inline usize simdCtxSize() {
+inline usize simdContextSize() {
     if (Cpuid::hasXsave()) {
         return Cpuid::xsaveSize();
     }
@@ -45,7 +45,7 @@ inline usize simdCtxSize() {
     return 512;
 }
 
-inline void simdSaveCtx(void *ptr) {
+inline void simdSaveContext(void *ptr) {
     if (Cpuid::hasXsave()) {
         xsave(ptr);
     } else {
@@ -53,7 +53,7 @@ inline void simdSaveCtx(void *ptr) {
     }
 }
 
-inline void simdLoadCtx(void *ptr) {
+inline void simdLoadContext(void *ptr) {
     if (Cpuid::hasXsave()) {
         xrstor(ptr);
     } else {
@@ -61,9 +61,9 @@ inline void simdLoadCtx(void *ptr) {
     }
 }
 
-inline void simdInitCtx(void *ptr) {
+inline void simdInitContext(void *ptr) {
     fninit();
-    simdSaveCtx(ptr);
+    simdSaveContext(ptr);
 }
 
 } // namespace x86_64

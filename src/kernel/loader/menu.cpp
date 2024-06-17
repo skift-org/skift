@@ -159,7 +159,7 @@ Ui::Child menu(Configs const &c) {
     );
 }
 
-Res<> showMenu(Sys::Ctx &ctx, Configs const &c) {
+Res<> showMenu(Sys::Context &ctx, Configs const &c) {
     return Ui::runApp(ctx, Loader::menu(c));
 }
 

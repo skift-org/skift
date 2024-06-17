@@ -13,7 +13,7 @@ struct Unit {
     Hj::Channel _in;
     Hj::Channel _out;
 
-    static Res<Strong<Unit>> load(Sys::Ctx &ctx, Str id);
+    static Res<Strong<Unit>> load(Sys::Context &ctx, Str id);
 };
 
 struct Object {
@@ -28,14 +28,14 @@ struct Object {
 };
 
 struct Bus {
-    Sys::Ctx &context;
+    Sys::Context &context;
     Hj::Listener _listener;
     Hj::Domain _domain;
 
     Vec<Strong<Unit>> _units{};
     Vec<Strong<Object>> _objs{};
 
-    static Res<Bus> create(Sys::Ctx &ctx) {
+    static Res<Bus> create(Sys::Context &ctx) {
         auto domain = try$(Hj::Domain::create(Hj::ROOT));
         auto listener = try$(Hj::Listener::create(Hj::ROOT));
         return Ok(Bus{ctx, std::move(listener), std::move(domain)});

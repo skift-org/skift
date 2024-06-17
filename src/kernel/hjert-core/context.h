@@ -20,8 +20,8 @@ enum struct Mode : u8 {
     SUPER,  // The task is running in supervisor mode propably serving a syscall
 };
 
-struct Ctx {
-    virtual ~Ctx() = default;
+struct Context {
+    virtual ~Context() = default;
     virtual void save(Arch::Frame const &) = 0;
     virtual void load(Arch::Frame &) = 0;
 };

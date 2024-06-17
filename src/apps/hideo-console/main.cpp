@@ -16,6 +16,6 @@ Ui::Child app() {
 
 } // namespace Hideo::Console
 
-Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
     co_return Ui::runApp(ctx, Hideo::Console::app());
 }

@@ -8,7 +8,7 @@ void __panicHandler(Karm::PanicKind kind, char const *msg);
 int main(int argc, char const **argv) {
     Karm::registerPanicHandler(__panicHandler);
 
-    auto &ctx = Sys::globalCtx();
+    auto &ctx = Sys::globalContext();
     ctx.add<Sys::ArgsHook>(argc, argv);
     Res<> code = Sys::run(entryPointAsync(ctx));
     if (not code) {

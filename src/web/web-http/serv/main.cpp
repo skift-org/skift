@@ -90,7 +90,7 @@ Async::Task<> handleConnection(Sys::TcpConnection stream) {
 
 } // namespace Web::Server
 
-Async::Task<> entryPointAsync(Sys::Ctx &) {
+Async::Task<> entryPointAsync(Sys::Context &) {
     auto listener = co_try$(Sys::TcpListener::listen(Sys::Ip4::localhost(8080)));
     logInfo("Serving on http://{}", listener.addr());
     while (true)

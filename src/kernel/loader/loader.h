@@ -93,7 +93,7 @@ struct Configs {
     }
 };
 
-Res<> showMenu(Sys::Ctx &ctx, Configs const &c);
+Res<> showMenu(Sys::Context &ctx, Configs const &c);
 
 Res<> loadEntry(Entry const &);
 

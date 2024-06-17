@@ -3,7 +3,7 @@
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 
-Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto &args = useArgs(ctx);
 
     auto url = co_try$(Mime::parseUrlOrPath(args[0]));

@@ -4,7 +4,7 @@ namespace Karm::Ipc {
 
 // MARK: Server ----------------------------------------------------------------
 
-Res<Server> Server::create(Sys::Ctx &ctx) {
+Res<Server> Server::create(Sys::Context &ctx) {
     auto &channel = useChannel(ctx);
     return Ok(Server{std::move(channel.con)});
 }

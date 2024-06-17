@@ -2,14 +2,14 @@
 
 #include <karm-base/func.h>
 
-#include "ctx.h"
+#include "context.h"
 #include "object.h"
 
 namespace Hjert::Core {
 
 struct Space;
 struct Domain;
-struct Ctx;
+struct Context;
 
 using Blocker = Func<TimeStamp()>;
 
@@ -24,7 +24,7 @@ struct Task :
 
     Mode _mode;
     Stack _stack;
-    Opt<Box<Ctx>> _ctx;
+    Opt<Box<Context>> _ctx;
 
     Opt<Strong<Space>> _space;
     Opt<Strong<Domain>> _domain;

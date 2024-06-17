@@ -12,7 +12,7 @@ struct Service {
     virtual ~Service() = default;
 };
 
-struct Ctx :
+struct Context :
     Meta::Static {
     Vec<Strong<Service>> _srvs;
 
@@ -31,7 +31,7 @@ struct Ctx :
     }
 };
 
-Ctx &globalCtx();
+Context &globalContext();
 
 struct ArgsHook :
     public Service {
@@ -65,7 +65,7 @@ struct ArgsHook :
     }
 };
 
-inline auto &useArgs(Ctx &ctx = globalCtx()) {
+inline auto &useArgs(Context &ctx = globalContext()) {
     return ctx.use<ArgsHook>();
 }
 
@@ -74,7 +74,7 @@ enum struct FormFactor {
     MOBILE,
 };
 
-inline FormFactor useFormFactor(Ctx &ctx = globalCtx()) {
+inline FormFactor useFormFactor(Context &ctx = globalContext()) {
     if (useArgs(ctx).has("--mobile"))
         return FormFactor::MOBILE;
     return FormFactor::DESKTOP;
@@ -82,4 +82,4 @@ inline FormFactor useFormFactor(Ctx &ctx = globalCtx()) {
 
 } // namespace Karm::Sys
 
-Async::Task<> entryPointAsync(Sys::Ctx &);
+Async::Task<> entryPointAsync(Sys::Context &);

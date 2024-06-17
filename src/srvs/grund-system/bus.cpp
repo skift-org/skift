@@ -7,7 +7,7 @@
 
 namespace Grund::System {
 
-Res<Strong<Unit>> Unit::load(Sys::Ctx &ctx, Str id) {
+Res<Strong<Unit>> Unit::load(Sys::Context &ctx, Str id) {
     logInfo("system: loading service '{}'...", id);
 
     auto &handover = useHandover(ctx);

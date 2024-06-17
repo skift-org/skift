@@ -89,7 +89,7 @@ Res<> dumpKindness() {
 
 } // namespace Sysfetch
 
-Async::Task<> entryPointAsync(Sys::Ctx &) {
+Async::Task<> entryPointAsync(Sys::Context &) {
     Res<> res = Ok();
 
     Sys::println("{}", Cli::styled(ART, Cli::BLUE));

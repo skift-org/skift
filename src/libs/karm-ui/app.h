@@ -67,7 +67,7 @@ Child inspector(Child child) {
     );
 }
 
-inline Res<> runApp(Sys::Ctx &ctx, Child root) {
+inline Res<> runApp(Sys::Context &ctx, Child root) {
     auto &args = useArgs(ctx);
     if (args.has("--debug")) {
         root = inspector(root);

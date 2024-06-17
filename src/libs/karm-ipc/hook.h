@@ -10,6 +10,6 @@ struct ChannelHook : public Sys::Service {
         : con(std::move(con)) {}
 };
 
-inline ChannelHook &useChannel(Sys::Ctx &ctx = Sys::globalCtx()) {
+inline ChannelHook &useChannel(Sys::Context &ctx = Sys::globalContext()) {
     return ctx.use<ChannelHook>();
 }

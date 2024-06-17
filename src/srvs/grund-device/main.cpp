@@ -23,7 +23,7 @@ struct IsaRootBus : public Node {
 
 } // namespace Grund::Device
 
-Async::Task<> entryPointAsync(Sys::Ctx &) {
+Async::Task<> entryPointAsync(Sys::Context &) {
     logInfo("devices: building device tree...");
     auto root = makeStrong<Grund::Device::IsaRootBus>();
     co_try$(root->init());

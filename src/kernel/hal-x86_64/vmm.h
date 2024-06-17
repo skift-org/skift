@@ -114,7 +114,7 @@ struct Vmm : public Hal::Vmm {
         x86_64::wrcr3(root());
     }
 
-    struct Ctx {
+    struct Context {
         usize vstart = -1;
         usize vend = 0;
 
@@ -148,7 +148,7 @@ struct Vmm : public Hal::Vmm {
     };
 
     template <usize L>
-    void _dumpPml(Ctx &ctx, Pml<L> &pml, usize vaddr) {
+    void _dumpPml(Context &ctx, Pml<L> &pml, usize vaddr) {
         for (usize i = 0; i < 512; i++) {
             auto page = pml[i];
             usize curr = pml.index2virt(i) | vaddr;
@@ -166,7 +166,7 @@ struct Vmm : public Hal::Vmm {
 
     void dump() override {
         logInfo("x86_64: vmm: dump pml4 {x}", (usize)_pml4);
-        Ctx ctx{};
+        Context ctx{};
         _dumpPml(ctx, *_pml4, 0);
         ctx.next(0, 0);
     }

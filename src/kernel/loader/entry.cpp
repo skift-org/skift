@@ -4,7 +4,7 @@
 
 #include "loader.h"
 
-Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
     logInfo("loading configs...");
     auto file = co_try$(Sys::File::open("file:/boot/loader.json"_url));
 

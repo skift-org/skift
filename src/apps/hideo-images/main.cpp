@@ -26,7 +26,7 @@ Ui::Child app(State initial) {
 
 } // namespace Hideo::Images
 
-Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto &args = useArgs(ctx);
     Res<Media::Image> image = Error::invalidInput("No image provided");
 

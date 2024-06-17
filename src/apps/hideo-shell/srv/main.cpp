@@ -3,7 +3,7 @@
 
 #include "../app.h"
 
-Async::Task<> entryPointAsync(Sys::Ctx &ctx) {
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto args = useArgs(ctx);
     bool isMobile = Sys::useFormFactor() == Sys::FormFactor::MOBILE;
 

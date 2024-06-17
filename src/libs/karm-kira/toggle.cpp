@@ -29,7 +29,7 @@ struct Toggle : public Ui::View<Toggle> {
             g.fillStyle(_mouseListener.isHover() ? Ui::ACCENT600 : Ui::ACCENT700);
             g.fill(bound(), 999);
 
-            g.fillStyle(Ui::GRAY50);
+            g.fillStyle(Gfx::WHITE);
             g.fill(thumb, 999);
 
             if (_mouseListener.isPress()) {

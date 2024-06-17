@@ -58,17 +58,20 @@ ButtonStyle ButtonStyle::primary() {
         .idleStyle = {
             .borderRadius = RADIUS,
             .backgroundPaint = ACCENT700,
+            .foregroundPaint = Gfx::WHITE,
         },
         .hoverStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
             .backgroundPaint = ACCENT600,
+            .foregroundPaint = Gfx::WHITE,
         },
         .pressStyle = {
             .borderRadius = RADIUS,
             .borderWidth = 1,
             .borderPaint = ACCENT600,
             .backgroundPaint = ACCENT700,
+            .foregroundPaint = Gfx::WHITE,
         },
     };
 }

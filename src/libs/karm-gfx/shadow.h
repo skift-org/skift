@@ -52,7 +52,7 @@ struct BoxShadow {
 
     static BoxShadow elevated(f64 v, Gfx::Color fill = Gfx::BLACK) {
         return {
-            fill.withOpacity(0.5),
+            fill.withOpacity(0.25),
             v * 2,
             -v,
             {0, (int)v},

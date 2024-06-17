@@ -16,10 +16,6 @@ struct View : public LeafNode<Crtp> {
         return _bound;
     }
 
-    Math::Recti overflow() override {
-        return _bound;
-    }
-
     void layout(Math::Recti bound) override {
         _bound = bound;
     }

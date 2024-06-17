@@ -20,15 +20,6 @@ void closeDialog(Node &n) {
     bubble<CloseDialogEvent>(n);
 }
 
-struct ShowPopoverEvent {
-    Math::Vec2i at;
-    Child child;
-};
-
-void showPopover(Node &n, Math::Vec2i at, Child child) {
-    bubble<ShowPopoverEvent>(n, at, child);
-}
-
 void closePopover(Node &n) {
     struct ClosePopoverEvent {};
     bubble<ClosePopoverEvent>(n);
@@ -42,11 +33,6 @@ struct DialogLayer : public LeafNode<DialogLayer> {
     Opt<Child> _shouldShow;
     bool _shouldDialogClose = false;
 
-    Opt<Child> _popover;
-    Opt<Child> _shouldPopover;
-    bool _shouldPopoverClose = false;
-    Math::Vec2i _popoverAt;
-
     DialogLayer(Child child) : _child(child) {
         _child->attach(this);
     }
@@ -54,10 +40,6 @@ struct DialogLayer : public LeafNode<DialogLayer> {
     ~DialogLayer() {
         if (_dialog) {
             (*_dialog)->detach(this);
-        }
-
-        if (_popover) {
-            (*_popover)->detach(this);
         }
 
         _child->detach(this);
@@ -75,16 +57,8 @@ struct DialogLayer : public LeafNode<DialogLayer> {
 
     Node const &dialog() const { return **_dialog; }
 
-    Node &popover() { return **_popover; }
-
-    Node const &popover() const { return **_popover; }
-
     bool dialogVisible() const {
         return (bool)_dialog;
-    }
-
-    bool popoverVisible() const {
-        return (bool)_popover;
     }
 
     void reconcile(DialogLayer &o) override {
@@ -120,9 +94,7 @@ struct DialogLayer : public LeafNode<DialogLayer> {
         if (_visibility.needRepaint(*this, e))
             Ui::shouldRepaint(*this);
 
-        if (popoverVisible()) {
-            popover().event(e);
-        } else if (dialogVisible()) {
+        if (dialogVisible()) {
             dialog().event(e);
         } else {
             child().event(e);
@@ -138,14 +110,6 @@ struct DialogLayer : public LeafNode<DialogLayer> {
             mouseLeave(*_child);
             shouldLayout(*this);
             _visibility.animate(*this, 1, 0.3, Math::Easing::exponentialOut);
-        } else if (e.is<ShowPopoverEvent>()) {
-            // We need to defer showing the popover until the next frame,
-            // otherwise replacing the popover might cause some use after free down the tree
-            auto &s = e.unwrap<ShowPopoverEvent>();
-            _shouldPopover = s.child;
-            _popoverAt = s.at;
-            mouseLeave(*_child);
-            shouldLayout(*this);
         } else if (e.is<CloseDialogEvent>()) {
             // We need to defer closing the dialog until the next frame,
             // otherwise we might cause some use after free down the tree
@@ -166,14 +130,6 @@ struct DialogLayer : public LeafNode<DialogLayer> {
             _shouldDialogClose = false;
         }
 
-        if (_shouldPopoverClose) {
-            if (_popover) {
-                (*_popover)->detach(this);
-                _popover = NONE;
-            }
-            _shouldPopoverClose = false;
-        }
-
         if (_shouldShow) {
             if (_dialog) {
                 (*_dialog)->detach(this);
@@ -183,24 +139,10 @@ struct DialogLayer : public LeafNode<DialogLayer> {
             _shouldShow = NONE;
         }
 
-        if (_shouldPopover) {
-            if (_popover) {
-                (*_popover)->detach(this);
-            }
-            _popover = _shouldPopover;
-            (*_popover)->attach(this);
-            _shouldPopover = NONE;
-        }
-
         child().layout(r);
 
         if (dialogVisible()) {
             (*_dialog)->layout(r);
-        }
-
-        if (popoverVisible()) {
-            auto popoverSize = (*_popover)->size(r.size(), Hint::MIN);
-            (*_popover)->layout({_popoverAt, popoverSize});
         }
     }
 

@@ -3,6 +3,7 @@
 #include <karm-ui/drag.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
+#include <karm-ui/popover.h>
 #include <karm-ui/view.h>
 
 #include "dialogs.h"
@@ -133,7 +134,8 @@ Ui::Child mobileScafold(Scafold::State const &s, Scafold const &scafold) {
 
     return Ui::vflow(body) |
            Ui::pinSize(Math::Vec2i{411, 731}) |
-           Ui::dialogLayer();
+           Ui::dialogLayer() |
+           Ui::popoverLayer();
 }
 
 Ui::Child desktopScafold(Scafold::State const &s, Scafold const &scafold) {
@@ -194,7 +196,8 @@ Ui::Child desktopScafold(Scafold::State const &s, Scafold const &scafold) {
 
     return Ui::vflow(body) |
            Ui::pinSize(scafold.size) |
-           Ui::dialogLayer();
+           Ui::dialogLayer() |
+           Ui::popoverLayer();
 }
 
 Ui::Child scafold(Scafold scafold) {

@@ -20,11 +20,6 @@ void closeDialog(Node &n) {
     bubble<CloseDialogEvent>(n);
 }
 
-void closePopover(Node &n) {
-    struct ClosePopoverEvent {};
-    bubble<ClosePopoverEvent>(n);
-}
-
 struct DialogLayer : public LeafNode<DialogLayer> {
     Easedf _visibility{};
     Child _child;

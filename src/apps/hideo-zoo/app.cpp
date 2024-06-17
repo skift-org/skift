@@ -7,6 +7,7 @@
 #include "page-avatar.h"
 #include "page-badge.h"
 #include "page-checkbox.h"
+#include "page-context-menu.h"
 #include "page-radio.h"
 #include "page-sidenav.h"
 #include "page-slider.h"
@@ -18,9 +19,10 @@ static Array PAGES = {
     &PAGE_AVATAR,
     &PAGE_BADGE,
     &PAGE_CHECKBOX,
+    &PAGE_CONTEXT_MENU,
+    &PAGE_RADIO,
     &PAGE_SIDENAV,
     &PAGE_SLIDER,
-    &PAGE_RADIO,
     &PAGE_TOGGLE,
 };
 

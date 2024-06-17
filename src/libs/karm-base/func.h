@@ -37,8 +37,10 @@ struct Func<Out(In...)> {
     Func(F f) : _wrap(makeBox<Wrap<F>>(std::move(f))) {}
 
     template <typename F>
-    requires (Meta::RvalueRef<F &&> and not (Meta::FuncPtr<F>)) and Meta::Callable<F, In...>
+    requires Meta::RvalueRef<F &&> and (not Meta::FuncPtr<F>) and Meta::Callable<F, In...> and (not Meta::Same<Meta::RemoveConstVolatileRef<F>, Func>)
     Func(F &&f) : _wrap(makeBox<Wrap<F>>(std::move(f))) {}
+
+    Func(Func &&other) : _wrap(std::move(other._wrap)) {}
 
     template <typename F>
     requires Meta::FuncPtr<F> and Meta::Callable<F, In...>
@@ -49,10 +51,15 @@ struct Func<Out(In...)> {
     }
 
     template <typename F>
-    requires (Meta::RvalueRef<F &&> and not (Meta::FuncPtr<F>))
+    requires (Meta::RvalueRef<F &&> and (not Meta::FuncPtr<F>) and (not Meta::Same<Meta::RemoveConstVolatileRef<F>, Func>))
     Func &operator=(F &&f)
     {
         _wrap = makeBox<Wrap<F>>(std::move(f));
+        return *this;
+    }
+
+    Func& operator=(Func &&other) {
+        _wrap = std::move(other._wrap);
         return *this;
     }
 

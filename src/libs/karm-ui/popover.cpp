@@ -71,9 +71,16 @@ struct PopoverLayer : public LeafNode<PopoverLayer> {
     void event(Sys::Event &e) override {
         if (popoverVisible()) {
             popover().event(e);
-        } else {
-            child().event(e);
+            e.handle<Events::MouseEvent>([&](auto &m) {
+                if (m.type == Events::MouseEvent::PRESS) {
+                    _shouldPopoverClose = true;
+                    shouldLayout(*this);
+                    return true;
+                }
+                return false;
+            });
         }
+        child().event(e);
     }
 
     void bubble(Sys::Event &e) override {
@@ -96,7 +103,6 @@ struct PopoverLayer : public LeafNode<PopoverLayer> {
     }
 
     void layout(Math::Recti r) override {
-
         if (_shouldPopoverClose) {
             if (_popover) {
                 (*_popover)->detach(this);
@@ -130,5 +136,9 @@ struct PopoverLayer : public LeafNode<PopoverLayer> {
         return _child->bound();
     }
 };
+
+Child popoverLayer(Child child) {
+    return makeStrong<PopoverLayer>(child);
+}
 
 } // namespace Karm::Ui

@@ -76,7 +76,7 @@ Ui::Child app() {
                 );
             },
             .body = [&] {
-                return DEMOS[s.current]->build();
+                return DEMOS[s.current]->build() | Ui::key(s.current);
             },
         });
     });

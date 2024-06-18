@@ -35,16 +35,6 @@ using Visitor = Func<void(Node &)>;
 
 using Key = Opt<Hash>;
 
-inline bool match(Key lhs, Key rhs) {
-    if (not lhs.has() and not rhs.has())
-        return true;
-
-    if (lhs.has() and rhs.has())
-        return lhs == rhs;
-
-    return false;
-}
-
 struct Node :
     Meta::Static {
 
@@ -139,7 +129,7 @@ struct LeafNode : public Node {
         if (this == &other.unwrap())
             panic("reconcile() called on self, did you forget to wrap the node in a slot?");
 
-        if (not other.is<Crtp>())
+        if (not other.is<Crtp>() or _key != other->key())
             return other;
 
         reconcile(other.unwrap<Crtp>());

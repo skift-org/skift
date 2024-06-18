@@ -8,20 +8,12 @@ namespace Karm::Ui {
 
 struct Scroll : public ProxyNode<Scroll> {
     bool _mouseIn = false;
+    bool _animated = false;
     Math::Orien _orient{};
     Math::Recti _bound{};
     Math::Vec2f _scroll{};
     Math::Vec2f _targetScroll{};
-
-    // For momentum scrolling
     Easedf _scrollOpacity;
-
-    bool _animated = false;
-    Math::Vec2f _acceleration; // Scroll acceleration
-    Math::Vec2f _momentum;     // Scroll velocity
-
-    static constexpr f64 DECELERATION = 0.85; // Factor for deceleration
-    static constexpr f64 RESISTANCE = 0.85;   // Resistance to bring scroll back in bounds
 
     Scroll(Child child, Math::Orien orient)
         : ProxyNode(child), _orient(orient) {}
@@ -30,6 +22,12 @@ struct Scroll : public ProxyNode<Scroll> {
         auto childBound = child().bound();
         _targetScroll.x = clamp(s.x, -(childBound.width - min(childBound.width, bound().width)), 0);
         _targetScroll.y = clamp(s.y, -(childBound.height - min(childBound.height, bound().height)), 0);
+        if (_scroll.dist(_targetScroll) < 0.5) {
+            _scroll = _targetScroll;
+            _animated = false;
+        } else {
+            _animated = true;
+        }
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {
@@ -73,7 +71,9 @@ struct Scroll : public ProxyNode<Scroll> {
     }
 
     void event(Sys::Event &e) override {
-        _scrollOpacity.update(*this, e);
+        if (_scrollOpacity.needRepaint(*this, e)) {
+            shouldRepaint(*parent(), bound());
+        }
 
         if (auto *me = e.is<Events::MouseEvent>()) {
             if (bound().contains(me->pos)) {
@@ -85,9 +85,8 @@ struct Scroll : public ProxyNode<Scroll> {
 
                 if (not e.accepted()) {
                     if (me->type == Events::MouseEvent::SCROLL) {
-                        _acceleration = _acceleration + me->scroll / (1.0 / 200.0);
-                        _animated = true;
-                        shouldAnimate(*this); // Start animation to apply momentum
+                        scroll((_scroll + me->scroll * 128).cast<isize>());
+                        shouldAnimate(*this);
                         _scrollOpacity.animate(*this, 1, 0.3);
                     }
                 }
@@ -95,71 +94,20 @@ struct Scroll : public ProxyNode<Scroll> {
                 _mouseIn = false;
                 mouseLeave(*_child);
             }
-        } else if (e.is<Node::AnimateEvent>()) {
-            // Cancel momentum & acceleration
-            // if we can't scroll in that direction
-            if (_orient == Math::Orien::VERTICAL) {
-                _momentum.x = 0;
-                _acceleration.x = 0;
-            }
+        } else if (e.is<Node::AnimateEvent>() and _animated) {
+            shouldRepaint(*parent(), bound());
 
-            if (_orient == Math::Orien::HORIZONTAL) {
-                _momentum.y = 0;
-                _acceleration.y = 0;
-            }
+            auto delta = _targetScroll - _scroll;
 
-            // Cancel momentum if child is smaller than scroll area
-            auto bound = this->bound();
-            auto childBound = child().bound();
+            _scroll = _scroll + delta * (e.unwrap<Node::AnimateEvent>().dt * 12);
 
-            if (childBound.width <= bound.width) {
-                _momentum.x = 0;
-                _acceleration.x = 0;
-            }
-
-            if (childBound.height <= bound.height) {
-                _momentum.y = 0;
-                _acceleration.y = 0;
-            }
-
-            // Is the scroll position out of bounds?
-            // Apply a force to bring it back in bounds
-            auto overflow = childBound.size() - min(childBound.size(), bound.size());
-
-            if (_scroll.x > 0) {
-                _acceleration.x = _acceleration.x - _scroll.x * RESISTANCE;
-            } else if (_scroll.x < -overflow.x) {
-                _acceleration.x = _acceleration.x - (_scroll.x + overflow.x) * RESISTANCE;
-            }
-
-            if (_scroll.y > 0) {
-                _acceleration.y = _acceleration.y - _scroll.y * RESISTANCE;
-            } else if (_scroll.y < -overflow.y) {
-                _acceleration.y = _acceleration.y - (_scroll.y + overflow.y) * RESISTANCE;
-            }
-
-            // Apply deceleration
-            _momentum = _momentum * DECELERATION;
-
-            // Apply acceleration
-            _momentum = _momentum + _acceleration;
-            _acceleration = 0;
-
-            // Apply momentum to scroll position
-            if (Math::epsilonEq(_momentum.x, 0.0, 1.0) and
-                Math::epsilonEq(_momentum.y, 0.0, 1.0) and _animated) {
-                _momentum = 0;
-                _scrollOpacity.animate(*this, 0, 0.3);
+            if (_scroll.dist(_targetScroll) < 0.5) {
+                _scroll = _targetScroll;
                 _animated = false;
+                _scrollOpacity.animate(*this, 0, 0.3);
             } else {
-                _scroll = _scroll + _momentum * e.unwrap<Node::AnimateEvent>().dt;
-                // NOTE: We have to tell our parent to repaint us instead of
-                //       just calling shouldRepaint() because bubble() will
-                //       offset the paint event by the scroll position
-                shouldRepaint(*parent(), bound);
                 shouldAnimate(*this);
             }
-
             ProxyNode<Scroll>::event(e);
         } else {
             ProxyNode<Scroll>::event(e);

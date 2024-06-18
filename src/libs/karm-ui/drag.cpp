@@ -22,9 +22,6 @@ struct Dismisable :
           _threshold(threshold) {}
 
     void reconcile(Dismisable &o) override {
-        if (not match(key(), o.key()))
-            reset();
-
         _onDismis = std::move(o._onDismis);
         _dir = o._dir;
         _threshold = o._threshold;
@@ -34,12 +31,6 @@ struct Dismisable :
 
     Math::Vec2i drag() const {
         return _drag.value().cast<isize>();
-    }
-
-    void reset() {
-        _drag = {};
-        _last = {};
-        _dismissed = false;
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {

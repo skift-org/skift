@@ -16,6 +16,7 @@ struct Eased {
     Math::Easing _easing{};
     f64 _elapsed{};
     f64 _duration{};
+    f64 _delay{};
     bool _animated{};
 
     Eased() = default;
@@ -44,6 +45,7 @@ struct Eased {
             _target = target;
             _elapsed = 0;
             _duration = 0;
+            _delay = 0;
             return;
         }
 

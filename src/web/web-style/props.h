@@ -319,6 +319,110 @@ struct UnicodeRangeProp {
     }
 };
 
+// MARK: Margin ----------------------------------------------------------------
+
+// https://www.w3.org/TR/css-box-3/#propdef-margin
+
+struct MarginTopProp {
+    MarginWidth value;
+
+    static Str name() { return "margin-top"; }
+
+    static auto initial() { return Length::ZERO; }
+
+    void apply(Computed &c) const {
+        c.margin.top = value;
+    }
+};
+
+struct MarginRightProp {
+    MarginWidth value;
+
+    static Str name() { return "margin-right"; }
+
+    static auto initial() { return Length::ZERO; }
+
+    void apply(Computed &c) const {
+        c.margin.right = value;
+    }
+};
+
+struct MarginBottomProp {
+    MarginWidth value;
+
+    static Str name() { return "margin-bottom"; }
+
+    static auto initial() { return Length::ZERO; }
+
+    void apply(Computed &c) const {
+        c.margin.bottom = value;
+    }
+};
+
+struct MarginLeftProp {
+    MarginWidth value;
+
+    static Str name() { return "margin-left"; }
+
+    static auto initial() { return Length::ZERO; }
+
+    void apply(Computed &c) const {
+        c.margin.left = value;
+    }
+};
+
+// MARK: Padding ---------------------------------------------------------------
+
+// https://www.w3.org/TR/css-box-3/#propdef-padding
+
+struct PaddingTopProp {
+    PercentOr<Length> value;
+
+    static Str name() { return "padding-top"; }
+
+    static Length initial() { return Length::ZERO; }
+
+    void apply(Computed &c) const {
+        c.padding.top = value;
+    }
+};
+
+struct PaddingRightProp {
+    PercentOr<Length> value;
+
+    static Str name() { return "padding-right"; }
+
+    static auto initial() { return Length::ZERO; }
+
+    void apply(Computed &c) const {
+        c.padding.right = value;
+    }
+};
+
+struct PaddingBottomProp {
+    PercentOr<Length> value;
+
+    static Str name() { return "padding-bottom"; }
+
+    static auto initial() { return Length::ZERO; }
+
+    void apply(Computed &c) const {
+        c.padding.bottom = value;
+    }
+};
+
+struct PaddingLeftProp {
+    PercentOr<Length> value;
+
+    static Str name() { return "padding-left"; }
+
+    static auto initial() { return Length::ZERO; }
+
+    void apply(Computed &c) const {
+        c.padding.left = value;
+    }
+};
+
 // MARK: Sizing ----------------------------------------------------------------
 // https://www.w3.org/TR/css-sizing-3
 
@@ -442,6 +546,18 @@ using _Prop = Union<
     SizeAdjustProp,
     SrcProp,
     UnicodeRangeProp,
+
+    // Margin
+    MarginTopProp,
+    MarginRightProp,
+    MarginBottomProp,
+    MarginLeftProp,
+
+    // Padding
+    PaddingTopProp,
+    PaddingRightProp,
+    PaddingBottomProp,
+    PaddingLeftProp,
 
     // Sizing
     BoxSizingProp,

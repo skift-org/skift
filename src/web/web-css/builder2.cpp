@@ -49,6 +49,9 @@ static Res<Gfx::Color> _parseHexColor(Io::SScan &s) {
 }
 
 Res<Color> parseColor(Cursor<Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
     if (c.peek() == Token::HASH) {
         Io::SScan scan = c->token.data;
         return Ok(try$(_parseHexColor(scan)));
@@ -69,11 +72,9 @@ Res<Color> parseColor(Cursor<Sst> &c) {
 
         if (data == "transparent")
             return Ok(TRANSPARENT);
-
-        return Error::invalidData("unknown color");
-    } else {
-        return Error::invalidData("expected color");
     }
+
+    return Error::invalidData("expected color");
 }
 
 // MARK: Length
@@ -90,14 +91,63 @@ static Res<Length::Unit> _parseLengthUnit(Str unit) {
 }
 
 Res<Length> parseLength(Cursor<Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
     if (c.peek() == Token::DIMENSION) {
         Io::SScan scan = c->token.data;
         auto value = tryOr(Io::atof(scan), 0.0);
         auto unit = try$(_parseLengthUnit(scan.remStr()));
         return Ok(Length{value, unit});
-    } else {
-        return Error::invalidData("expected length");
     }
+
+    return Error::invalidData("expected length");
+}
+
+// MARL: MarginWidth
+// https://drafts.csswg.org/css-values/#margin-width
+
+Res<MarginWidth> parseMarginWidth(Cursor<Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c->token == Token{Token::IDENT, "auto"}) {
+        c.next();
+        return Ok(MarginWidth::AUTO);
+    }
+
+    return Ok(try$(parseLengthOrPercentage(c)));
+}
+
+// MARK: Percentage
+// https://drafts.csswg.org/css-values/#percentages
+
+Res<Percent> parsePercentage(Cursor<Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.peek() == Token::PERCENTAGE) {
+        Io::SScan scan = c->token.data;
+        auto value = tryOr(Io::atof(scan), 0.0);
+        if (scan.remStr() != "%")
+            return Error::invalidData("invalid percentage");
+
+        return Ok(Percent{value});
+    }
+
+    return Error::invalidData("expected percentage");
+}
+
+Res<PercentOr<Length>> parseLengthOrPercentage(Cursor<Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.peek() == Token::DIMENSION)
+        return Ok(try$(parseLength(c)));
+    else if (c.peek() == Token::PERCENTAGE)
+        return Ok(try$(parsePercentage(c)));
+    else
+        return Error::invalidData("expected length or percentage");
 }
 
 // MARK: Size
@@ -105,12 +155,10 @@ Res<Length> parseLength(Cursor<Sst> &c) {
 
 Res<Size> parseSize(Cursor<Sst> &c) {
     if (c.ended())
-        return Error::invalidData("expected size");
+        return Error::invalidData("unexpected end of input");
 
-    auto sst = c.next();
-
-    if (sst == Token::IDENT) {
-        auto data = sst.token.data;
+    if (c.peek() == Token::IDENT) {
+        auto data = c.next().token.data;
         if (data == "auto") {
             return Ok(Size::AUTO);
         } else if (data == "none") {
@@ -120,12 +168,12 @@ Res<Size> parseSize(Cursor<Sst> &c) {
         } else if (data == "max-content") {
             return Ok(Size::MAX_CONTENT);
         }
-    } else if (sst == Token::PERCENTAGE) {
+    } else if (c.peek() == Token::PERCENTAGE) {
         return Ok(try$(parsePercentage(c)));
-    } else if (sst == Token::DIMENSION) {
+    } else if (c.peek() == Token::DIMENSION) {
         return Ok(try$(parseLength(c)));
-    } else if (sst == Sst::FUNC) {
-        auto const &prefix = sst.prefix.unwrap();
+    } else if (c.peek() == Sst::FUNC) {
+        auto const &prefix = c.next().prefix.unwrap();
         auto prefixToken = prefix->token;
         if (prefixToken.data == "fit-content") {
             Cursor<Sst> content = prefix->content;
@@ -134,31 +182,6 @@ Res<Size> parseSize(Cursor<Sst> &c) {
     }
 
     return Error::invalidData("expected size");
-}
-
-// MARK: Percentage
-// https://drafts.csswg.org/css-values/#percentages
-
-Res<Percent> parsePercentage(Cursor<Sst> &c) {
-    if (c.peek() == Token::PERCENTAGE) {
-        Io::SScan scan = c->token.data;
-        auto value = tryOr(Io::atof(scan), 0.0);
-        if (scan.remStr() != "%")
-            return Error::invalidData("invalid percentage");
-
-        return Ok(Percent{value});
-    } else {
-        return Error::invalidData("expected percentage");
-    }
-}
-
-Res<PercentOr<Length>> parseLengthOrPercentage(Cursor<Sst> &c) {
-    if (c.peek() == Token::DIMENSION)
-        return Ok(try$(parseLength(c)));
-    else if (c.peek() == Token::PERCENTAGE)
-        return Ok(try$(parsePercentage(c)));
-    else
-        return Error::invalidData("expected length or percentage");
 }
 
 // MARK: Media Queries ---------------------------------------------------------
@@ -188,35 +211,79 @@ Res<> _parseProp(Cursor<Sst> &c, Style::ColorProp &p) {
     return Ok();
 }
 
+// MARK: Margin
+
+Res<> _parseProp(Cursor<Sst> &c, Style::MarginTopProp &p) {
+    p.value = try$(parseMarginWidth(c));
+    return Ok();
+}
+
+Res<> _parseProp(Cursor<Sst> &c, Style::MarginRightProp &p) {
+    p.value = try$(parseMarginWidth(c));
+    return Ok();
+}
+
+Res<> _parseProp(Cursor<Sst> &c, Style::MarginBottomProp &p) {
+    p.value = try$(parseMarginWidth(c));
+    return Ok();
+}
+
+Res<> _parseProp(Cursor<Sst> &c, Style::MarginLeftProp &p) {
+    p.value = try$(parseMarginWidth(c));
+    return Ok();
+}
+
+// MARK: Padding
+
+Res<> _parseProp(Cursor<Sst> &c, Style::PaddingTopProp &p) {
+    p.value = try$(parseLengthOrPercentage(c));
+    return Ok();
+}
+
+Res<> _parseProp(Cursor<Sst> &c, Style::PaddingRightProp &p) {
+    p.value = try$(parseLengthOrPercentage(c));
+    return Ok();
+}
+
+Res<> _parseProp(Cursor<Sst> &c, Style::PaddingBottomProp &p) {
+    p.value = try$(parseLengthOrPercentage(c));
+    return Ok();
+}
+
+Res<> _parseProp(Cursor<Sst> &c, Style::PaddingLeftProp &p) {
+    p.value = try$(parseLengthOrPercentage(c));
+    return Ok();
+}
+
 // MARK: Sizing
 
 Res<> _parseProp(Cursor<Sst> &c, Style::WidthProp &p) {
-    p.value = try$(parseLength(c));
+    p.value = try$(parseSize(c));
     return Ok();
 }
 
 Res<> _parseProp(Cursor<Sst> &c, Style::HeightProp &p) {
-    p.value = try$(parseLength(c));
+    p.value = try$(parseSize(c));
     return Ok();
 }
 
 Res<> _parseProp(Cursor<Sst> &c, Style::MinWidthProp &p) {
-    p.value = try$(parseLength(c));
+    p.value = try$(parseSize(c));
     return Ok();
 }
 
 Res<> _parseProp(Cursor<Sst> &c, Style::MinHeightProp &p) {
-    p.value = try$(parseLength(c));
+    p.value = try$(parseSize(c));
     return Ok();
 }
 
 Res<> _parseProp(Cursor<Sst> &c, Style::MaxWidthProp &p) {
-    p.value = try$(parseLength(c));
+    p.value = try$(parseSize(c));
     return Ok();
 }
 
 Res<> _parseProp(Cursor<Sst> &c, Style::MaxHeightProp &p) {
-    p.value = try$(parseLength(c));
+    p.value = try$(parseSize(c));
     return Ok();
 }
 

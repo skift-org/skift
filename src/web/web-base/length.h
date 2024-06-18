@@ -43,8 +43,8 @@ struct Length {
 
     using enum Unit;
 
-    f64 _val;
-    Unit _unit;
+    f64 _val = 0;
+    Unit _unit = Unit::PX;
 
     static Length const ZERO;
 

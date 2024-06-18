@@ -67,6 +67,10 @@ struct Token {
     bool operator==(Type type) const {
         return this->type == type;
     }
+
+    bool operator==(Token const &other) const {
+        return type == other.type && data == other.data;
+    }
 };
 
 struct Lexer {

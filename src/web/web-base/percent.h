@@ -9,6 +9,8 @@ namespace Web {
 struct Percent : public Distinct<f64, struct _PercentTag> {
     using Distinct::Distinct;
 
+    static Percent const ZERO;
+
     static Percent from(f64 val) {
         return Percent(val);
     }
@@ -17,6 +19,8 @@ struct Percent : public Distinct<f64, struct _PercentTag> {
         e("{}%", value());
     }
 };
+
+inline Percent const Percent::ZERO = Percent(0);
 
 template <typename T>
 struct PercentOf {
@@ -38,25 +42,38 @@ struct PercentOr {
 
     Type _type;
     union {
-        Percent percent;
-        T value;
+        Percent _percent;
+        T _value;
     };
 
+    static PercentOr ZERO;
+
+    PercentOr()
+        : PercentOr(Percent::ZERO) {
+    }
+
     PercentOr(Percent percent)
-        : _type(Type::PERCENT), percent(percent) {
+        : _type(Type::PERCENT), _percent(percent) {
     }
 
     PercentOr(T value)
-        : _type(Type::VALUE), value(value) {
+        : _type(Type::VALUE), _value(value) {
     }
 
     void repr(Io::Emit &e) const {
         if (_type == Type::PERCENT) {
-            e("{}%", percent.value());
+            e("{}", _percent);
         } else {
-            e("{}", value);
+            e("{}", _value);
         }
     }
+
+    bool operator==(Type type) const {
+        return _type == type;
+    }
 };
+
+template <typename T>
+inline PercentOr<T> PercentOr<T>::ZERO = Percent::ZERO;
 
 } // namespace Web

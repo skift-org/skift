@@ -7,6 +7,7 @@
 #include <web-base/display.h>
 #include <web-base/flex.h>
 #include <web-base/float.h>
+#include <web-base/insets.h>
 #include <web-base/sizing.h>
 #include <web-base/visibility.h>
 
@@ -17,6 +18,8 @@ struct Computed {
 
     Vec<Background> backgrounds;
     Borders borders;
+    Margin margin;
+    Padding padding;
     Sizing sizing;
 
     // CSS Display Module Level 3

@@ -16,7 +16,7 @@ void write(Io::Emit &e, Object const &o) {
         [&](bool b) {
             e(b ? "true" : "false");
         },
-        [&](i64 i) {
+        [&](isize i) {
             e(i);
         },
         [&](f64 f) {

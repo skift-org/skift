@@ -23,7 +23,8 @@ struct ContextMenu : public Ui::ProxyNode<ContextMenu> {
         Ui::ProxyNode<ContextMenu>::event(e);
         e.handle<Events::MouseEvent>([&](Events::MouseEvent &m) {
             if (m.type == Events::MouseEvent::PRESS and
-                m.button == Events::Button::RIGHT) {
+                m.button == Events::Button::RIGHT and
+                bound().contains(m.pos)) {
                 Ui::showPopover(*this, m.pos, _menu());
                 return true;
             }
@@ -69,6 +70,25 @@ Ui::Child contextMenuItem(Ui::OnPress onPress, Opt<Mdi::Icon> i, Str t) {
                Ui::ButtonStyle::subtle()
            ) |
            Ui::spacing(4);
+}
+
+Ui::Child contextMenuDock(Ui::Children children) {
+    return Ui::hflow(
+               2,
+               children
+           ) |
+           Ui::spacing(4);
+}
+
+Ui::Child contextMenuIcon(Ui::OnPress onPress, Mdi::Icon i) {
+    return Ui::button(
+        [onPress = std::move(onPress)](auto &n) {
+            onPress(n);
+            Ui::closePopover(n);
+        },
+        Ui::ButtonStyle::subtle(),
+        i
+    );
 }
 
 } // namespace Karm::Kira

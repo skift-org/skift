@@ -17,16 +17,19 @@ static inline Page PAGE_CONTEXT_MENU{
                Ui::bound() |
                Kr::contextMenu([] {
                    return Kr::contextMenuContent({
-                       Kr::contextMenuItem(Ui::NOP, Mdi::IMAGE, "Open"),
-                       Kr::contextMenuItem(Ui::NOP, Mdi::FORMAT_LIST_BULLETED_SQUARE, "Open as..."),
+                       Kr::contextMenuItem(Ui::NOP, Mdi::OPEN_IN_APP, "Open"),
+                       Kr::contextMenuItem(Ui::NOP, Mdi::PENCIL, "Edit"),
                        Ui::separator(),
                        Kr::contextMenuItem(Ui::NOP, Mdi::CONTENT_COPY, "Copy"),
                        Kr::contextMenuItem(Ui::NOP, Mdi::CONTENT_CUT, "Cut"),
                        Kr::contextMenuItem(Ui::NOP, Mdi::CONTENT_PASTE, "Paste"),
                        Ui::separator(),
+                       Kr::contextMenuItem(Ui::NOP, Mdi::SHARE, "Interact..."),
                        Kr::contextMenuItem(Ui::NOP, Mdi::CURSOR_TEXT, "Rename..."),
                        Ui::separator(),
                        Kr::contextMenuItem(Ui::NOP, Mdi::DELETE, "Delete"),
+                       Ui::separator(),
+                       Kr::contextMenuItem(Ui::NOP, Mdi::INFORMATION_OUTLINE, "Properties..."),
                    });
                });
     },

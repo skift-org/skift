@@ -13,7 +13,7 @@ Ui::Child avatar(String t) {
     Ui::BoxStyle boxStyle = {
         .borderRadius = 99,
         .backgroundPaint = Ui::GRAY800,
-        .foregroundPaint = Ui::GRAY500
+        .foregroundPaint = Ui::GRAY400
     };
 
     return Ui::labelLarge(t) |
@@ -26,7 +26,7 @@ Ui::Child avatar(Mdi::Icon i) {
     Ui::BoxStyle boxStyle = {
         .borderRadius = 99,
         .backgroundPaint = Ui::GRAY800,
-        .foregroundPaint = Ui::GRAY500
+        .foregroundPaint = Ui::GRAY400
     };
 
     return Ui::icon(i, 26) |

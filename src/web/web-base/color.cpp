@@ -9,9 +9,9 @@ Opt<Color> parseNamedColor(Str name) {
     if (name == "currentColor")
         return Color::CURRENT;
 
-#define COLOR(NAME, _, VALUE) \
-    if (name == #NAME)        \
-        return NAME;
+#define COLOR(ID, NAME, ...) \
+    if (name == #NAME)       \
+        return ID;
 #include "defs/colors.inc"
 #undef COLOR
 

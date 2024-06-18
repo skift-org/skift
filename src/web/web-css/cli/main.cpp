@@ -17,10 +17,8 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto url = co_try$(Mime::parseUrlOrPath(args[1]));
 
     if (verb == "dump-stylesheet") {
-        logInfo("fetching & parsing {}", url);
-        co_try$(Web::Css::fetchStylesheet(url));
-        logInfo("Stylesheet parsed");
-        Sys::println("{}", Web::Css::fetchStylesheet(url).unwrap());
+        auto stylesheet = co_try$(Web::Css::fetchStylesheet(url));
+        Sys::println("{}", stylesheet);
         co_return Ok();
     } else if (verb == "dump-sst") {
         auto file = co_try$(Sys::File::open(url));

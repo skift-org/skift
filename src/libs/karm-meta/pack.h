@@ -54,34 +54,34 @@ always_inline static auto indexCast(usize index, auto *ptr, auto func) {
 }
 
 template <typename...>
-struct _ForEach;
+struct _Any;
 
 template <typename T>
-struct _ForEach<T> {
+struct _Any<T> {
     always_inline static auto eval(auto func) {
         return func(Type<T>{});
     }
 };
 
 template <typename T, typename... Ts>
-struct _ForEach<T, Ts...> {
+struct _Any<T, Ts...> {
     always_inline static auto eval(auto func)
         requires(not Meta::Same<decltype(func(Type<T>{})), void>)
     {
-        return func(Type<T>{}) ?: _ForEach<Ts...>::eval(func);
+        return func(Type<T>{}) ?: _Any<Ts...>::eval(func);
     }
 
     always_inline static auto eval(auto func)
         requires(Meta::Same<decltype(func(Type<T>{})), void>)
     {
         func(Type<T>{});
-        _ForEach<Ts...>::eval(func);
+        _Any<Ts...>::eval(func);
     }
 };
 
 template <typename... Ts>
-always_inline static auto foreach(auto func) {
-    return _ForEach<Ts...>::eval(func);
+always_inline static auto any(auto func) {
+    return _Any<Ts...>::eval(func);
 }
 
 } // namespace Karm::Meta

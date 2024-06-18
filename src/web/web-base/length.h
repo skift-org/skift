@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/distinct.h>
+#include <karm-io/emit.h>
 #include <karm-math/fixed.h>
 #include <karm-math/rect.h>
 #include <karm-math/spacing.h>
@@ -28,6 +29,17 @@ struct Length {
 #include "defs/lengths.inc"
 #undef LENGTH
     };
+
+    static Str toStr(Unit unit) {
+        switch (unit) {
+#define LENGTH(NAME, ...) \
+    case Unit::NAME:      \
+        return #NAME;
+#include "defs/lengths.inc"
+#undef LENGTH
+        }
+        panic("invalid length unit");
+    }
 
     using enum Unit;
 
@@ -132,6 +144,10 @@ struct Length {
         if (_unit != other._unit)
             return std::partial_ordering::unordered;
         return _val <=> other._val;
+    }
+
+    void repr(Io::Emit &e) const {
+        e("{}{}", _val, Io::toLowerCase(toStr(_unit)));
     }
 };
 
@@ -362,11 +378,3 @@ struct LengthContext {
 };
 
 } // namespace Web
-
-template <>
-struct Karm::Io::Formatter<Web::Length> {
-    Res<usize> format(Io::TextWriter &writer, Web::Length const &val) {
-        usize written = try$(Io::format(writer, " {#}{#}", val.val(), val.unit()));
-        return Ok(written);
-    }
-};

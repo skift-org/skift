@@ -166,7 +166,7 @@ Ui::Child editorFilterControls(Gfx::Filter const &filter) {
 
 Ui::Child editorFilters(State const &s) {
     Ui::Children tiles;
-    Gfx::Filter::foreach([&]<typename T>(Meta::Type<T>) {
+    Gfx::Filter::any([&]<typename T>(Meta::Type<T>) {
         tiles.pushBack(
             editorFilterTile(
                 [](auto &n) {
@@ -177,6 +177,8 @@ Ui::Child editorFilters(State const &s) {
                 Io::toTitleCase(T::NAME).unwrap()
             )
         );
+
+        return false;
     });
 
     return Ui::hflow(8, tiles);

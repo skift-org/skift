@@ -147,8 +147,8 @@ struct Union {
         return Meta::indexCast<Ts...>(_index, _buf, visitor);
     }
 
-    always_inline static auto foreach(auto visitor) {
-        return Meta::foreach<Ts...>(visitor);
+    always_inline static auto any(auto visitor) {
+        return Meta::any<Ts...>(visitor);
     }
 
     template <Meta::Contains<Ts...> T>

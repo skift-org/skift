@@ -15,8 +15,9 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto verb = args[0];
 
     if (verb == "list-props") {
-        Web::Style::Prop::foreach([]<typename T>(Meta::Type<T>) {
+        Web::Style::Prop::any([]<typename T>(Meta::Type<T>) {
             Sys::println("{}", T::name());
+            return false;
         });
         co_return Ok();
     } else {

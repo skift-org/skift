@@ -1,5 +1,6 @@
 #include <hideo-base/scafold.h>
 #include <karm-kira/context-menu.h>
+#include <karm-kira/side-panel.h>
 #include <karm-mime/mime.h>
 #include <karm-sys/file.h>
 #include <karm-ui/input.h>
@@ -11,10 +12,17 @@
 
 namespace Hideo::Browser {
 
+enum struct SidePanel {
+    CLOSE,
+    BOOKMARKS,
+    DEVELOPER_TOOLS,
+};
+
 struct State {
     Mime::Url url;
     Strong<Web::Dom::Document> dom;
     Opt<Error> err;
+    SidePanel sidePanel = SidePanel::CLOSE;
 
     bool canGoBack() const {
         return false;
@@ -31,15 +39,18 @@ struct GoBack {};
 
 struct GoForward {};
 
-using Action = Union<Reload, GoBack, GoForward>;
+using Action = Union<Reload, GoBack, GoForward, SidePanel>;
 
-void reduce(State &, Action a) {
+void reduce(State &s, Action a) {
     a.visit(Visitor{
         [&](Reload) {
         },
         [&](GoBack) {
         },
         [&](GoForward) {
+        },
+        [&](SidePanel p) {
+            s.sidePanel = p;
         },
     });
 }
@@ -48,10 +59,10 @@ using Model = Ui::Model<State, Action, reduce>;
 
 Ui::Child mainMenu() {
     return Kr::contextMenuContent({
-        Kr::contextMenuItem(Ui::NOP, Mdi::BOOKMARK, "Bookmarks"),
+        Kr::contextMenuItem(Model::bind(SidePanel::BOOKMARKS), Mdi::BOOKMARK, "Bookmarks"),
         Ui::separator(),
         Kr::contextMenuItem(Ui::NOP, Mdi::PRINTER, "Print..."),
-        Kr::contextMenuItem(Ui::NOP, Mdi::CODE_TAGS, "Developer Tools"),
+        Kr::contextMenuItem(Model::bind(SidePanel::DEVELOPER_TOOLS), Mdi::CODE_TAGS, "Developer Tools"),
         Ui::separator(),
         Kr::contextMenuItem(Ui::NOP, Mdi::COG, "Settings"),
     });
@@ -71,6 +82,48 @@ Ui::Child addressBar(Mime::Url const &url) {
                .borderWidth = 1,
                .backgroundPaint = Ui::GRAY800,
            });
+}
+
+Ui::Child contextMenu() {
+    return Kr::contextMenuContent({
+        Kr::contextMenuDock({
+            Kr::contextMenuIcon(Ui::NOP, Mdi::ARROW_LEFT),
+            Kr::contextMenuIcon(Ui::NOP, Mdi::ARROW_RIGHT),
+            Kr::contextMenuIcon(Ui::NOP, Mdi::REFRESH),
+        }),
+        Ui::separator(),
+        Kr::contextMenuItem(Ui::NOP, Mdi::CODE_TAGS, "View Source..."),
+        Kr::contextMenuItem(Model::bind(SidePanel::DEVELOPER_TOOLS), Mdi::BUTTON_CURSOR, "Inspect"),
+    });
+}
+
+Ui::Child sidePanel(State const &s) {
+    switch (s.sidePanel) {
+    case SidePanel::BOOKMARKS:
+        return Kr::sidePanelContent({
+            Kr::sidePanelTitle(Model::bind(SidePanel::CLOSE), "Bookmarks"),
+            Ui::separator(),
+            Ui::empty(9),
+        });
+    case SidePanel::DEVELOPER_TOOLS:
+        return Kr::sidePanelContent({
+            Kr::sidePanelTitle(Model::bind(SidePanel::CLOSE), "Developer Tools"),
+            Ui::separator(),
+            Web::View::inspect(s.dom),
+        });
+    default:
+        return Ui::empty();
+    }
+}
+
+Ui::Child appContent(State const &s) {
+    auto webView = Web::View::view(s.dom) | Kr::contextMenu(slot$(contextMenu()));
+    if (s.sidePanel == SidePanel::CLOSE)
+        return webView;
+    return Ui::hflow(
+        webView | Ui::grow(),
+        sidePanel(s)
+    );
 }
 
 Ui::Child app(Mime::Url url, Strong<Web::Dom::Document> dom, Opt<Error> err) {
@@ -95,10 +148,11 @@ Ui::Child app(Mime::Url url, Strong<Web::Dom::Document> dom, Opt<Error> err) {
                         [](Ui::Node &n) {
                             Ui::showPopover(n, n.bound().bottomEnd(), mainMenu());
                         },
-                        Ui::ButtonStyle::subtle(), Mdi::DOTS_HORIZONTAL
+                        Ui::ButtonStyle::subtle(),
+                        Mdi::DOTS_HORIZONTAL
                     )
                 ),
-                .body = slot$(Web::View::view(s.dom)),
+                .body = slot$(appContent(s)),
             });
         }
     );

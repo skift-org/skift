@@ -84,23 +84,7 @@ Ui::Child node(Dom::Node const &n, isize ident = 0) {
 }
 
 Ui::Child inspect(Strong<Web::Dom::Document> dom) {
-    return Ui::vflow(
-               Ui::hflow(
-                   Ui::labelLarge("Inspector"),
-                   Ui::grow(NONE),
-                   Ui::button(
-                       Ui::NOP,
-                       Ui::ButtonStyle::subtle(),
-                       Ui::icon(Mdi::CLOSE) | Ui::center()
-                   )
-               ) | Ui::spacing(6),
-               Ui::separator(),
-               Ui::vflow(node(*dom)) |
-                   Ui::spacing(6) |
-                   Ui::vscroll() |
-                   Ui::grow()
-           ) |
-           Ui::pinSize({320, 0});
+    return node(*dom);
 }
 
 } // namespace Web::View

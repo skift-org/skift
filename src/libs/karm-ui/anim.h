@@ -39,6 +39,11 @@ struct Eased {
         Ui::shouldAnimate(n);
     }
 
+    auto &delay(f64 delay) {
+        _delay = delay;
+        return *this;
+    }
+
     void animate(Node &n, T target, f64 duration = 1.0, Math::Easing easing = {}) {
         if (Math::epsilonEq(_value, target, 0.1)) {
             _value = target;
@@ -67,8 +72,13 @@ struct Eased {
         e.handle<Node::AnimateEvent>([&](auto &a) {
             if (_animated) {
                 Ui::shouldAnimate(n);
-                shouldRepaint = true;
 
+                if (_delay > 0) {
+                    _delay -= a.dt;
+                    return false;
+                }
+
+                shouldRepaint = true;
                 _elapsed += a.dt;
                 if (_elapsed > _duration) {
                     _elapsed = _duration;
@@ -124,6 +134,12 @@ struct Eased2 {
     void set(Node &n, Math::Vec2<T> v) {
         _x.set(n, v.x);
         _y.set(n, v.y);
+    }
+
+    auto &delay(f64 delay) {
+        _x.delay(delay);
+        _y.delay(delay);
+        return *this;
     }
 
     void animate(Node &n, Math::Vec2<T> target, f64 duration = 1.0, Math::Easing easing = {}) {

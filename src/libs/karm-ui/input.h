@@ -65,12 +65,12 @@ struct MouseListener {
 
             _pos = m.pos - node.bound().topStart();
 
-            if (m.type == Events::MouseEvent::PRESS) {
+            if (m.type == Events::MouseEvent::PRESS and m.button == Events::Button::LEFT) {
                 state = PRESS;
                 return true;
             }
 
-            if (m.type == Events::MouseEvent::RELEASE) {
+            if (m.type == Events::MouseEvent::RELEASE and m.button == Events::Button::LEFT) {
                 state = HOVER;
                 result = true;
                 return true;

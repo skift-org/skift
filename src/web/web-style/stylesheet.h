@@ -21,7 +21,21 @@ struct StyleRule {
     Vec<Prop> props;
 
     void repr(Io::Emit &e) const {
-        e("(style-rule {} {})", selector, props);
+        e("(style-rule");
+        e.indent();
+        e("\nselector: {}", selector);
+        if (props) {
+            e.newline();
+            e("props: [");
+            e.indentNewline();
+            for (auto const &prop : props) {
+                e("{}\n", prop);
+            }
+            e.deindent();
+            e("]\n");
+        }
+        e.deindent();
+        e(")");
     }
 };
 
@@ -78,7 +92,21 @@ struct StyleSheet {
     Vec<Rule> rules;
 
     void repr(Io::Emit &e) const {
-        e("(style-sheet {} {} {} {})", mime, href, title, rules);
+        e("(style-sheet {} {} {}", mime, href, title);
+
+        e.indent();
+        if (rules) {
+            e.newline();
+            e("rules: [");
+            e.indentNewline();
+            for (auto const &rule : rules) {
+                e("{}\n", rule);
+            }
+            e.deindent();
+            e("]\n");
+        }
+        e.deindent();
+        e(")");
     }
 };
 

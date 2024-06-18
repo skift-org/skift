@@ -12,7 +12,8 @@ enum struct OpCode {
     WHERE,
     AND,
     COLUMN,
-    OR
+    OR,
+    NOP
 };
 
 static Res<Style::Selector> parseSelectorElement(Vec<Sst> const &prefix, usize &i) {
@@ -43,7 +44,11 @@ static Res<Style::Selector> parseSelectorElement(Vec<Sst> const &prefix, usize &
 static Res<Style::Selector> parseSelector(auto content) {
     usize i = 0;
     Style::Selector currentSelector = try$(parseSelectorElement(content, i));
+    if (i >= content.len() - 1) {
+        return Ok(currentSelector);
+    }
     i++;
+    logDebug("selecorrrrr {#} i:{}", content, i);
     return parseInfixExpr(currentSelector, content, i);
 }
 
@@ -52,15 +57,15 @@ static Res<OpCode> sstNode2OpCode(Vec<Sst> const &content, usize &i) {
     case Token::Type::COMMA:
         return Ok(OpCode::OR);
     case Token::Type::WHITESPACE:
-        if (i >= content.len()) {
-            return Error();
+        if (i >= content.len() - 1) {
+            return Ok(OpCode::NOP);
         }
         if (content[i + 1].token.type != Token::Type::IDENT && content[i + 1].token.type != Token::Type::HASH && content[i + 1].token.data != "*") {
             return Ok(OpCode::DESCENDANT);
         } else {
             i++;
             auto op = sstNode2OpCode(content, i);
-            if (i >= content.len()) {
+            if (i >= content.len() - 1) {
                 return Error();
             }
             if (content[i + 1].token.type == Token::Type::WHITESPACE) {
@@ -73,36 +78,41 @@ static Res<OpCode> sstNode2OpCode(Vec<Sst> const &content, usize &i) {
     }
 }
 
-static Res<Style::Selector> parseInfixExpr(auto lhs, auto content, usize &i) {
+Res<Style::Selector> parseNfixExpr(auto lhs, Token::Type separator, Vec<Sst> const &, usize &) {
+    logDebug("NFIX FOUND AFTER {}", lhs, separator);
+
+    return Ok(Style::Selector::and_(Vec<Style::Selector>{
+        lhs
+    }));
+}
+
+Res<Style::Selector> parseInfixExpr(auto lhs, auto content, usize &i) {
+    logDebug("INFIX ?");
     OpCode opCode = try$(sstNode2OpCode(content, i));
     logDebug("INFIX FOUND AFTER {} with OP {}", lhs, opCode);
 
     // parse OP
     switch (opCode) {
+    case OpCode::NOP:
+        return Ok(lhs);
     case OpCode::DESCENDANT:
-        return Ok(parseInfixExpr(Style::Selector::descendant({lhs, parseExpr(content)}), content, i));
+        return Ok(Style::Selector::descendant(lhs, try$(parseSelectorElement(content, i))));
     case OpCode::CHILD:
-        return Ok(Style::Selector::child({lhs, parseSelector(content)}));
+        return Ok(Style::Selector::child(lhs, try$(parseSelectorElement(content, i))));
     case OpCode::ADJACENT:
-        return Ok(Style::Selector::adjacent({lhs, parseSelector(content)}));
+        return Ok(Style::Selector::adjacent(lhs, try$(parseSelectorElement(content, i))));
     case OpCode::SUBSEQUENT:
-        return Ok(Style::Selector::subsequent({lhs, parseSelector(content)}));
+        return Ok(Style::Selector::subsequent(lhs, try$(parseSelectorElement(content, i))));
     case OpCode::NOT:
-        return Ok(Style::Selector::not_({lhs, parseSelector(content)}));
+        return Ok(Style::Selector::not_(try$(parseSelectorElement(content, i))));
     case OpCode::WHERE:
-        return Ok(Style::Selector::where({lhs, parseSelector(content)}));
+        return Ok(Style::Selector::where(try$(parseSelectorElement(content, i))));
     case OpCode::AND:
-        return Ok(Style::Selector::and_(Vec<Style::Selector>{
-            lhs, parseNfixExpr(lhs, content, i)
-        }));
+        return parseNfixExpr(lhs, Token::COMMA, content, i);
     case OpCode::COLUMN:
     case OpCode::OR:
-        break;
+        return parseNfixExpr(lhs, Token::COMMA, content, i);
     }
-}
-
-static Res<Style::Selector> parseNfixExpr(auto lhs, Vec<Sst> const &, usize &) {
-    logDebug("NFIX FOUND AFTER {}", lhs);
 }
 
 static Res<Style::Rule> getRuleObject(auto prefix) {
@@ -135,17 +145,17 @@ static Res<Style::Rule> getRuleObject(auto prefix) {
         }
         default: {
             Style::StyleRule parsed = Style::StyleRule(try$(parseSelector(prefix)));
-            // parsed.selector = try$(parseSelector());
             return Ok(parsed);
         }
         }
     }
 }
 
-static Res<Style::Rule> parseQualifiedRule(Sst rule) {
+Res<Style::Rule> parseQualifiedRule(Sst rule) {
     auto &prefix = rule.prefix.unwrap()->content;
 
     auto parsed = try$(getRuleObject(prefix));
+    logDebug("parsed rule {#}", parsed);
 
     auto block = rule.content[0].content;
     bool parsingContent = false;
@@ -191,7 +201,7 @@ Vec<Style::Rule> parseSST(Sst sst) {
         switch (sst.content[i].type) {
 
         case Sst::_Type::RULE:
-            // rules.pushBack(parseQualifiedRule(sst.content[i]).unwrap());
+            rules.pushBack(parseQualifiedRule(sst.content[i]).unwrap());
             break;
         case Sst::_Type::FUNC:
         case Sst::_Type::DECL:

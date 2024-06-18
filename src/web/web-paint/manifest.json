@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "web-paint",
+    "type": "lib",
+    "description": "Painting engine",
+    "requires": [
+        "web-style"
+    ]
+}

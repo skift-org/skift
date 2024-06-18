@@ -7,6 +7,8 @@ namespace Karm::Ui {
 // MARK: Scroll ----------------------------------------------------------------
 
 struct Scroll : public ProxyNode<Scroll> {
+    static constexpr isize SCROLL_BAR_WIDTH = 4;
+
     bool _mouseIn = false;
     bool _animated = false;
     Math::Orien _orient{};
@@ -30,6 +32,22 @@ struct Scroll : public ProxyNode<Scroll> {
         }
     }
 
+    bool canHScroll() {
+        return (_orient == Math::Orien::HORIZONTAL or _orient == Math::Orien::BOTH) and child().bound().width > bound().width;
+    }
+
+    Math::Recti hTrack() {
+        return Math::Recti{bound().start(), bound().bottom() - SCROLL_BAR_WIDTH, bound().width, SCROLL_BAR_WIDTH};
+    }
+
+    bool canVScroll() {
+        return (_orient == Math::Orien::VERTICAL or _orient == Math::Orien::BOTH) and child().bound().height > bound().height;
+    }
+
+    Math::Recti vTrack() {
+        return Math::Recti{bound().end() - SCROLL_BAR_WIDTH, bound().top(), SCROLL_BAR_WIDTH, bound().height};
+    }
+
     void paint(Gfx::Context &g, Math::Recti r) override {
         g.save();
         g.clip(_bound);
@@ -51,20 +69,20 @@ struct Scroll : public ProxyNode<Scroll> {
 
         auto childBound = child().bound();
 
-        if ((_orient == Math::Orien::HORIZONTAL or _orient == Math::Orien::BOTH) and childBound.width > bound().width) {
+        if (canHScroll()) {
             auto scrollBarWidth = (bound().width) * bound().width / childBound.width;
             auto scrollBarX = bound().start() + (-_scroll.x * bound().width / childBound.width);
 
             g.fillStyle(Gfx::GRAY500.withOpacity(0.3 * _scrollOpacity.value()));
-            g.fill(Math::Recti{(isize)scrollBarX, bound().bottom() - 4, scrollBarWidth, 4});
+            g.fill(Math::Recti{(isize)scrollBarX, bound().bottom() - SCROLL_BAR_WIDTH, scrollBarWidth, SCROLL_BAR_WIDTH});
         }
 
-        if ((_orient == Math::Orien::VERTICAL or _orient == Math::Orien::BOTH) and childBound.height > bound().height) {
+        if (canVScroll()) {
             auto scrollBarHeight = (bound().height) * bound().height / childBound.height;
             auto scrollBarY = bound().top() + (-_scroll.y * bound().height / childBound.height);
 
             g.fillStyle(Ui::GRAY500.withOpacity(0.3 * _scrollOpacity.value()));
-            g.fill(Math::Recti{bound().end() - 4, (isize)scrollBarY, 4, scrollBarHeight});
+            g.fill(Math::Recti{bound().end() - SCROLL_BAR_WIDTH, (isize)scrollBarY, SCROLL_BAR_WIDTH, scrollBarHeight});
         }
 
         g.restore();
@@ -72,7 +90,11 @@ struct Scroll : public ProxyNode<Scroll> {
 
     void event(Sys::Event &e) override {
         if (_scrollOpacity.needRepaint(*this, e)) {
-            shouldRepaint(*parent(), bound());
+            if (canHScroll())
+                shouldRepaint(*parent(), hTrack());
+
+            if (canVScroll())
+                shouldRepaint(*parent(), vTrack());
         }
 
         if (auto *me = e.is<Events::MouseEvent>()) {

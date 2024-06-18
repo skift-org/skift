@@ -48,7 +48,6 @@ static Res<Style::Selector> parseSelector(auto content) {
         return Ok(currentSelector);
     }
     i++;
-    logDebug("selecorrrrr {#} i:{}", content, i);
     return parseInfixExpr(currentSelector, content, i);
 }
 
@@ -60,7 +59,9 @@ static Res<OpCode> sstNode2OpCode(Vec<Sst> const &content, usize &i) {
         if (i >= content.len() - 1) {
             return Ok(OpCode::NOP);
         }
-        if (content[i + 1].token.type != Token::Type::IDENT && content[i + 1].token.type != Token::Type::HASH && content[i + 1].token.data != "*") {
+        if (content[i + 1].token.type == Token::Type::IDENT || content[i + 1].token.type == Token::Type::HASH || content[i + 1].token.data == "*") {
+            logDebug("Descendant");
+            i++;
             return Ok(OpCode::DESCENDANT);
         } else {
             i++;
@@ -87,7 +88,6 @@ Res<Style::Selector> parseNfixExpr(auto lhs, Token::Type separator, Vec<Sst> con
 }
 
 Res<Style::Selector> parseInfixExpr(auto lhs, auto content, usize &i) {
-    logDebug("INFIX ?");
     OpCode opCode = try$(sstNode2OpCode(content, i));
     logDebug("INFIX FOUND AFTER {} with OP {}", lhs, opCode);
 
@@ -116,6 +116,7 @@ Res<Style::Selector> parseInfixExpr(auto lhs, auto content, usize &i) {
 }
 
 static Res<Style::Rule> getRuleObject(auto prefix) {
+
     switch (prefix[0].type) {
     case Sst::RULE:
     case Sst::FUNC:
@@ -200,14 +201,14 @@ Vec<Style::Rule> parseSST(Sst sst) {
     for (usize i = 0; i < sst.content.len(); i++) {
         switch (sst.content[i].type) {
 
-        case Sst::_Type::RULE:
+        case Sst::Type::RULE:
             rules.pushBack(parseQualifiedRule(sst.content[i]).unwrap());
             break;
-        case Sst::_Type::FUNC:
-        case Sst::_Type::DECL:
-        case Sst::_Type::LIST:
-        case Sst::_Type::TOKEN:
-        case Sst::_Type::BLOCK:
+        case Sst::Type::FUNC:
+        case Sst::Type::DECL:
+        case Sst::Type::LIST:
+        case Sst::Type::TOKEN:
+        case Sst::Type::BLOCK:
             break;
         }
     }

@@ -72,7 +72,7 @@ struct PopoverLayer : public LeafNode<PopoverLayer> {
         if (popoverVisible()) {
             popover().event(e);
             e.handle<Events::MouseEvent>([&](auto &m) {
-                if (m.type == Events::MouseEvent::PRESS) {
+                if (not e.accepted() and m.type == Events::MouseEvent::PRESS) {
                     _shouldPopoverClose = true;
                     shouldLayout(*this);
                     return true;
@@ -90,7 +90,6 @@ struct PopoverLayer : public LeafNode<PopoverLayer> {
             auto &s = e.unwrap<ShowPopoverEvent>();
             _shouldPopover = s.child;
             _popoverAt = s.at;
-            mouseLeave(*_child);
             shouldLayout(*this);
         } else if (e.is<ClosePopoverEvent>()) {
             // We need to defer closing the dialog until the next frame,

@@ -1,7 +1,9 @@
 #include <hideo-base/scafold.h>
+#include <karm-kira/context-menu.h>
 #include <karm-mime/mime.h>
 #include <karm-sys/file.h>
 #include <karm-ui/input.h>
+#include <karm-ui/popover.h>
 #include <web-html/parser.h>
 #include <web-view/inspect.h>
 #include <web-view/view.h>
@@ -44,6 +46,33 @@ void reduce(State &, Action a) {
 
 using Model = Ui::Model<State, Action, reduce>;
 
+Ui::Child mainMenu() {
+    return Kr::contextMenuContent({
+        Kr::contextMenuItem(Ui::NOP, Mdi::BOOKMARK, "Bookmarks"),
+        Ui::separator(),
+        Kr::contextMenuItem(Ui::NOP, Mdi::PRINTER, "Print..."),
+        Kr::contextMenuItem(Ui::NOP, Mdi::CODE_TAGS, "Developer Tools"),
+        Ui::separator(),
+        Kr::contextMenuItem(Ui::NOP, Mdi::COG, "Settings"),
+    });
+}
+
+Ui::Child addressBar(Mime::Url const &url) {
+    return Ui::hflow(
+               0,
+               Math::Align::CENTER,
+               Ui::text("{}", url),
+               Ui::grow(NONE),
+               Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BOOKMARK_OUTLINE)
+           ) |
+           Ui::box({
+               .padding = {12, 0, 0, 0},
+               .borderRadius = 4,
+               .borderWidth = 1,
+               .backgroundPaint = Ui::GRAY800,
+           });
+}
+
 Ui::Child app(Mime::Url url, Strong<Web::Dom::Document> dom, Opt<Error> err) {
     return Ui::reducer<Model>(
         {
@@ -60,7 +89,15 @@ Ui::Child app(Mime::Url url, Strong<Web::Dom::Document> dom, Opt<Error> err) {
                     Ui::button(Model::bindIf<GoForward>(s.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
                     Ui::button(Model::bind<Reload>(), Ui::ButtonStyle::subtle(), Mdi::REFRESH)
                 ),
-                .sidebar = slot$(Web::View::inspect(s.dom)),
+                .midleTools = slots$(addressBar(s.url) | Ui::grow()),
+                .endTools = slots$(
+                    Ui::button(
+                        [](Ui::Node &n) {
+                            Ui::showPopover(n, n.bound().bottomEnd(), mainMenu());
+                        },
+                        Ui::ButtonStyle::subtle(), Mdi::DOTS_HORIZONTAL
+                    )
+                ),
                 .body = slot$(Web::View::view(s.dom)),
             });
         }

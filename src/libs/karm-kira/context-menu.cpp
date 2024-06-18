@@ -1,3 +1,4 @@
+#include <karm-ui/anim.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/popover.h>
 
@@ -47,7 +48,8 @@ Ui::Child contextMenuContent(Ui::Children children) {
                .borderPaint = Ui::GRAY800,
                .backgroundPaint = Ui::GRAY900,
                .shadowStyle = Gfx::BoxShadow::elevated(4),
-           });
+           }) |
+           Ui::slideIn(Ui::SlideFrom::TOP);
 }
 
 Ui::Child contextMenuItem(Ui::OnPress onPress, Opt<Mdi::Icon> i, Str t) {

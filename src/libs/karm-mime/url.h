@@ -2,11 +2,8 @@
 
 // https://url.spec.whatwg.org/
 
-#include <karm-base/string.h>
-#include <karm-base/vec.h>
 #include <karm-io/expr.h>
 #include <karm-io/fmt.h>
-#include <karm-io/sscan.h>
 
 #include "path.h"
 

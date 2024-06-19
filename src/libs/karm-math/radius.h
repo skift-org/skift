@@ -1,51 +1,86 @@
 #pragma once
 
+#include <karm-base/array.h>
+#include <karm-base/iter.h>
 #include <karm-base/std.h>
+
+#include "vec.h"
 
 namespace Karm::Math {
 
 template <typename T>
 struct Radius {
+    /*
+        The radii are disposed in the following order
+
+              b        c
+              . │    │
+             ┌──┤....├──┐
+           a │  │    │  │ d
+             │          │
+            ─┴─        ─┴─
+             :          :
+             :          :
+            ─┬─        ─┬─
+             │          │
+           h │  │    │  │ e
+             └──┤....├──┘
+                │    │
+              g        f
+
+        border-radius: b c f g / a d e h
+    */
+
     union {
-        T topStart{};
-        T all;
+        struct {
+            T a, b, c, d, e, f, g, h;
+        };
+        Array<T, 8> radii;
     };
-    T topEnd{};
-    T bottomStart{};
-    T bottomEnd{};
 
     constexpr Radius() = default;
 
     constexpr Radius(T all)
-        : topStart(all),
-          topEnd(all),
-          bottomStart(all),
-          bottomEnd(all) {}
+        : a(all), b(all), c(all), d(all), e(all), f(all), g(all), h(all) {}
 
     constexpr Radius(T StartEnd, T EndStart)
-        : topStart(StartEnd),
-          topEnd(EndStart),
-          bottomStart(EndStart),
-          bottomEnd(StartEnd) {}
+        : Radius(StartEnd, StartEnd, EndStart, EndStart) {}
 
     constexpr Radius(T topStart, T topEnd, T bottomStart, T bottomEnd)
-        : topStart(topStart),
-          topEnd(topEnd),
-          bottomStart(bottomStart),
-          bottomEnd(bottomEnd) {}
+        : a(topStart), b(topStart),
+          c(topEnd), d(topEnd),
+          e(bottomEnd), f(bottomEnd),
+          g(bottomStart), h(bottomStart) {}
 
     bool zero() const {
-        return topStart == 0 and topEnd == 0 and
-               bottomStart == 0 and bottomEnd == 0;
+        return iter(radii).all([](T radius) {
+            return radius == 0;
+        });
     }
 
-    Radius clamp(T min, T max) const {
-        return {
-            clamp(topStart, min, max),
-            clamp(topEnd, min, max),
-            clamp(bottomStart, min, max),
-            clamp(bottomEnd, min, max),
+    T all() const {
+        return a;
+    }
+
+    void all(T all) {
+        for (auto &radius : radii) {
+            radius = all;
+        }
+    }
+
+    Radius reduceOverlap(Vec2<T> size) const {
+        auto res = *this;
+        auto scaleAll = [&](auto factor) {
+            if (factor >= 1)
+                return;
+            for (auto &radius : res.radii)
+                radius *= factor;
         };
+        scaleAll(size.width / (b + c));
+        scaleAll(size.height / (d + e));
+        scaleAll(size.width / (f + g));
+        scaleAll(size.height / (h + a));
+        return res;
     }
 };
 

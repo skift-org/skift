@@ -327,50 +327,49 @@ void Path::rect(Math::Rectf rect, Math::Radiusf radius) {
         lineTo(rect.bottomStart());
         close();
     } else {
-        auto maxRadius = min(rect.width, rect.height) / 2;
+        radius = radius.reduceOverlap(rect.size());
 
-        radius.topStart = min(radius.topStart, maxRadius);
-        radius.topEnd = min(radius.topEnd, maxRadius);
-        radius.bottomEnd = min(radius.bottomEnd, maxRadius);
-        radius.bottomStart = min(radius.bottomStart, maxRadius);
+        f64 cpa = radius.a - (radius.a * 0.5522847498);
+        f64 cpb = radius.b - (radius.b * 0.5522847498);
+        f64 cpc = radius.c - (radius.c * 0.5522847498);
+        f64 cpd = radius.d - (radius.d * 0.5522847498);
+        f64 cpe = radius.e - (radius.e * 0.5522847498);
+        f64 cpf = radius.f - (radius.f * 0.5522847498);
+        f64 cpg = radius.g - (radius.g * 0.5522847498);
+        f64 cph = radius.h - (radius.h * 0.5522847498);
 
-        f64 cpTopStart = radius.topStart - (radius.topStart * 0.5522847498);
-        f64 cpTopEnd = radius.topEnd - (radius.topEnd * 0.5522847498);
-        f64 cpBottomEnd = radius.bottomEnd - (radius.bottomEnd * 0.5522847498);
-        f64 cpBottomStart = radius.bottomStart - (radius.bottomStart * 0.5522847498);
-
-        moveTo({rect.x + radius.topStart, rect.y});
+        moveTo({rect.x + radius.b, rect.y});
 
         // Top end edge
-        lineTo({rect.x + rect.width - radius.topEnd, rect.y});
+        lineTo({rect.x + rect.width - radius.c, rect.y});
         cubicTo(
-            {rect.x + rect.width - cpTopEnd, rect.y},
-            {rect.x + rect.width, rect.y + cpTopEnd},
-            {rect.x + rect.width, rect.y + radius.topEnd}
+            {rect.x + rect.width - cpc, rect.y},
+            {rect.x + rect.width, rect.y + cpd},
+            {rect.x + rect.width, rect.y + radius.d}
         );
 
         // Bottom end edge
-        lineTo({rect.x + rect.width, rect.y + rect.height - radius.bottomEnd});
+        lineTo({rect.x + rect.width, rect.y + rect.height - radius.e});
         cubicTo(
-            {rect.x + rect.width, rect.y + rect.height - cpBottomEnd},
-            {rect.x + rect.width - cpBottomEnd, rect.y + rect.height},
-            {rect.x + rect.width - radius.bottomEnd, rect.y + rect.height}
+            {rect.x + rect.width, rect.y + rect.height - cpe},
+            {rect.x + rect.width - cpf, rect.y + rect.height},
+            {rect.x + rect.width - radius.f, rect.y + rect.height}
         );
 
         // Bottom start edge
-        lineTo({rect.x + radius.bottomStart, rect.y + rect.height});
+        lineTo({rect.x + radius.g, rect.y + rect.height});
         cubicTo(
-            {rect.x + cpBottomStart, rect.y + rect.height},
-            {rect.x, rect.y + rect.height - cpBottomStart},
-            {rect.x, rect.y + rect.height - radius.bottomStart}
+            {rect.x + cpg, rect.y + rect.height},
+            {rect.x, rect.y + rect.height - cph},
+            {rect.x, rect.y + rect.height - radius.h}
         );
 
         // Top start edge
-        lineTo({rect.x, rect.y + radius.topStart});
+        lineTo({rect.x, rect.y + radius.a});
         cubicTo(
-            {rect.x, rect.y + cpTopStart},
-            {rect.x + cpTopStart, rect.y},
-            {rect.x + radius.topStart, rect.y}
+            {rect.x, rect.y + cpa},
+            {rect.x + cpb, rect.y},
+            {rect.x + radius.b, rect.y}
         );
 
         close();

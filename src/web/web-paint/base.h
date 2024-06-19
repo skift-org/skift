@@ -6,6 +6,8 @@
 namespace Web::Paint {
 
 struct Node {
+    isize zIndex = 0;
+
     virtual ~Node() = default;
 
     /// Prepare the scene graph for rendering (z-order, prunning, etc)

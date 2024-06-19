@@ -1,6 +1,7 @@
 #include <hideo-base/alert.h>
 #include <hideo-base/dialogs.h>
 #include <hideo-base/scafold.h>
+#include <karm-kira/context-menu.h>
 #include <karm-mime/mime.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/input.h>
@@ -46,16 +47,37 @@ Ui::ButtonStyle itemStyle(bool odd) {
     };
 }
 
-Ui::Child directorEntry(Sys::DirEntry const &entry, bool odd) {
-    return Ui::button(
-        Model::bind<Navigate>(entry.name),
-        itemStyle(odd),
-        entry.isDir ? Mdi::FOLDER : Mime::iconFor(tryOr(Mime::sniffSuffix(Mime::suffixOf(entry.name)), "file"s)),
-        entry.name
-    );
+Ui::Child directoryContextMenu() {
+    return Kr::contextMenuContent({
+        Kr::contextMenuDock({
+            Kr::contextMenuIcon(Ui::NOP, Mdi::CONTENT_COPY),
+            Kr::contextMenuIcon(Ui::NOP, Mdi::CONTENT_CUT),
+            // Kr::contextMenuIcon(Ui::NOP, Mdi::CONTENT_PASTE),
+            Kr::contextMenuIcon(Ui::NOP, Mdi::FORM_TEXTBOX),
+            Ui::grow(NONE),
+            Ui::separator(),
+            Kr::contextMenuIcon(Ui::NOP, Mdi::DELETE_OUTLINE),
+        }),
+        Ui::separator(),
+        Kr::contextMenuItem(Ui::NOP, Mdi::MAGNIFY, "Preview"),
+        Kr::contextMenuItem(Ui::NOP, Mdi::PENCIL, "Modify"),
+        Kr::contextMenuItem(Ui::NOP, Mdi::SHARE, "Interact..."),
+        Ui::separator(),
+        Kr::contextMenuItem(Ui::NOP, Mdi::INFORMATION_OUTLINE, "Properties"),
+    });
 }
 
-Ui::Child directoryListing(State const &, Sys::Dir const &dir) {
+Ui::Child directorEntry(Sys::DirEntry const &entry, bool odd) {
+    return Ui::button(
+               Model::bind<Navigate>(entry.name),
+               itemStyle(odd),
+               entry.isDir ? Mdi::FOLDER : Mime::iconFor(tryOr(Mime::sniffSuffix(Mime::suffixOf(entry.name)), "file"s)),
+               entry.name
+           ) |
+           Kr::contextMenu(slot$(directoryContextMenu()));
+}
+
+Ui::Child directoryListing(State const &s, Sys::Dir const &dir) {
     if (dir.entries().len() == 0)
         return Ui::bodyMedium(Ui::GRAY500, "This directory is empty.") | Ui::center();
 
@@ -68,7 +90,7 @@ Ui::Child directoryListing(State const &, Sys::Dir const &dir) {
 
     return Ui::vflow(children) |
            Ui::align(Math::Align::TOP | Math::Align::HFILL) |
-           Ui::vscroll();
+           Ui::vscroll() | Ui::key(s.currentIndex);
 }
 
 Ui::Child breadcrumbItem(Str text, isize index) {

@@ -1,4 +1,5 @@
 #include <karm-sys/info.h>
+#include <karm-sys/launch.h>
 
 #include "model.h"
 
@@ -24,7 +25,13 @@ void reduce(State &s, Action a) {
         [&](Navigate navigate) {
             auto dest = s.currentUrl();
             dest.append(navigate.item);
-            reduce(s, GoTo{dest});
+
+            auto stat = Sys::stat(dest).unwrap();
+            if (stat.type == Sys::Stat::FILE) {
+                (void)Sys::launch(Mime::Uti::PUBLIC_PREVIEW, dest);
+            } else {
+                reduce(s, GoTo{dest});
+            }
         },
         [&](GoTo gotTo) {
             if (s.currentUrl() == gotTo.url)

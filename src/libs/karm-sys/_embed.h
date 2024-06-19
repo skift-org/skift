@@ -3,6 +3,7 @@
 #include <karm-base/cons.h>
 #include <karm-base/range.h>
 #include <karm-base/time.h>
+#include <karm-mime/uti.h>
 
 #include "async.h"
 #include "dir.h"
@@ -35,6 +36,12 @@ Res<Strong<Sys::Fd>> createErr();
 Res<Vec<Sys::DirEntry>> readDir(Mime::Url const &url);
 
 Res<Stat> stat(Mime::Url const &url);
+
+// MARK: User interactions -----------------------------------------------------
+
+Res<> launch(Mime::Uti const &intent, Mime::Url const &url);
+
+Async::Task<> launchAsync(Mime::Uti const &intent, Mime::Url const &url);
 
 // MARK: Sockets ---------------------------------------------------------------
 

@@ -187,6 +187,31 @@ Res<Stat> stat(Mime::Url const &url) {
     return Ok(Posix::fromStat(buf));
 }
 
+// MARK: User interactions -----------------------------------------------------
+
+Res<> launch(Mime::Uti const &, Mime::Url const &url) {
+    String str = try$(resolve(url)).str();
+
+    int pid = fork();
+    if (pid < 0)
+        return Posix::fromLastErrno();
+
+    if (pid == 0) {
+#ifdef __ck_sys_darwin__
+        execlp("open", "open", str.buf(), nullptr);
+#else
+        execlp("xdg-open", "xdg-open", str.buf(), nullptr);
+#endif
+        _exit(1);
+    }
+
+    return Ok();
+}
+
+Async::Task<> launchAsync(Mime::Uti const &uti, Mime::Url const &url) {
+    co_return launch(uti, url);
+}
+
 // MARK: Sockets ---------------------------------------------------------------
 
 Res<Strong<Fd>> listenUdp(SocketAddr addr) {

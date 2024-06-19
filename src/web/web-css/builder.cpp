@@ -1,4 +1,4 @@
-#include "builder2.h"
+#include "builder.h"
 
 namespace Web::Css {
 
@@ -206,9 +206,15 @@ enum struct OpCode {
 };
 
 static Style::Selector parseSelectorElement(Vec<Sst> const &prefix, usize &i) {
-    logDebug("new selector found {}", prefix[i].token);
 
     switch (prefix[i].token.type) {
+    case Token::WHITESPACE:
+        if (i >= prefix.len()) {
+            logError("ERROR : unterminated selector");
+            return Style::EmptySelector{};
+        }
+        i++;
+        return parseSelectorElement(prefix, i);
     case Token::HASH:
         return Style::IdSelector{next(prefix[i].token.data, 1)};
     case Token::IDENT:
@@ -216,11 +222,10 @@ static Style::Selector parseSelectorElement(Vec<Sst> const &prefix, usize &i) {
     case Token::DELIM:
         if (prefix[i].token.data == ".") {
             if (i >= prefix.len()) {
-                logDebug("ERROR : unterminated selector");
+                logError("ERROR : unterminated selector");
                 return Style::EmptySelector{};
             }
             i++;
-            logDebug("new selector found {}", prefix[i].token);
             return Style::ClassSelector{prefix[i].token.data};
         } else if (prefix[i].token.data == "*") {
             return Style::UniversalSelector{};
@@ -234,6 +239,11 @@ static Style::Selector parseSelectorElement(Vec<Sst> const &prefix, usize &i) {
 static OpCode sstNode2OpCode(Vec<Sst> const &content, usize &i) {
     switch (content[i].token.type) {
     case Token::Type::COMMA:
+        if (i >= content.len() - 1) {
+            logError("ERROR : unterminated selector");
+            return OpCode::NOP;
+        }
+        i++;
         return OpCode::OR;
     case Token::Type::WHITESPACE:
         // a white space could be an operator or be ignored if followed by another op
@@ -247,7 +257,7 @@ static OpCode sstNode2OpCode(Vec<Sst> const &content, usize &i) {
             i++;
             auto op = sstNode2OpCode(content, i);
             if (i >= content.len() - 1) {
-                logDebug("ERROR : unterminated selector");
+                logError("ERROR : unterminated selector");
                 return OpCode::NOP;
             }
             if (content[i + 1].token.type == Token::Type::WHITESPACE) {
@@ -260,19 +270,24 @@ static OpCode sstNode2OpCode(Vec<Sst> const &content, usize &i) {
     }
 }
 
-Style::Selector parseNfixExpr(auto lhs, Token::Type separator, Vec<Sst> const &, usize &) {
-    logDebug("NFIX FOUND AFTER {}", lhs, separator);
+Style::Selector parseNfixExpr(auto lhs, OpCode op, Vec<Sst> const &content, usize &i) {
+    Vec<Style::Selector> selectors = {lhs, parseSelectorElement(content, i)};
 
-    return Style::Selector::and_(Vec<Style::Selector>{
-        lhs
-    });
+    // TODO parse next selectors
+
+    switch (op) {
+    case OpCode::AND:
+        return Style::Selector::and_(selectors);
+    case OpCode::OR:
+        return Style::Selector::or_(selectors);
+    default:
+        return Style::Selector::and_(selectors);
+    }
 }
 
 Style::Selector parseInfixExpr(auto lhs, auto content, usize &i) {
     OpCode opCode = sstNode2OpCode(content, i);
-    logDebug("INFIX FOUND AFTER {} with OP {}", lhs, opCode);
 
-    // parse OP
     switch (opCode) {
     case OpCode::NOP:
         return lhs;
@@ -288,11 +303,10 @@ Style::Selector parseInfixExpr(auto lhs, auto content, usize &i) {
         return Style::Selector::not_(parseSelectorElement(content, i));
     case OpCode::WHERE:
         return Style::Selector::where(parseSelectorElement(content, i));
-    case OpCode::AND:
-        return parseNfixExpr(lhs, Token::COMMA, content, i);
     case OpCode::COLUMN:
     case OpCode::OR:
-        return parseNfixExpr(lhs, Token::COMMA, content, i);
+    case OpCode::AND:
+        return parseNfixExpr(lhs, opCode, content, i);
     }
 }
 

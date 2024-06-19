@@ -302,7 +302,7 @@ template <>
 struct Karm::Io::Formatter<Web::Style::Selector> {
     Res<usize> format(Io::TextWriter &writer, Web::Style::Selector const &val) {
         return val.visit([&](auto const &v) -> Res<usize> {
-            return Io::format(writer, "{}", v);
+            return Io::format(writer, "{#}", v);
         });
     }
 };

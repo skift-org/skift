@@ -32,6 +32,7 @@ struct Sst {
     using enum Type;
 
     Type type;
+    // Contains the token if type is TOKEN or the @rule name
     Token token = Token(Token::NIL);
     Opt<Box<Sst>> prefix{};
     Content content{};

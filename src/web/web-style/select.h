@@ -66,6 +66,11 @@ struct UniversalSelector {
 
 static constexpr UniversalSelector UNIVERSAL = {};
 
+struct EmptySelector {
+};
+
+static constexpr EmptySelector EMPTY = {};
+
 struct Infix {
     enum struct Type {
         DESCENDANT,
@@ -157,6 +162,7 @@ using _Selector = Union<
     Infix,
     TypeSelector,
     UniversalSelector,
+    EmptySelector,
     IdSelector,
     ClassSelector,
     PseudoClass,
@@ -169,6 +175,10 @@ struct Selector : public _Selector {
 
     static Selector universal() {
         return UNIVERSAL;
+    }
+
+    static Selector empty() {
+        return EMPTY;
     }
 
     static Selector and_(Vec<Selector> selectors) {
@@ -264,6 +274,13 @@ template <>
 struct Karm::Io::Formatter<Web::Style::UniversalSelector> {
     Res<usize> format(Io::TextWriter &writer, Web::Style::UniversalSelector const &) {
         return Io::format(writer, "*");
+    }
+};
+
+template <>
+struct Karm::Io::Formatter<Web::Style::EmptySelector> {
+    Res<usize> format(Io::TextWriter &writer, Web::Style::EmptySelector const &) {
+        return Io::format(writer, "EMPTY_SELECTOR");
     }
 };
 

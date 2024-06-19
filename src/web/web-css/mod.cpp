@@ -1,7 +1,6 @@
 #include <karm-sys/file.h>
 
 #include "builder.h"
-#include "builder2.h"
 #include "mod.h"
 #include "parser.h"
 
@@ -12,8 +11,7 @@ namespace Web::Css {
 Style::StyleSheet parseStylesheet(Io::SScan &s) {
     Lexer lex{s};
     Sst sst = consumeRuleList(lex, true);
-    logDebug("sst ready");
-    return Style::StyleSheet{.rules = parseSST(sst)};
+    return parseStyleSheet(sst);
 }
 
 Res<Style::StyleSheet> fetchStylesheet(Mime::Url url) {

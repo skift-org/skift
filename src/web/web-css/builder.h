@@ -6,7 +6,28 @@
 
 namespace Web::Css {
 
-// No spec, we take the SST we built and convert it to a usable list of rules
-Vec<Style::Rule> parseSST(Sst);
+// MARK: Types -----------------------------------------------------------------
+
+Res<Color> parseColor(Cursor<Sst> &c);
+
+Res<Length> parseLength(Cursor<Sst> &c);
+
+Res<Size> parseSize(Cursor<Sst> &c);
+
+Res<Percent> parsePercentage(Cursor<Sst> &c);
+
+Res<PercentOr<Length>> parseLengthOrPercentage(Cursor<Sst> &c);
+
+// MARK: Rules -----------------------------------------------------------------
+
+Style::MediaQuery parseMediaQuery(Cursor<Sst> &);
+
+Style::Selector parseSelector(Cursor<Sst> &);
+
+Res<Style::Prop> parseProperty(Sst const &sst);
+
+Style::Rule parseRule(Sst const &sst);
+
+Style::StyleSheet parseStyleSheet(Sst const &sst);
 
 } // namespace Web::Css

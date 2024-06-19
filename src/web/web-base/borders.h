@@ -1,6 +1,10 @@
 #pragma once
 
 #include <karm-gfx/paint.h>
+#include <karm-math/radius.h>
+
+#include "length.h"
+#include "percent.h"
 
 namespace Web {
 
@@ -33,8 +37,6 @@ enum struct BorderStyle {
 };
 
 struct Border {
-    f64 radiusStart;
-    f64 radiusEnd;
     f64 width;
     BorderStyle style;
 };
@@ -43,13 +45,31 @@ struct Borders {
     Gfx::Paint paint = Gfx::BLACK;
     BorderCollapse collapse;
 
-    Border top;
-    Border right;
-    Border bottom;
-    Border left;
+    Border top, right, bottom, left;
+    Math::Radius<PercentOr<Length>> radii;
 
     void all(Border b) {
         top = right = bottom = left = b;
+    }
+
+    void set(BorderEdge edge, Border b) {
+        switch (edge) {
+        case BorderEdge::ALL:
+            all(b);
+            break;
+        case BorderEdge::TOP:
+            top = b;
+            break;
+        case BorderEdge::RIGHT:
+            right = b;
+            break;
+        case BorderEdge::BOTTOM:
+            bottom = b;
+            break;
+        case BorderEdge::LEFT:
+            left = b;
+            break;
+        }
     }
 };
 

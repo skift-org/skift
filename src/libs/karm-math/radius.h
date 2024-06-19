@@ -38,9 +38,7 @@ struct Radius {
         Array<T, 8> radii;
     };
 
-    constexpr Radius() = default;
-
-    constexpr Radius(T all)
+    constexpr Radius(T all = {})
         : a(all), b(all), c(all), d(all), e(all), f(all), g(all), h(all) {}
 
     constexpr Radius(T StartEnd, T EndStart)
@@ -51,6 +49,9 @@ struct Radius {
           c(topEnd), d(topEnd),
           e(bottomEnd), f(bottomEnd),
           g(bottomStart), h(bottomStart) {}
+
+    constexpr Radius(T a, T b, T c, T d, T e, T f, T g, T h)
+        : a(a), b(b), c(c), d(d), e(e), f(f), g(g), h(h) {}
 
     bool zero() const {
         return iter(radii).all([](T radius) {

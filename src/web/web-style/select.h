@@ -119,7 +119,7 @@ enum struct Dir {
 struct PseudoClass {
     enum struct Type {
 #define PSEUDO_CLASS(ID, ...) ID,
-#include "defs/pseudo-class.def"
+#include "defs/pseudo-class.inc"
 #undef PSEUDO_CLASS
     };
 

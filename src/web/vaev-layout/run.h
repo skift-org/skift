@@ -20,11 +20,7 @@ struct Run : public Frag {
     void layout(RectPx) override {
     }
 
-    Vec2Px size(Vec2Px) override {
-        return {};
-    }
-
-    void paint(Paint::Node &) override {}
+    void paint(Paint::Stack &) override {}
 };
 
 } // namespace Vaev::Layout

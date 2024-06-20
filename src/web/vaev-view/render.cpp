@@ -1,3 +1,4 @@
+#include <karm-sys/time.h>
 #include <vaev-css/mod.h>
 #include <vaev-dom/element.h>
 #include <vaev-layout/builder.h>
@@ -20,9 +21,13 @@ static void _collectStyle(Dom::Node const &node, Style::StyleBook &sb) {
     }
 }
 
-Strong<Paint::Node> render(Dom::Document const &dom, RectPx viewport) {
+Strong<Paint::Node> render(Dom::Document const &dom, Vec2Px viewport) {
+    auto timeStart = Sys::now();
+    logDebug("dom: \n{}", dom);
+
     logDebug("collecting styles");
     Style::StyleBook stylebook;
+    stylebook.add(Css::fetchStylesheet("bundle://vaev-view/user-agent.css"_url).take());
     _collectStyle(dom, stylebook);
 
     logDebug("building layout tree");
@@ -30,13 +35,20 @@ Strong<Paint::Node> render(Dom::Document const &dom, RectPx viewport) {
     Strong<Layout::Flow> layoutRoot = makeStrong<Layout::BlockFlow>(makeStrong<Style::Computed>());
     Layout::build(computer, dom, *layoutRoot);
 
-    logDebug("computing layout");
+    logDebug("computing layout for viewport: {}", viewport);
     layoutRoot->layout(viewport);
+
+    logDebug("layout tree: \n{}", layoutRoot);
 
     logDebug("painting layout");
     auto paintRoot = makeStrong<Paint::Stack>();
     layoutRoot->paint(*paintRoot);
     paintRoot->prepare();
+
+    logDebug("paint tree: \n{}", paintRoot);
+
+    auto elapsed = Sys::now() - timeStart;
+    logDebug("render time: {}ms", elapsed.toUSecs() / 1000.0);
 
     return paintRoot;
 }

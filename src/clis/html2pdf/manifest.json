@@ -8,6 +8,7 @@
         "vaev-style",
         "vaev-css",
         "vaev-layout",
+        "vaev-view",
         "karm-sys"
     ]
 }

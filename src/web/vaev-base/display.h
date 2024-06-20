@@ -11,7 +11,7 @@ namespace Vaev {
 
 struct Display {
     enum struct Box : u8 {
-        CONTENT,
+        CONTENTS,
         NONE,
     };
 
@@ -77,6 +77,9 @@ struct Display {
         Box _box;
         Internal _internal;
     };
+
+    Display()
+        : Display(Display::FLOW, Display::INLINE) {}
 
     Display(Box box)
         : _type(Type::BOX), _box(box) {}

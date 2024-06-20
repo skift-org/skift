@@ -2,21 +2,29 @@
 
 #include <karm-base/rc.h>
 #include <karm-base/vec.h>
+#include <karm-logger/logger.h>
 #include <vaev-base/length.h>
 #include <vaev-paint/base.h>
+#include <vaev-paint/box.h>
+#include <vaev-paint/stack.h>
 #include <vaev-style/computed.h>
 
 namespace Vaev::Layout {
 
+#define FOREACH_TYPE(ITER) \
+    ITER(BLOCK)            \
+    ITER(FLEX)             \
+    ITER(GRID)             \
+    ITER(IMAGE)            \
+    ITER(INLINE)           \
+    ITER(TABLE)            \
+    ITER(RUN)
+
 struct Frag {
     enum struct Type {
-        BLOCK,
-        FLEX,
-        GRID,
-        IMAGE,
-        INLINE,
-        TABLE,
-        RUN
+#define ITER(NAME) NAME,
+        FOREACH_TYPE(ITER)
+#undef ITER
     };
 
     using enum Type;
@@ -33,10 +41,33 @@ struct Frag {
 
     virtual ~Frag() = default;
     virtual Type type() const = 0;
+    Str typeStr() const {
+        switch (type()) {
+#define ITER(NAME)   \
+    case Type::NAME: \
+        return #NAME;
+            FOREACH_TYPE(ITER)
+#undef ITER
+        }
+    }
 
-    virtual void layout(RectPx) = 0;
-    virtual Vec2Px size(Vec2Px) = 0;
-    virtual void paint(Paint::Node &) = 0;
+    virtual void layout(RectPx bound) {
+        logDebug("setting border box: {}", bound);
+        _borderBox = bound;
+    }
+
+    virtual void paint(Paint::Stack &stack) {
+        if (style().backgrounds.len()) {
+            Paint::Box box;
+            box.backgrounds = style().backgrounds;
+            box.bound = _borderBox;
+            stack.add(makeStrong<Paint::Box>(std::move(box)));
+        }
+    }
+
+    virtual void repr(Io::Emit &e) const {
+        e("({} {})", typeStr(), _borderBox);
+    }
 
     Style::Computed const &style() const {
         return *_style;
@@ -75,16 +106,35 @@ struct Flow : public Frag {
     }
 
     void layout(RectPx bound) override {
+        logDebug("layout: {}", bound);
+        Frag::layout(bound);
         for (auto &c : _frags) {
             c->layout(bound);
         }
     }
 
-    void paint(Paint::Node &node) override {
+    void paint(Paint::Stack &stack) override {
+        Frag::paint(stack);
+
         for (auto &c : _frags) {
-            c->paint(node);
+            c->paint(stack);
         }
     }
+
+    void repr(Io::Emit &e) const override {
+        e("({}", typeStr());
+        if (_frags) {
+            e.indentNewline();
+            for (auto &c : _frags) {
+                c->repr(e);
+                e.newline();
+            }
+            e.deindent();
+        }
+        e(")");
+    }
 };
+
+#undef FOREACH_TYPE
 
 } // namespace Vaev::Layout

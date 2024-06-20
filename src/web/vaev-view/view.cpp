@@ -14,10 +14,14 @@ struct View : public Ui::View<View> {
 
     void paint(Gfx::Context &g, Math::Recti) override {
         if (not _paintRoot)
-            _paintRoot = render(*_dom, bound().cast<Px>());
+            _paintRoot = render(*_dom, bound().size().cast<Px>());
 
         g.save();
-        g.clear(bound(), WHITE);
+
+        g.origin(bound().xy);
+        g.clip(bound().size());
+        g.clear(bound().size(), WHITE);
+
         (*_paintRoot)->paint(g);
         g.restore();
     }

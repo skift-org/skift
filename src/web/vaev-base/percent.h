@@ -71,6 +71,22 @@ struct PercentOr {
     bool operator==(Type type) const {
         return _type == type;
     }
+
+    bool resolved() const {
+        return _type == Type::VALUE and _value.resolved();
+    }
+
+    T value() const {
+        if (_type == Type::PERCENT)
+            panic("cannot get value of percent");
+        return _value;
+    }
+
+    Percent percent() const {
+        if (_type == Type::VALUE)
+            panic("cannot get percent of value");
+        return _percent;
+    }
 };
 
 template <typename T>

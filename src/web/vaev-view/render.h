@@ -6,6 +6,6 @@
 
 namespace Vaev::View {
 
-Strong<Paint::Node> render(Dom::Document const &dom, RectPx viewport);
+Strong<Paint::Node> render(Dom::Document const &dom, Vec2Px viewport);
 
 } // namespace Vaev::View

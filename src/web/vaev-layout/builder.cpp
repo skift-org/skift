@@ -1,3 +1,4 @@
+#include <vaev-dom/document.h>
 #include <vaev-dom/element.h>
 #include <vaev-dom/text.h>
 
@@ -11,7 +12,7 @@
 
 namespace Vaev::Layout {
 
-void build(Style::Computer &c, Vec<Strong<Dom::Node>> const &children, Flow &parent) {
+void buildChildren(Style::Computer &c, Vec<Strong<Dom::Node>> const &children, Flow &parent) {
     for (auto &child : children) {
         build(c, *child, parent);
     }
@@ -22,8 +23,10 @@ Strong<Flow> buildForDisplay(Display const &display, Strong<Style::Computed> sty
     case Display::Inside::FLOW:
     case Display::Inside::FLOW_ROOT:
         return makeStrong<BlockFlow>(style);
+
     case Display::Inside::FLEX:
         return makeStrong<FlexFlow>(style);
+
     case Display::Inside::GRID:
         return makeStrong<GridFlow>(style);
 
@@ -32,7 +35,7 @@ Strong<Flow> buildForDisplay(Display const &display, Strong<Style::Computed> sty
     }
 }
 
-void build(Style::Computer &c, Dom::Element const &el, Flow &parent) {
+void buildElement(Style::Computer &c, Dom::Element const &el, Flow &parent) {
     auto style = c.computeFor(el);
 
     if (el.tagName == Html::IMG) {
@@ -45,20 +48,23 @@ void build(Style::Computer &c, Dom::Element const &el, Flow &parent) {
     if (display == Display::NONE)
         return;
 
-    if (display == Display::CONTENT) {
-        build(c, el.children(), parent);
+    if (display == Display::CONTENTS) {
+        buildChildren(c, el.children(), parent);
         return;
     }
 
     auto frag = buildForDisplay(display, style);
-    build(c, el.children(), *frag);
+    buildChildren(c, el.children(), *frag);
+    parent.add(frag);
 }
 
 void build(Style::Computer &c, Dom::Node const &node, Flow &parent) {
     if (auto *el = node.is<Dom::Element>()) {
-        build(c, *el, parent);
+        buildElement(c, *el, parent);
     } else if (auto *text = node.is<Dom::Text>()) {
         parent.add(makeStrong<Run>(parent._style, text->data));
+    } else if (auto *doc = node.is<Dom::Document>()) {
+        buildChildren(c, doc->children(), parent);
     }
 }
 

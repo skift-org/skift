@@ -8,9 +8,19 @@
 namespace Vaev::Paint {
 
 struct Box : public Node {
-    Math::Recti bound;
+    RectPx bound;
     Borders borders;
     Vec<Background> backgrounds;
+
+    void paint(Gfx::Context &ctx) override {
+        ColorContext cctx; // FIXME: Resolving color should happen in the layout phase
+        for (auto &background : backgrounds)
+            ctx._fillRect(bound.cast<isize>(), cctx.resolve(background.paint));
+    }
+
+    void repr(Io::Emit &e) const override {
+        e("(box {})", bound);
+    }
 };
 
 } // namespace Vaev::Paint

@@ -13,14 +13,14 @@ Spec spec(Selector const &) {
 
 bool match(Selector const &sel, Dom::Element const &el);
 
-bool match(Infix const &s, Dom::Element &) {
+bool _match(Infix const &s, Dom::Element const &) {
     switch (s.type) {
     default:
         notImplemented();
     }
 }
 
-bool match(Nfix const &s, Dom::Element &el) {
+bool _match(Nfix const &s, Dom::Element const &el) {
     switch (s.type) {
     case Nfix::AND:
         for (auto &inner : s.inners)
@@ -52,45 +52,35 @@ bool match(Nfix const &s, Dom::Element &el) {
 
 // 5.1. Type (tag name) selector
 // https://www.w3.org/TR/selectors-4/#type
-bool match(TypeSelector const &s, Dom::Element &el) {
+bool _match(TypeSelector const &s, Dom::Element const &el) {
     return el.tagName == s.type;
 }
 
-bool match(IdSelector const &s, Dom::Element &el) {
+bool _match(IdSelector const &s, Dom::Element const &el) {
     return el.id() == s.id;
 }
 
-bool match(ClassSelector const &s, Dom::Element &el) {
+bool _match(ClassSelector const &s, Dom::Element const &el) {
     return el.classList.contains(s.class_);
 }
 
 // 5.2. Universal selector
 // https://www.w3.org/TR/selectors-4/#the-universal-selector
-bool match(UniversalSelector const &, Dom::Element &) {
+bool _match(UniversalSelector const &, Dom::Element const &) {
     return true;
 }
 
 bool match(Selector const &sel, Dom::Element const &el) {
-    return sel.visit(Visitor{
-        [&](Infix const &s) {
-            return match(s, el);
-        },
-        [&](TypeSelector const &s) {
-            return match(s, el);
-        },
-        [&](UniversalSelector const &s) {
-            return match(s, el);
-        },
-        [&](ClassSelector const &s) {
-            return match(s, el);
-        },
-        [&](IdSelector const &s) {
-            return match(s, el);
-        },
-        [&](auto &) -> bool {
-            notImplemented();
+    return sel.visit(
+        [&](auto const &s) {
+            if constexpr (requires { _match(s, el); }) {
+                return _match(s, el);
+            } else {
+                logWarn("unimplemented selector: {}", s);
+                return false;
+            }
         }
-    });
+    );
 }
 
 } // namespace Vaev::Style

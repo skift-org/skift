@@ -16,10 +16,6 @@ struct BlockFlow : public Flow {
     void layout(RectPx bound) override {
         Flow::layout(bound);
     }
-
-    Vec2Px size(Vec2Px) override {
-        return {};
-    }
 };
 
 } // namespace Vaev::Layout

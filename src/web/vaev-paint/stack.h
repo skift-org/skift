@@ -7,6 +7,10 @@ namespace Vaev::Paint {
 struct Stack : public Node {
     Vec<Strong<Node>> _children;
 
+    void add(Strong<Node> child) {
+        _children.pushBack(child);
+    }
+
     void prepare() override {
         stableSort(_children, [](auto &a, auto &b) {
             return a->zIndex < b->zIndex;
@@ -31,6 +35,15 @@ struct Stack : public Node {
     void print(Print::Context &ctx) override {
         for (auto &child : _children)
             child->print(ctx);
+    }
+
+    void repr(Io::Emit &e) const override {
+        e("(stack");
+        for (auto &child : _children) {
+            e(" ");
+            child->repr(e);
+        }
+        e(")");
     }
 };
 

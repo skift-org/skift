@@ -47,10 +47,6 @@ struct FlexFlow : public Flow {
 
         Flow::layout(bound);
     }
-
-    Vec2Px size(Vec2Px) override {
-        return {};
-    }
 };
 
 } // namespace Vaev::Layout

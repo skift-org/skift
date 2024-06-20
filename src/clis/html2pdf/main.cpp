@@ -1,6 +1,7 @@
 #include <karm-mime/mime.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
+#include <karm-sys/time.h>
 #include <vaev-html/parser.h>
 #include <vaev-view/render.h>
 #include <vaev-xml/parser.h>
@@ -8,7 +9,6 @@
 namespace Vaev {
 
 Res<Strong<Dom::Document>> fetch(Mime::Url url) {
-    logInfo("fetching: {}", url);
 
     if (url.scheme == "about") {
         if (url.path.str() == "./blank")
@@ -19,6 +19,8 @@ Res<Strong<Dom::Document>> fetch(Mime::Url url) {
 
         return Error::invalidInput("unsupported about page");
     }
+
+    auto start = Sys::now();
 
     auto mime = Mime::sniffSuffix(url.path.suffix());
 
@@ -33,11 +35,17 @@ Res<Strong<Dom::Document>> fetch(Mime::Url url) {
         Html::Parser parser{dom};
         parser.write(buf);
 
+        auto elapsed = Sys::now() - start;
+        logDebug("parse time: {}ms", elapsed.toUSecs() / 1000.0);
+
         return Ok(dom);
     } else if (mime->is("application/xhtml+xml"_mime)) {
         Io::SScan scan{buf};
         Xml::Parser parser;
         dom = try$(parser.parse(scan, HTML));
+
+        auto elapsed = Sys::now() - start;
+        logDebug("parse time: {}ms", elapsed.toUSecs() / 1000.0);
 
         return Ok(dom);
     } else {

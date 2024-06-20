@@ -42,6 +42,10 @@ struct Size {
     Size(Length value) : type(LENGTH), value(value) {
     }
 
+    bool operator==(Type type) const {
+        return this->type == type;
+    }
+
     void repr(Io::Emit &e) const {
         switch (type) {
         case Type::NONE:

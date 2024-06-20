@@ -77,6 +77,23 @@ Res<Color> parseColor(Cursor<Sst> &c) {
     return Error::invalidData("expected color");
 }
 
+// MARK: Display
+// https://drafts.csswg.org/css-display-3/#propdef-display
+static Res<Display> parseDisplay(Cursor<Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    auto const &sst = c.next();
+
+    if (sst.token == Token{Token::IDENT, "contents"}) {
+        return Ok(Display::CONTENTS);
+    } else if (sst.token == Token{Token::IDENT, "none"}) {
+        return Ok(Display::NONE);
+    }
+
+    return Error::invalidData("expected display value");
+}
+
 // MARK: Length
 // https://drafts.csswg.org/css-values/#lengths
 
@@ -332,6 +349,11 @@ Res<> _parseProp(Cursor<Sst> &c, Style::BackgroundColorProp &p) {
 
 Res<> _parseProp(Cursor<Sst> &c, Style::ColorProp &p) {
     p.value = try$(parseColor(c));
+    return Ok();
+}
+
+Res<> _parseProp(Cursor<Sst> &c, Style::DisplayProp &p) {
+    p.value = try$(parseDisplay(c));
     return Ok();
 }
 

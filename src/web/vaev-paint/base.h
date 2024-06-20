@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-gfx/context.h>
+#include <karm-io/emit.h>
 #include <karm-print/context.h>
 
 namespace Vaev::Paint {
@@ -19,6 +20,10 @@ struct Node {
     virtual void paint(Gfx::Context &) {}
 
     virtual void print(Print::Context &) {}
+
+    virtual void repr(Io::Emit &e) const {
+        e("Node");
+    }
 };
 
 } // namespace Vaev::Paint

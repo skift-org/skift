@@ -9,7 +9,7 @@ struct Stack : public Node {
 
     void prepare() override {
         stableSort(_children, [](auto &a, auto &b) {
-            return a->attrs().zIndex < b->attrs().zIndex;
+            return a->zIndex < b->zIndex;
         });
 
         for (auto &child : _children)

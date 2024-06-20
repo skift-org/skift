@@ -118,3 +118,5 @@ static inline Str toStr(Token::Type type) {
 }
 
 } // namespace Web::Css
+
+#undef FOREACH_TOKEN

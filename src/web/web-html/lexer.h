@@ -163,6 +163,8 @@ static inline Str toStr(Lexer::State state) {
     }
 }
 
+#undef FOREACH_TOKEN
+
 } // namespace Web::Html
 
 template <>

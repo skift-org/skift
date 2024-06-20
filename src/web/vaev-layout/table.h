@@ -21,9 +21,7 @@ struct TableFlow : public Flow {
     }
 
     void layout(RectPx bound) override {
-        for (auto &c : _frags) {
-            c->layout(bound);
-        }
+        Flow::layout(bound);
     }
 
     Vec2Px size(Vec2Px) override {

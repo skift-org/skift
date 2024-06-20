@@ -13,7 +13,8 @@ struct BlockFlow : public Flow {
         return TYPE;
     }
 
-    void layout(RectPx) override {
+    void layout(RectPx bound) override {
+        Flow::layout(bound);
     }
 
     Vec2Px size(Vec2Px) override {

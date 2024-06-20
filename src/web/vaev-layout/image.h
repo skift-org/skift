@@ -25,6 +25,8 @@ struct ImageFrag : public Frag {
     Vec2Px size(Vec2Px) override {
         return {};
     }
+
+    void paint(Paint::Node &) override {}
 };
 
 } // namespace Vaev::Layout

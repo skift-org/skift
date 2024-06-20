@@ -45,9 +45,7 @@ struct FlexFlow : public Flow {
         _createItems();
         _sortByOrder();
 
-        for (auto &c : _frags) {
-            c->layout(bound);
-        }
+        Flow::layout(bound);
     }
 
     Vec2Px size(Vec2Px) override {

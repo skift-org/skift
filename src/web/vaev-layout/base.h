@@ -3,6 +3,7 @@
 #include <karm-base/rc.h>
 #include <karm-base/vec.h>
 #include <vaev-base/length.h>
+#include <vaev-paint/base.h>
 #include <vaev-style/computed.h>
 
 namespace Vaev::Layout {
@@ -35,6 +36,7 @@ struct Frag {
 
     virtual void layout(RectPx) = 0;
     virtual Vec2Px size(Vec2Px) = 0;
+    virtual void paint(Paint::Node &) = 0;
 
     Style::Computed const &style() const {
         return *_style;
@@ -70,6 +72,18 @@ struct Flow : public Frag {
 
     void add(Strong<Frag> frag) {
         _frags.pushBack(frag);
+    }
+
+    void layout(RectPx bound) override {
+        for (auto &c : _frags) {
+            c->layout(bound);
+        }
+    }
+
+    void paint(Paint::Node &node) override {
+        for (auto &c : _frags) {
+            c->paint(node);
+        }
     }
 };
 

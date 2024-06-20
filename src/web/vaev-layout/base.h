@@ -52,7 +52,6 @@ struct Frag {
     }
 
     virtual void layout(RectPx bound) {
-        logDebug("setting border box: {}", bound);
         _borderBox = bound;
     }
 
@@ -63,6 +62,10 @@ struct Frag {
             box.bound.wh = {Px{100}, Px{100}};
             stack.add(makeStrong<Paint::Box>(std::move(box)));
         }
+    }
+
+    virtual void debug(Gfx::Context &g) {
+        g.stroke(_borderBox.cast<isize>());
     }
 
     virtual void repr(Io::Emit &e) const {
@@ -106,7 +109,6 @@ struct Flow : public Frag {
     }
 
     void layout(RectPx bound) override {
-        logDebug("layout: {}", bound);
         Frag::layout(bound);
         for (auto &c : _frags) {
             c->layout(bound);
@@ -119,6 +121,14 @@ struct Flow : public Frag {
         for (auto &c : _frags) {
             c->paint(stack);
         }
+    }
+
+    void debug(Gfx::Context &g) override {
+        for (auto &c : _frags) {
+            c->debug(g);
+        }
+
+        g.plot(_borderBox.cast<isize>(), Gfx::RED);
     }
 
     void repr(Io::Emit &e) const override {

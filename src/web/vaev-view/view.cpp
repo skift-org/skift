@@ -8,13 +8,13 @@ namespace Vaev::View {
 
 struct View : public Ui::View<View> {
     Strong<Dom::Document> _dom;
-    Opt<Strong<Paint::Node>> _paintRoot;
+    Opt<Cons<Strong<Layout::Frag>, Strong<Paint::Node>>> _renderResult;
 
     View(Strong<Dom::Document> dom) : _dom(dom) {}
 
     void paint(Gfx::Context &g, Math::Recti) override {
-        if (not _paintRoot)
-            _paintRoot = render(*_dom, bound().size().cast<Px>());
+        if (not _renderResult)
+            _renderResult = render(*_dom, bound().size().cast<Px>());
 
         g.save();
 
@@ -22,12 +22,15 @@ struct View : public Ui::View<View> {
         g.clip(bound().size());
         g.clear(bound().size(), WHITE);
 
-        (*_paintRoot)->paint(g);
+        (*_renderResult).cdr->paint(g);
+        if (Ui::debugShowLayoutBounds)
+            (*_renderResult).car->debug(g);
+
         g.restore();
     }
 
     void layout(Math::Recti bound) override {
-        _paintRoot = NONE;
+        _renderResult = NONE;
         Ui::View<View>::layout(bound);
     }
 

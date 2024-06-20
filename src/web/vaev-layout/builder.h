@@ -3,7 +3,6 @@
 #include <vaev-dom/node.h>
 #include <vaev-style/computer.h>
 
-#include "base.h"
 #include "block.h"
 
 namespace Vaev::Layout {

@@ -66,7 +66,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto input = co_try$(Mime::parseUrlOrPath(args[0]));
     auto dom = co_try$(Vaev::fetch(input));
 
-    Vaev::RectPx viewport{Vaev::Px{800}, Vaev::Px{600}};
+    Vaev::Vec2Px viewport{Vaev::Px{800}, Vaev::Px{600}};
     Vaev::View::render(*dom, viewport);
 
     co_return Ok();

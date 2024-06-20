@@ -4,6 +4,8 @@
     "type": "exe",
     "description": "Converts HTML to PDF",
     "requires": [
+        "web-xml",
+        "web-style",
         "karm-sys"
     ]
 }

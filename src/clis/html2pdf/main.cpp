@@ -50,7 +50,7 @@ Res<Strong<Vaev::Dom::Document>> fetch(Mime::Url url) {
 
 static void collectStyle(Dom::Node const &node, Style::StyleBook &sb) {
     if (auto *el = node.is<Dom::Element>(); el and el->tagName == Html::STYLE) {
-        auto text = el->innerText();
+        auto text = el->textContent();
         Io::SScan textScan{text};
         auto sheet = Css::parseStylesheet(textScan);
         sb.add(std::move(sheet));

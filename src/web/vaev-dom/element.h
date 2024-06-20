@@ -33,20 +33,20 @@ struct Element : public Node {
         return TYPE;
     }
 
-    String innerText() const {
+    String textContent() const {
         String builder;
         if (_children.len() == 0)
             return ""s;
 
         if (_children.len() > 1)
-            panic("innerText is not implemented for elements with multiple children");
+            panic("textContent is not implemented for elements with multiple children");
 
         auto const &child = *_children[0];
         if (auto *text = child.is<Text>()) {
             return text->data;
         }
 
-        panic("innerText is not implemented for elements with children other than text nodes");
+        panic("textContent is not implemented for elements with children other than text nodes");
     }
 
     void _repr(Io::Emit &e) const override {

@@ -5,6 +5,7 @@
 #include <karm-sys/file.h>
 #include <karm-ui/input.h>
 #include <karm-ui/popover.h>
+#include <karm-ui/scroll.h>
 #include <vaev-html/parser.h>
 #include <vaev-view/inspect.h>
 #include <vaev-view/view.h>
@@ -109,7 +110,7 @@ Ui::Child sidePanel(State const &s) {
         return Kr::sidePanelContent({
             Kr::sidePanelTitle(Model::bind(SidePanel::CLOSE), "Developer Tools"),
             Ui::separator(),
-            Vaev::View::inspect(s.dom),
+            Vaev::View::inspect(s.dom) | Ui::vhscroll() | Ui::grow(),
         });
     default:
         return Ui::empty();

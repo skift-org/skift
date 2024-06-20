@@ -6,7 +6,7 @@ namespace Karm::Kira {
 
 Ui::Child sidePanelContent(Ui::Children children) {
     return Ui::vflow(children) |
-           Ui::minSize({320, Ui::UNCONSTRAINED});
+           Ui::pinSize({320, Ui::UNCONSTRAINED});
 }
 
 Ui::Child sidePanelTitle(Ui::OnPress onClose, Str title) {

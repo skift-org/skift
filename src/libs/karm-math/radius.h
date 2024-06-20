@@ -77,10 +77,10 @@ struct Radius {
             for (auto &radius : res.radii)
                 radius *= factor;
         };
-        scaleAll(size.width / (b + c));
-        scaleAll(size.height / (d + e));
-        scaleAll(size.width / (f + g));
-        scaleAll(size.height / (h + a));
+        scaleAll(size.width / (res.b + res.c));
+        scaleAll(size.height / (res.d + res.e));
+        scaleAll(size.width / (res.f + res.g));
+        scaleAll(size.height / (res.h + res.a));
         return res;
     }
 };

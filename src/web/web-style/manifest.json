@@ -2,7 +2,7 @@
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
     "id": "web-style",
     "type": "lib",
-    "description": "The Stylish CSS styling engine",
+    "description": "The Stylish styling engine",
     "requires": [
         "web-base",
         "web-html",

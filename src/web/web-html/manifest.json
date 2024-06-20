@@ -7,6 +7,7 @@
         "karm-logger",
         "web-base",
         "web-svg",
-        "web-mathml"
+        "web-mathml",
+        "web-dom"
     ]
 }

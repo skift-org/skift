@@ -8,6 +8,7 @@
 
 #include "attr.h"
 #include "node.h"
+#include "text.h"
 
 namespace Vaev::Dom {
 
@@ -30,6 +31,22 @@ struct Element : public Node {
 
     NodeType nodeType() const override {
         return TYPE;
+    }
+
+    String innerText() const {
+        String builder;
+        if (_children.len() == 0)
+            return ""s;
+
+        if (_children.len() > 1)
+            panic("innerText is not implemented for elements with multiple children");
+
+        auto const &child = *_children[0];
+        if (auto *text = child.is<Text>()) {
+            return text->data;
+        }
+
+        panic("innerText is not implemented for elements with children other than text nodes");
     }
 
     void _repr(Io::Emit &e) const override {

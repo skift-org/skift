@@ -2,7 +2,16 @@
 
 namespace Vaev::Style {
 
-bool match(Selector const &sel, Dom::Element &el);
+// MARK: Selector Specificity ---------------------------------------------------
+
+Spec spec(Selector const &) {
+    // TODO: Implement
+    return Spec::ZERO;
+}
+
+// MARK: Selector Matching -----------------------------------------------------
+
+bool match(Selector const &sel, Dom::Element const &el);
 
 bool match(Infix const &s, Dom::Element &) {
     switch (s.type) {
@@ -61,7 +70,7 @@ bool match(UniversalSelector const &, Dom::Element &) {
     return true;
 }
 
-bool match(Selector const &sel, Dom::Element &el) {
+bool match(Selector const &sel, Dom::Element const &el) {
     return sel.visit(Visitor{
         [&](Infix const &s) {
             return match(s, el);

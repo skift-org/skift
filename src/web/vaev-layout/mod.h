@@ -1,12 +1,13 @@
 #pragma once
 
 #include <vaev-dom/node.h>
+#include <vaev-style/computer.h>
 
 #include "base.h"
+#include "block.h"
 
 namespace Vaev::Layout {
 
-/// Convert a DOM tree from the bottom-up into a layout tree.
-void build(Dom::Node const &n, Vec<Strong<Frag>> &out);
+void build(Style::Computer &c, Dom::Node const &n, Flow &parent);
 
 } // namespace Vaev::Layout

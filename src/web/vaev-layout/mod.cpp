@@ -2,6 +2,8 @@
 #include <vaev-dom/text.h>
 
 #include "block.h"
+#include "flex.h"
+#include "grid.h"
 #include "image.h"
 #include "inline.h"
 #include "mod.h"
@@ -9,43 +11,54 @@
 
 namespace Vaev::Layout {
 
-// FIXME: For now this is hadcoded, but it should follow the display property.
-static Array BLOCKS = {
-    Html::DIV,
-    Html::P,
-    Html::H1,
-    Html::H2,
-    Html::H3,
-    Html::H4,
-    Html::H5,
-    Html::H6,
-};
-
-void build(Vec<Strong<Dom::Node>> const &children, Vec<Strong<Frag>> &out) {
+void build(Style::Computer &c, Vec<Strong<Dom::Node>> const &children, Flow &parent) {
     for (auto &child : children) {
-        build(*child, out);
+        build(c, *child, parent);
     }
 }
 
-void build(Dom::Element const &el, Vec<Strong<Frag>> &out) {
-    if (el.tagName == Html::IMG)
-        out.pushBack(makeStrong<ImageFrag>(makeStrong<Style::Computed>(), Media::Image::fallback()));
-    else if (contains(BLOCKS, el.tagName)) {
-        auto frag = makeStrong<BlockFlow>(makeStrong<Style::Computed>());
-        build(el.children(), frag->_frags);
-        out.pushBack(frag);
-    } else {
-        auto frag = makeStrong<InlineFlow>(makeStrong<Style::Computed>());
-        build(el.children(), frag->_frags);
-        out.pushBack(frag);
+Strong<Flow> buildForDisplay(Display const &display, Strong<Style::Computed> style) {
+    switch (display.inside()) {
+    case Display::Inside::FLOW:
+    case Display::Inside::FLOW_ROOT:
+        return makeStrong<BlockFlow>(style);
+    case Display::Inside::FLEX:
+        return makeStrong<FlexFlow>(style);
+    case Display::Inside::GRID:
+        return makeStrong<GridFlow>(style);
+
+    default:
+        return makeStrong<InlineFlow>(style);
     }
 }
 
-void build(Dom::Node const &node, Vec<Strong<Frag>> &out) {
+void build(Style::Computer &c, Dom::Element const &el, Flow &parent) {
+    auto style = c.computeFor(el);
+
+    if (el.tagName == Html::IMG) {
+        parent.add(makeStrong<ImageFrag>(style, Media::Image::fallback()));
+        return;
+    }
+
+    auto display = style->display;
+
+    if (display == Display::NONE)
+        return;
+
+    if (display == Display::CONTENT) {
+        build(c, el.children(), parent);
+        return;
+    }
+
+    auto frag = buildForDisplay(display, style);
+    build(c, el.children(), *frag);
+}
+
+void build(Style::Computer &c, Dom::Node const &node, Flow &parent) {
     if (auto *el = node.is<Dom::Element>()) {
-        build(*el, out);
+        build(c, *el, parent);
     } else if (auto *text = node.is<Dom::Text>()) {
-        out.pushBack(makeStrong<Run>(makeStrong<Style::Computed>(), text->data));
+        parent.add(makeStrong<Run>(parent._style, text->data));
     }
 }
 

@@ -1,9 +1,11 @@
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
-#include <vaev-dom/document.h>
-#include <vaev-html/parser.h>
-#include <vaev-style/stylesheet.h>
-#include <vaev-xml/parser.h>
+#include <vaev-css>
+#include <vaev-dom>
+#include <vaev-html>
+#include <vaev-layout>
+#include <vaev-style>
+#include <vaev-xml>
 
 namespace Vaev {
 
@@ -46,14 +48,34 @@ Res<Strong<Vaev::Dom::Document>> fetch(Mime::Url url) {
     }
 }
 
-static void collectStyle(Dom::Node &, Style::StyleBook &) {
+static void collectStyle(Dom::Node const &node, Style::StyleBook &sb) {
+    if (auto *el = node.is<Dom::Element>(); el and el->tagName == Html::STYLE) {
+        auto text = el->innerText();
+        Io::SScan textScan{text};
+        auto sheet = Css::parseStylesheet(textScan);
+        sb.add(std::move(sheet));
+    } else {
+        for (auto &child : node.children())
+            collectStyle(*child, sb);
+    }
 }
 
 void render(Dom::Document &dom) {
     logDebug("document: {}", dom);
 
+    // Collect styles from the document
     Style::StyleBook stylebook;
     collectStyle(dom, stylebook);
+    logDebug("stylebook: {}", stylebook);
+
+    logDebug("building layout tree");
+    Style::Computer computer{stylebook};
+    Strong<Layout::Flow> root = makeStrong<Layout::BlockFlow>(makeStrong<Style::Computed>());
+    Layout::build(computer, dom, *root);
+
+    logDebug("computing layout");
+    RectPx viewport{Px{800}, Px{600}};
+    root->layout(viewport);
 }
 
 } // namespace Vaev

@@ -252,7 +252,7 @@ struct Selector : public _Selector {
 
 Spec spec(Selector const &sel);
 
-bool match(Selector const &sel, Dom::Element &el);
+bool match(Selector const &sel, Dom::Element const &el);
 
 } // namespace Vaev::Style
 

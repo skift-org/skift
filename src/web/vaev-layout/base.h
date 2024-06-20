@@ -67,6 +67,10 @@ struct Flow : public Frag {
     Style::Computed const &styleAt(usize frag) const {
         return _frags[frag]->style();
     }
+
+    void add(Strong<Frag> frag) {
+        _frags.pushBack(frag);
+    }
 };
 
 } // namespace Vaev::Layout

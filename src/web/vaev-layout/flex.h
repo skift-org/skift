@@ -36,7 +36,7 @@ struct FlexFlow : public Flow {
 
     void _sortByOrder() {
         stableSort(_items, [&](auto a, auto b) {
-            return style(a.frag).order < style(b.frag).order;
+            return styleAt(a.frag).order < styleAt(b.frag).order;
         });
     }
 

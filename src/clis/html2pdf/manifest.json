@@ -6,6 +6,8 @@
     "requires": [
         "vaev-xml",
         "vaev-style",
+        "vaev-css",
+        "vaev-layout",
         "karm-sys"
     ]
 }

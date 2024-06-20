@@ -116,6 +116,10 @@ struct StyleBook {
     void repr(Io::Emit &e) const {
         e("(style-book {})", styleSheets);
     }
+
+    void add(StyleSheet &&sheet) {
+        styleSheets.pushBack(std::move(sheet));
+    }
 };
 
 } // namespace Vaev::Style

@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "vaev-view",
+    "type": "lib",
+    "description": "Host Vaev web content",
+    "requires": [
+        "karm-ui",
+        "vaev-layout"
+    ]
+}

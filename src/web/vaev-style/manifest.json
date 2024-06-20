@@ -1,0 +1,12 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "vaev-style",
+    "type": "lib",
+    "description": "The Stylish styling engine",
+    "requires": [
+        "vaev-base",
+        "vaev-html",
+        "vaev-svg",
+        "vaev-mathml"
+    ]
+}

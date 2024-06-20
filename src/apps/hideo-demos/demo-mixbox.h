@@ -4,7 +4,7 @@
 
 #include <karm-ui/view.h>
 #include <mixbox/mixbox.h>
-#include <web-base/color.h>
+#include <vaev-base/color.h>
 
 #include "base.h"
 
@@ -19,7 +19,7 @@ static inline Demo MIXBOX_DEMO{
             [](Gfx::Context &g, Math::Vec2i bound) {
                 auto grad = Gfx::Gradient::linear();
                 for (f64 i = 0; i <= 100; i += 10)
-                    grad.withStop(Mixbox::lerpColor(Web::YELLOW, Web::RED, i / 100.0), i / 100.0);
+                    grad.withStop(Mixbox::lerpColor(Vaev::YELLOW, Vaev::RED, i / 100.0), i / 100.0);
                 g.fillStyle(grad.bake());
                 g.fill(bound);
             }

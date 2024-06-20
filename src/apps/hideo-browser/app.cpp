@@ -5,10 +5,10 @@
 #include <karm-sys/file.h>
 #include <karm-ui/input.h>
 #include <karm-ui/popover.h>
-#include <web-html/parser.h>
-#include <web-view/inspect.h>
-#include <web-view/view.h>
-#include <web-xml/parser.h>
+#include <vaev-html/parser.h>
+#include <vaev-view/inspect.h>
+#include <vaev-view/view.h>
+#include <vaev-xml/parser.h>
 
 namespace Hideo::Browser {
 
@@ -20,7 +20,7 @@ enum struct SidePanel {
 
 struct State {
     Mime::Url url;
-    Strong<Web::Dom::Document> dom;
+    Strong<Vaev::Dom::Document> dom;
     Opt<Error> err;
     SidePanel sidePanel = SidePanel::CLOSE;
 
@@ -109,7 +109,7 @@ Ui::Child sidePanel(State const &s) {
         return Kr::sidePanelContent({
             Kr::sidePanelTitle(Model::bind(SidePanel::CLOSE), "Developer Tools"),
             Ui::separator(),
-            Web::View::inspect(s.dom),
+            Vaev::View::inspect(s.dom),
         });
     default:
         return Ui::empty();
@@ -117,7 +117,7 @@ Ui::Child sidePanel(State const &s) {
 }
 
 Ui::Child appContent(State const &s) {
-    auto webView = Web::View::view(s.dom) | Kr::contextMenu(slot$(contextMenu()));
+    auto webView = Vaev::View::view(s.dom) | Kr::contextMenu(slot$(contextMenu()));
     if (s.sidePanel == SidePanel::CLOSE)
         return webView;
     return Ui::hflow(
@@ -126,7 +126,7 @@ Ui::Child appContent(State const &s) {
     );
 }
 
-Ui::Child app(Mime::Url url, Strong<Web::Dom::Document> dom, Opt<Error> err) {
+Ui::Child app(Mime::Url url, Strong<Vaev::Dom::Document> dom, Opt<Error> err) {
     return Ui::reducer<Model>(
         {
             url,
@@ -158,7 +158,7 @@ Ui::Child app(Mime::Url url, Strong<Web::Dom::Document> dom, Opt<Error> err) {
     );
 }
 
-Res<Strong<Web::Dom::Document>> fetch(Mime::Url url) {
+Res<Strong<Vaev::Dom::Document>> fetch(Mime::Url url) {
     logInfo("fetching: {}", url);
 
     if (url.scheme == "about") {
@@ -176,19 +176,19 @@ Res<Strong<Web::Dom::Document>> fetch(Mime::Url url) {
     if (not mime.has())
         return Error::invalidInput("cannot determine MIME type");
 
-    auto dom = makeStrong<Web::Dom::Document>();
+    auto dom = makeStrong<Vaev::Dom::Document>();
     auto file = try$(Sys::File::open(url));
     auto buf = try$(Io::readAllUtf8(file));
 
     if (mime->is("text/html"_mime)) {
-        Web::Html::Parser parser{dom};
+        Vaev::Html::Parser parser{dom};
         parser.write(buf);
 
         return Ok(dom);
     } else if (mime->is("application/xhtml+xml"_mime)) {
         Io::SScan scan{buf};
-        Web::Xml::Parser parser;
-        dom = try$(parser.parse(scan, Web::HTML));
+        Vaev::Xml::Parser parser;
+        dom = try$(parser.parse(scan, Vaev::HTML));
 
         return Ok(dom);
     } else {

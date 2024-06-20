@@ -5,8 +5,8 @@
     "description": "Browse the web",
     "requires": [
         "hideo-base",
-        "web-html",
-        "web-xml",
-        "web-view"
+        "vaev-html",
+        "vaev-xml",
+        "vaev-view"
     ]
 }

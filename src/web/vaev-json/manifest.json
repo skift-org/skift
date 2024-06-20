@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "vaev-json",
+    "type": "lib",
+    "description": "JSON parser and serializer",
+    "requires": [
+        "karm-io"
+    ]
+}

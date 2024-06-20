@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "vaev-paint",
+    "type": "lib",
+    "description": "Painting engine of Vaev",
+    "requires": [
+        "vaev-style"
+    ]
+}

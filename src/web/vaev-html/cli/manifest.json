@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "vaev-html.cli",
+    "type": "exe",
+    "description": "HTML CLI",
+    "requires": [
+        "karm-sys",
+        "vaev-html"
+    ]
+}

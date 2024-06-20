@@ -1,13 +1,13 @@
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
-#include <web-dom/document.h>
-#include <web-html/parser.h>
-#include <web-style/stylesheet.h>
-#include <web-xml/parser.h>
+#include <vaev-dom/document.h>
+#include <vaev-html/parser.h>
+#include <vaev-style/stylesheet.h>
+#include <vaev-xml/parser.h>
 
-namespace Web {
+namespace Vaev {
 
-Res<Strong<Web::Dom::Document>> fetch(Mime::Url url) {
+Res<Strong<Vaev::Dom::Document>> fetch(Mime::Url url) {
     logInfo("fetching: {}", url);
 
     if (url.scheme == "about") {
@@ -25,19 +25,19 @@ Res<Strong<Web::Dom::Document>> fetch(Mime::Url url) {
     if (not mime.has())
         return Error::invalidInput("cannot determine MIME type");
 
-    auto dom = makeStrong<Web::Dom::Document>();
+    auto dom = makeStrong<Vaev::Dom::Document>();
     auto file = try$(Sys::File::open(url));
     auto buf = try$(Io::readAllUtf8(file));
 
     if (mime->is("text/html"_mime)) {
-        Web::Html::Parser parser{dom};
+        Vaev::Html::Parser parser{dom};
         parser.write(buf);
 
         return Ok(dom);
     } else if (mime->is("application/xhtml+xml"_mime)) {
         Io::SScan scan{buf};
-        Web::Xml::Parser parser;
-        dom = try$(parser.parse(scan, Web::HTML));
+        Vaev::Xml::Parser parser;
+        dom = try$(parser.parse(scan, Vaev::HTML));
 
         return Ok(dom);
     } else {
@@ -56,7 +56,7 @@ void render(Dom::Document &dom) {
     collectStyle(dom, stylebook);
 }
 
-} // namespace Web
+} // namespace Vaev
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto args = Sys::useArgs(ctx);
@@ -66,9 +66,9 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     }
 
     auto input = co_try$(Mime::parseUrlOrPath(args[0]));
-    auto dom = co_try$(Web::fetch(input));
+    auto dom = co_try$(Vaev::fetch(input));
 
-    Web::render(*dom);
+    Vaev::render(*dom);
 
     co_return Ok();
 }

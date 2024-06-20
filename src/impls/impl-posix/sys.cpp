@@ -189,7 +189,7 @@ Res<Stat> stat(Mime::Url const &url) {
 
 // MARK: User interactions -----------------------------------------------------
 
-Res<> launch(Mime::Uti const &, Mime::Url const &url) {
+Res<> launch(Mime::Uti const &uti, Mime::Url const &url) {
     String str = try$(resolve(url)).str();
 
     int pid = fork();
@@ -198,7 +198,11 @@ Res<> launch(Mime::Uti const &, Mime::Url const &url) {
 
     if (pid == 0) {
 #ifdef __ck_sys_darwin__
-        execlp("open", "open", str.buf(), nullptr);
+        if (uti == Mime::Uti::PUBLIC_MODIFY) {
+            execlp("open", "open", "-t", str.buf(), nullptr);
+        } else {
+            execlp("open", "open", str.buf(), nullptr);
+        }
 #else
         execlp("xdg-open", "xdg-open", str.buf(), nullptr);
 #endif

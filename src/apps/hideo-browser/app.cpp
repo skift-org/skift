@@ -3,6 +3,7 @@
 #include <karm-kira/side-panel.h>
 #include <karm-mime/mime.h>
 #include <karm-sys/file.h>
+#include <karm-sys/launch.h>
 #include <karm-ui/input.h>
 #include <karm-ui/popover.h>
 #include <karm-ui/scroll.h>
@@ -85,7 +86,7 @@ Ui::Child addressBar(Mime::Url const &url) {
            });
 }
 
-Ui::Child contextMenu() {
+Ui::Child contextMenu(State const &s) {
     return Kr::contextMenuContent({
         Kr::contextMenuDock({
             Kr::contextMenuIcon(Ui::NOP, Mdi::ARROW_LEFT),
@@ -93,7 +94,12 @@ Ui::Child contextMenu() {
             Kr::contextMenuIcon(Ui::NOP, Mdi::REFRESH),
         }),
         Ui::separator(),
-        Kr::contextMenuItem(Ui::NOP, Mdi::CODE_TAGS, "View Source..."),
+        Kr::contextMenuItem(
+            [s](auto &) {
+                (void)Sys::launch(Mime::Uti::PUBLIC_MODIFY, s.url);
+            },
+            Mdi::CODE_TAGS, "View Source..."
+        ),
         Kr::contextMenuItem(Model::bind(SidePanel::DEVELOPER_TOOLS), Mdi::BUTTON_CURSOR, "Inspect"),
     });
 }
@@ -118,7 +124,7 @@ Ui::Child sidePanel(State const &s) {
 }
 
 Ui::Child appContent(State const &s) {
-    auto webView = Vaev::View::view(s.dom) | Kr::contextMenu(slot$(contextMenu()));
+    auto webView = Vaev::View::view(s.dom) | Kr::contextMenu(slot$(contextMenu(s)));
     if (s.sidePanel == SidePanel::CLOSE)
         return webView;
     return Ui::hflow(

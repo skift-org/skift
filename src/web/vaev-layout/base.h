@@ -60,7 +60,7 @@ struct Frag {
         if (style().backgrounds.len()) {
             Paint::Box box;
             box.backgrounds = style().backgrounds;
-            box.bound = _borderBox;
+            box.bound.wh = {Px{100}, Px{100}};
             stack.add(makeStrong<Paint::Box>(std::move(box)));
         }
     }

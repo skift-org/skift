@@ -31,6 +31,10 @@ struct Uti {
     static Uti parse(Str str) {
         return Uti{str}; // lol
     }
+
+    bool operator==(Uti const &other) const {
+        return _buf == other._buf;
+    }
 };
 
 } // namespace Karm::Mime

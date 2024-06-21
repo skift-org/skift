@@ -4,6 +4,7 @@
 #include "model.h"
 
 // Pages
+#include "page-alert.h"
 #include "page-avatar.h"
 #include "page-badge.h"
 #include "page-checkbox.h"
@@ -18,6 +19,7 @@
 namespace Hideo::Zoo {
 
 static Array PAGES = {
+    &PAGE_ALERT,
     &PAGE_AVATAR,
     &PAGE_BADGE,
     &PAGE_CHECKBOX,

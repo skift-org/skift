@@ -3,7 +3,7 @@
 #include <karm-ui/reducer.h>
 #include <karm-ui/scroll.h>
 
-#include "sidenav.h"
+#include "side-nav.h"
 
 namespace Karm::Kira {
 

@@ -12,7 +12,7 @@ static inline Page PAGE_CONTEXT_MENU{
     "Context Menu",
     "Displays a menu to the user — such as a set of actions or functions — triggered by a button.",
     [] {
-        return Ui::labelMedium("Right click here") |
+        return Ui::labelLarge(Ui::GRAY500, "Right click here") |
                Ui::center() |
                Ui::bound() |
                Kr::contextMenu([] {

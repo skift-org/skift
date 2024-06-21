@@ -10,7 +10,7 @@ namespace Hideo::Zoo {
 static inline Page PAGE_SIDE_PANEL{
     Mdi::MENU_OPEN,
     "Side Panel",
-    "A panel that slides in from the side of the screen.",
+    "A panel that slides in from the side of the screen to display aditional information or properties",
     [] {
         return Ui::state(false, [](auto state, auto bind) {
             auto content = Ui::button(bind(!state), "Toggle Side Panel") |
@@ -27,7 +27,7 @@ static inline Page PAGE_SIDE_PANEL{
                 Kr::sidePanelContent({
                     Kr::sidePanelTitle(bind(false), "Side Panel"),
                     Ui::separator(),
-                    Ui::labelMedium("This is a side panel.") |
+                    Ui::labelMedium(Ui::GRAY500, "This is a side panel.") |
                         Ui::center() | Ui::grow(),
                 })
             );

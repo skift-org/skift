@@ -22,23 +22,7 @@ FlagsEnum$(DialogButton);
 
 // MARK: Dialogs Scaffolding ---------------------------------------------------
 
-Ui::Child dialogTitle(String title);
-
-Ui::Child dialogScafold(Math::Align a, Ui::Child inner);
-
-inline auto dialogScafold(Math::Align a) {
-    return [a](Ui::Child inner) {
-        return dialogScafold(a, inner);
-    };
-}
-
 Ui::Child dialogScafold(Math::Align a, Ui::Child content, Ui::Children actions);
-
-inline auto dialogScafold(Math::Align a, Ui::Children content) {
-    return [a, content = std::move(content)](Ui::Child inner) {
-        return dialogScafold(a, inner, content);
-    };
-}
 
 Ui::Child dialogButton(DialogButton result, bool primary = false);
 

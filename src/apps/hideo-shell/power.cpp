@@ -1,11 +1,13 @@
-#include <hideo-base/dialogs.h>
+#include <karm-kira/dialog.h>
+#include <karm-ui/dialog.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 
 namespace Hideo::Shell {
 
 Ui::Child powerDialog() {
-    auto actions =
+    return Kr::dialogContent({
+        Kr::dialogTitleBar("Power Options"s),
         Ui::vflow(
             4,
             Ui::button(Ui::closeDialog, Ui::ButtonStyle::subtle(), Mdi::LOGOUT, "Logout"),
@@ -13,13 +15,10 @@ Ui::Child powerDialog() {
             Ui::button(Ui::closeDialog, Ui::ButtonStyle::subtle(), Mdi::RESTART, "Restart"),
             Ui::button(Ui::closeDialog, Ui::ButtonStyle::subtle(), Mdi::POWER_STANDBY, "Shutdown")
         ) |
-        Ui::grow();
-
-    return dialogScafold(
-        Math::Align::CENTER | Math::Align::CLAMP,
-        dialogTitle("Power Options"s) | Ui::minSize({320, Ui::UNCONSTRAINED}),
-        {actions}
-    );
+            Ui::spacing(4) |
+            Ui::minSize({260, Ui::UNCONSTRAINED}) |
+            Ui::grow(),
+    });
 }
 
 } // namespace Hideo::Shell

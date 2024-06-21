@@ -89,6 +89,14 @@ struct DialogLayer : public LeafNode<DialogLayer> {
         if (_visibility.needRepaint(*this, e))
             Ui::shouldRepaint(*this);
 
+        e.handle<Events::KeyboardEvent>([&](Events::KeyboardEvent &e) {
+            if (e.type == Events::KeyboardEvent::PRESS && e.key == Events::Key::ESC) {
+                closeDialog(*this);
+                return true;
+            }
+            return false;
+        });
+
         if (dialogVisible()) {
             dialog().event(e);
         } else {

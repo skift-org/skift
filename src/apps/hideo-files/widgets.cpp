@@ -2,6 +2,7 @@
 #include <hideo-base/dialogs.h>
 #include <hideo-base/scafold.h>
 #include <karm-kira/context-menu.h>
+#include <karm-kira/dialog.h>
 #include <karm-mime/mime.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/input.h>
@@ -242,7 +243,7 @@ Ui::Child openFileDialog() {
             return dialogScafold(
                 Math::Align::FILL,
                 Ui::vflow(
-                    dialogTitle("Open file…"s),
+                    Kr::dialogTitleBar("Open file…"s),
                     toolbar(d),
                     maybeDir
                         ? directoryListing(d, maybeDir.unwrap()) |

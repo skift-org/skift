@@ -8,9 +8,10 @@
 #include "page-badge.h"
 #include "page-checkbox.h"
 #include "page-context-menu.h"
+#include "page-dialog.h"
 #include "page-radio.h"
+#include "page-side-nav.h"
 #include "page-side-panel.h"
-#include "page-sidenav.h"
 #include "page-slider.h"
 #include "page-toggle.h"
 
@@ -21,6 +22,7 @@ static Array PAGES = {
     &PAGE_BADGE,
     &PAGE_CHECKBOX,
     &PAGE_CONTEXT_MENU,
+    &PAGE_DIALOG,
     &PAGE_RADIO,
     &PAGE_SIDE_PANEL,
     &PAGE_SIDENAV,
@@ -51,9 +53,9 @@ Ui::Child app() {
                 auto &page = PAGES[s.page];
                 return Ui::vflow(
                     Ui::vflow(
-                        Ui::titleLarge(page->name),
+                        Ui::titleMedium(page->name),
                         Ui::empty(4),
-                        Ui::bodyMedium(page->description)
+                        Ui::bodySmall(page->description)
                     ) | Ui::spacing(16),
                     Ui::separator(),
                     page->build() | Ui::grow()

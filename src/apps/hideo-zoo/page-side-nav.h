@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-kira/sidenav.h>
+#include <karm-kira/side-nav.h>
 #include <karm-ui/layout.h>
 
 #include "model.h"

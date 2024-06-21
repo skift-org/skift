@@ -1,7 +1,9 @@
 #include <karm-kira/badge.h>
+#include <karm-kira/dialog.h>
 #include <karm-ui/box.h>
 #include <karm-ui/dialog.h>
-#include <karm-ui/drag.h>
+#include <karm-ui/input.h>
+#include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
 
 #include "dialogs.h"
@@ -10,42 +12,11 @@ namespace Hideo {
 
 // MARK: Dialogs Scaffolding ---------------------------------------------------
 
-Ui::Child dialogTitle(String title) {
-    return Ui::vflow(
-        Ui::hflow(
-            Ui::titleSmall(title) | Ui::vcenter(),
-            Ui::grow(NONE),
-            button(Ui::closeDialog, Ui::ButtonStyle::subtle(), Mdi::CLOSE)
-        ) |
-            Ui::spacing({16, 4, 4, 4}),
-        Ui::separator()
-    );
-}
-
-Ui::Child dialogScafold(Math::Align a, Ui::Child inner) {
-    Ui::BoxStyle const boxStyle = {
-        .borderRadius = 8,
-        .borderWidth = 1,
-        .borderPaint = Ui::GRAY800,
-        .backgroundPaint = Ui::GRAY900,
-        .shadowStyle = Gfx::BoxShadow::elevated(16)
-    };
-
-    return inner |
-           box(boxStyle) |
-           Ui::dragRegion() |
-           Ui::align(a) |
-           Ui::spacing(16);
-}
-
-Ui::Child dialogScafold(Math::Align a, Ui::Child content, Ui::Children actions) {
-    auto layout =
-        Ui::vflow(
-            content | Ui::grow(),
-            hflow(8, actions) | Ui::spacing(8)
-        );
-
-    return dialogScafold(a, layout);
+Ui::Child dialogScafold(Math::Align, Ui::Child content, Ui::Children actions) {
+    return Kr::dialogContent({
+        content | Ui::grow(),
+        hflow(8, actions) | Ui::spacing(8),
+    });
 }
 
 Ui::Child dialogCloseButton() {
@@ -84,19 +55,10 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.)";
 
 Ui::Child licenseDialog() {
-    return dialogScafold(
-        Math::Align::CLAMP |
-            Math::Align::CENTER |
-            Math::Align::TOP_START,
-        Ui::vflow(
-            dialogTitle("License"s),
-            Ui::bodySmall(LICENSE) |
-                Ui::spacing(16) |
-                Ui::vscroll() |
-                Ui::maxSize({480, Ui::UNCONSTRAINED}) |
-                Ui::grow()
-        )
-    );
+    return Kr::dialogContent({
+        Kr::dialogTitleBar("License"s),
+        Ui::bodySmall(LICENSE) | Ui::spacing(16) | Ui::vscroll() | Ui::maxSize({480, Ui::UNCONSTRAINED}) | Ui::grow(),
+    });
 }
 
 Ui::Child aboutDialog(Mdi::Icon i, String name) {

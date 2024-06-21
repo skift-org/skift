@@ -1,5 +1,5 @@
 #include <hideo-base/scafold.h>
-#include <karm-kira/sidenav.h>
+#include <karm-kira/side-nav.h>
 #include <karm-ui/dialog.h>
 
 #include "model.h"

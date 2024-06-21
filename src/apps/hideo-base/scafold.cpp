@@ -94,9 +94,6 @@ Ui::Child mobileScafold(Scafold::State const &s, Scafold const &scafold) {
     if (s.sidebarOpen and scafold.sidebar) {
         body.pushBack(
             (scafold.sidebar().unwrap()) |
-            Ui::box({
-                .backgroundPaint = Ui::GRAY900,
-            }) |
             Ui::grow()
         );
     } else {

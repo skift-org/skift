@@ -8,7 +8,7 @@
 namespace Hideo::Zoo {
 
 static inline Page PAGE_SIDENAV{
-    Mdi::FILE_TREE,
+    Mdi::DOCK_LEFT,
     "Sidenav",
     "A vertical list of links that can be toggled open and closed.",
     [] {

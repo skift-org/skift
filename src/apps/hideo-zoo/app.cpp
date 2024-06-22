@@ -10,6 +10,7 @@
 #include "page-checkbox.h"
 #include "page-context-menu.h"
 #include "page-dialog.h"
+#include "page-navbar.h"
 #include "page-radio.h"
 #include "page-side-nav.h"
 #include "page-side-panel.h"
@@ -25,6 +26,7 @@ static Array PAGES = {
     &PAGE_CHECKBOX,
     &PAGE_CONTEXT_MENU,
     &PAGE_DIALOG,
+    &PAGE_NAVBAR,
     &PAGE_RADIO,
     &PAGE_SIDE_PANEL,
     &PAGE_SIDENAV,

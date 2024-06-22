@@ -1,5 +1,5 @@
-#include <hideo-base/navbar.h>
 #include <hideo-base/scafold.h>
+#include <karm-kira/navbar.h>
 #include <karm-sys/time.h>
 #include <karm-ui/anim.h>
 
@@ -53,32 +53,32 @@ Ui::Child app() {
                 .title = "Clock"s,
                 .titlebar = TitlebarStyle::DIALOG,
                 .body = [&] {
-                    auto navbar = Hideo::navbar(
-                        Hideo::navbarItem(
+                    auto navbar = Kr::navbarContent({
+                        Kr::navbarItem(
+                            Model::bind(Page::ALARM),
                             Mdi::ALARM,
                             "Alarm",
-                            s.page == Page::ALARM,
-                            Model::bind(Page::ALARM)
+                            s.page == Page::ALARM
                         ),
-                        Hideo::navbarItem(
+                        Kr::navbarItem(
+                            Model::bind(Page::CLOCK),
                             Mdi::CLOCK_OUTLINE,
                             "Clock",
-                            s.page == Page::CLOCK,
-                            Model::bind(Page::CLOCK)
+                            s.page == Page::CLOCK
                         ),
-                        Hideo::navbarItem(
+                        Kr::navbarItem(
+                            Model::bind(Page::TIMER),
                             Mdi::TIMER_SAND,
                             "Timer",
-                            s.page == Page::TIMER,
-                            Model::bind(Page::TIMER)
+                            s.page == Page::TIMER
                         ),
-                        Hideo::navbarItem(
+                        Kr::navbarItem(
+                            Model::bind(Page::STOPWATCH),
                             Mdi::TIMER_OUTLINE,
                             "Stopwatch",
-                            s.page == Page::STOPWATCH,
-                            Model::bind(Page::STOPWATCH)
-                        )
-                    );
+                            s.page == Page::STOPWATCH
+                        ),
+                    });
 
                     auto body = Ui::carousel(
                         (usize)s.page,

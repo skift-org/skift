@@ -8,7 +8,7 @@
 namespace Hideo::Zoo {
 
 static inline Page PAGE_SIDE_PANEL{
-    Mdi::MENU_OPEN,
+    Mdi::DOCK_RIGHT,
     "Side Panel",
     "A panel that slides in from the side of the screen to display aditional information or properties",
     [] {

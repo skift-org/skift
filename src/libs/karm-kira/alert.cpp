@@ -1,3 +1,4 @@
+#include <karm-sys/context.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
 #include <karm-ui/input.h>
@@ -38,7 +39,15 @@ Ui::Child alertDescription(String text) {
 }
 
 Ui::Child alertFooter(Ui::Children children) {
-    return Ui::hflow(8, children) |
+    auto isMobile = Sys::useFormFactor() == Sys::FormFactor::MOBILE;
+    return Ui::flow(
+               {
+                   isMobile ? Math::Flow::TOP_TO_BOTTOM : Math::Flow::LEFT_TO_RIGHT,
+                   Math::Align::FILL,
+                   8,
+               },
+               children
+           ) |
            Ui::spacing({0, 16, 0, 0});
 }
 

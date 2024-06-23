@@ -2,13 +2,12 @@
 
 This directory contains the source code for the project.
 
- - [`apps/`](apps/)  core system applications
- - [`assets/`](assets/) shared assets such as images and fonts
- - [`clis/`](clis/) core system command line applications
- - [`embed/`](embed/) platform specific interfaces
- - [`impls/`](impls/) platform specific implementations
- - [`kernel/`](kernel/) kernel & bootloaders
- - [`libs/`](libs/) core system libraries
- - [`specs/`](specs/) implementation of standard interfaces/specifications
- - [`srvs/`](srvs/) core system services
- - [`web/`](web/) web platform specific interfaces
+ - [`apps/`](apps/) - Core system applications
+ - [`assets/`](assets/) - Shared assets such as images and fonts
+ - [`clis/`](clis/) - Core system command line applications
+ - [`impls/`](impls/) - Platform specific implementations
+ - [`kernel/`](kernel/) - Kernel & bootloaders
+ - [`libs/`](libs/) - Core system libraries
+ - [`specs/`](specs/) - Implementation of standard interfaces/specifications
+ - [`srvs/`](srvs/) - Core system services
+ - [`web/`](web/) - The Vaev browser engine

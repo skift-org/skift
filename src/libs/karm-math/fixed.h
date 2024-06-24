@@ -70,13 +70,13 @@ struct _Fixed {
     constexpr _Fixed() : _val(0) {}
 
     template <Meta::Float F>
-    explicit _Fixed(F val) : _val(fromFloatNearest(val)._val) {}
+    explicit _Fixed(F from) : _val(fromFloatNearest(from)._val) {}
 
     template <Meta::SignedIntegral I>
-    explicit _Fixed(I val) : _val(fromInt<I>(val)._val) {}
+    explicit _Fixed(I from) : _val(fromInt<I>(from)._val) {}
 
     template <Meta::UnsignedIntegral U>
-    explicit _Fixed(U val) : _val(fromUint<U>(val)._val) {}
+    explicit _Fixed(U from) : _val(fromUint<U>(from)._val) {}
 
     T raw() const {
         return _val;

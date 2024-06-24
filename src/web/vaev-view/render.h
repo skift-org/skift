@@ -7,6 +7,11 @@
 
 namespace Vaev::View {
 
-Cons<Strong<Layout::Frag>, Strong<Paint::Node>> render(Dom::Document const &dom, Vec2Px viewport);
+struct RenderResult {
+    Strong<Layout::Frag> layout;
+    Strong<Paint::Node> paint;
+};
+
+RenderResult render(Dom::Document const &dom, Vec2Px viewport);
 
 } // namespace Vaev::View

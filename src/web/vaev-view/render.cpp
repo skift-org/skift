@@ -21,7 +21,7 @@ static void _collectStyle(Dom::Node const &node, Style::StyleBook &sb) {
     }
 }
 
-Cons<Strong<Layout::Frag>, Strong<Paint::Node>> render(Dom::Document const &dom, Vec2Px viewport) {
+RenderResult render(Dom::Document const &dom, Vec2Px viewport) {
     Style::StyleBook stylebook;
     stylebook.add(Css::fetchStylesheet("bundle://vaev-view/user-agent.css"_url).take());
     _collectStyle(dom, stylebook);

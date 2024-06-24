@@ -378,25 +378,11 @@ Res<> memFlush(void *, usize) {
     return Ok();
 }
 
-Res<> populate(SysInfo &) {
-    return Error::notImplemented();
+Res<Stat> stat(Mime::Url const &) {
+    notImplemented();
 }
 
-Res<> populate(MemInfo &) {
-    return Error::notImplemented();
-}
-
-Res<> populate(Vec<CpuInfo> &) {
-    return Error::notImplemented();
-}
-
-Res<> populate(UserInfo &) {
-    return Error::notImplemented();
-}
-
-Res<> populate(Vec<UserInfo> &) {
-    return Error::notImplemented();
-}
+// MARK: Time ------------------------------------------------------------------
 
 TimeStamp now() {
     Efi::Time t;
@@ -417,6 +403,40 @@ TimeStamp now() {
     return DateTime{date, time}.toTimeStamp() +
            TimeSpan::fromUSecs(t.nanosecond / 1000);
 }
+
+// MARK: System Informations ---------------------------------------------------
+
+Res<> populate(SysInfo &) {
+    return Error::notImplemented();
+}
+
+Res<> populate(MemInfo &) {
+    return Error::notImplemented();
+}
+
+Res<> populate(Vec<CpuInfo> &) {
+    return Error::notImplemented();
+}
+
+Res<> populate(UserInfo &) {
+    return Error::notImplemented();
+}
+
+Res<> populate(Vec<UserInfo> &) {
+    return Error::notImplemented();
+}
+
+// MARK: User interactions -----------------------------------------------------
+
+Res<> launch(Mime::Uti const &, Mime::Url const &) {
+    notImplemented();
+}
+
+Async::Task<> launchAsync(Mime::Uti const &, Mime::Url const &) {
+    notImplemented();
+}
+
+// MARK: Process Managment -----------------------------------------------------
 
 Res<> sleep(TimeSpan) {
     return Error::notImplemented();

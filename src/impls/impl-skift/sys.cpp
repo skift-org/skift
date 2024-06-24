@@ -53,6 +53,20 @@ Res<Vec<Sys::DirEntry>> readDir(Mime::Url const &) {
     notImplemented();
 }
 
+Res<Stat> stat(Mime::Url const &) {
+    notImplemented();
+}
+
+// MARK: User interactions -----------------------------------------------------
+
+Res<> launch(Mime::Uti const &, Mime::Url const &) {
+    notImplemented();
+}
+
+Async::Task<> launchAsync(Mime::Uti const &, Mime::Url const &) {
+    notImplemented();
+}
+
 // MARK: Sockets ---------------------------------------------------------------
 
 Res<Strong<Sys::Fd>> connectTcp(SocketAddr) {

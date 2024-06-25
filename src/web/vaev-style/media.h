@@ -28,7 +28,7 @@ struct Media {
     /// https://drafts.csswg.org/mediaqueries/#aspect-ratio
     f64 aspectRatio;
 
-    /// 4.4. Device Height: the device-height feature
+    /// 4.4. Orientation: the orientation feature
     /// https://drafts.csswg.org/mediaqueries/#orientation
     Orientation orientation;
 
@@ -51,11 +51,11 @@ struct Media {
     Update update;
 
     /// 5.5. Overflow Block: the overflow-block feature
-    /// https://drafts.csswg.org/mediaqueries/#overflow-block
+    /// https://drafts.csswg.org/mediaqueries/#mf-overflow-block
     OverflowBlock overflowBlock;
 
     /// 5.6. Overflow Inline: the overflow-inline feature
-    /// https://drafts.csswg.org/mediaqueries/#overflow-inline
+    /// https://drafts.csswg.org/mediaqueries/#mf-overflow-inline
     OverflowInline overflowInline;
 
     //  6. MARK: Color Media Features
@@ -87,11 +87,11 @@ struct Media {
     Hover hover;
 
     /// 7.3. Any Pointer: the any-pointer feature
-    /// https://drafts.csswg.org/mediaqueries/#any-pointer
+    /// https://drafts.csswg.org/mediaqueries/#any-input
     Pointer anyPointer;
 
     /// 7.4. Any Hover: the any-hover feature
-    /// https://drafts.csswg.org/mediaqueries/#any-hover
+    /// https://drafts.csswg.org/mediaqueries/#any-input
     Hover anyHover;
 };
 
@@ -107,14 +107,22 @@ struct RangeBound {
 
     T value = {};
     Type type = NONE;
+
+    void repr(Io::Emit &e) const {
+        e("{}{}", value, type == INCLUSIVE ? "i"s : "e"s);
+    }
 };
 
-template <typename T, auto Media::*F>
+template <StrLit NAME, typename T, auto Media::*F>
 struct RangeFeature {
     using Bound = RangeBound<T>;
 
     Bound lower{};
     Bound upper{};
+
+    static constexpr Str name() {
+        return NAME;
+    }
 
     bool match(T actual) const {
         bool result = true;
@@ -156,11 +164,19 @@ struct RangeFeature {
             .upper = {value, Bound::INCLUSIVE},
         };
     }
+
+    void repr(Io::Emit &e) const {
+        e("{}: {} - {}", NAME, lower, upper);
+    }
 };
 
-template <typename T, auto Media::*F>
+template <StrLit NAME, typename T, auto Media::*F>
 struct DiscreteFeature {
     T value;
+
+    static constexpr Str name() {
+        return NAME;
+    }
 
     bool match(T actual) const {
         return actual == value;
@@ -169,91 +185,95 @@ struct DiscreteFeature {
     bool match(Media const &media) const {
         return match(media.*F);
     }
+
+    void repr(Io::Emit &e) const {
+        e("{}: {}", NAME, value);
+    }
 };
 
 /// 2.3. Media Types
 /// https://drafts.csswg.org/mediaqueries/#media-types
-using TypeFeature = DiscreteFeature<MediaType, &Media::type>;
+using TypeFeature = DiscreteFeature<"type", MediaType, &Media::type>;
 
 // 4. MARK: Viewport/Page Dimensions Media Features ----------------------------
 
 /// 4.1. Width: the width feature
 /// https://drafts.csswg.org/mediaqueries/#width
-using WidthFeature = RangeFeature<Length, &Media::width>;
+using WidthFeature = RangeFeature<"width", Length, &Media::width>;
 
 /// 4.2. Height: the height feature
 /// https://drafts.csswg.org/mediaqueries/#height
-using HeightFeature = RangeFeature<Length, &Media::height>;
+using HeightFeature = RangeFeature<"height", Length, &Media::height>;
 
 /// 4.3. Device Width: the device-width feature
 /// https://drafts.csswg.org/mediaqueries/#aspect-ratio
-using AspectRatioFeature = RangeFeature<f64, &Media::aspectRatio>;
+using AspectRatioFeature = RangeFeature<"aspect-ratio", f64, &Media::aspectRatio>;
 
 /// 4.4. Device Height: the device-height feature
 /// https://drafts.csswg.org/mediaqueries/#orientation
-using OrientationFeature = DiscreteFeature<Orientation, &Media::orientation>;
+using OrientationFeature = DiscreteFeature<"orientation", Orientation, &Media::orientation>;
 
 // 5. MARK: Display Quality Media Features
 
 /// 5.1. Resolution: the resolution feature
 /// https://drafts.csswg.org/mediaqueries/#resolution
-using ResolutionFeature = RangeFeature<Resolution, &Media::resolution>;
+using ResolutionFeature = RangeFeature<"resolution", Resolution, &Media::resolution>;
 
 /// 5.2. Scan: the scan feature
 /// https://drafts.csswg.org/mediaqueries/#scan
-using ScanFeature = DiscreteFeature<Scan, &Media::scan>;
+using ScanFeature = DiscreteFeature<"scan", Scan, &Media::scan>;
 
 /// 5.3. Grid: the grid feature
 /// https://drafts.csswg.org/mediaqueries/#grid
-using GridFeature = DiscreteFeature<bool, &Media::grid>;
+using GridFeature = DiscreteFeature<"grid", bool, &Media::grid>;
 
 /// 5.4. Update: the update feature
 /// https://drafts.csswg.org/mediaqueries/#update
-using UpdateFeature = DiscreteFeature<Update, &Media::update>;
+using UpdateFeature = DiscreteFeature<"update", Update, &Media::update>;
 
 /// 5.5. Overflow Block: the overflow-block feature
-/// https://drafts.csswg.org/mediaqueries/#overflow-block
-using OverflowBlockFeature = DiscreteFeature<OverflowBlock, &Media::overflowBlock>;
+/// https://drafts.csswg.org/mediaqueries/#mf-overflow-block
+using OverflowBlockFeature = DiscreteFeature<"overflow-block", OverflowBlock, &Media::overflowBlock>;
 
 /// 5.6. Overflow Inline: the overflow-inline feature
-/// https://drafts.csswg.org/mediaqueries/#overflow-inline
-using OverflowInlineFeature = DiscreteFeature<OverflowInline, &Media::overflowInline>;
+/// https://drafts.csswg.org/mediaqueries/#mf-overflow-inline
+using OverflowInlineFeature = DiscreteFeature<"overflow-inline", OverflowInline, &Media::overflowInline>;
 
 //  6. MARK: Color Media Features ----------------------------------------------
 
 // 6.1. Color: the color feature
 /// https://drafts.csswg.org/mediaqueries/#color
-using ColorFeature = RangeFeature<int, &Media::color>;
+using ColorFeature = RangeFeature<"color", int, &Media::color>;
 
 /// 6.2. Color Index: the color-index feature
 /// https://drafts.csswg.org/mediaqueries/#color-index
-using ColorIndexFeature = RangeFeature<int, &Media::colorIndex>;
+using ColorIndexFeature = RangeFeature<"color-index", int, &Media::colorIndex>;
 
 /// 6.3. Monochrome: the monochrome feature
 /// https://drafts.csswg.org/mediaqueries/#monochrome
-using MonochromeFeature = RangeFeature<int, &Media::monochrome>;
+using MonochromeFeature = RangeFeature<"monochrome", int, &Media::monochrome>;
 
 /// 6.4. Color Gamut: the color-gamut feature
 /// https://drafts.csswg.org/mediaqueries/#color-gamut
-using ColorGamutFeature = DiscreteFeature<ColorGamut, &Media::colorGamut>;
+using ColorGamutFeature = DiscreteFeature<"color-gamut", ColorGamut, &Media::colorGamut>;
 
 // 7. MARK: Interaction Media Features
 
 /// 7.1. Pointer: the pointer feature
 /// https://drafts.csswg.org/mediaqueries/#pointer
-using PointerFeature = DiscreteFeature<Pointer, &Media::pointer>;
+using PointerFeature = DiscreteFeature<"pointer", Pointer, &Media::pointer>;
 
 /// 7.2. Hover: the hover feature
 /// https://drafts.csswg.org/mediaqueries/#hover
-using HoverFeature = DiscreteFeature<Hover, &Media::hover>;
+using HoverFeature = DiscreteFeature<"hover", Hover, &Media::hover>;
 
 /// 7.3. Any Pointer: the any-pointer feature
 /// https://drafts.csswg.org/mediaqueries/#any-pointer
-using AnyPointerFeature = DiscreteFeature<Pointer, &Media::anyPointer>;
+using AnyPointerFeature = DiscreteFeature<"pointer", Pointer, &Media::anyPointer>;
 
 /// 7.4. Any Hover: the any-hover feature
 /// https://drafts.csswg.org/mediaqueries/#any-hover
-using AnyHoverFeature = DiscreteFeature<Hover, &Media::anyHover>;
+using AnyHoverFeature = DiscreteFeature<"hover", Hover, &Media::anyHover>;
 
 using _Feature = Union<
     TypeFeature,
@@ -279,6 +299,12 @@ using _Feature = Union<
 struct Feature : public _Feature {
     using _Feature::_Feature;
 
+    void repr(Io::Emit &e) const {
+        visit([&](auto const &feature) {
+            e("{}", feature);
+        });
+    }
+
     bool match(Media const &media) const {
         return visit([&](auto const &feature) {
             return feature.match(media);
@@ -289,7 +315,7 @@ struct Feature : public _Feature {
         return TypeFeature{value};
     }
 
-    static Feature width(RangeFeature<Length, &Media::width> value) {
+    static Feature width(WidthFeature value) {
         return value;
     }
 };
@@ -317,6 +343,10 @@ struct MediaQuery {
                 return false;
             }
         }
+
+        void repr(Io::Emit &e) const {
+            e("({} {} {})", *lhs, type == AND ? "and" : "or", *rhs);
+        }
     };
 
     struct _Prefix {
@@ -337,6 +367,10 @@ struct MediaQuery {
             default:
                 return false;
             }
+        }
+
+        void repr(Io::Emit &e) const {
+            e("({} {})", type == NOT ? "not" : "only", *query);
         }
     };
 
@@ -401,40 +435,17 @@ struct MediaQuery {
             }
         });
     }
-};
 
-} // namespace Vaev::Style
-
-template <typename T>
-struct Karm::Io::Formatter<Vaev::Style::RangeBound<T>> {
-    Res<usize> format(Io::TextWriter &writer, Vaev::Style::RangeBound<T> const &v) {
-        return Io::format(writer, "{} {}", v.value, v.type == Vaev::Style::RangeBound<T>::INCLUSIVE ? "inclusive"s : "exclusive"s);
-    }
-};
-
-template <typename T, auto Vaev::Style::Media::*F>
-struct Karm::Io::Formatter<Vaev::Style::RangeFeature<T, F>> {
-    Res<usize> format(Io::TextWriter &writer, Vaev::Style::RangeFeature<T, F> const &v) {
-        return Io::format(writer, "{} - {}", v.lower, v.upper);
-    }
-};
-
-template <typename T, auto Vaev::Style::Media::*F>
-struct Karm::Io::Formatter<Vaev::Style::DiscreteFeature<T, F>> {
-    Res<usize> format(Io::TextWriter &writer, Vaev::Style::DiscreteFeature<T, F> const &v) {
-        return Io::format(writer, "{}", v.value);
-    }
-};
-
-template <>
-struct Karm::Io::Formatter<Vaev::Style::Feature> {
-    Res<usize> format(Io::TextWriter &writer, Vaev::Style::Feature const &val) {
-        return val.visit([&](auto const &v) -> Res<usize> {
-            return Io::format(writer, "{}", v);
+    void repr(Io::Emit &e) const {
+        _store.visit(Visitor{
+            [&](auto const &value) {
+                e("{}", value);
+            },
+            [&](None) {
+                e("all");
+            }
         });
     }
 };
 
-Reflectable$(Vaev::Style::MediaQuery::_Infix, type, lhs, rhs);
-Reflectable$(Vaev::Style::MediaQuery::_Prefix, type, query);
-Reflectable$(Vaev::Style::MediaQuery, _store);
+} // namespace Vaev::Style

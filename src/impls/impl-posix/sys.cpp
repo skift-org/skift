@@ -189,7 +189,7 @@ Res<Stat> stat(Mime::Url const &url) {
 
 // MARK: User interactions -----------------------------------------------------
 
-Res<> launch(Mime::Uti const &uti, Mime::Url const &url) {
+Res<> launch([[maybe_unused]] Mime::Uti const &uti, [[maybe_unused]] Mime::Url const &url) {
     String str = try$(resolve(url)).str();
 
     int pid = fork();

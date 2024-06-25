@@ -59,11 +59,20 @@ void reduce(State &s, Action a) {
 
 using Model = Ui::Model<State, Action, reduce>;
 
-Ui::Child mainMenu() {
+Ui::Child mainMenu(State const &s) {
     return Kr::contextMenuContent({
         Kr::contextMenuItem(Model::bind(SidePanel::BOOKMARKS), Mdi::BOOKMARK, "Bookmarks"),
         Ui::separator(),
         Kr::contextMenuItem(Ui::NOP, Mdi::PRINTER, "Print..."),
+#ifdef __ck_host__
+        Kr::contextMenuItem(
+            [&](auto &) {
+                (void)Sys::launch(Mime::Uti::PUBLIC_OPEN, s.url);
+            },
+            Mdi::GOOGLE_CHROME, "Open in Chrome..."
+        ),
+#endif
+        Ui::separator(),
         Kr::contextMenuItem(Model::bind(SidePanel::DEVELOPER_TOOLS), Mdi::CODE_TAGS, "Developer Tools"),
         Ui::separator(),
         Kr::contextMenuItem(Ui::NOP, Mdi::COG, "Settings"),
@@ -152,8 +161,8 @@ Ui::Child app(Mime::Url url, Strong<Vaev::Dom::Document> dom, Opt<Error> err) {
                 .midleTools = slots$(addressBar(s.url) | Ui::grow()),
                 .endTools = slots$(
                     Ui::button(
-                        [](Ui::Node &n) {
-                            Ui::showPopover(n, n.bound().bottomEnd(), mainMenu());
+                        [&](Ui::Node &n) {
+                            Ui::showPopover(n, n.bound().bottomEnd(), mainMenu(s));
                         },
                         Ui::ButtonStyle::subtle(),
                         Mdi::DOTS_HORIZONTAL

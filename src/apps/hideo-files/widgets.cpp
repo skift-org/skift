@@ -62,7 +62,7 @@ Ui::Child directoryContextMenu() {
         Ui::separator(),
         Kr::contextMenuItem(Ui::NOP, Mdi::MAGNIFY, "Preview"),
         Kr::contextMenuItem(Ui::NOP, Mdi::PENCIL, "Modify"),
-        Kr::contextMenuItem(Ui::NOP, Mdi::SHARE, "Interact..."),
+        Kr::contextMenuItem(Ui::NOP, Mdi::SHARE, "Interact…"),
         Ui::separator(),
         Kr::contextMenuItem(Ui::NOP, Mdi::INFORMATION_OUTLINE, "Properties"),
     });

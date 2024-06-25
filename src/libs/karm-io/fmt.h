@@ -876,6 +876,9 @@ struct Formatter<_String<E>> : public StringFormatter<E> {
     }
 };
 
+template <usize N>
+struct Formatter<StrLit<N>> : public StringFormatter<Utf8> {};
+
 template <>
 struct Formatter<char const *> : public StringFormatter<Utf8> {
     Res<usize> format(Io::TextWriter &writer, char const *text) {

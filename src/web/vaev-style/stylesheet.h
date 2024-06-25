@@ -20,32 +20,14 @@ struct StyleRule {
     Selector selector;
     Vec<Prop> props;
 
-    void repr(Io::Emit &e) const {
-        e("(style-rule");
-        e.indent();
-        e("\nselector: {}", selector);
-        if (props) {
-            e.newline();
-            e("props: [");
-            e.indentNewline();
-            for (auto const &prop : props) {
-                e("{}\n", prop);
-            }
-            e.deindent();
-            e("]\n");
-        }
-        e.deindent();
-        e(")");
-    }
+    void repr(Io::Emit &e) const;
 };
 
 // https://www.w3.org/TR/cssom-1/#the-cssimportrule-interface
 struct ImportRule {
     Mime::Url url;
 
-    void repr(Io::Emit &e) const {
-        e("(import-rule {})", url);
-    }
+    void repr(Io::Emit &e) const;
 };
 
 // https://www.w3.org/TR/css-conditional-3/#the-cssmediarule-interface
@@ -53,18 +35,14 @@ struct MediaRule {
     MediaQuery media;
     Vec<Rule> rules;
 
-    void repr(Io::Emit &e) const {
-        e("(media-rule {} {})", media, rules);
-    }
+    void repr(Io::Emit &e) const;
 };
 
 // https://www.w3.org/TR/css-fonts-4/#cssfontfacerule
 struct FontFaceRule {
     Vec<Prop> props;
 
-    void repr(Io::Emit &e) const {
-        e("(font-face-rule {})", props);
-    }
+    void repr(Io::Emit &e) const;
 };
 
 // https://www.w3.org/TR/cssom-1/#the-cssrule-interface
@@ -77,11 +55,7 @@ using _Rule = Union<
 struct Rule : public _Rule {
     using _Rule::_Rule;
 
-    void repr(Io::Emit &e) const {
-        visit([&](auto const &r) {
-            e("{}", r);
-        });
-    }
+    void repr(Io::Emit &e) const;
 };
 
 // https:// www.w3.org/TR/cssom-1/#css-style-sheets
@@ -91,35 +65,15 @@ struct StyleSheet {
     Str title = "";
     Vec<Rule> rules;
 
-    void repr(Io::Emit &e) const {
-        e("(style-sheet {} {} {}", mime, href, title);
-
-        e.indent();
-        if (rules) {
-            e.newline();
-            e("rules: [");
-            e.indentNewline();
-            for (auto const &rule : rules) {
-                e("{}\n", rule);
-            }
-            e.deindent();
-            e("]\n");
-        }
-        e.deindent();
-        e(")");
-    }
+    void repr(Io::Emit &e) const;
 };
 
 struct StyleBook {
     Vec<StyleSheet> styleSheets;
 
-    void repr(Io::Emit &e) const {
-        e("(style-book {})", styleSheets);
-    }
+    void repr(Io::Emit &e) const;
 
-    void add(StyleSheet &&sheet) {
-        styleSheets.pushBack(std::move(sheet));
-    }
+    void add(StyleSheet &&sheet);
 };
 
 } // namespace Vaev::Style

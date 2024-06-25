@@ -53,6 +53,11 @@ struct Sst {
         return this->type == TOKEN and
                token.type == type;
     }
+
+    bool operator==(Token const &other) const {
+        return type == TOKEN and
+               token == other;
+    }
 };
 
 Str toStr(Sst::Type type);
@@ -64,6 +69,8 @@ Content consumeRuleList(Lexer &lex, bool topLevel);
 Sst consumeAtRule(Lexer &lex);
 
 Opt<Sst> consumeRule(Lexer &lex);
+
+Content consumeDeclarationValue(Lexer &lex);
 
 Content consumeDeclarationList(Lexer &lex);
 

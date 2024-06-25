@@ -11,39 +11,39 @@
 
 namespace Vaev::Css {
 
-#define FOREACH_TOKEN(TOKEN)                     \
-    TOKEN(NIL)                  /* no a token */ \
-    TOKEN(IDENT)                /* foo */        \
-    TOKEN(FUNCTION)             /* calc( */      \
-    TOKEN(AT_KEYWORD)           /* @import */    \
-    TOKEN(HASH)                 /* #foo */       \
-    TOKEN(STRING)               /* "foo" */      \
-    TOKEN(BAD_STRING)           /* "foo */       \
-    TOKEN(URL)                  /* url(foo) */   \
-    TOKEN(BAD_URL)              /* url(foo */    \
-    TOKEN(DELIM)                /* !, +, - */    \
-    TOKEN(NUMBER)               /* 123 */        \
-    TOKEN(PERCENTAGE)           /* 123% */       \
-    TOKEN(DIMENSION)            /* 123px */      \
-    TOKEN(WHITESPACE)           /* ' ' */        \
-    TOKEN(CDO)                  /* <!-- */       \
-    TOKEN(CDC)                  /* --> */        \
-    TOKEN(COLON)                /* : */          \
-    TOKEN(SEMICOLON)            /* ; */          \
-    TOKEN(COMMA)                /* , */          \
-    TOKEN(LEFT_CURLY_BRACKET)   /* { */          \
-    TOKEN(RIGHT_CURLY_BRACKET)  /* } */          \
-    TOKEN(LEFT_SQUARE_BRACKET)  /* [ */          \
-    TOKEN(RIGHT_SQUARE_BRACKET) /* ] */          \
-    TOKEN(LEFT_PARENTHESIS)     /* ( */          \
-    TOKEN(RIGHT_PARENTHESIS)    /* ) */          \
-    TOKEN(COMMENT)              /* */            \
-    TOKEN(END_OF_FILE)          /* EOF */        \
-    TOKEN(OTHER)                /* anything else */
+#define FOREACH_TOKEN(TOKEN)                                         \
+    TOKEN(NIL, nil)                                 /* no a token */ \
+    TOKEN(IDENT, ident)                             /* foo */        \
+    TOKEN(FUNCTION, function)                       /* calc( */      \
+    TOKEN(AT_KEYWORD, atKeyword)                    /* @import */    \
+    TOKEN(HASH, hash)                               /* #foo */       \
+    TOKEN(STRING, string)                           /* "foo" */      \
+    TOKEN(BAD_STRING, badString)                    /* "foo */       \
+    TOKEN(URL, url)                                 /* url(foo) */   \
+    TOKEN(BAD_URL, badUrl)                          /* url(foo */    \
+    TOKEN(DELIM, delim)                             /* !, +, - */    \
+    TOKEN(NUMBER, number)                           /* 123 */        \
+    TOKEN(PERCENTAGE, percentage)                   /* 123% */       \
+    TOKEN(DIMENSION, dimension)                     /* 123px */      \
+    TOKEN(WHITESPACE, whitespace)                   /* ' ' */        \
+    TOKEN(CDO, cdo)                                 /* <!-- */       \
+    TOKEN(CDC, cdc)                                 /* --> */        \
+    TOKEN(COLON, colon)                             /* : */          \
+    TOKEN(SEMICOLON, semicolon)                     /* ; */          \
+    TOKEN(COMMA, comma)                             /* , */          \
+    TOKEN(LEFT_CURLY_BRACKET, leftCurlyBracket)     /* { */          \
+    TOKEN(RIGHT_CURLY_BRACKET, rightCurlyBracket)   /* } */          \
+    TOKEN(LEFT_SQUARE_BRACKET, leftSquareBracket)   /* [ */          \
+    TOKEN(RIGHT_SQUARE_BRACKET, rightSquareBracket) /* ] */          \
+    TOKEN(LEFT_PARENTHESIS, leftParenthesis)        /* ( */          \
+    TOKEN(RIGHT_PARENTHESIS, rightParenthesis)      /* ) */          \
+    TOKEN(COMMENT, comment)                         /* */            \
+    TOKEN(END_OF_FILE, endOfFile)                   /* EOF */        \
+    TOKEN(OTHER, other)                             /* anything else */
 
 struct Token {
     enum struct Type {
-#define ITER(NAME) NAME,
+#define ITER(NAME, ...) NAME,
         FOREACH_TOKEN(ITER)
 #undef ITER
     };
@@ -52,6 +52,11 @@ struct Token {
 
     Type type;
     Str data;
+
+#define ITER(ID, NAME) \
+    static Token NAME(Str data = "") { return {ID, data}; }
+    FOREACH_TOKEN(ITER)
+#undef ITER
 
     Token() : type(NIL) {}
 
@@ -107,8 +112,8 @@ struct Lexer {
 
 static inline Str toStr(Token::Type type) {
     switch (type) {
-#define ITER(NAME)    \
-    case Token::NAME: \
+#define ITER(NAME, ...) \
+    case Token::NAME:   \
         return #NAME;
         FOREACH_TOKEN(ITER)
 #undef ITER

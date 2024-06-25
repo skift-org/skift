@@ -123,6 +123,10 @@ struct [[nodiscard]] Res {
     always_inline auto operator<=>(Res const &) const
         requires Meta::Comparable<Inner>
     = default;
+
+    always_inline auto operator==(bool b) const {
+        return has() == b;
+    }
 };
 
 static_assert(Tryable<Res<isize, Error>>);

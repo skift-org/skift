@@ -69,6 +69,19 @@ struct Cursor {
         return slice;
     }
 
+    template <Meta::Equatable<T> U>
+    always_inline constexpr bool skip(U const &c) {
+        if (ended()) [[unlikely]]
+            return false;
+
+        if (peek() == c) {
+            _begin++;
+            return true;
+        }
+
+        return false;
+    }
+
     always_inline constexpr T const *buf() const {
         return _begin;
     }

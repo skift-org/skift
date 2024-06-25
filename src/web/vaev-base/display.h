@@ -152,6 +152,24 @@ struct Display {
         return is(Type::INTERNAL) and _internal == internal;
     }
 
+    bool operator==(Display const &other) const {
+        if (_type != other._type)
+            return false;
+
+        switch (_type) {
+        case Type::DEFAULT:
+            return _inside == other._inside and _outside == other._outside and _item == other._item;
+
+        case Type::INTERNAL:
+            return _internal == other._internal;
+
+        case Type::BOX:
+            return _box == other._box;
+        }
+
+        return false;
+    }
+
     void repr(Io::Emit &e) const {
         switch (_type) {
         case Type::DEFAULT:

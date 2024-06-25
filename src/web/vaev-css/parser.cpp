@@ -209,22 +209,39 @@ Content consumeDeclarationBlock(Lexer &lex) {
     return res;
 }
 
+// https://www.w3.org/TR/css-syntax-3/#consume-declaration
+static void eatWhitespace(Lexer &lex) {
+    while (lex.peek() == Token::WHITESPACE)
+        lex.next();
+}
+
 bool declarationAhead(Lexer lex) {
     bool res = lex.peek() == Token::IDENT;
     lex.next();
-    while (lex.peek() == Token::WHITESPACE)
-        lex.next();
+    eatWhitespace(lex);
     return res and lex.peek() == Token::COLON;
 }
 
-// https://www.w3.org/TR/css-syntax-3/#consume-declaration
+Content consumeDeclarationValue(Lexer &lex) {
+    Content value;
+    // 3. While the next input token is a <whitespace-token>, consume the next input token.
+    eatWhitespace(lex);
+
+    // 4. As long as the next input token is anything other than an <EOF-token>,
+    //    consume a component value and append it to the declaration’s value.
+    while ((lex.peek() != Token::END_OF_FILE and lex.peek() != Token::SEMICOLON and lex.peek() != Token::RIGHT_CURLY_BRACKET)) {
+        value.pushBack(consumeComponentValue(lex));
+        eatWhitespace(lex);
+    }
+    return value;
+}
+
 Opt<Sst> consumeDeclaration(Lexer &lex) {
     Sst decl{Sst::DECL};
     decl.token = lex.next();
 
     // 1. While the next input token is a <whitespace-token>, consume the next input token.
-    while (lex.peek() == Token::WHITESPACE)
-        lex.next();
+    eatWhitespace(lex);
 
     // 2. If the next input token is anything other than a <colon-token>, this is a parse error. Return nothing.
     if (lex.peek() != Token::COLON) {
@@ -235,17 +252,8 @@ Opt<Sst> consumeDeclaration(Lexer &lex) {
     // Otherwise, consume the next input token.
     lex.next();
 
-    // 3. While the next input token is a <whitespace-token>, consume the next input token.
-    while (lex.peek() == Token::WHITESPACE)
-        lex.next();
-
-    // 4. As long as the next input token is anything other than an <EOF-token>,
-    //    consume a component value and append it to the declaration’s value.
-    while ((lex.peek() != Token::END_OF_FILE and lex.peek() != Token::SEMICOLON and lex.peek() != Token::RIGHT_CURLY_BRACKET)) {
-        decl.content.pushBack(consumeComponentValue(lex));
-        while (lex.peek() == Token::WHITESPACE)
-            lex.next();
-    }
+    // Parse the declaration’s value.
+    decl.content = consumeDeclarationValue(lex);
 
     return decl;
 }

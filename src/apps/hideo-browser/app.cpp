@@ -59,7 +59,7 @@ void reduce(State &s, Action a) {
 
 using Model = Ui::Model<State, Action, reduce>;
 
-Ui::Child mainMenu(State const &s) {
+Ui::Child mainMenu([[maybe_unused]] State const &s) {
     return Kr::contextMenuContent({
         Kr::contextMenuItem(Model::bind(SidePanel::BOOKMARKS), Mdi::BOOKMARK, "Bookmarks"),
         Ui::separator(),

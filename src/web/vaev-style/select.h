@@ -52,6 +52,10 @@ struct Spec {
 
     bool operator==(Spec const &other) const = default;
     auto operator<=>(Spec const &other) const = default;
+
+    void repr(Io::Emit &e) const {
+        e("{}-{}-{}", a, b, c);
+    }
 };
 
 inline Spec const Spec::ZERO = {0, 0, 0};
@@ -62,11 +66,17 @@ inline Spec const Spec::C = {0, 0, 1};
 struct Selector;
 
 struct UniversalSelector {
+    void repr(Io::Emit &e) const {
+        e("*");
+    }
 };
 
 static constexpr UniversalSelector UNIVERSAL = {};
 
 struct EmptySelector {
+    void repr(Io::Emit &e) const {
+        e("EMPTY");
+    }
 };
 
 static constexpr EmptySelector EMPTY = {};
@@ -84,6 +94,10 @@ struct Infix {
     Type type;
     Box<Selector> lhs;
     Box<Selector> rhs;
+
+    void repr(Io::Emit &e) const {
+        e("({} {} {})", *lhs, type, *rhs);
+    }
 };
 
 struct Nfix {
@@ -98,22 +112,42 @@ struct Nfix {
 
     Type type;
     Vec<Selector> inners;
+
+    void repr(Io::Emit &e) const {
+        e("({} {})", type, inners);
+    }
 };
 
 struct TypeSelector {
     TagName type;
+
+    void repr(Io::Emit &e) const {
+        e("{}", type);
+    }
 };
 
 struct IdSelector {
     String id;
+
+    void repr(Io::Emit &e) const {
+        e("#{}", id);
+    }
 };
 
 struct ClassSelector {
     String class_;
+
+    void repr(Io::Emit &e) const {
+        e(".{}", class_);
+    }
 };
 
 struct AnB {
     isize a, b;
+
+    void repr(Io::Emit &e) const {
+        e("{}n{}{}", a, b < 0 ? "-"s : "+"s, b);
+    }
 };
 
 enum struct Dir {
@@ -133,6 +167,10 @@ struct PseudoClass {
 
     Type type;
     Extra extra = NONE;
+
+    void repr(Io::Emit &e) const {
+        e("{}", type);
+    }
 };
 
 struct AttributeSelector {
@@ -154,7 +192,12 @@ struct AttributeSelector {
     };
 
     String name;
+    Match match;
     String value;
+
+    void repr(Io::Emit &e) const {
+        e("[{} {} {}]", name, match, value);
+    }
 };
 
 using _Selector = Union<
@@ -248,6 +291,12 @@ struct Selector : public _Selector {
             makeBox<Selector>(std::move(rhs)),
         };
     }
+
+    void repr(Io::Emit &e) const {
+        visit([&](auto const &v) {
+            e("{}", v);
+        });
+    }
 };
 
 Spec spec(Selector const &sel);
@@ -255,54 +304,3 @@ Spec spec(Selector const &sel);
 bool match(Selector const &sel, Dom::Element const &el);
 
 } // namespace Vaev::Style
-
-template <>
-struct Karm::Io::Formatter<Vaev::Style::Spec> {
-    Res<usize> format(Io::TextWriter &writer, Vaev::Style::Spec const &val) {
-        return Io::format(writer, "{}-{}-{}", val.a, val.b, val.c);
-    }
-};
-
-template <>
-struct Karm::Io::Formatter<Vaev::Style::AnB> {
-    Res<usize> format(Io::TextWriter &writer, Vaev::Style::AnB const &val) {
-        return Io::format(writer, "rhs{}n{}{}", val.a, val.b < 0 ? "-"s : "+"s, val.b);
-    }
-};
-
-template <>
-struct Karm::Io::Formatter<Vaev::Style::UniversalSelector> {
-    Res<usize> format(Io::TextWriter &writer, Vaev::Style::UniversalSelector const &) {
-        return Io::format(writer, "*");
-    }
-};
-
-template <>
-struct Karm::Io::Formatter<Vaev::Style::EmptySelector> {
-    Res<usize> format(Io::TextWriter &writer, Vaev::Style::EmptySelector const &) {
-        return Io::format(writer, "EMPTY_SELECTOR");
-    }
-};
-
-Reflectable$(Vaev::Style::Infix, type, lhs, rhs);
-
-Reflectable$(Vaev::Style::Nfix, type, inners);
-
-Reflectable$(Vaev::Style::TypeSelector, type);
-
-Reflectable$(Vaev::Style::IdSelector, id);
-
-Reflectable$(Vaev::Style::ClassSelector, class_);
-
-Reflectable$(Vaev::Style::PseudoClass, type, extra);
-
-Reflectable$(Vaev::Style::AttributeSelector, name, value);
-
-template <>
-struct Karm::Io::Formatter<Vaev::Style::Selector> {
-    Res<usize> format(Io::TextWriter &writer, Vaev::Style::Selector const &val) {
-        return val.visit([&](auto const &v) -> Res<usize> {
-            return Io::format(writer, "{#}", v);
-        });
-    }
-};

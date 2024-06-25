@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-io/fmt.h>
+#include <karm-io/emit.h>
 #include <karm-math/const.h>
 
 namespace Vaev {
@@ -91,14 +91,23 @@ struct Resolution {
     std::partial_ordering operator<=>(Resolution const &other) const {
         return toDpi() <=> other.toDpi();
     }
+
+    void repr(Io::Emit &e) const {
+        switch (_unit) {
+        case Unit::DPI:
+            e("{}dpi", _val);
+            break;
+        case Unit::DPCM:
+            e("{}dpcm", _val);
+            break;
+        case Unit::DPPX:
+            e("{}dppx", _val);
+            break;
+        case Unit::INFINITE:
+            e("infinite");
+            break;
+        }
+    }
 };
 
 } // namespace Vaev
-
-template <>
-struct Karm::Io::Formatter<Vaev::Resolution> {
-    Res<usize> format(Io::TextWriter &writer, Vaev::Resolution const &val) {
-        usize written = try$(Io::format(writer, " {#}{#}", val.val(), val.unit()));
-        return Ok(written);
-    }
-};

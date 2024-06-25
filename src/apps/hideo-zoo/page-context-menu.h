@@ -24,12 +24,12 @@ static inline Page PAGE_CONTEXT_MENU{
                        Kr::contextMenuItem(Ui::NOP, Mdi::CONTENT_CUT, "Cut"),
                        Kr::contextMenuItem(Ui::NOP, Mdi::CONTENT_PASTE, "Paste"),
                        Ui::separator(),
-                       Kr::contextMenuItem(Ui::NOP, Mdi::SHARE, "Interact..."),
-                       Kr::contextMenuItem(Ui::NOP, Mdi::CURSOR_TEXT, "Rename..."),
+                       Kr::contextMenuItem(Ui::NOP, Mdi::SHARE, "Interact…"),
+                       Kr::contextMenuItem(Ui::NOP, Mdi::CURSOR_TEXT, "Rename…"),
                        Ui::separator(),
                        Kr::contextMenuItem(Ui::NOP, Mdi::DELETE, "Delete"),
                        Ui::separator(),
-                       Kr::contextMenuItem(Ui::NOP, Mdi::INFORMATION_OUTLINE, "Properties..."),
+                       Kr::contextMenuItem(Ui::NOP, Mdi::INFORMATION_OUTLINE, "Properties…"),
                    });
                });
     },

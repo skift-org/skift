@@ -2,6 +2,7 @@
 
 #include <compare>
 
+#include "ints.h"
 #include "macros.h"
 
 namespace Karm {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "_prelude.h"
+
 namespace Karm {
 
 #define goto _Pragma("GCC error \"goto is not allowed\"") goto

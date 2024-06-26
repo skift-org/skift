@@ -22,8 +22,6 @@ Res<PercentOr<Length>> parseLengthOrPercentage(Cursor<Sst> &c);
 
 Style::MediaQuery parseMediaQuery(Cursor<Sst> &);
 
-Style::Selector parseSelector(Cursor<Sst> &);
-
 Res<Style::Prop> parseProperty(Sst const &sst);
 
 Style::Rule parseRule(Sst const &sst);

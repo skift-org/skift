@@ -18,7 +18,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
 
     if (verb == "dump-stylesheet") {
         auto stylesheet = co_try$(Vaev::Css::fetchStylesheet(url));
-        Sys::println("{}", stylesheet);
+        Sys::println("{#}", stylesheet);
         co_return Ok();
     } else if (verb == "dump-sst") {
         auto file = co_try$(Sys::File::open(url));

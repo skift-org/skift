@@ -51,11 +51,11 @@ struct Cursor {
         return &peek();
     }
 
-    always_inline constexpr T next() {
+    always_inline constexpr T const &next() {
         if (ended()) [[unlikely]]
             panic("next() called on ended cursor");
 
-        T r = *_begin;
+        T const &r = *_begin;
         _begin++;
         return r;
     }

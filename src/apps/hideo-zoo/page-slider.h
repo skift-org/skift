@@ -15,7 +15,8 @@ static inline Page PAGE_SLIDER{
         return Kr::slider(
                    0.5,
                    NONE,
-                   Mdi::CAT
+                   Mdi::CAT,
+                   "Cuteness"
                ) |
                Ui::minSize({320, Ui::UNCONSTRAINED}) |
                Ui::center();

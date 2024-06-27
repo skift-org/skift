@@ -141,7 +141,7 @@ Ui::Child sliderRow(f64 value, Ui::OnChange<f64> onChange, String title) {
         NONE,
         title,
         NONE,
-        Kr::slider(value, std::move(onChange), Mdi::DRAG_VERTICAL_VARIANT) | Ui::minSize({128, Ui::UNCONSTRAINED})
+        Kr::slider(value, std::move(onChange), Mdi::DRAG_VERTICAL_VARIANT, "") | Ui::minSize({128, Ui::UNCONSTRAINED})
     );
 }
 

@@ -234,22 +234,28 @@ Ui::Child app(State state) {
     return Ui::reducer<Model>(
         std::move(state),
         [](auto const &state) {
-            return Ui::stack(
-                       state.locked
-                           ? lock(state)
-                           : (state.isMobile ? tablet(state)
-                                             : desktop(state)),
+            auto content =
+                Ui::stack(
+                    state.locked
+                        ? lock(state)
+                        : (state.isMobile ? tablet(state)
+                                          : desktop(state)),
 
-                       state.isMobile
-                           ? tabletPanels(state)
-                           : desktopPanels(state)
-                   ) |
+                    state.isMobile
+                        ? tabletPanels(state)
+                        : desktopPanels(state)
+                ) |
+                Ui::dialogLayer() |
+                Ui::pinSize(
+                    state.isMobile ? Math::Vec2i{411, 731}
+                                   : Math::Vec2i{1280, 720}
+                );
 
-                   Ui::dialogLayer() |
-                   Ui::pinSize(
-                       state.isMobile ? Math::Vec2i{411, 731}
-                                      : Math::Vec2i{1280, 720}
-                   );
+            if (state.nightLight) {
+                content = Ui::foregroundFilter(Gfx::SepiaFilter{0.7}, content);
+            }
+
+            return content;
         }
     );
 }

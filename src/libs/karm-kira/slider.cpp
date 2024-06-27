@@ -5,19 +5,21 @@
 
 namespace Karm::Kira {
 
-Ui::Child slider(f64 value, Ui::OnChange<f64> onChange, Mdi::Icon icon) {
+Ui::Child slider(f64 value, Ui::OnChange<f64> onChange, Mdi::Icon icon, Str text) {
     return Ui::hflow(
-               Ui::grow(NONE),
+               0,
+               Math::Align::CENTER,
                Ui::icon(icon) |
                    Ui::center() |
                    Ui::aspectRatio(1) |
-                   Ui::bound() |
-                   Ui::dragRegion()
+                   Ui::bound(),
+               Ui::labelMedium(text)
            ) |
            Ui::box({
                .borderRadius = 6,
                .backgroundPaint = Ui::ACCENT600,
            }) |
+           Ui::dragRegion() |
            Ui::slider(value, std::move(onChange)) |
            Ui::box({
                .borderRadius = 6,

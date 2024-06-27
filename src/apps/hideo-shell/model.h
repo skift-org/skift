@@ -24,6 +24,9 @@ enum struct Panel {
 struct State : Meta::NoCopy {
     bool locked = true;
     bool isMobile = true;
+    bool nightLight = false;
+    f64 brightness = 0.75;
+    f64 volume = 0.5;
     Panel activePanel = Panel::NIL;
     bool isSysPanelColapsed = true;
     bool isAppPanelThumbnails = false;
@@ -37,6 +40,16 @@ struct State : Meta::NoCopy {
 };
 
 struct ToggleTablet {};
+
+struct ToggleNightLight {};
+
+struct ChangeBrightness {
+    f64 value;
+};
+
+struct ChangeVolume {
+    f64 value;
+};
 
 struct Lock {};
 
@@ -75,6 +88,9 @@ struct Activate {
 
 using Action = Union<
     ToggleTablet,
+    ToggleNightLight,
+    ChangeBrightness,
+    ChangeVolume,
     Lock,
     Unlock,
     DimisNoti,

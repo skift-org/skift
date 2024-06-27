@@ -9,6 +9,15 @@ void reduce(State &s, Action a) {
             s.activePanel = Panel::NIL;
             s.isSysPanelColapsed = true;
         },
+        [&](ToggleNightLight) {
+            s.nightLight = not s.nightLight;
+        },
+        [&](ChangeBrightness m) {
+            s.brightness = m.value;
+        },
+        [&](ChangeVolume m) {
+            s.volume = m.value;
+        },
         [&](Lock) {
             s.locked = true;
             s.activePanel = Panel::NIL;

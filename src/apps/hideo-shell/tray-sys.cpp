@@ -139,7 +139,31 @@ Ui::Child colapsedQuickSettings(State const &) {
     return settings;
 }
 
-Ui::Child expendedQuickSettings(State const &state) {
+Mdi::Icon _iconForBrightnessValue(f64 value) {
+    if (value < 0.01) {
+        return Mdi::BRIGHTNESS_4;
+    } else if (value < 0.33) {
+        return Mdi::BRIGHTNESS_5;
+    } else if (value < 0.66) {
+        return Mdi::BRIGHTNESS_6;
+    } else {
+        return Mdi::BRIGHTNESS_7;
+    }
+}
+
+Mdi::Icon _iconForVolumeValue(f64 value) {
+    if (value < 0.01) {
+        return Mdi::VOLUME_MUTE;
+    } else if (value < 0.33) {
+        return Mdi::VOLUME_LOW;
+    } else if (value < 0.66) {
+        return Mdi::VOLUME_MEDIUM;
+    } else {
+        return Mdi::VOLUME_HIGH;
+    }
+}
+
+Ui::Child expendedQuickSettings(State const &s) {
     auto settings = Ui::grid(
         {
             .rows = Ui::GridUnit::fixed(46).repeated(4),
@@ -175,24 +199,41 @@ Ui::Child expendedQuickSettings(State const &state) {
             .press = Ui::NOP,
         }),
         quickSetting({
-            .icon = state.isMobile ? Mdi::LAPTOP : Mdi::CELLPHONE,
+            .icon = s.isMobile ? Mdi::LAPTOP : Mdi::CELLPHONE,
             .name = "Tablet Mode",
-            .state = state.isMobile,
+            .state = s.isMobile,
             .press = Model::bind<ToggleTablet>(),
         }),
         quickSetting({
             .icon = Mdi::CIRCLE_HALF_FULL,
             .name = "Dark Mode",
             .press = Ui::NOP,
+        }),
+        quickSetting({
+            .icon = Mdi::BRIGHTNESS_2,
+            .name = "Night Light",
+            .state = s.nightLight,
+            .press = Model::bind<ToggleNightLight>(),
         })
     );
 
     return Ui::vflow(
         8,
-        Kr::slider(0.5, NONE, Mdi::BRIGHTNESS_6),
-        Kr::slider(0.5, NONE, Mdi::VOLUME_HIGH),
-        settings | Ui::grow(),
-        quickTools(state)
+        Kr::slider(
+            s.brightness,
+            [](auto &n, auto value) {
+                Model::bubble(n, ChangeBrightness{value});
+            },
+            _iconForBrightnessValue(s.brightness), "Brightness"
+        ),
+        Kr::slider(
+            s.volume,
+            [](auto &n, auto value) {
+                Model::bubble(n, ChangeVolume{value});
+            },
+            _iconForVolumeValue(s.volume), "Volume"
+        ),
+        settings | Ui::grow(), quickTools(s)
     );
 }
 

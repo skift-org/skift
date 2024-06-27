@@ -43,7 +43,15 @@ constexpr auto operator<=>(T const &lhs, U const &rhs) {
 template <Sliceable T, Sliceable U>
     requires Meta::Equatable<typename T::Inner, typename U::Inner>
 constexpr bool operator==(T const &lhs, U const &rhs) {
-    return (lhs <=> rhs) == 0;
+    if (lhs.len() != rhs.len())
+        return false;
+
+    for (usize i = 0; i < min(lhs.len(), rhs.len()); i++) {
+        if (lhs[i] != rhs[i])
+            return false;
+    }
+
+    return true;
 }
 
 template <typename T>

@@ -12,9 +12,38 @@ struct View : public Ui::View<View> {
 
     View(Strong<Dom::Document> dom) : _dom(dom) {}
 
+    Style::Media _constructMedia() {
+        return {
+            .type = MediaType::SCREEN,
+            .width = Px{bound().width},
+            .height = Px{bound().height},
+            .aspectRatio = bound().width / (f64)bound().height,
+            .orientation = Orientation::LANDSCAPE,
+
+            .resolution = Resolution::fromDpi(96),
+            .scan = Scan::PROGRESSIVE,
+            .grid = false,
+            .update = Update::FAST,
+
+            .overflowBlock = OverflowBlock::SCROLL,
+            .overflowInline = OverflowInline::SCROLL,
+
+            .color = 8,
+            .colorIndex = 0,
+            .monochrome = 0,
+            .colorGamut = ColorGamut::SRGB,
+            .pointer = Pointer::FINE,
+            .hover = Hover::HOVER,
+            .anyPointer = Pointer::FINE,
+            .anyHover = Hover::HOVER,
+        };
+    }
+
     void paint(Gfx::Context &g, Math::Recti) override {
-        if (not _renderResult)
-            _renderResult = render(*_dom, bound().size().cast<Px>());
+        if (not _renderResult) {
+            auto media = _constructMedia();
+            _renderResult = render(*_dom, media, bound().size().cast<Px>());
+        }
 
         g.save();
 

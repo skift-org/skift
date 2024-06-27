@@ -9,6 +9,8 @@ enum struct MediaType {
     ALL,
     PRINT,
     SCREEN,
+
+    OTHER, // tty, tv, projection, handheld, braille, aural, embossed
 };
 
 enum struct Orientation {
@@ -29,8 +31,8 @@ enum struct Update {
 
 enum struct OverflowBlock {
     NONE,
+    SCROLL,
     PAGED,
-    CONTINUOUS,
 };
 
 enum struct OverflowInline {

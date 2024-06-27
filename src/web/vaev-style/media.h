@@ -3,6 +3,7 @@
 #include <karm-base/box.h>
 #include <vaev-base/length.h>
 #include <vaev-base/media.h>
+#include <vaev-base/numbers.h>
 #include <vaev-base/resolution.h>
 
 namespace Vaev::Style {
@@ -26,7 +27,7 @@ struct Media {
 
     /// 4.3. Device Width: the device-width feature
     /// https://drafts.csswg.org/mediaqueries/#aspect-ratio
-    f64 aspectRatio;
+    Number aspectRatio;
 
     /// 4.4. Orientation: the orientation feature
     /// https://drafts.csswg.org/mediaqueries/#orientation
@@ -62,15 +63,15 @@ struct Media {
 
     // 6.1. Color: the color feature
     /// https://drafts.csswg.org/mediaqueries/#color
-    int color;
+    Integer color;
 
     /// 6.2. Color Index: the color-index feature
     /// https://drafts.csswg.org/mediaqueries/#color-index
-    int colorIndex;
+    Integer colorIndex;
 
     /// 6.3. Monochrome: the monochrome feature
     /// https://drafts.csswg.org/mediaqueries/#monochrome
-    int monochrome;
+    Integer monochrome;
 
     /// 6.4. Color Gamut: the color-gamut feature
     /// https://drafts.csswg.org/mediaqueries/#color-gamut
@@ -97,6 +98,13 @@ struct Media {
 
 // MARK: Media Features --------------------------------------------------------
 
+enum struct RangePrefix {
+    MIN,   // min-<feature> : value
+    MAX,   // max-<feature> : value
+    EXACT, // <feature> : value
+    BOOL,  // <feature>
+};
+
 template <typename T>
 struct RangeBound {
     enum Type : u8 {
@@ -116,6 +124,7 @@ struct RangeBound {
 template <StrLit NAME, typename T, auto Media::*F>
 struct RangeFeature {
     using Bound = RangeBound<T>;
+    using Inner = T;
 
     Bound lower{};
     Bound upper{};
@@ -137,6 +146,11 @@ struct RangeFeature {
             result &= actual <= upper.value;
         } else if (upper.type == Bound::EXCLUSIVE) {
             result &= actual < upper.value;
+        }
+
+        // both types are NONE, evaluate in boolean context
+        if (not lower.type and not upper.type) {
+            result = actual != T{};
         }
 
         return result;
@@ -165,6 +179,23 @@ struct RangeFeature {
         };
     }
 
+    static RangeFeature boolean() {
+        return {};
+    }
+
+    static RangeFeature make(RangePrefix prefix, T value = {}) {
+        switch (prefix) {
+        case RangePrefix::MIN:
+            return min(value);
+        case RangePrefix::MAX:
+            return max(value);
+        case RangePrefix::EXACT:
+            return exact(value);
+        case RangePrefix::BOOL:
+            return boolean();
+        }
+    }
+
     void repr(Io::Emit &e) const {
         e("{}: {} - {}", NAME, lower, upper);
     }
@@ -172,13 +203,28 @@ struct RangeFeature {
 
 template <StrLit NAME, typename T, auto Media::*F>
 struct DiscreteFeature {
-    T value;
+    using Inner = T;
+    enum Type : u8 {
+        NONE,
+        EQUAL
+    };
+
+    T value{};
+    Type type = EQUAL;
 
     static constexpr Str name() {
         return NAME;
     }
 
+    static DiscreteFeature make(RangePrefix prefix, T value = {}) {
+        if (prefix == RangePrefix::BOOL)
+            return {.type = NONE};
+        return {value};
+    }
+
     bool match(T actual) const {
+        if (type == Type::NONE)
+            return actual != T{};
         return actual == value;
     }
 
@@ -207,7 +253,7 @@ using HeightFeature = RangeFeature<"height", Length, &Media::height>;
 
 /// 4.3. Device Width: the device-width feature
 /// https://drafts.csswg.org/mediaqueries/#aspect-ratio
-using AspectRatioFeature = RangeFeature<"aspect-ratio", f64, &Media::aspectRatio>;
+using AspectRatioFeature = RangeFeature<"aspect-ratio", Number, &Media::aspectRatio>;
 
 /// 4.4. Device Height: the device-height feature
 /// https://drafts.csswg.org/mediaqueries/#orientation
@@ -243,15 +289,15 @@ using OverflowInlineFeature = DiscreteFeature<"overflow-inline", OverflowInline,
 
 // 6.1. Color: the color feature
 /// https://drafts.csswg.org/mediaqueries/#color
-using ColorFeature = RangeFeature<"color", int, &Media::color>;
+using ColorFeature = RangeFeature<"color", Integer, &Media::color>;
 
 /// 6.2. Color Index: the color-index feature
 /// https://drafts.csswg.org/mediaqueries/#color-index
-using ColorIndexFeature = RangeFeature<"color-index", int, &Media::colorIndex>;
+using ColorIndexFeature = RangeFeature<"color-index", Integer, &Media::colorIndex>;
 
 /// 6.3. Monochrome: the monochrome feature
 /// https://drafts.csswg.org/mediaqueries/#monochrome
-using MonochromeFeature = RangeFeature<"monochrome", int, &Media::monochrome>;
+using MonochromeFeature = RangeFeature<"monochrome", Integer, &Media::monochrome>;
 
 /// 6.4. Color Gamut: the color-gamut feature
 /// https://drafts.csswg.org/mediaqueries/#color-gamut
@@ -274,6 +320,8 @@ using AnyPointerFeature = DiscreteFeature<"pointer", Pointer, &Media::anyPointer
 /// 7.4. Any Hover: the any-hover feature
 /// https://drafts.csswg.org/mediaqueries/#any-hover
 using AnyHoverFeature = DiscreteFeature<"hover", Hover, &Media::anyHover>;
+
+// MARK: Media Feature ---------------------------------------------------------
 
 using _Feature = Union<
     TypeFeature,

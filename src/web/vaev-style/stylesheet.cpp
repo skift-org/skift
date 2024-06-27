@@ -40,6 +40,10 @@ void MediaRule::repr(Io::Emit &e) const {
     }
 }
 
+bool MediaRule::match(Media const &m) const {
+    return media.match(m);
+}
+
 void FontFaceRule::repr(Io::Emit &e) const {
     e("(font-face-rule {})", props);
 }

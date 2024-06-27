@@ -5,10 +5,110 @@
 
 namespace Vaev::Css {
 
+static void eatWhitespace(Cursor<Sst> &c) {
+    while (not c.ended() and c.peek() == Token::WHITESPACE)
+        c.next();
+}
+
 // MARK: Media Queries ---------------------------------------------------------
 
-Style::MediaQuery parseMediaQuery(Cursor<Sst> &) {
-    return {};
+static Cons<Style::RangePrefix, Str> _explodeFeatureName(Io::SScan s) {
+    if (s.skip("min-"))
+        return {Style::RangePrefix::MIN, s.remStr()};
+    else if (s.skip("max-"))
+        return {Style::RangePrefix::MAX, s.remStr()};
+    else
+        return {Style::RangePrefix::EXACT, s.remStr()};
+}
+
+static Style::Feature _parseMediaFeature(Cursor<Sst> &c) {
+    if (c.ended()) {
+        logWarn("unexpected end of input");
+        return Style::TypeFeature{MediaType::OTHER};
+    }
+
+    if (*c != Token::IDENT) {
+        logWarn("expected ident");
+        return Style::TypeFeature{MediaType::OTHER};
+    }
+
+    auto unexplodedName = c.next().token.data;
+    auto [prefix, name] = _explodeFeatureName(unexplodedName);
+
+    Opt<Style::Feature> prop;
+
+    eatWhitespace(c);
+    Style::Feature::any([&]<typename F>(Meta::Type<F>) -> bool {
+        if (name != F::name())
+            return false;
+
+        if (not c.skip(Token::COLON)) {
+            prop.emplace(F::make(Style::RangePrefix::BOOL));
+            return true;
+        }
+
+        eatWhitespace(c);
+
+        auto maybeValue = parseValue<typename F::Inner>(c);
+        if (not maybeValue) {
+            logError("failed to parse value for feature {#}: {}", F::name(), maybeValue.none());
+            return true;
+        }
+
+        prop.emplace(F::make(prefix, maybeValue.take()));
+        return true;
+    });
+
+    if (not prop) {
+        logWarn("cannot parse feature: {}", unexplodedName);
+        return Style::TypeFeature{MediaType::OTHER};
+    }
+
+    return prop.take();
+}
+
+Style::MediaQuery parseMediaQueryInfix(Cursor<Sst> &c);
+
+Style::MediaQuery _parseMediaQueryLeaf(Cursor<Sst> &c) {
+    if (c.skip(Token::ident("not"))) {
+        return Style::MediaQuery::negate(parseMediaQueryInfix(c));
+    } else if (c.skip(Token::ident("only"))) {
+        return parseMediaQueryInfix(c);
+    } else if (c.peek() == Sst::BLOCK) {
+        Cursor<Sst> content = c.next().content;
+        return parseMediaQueryInfix(content);
+    } else if (auto type = parseValue<MediaType>(c)) {
+        return Style::TypeFeature{type.take()};
+    } else
+        return _parseMediaFeature(c);
+}
+
+Style::MediaQuery parseMediaQueryInfix(Cursor<Sst> &c) {
+    auto lhs = _parseMediaQueryLeaf(c);
+    while (not c.ended()) {
+        if (c.skip(Token::ident("and"))) {
+            lhs = Style::MediaQuery::combineAnd(lhs, _parseMediaQueryLeaf(c));
+        } else if (c.skip(Token::ident("or"))) {
+            lhs = Style::MediaQuery::combineOr(lhs, _parseMediaQueryLeaf(c));
+        } else {
+            break;
+        }
+    }
+    return lhs;
+}
+
+Style::MediaQuery parseMediaQuery(Cursor<Sst> &c) {
+    eatWhitespace(c);
+    Style::MediaQuery lhs = parseMediaQueryInfix(c);
+    eatWhitespace(c);
+    while (not c.ended() and c.skip(Token::COMMA)) {
+        eatWhitespace(c);
+        auto rhs = parseMediaQueryInfix(c);
+        lhs = Style::MediaQuery::combineOr(lhs, rhs);
+        eatWhitespace(c);
+    }
+
+    return lhs;
 }
 
 // MARK: Properties ------------------------------------------------------------
@@ -17,93 +117,93 @@ Style::MediaQuery parseMediaQuery(Cursor<Sst> &) {
 
 Res<> _parseProp(Cursor<Sst> &c, Style::BackgroundColorProp &p) {
     while (not c.ended())
-        p.value.pushBack(try$(parseColor(c)));
+        p.value.pushBack(try$(parseValue<Color>(c)));
     return Ok();
 }
 
 Res<> _parseProp(Cursor<Sst> &c, Style::ColorProp &p) {
-    p.value = try$(parseColor(c));
+    p.value = try$(parseValue<Color>(c));
     return Ok();
 }
 
 Res<> _parseProp(Cursor<Sst> &c, Style::DisplayProp &p) {
-    p.value = try$(parseDisplay(c));
+    p.value = try$(parseValue<Display>(c));
     return Ok();
 }
 
 // MARK: Margin
 
 Res<> _parseProp(Cursor<Sst> &c, Style::MarginTopProp &p) {
-    p.value = try$(parseMarginWidth(c));
+    p.value = try$(parseValue<MarginWidth>(c));
     return Ok();
 }
 
 Res<> _parseProp(Cursor<Sst> &c, Style::MarginRightProp &p) {
-    p.value = try$(parseMarginWidth(c));
+    p.value = try$(parseValue<MarginWidth>(c));
     return Ok();
 }
 
 Res<> _parseProp(Cursor<Sst> &c, Style::MarginBottomProp &p) {
-    p.value = try$(parseMarginWidth(c));
+    p.value = try$(parseValue<MarginWidth>(c));
     return Ok();
 }
 
 Res<> _parseProp(Cursor<Sst> &c, Style::MarginLeftProp &p) {
-    p.value = try$(parseMarginWidth(c));
+    p.value = try$(parseValue<MarginWidth>(c));
     return Ok();
 }
 
 // MARK: Padding
 
 Res<> _parseProp(Cursor<Sst> &c, Style::PaddingTopProp &p) {
-    p.value = try$(parseLengthOrPercentage(c));
+    p.value = try$(parseValue<PercentOr<Length>>(c));
     return Ok();
 }
 
 Res<> _parseProp(Cursor<Sst> &c, Style::PaddingRightProp &p) {
-    p.value = try$(parseLengthOrPercentage(c));
+    p.value = try$(parseValue<PercentOr<Length>>(c));
     return Ok();
 }
 
 Res<> _parseProp(Cursor<Sst> &c, Style::PaddingBottomProp &p) {
-    p.value = try$(parseLengthOrPercentage(c));
+    p.value = try$(parseValue<PercentOr<Length>>(c));
     return Ok();
 }
 
 Res<> _parseProp(Cursor<Sst> &c, Style::PaddingLeftProp &p) {
-    p.value = try$(parseLengthOrPercentage(c));
+    p.value = try$(parseValue<PercentOr<Length>>(c));
     return Ok();
 }
 
 // MARK: Sizing
 
 Res<> _parseProp(Cursor<Sst> &c, Style::WidthProp &p) {
-    p.value = try$(parseSize(c));
+    p.value = try$(parseValue<Size>(c));
     return Ok();
 }
 
 Res<> _parseProp(Cursor<Sst> &c, Style::HeightProp &p) {
-    p.value = try$(parseSize(c));
+    p.value = try$(parseValue<Size>(c));
     return Ok();
 }
 
 Res<> _parseProp(Cursor<Sst> &c, Style::MinWidthProp &p) {
-    p.value = try$(parseSize(c));
+    p.value = try$(parseValue<Size>(c));
     return Ok();
 }
 
 Res<> _parseProp(Cursor<Sst> &c, Style::MinHeightProp &p) {
-    p.value = try$(parseSize(c));
+    p.value = try$(parseValue<Size>(c));
     return Ok();
 }
 
 Res<> _parseProp(Cursor<Sst> &c, Style::MaxWidthProp &p) {
-    p.value = try$(parseSize(c));
+    p.value = try$(parseValue<Size>(c));
     return Ok();
 }
 
 Res<> _parseProp(Cursor<Sst> &c, Style::MaxHeightProp &p) {
-    p.value = try$(parseSize(c));
+    p.value = try$(parseValue<Size>(c));
     return Ok();
 }
 

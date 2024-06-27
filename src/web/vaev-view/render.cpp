@@ -21,12 +21,12 @@ static void _collectStyle(Dom::Node const &node, Style::StyleBook &sb) {
     }
 }
 
-RenderResult render(Dom::Document const &dom, Vec2Px viewport) {
+RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px viewport) {
     Style::StyleBook stylebook;
     stylebook.add(Css::fetchStylesheet("bundle://vaev-view/user-agent.css"_url).take());
     _collectStyle(dom, stylebook);
 
-    Style::Computer computer{stylebook};
+    Style::Computer computer{media, stylebook};
     Strong<Layout::Flow> layoutRoot = makeStrong<Layout::BlockFlow>(makeStrong<Style::Computed>());
     Layout::build(computer, dom, *layoutRoot);
 

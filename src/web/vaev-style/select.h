@@ -297,10 +297,10 @@ struct Selector : public _Selector {
             e("{}", v);
         });
     }
+
+    bool match(Dom::Element const &el) const;
 };
 
 Spec spec(Selector const &sel);
-
-bool match(Selector const &sel, Dom::Element const &el);
 
 } // namespace Vaev::Style

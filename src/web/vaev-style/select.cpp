@@ -11,8 +11,6 @@ Spec spec(Selector const &) {
 
 // MARK: Selector Matching -----------------------------------------------------
 
-bool match(Selector const &sel, Dom::Element const &el);
-
 bool _match(Infix const &s, Dom::Element const &) {
     switch (s.type) {
     default:
@@ -24,7 +22,7 @@ bool _match(Nfix const &s, Dom::Element const &el) {
     switch (s.type) {
     case Nfix::AND:
         for (auto &inner : s.inners)
-            if (not match(inner, el))
+            if (not inner.match(el))
                 return false;
         return true;
 
@@ -35,15 +33,15 @@ bool _match(Nfix const &s, Dom::Element const &el) {
     // https://www.w3.org/TR/selectors-4/#matchess
     case Nfix::OR:
         for (auto &inner : s.inners)
-            if (match(inner, el))
+            if (inner.match(el))
                 return true;
         return false;
 
     case Nfix::NOT:
-        return not match(s.inners[0], el);
+        return not s.inners[0].match(el);
 
     case Nfix::WHERE:
-        return match(s.inners[0], el);
+        return not s.inners[0].match(el);
 
     default:
         notImplemented();
@@ -70,17 +68,17 @@ bool _match(UniversalSelector const &, Dom::Element const &) {
     return true;
 }
 
-bool match(Selector const &sel, Dom::Element const &el) {
-    return sel.visit(
+// MARK: Selector -------- -----------------------------------------------------
+
+bool Selector::match(Dom::Element const &el) const {
+    return visit(
         [&](auto const &s) {
-            if constexpr (requires { _match(s, el); }) {
+            if constexpr (requires { _match(s, el); })
                 return _match(s, el);
-            } else {
-                logWarn("unimplemented selector: {}", s);
-                return false;
-            }
+
+            logWarn("unimplemented selector: {}", s);
+            return false;
         }
     );
 }
-
 } // namespace Vaev::Style

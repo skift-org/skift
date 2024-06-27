@@ -21,6 +21,10 @@ struct StyleRule {
     Vec<Prop> props;
 
     void repr(Io::Emit &e) const;
+
+    bool match(Dom::Element const &el) const {
+        return selector.match(el);
+    }
 };
 
 // https://www.w3.org/TR/cssom-1/#the-cssimportrule-interface
@@ -36,6 +40,8 @@ struct MediaRule {
     Vec<Rule> rules;
 
     void repr(Io::Emit &e) const;
+
+    bool match(Media const &m) const;
 };
 
 // https://www.w3.org/TR/css-fonts-4/#cssfontfacerule

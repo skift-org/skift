@@ -158,7 +158,8 @@ Ui::Child editorFilterControls(Gfx::Filter const &filter) {
                 [](auto &n, auto v) {
                     Model::bubble(n, SetFilter{T{v}});
                 },
-                Mdi::DRAG_VERTICAL_VARIANT
+                Mdi::DRAG_VERTICAL_VARIANT,
+                Io::toTitleCase(T::NAME).unwrap()
             );
         }
     });

@@ -6,11 +6,10 @@ namespace Vaev::Css::Tests {
 
 test$("vaev-css-build-display") {
     auto testCase = [&](Str input, Display expected) -> Res<> {
-        logDebug("input: '{}'", input);
         auto lex = Lexer{input};
         auto val = consumeDeclarationValue(lex);
         Cursor<Sst> sst{val};
-        auto res = parseDisplay(sst);
+        auto res = parseValue<Display>(sst);
         expect$(res);
         expectEq$(res.unwrap(), expected);
         return Ok();

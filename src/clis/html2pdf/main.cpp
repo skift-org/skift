@@ -8,7 +8,35 @@
 
 namespace Vaev {
 
-Res<Strong<Dom::Document>> fetch(Mime::Url url) {
+Style::Media constructMedia(Vec2Px pageSize) {
+    return {
+        .type = MediaType::SCREEN,
+        .width = Px{pageSize.width},
+        .height = Px{pageSize.height},
+        .aspectRatio = pageSize.width.toFloat<Number>() / pageSize.height.toFloat<Number>(),
+        .orientation = Orientation::LANDSCAPE,
+
+        .resolution = Resolution::fromDpi(96),
+        .scan = Scan::PROGRESSIVE,
+        .grid = false,
+        .update = Update::FAST,
+
+        .overflowBlock = OverflowBlock::SCROLL,
+        .overflowInline = OverflowInline::SCROLL,
+
+        .color = 8,
+        .colorIndex = 0,
+        .monochrome = 0,
+        .colorGamut = ColorGamut::SRGB,
+        .pointer = Pointer::FINE,
+        .hover = Hover::HOVER,
+        .anyPointer = Pointer::FINE,
+        .anyHover = Hover::HOVER,
+    };
+}
+
+Res<Strong<Dom::Document>>
+fetch(Mime::Url url) {
 
     if (url.scheme == "about") {
         if (url.path.str() == "./blank")
@@ -18,7 +46,7 @@ Res<Strong<Dom::Document>> fetch(Mime::Url url) {
             return fetch("bundle://hideo-browser/start-page.xhtml"_url);
 
         return Error::invalidInput("unsupported about page");
-    }
+    } // namespace Vaev
 
     auto start = Sys::now();
 
@@ -67,7 +95,8 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto dom = co_try$(Vaev::fetch(input));
 
     Vaev::Vec2Px viewport{Vaev::Px{800}, Vaev::Px{600}};
-    Vaev::View::render(*dom, viewport);
+    auto media = Vaev::constructMedia(viewport);
+    Vaev::View::render(*dom, media, viewport);
 
     co_return Ok();
 }

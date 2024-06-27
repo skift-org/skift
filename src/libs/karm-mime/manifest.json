@@ -4,11 +4,6 @@
     "type": "lib",
     "description": "URL & MIME type parser",
     "requires": [
-        "karm-io",
-        "bmp-spec",
-        "jpeg-spec",
-        "png-spec",
-        "qoi-spec",
-        "ttf-spec"
+        "karm-io"
     ]
 }

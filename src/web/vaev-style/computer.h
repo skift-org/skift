@@ -8,7 +8,12 @@
 namespace Vaev::Style {
 
 struct Computer {
+    Media _media;
     StyleBook const &_styleBook;
+
+    using MatchingRules = Vec<StyleRule const *>;
+
+    void _evalRule(Rule const &rule, Dom::Element const &el, MatchingRules &matches);
 
     Strong<Computed> computeFor(Dom::Element const &el);
 };

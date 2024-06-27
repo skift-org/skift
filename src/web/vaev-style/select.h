@@ -69,6 +69,8 @@ struct UniversalSelector {
     void repr(Io::Emit &e) const {
         e("*");
     }
+
+    bool operator==(UniversalSelector const &) const = default;
 };
 
 static constexpr UniversalSelector UNIVERSAL = {};
@@ -77,6 +79,8 @@ struct EmptySelector {
     void repr(Io::Emit &e) const {
         e("EMPTY");
     }
+
+    bool operator==(EmptySelector const &) const = default;
 };
 
 static constexpr EmptySelector EMPTY = {};
@@ -100,6 +104,8 @@ struct Infix {
     void repr(Io::Emit &e) const {
         e("({} {} {})", *lhs, type, *rhs);
     }
+
+    bool operator==(Infix const &) const;
 };
 
 struct Nfix {
@@ -120,6 +126,8 @@ struct Nfix {
     void repr(Io::Emit &e) const {
         e("({} {})", type, inners);
     }
+
+    bool operator==(Nfix const &) const;
 };
 
 struct TypeSelector {
@@ -128,6 +136,8 @@ struct TypeSelector {
     void repr(Io::Emit &e) const {
         e("{}", type);
     }
+
+    bool operator==(TypeSelector const &) const = default;
 };
 
 struct IdSelector {
@@ -136,6 +146,8 @@ struct IdSelector {
     void repr(Io::Emit &e) const {
         e("#{}", id);
     }
+
+    bool operator==(IdSelector const &) const = default;
 };
 
 struct ClassSelector {
@@ -144,6 +156,8 @@ struct ClassSelector {
     void repr(Io::Emit &e) const {
         e(".{}", class_);
     }
+
+    bool operator==(ClassSelector const &) const = default;
 };
 
 struct AnB {
@@ -310,7 +324,13 @@ struct Selector : public _Selector {
     }
 
     bool match(Dom::Element const &el) const;
+
+    bool operator==(Selector const &) const = default;
 };
+
+inline bool Infix::operator==(Infix const &) const = default;
+
+inline bool Nfix::operator==(Nfix const &) const = default;
 
 Spec spec(Selector const &sel);
 

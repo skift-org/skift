@@ -60,7 +60,6 @@ OpCode sstNode2OpCode(Slice<Sst> content, usize &i) {
         if (i + 1 >= content.len()) {
             return OpCode::NOP;
         }
-        logDebug("WHITESPACE at {} {}", content[i], content[i + 1]);
         if (content[i + 1] == Token::IDENT || content[i + 1] == Token::HASH || content[i + 1] == Token::DELIM || content[i + 1].token.data == "*") {
             i++;
             return OpCode::DESCENDANT;
@@ -92,12 +91,10 @@ Style::Selector parseNfixExpr(Style::Selector lhs, OpCode op, Slice<Sst> content
         }
         i++;
         OpCode nextOpCode = sstNode2OpCode(content, i);
-        logDebug("TRUE ? {} {} with selectors {}", nextOpCode, i, selectors);
         if (nextOpCode == OpCode::NOP) {
             break;
         } else if (nextOpCode == op) {
             // adding the selector to the nfix
-            logDebug("ADDING TO NFIX at {#} - {#}", content[i], content[i + 1]);
             selectors.pushBack(parseSelectorElement(content, i));
         } else if (nextOpCode == OpCode::COLUMN || nextOpCode == OpCode::OR || nextOpCode == OpCode::AND) {
             // parse new nfix
@@ -105,12 +102,10 @@ Style::Selector parseNfixExpr(Style::Selector lhs, OpCode op, Slice<Sst> content
             if (nextOpCode < op) {
                 break;
             }
-            logDebug("new nfix at {#} - {#}", content[i], content[i + 1]);
 
             last(selectors) = parseNfixExpr(selectors[selectors.len() - 1], nextOpCode, content, i);
         } else {
             // parse new infix
-            logDebug("new infix");
 
             selectors.pushBack(parseInfixExpr(parseSelectorElement(content, i), content, i));
         }
@@ -153,7 +148,7 @@ Style::Selector parseInfixExpr(Style::Selector lhs, Slice<Sst> content, usize &i
 
 Style::Selector parseSelector(Slice<Sst> content) {
     if (!content) {
-        logError("ERROR : empty selector");
+        logWarn("empty selector");
         return Style::EmptySelector{};
     }
 

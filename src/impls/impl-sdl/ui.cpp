@@ -5,6 +5,38 @@
 
 namespace Karm::Ui::_Embed {
 
+static SDL_HitTestResult _hitTestCallback(SDL_Window *Window, SDL_Point const *Area, void *) {
+    constexpr isize MOUSE_GRAB_PADDING = 8;
+    int Width, Height;
+    SDL_GetWindowSize(Window, &Width, &Height);
+
+    if (Area->y < MOUSE_GRAB_PADDING) {
+        if (Area->x < MOUSE_GRAB_PADDING) {
+            return SDL_HITTEST_RESIZE_TOPLEFT;
+        } else if (Area->x > Width - MOUSE_GRAB_PADDING) {
+            return SDL_HITTEST_RESIZE_TOPRIGHT;
+        } else {
+            return SDL_HITTEST_RESIZE_TOP;
+        }
+    } else if (Area->y > Height - MOUSE_GRAB_PADDING) {
+        if (Area->x < MOUSE_GRAB_PADDING) {
+            return SDL_HITTEST_RESIZE_BOTTOMLEFT;
+        } else if (Area->x > Width - MOUSE_GRAB_PADDING) {
+            return SDL_HITTEST_RESIZE_BOTTOMRIGHT;
+        } else {
+            return SDL_HITTEST_RESIZE_BOTTOM;
+        }
+    } else if (Area->x < MOUSE_GRAB_PADDING) {
+        return SDL_HITTEST_RESIZE_LEFT;
+    } else if (Area->x > Width - MOUSE_GRAB_PADDING) {
+        return SDL_HITTEST_RESIZE_RIGHT;
+    } else if (Area->y < 70) {
+        return SDL_HITTEST_DRAGGABLE;
+    }
+
+    return SDL_HITTEST_DRAGGABLE; // SDL_HITTEST_NORMAL <- Windows behaviour
+}
+
 struct SdlHost :
     public Host {
     SDL_Window *_window{};
@@ -524,6 +556,8 @@ Res<Strong<Host>> makeHost(Child root) {
 
     if (not window)
         return Error::other(SDL_GetError());
+
+    SDL_SetWindowHitTest(window, _hitTestCallback, nullptr);
 
     return Ok(makeStrong<SdlHost>(root, window));
 }

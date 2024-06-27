@@ -77,10 +77,18 @@ struct Radius {
             for (auto &radius : res.radii)
                 radius *= factor;
         };
-        scaleAll(size.width / (res.b + res.c));
-        scaleAll(size.height / (res.d + res.e));
-        scaleAll(size.width / (res.f + res.g));
-        scaleAll(size.height / (res.h + res.a));
+
+        auto sumTop = res.b + res.c;
+        scaleAll(sumTop > T{} ? size.width / sumTop : T{});
+
+        auto sumEnd = res.d + res.e;
+        scaleAll(sumEnd > T{} ? size.height / sumEnd : T{});
+
+        auto sumBottom = res.f + res.g;
+        scaleAll(sumBottom > T{} ? size.width / sumBottom : T{});
+
+        auto sumStart = res.h + res.a;
+        scaleAll(sumStart > T{} ? size.height / sumStart : T{});
         return res;
     }
 };

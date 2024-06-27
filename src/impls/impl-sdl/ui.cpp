@@ -5,36 +5,34 @@
 
 namespace Karm::Ui::_Embed {
 
-static SDL_HitTestResult _hitTestCallback(SDL_Window *Window, SDL_Point const *Area, void *) {
-    constexpr isize MOUSE_GRAB_PADDING = 8;
-    int Width, Height;
-    SDL_GetWindowSize(Window, &Width, &Height);
+static SDL_HitTestResult _hitTestCallback(SDL_Window *window, SDL_Point const *area, void *) {
+    constexpr isize MOUSE_GRAB_PADDING = 16;
+    int width, height;
+    SDL_GetWindowSize(window, &width, &height);
 
-    if (Area->y < MOUSE_GRAB_PADDING) {
-        if (Area->x < MOUSE_GRAB_PADDING) {
+    if (area->y < MOUSE_GRAB_PADDING) {
+        if (area->x < MOUSE_GRAB_PADDING) {
             return SDL_HITTEST_RESIZE_TOPLEFT;
-        } else if (Area->x > Width - MOUSE_GRAB_PADDING) {
+        } else if (area->x > width - MOUSE_GRAB_PADDING) {
             return SDL_HITTEST_RESIZE_TOPRIGHT;
         } else {
             return SDL_HITTEST_RESIZE_TOP;
         }
-    } else if (Area->y > Height - MOUSE_GRAB_PADDING) {
-        if (Area->x < MOUSE_GRAB_PADDING) {
+    } else if (area->y > height - MOUSE_GRAB_PADDING) {
+        if (area->x < MOUSE_GRAB_PADDING) {
             return SDL_HITTEST_RESIZE_BOTTOMLEFT;
-        } else if (Area->x > Width - MOUSE_GRAB_PADDING) {
+        } else if (area->x > width - MOUSE_GRAB_PADDING) {
             return SDL_HITTEST_RESIZE_BOTTOMRIGHT;
         } else {
             return SDL_HITTEST_RESIZE_BOTTOM;
         }
-    } else if (Area->x < MOUSE_GRAB_PADDING) {
+    } else if (area->x < MOUSE_GRAB_PADDING) {
         return SDL_HITTEST_RESIZE_LEFT;
-    } else if (Area->x > Width - MOUSE_GRAB_PADDING) {
+    } else if (area->x > width - MOUSE_GRAB_PADDING) {
         return SDL_HITTEST_RESIZE_RIGHT;
-    } else if (Area->y < 70) {
-        return SDL_HITTEST_DRAGGABLE;
     }
 
-    return SDL_HITTEST_DRAGGABLE; // SDL_HITTEST_NORMAL <- Windows behaviour
+    return SDL_HITTEST_NORMAL;
 }
 
 struct SdlHost :

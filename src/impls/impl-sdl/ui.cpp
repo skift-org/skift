@@ -5,35 +5,7 @@
 
 namespace Karm::Ui::_Embed {
 
-static SDL_HitTestResult _hitTestCallback(SDL_Window *window, SDL_Point const *area, void *) {
-    constexpr isize MOUSE_GRAB_PADDING = 16;
-    int width, height;
-    SDL_GetWindowSize(window, &width, &height);
-
-    if (area->y < MOUSE_GRAB_PADDING) {
-        if (area->x < MOUSE_GRAB_PADDING) {
-            return SDL_HITTEST_RESIZE_TOPLEFT;
-        } else if (area->x > width - MOUSE_GRAB_PADDING) {
-            return SDL_HITTEST_RESIZE_TOPRIGHT;
-        } else {
-            return SDL_HITTEST_RESIZE_TOP;
-        }
-    } else if (area->y > height - MOUSE_GRAB_PADDING) {
-        if (area->x < MOUSE_GRAB_PADDING) {
-            return SDL_HITTEST_RESIZE_BOTTOMLEFT;
-        } else if (area->x > width - MOUSE_GRAB_PADDING) {
-            return SDL_HITTEST_RESIZE_BOTTOMRIGHT;
-        } else {
-            return SDL_HITTEST_RESIZE_BOTTOM;
-        }
-    } else if (area->x < MOUSE_GRAB_PADDING) {
-        return SDL_HITTEST_RESIZE_LEFT;
-    } else if (area->x > width - MOUSE_GRAB_PADDING) {
-        return SDL_HITTEST_RESIZE_RIGHT;
-    }
-
-    return SDL_HITTEST_NORMAL;
-}
+static SDL_HitTestResult _hitTestCallback(SDL_Window *window, SDL_Point const *area, void *data);
 
 struct SdlHost :
     public Host {
@@ -329,6 +301,9 @@ struct SdlHost :
         return ev;
     }
 
+    SDL_Cursor *_cursor{};
+    SDL_SystemCursor _systemCursor{};
+
     void translate(SDL_Event const &sdlEvent) {
         switch (sdlEvent.type) {
         case SDL_WINDOWEVENT:
@@ -377,6 +352,43 @@ struct SdlHost :
             buttons |= (sdlEvent.motion.state & SDL_BUTTON_LMASK) ? Events::Button::LEFT : Events::Button::NONE;
             buttons |= (sdlEvent.motion.state & SDL_BUTTON_MMASK) ? Events::Button::MIDDLE : Events::Button::NONE;
             buttons |= (sdlEvent.motion.state & SDL_BUTTON_RMASK) ? Events::Button::RIGHT : Events::Button::NONE;
+
+            // do the hit test and update the cursor
+
+            SDL_Point p = {sdlEvent.motion.x, sdlEvent.motion.y};
+            SDL_HitTestResult result = _hitTestCallback(_window, &p, this);
+            SDL_SystemCursor systemCursor = SDL_SYSTEM_CURSOR_ARROW;
+
+            switch (result) {
+            case SDL_HITTEST_RESIZE_TOPLEFT:
+            case SDL_HITTEST_RESIZE_BOTTOMRIGHT:
+                systemCursor = SDL_SYSTEM_CURSOR_SIZENWSE;
+                break;
+            case SDL_HITTEST_RESIZE_TOPRIGHT:
+            case SDL_HITTEST_RESIZE_BOTTOMLEFT:
+                systemCursor = SDL_SYSTEM_CURSOR_SIZENESW;
+                break;
+            case SDL_HITTEST_RESIZE_TOP:
+            case SDL_HITTEST_RESIZE_BOTTOM:
+                systemCursor = SDL_SYSTEM_CURSOR_SIZENS;
+                break;
+            case SDL_HITTEST_RESIZE_LEFT:
+            case SDL_HITTEST_RESIZE_RIGHT:
+                systemCursor = SDL_SYSTEM_CURSOR_SIZEWE;
+                break;
+            default:
+                break;
+            }
+
+            if (_systemCursor != systemCursor) {
+                if (_cursor) {
+                    SDL_FreeCursor(_cursor);
+                }
+
+                _cursor = SDL_CreateSystemCursor(systemCursor);
+                SDL_SetCursor(_cursor);
+                _systemCursor = systemCursor;
+            }
 
             _lastMousePos = {
                 sdlEvent.motion.x,
@@ -538,6 +550,35 @@ struct SdlHost :
     }
 };
 
+static SDL_HitTestResult _hitTestCallback(SDL_Window *window, SDL_Point const *area, void *data) {
+    SdlHost *host = (SdlHost *)data;
+    isize grabPadding = 16 * host->dpi();
+    int width, height;
+    SDL_GetWindowSize(window, &width, &height);
+
+    if (area->y < grabPadding) {
+        if (area->x < grabPadding)
+            return SDL_HITTEST_RESIZE_TOPLEFT;
+        else if (area->x > width - grabPadding)
+            return SDL_HITTEST_RESIZE_TOPRIGHT;
+
+        return SDL_HITTEST_RESIZE_TOP;
+    } else if (area->y > height - grabPadding) {
+        if (area->x < grabPadding)
+            return SDL_HITTEST_RESIZE_BOTTOMLEFT;
+        else if (area->x > width - grabPadding)
+            return SDL_HITTEST_RESIZE_BOTTOMRIGHT;
+
+        return SDL_HITTEST_RESIZE_BOTTOM;
+    } else if (area->x < grabPadding) {
+        return SDL_HITTEST_RESIZE_LEFT;
+    } else if (area->x > width - grabPadding) {
+        return SDL_HITTEST_RESIZE_RIGHT;
+    }
+
+    return SDL_HITTEST_NORMAL;
+}
+
 Res<Strong<Host>> makeHost(Child root) {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 
@@ -555,9 +596,11 @@ Res<Strong<Host>> makeHost(Child root) {
     if (not window)
         return Error::other(SDL_GetError());
 
-    SDL_SetWindowHitTest(window, _hitTestCallback, nullptr);
+    auto host = makeStrong<SdlHost>(root, window);
 
-    return Ok(makeStrong<SdlHost>(root, window));
+    SDL_SetWindowHitTest(window, _hitTestCallback, (void *)&host.unwrap());
+
+    return Ok(host);
 }
 
 } // namespace Karm::Ui::_Embed

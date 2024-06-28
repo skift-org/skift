@@ -49,40 +49,36 @@ struct MouseListener {
         return _pos;
     }
 
-    bool listen(Node &node, Sys::Event &e) {
+    bool listen(Node &node, Sys::Event &event) {
         bool result = false;
         MouseState state = _state;
 
-        e.handle<Events::MouseEvent>([&](auto &m) {
-            if (not node.bound().contains(m.pos)) {
+        if (auto *e = event.is<Events::MouseEvent>()) {
+            if (not node.bound().contains(e->pos)) {
                 state = IDLE;
-                return false;
+            } else {
+
+                if (state != PRESS) {
+                    state = HOVER;
+                }
+
+                _pos = e->pos - node.bound().topStart();
+
+                if (e->type == Events::MouseEvent::PRESS and
+                    e->button == Events::Button::LEFT) {
+                    state = PRESS;
+                    event.accept();
+
+                } else if (e->type == Events::MouseEvent::RELEASE and
+                           e->button == Events::Button::LEFT) {
+                    state = HOVER;
+                    result = true;
+                    event.accept();
+                }
             }
-
-            if (state != PRESS) {
-                state = HOVER;
-            }
-
-            _pos = m.pos - node.bound().topStart();
-
-            if (m.type == Events::MouseEvent::PRESS and m.button == Events::Button::LEFT) {
-                state = PRESS;
-                return true;
-            }
-
-            if (m.type == Events::MouseEvent::RELEASE and m.button == Events::Button::LEFT) {
-                state = HOVER;
-                result = true;
-                return true;
-            }
-
-            return false;
-        });
-
-        e.handle<Events::MouseLeaveEvent>([&](auto) {
+        } else if (auto *e = event.is<Events::MouseLeaveEvent>()) {
             state = IDLE;
-            return false;
-        });
+        }
 
         if (state != _state) {
             _state = state;

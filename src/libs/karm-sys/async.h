@@ -10,35 +10,15 @@ namespace Karm::Sys {
 
 // MARK: Event -----------------------------------------------------------------
 
-enum struct Propagation {
-    NONE, //< Don't propagate futher than the target sink
-    UP,   //< Move down the children of the target sink
-    DOWN, //< Move up the parent of the target sink
-    STOP, //< Stop the propagation
-};
-
 struct Event {
-    Propagation _propagation;
-
-    Event(Propagation propagation)
-        : _propagation(propagation) {}
+    bool _accepted = false;
 
     virtual ~Event() = default;
 
     virtual Meta::Id id() const = 0;
-    virtual Opt<Bytes> bytes() const { return NONE; }
 
     virtual void *_unwrap() = 0;
     virtual void const *_unwrap() const = 0;
-
-    template <typename T>
-    Event &handle(auto callback) {
-        if (auto *p = is<T>())
-            if (callback(*p)) {
-                accept();
-            }
-        return *this;
-    }
 
     template <typename T>
     T *is() {
@@ -48,16 +28,6 @@ struct Event {
     template <typename T>
     T const *is() const {
         return id() == Meta::idOf<T>() ? &unwrap<T>() : nullptr;
-    }
-
-    template <typename T>
-    T *is(Propagation p) {
-        return id() == Meta::idOf<T>() and _propagation == p ? &unwrap<T>() : nullptr;
-    }
-
-    template <typename T>
-    T const *is(Propagation p) const {
-        return id() == Meta::idOf<T>() and _propagation == p ? &unwrap<T>() : nullptr;
     }
 
     template <typename T>
@@ -71,11 +41,11 @@ struct Event {
     }
 
     void accept() {
-        _propagation = Propagation::STOP;
+        _accepted = true;
     }
 
     bool accepted() {
-        return _propagation == Propagation::STOP;
+        return _accepted;
     }
 };
 
@@ -84,8 +54,8 @@ struct _Event : public Event {
     T _buf;
 
     template <typename... Args>
-    _Event(Propagation p, Args &&...args)
-        : Event(p), _buf{std::forward<Args>(args)...} {}
+    _Event(Args &&...args)
+        : _buf{std::forward<Args>(args)...} {}
 
     Meta::Id id() const override {
         return Meta::idOf<T>();
@@ -98,18 +68,11 @@ struct _Event : public Event {
     void const *_unwrap() const override {
         return &_buf;
     }
-
-    Opt<Bytes> bytes() const override {
-        if constexpr (Meta::TrivialyCopyable<T>) {
-            return Bytes{reinterpret_cast<Byte const *>(&_buf), sizeof(T)};
-        }
-        return NONE;
-    }
 };
 
 template <typename T, typename... Args>
-Box<Event> makeEvent(Propagation propagation, Args &&...args) {
-    return makeBox<_Event<T>>(propagation, std::forward<Args>(args)...);
+Box<Event> makeEvent(Args &&...args) {
+    return makeBox<_Event<T>>(std::forward<Args>(args)...);
 }
 
 // MARK: Scheduler -------------------------------------------------------------

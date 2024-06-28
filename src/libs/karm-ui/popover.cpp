@@ -19,89 +19,88 @@ void closePopover(Node &n) {
     bubble<ClosePopoverEvent>(n);
 }
 
-struct PopoverLayer : public LeafNode<PopoverLayer> {
-    Child _child;
-
+struct PopoverLayer : public ProxyNode<PopoverLayer> {
     Opt<Child> _popover;
     Opt<Child> _shouldPopover;
     bool _shouldPopoverClose = false;
     Math::Vec2i _popoverAt;
 
-    PopoverLayer(Child child) : _child(child) {
-        _child->attach(this);
-    }
+    using ProxyNode<PopoverLayer>::ProxyNode;
 
     ~PopoverLayer() {
-        if (_popover) {
+        if (_popover)
             (*_popover)->detach(this);
-        }
-
-        _child->detach(this);
     }
 
-    Node &child() {
-        return *_child;
+    void _showPopover(Child child, Math::Vec2i at) {
+        // We need to defer showing the dialog until the next frame,
+        // otherwise replacing the dialog might cause some use after free down the tree
+        _shouldPopover = child;
+        _popoverAt = at;
+        shouldLayout(*this);
     }
 
-    Node const &child() const {
-        return *_child;
+    void _closePopover() {
+        // We need to defer closing the dialog until the next frame,
+        // otherwise we might cause some use after free down the tree
+        _shouldPopoverClose = true;
+        shouldLayout(*this);
     }
 
-    Node &popover() { return **_popover; }
-
-    Node const &popover() const { return **_popover; }
-
-    bool popoverVisible() const {
-        return (bool)_popover;
-    }
-
-    void reconcile(PopoverLayer &o) override {
-        _child = tryOr(_child->reconcile(o._child), _child);
-        _child->attach(this);
+    Math::Recti _positionPopover(Math::Recti r) {
+        // Position the popover at the given point, but make sure it fits in the screen
+        auto size = (*_popover)->size(r.size(), Hint::MIN);
+        auto pos = _popoverAt;
+        pos.y = clamp(pos.y, 0, r.size().y - size.y);
+        if (pos.x + size.x > r.end())
+            pos.x = pos.x - size.x;
+        return {pos, size};
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {
-        child().paint(g, r);
+        ProxyNode::paint(g, r);
 
-        if (popoverVisible()) {
+        if (_popover)
             (*_popover)->paint(g, r);
+    }
+
+    void event(Sys::Event &event) override {
+        ProxyNode::event(event);
+
+        if (event.accepted())
+            return;
+
+        if (not _popover)
+            return;
+
+        (*_popover)->event(event);
+
+        if (event.accepted())
+            return;
+
+        auto *e = event.is<Events::MouseEvent>();
+
+        if (e->type == Events::MouseEvent::PRESS) {
+            _closePopover();
+            event.accept();
         }
     }
 
-    void event(Sys::Event &e) override {
-        if (popoverVisible()) {
-            popover().event(e);
-            e.handle<Events::MouseEvent>([&](auto &m) {
-                if (not e.accepted() and m.type == Events::MouseEvent::PRESS) {
-                    _shouldPopoverClose = true;
-                    shouldLayout(*this);
-                    return true;
-                }
-                return false;
-            });
+    void bubble(Sys::Event &event) override {
+        if (auto *e = event.is<ShowPopoverEvent>()) {
+            _showPopover(e->child, e->at);
+            event.accept();
+        } else if (event.is<ClosePopoverEvent>()) {
+            _closePopover();
+            event.accept();
         }
-        child().event(e);
-    }
 
-    void bubble(Sys::Event &e) override {
-        if (e.is<ShowPopoverEvent>()) {
-            // We need to defer showing the popover until the next frame,
-            // otherwise replacing the popover might cause some use after free down the tree
-            auto &s = e.unwrap<ShowPopoverEvent>();
-            _shouldPopover = s.child;
-            _popoverAt = s.at;
-            shouldLayout(*this);
-        } else if (e.is<ClosePopoverEvent>()) {
-            // We need to defer closing the dialog until the next frame,
-            // otherwise we might cause some use after free down the tree
-            _shouldPopoverClose = true;
-            shouldLayout(*this);
-        } else if (parent()) {
-            parent()->bubble(e);
-        }
+        LeafNode<PopoverLayer>::bubble(event);
     }
 
     void layout(Math::Recti r) override {
+        ProxyNode::layout(r);
+
         if (_shouldPopoverClose) {
             if (_popover) {
                 (*_popover)->detach(this);
@@ -111,35 +110,16 @@ struct PopoverLayer : public LeafNode<PopoverLayer> {
         }
 
         if (_shouldPopover) {
-            if (_popover) {
+            if (_popover)
                 (*_popover)->detach(this);
-            }
+
             _popover = _shouldPopover;
             (*_popover)->attach(this);
             _shouldPopover = NONE;
         }
 
-        child().layout(r);
-
-        if (popoverVisible()) {
-            auto size = (*_popover)->size(r.size(), Hint::MIN);
-            auto pos = _popoverAt;
-            pos.y = clamp(pos.y, 0, r.size().y - size.y);
-
-            if (pos.x + size.x > r.end()) {
-                pos.x = pos.x - size.x;
-            }
-
-            (*_popover)->layout({pos, size});
-        }
-    }
-
-    Math::Vec2i size(Math::Vec2i s, Hint hint) override {
-        return child().size(s, hint);
-    }
-
-    Math::Recti bound() override {
-        return _child->bound();
+        if (_popover)
+            (*_popover)->layout(_positionPopover(r));
     }
 };
 

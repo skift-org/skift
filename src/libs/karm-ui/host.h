@@ -197,9 +197,9 @@ struct Host : public Node {
         }
     }
 
-    void event(Sys::Event &e) override {
+    void event(Sys::Event &event) override {
         _perf.record(PerfEvent::INPUT);
-        _root->event(e);
+        _root->event(event);
         auto elapsed = _perf.end();
         static usize maxStutter = 1;
         if (elapsed.toMSecs() > maxStutter) {
@@ -209,23 +209,24 @@ struct Host : public Node {
     }
 
     void bubble(Sys::Event &event) override {
-        event
-            .handle<Node::PaintEvent>([this](auto &e) {
-                _dirty.pushBack(e.bound);
-                return true;
-            })
-            .handle<Node::LayoutEvent>([this](auto &) {
-                _shouldLayout = true;
-                return true;
-            })
-            .handle<Node::AnimateEvent>([this](auto &) {
-                _shouldAnimate = true;
-                return true;
-            })
-            .handle<Events::RequestExitEvent>([this](auto &e) {
-                _res = e.res;
-                return true;
-            });
+        if (auto *e = event.is<Node::PaintEvent>()) {
+            _dirty.pushBack(e->bound);
+            event.accept();
+        } else if (auto *e = event.is<Node::LayoutEvent>()) {
+            _shouldLayout = true;
+            event.accept();
+        } else if (auto *e = event.is<Node::AnimateEvent>()) {
+            _shouldAnimate = true;
+            event.accept();
+        } else if (auto *e = event.is<Events::RequestExitEvent>()) {
+            _res = e->res;
+            event.accept();
+        }
+
+        if (not event.accepted()) {
+            logWarn("unhandled event, bouncing down");
+            _root->event(event);
+        }
     }
 
     void doLayout() {
@@ -264,7 +265,7 @@ struct Host : public Node {
         while (not _res) {
             if (_shouldAnimate and scheduleFrame()) {
                 _shouldAnimate = false;
-                auto e = Sys::makeEvent<Node::AnimateEvent>(Sys::Propagation::DOWN, FRAME_TIME);
+                auto e = Sys::makeEvent<Node::AnimateEvent>(FRAME_TIME);
                 event(*e);
             }
 

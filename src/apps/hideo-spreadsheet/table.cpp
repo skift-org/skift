@@ -52,32 +52,33 @@ struct Table : public Ui::View<Table> {
 
     // MARK: Events ------------------------------------------------------------
 
-    void event(Sys::Event &e) override {
-        e.handle<Events::MouseEvent>([&](Events::MouseEvent const &m) {
-            auto pos = m.pos - bound().topStart();
-            if (bound().contains(m.pos)) {
-                if (m.type == Events::MouseEvent::PRESS) {
-                    auto cell = sheet().cellAt(pos - Math::Vec2i{CELL_WIDTH, CELL_HEIGHT});
-                    if (cell) {
-                        Model::bubble(*this, UpdateSelection{Range{*cell}});
-                    }
-                } else if (m.type == Events::MouseEvent::MOVE and (m.buttons & Events::Button::LEFT) == Events::Button::LEFT) {
-                    auto cell = sheet().cellAt(pos - Math::Vec2i{CELL_WIDTH, CELL_HEIGHT});
-                    if (cell) {
-                        auto sel = *_state->selection;
-                        sel.end = *cell;
+    void event(Sys::Event &event) override {
+        auto *e = event.is<Events::MouseEvent>();
+        if (not e)
+            return;
 
-                        if (*_state->selection != sel) {
-                            Model::bubble(*this, UpdateSelection{sel});
-                        }
-                    }
-                }
+        auto pos = e->pos - bound().topStart();
+        if (not bound().contains(e->pos))
+            return;
 
-                return true;
+        if (e->type == Events::MouseEvent::PRESS) {
+            auto cell = sheet().cellAt(pos - Math::Vec2i{CELL_WIDTH, CELL_HEIGHT});
+            if (cell) {
+                Model::bubble(*this, UpdateSelection{Range{*cell}});
             }
+        } else if (e->type == Events::MouseEvent::MOVE and (e->buttons & Events::Button::LEFT) == Events::Button::LEFT) {
+            auto cell = sheet().cellAt(pos - Math::Vec2i{CELL_WIDTH, CELL_HEIGHT});
+            if (cell) {
+                auto sel = *_state->selection;
+                sel.end = *cell;
 
-            return false;
-        });
+                if (*_state->selection != sel) {
+                    Model::bubble(*this, UpdateSelection{sel});
+                }
+            }
+        }
+
+        event.accept();
     }
 
     // MARK: Painting ----------------------------------------------------------

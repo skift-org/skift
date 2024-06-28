@@ -1,5 +1,6 @@
 #include <hideo-base/alert.h>
 #include <hideo-base/scafold.h>
+#include <karm-kira/alert.h>
 #include <karm-kira/context-menu.h>
 #include <karm-kira/side-panel.h>
 #include <karm-mime/mime.h>
@@ -106,10 +107,18 @@ Ui::Child mainMenu([[maybe_unused]] State const &s) {
         Kr::contextMenuItem(Ui::NOP, Mdi::PRINTER, "Print..."),
 #ifdef __ck_host__
         Kr::contextMenuItem(
-            [&](auto &) {
-                (void)Sys::launch(Mime::Uti::PUBLIC_OPEN, s.url);
+            [&](auto &n) {
+                auto res = Sys::launch(Mime::Uti::PUBLIC_OPEN, s.url);
+                if (not res)
+                    Ui::showDialog(
+                        n,
+                        Kr::alert(
+                            "Error"s,
+                            Io::format("Failed to open in default browser\n\n{}", res).unwrap()
+                        )
+                    );
             },
-            Mdi::GOOGLE_CHROME, "Open in Chrome..."
+            Mdi::WEB, "Open in default browser..."
         ),
 #endif
         Ui::separator(),
@@ -153,20 +162,33 @@ Ui::Child contextMenu(State const &s) {
     });
 }
 
+Ui::Child inspectorContent(State const &s) {
+    if (not s.dom) {
+        return Ui::labelMedium(Ui::GRAY500, "No document") |
+               Ui::center();
+    }
+
+    return Vaev::View::inspect(s.dom.unwrap()) | Ui::vhscroll();
+}
+
 Ui::Child sidePanel(State const &s) {
     switch (s.sidePanel) {
     case SidePanel::BOOKMARKS:
         return Kr::sidePanelContent({
             Kr::sidePanelTitle(Model::bind(SidePanel::CLOSE), "Bookmarks"),
             Ui::separator(),
-            Ui::empty(9),
+            Ui::labelMedium(Ui::GRAY500, "No bookmarks") |
+                Ui::center() |
+                Ui::grow(),
         });
+
     case SidePanel::DEVELOPER_TOOLS:
         return Kr::sidePanelContent({
             Kr::sidePanelTitle(Model::bind(SidePanel::CLOSE), "Developer Tools"),
             Ui::separator(),
-            Vaev::View::inspect(s.dom.unwrap()) | Ui::vhscroll() | Ui::grow(),
+            inspectorContent(s) | Ui::grow(),
         });
+
     default:
         return Ui::empty();
     }
@@ -186,15 +208,19 @@ Ui::Child alert(State const &s, String title, String body) {
            Ui::center();
 }
 
-Ui::Child appContent(State const &s) {
-    if (not s.dom.has())
+Ui::Child webview(State const &s) {
+    if (not s.dom)
         return alert(s, "The page could not be loaded"s, Io::toStr(s.dom).unwrap());
 
-    auto webView = Vaev::View::view(s.dom.unwrap()) | Kr::contextMenu(slot$(contextMenu(s)));
+    return Vaev::View::view(s.dom.unwrap()) | Kr::contextMenu(slot$(contextMenu(s)));
+}
+
+Ui::Child appContent(State const &s) {
     if (s.sidePanel == SidePanel::CLOSE)
-        return webView;
+        return webview(s);
     return Ui::hflow(
-        webView | Ui::grow(),
+        webview(s) | Ui::grow(),
+        Ui::separator(),
         sidePanel(s)
     );
 }

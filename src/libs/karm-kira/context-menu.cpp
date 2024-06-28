@@ -19,17 +19,20 @@ struct ContextMenu : public Ui::ProxyNode<ContextMenu> {
         _menu = std::move(o._menu);
     }
 
-    void event(Sys::Event &e) override {
-        Ui::ProxyNode<ContextMenu>::event(e);
-        e.handle<Events::MouseEvent>([&](Events::MouseEvent &m) {
-            if (m.type == Events::MouseEvent::PRESS and
-                m.button == Events::Button::RIGHT and
-                bound().contains(m.pos)) {
-                Ui::showPopover(*this, m.pos, _menu());
-                return true;
+    void event(Sys::Event &event) override {
+        Ui::ProxyNode<ContextMenu>::event(event);
+
+        if (event.accepted())
+            return;
+
+        if (auto *e = event.is<Events::MouseEvent>()) {
+            if (e->type == Events::MouseEvent::PRESS and
+                e->button == Events::Button::RIGHT and
+                bound().contains(e->pos)) {
+                Ui::showPopover(*this, e->pos, _menu());
+                event.accept();
             }
-            return false;
-        });
+        }
     }
 };
 

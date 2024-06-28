@@ -66,33 +66,32 @@ struct Eased {
         Ui::shouldAnimate(n);
     }
 
-    bool needRepaint(Node &n, Sys::Event &e) {
-        bool shouldRepaint = false;
-
-        e.handle<Node::AnimateEvent>([&](auto &a) {
-            if (_animated) {
-                Ui::shouldAnimate(n);
-
-                if (_delay > 0) {
-                    _delay -= a.dt;
-                    return false;
-                }
-
-                shouldRepaint = true;
-                _elapsed += a.dt;
-                if (_elapsed > _duration) {
-                    _elapsed = _duration;
-                    _value = _target;
-                    _animated = false;
-                } else {
-                    f64 p = _elapsed / _duration;
-                    _value = Math::lerp(_start, _target, _easing(p));
-                }
-            }
+    bool needRepaint(Node &n, Sys::Event &event) {
+        if (not _animated)
             return false;
-        });
 
-        return shouldRepaint;
+        auto *e = event.is<Node::AnimateEvent>();
+        if (not e)
+            return false;
+
+        Ui::shouldAnimate(n);
+
+        if (_delay > 0) {
+            _delay -= e->dt;
+            return false;
+        }
+
+        _elapsed += e->dt;
+        if (_elapsed > _duration) {
+            _elapsed = _duration;
+            _value = _target;
+            _animated = false;
+        } else {
+            f64 p = _elapsed / _duration;
+            _value = Math::lerp(_start, _target, _easing(p));
+        }
+
+        return true;
     }
 
     void update(Node &n, Sys::Event &e) {
@@ -101,18 +100,6 @@ struct Eased {
 
     bool reached() const {
         return not _animated;
-    }
-
-    operator T() const {
-        return _value;
-    }
-
-    auto const &operator*() const {
-        return _value;
-    }
-
-    auto *operator->() const {
-        return &_value;
     }
 };
 

@@ -8,13 +8,13 @@ namespace Karm::Ui {
 
 template <typename E, typename... Args>
 inline void event(Node &n, Args &&...args) {
-    auto e = Sys::makeEvent<E>(Sys::Propagation::DOWN, std::forward<Args>(args)...);
+    auto e = Sys::makeEvent<E>(std::forward<Args>(args)...);
     n.event(*e);
 }
 
 template <typename E, typename... Args>
 inline void bubble(Node &n, Args &&...args) {
-    auto e = Sys::makeEvent<E>(Sys::Propagation::UP, std::forward<Args>(args)...);
+    auto e = Sys::makeEvent<E>(std::forward<Args>(args)...);
     n.bubble(*e);
 }
 

@@ -22,10 +22,11 @@ void closeDialog(Node &n) {
 
 struct DialogLayer : public LeafNode<DialogLayer> {
     Easedf _visibility{};
-    Child _child;
 
+    Child _child;
     Opt<Child> _dialog;
     Opt<Child> _shouldShow;
+
     bool _shouldDialogClose = false;
 
     DialogLayer(Child child) : _child(child) {
@@ -33,27 +34,26 @@ struct DialogLayer : public LeafNode<DialogLayer> {
     }
 
     ~DialogLayer() {
-        if (_dialog) {
+        if (_dialog)
             (*_dialog)->detach(this);
-        }
-
         _child->detach(this);
     }
 
-    Node &child() {
-        return *_child;
+    void _showDialog(Child child) {
+        // We need to defer showing the dialog until the next frame,
+        // otherwise replacing the dialog might cause some use after free down the tree
+        _shouldShow = child;
+        mouseLeave(*_child);
+        shouldLayout(*this);
+        _visibility.animate(*this, 1, 0.3, Math::Easing::exponentialOut);
     }
 
-    Node const &child() const {
-        return *_child;
-    }
-
-    Node &dialog() { return **_dialog; }
-
-    Node const &dialog() const { return **_dialog; }
-
-    bool dialogVisible() const {
-        return (bool)_dialog;
+    void _closeDialog() {
+        // We need to defer closing the dialog until the next frame,
+        // otherwise we might cause some use after free down the tree
+        _shouldDialogClose = true;
+        shouldLayout(*this);
+        _visibility.animate(*this, 0, 0.1);
     }
 
     void reconcile(DialogLayer &o) override {
@@ -62,7 +62,7 @@ struct DialogLayer : public LeafNode<DialogLayer> {
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {
-        child().paint(g, r);
+        _child->paint(g, r);
 
         if (_visibility.value() > 0.001) {
             g.save();
@@ -71,15 +71,14 @@ struct DialogLayer : public LeafNode<DialogLayer> {
             g.restore();
         }
 
-        if (dialogVisible()) {
-
+        if (_dialog) {
             g.save();
             // change the orgin to the center of the screen
             g.translate(bound().center().cast<f64>());
             g.scale(Math::lerp(0.9, 1, _visibility.value()));
             g.translate(-bound().center().cast<f64>());
 
-            dialog().paint(g, r);
+            (*_dialog)->paint(g, r);
 
             g.restore();
         }
@@ -89,39 +88,34 @@ struct DialogLayer : public LeafNode<DialogLayer> {
         if (_visibility.needRepaint(*this, e))
             Ui::shouldRepaint(*this);
 
-        e.handle<Events::KeyboardEvent>([&](Events::KeyboardEvent &e) {
-            if (e.type == Events::KeyboardEvent::PRESS && e.key == Events::Key::ESC) {
-                closeDialog(*this);
-                return true;
-            }
-            return false;
-        });
+        auto *ke = e.is<Events::KeyboardEvent>();
 
-        if (dialogVisible()) {
-            dialog().event(e);
+        if (ke and ke->type == Events::KeyboardEvent::PRESS and ke->key == Events::Key::ESC) {
+            _closeDialog();
+            e.accept();
+        } else if (auto *se = e.is<ShowDialogEvent>()) {
+            _showDialog(se->child);
+            e.accept();
+        } else if (e.is<CloseDialogEvent>()) {
+            _closeDialog();
+            e.accept();
+        } else if (_dialog) {
+            (*_dialog)->event(e);
         } else {
-            child().event(e);
+            _child->event(e);
         }
     }
 
     void bubble(Sys::Event &e) override {
-        if (e.is<ShowDialogEvent>()) {
-            // We need to defer showing the dialog until the next frame,
-            // otherwise replacing the dialog might cause some use after free down the tree
-            auto &s = e.unwrap<ShowDialogEvent>();
-            _shouldShow = s.child;
-            mouseLeave(*_child);
-            shouldLayout(*this);
-            _visibility.animate(*this, 1, 0.3, Math::Easing::exponentialOut);
+        if (auto *se = e.is<ShowDialogEvent>()) {
+            _showDialog(se->child);
+            e.accept();
         } else if (e.is<CloseDialogEvent>()) {
-            // We need to defer closing the dialog until the next frame,
-            // otherwise we might cause some use after free down the tree
-            _shouldDialogClose = true;
-            shouldLayout(*this);
-            _visibility.animate(*this, 0, 0.1);
-        } else if (parent()) {
-            parent()->bubble(e);
+            _closeDialog();
+            e.accept();
         }
+
+        LeafNode<DialogLayer>::bubble(e);
     }
 
     void layout(Math::Recti r) override {
@@ -142,15 +136,14 @@ struct DialogLayer : public LeafNode<DialogLayer> {
             _shouldShow = NONE;
         }
 
-        child().layout(r);
+        _child->layout(r);
 
-        if (dialogVisible()) {
+        if (_dialog)
             (*_dialog)->layout(r);
-        }
     }
 
     Math::Vec2i size(Math::Vec2i s, Hint hint) override {
-        return child().size(s, hint);
+        return _child->size(s, hint);
     }
 
     Math::Recti bound() override {

@@ -14,6 +14,8 @@ Error fromErrno(isize error);
 
 Error fromLastErrno();
 
+Error fromStatus(isize status);
+
 Res<> consumeErrno();
 
 struct sockaddr_in toSockAddr(Sys::SocketAddr addr);

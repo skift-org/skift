@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <sys/un.h>
 #include <sys/utsname.h>
+#include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -209,7 +210,14 @@ Res<> launch([[maybe_unused]] Mime::Uti const &uti, [[maybe_unused]] Mime::Url c
         _exit(1);
     }
 
-    return Ok();
+    auto status = 0;
+    if (waitpid(pid, &status, 0) < 0)
+        return Posix::fromLastErrno();
+
+    if (WIFEXITED(status) and WEXITSTATUS(status) == 0)
+        return Ok();
+
+    return Posix::fromStatus(status);
 }
 
 Async::Task<> launchAsync(Mime::Uti const &uti, Mime::Url const &url) {

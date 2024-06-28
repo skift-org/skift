@@ -175,6 +175,17 @@ Error fromLastErrno() {
     return fromErrno(errno);
 }
 
+// Construct an error from a process status code.
+Error fromStatus(isize status) {
+    if (WIFEXITED(status)) {
+        return fromErrno(WEXITSTATUS(status));
+    } else if (WIFSIGNALED(status)) {
+        return Error::other("process terminated by signal");
+    } else {
+        return Error::other("process terminated abnormally");
+    }
+}
+
 Res<> consumeErrno() {
     if (errno == 0) {
         return Ok();

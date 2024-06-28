@@ -20,7 +20,7 @@ Ui::Child alertContent(Ui::Children children) {
 
     return Ui::vflow(children) |
            box(boxStyle) |
-           Ui::maxSize({400, Ui::UNCONSTRAINED}) |
+           Ui::minSize({400, Ui::UNCONSTRAINED}) |
            Ui::dragRegion() |
            Ui::align(Math::Align::CENTER | Math::Align::CLAMP) |
            Ui::spacing(32);
@@ -67,6 +67,19 @@ Ui::Child alertCancel() {
         Ui::closeDialog,
         "Cancel"
     );
+}
+
+Ui::Child alert(String title, String description) {
+    return alertContent({
+        alertHeader({
+            alertTitle(title),
+            alertDescription(description),
+        }),
+        alertFooter({
+            Ui::grow(NONE),
+            alertAction(Ui::NOP, "Ok"s),
+        }),
+    });
 }
 
 } // namespace Karm::Kira

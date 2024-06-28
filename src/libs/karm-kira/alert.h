@@ -20,4 +20,6 @@ Ui::Child alertAction(Ui::OnPress onPress, String text);
 
 Ui::Child alertCancel();
 
+Ui::Child alert(String title, String description);
+
 } // namespace Karm::Kira

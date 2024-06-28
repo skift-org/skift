@@ -21,6 +21,7 @@
 -I../.cutekit/generated/__aliases__
 
 -D__clangd__
+-D__ck_host__
 -D__ck_sys_linux__
 -D__ck_sys_darwin__
 -D__ck_arch_x86_64__

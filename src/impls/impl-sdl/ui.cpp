@@ -552,7 +552,7 @@ struct SdlHost :
 
 static SDL_HitTestResult _hitTestCallback(SDL_Window *window, SDL_Point const *area, void *data) {
     SdlHost *host = (SdlHost *)data;
-    isize grabPadding = 16 * host->dpi();
+    isize grabPadding = 6 * host->dpi();
     int width, height;
     SDL_GetWindowSize(window, &width, &height);
 

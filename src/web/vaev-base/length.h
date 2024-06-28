@@ -6,6 +6,8 @@
 #include <karm-math/rect.h>
 #include <karm-math/spacing.h>
 
+#include "writing.h"
+
 namespace Vaev {
 
 /// Represents a physical pixel on the actual device screen.

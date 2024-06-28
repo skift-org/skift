@@ -22,6 +22,11 @@ struct Computed {
     Padding padding;
     Sizing sizing;
 
+    // CSS Writing Modes Level 3
+    // https://www.w3.org/TR/css-writing-modes-3
+    WritingMode writingMode = WritingMode::HORIZONTAL_TB;
+    Direction direction = Direction::LTR;
+
     // CSS Display Module Level 3
     // https://www.w3.org/TR/css-display-3
     Display display = {Display::FLOW, Display::INLINE};

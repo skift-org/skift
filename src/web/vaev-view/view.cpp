@@ -39,6 +39,11 @@ struct View : public Ui::View<View> {
         };
     }
 
+    void reconcile(View &o) override {
+        _dom = o._dom;
+        _renderResult = NONE;
+    }
+
     void paint(Gfx::Context &g, Math::Recti) override {
         if (not _renderResult) {
             auto media = _constructMedia();

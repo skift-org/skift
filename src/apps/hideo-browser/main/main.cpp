@@ -9,10 +9,10 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
                    ? co_try$(Mime::parseUrlOrPath(args[0]))
                    : "about:start"_url;
 
-    auto dom = co_try$(Hideo::Browser::fetch(url));
+    auto dom = Hideo::Browser::fetch(url);
 
     co_return Ui::runApp(
         ctx,
-        Hideo::Browser::app(url, dom, NONE)
+        Hideo::Browser::app(url, dom)
     );
 }

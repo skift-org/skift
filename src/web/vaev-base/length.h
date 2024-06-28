@@ -163,18 +163,6 @@ struct FontMetrics {
     Px lineHeight;
 };
 
-// https://drafts.csswg.org/css-writing-modes-4/#inline-axis
-enum struct InlineAxis {
-    HORIZONTAL,
-    VERTICAL,
-};
-
-// https://drafts.csswg.org/css-writing-modes-4/#block-axis
-enum struct BlockAxis {
-    HORIZONTAL,
-    VERTICAL,
-};
-
 struct LengthContext {
     Px dpi;
 

@@ -96,7 +96,7 @@ static inline Demo MESH_DEMO{
                        Ui::dragRegion() |
                        Ui::placed(Math::Recti::fromCenter(pos.cast<isize>(), {24, 24})) |
                        Ui::intent([=](Ui::Node &n, Sys::Event &e) {
-                           if (auto *m = e.is<Ui::DragEvent>(Sys::Propagation::UP)) {
+                           if (auto *m = e.is<Ui::DragEvent>()) {
                                e.accept();
                                Model::bubble<Edit>(n, {index, pos + m->delta});
                            }

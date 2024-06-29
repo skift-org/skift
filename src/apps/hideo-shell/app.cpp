@@ -184,10 +184,10 @@ Ui::Child appStack(State const &state) {
             }) |
             Ui::placed(s->bound) |
             Ui::intent([=](Ui::Node &n, Sys::Event &e) {
-                if (auto *m = e.is<Ui::DragEvent>(Sys::Propagation::UP)) {
+                if (auto *m = e.is<Ui::DragEvent>()) {
                     e.accept();
                     Model::bubble<MoveInstance>(n, {index, m->delta});
-                } else if (auto *c = e.is<Events::RequestExitEvent>(Sys::Propagation::UP)) {
+                } else if (auto *c = e.is<Events::RequestExitEvent>()) {
                     e.accept();
                     Model::bubble<CloseInstance>(n, {index});
                 }

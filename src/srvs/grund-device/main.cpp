@@ -50,7 +50,7 @@ Async::Task<> entryPointAsync(Sys::Context &) {
 
             auto irq = cap2irq.get(ev->cap);
             if (irq) {
-                auto e = Sys::makeEvent<Grund::Device::IrqEvent>(Sys::Propagation::UP, *irq);
+                auto e = Sys::makeEvent<Grund::Device::IrqEvent>(*irq);
                 co_try$(root->event(*e));
             }
             ev = listener.next();

@@ -531,22 +531,22 @@ struct SdlHost :
         return Ok();
     }
 
-    void bubble(Sys::Event &e) override {
-        if (e.is<DragEvent>()) {
-            auto &dragEvent = e.unwrap<DragEvent>();
-            if (dragEvent.type == DragEvent::START) {
+    void bubble(Sys::Event &event) override {
+        if (auto *e = event.is<DragEvent>()) {
+            if (e->type == DragEvent::START) {
                 SDL_CaptureMouse(SDL_TRUE);
-            } else if (dragEvent.type == DragEvent::END) {
+            } else if (e->type == DragEvent::END) {
                 SDL_CaptureMouse(SDL_FALSE);
-            } else if (dragEvent.type == DragEvent::DRAG) {
+            } else if (e->type == DragEvent::DRAG) {
                 Math::Vec2<i32> pos{};
                 SDL_GetWindowPosition(_window, &pos.x, &pos.y);
-                pos = pos + dragEvent.delta.cast<i32>();
+                pos = pos + e->delta.cast<i32>();
                 SDL_SetWindowPosition(_window, pos.x, pos.y);
             }
+            event.accept();
         }
 
-        Host::bubble(e);
+        Host::bubble(event);
     }
 };
 

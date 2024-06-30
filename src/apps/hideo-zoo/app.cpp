@@ -8,8 +8,10 @@
 #include "page-avatar.h"
 #include "page-badge.h"
 #include "page-checkbox.h"
+#include "page-color-input.h"
 #include "page-context-menu.h"
 #include "page-dialog.h"
+#include "page-hsv-square.h"
 #include "page-navbar.h"
 #include "page-radio.h"
 #include "page-side-nav.h"
@@ -24,8 +26,10 @@ static Array PAGES = {
     &PAGE_AVATAR,
     &PAGE_BADGE,
     &PAGE_CHECKBOX,
+    &PAGE_COLOR_INPUT,
     &PAGE_CONTEXT_MENU,
     &PAGE_DIALOG,
+    &PAGE_HSV_SQUARE,
     &PAGE_NAVBAR,
     &PAGE_RADIO,
     &PAGE_SIDE_PANEL,

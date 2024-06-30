@@ -13,9 +13,11 @@ struct Box : public Node {
     Vec<Background> backgrounds;
 
     void paint(Gfx::Context &ctx) override {
-        ColorContext cctx; // FIXME: Resolving color should happen in the layout phase
-        for (auto &background : backgrounds)
-            ctx._fillRect(bound.cast<isize>(), cctx.resolve(background.paint));
+        ColorContext colorContext; // FIXME: Resolving color should happen in the layout phase
+        for (auto &background : backgrounds) {
+            ctx.fillStyle(colorContext.resolve(background.paint));
+            ctx.fill(bound.cast<isize>());
+        }
     }
 
     void repr(Io::Emit &e) const override {

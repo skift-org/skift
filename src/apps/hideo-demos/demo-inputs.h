@@ -3,6 +3,7 @@
 #include <hideo-base/dialogs.h>
 #include <hideo-base/row.h>
 #include <hideo-base/scafold.h>
+#include <karm-kira/dialog.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
@@ -13,7 +14,7 @@
 namespace Hideo::Demos {
 
 static void willShowMessage(Ui::Node &n) {
-    showMsgDialog(n, "Button pressed"s);
+    Ui::showDialog(n, Kr::alert("Message"s, "This is a message"s));
 }
 
 static inline Demo INPUTS_DEMO{

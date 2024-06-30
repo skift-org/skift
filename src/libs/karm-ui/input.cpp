@@ -394,24 +394,6 @@ Child slider(f64 value, OnChange<f64> onChange, Child child) {
     return makeStrong<Slider>(value, std::move(onChange), std::move(child));
 }
 
-// MARK: Color -----------------------------------------------------------------
-
-Child color(Gfx::Color color, OnChange<Gfx::Color>) {
-    return button(
-        NOP,
-        ButtonStyle::regular(),
-        empty({32, 16}) |
-            box({
-                .margin = 4,
-                .borderRadius = 2,
-                .borderWidth = 1,
-                .borderPaint = Gfx::GRAY50.withOpacity(0.1),
-                .backgroundPaint = color,
-            }) |
-            Ui::center() | Ui::bound()
-    );
-}
-
 // MARK: Intent ----------------------------------------------------------------
 
 struct Intent : public ProxyNode<Intent> {

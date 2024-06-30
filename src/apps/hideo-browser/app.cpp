@@ -1,7 +1,7 @@
 #include <hideo-base/alert.h>
 #include <hideo-base/scafold.h>
-#include <karm-kira/alert.h>
 #include <karm-kira/context-menu.h>
+#include <karm-kira/dialog.h>
 #include <karm-kira/side-panel.h>
 #include <karm-mime/mime.h>
 #include <karm-sys/file.h>

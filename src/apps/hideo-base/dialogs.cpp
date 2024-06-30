@@ -61,77 +61,33 @@ Ui::Child licenseDialog() {
     });
 }
 
-Ui::Child aboutDialog(Mdi::Icon i, String name) {
-    auto content =
-        Ui::vflow(
-            16,
-            Ui::vflow(
-                8,
-                Math::Align::CENTER,
-                Ui::icon(i, 56) | Ui::spacing(8),
-                Ui::titleLarge(name),
-                versionBadge()
-            ),
-            Ui::text(
-                Ui::TextStyles::bodySmall()
-                    .withAlign(Gfx::TextAlign::CENTER)
-                    .withColor(Ui::GRAY400),
-                "Copyright © 2018-2024\n"
-                "The skiftOS Developers & Odoo S.A.\n"
+Ui::Child aboutDialog(Mdi::Icon, String name) {
+
+    return Kr::dialogContent({
+
+        Kr::dialogHeader({
+            Ui::hflow(6, Math::Align::CENTER, Kr::dialogTitle(name), versionBadge()),
+            Kr::dialogDescription(
+                "Copyright © 2018-2024 The skiftOS Developers\n"
+                "Copyright © 2024 Odoo S.A.\n"
                 "\n"
-                "All rights reserved."
-            )
-        ) |
-        Ui::spacing(16);
-
-    Ui::Children actions = {
-        button(
-            [](auto &n) {
-                showDialog(n, licenseDialog());
-            },
-            Ui::ButtonStyle::subtle(), Mdi::LICENSE,
-            "License"
-        ),
-        Ui::grow(NONE),
-        dialogCloseButton(),
-    };
-
-    return dialogScafold(
-        Math::Align::CENTER | Math::Align::CLAMP,
-        content | Ui::minSize({280, Ui::UNCONSTRAINED}),
-        actions
-    );
+                "All rights reserved."s
+            ),
+        }),
+        Kr::dialogFooter({
+            button(
+                [](auto &n) {
+                    showDialog(n, licenseDialog());
+                },
+                Ui::ButtonStyle::regular(), "License"
+            ),
+            Kr::dialogAction(Ui::NOP, "Ok"s),
+        })
+    });
 }
 
 void showAboutDialog(Ui::Node &n, Mdi::Icon icon, String name) {
     showDialog(n, aboutDialog(icon, name));
-}
-
-Ui::Child msgDialog(String title, String msg) {
-    auto titleLbl = Ui::titleMedium(title);
-    auto msgLbl = Ui::text(msg);
-    Ui::Children actions = {
-        Ui::grow(NONE),
-        button(
-            Ui::closeDialog,
-            Ui::ButtonStyle::primary(),
-            "Ok"
-        ),
-    };
-
-    return dialogScafold(
-        Math::Align::CENTER,
-        vflow(16, titleLbl, msgLbl),
-        actions
-    );
-}
-
-void showMsgDialog(Ui::Node &n, String title, String msg) {
-    showDialog(n, msgDialog(title, msg));
-}
-
-void showMsgDialog(Ui::Node &n, String msg) {
-    showDialog(n, msgDialog("Message"s, msg));
 }
 
 } // namespace Hideo

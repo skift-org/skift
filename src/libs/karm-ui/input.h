@@ -172,12 +172,6 @@ static inline auto slider(f64 value, OnChange<f64> onChange) {
     };
 }
 
-// MARK: Select ----------------------------------------------------------------
-
-// MARK: Color -----------------------------------------------------------------
-
-Child color(Gfx::Color color, OnChange<Gfx::Color> onChange);
-
 // MARK: Intent ----------------------------------------------------------------
 
 using Filter = Func<void(Node &, Sys::Event &e)>;

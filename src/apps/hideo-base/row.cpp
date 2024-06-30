@@ -1,4 +1,5 @@
 #include <karm-kira/checkbox.h>
+#include <karm-kira/color-input.h>
 #include <karm-kira/radio.h>
 #include <karm-kira/slider.h>
 #include <karm-kira/toggle.h>
@@ -150,7 +151,7 @@ Ui::Child colorRow(Gfx::Color c, Ui::OnChange<Gfx::Color> onChange, String title
         NONE,
         title,
         NONE,
-        color(c, std::move(onChange))
+        Kr::colorInput(c, std::move(onChange))
     );
 }
 

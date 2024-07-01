@@ -46,6 +46,8 @@ struct Token {
 #define ITER(NAME, ...) NAME,
         FOREACH_TOKEN(ITER)
 #undef ITER
+
+            _LEN,
     };
 
     using enum Type;
@@ -109,18 +111,6 @@ struct Lexer {
         return _scan.ended();
     }
 };
-
-static inline Str toStr(Token::Type type) {
-    switch (type) {
-#define ITER(NAME, ...) \
-    case Token::NAME:   \
-        return #NAME;
-        FOREACH_TOKEN(ITER)
-#undef ITER
-    default:
-        panic("invalid token type");
-    }
-}
 
 } // namespace Vaev::Css
 

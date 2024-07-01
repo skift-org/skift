@@ -54,13 +54,31 @@ auto iterFields(T &v, auto f) {
 
 // MARK: Enums -----------------------------------------------------------------
 
+// HACK: Sometime they can be multiple enums in the same scope
+//       This allow the _LEN to not conflict
+#define FOREACH_ENUM_LEN(LEN) \
+    LEN()                     \
+    LEN(0)                    \
+    LEN(1)                    \
+    LEN(2)                    \
+    LEN(3)                    \
+    LEN(4)                    \
+    LEN(5)                    \
+    LEN(6)                    \
+    LEN(7)
+
 template <Meta::Enum E>
 consteval Meta::UnderlyingType<E> _enumMin() {
     if constexpr (requires { E::_MIN; }) {
         return toUnderlyingType(E::_MIN);
-    } else if constexpr (requires { E::_LEN; }) {
-        return Meta::UnderlyingType<E>{};
-    } else {
+    }
+#define ITER(LEN)                                    \
+    else if constexpr (requires { E::_LEN##LEN; }) { \
+        return Meta::UnderlyingType<E>{};            \
+    }
+    FOREACH_ENUM_LEN(ITER)
+#undef ITER
+    else {
         static_assert(false, "Enum must have _MIN or _LEN");
     }
 }
@@ -69,20 +87,27 @@ template <Meta::Enum E>
 consteval Meta::UnderlyingType<E> _enumMax() {
     if constexpr (requires { E::_MAX; }) {
         return toUnderlyingType(E::_MAX);
-    } else if constexpr (requires { E::_LEN; }) {
-        return toUnderlyingType(E::_LEN) - 1;
-    } else {
+    }
+#define ITER(LEN)                                    \
+    else if constexpr (requires { E::_LEN##LEN; }) { \
+        return toUnderlyingType(E::_LEN##LEN) - 1;   \
+    }
+    FOREACH_ENUM_LEN(ITER)
+#undef ITER
+    else {
         static_assert(false, "Enum must have _MAX or _LEN");
     }
 }
 
 template <Meta::Enum E>
 consteval Meta::UnderlyingType<E> _enumLen() {
-    if constexpr (requires { E::_LEN; }) {
-        return toUnderlyingType(E::_LEN);
-    } else {
-        return _enumMax<E>() - _enumMin<E>() + 1;
-    }
+#define ITER(LEN)                               \
+    if constexpr (requires { E::_LEN##LEN; }) { \
+        return toUnderlyingType(E::_LEN##LEN);  \
+    } else
+    FOREACH_ENUM_LEN(ITER)
+#undef ITER
+    return _enumMax<E>() - _enumMin<E>() + 1;
 }
 
 template <Meta::Enum E, E V>
@@ -110,7 +135,15 @@ static constexpr Array<_EnumField<E>, sizeof...(Vs)> _makeEnumFields(std::intege
 }
 
 template <typename E>
-concept ReflectableEnum = Meta::Enum<E> and (requires { E::_MAX; } or requires { E::_LEN; });
+concept ReflectableEnum =
+    Meta::Enum<E> and
+    (requires { E::_MAX; } or
+     (
+#define ITER(LEN) requires { E::_LEN##LEN; } or
+         FOREACH_ENUM_LEN(ITER)
+#undef ITER
+             false
+     ));
 
 template <ReflectableEnum E>
 struct Reflect<E> {
@@ -169,3 +202,5 @@ static constexpr Opt<E> valueOf(Str name) {
 
 template <typename T>
 ReflectableTemplate$(Karm::Range<T>, start, size);
+
+#undef FOREACH_ENUM_LEN

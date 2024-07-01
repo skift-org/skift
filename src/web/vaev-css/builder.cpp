@@ -279,7 +279,7 @@ Style::StyleRule parseStyleRule(Sst const &sst) {
             if (prop)
                 res.props.pushBack(prop.take());
             else
-                logWarn("failed to parse property: {}", prop.none());
+                logWarn("failed to parse property: {}", item.token);
         } else {
             logWarn("unexpected item in style rule: {}", item.type);
         }

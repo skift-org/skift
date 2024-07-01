@@ -10,7 +10,7 @@ void Sst::repr(Io::Emit &e) const {
         return;
     }
 
-    e("({} ", Io::toParamCase(toStr(type)));
+    e("({} ", type);
     if (token)
         e("token={}", token);
     e.indent();
@@ -34,18 +34,6 @@ void Sst::repr(Io::Emit &e) const {
     }
     e.deindent();
     e(")\n");
-}
-
-Str toStr(Sst::Type type) {
-    switch (type) {
-#define ITER(NAME)  \
-    case Sst::NAME: \
-        return #NAME;
-        FOREACH_SST(ITER)
-#undef ITER
-    default:
-        panic("invalid ast type");
-    }
 }
 
 // MARK: Parser ----------------------------------------------------------------

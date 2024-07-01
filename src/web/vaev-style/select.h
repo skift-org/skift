@@ -88,6 +88,8 @@ struct Infix {
         ADJACENT,
         SUBSEQUENT,
         COLUMN,
+
+        _LEN,
     };
 
     using enum Type;
@@ -106,6 +108,8 @@ struct Nfix {
         OR,  // :is(), ', '
         NOT,
         WHERE,
+
+        _LEN,
     };
 
     using enum Type;
@@ -160,6 +164,8 @@ struct PseudoClass {
 #define PSEUDO_CLASS(ID, ...) ID,
 #include "defs/pseudo-class.inc"
 #undef PSEUDO_CLASS
+
+        _LEN,
     };
 
     using enum Type;
@@ -177,6 +183,8 @@ struct AttributeSelector {
     enum Case {
         SENSITIVE,
         INSENSITIVE,
+
+        _LEN0,
     };
 
     enum Match {
@@ -189,14 +197,17 @@ struct AttributeSelector {
         STR_START_WITH, //< [attr^="value"]
         STR_END_WITH,   //< [attr$="value"]
         STR_CONTAIN,    //< [attr*="value"]
+
+        _LEN1,
     };
 
     String name;
+    Case case_;
     Match match;
     String value;
 
     void repr(Io::Emit &e) const {
-        e("[{} {} {}]", name, match, value);
+        e("[{} {} {} {}]", name, case_, match, value);
     }
 };
 

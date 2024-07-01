@@ -28,6 +28,8 @@ struct Sst {
 #define ITER(NAME) NAME,
         FOREACH_SST(ITER)
 #undef ITER
+
+            _LEN,
     };
     using enum Type;
 
@@ -60,8 +62,6 @@ struct Sst {
     }
 };
 
-Str toStr(Sst::Type type);
-
 // MARK: Parser ----------------------------------------------------------------
 
 Content consumeRuleList(Lexer &lex, bool topLevel);
@@ -89,10 +89,3 @@ Sst consumeFunc(Lexer &lex);
 } // namespace Vaev::Css
 
 Reflectable$(Vaev::Css::Sst, type, token, prefix, content);
-
-template <>
-struct Karm::Io::Formatter<Vaev::Css::Sst::Type> {
-    Res<usize> format(Io::TextWriter &writer, Vaev::Css::Sst::Type val) {
-        return (writer.writeStr(try$(Io::toParamCase(toStr(val)))));
-    }
-};

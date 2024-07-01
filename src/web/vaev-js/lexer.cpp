@@ -9,8 +9,8 @@ namespace Vaev::Js {
 void Token::repr(Io::Emit &e) const {
     e(
         "({}::{} {#})",
-        Io::toParamCase(toStr(category())).unwrap(),
-        Io::toParamCase(toStr(type)).unwrap(),
+        category(),
+        type,
         data
     );
 }

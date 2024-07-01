@@ -22,18 +22,8 @@ enum struct NodeType {
 #define ITER(NAME, VALUE) NAME = VALUE,
     FOREACH_NODE_TYPE(ITER)
 #undef ITER
+        _LEN,
 };
-
-static inline Str toStr(NodeType type) {
-    switch (type) {
-#define ITER(NAME, VALUE) \
-    case NodeType::NAME:  \
-        return #NAME;
-        FOREACH_NODE_TYPE(ITER)
-#undef ITER
-    }
-    panic("unreachable");
-}
 
 // https://dom.spec.whatwg.org/#interface-node
 struct Node :
@@ -131,7 +121,7 @@ struct Node :
     virtual void _repr(Io::Emit &) const {}
 
     void repr(Io::Emit &e) const {
-        e("({}", Io::toParamCase(toStr(nodeType())));
+        e("({}", nodeType());
         _repr(e);
         if (_children.len() > 0) {
             e.indentNewline();

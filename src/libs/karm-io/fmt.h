@@ -496,7 +496,10 @@ struct Formatter<Le<T>> : public Formatter<T> {
 template <Meta::Enum T>
 struct Formatter<T> {
     Res<usize> format(Io::TextWriter &writer, T val) {
-        return Formatter<Meta::UnderlyingType<T>>().format(writer, toUnderlyingType(val));
+        if constexpr (ReflectableEnum<T>) {
+            return writer.writeStr(nameOf<T>(val));
+        } else
+            return Formatter<Meta::UnderlyingType<T>>().format(writer, toUnderlyingType(val));
     }
 };
 

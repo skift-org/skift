@@ -15,21 +15,6 @@ enum struct SystemColor : u8 {
     _LEN
 };
 
-static inline Str toStr(SystemColor c) {
-    switch (c) {
-#define COLOR(NAME, STR, ...) \
-    case SystemColor::NAME:   \
-        return #STR;
-#include "defs/system-colors.inc"
-#undef COLOR
-
-    case SystemColor::_LEN:
-        break;
-    }
-
-    panic("invalid SystemColor");
-}
-
 struct Color {
     enum struct Type {
         SRGB,
@@ -64,7 +49,7 @@ struct Color {
             break;
 
         case Type::SYSTEM:
-            e("{}", toStr(system));
+            e("{}", system);
             break;
 
         case Type::CURRENT:

@@ -13,6 +13,8 @@ struct Display {
     enum struct Box : u8 {
         CONTENTS,
         NONE,
+
+        _LEN0,
     };
 
     using enum Box;
@@ -30,6 +32,8 @@ struct Display {
         RUBY_TEXT,
         RUBY_BASE_CONTAINER,
         RUBY_TEXT_CONTAINER,
+
+        _LEN1,
     };
 
     using enum Internal;
@@ -42,6 +46,8 @@ struct Display {
         RUBY,
         TABLE,
         MATH,
+
+        _LEN2,
     };
 
     using enum Inside;
@@ -50,19 +56,25 @@ struct Display {
         BLOCK,
         INLINE,
         RUN_IN,
+
+        _LEN3,
     };
 
     using enum Outside;
 
     enum struct Item : u8 {
         NO,
-        YES
+        YES,
+
+        _LEN4,
     };
 
     enum struct Type : u8 {
         DEFAULT,
         INTERNAL,
-        BOX
+        BOX,
+
+        _LEN5,
     };
 
     using enum Type;
@@ -165,6 +177,9 @@ struct Display {
 
         case Type::BOX:
             return _box == other._box;
+
+        default:
+            unreachable();
         }
 
         return false;
@@ -183,6 +198,9 @@ struct Display {
         case Type::BOX:
             e("(display box: {})", _box);
             break;
+
+        default:
+            unreachable();
         }
     }
 };

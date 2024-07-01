@@ -30,18 +30,9 @@ struct Length {
 #define LENGTH(NAME, ...) NAME,
 #include "defs/lengths.inc"
 #undef LENGTH
-    };
 
-    static Str toStr(Unit unit) {
-        switch (unit) {
-#define LENGTH(NAME, ...) \
-    case Unit::NAME:      \
-        return #NAME;
-#include "defs/lengths.inc"
-#undef LENGTH
-        }
-        panic("invalid length unit");
-    }
+        _LEN,
+    };
 
     using enum Unit;
 
@@ -149,7 +140,7 @@ struct Length {
     }
 
     void repr(Io::Emit &e) const {
-        e("{}{}", _val, Io::toLowerCase(toStr(_unit)));
+        e("{}{}", _val, _unit);
     }
 };
 

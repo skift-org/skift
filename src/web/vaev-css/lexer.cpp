@@ -17,7 +17,7 @@ void Token::repr(Io::Emit &e) const {
 
     e(
         "({} {#})",
-        Io::toParamCase(toStr(type)).unwrap(),
+        type,
         data
     );
 }

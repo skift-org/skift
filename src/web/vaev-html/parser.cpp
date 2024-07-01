@@ -12,7 +12,7 @@ namespace Vaev::Html {
 // https://html.spec.whatwg.org/multipage/parsing.html#parse-errors
 
 void Parser::_raise(Str msg) {
-    logError("{}: {}", toStr(_insertionMode), msg);
+    logError("{}: {}", _insertionMode, msg);
 }
 
 // 13.2.4.2 MARK: The stack of open elements
@@ -977,7 +977,7 @@ void Parser::_switchTo(Mode mode) {
 }
 
 void Parser::_acceptIn(Mode mode, Token const &t) {
-    logDebug("Parsing {} in {}", t, toStr(mode));
+    logDebug("Parsing {} in {}", t, mode);
 
     switch (mode) {
 

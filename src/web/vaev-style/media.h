@@ -103,6 +103,8 @@ enum struct RangePrefix {
     MAX,   // max-<feature> : value
     EXACT, // <feature> : value
     BOOL,  // <feature>
+
+    _LEN,
 };
 
 template <typename T>
@@ -111,13 +113,21 @@ struct RangeBound {
         NONE,
         INCLUSIVE,
         EXCLUSIVE,
+
+        _LEN,
     };
 
     T value = {};
     Type type = NONE;
 
     void repr(Io::Emit &e) const {
-        e("{}{}", value, type == INCLUSIVE ? "i"s : "e"s);
+        e(
+            "{}{}",
+            value,
+            type == INCLUSIVE   ? "i"
+            : type == EXCLUSIVE ? "e"
+                                : ""
+        );
     }
 };
 
@@ -193,6 +203,9 @@ struct RangeFeature {
             return exact(value);
         case RangePrefix::BOOL:
             return boolean();
+
+        default:
+            unreachable();
         }
     }
 
@@ -206,7 +219,9 @@ struct DiscreteFeature {
     using Inner = T;
     enum Type : u8 {
         NONE,
-        EQUAL
+        EQUAL,
+
+        _LEN,
     };
 
     T value{};
@@ -233,7 +248,7 @@ struct DiscreteFeature {
     }
 
     void repr(Io::Emit &e) const {
-        e("{}: {}", NAME, value);
+        e("({}: {} {})", NAME, type, value);
     }
 };
 
@@ -375,6 +390,8 @@ struct MediaQuery {
         enum struct Type {
             AND,
             OR,
+
+            _LEN0,
         };
 
         Type type;
@@ -393,7 +410,7 @@ struct MediaQuery {
         }
 
         void repr(Io::Emit &e) const {
-            e("({} {} {})", *lhs, type == AND ? "and" : "or", *rhs);
+            e("({} {} {})", *lhs, type, *rhs);
         }
     };
 
@@ -401,6 +418,8 @@ struct MediaQuery {
         enum struct Type {
             NOT,
             ONLY,
+
+            _LEN1,
         };
 
         Type type;
@@ -418,7 +437,7 @@ struct MediaQuery {
         }
 
         void repr(Io::Emit &e) const {
-            e("({} {})", type == NOT ? "not" : "only", *query);
+            e("({} {})", type, *query);
         }
     };
 

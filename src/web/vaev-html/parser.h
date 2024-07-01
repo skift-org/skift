@@ -38,6 +38,8 @@ struct Parser : public Sink {
 #define ITER(NAME) NAME,
         FOREACH_INSERTION_MODE(ITER)
 #undef ITER
+
+            _LEN,
     };
 
     bool _scriptingEnabled = false;
@@ -87,16 +89,6 @@ struct Parser : public Sink {
     }
 };
 
-static inline Str toStr(Parser::Mode mode) {
-    switch (mode) {
-#define ITER(NAME)           \
-    case Parser::Mode::NAME: \
-        return #NAME;
-        FOREACH_INSERTION_MODE(ITER)
-#undef ITER
-    default:
-        panic("invalid mode");
-    }
-}
+#undef FOREACH_INSERTION_MODE
 
 } // namespace Vaev::Html

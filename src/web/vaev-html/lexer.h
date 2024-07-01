@@ -24,6 +24,8 @@ struct Token {
 #define ITER(NAME) NAME,
         FOREACH_TOKEN(ITER)
 #undef ITER
+
+            _LEN,
     };
 
     struct Attr {
@@ -52,6 +54,8 @@ struct Lexer {
 #define STATE(NAME) NAME,
 #include "defs/states.inc"
 #undef STATE
+
+        _LEN,
     };
 
     using enum State;
@@ -139,30 +143,6 @@ struct Lexer {
     void consume(Rune rune, bool isEof = false);
 };
 
-static inline Str toStr(Token::Type type) {
-    switch (type) {
-#define ITER(NAME)    \
-    case Token::NAME: \
-        return #NAME;
-        FOREACH_TOKEN(ITER)
-#undef ITER
-    default:
-        panic("invalid token type");
-    }
-}
-
-static inline Str toStr(Lexer::State state) {
-    switch (state) {
-#define STATE(NAME)          \
-    case Lexer::State::NAME: \
-        return #NAME;
-#include "defs/states.inc"
-#undef STATE
-    default:
-        panic("invalid state");
-    }
-}
-
 #undef FOREACH_TOKEN
 
 } // namespace Vaev::Html
@@ -170,8 +150,7 @@ static inline Str toStr(Lexer::State state) {
 template <>
 struct Karm::Io::Formatter<Vaev::Html::Token> {
     Res<usize> format(Io::TextWriter &writer, Vaev::Html::Token const &val) {
-        usize written = try$(writer.writeRune('('));
-        written += try$(writer.writeStr(try$(Io::toParamCase(Vaev::Html::toStr(val.type)))));
+        usize written = try$(Io::format(writer, "({}", val.type));
 
         if (val.name)
             written += try$(Io::format(writer, " name={}", val.name));

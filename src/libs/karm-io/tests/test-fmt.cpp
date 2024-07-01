@@ -94,6 +94,20 @@ test$("fmt-enum") {
     return Ok();
 }
 
+enum struct MyEnumReflectable {
+    BAR,
+    BAZ,
+
+    _LEN,
+};
+
+test$("fmt-enum-reflectable") {
+    try$(testCase("BAR", MyEnumReflectable::BAR));
+    try$(testCase("BAZ", MyEnumReflectable::BAZ));
+
+    return Ok();
+}
+
 // MARK: Boolean Formatting ----------------------------------------------------
 
 test$("fmt-bool") {

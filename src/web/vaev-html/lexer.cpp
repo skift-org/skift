@@ -22,11 +22,11 @@ struct Entity {
 };
 
 void Lexer::_raise(Str msg) {
-    logError("{}: {}", toStr(_state), msg);
+    logError("{}: {}", _state, msg);
 }
 
 void Lexer::consume(Rune rune, bool isEof) {
-    // logDebug("Lexing '{#c}' {#x} in {}", rune, rune, toStr(_state));
+    // logDebug("Lexing '{#c}' {#x} in {}", rune, rune, _state);
 
     switch (_state) {
 

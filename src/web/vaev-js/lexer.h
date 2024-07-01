@@ -146,12 +146,14 @@ struct Token {
 #define ITER(NAME) NAME,
         FOREACH_CATEGORY(ITER)
 #undef ITER
+            _LEN,
     };
 
     enum struct Type {
 #define ITER(NAME, ...) NAME,
         FOREACH_TOKEN(ITER)
 #undef ITER
+            _LEN,
     };
 
     using enum Type;
@@ -178,30 +180,6 @@ struct Token {
 
     void repr(Io::Emit &e) const;
 };
-
-static inline Str toStr(Token::Category category) {
-    switch (category) {
-#define ITER(NAME)              \
-    case Token::Category::NAME: \
-        return #NAME;
-        FOREACH_CATEGORY(ITER)
-#undef ITER
-    default:
-        panic("invalid token category");
-    }
-}
-
-static inline Str toStr(Token::Type type) {
-    switch (type) {
-#define ITER(NAME, ...) \
-    case Token::NAME:   \
-        return #NAME;
-        FOREACH_TOKEN(ITER)
-#undef ITER
-    default:
-        panic("invalid token type");
-    }
-}
 
 struct Lexer {
     Io::SScan &_scan;

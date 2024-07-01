@@ -25,6 +25,8 @@ struct Frag {
 #define ITER(NAME) NAME,
         FOREACH_TYPE(ITER)
 #undef ITER
+
+            _LEN,
     };
 
     using enum Type;
@@ -41,15 +43,6 @@ struct Frag {
 
     virtual ~Frag() = default;
     virtual Type type() const = 0;
-    Str typeStr() const {
-        switch (type()) {
-#define ITER(NAME)   \
-    case Type::NAME: \
-        return #NAME;
-            FOREACH_TYPE(ITER)
-#undef ITER
-        }
-    }
 
     virtual void layout(RectPx bound) {
         _borderBox = bound;
@@ -69,7 +62,7 @@ struct Frag {
     }
 
     virtual void repr(Io::Emit &e) const {
-        e("({} {})", typeStr(), _borderBox);
+        e("({} {})", type(), _borderBox);
     }
 
     Style::Computed const &style() const {

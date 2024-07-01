@@ -49,7 +49,7 @@ struct Flow : public Frag {
     }
 
     void repr(Io::Emit &e) const override {
-        e("({}", typeStr());
+        e("({}", type());
         if (_frags) {
             e.indentNewline();
             for (auto &c : _frags) {

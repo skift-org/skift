@@ -1,5 +1,6 @@
 #pragma once
 
+#include "enum.h"
 #include "macros.h"
 #include "string.h"
 #include "tuple.h"
@@ -50,6 +51,99 @@ auto iterFields(T &v, auto f) {
         return f(F::NAME, F::access(v));
     });
 }
+
+// MARK: Enums -----------------------------------------------------------------
+
+template <Meta::Enum E>
+consteval Meta::UnderlyingType<E> _enumMin() {
+    if constexpr (requires { E::_MIN; }) {
+        return toUnderlyingType(E::_MIN);
+    } else if constexpr (requires { E::_LEN; }) {
+        return Meta::UnderlyingType<E>{};
+    } else {
+        static_assert(false, "Enum must have _MIN or _LEN");
+    }
+}
+
+template <Meta::Enum E>
+consteval Meta::UnderlyingType<E> _enumMax() {
+    if constexpr (requires { E::_MAX; }) {
+        return toUnderlyingType(E::_MAX);
+    } else if constexpr (requires { E::_LEN; }) {
+        return toUnderlyingType(E::_LEN) - 1;
+    } else {
+        static_assert(false, "Enum must have _MAX or _LEN");
+    }
+}
+
+template <Meta::Enum E>
+consteval Meta::UnderlyingType<E> _enumLen() {
+    if constexpr (requires { E::_LEN; }) {
+        return toUnderlyingType(E::_LEN);
+    } else {
+        return _enumMax<E>() - _enumMin<E>() + 1;
+    }
+}
+
+template <Meta::Enum E, E V>
+static constexpr Str nameOf() {
+    Str v = __PRETTY_FUNCTION__;
+    auto start = lastIndexOf(v, ':').take();
+    start += 1;
+    return sub(v, start, v.len() - 1);
+}
+
+template <Meta::Enum E>
+struct _EnumField {
+    Str name;
+    Meta::UnderlyingType<E> value;
+};
+
+template <Meta::Enum E, E V>
+consteval auto _makeEnumField() {
+    return _EnumField<E>{nameOf<E, V>(), toUnderlyingType(V)};
+}
+
+template <Meta::Enum E, Meta::UnderlyingType<E>... Vs>
+static constexpr Array<_EnumField<E>, sizeof...(Vs)> _makeEnumFields(std::integer_sequence<Meta::UnderlyingType<E>, Vs...>) {
+    return {_makeEnumField<E, E(Vs + _enumMin<E>())>()...};
+}
+
+template <typename E>
+concept ReflectableEnum = Meta::Enum<E> and (requires { E::_MAX; } or requires { E::_LEN; });
+
+template <ReflectableEnum E>
+struct Reflect<E> {
+    using Type = E;
+    static constexpr Str NAME = nameOf<E>();
+
+    static constexpr Meta::UnderlyingType<E> MIN = _enumMin<E>();
+    static constexpr Meta::UnderlyingType<E> MAX = _enumMax<E>();
+    static constexpr Meta::UnderlyingType<E> LEN = _enumLen<E>();
+    static constexpr auto FIELDS = _makeEnumFields<E>(std::make_integer_sequence<Meta::UnderlyingType<E>, _enumLen<E>()>{});
+};
+
+template <Meta::Enum E>
+static constexpr Str nameOf(E v) {
+    using R = Reflect<E>;
+    for (auto &f : R::FIELDS) {
+        if (f.value == toUnderlyingType(v))
+            return f.name;
+    }
+    return "<unknown>";
+}
+
+template <Meta::Enum E>
+static constexpr Opt<E> valueOf(Str name) {
+    using R = Reflect<E>;
+    for (auto &f : R::FIELDS) {
+        if (f.name == name)
+            return E(f.value);
+    }
+    return {};
+}
+
+// MARK: Utilities -------------------------------------------------------------
 
 } // namespace Karm
 

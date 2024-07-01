@@ -162,7 +162,7 @@ struct Flags {
     }
 
 template <Meta::Enum E, typename U = Meta::UnderlyingType<E>>
-U toUnderlyingType(E value) {
+constexpr U toUnderlyingType(E value) {
     return (U)value;
 };
 

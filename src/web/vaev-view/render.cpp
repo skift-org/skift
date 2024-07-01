@@ -27,9 +27,7 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
     _collectStyle(dom, stylebook);
 
     Style::Computer computer{media, stylebook};
-    Strong<Layout::Flow> layoutRoot = makeStrong<Layout::BlockFlow>(makeStrong<Style::Computed>());
-    Layout::build(computer, dom, *layoutRoot);
-
+    auto layoutRoot = Layout::build(computer, dom);
     layoutRoot->layout(viewport);
 
     auto paintRoot = makeStrong<Paint::Stack>();

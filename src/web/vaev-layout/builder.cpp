@@ -68,4 +68,10 @@ void build(Style::Computer &c, Dom::Node const &node, Flow &parent) {
     }
 }
 
+Strong<Frag> build(Style::Computer &c, Dom::Document const &doc) {
+    auto root = makeStrong<BlockFlow>(makeStrong<Style::Computed>());
+    build(c, doc, *root);
+    return root;
+}
+
 } // namespace Vaev::Layout

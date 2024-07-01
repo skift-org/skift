@@ -85,9 +85,9 @@ struct [[nodiscard]] Res {
         return _inner.template unwrap<Ok<V>>().inner;
     }
 
-    always_inline constexpr V take() {
+    always_inline constexpr V take(char const *msg = "take() called on an error") {
         if (not _inner.template is<Ok<V>>()) [[unlikely]]
-            panic("take() called on an error");
+            panic(msg);
 
         return _inner.template unwrap<Ok<V>>().take();
     }

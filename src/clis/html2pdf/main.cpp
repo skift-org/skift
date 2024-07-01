@@ -96,7 +96,14 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
 
     Vaev::Vec2Px viewport{Vaev::Px{800}, Vaev::Px{600}};
     auto media = Vaev::constructMedia(viewport);
-    Vaev::View::render(*dom, media, viewport);
+
+    auto start = Sys::now();
+    auto result = Vaev::View::render(*dom, media, viewport);
+    auto elapsed = Sys::now() - start;
+    logDebug("render time: {}ms", elapsed.toUSecs() / 1000.0);
+
+    logDebug("layout tree: {}", result.layout);
+    logDebug("paint tree: {}", result.paint);
 
     co_return Ok();
 }

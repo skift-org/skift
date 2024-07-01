@@ -23,7 +23,7 @@ static void _collectStyle(Dom::Node const &node, Style::StyleBook &sb) {
 
 RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px viewport) {
     Style::StyleBook stylebook;
-    stylebook.add(Css::fetchStylesheet("bundle://vaev-view/user-agent.css"_url).take());
+    stylebook.add(Css::fetchStylesheet("bundle://vaev-view/user-agent.css"_url).take("user agent stylesheet not available"));
     _collectStyle(dom, stylebook);
 
     Style::Computer computer{media, stylebook};

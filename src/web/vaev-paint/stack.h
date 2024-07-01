@@ -39,9 +39,13 @@ struct Stack : public Node {
 
     void repr(Io::Emit &e) const override {
         e("(stack");
-        for (auto &child : _children) {
-            e(" ");
-            child->repr(e);
+        if (_children) {
+            e.indentNewline();
+            for (auto &child : _children) {
+                child->repr(e);
+                e.newline();
+            }
+            e.deindent();
         }
         e(")");
     }

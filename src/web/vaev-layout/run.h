@@ -20,6 +20,14 @@ struct Run : public Frag {
     void layout(RectPx) override {
     }
 
+    Px contentInlineSize() const override {
+        return Px{0};
+    }
+
+    Px contentBlockSize() const override {
+        return Px{0};
+    }
+
     void paint(Paint::Stack &) override {}
 };
 

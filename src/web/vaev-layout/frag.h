@@ -52,7 +52,7 @@ struct Frag {
         if (style().backgrounds.len()) {
             Paint::Box box;
             box.backgrounds = style().backgrounds;
-            box.bound.wh = {Px{100}, Px{100}};
+            box.bound = _borderBox;
             stack.add(makeStrong<Paint::Box>(std::move(box)));
         }
     }
@@ -63,6 +63,14 @@ struct Frag {
 
     virtual void repr(Io::Emit &e) const {
         e("({} {})", type(), _borderBox);
+    }
+
+    virtual Px contentInlineSize() const {
+        return Px{100};
+    }
+
+    virtual Px contentBlockSize() const {
+        return Px{100};
     }
 
     Style::Computed const &style() const {

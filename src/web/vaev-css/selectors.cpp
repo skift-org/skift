@@ -21,7 +21,7 @@ Style::Selector parseSelectorElement(Slice<Sst> prefix, usize &i) {
     switch (prefix[i].token.type) {
     case Token::WHITESPACE:
         if (i + 1 >= prefix.len()) {
-            logError("ERROR : unterminated selector");
+            // logError("ERROR : unterminated selector");
             return Style::EmptySelector{};
         }
         i++;

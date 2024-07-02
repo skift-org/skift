@@ -116,8 +116,11 @@ Style::MediaQuery parseMediaQuery(Cursor<Sst> &c) {
 // NOTE: Please keep this alphabetically sorted.
 
 Res<> _parseProp(Cursor<Sst> &c, Style::BackgroundColorProp &p) {
-    while (not c.ended())
+    eatWhitespace(c);
+    while (not c.ended()) {
         p.value.pushBack(try$(parseValue<Color>(c)));
+        eatWhitespace(c);
+    }
     return Ok();
 }
 
@@ -236,11 +239,14 @@ Res<Style::Prop> parseProperty(Sst const &sst) {
             Cursor<Sst> c = sst.content;
             auto res = _parseProp(c, prop);
             if (not res)
-                logError("failed to parse property {#}: {}", T::name(), res);
+                logWarn("failed to parse property {#}: {#} - {}", T::name(), sst.content, res);
             resProp = Ok(std::move(prop));
             return true;
         }
     });
+
+    if (not resProp)
+        logWarn("failed to parse property: {} - {}", sst.token, resProp);
 
     return resProp;
 }
@@ -284,8 +290,6 @@ Style::StyleRule parseStyleRule(Sst const &sst) {
             auto prop = parseProperty(item);
             if (prop)
                 res.props.pushBack(prop.take());
-            else
-                logWarn("failed to parse property: {}", item.token);
         } else {
             logWarn("unexpected item in style rule: {}", item.type);
         }

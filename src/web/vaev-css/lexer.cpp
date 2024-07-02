@@ -38,7 +38,7 @@ static auto const RE_QUOTES = Re::single('"', '\'');
 // NOSPEC: In the spec the fallback is delim
 // since DELIM has a semantic meaning and could catch a really unexpected content
 // we chose to use OTHER as a fallback and delim is a determined set of characters
-static auto const RE_DELIM = '.'_re | '+'_re | '-'_re | '#'_re | '~'_re | '!'_re | '*'_re;
+static auto const RE_DELIM = '.'_re | '+'_re | '-'_re | '#'_re | '~'_re | '!'_re | '*'_re | '='_re | '<'_re | '>'_re | '^'_re | '/'_re;
 
 static auto const RE_NEWLINE = Re::either(Re::single('\n', '\r', '\f'), Re::word("\r\n"));
 static auto const RE_ASCII = Re::range(0x00, 0x7f);
@@ -248,7 +248,7 @@ Token Lexer::_next(Io::SScan &s) const {
     } else if (s.skip(RE_DELIM)) {
         return {Token::DELIM, s.end()};
     } else {
-        logDebug("error at {#}", s.curr());
+        logWarn("error at {#c}", s.curr());
         s.next();
         return {Token::OTHER, s.end()};
     }

@@ -6,7 +6,7 @@ namespace Vaev::Css {
 
 void Sst::repr(Io::Emit &e) const {
     if (type == TOKEN) {
-        e("{}\n", token);
+        e("{}", token);
         return;
     }
 
@@ -27,13 +27,14 @@ void Sst::repr(Io::Emit &e) const {
         e.indentNewline();
         for (auto &child : content) {
             child.repr(e);
+            e.newline();
         }
         e.deindent();
         e("]");
         e.newline();
     }
     e.deindent();
-    e(")\n");
+    e(")");
 }
 
 // MARK: Parser ----------------------------------------------------------------

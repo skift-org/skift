@@ -14,8 +14,7 @@ Res<bool> ValueParser<bool>::parse(Cursor<Sst> &c) {
 // MARK: Color
 // https://drafts.csswg.org/css-color
 
-static Res<Gfx::Color>
-_parseHexColor(Io::SScan &s) {
+static Res<Gfx::Color> _parseHexColor(Io::SScan &s) {
     if (s.next() != '#')
         panic("expected '#'");
 
@@ -60,6 +59,7 @@ Res<Color> ValueParser<Color>::parse(Cursor<Sst> &c) {
 
     if (c.peek() == Token::HASH) {
         Io::SScan scan = c->token.data;
+        c.next();
         return Ok(try$(_parseHexColor(scan)));
     } else if (c.peek() == Token::IDENT) {
         Str data = c->token.data;
@@ -283,6 +283,8 @@ Res<Length> ValueParser<Length>::parse(Cursor<Sst> &c) {
         auto value = tryOr(Io::atof(scan), 0.0);
         auto unit = try$(_parseLengthUnit(scan.remStr()));
         return Ok(Length{value, unit});
+    } else if (c.peek() == Token::number("0")) {
+        return Ok(Length{0.0, Length::Unit::PX});
     }
 
     return Error::invalidData("expected length");

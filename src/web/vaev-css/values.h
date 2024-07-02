@@ -102,7 +102,7 @@ struct ValueParser<PercentOr<T>> {
         if (c.peek() == Token::PERCENTAGE)
             return Ok(try$(parseValue<Percent>(c)));
 
-        return Ok(try$(parseValue<Percent>(c)));
+        return Ok(try$(parseValue<T>(c)));
     }
 };
 

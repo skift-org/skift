@@ -8,6 +8,7 @@
 #include <vaev-base/flex.h>
 #include <vaev-base/float.h>
 #include <vaev-base/insets.h>
+#include <vaev-base/numbers.h>
 #include <vaev-base/sizing.h>
 #include <vaev-base/visibility.h>
 
@@ -30,7 +31,7 @@ struct Computed {
     // CSS Display Module Level 3
     // https://www.w3.org/TR/css-display-3
     Display display = {Display::FLOW, Display::INLINE};
-    isize order = 0;
+    Integer order = 0;
     Visibility visibility = Visibility::VISIBLE;
 
     Flex flex;

@@ -423,6 +423,19 @@ struct PaddingLeftProp {
     }
 };
 
+// https://www.w3.org/TR/css-display-3/#order-property
+struct OrderProp {
+    Integer value;
+
+    static Str name() { return "order"; }
+
+    static auto initial() { return 0; }
+
+    void apply(Computed &c) const {
+        c.order = value;
+    }
+};
+
 // MARK: Sizing ----------------------------------------------------------------
 // https://www.w3.org/TR/css-sizing-3
 

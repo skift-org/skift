@@ -175,6 +175,12 @@ Res<> _parseProp(Cursor<Sst> &c, Style::PaddingLeftProp &p) {
     return Ok();
 }
 
+// MARK: Order
+Res<> _parseProp(Cursor<Sst> &c, Style::OrderProp &p) {
+    p.value = try$(parseValue<Integer>(c));
+    return Ok();
+}
+
 // MARK: Sizing
 
 Res<> _parseProp(Cursor<Sst> &c, Style::WidthProp &p) {

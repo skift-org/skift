@@ -52,4 +52,18 @@ test$("stable-sort") {
     return Ok();
 }
 
+test$("stable-sort-small") {
+    Array arr{
+        2,
+        1
+    };
+
+    stableSort(arr);
+
+    expectEq$(arr[0], 1);
+    expectEq$(arr[1], 2);
+
+    return Ok();
+}
+
 } // namespace Karm::Base

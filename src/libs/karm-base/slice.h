@@ -450,7 +450,7 @@ always_inline constexpr void sort(MutSliceable auto &slice) {
 always_inline constexpr void stableSort(MutSliceable auto &slice, auto cmp) {
     for (usize i = 1; i < slice.len(); i++) {
         auto key = slice[i];
-        usize j = i - 1;
+        isize j = i - 1;
 
         while (j >= 0 and cmp(slice[j], key) > 0) {
             slice[j + 1] = slice[j];

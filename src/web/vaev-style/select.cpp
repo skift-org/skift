@@ -4,9 +4,40 @@ namespace Vaev::Style {
 
 // MARK: Selector Specificity ---------------------------------------------------
 
-Spec spec(Selector const &) {
-    // TODO: Implement
-    return Spec::ZERO;
+// https://www.w3.org/TR/selectors-3/#specificity
+Spec spec(Selector const &s) {
+    return s.visit(Visitor{
+        [](Nfix const &n) {
+            Spec sum = Spec::ZERO;
+            for (auto &inner : n.inners)
+                sum = sum + spec(inner);
+            return sum;
+        },
+        [](Infix const &i) {
+            return spec(*i.lhs) + spec(*i.rhs);
+        },
+        [](UniversalSelector const &) {
+            return Spec::ZERO;
+        },
+        [](EmptySelector const &) {
+            return Spec::ZERO;
+        },
+        [](IdSelector const &) {
+            return Spec::A;
+        },
+        [](TypeSelector const &) {
+            return Spec::C;
+        },
+        [](ClassSelector const &) {
+            return Spec::B;
+        },
+        [](PseudoClass const &) {
+            return Spec::ZERO;
+        },
+        [](AttributeSelector const &) {
+            return Spec::ZERO;
+        }
+    });
 }
 
 // MARK: Selector Matching -----------------------------------------------------

@@ -30,7 +30,6 @@ struct Node :
     Meta::Static {
 
     Node *_parent = nullptr;
-    LlItem<Node> _siblings;
     Vec<Strong<Node>> _children;
 
     virtual ~Node() = default;
@@ -61,7 +60,13 @@ struct Node :
         return *_parent;
     }
 
+    bool hasParent() const {
+        return _parent != nullptr;
+    }
+
     usize _parentIndex() const {
+        if (not _parent)
+            panic("node has no parent");
         return indexOf(parentNode()._children, *this).unwrap();
     }
 
@@ -108,14 +113,22 @@ struct Node :
 
     // MARK: Siblings
 
-    Strong<Node> previousSibling() {
+    Strong<Node> previousSibling() const {
         usize index = _parentIndex();
         return parentNode()._children[index - 1];
+    }
+
+    bool hasPreviousSibling() const {
+        return _parentIndex() > 0;
     }
 
     Strong<Node> nextSibling() {
         usize index = _parentIndex();
         return parentNode()._children[index + 1];
+    }
+
+    bool hasNextSibling() const {
+        return _parentIndex() < parentNode()._children.len() - 1;
     }
 
     virtual void _repr(Io::Emit &) const {}

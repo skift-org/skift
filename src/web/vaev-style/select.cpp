@@ -42,10 +42,60 @@ Spec spec(Selector const &s) {
 
 // MARK: Selector Matching -----------------------------------------------------
 
-bool _match(Infix const &s, Dom::Element const &) {
+bool _match(Infix const &s, Dom::Element const &e) {
     switch (s.type) {
+    // https://www.w3.org/TR/selectors-4/#descendant-combinators
+    case Infix::Type::DESCENDANT: {
+        Dom::Node const *curr = &e;
+        while (curr->hasParent()) {
+            auto &parent = curr->parentNode();
+            if (auto *el = parent.is<Dom::Element>())
+                if (s.lhs->match(*el))
+                    return true;
+            curr = &parent;
+        }
+        return false;
+    } break;
+
+    // https://www.w3.org/TR/selectors-4/#child-combinators
+    case Infix::Type::CHILD: {
+        if (not e.hasParent())
+            return false;
+
+        auto &parent = e.parentNode();
+        if (auto *el = parent.is<Dom::Element>())
+            return s.lhs->match(*el);
+        return false;
+    }
+
+    // https://www.w3.org/TR/selectors-4/#adjacent-sibling-combinators
+    case Infix::Type::ADJACENT: {
+        if (not e.hasPreviousSibling())
+            return false;
+
+        auto prev = e.previousSibling();
+        if (auto *el = prev.is<Dom::Element>())
+            return s.lhs->match(*el);
+        return false;
+    }
+
+    // https://www.w3.org/TR/selectors-4/#general-sibling-combinators
+    case Infix::Type::SUBSEQUENT: {
+        Dom::Node const *curr = &e;
+        while (curr->hasPreviousSibling()) {
+            auto prev = curr->previousSibling();
+            if (auto *el = prev.is<Dom::Element>())
+                if (s.lhs->match(*el))
+                    return true;
+            curr = &prev.unwrap();
+        }
+        return false;
+    }
+
+    // https://www.w3.org/TR/selectors-4/#the-column-combinator
+    case Infix::Type::COLUMN:
     default:
-        notImplemented();
+        unreachable();
     }
 }
 
@@ -75,7 +125,7 @@ bool _match(Nfix const &s, Dom::Element const &el) {
         return not s.inners[0].match(el);
 
     default:
-        notImplemented();
+        unreachable();
     }
 }
 

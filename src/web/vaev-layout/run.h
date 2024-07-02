@@ -8,9 +8,10 @@ namespace Vaev::Layout {
 
 struct Run : public Frag {
     static constexpr auto TYPE = RUN;
+    String _text;
 
-    Run(Strong<Style::Computed> style, String)
-        : Frag(style) {
+    Run(Strong<Style::Computed> style, String text)
+        : Frag(style), _text(text) {
     }
 
     Type type() const override {
@@ -29,6 +30,10 @@ struct Run : public Frag {
     }
 
     void paint(Paint::Stack &) override {}
+
+    void repr(Io::Emit &e) const override {
+        e("({} {} {#})", type(), _borderBox, _text);
+    }
 };
 
 } // namespace Vaev::Layout

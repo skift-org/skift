@@ -29,7 +29,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
         auto elapsed = Sys::now() - start;
         logInfo("parsed in {}ms", elapsed.toUSecs() / 1000.0);
 
-        // Sys::println("{}", res);
+        Sys::println("{}", res);
 
         co_return Ok();
     } else {

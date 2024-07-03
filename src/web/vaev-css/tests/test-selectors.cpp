@@ -8,9 +8,7 @@ Style::Selector parse(Str input) {
     logDebug("input: '{}'", input);
     auto lex = Lexer{input};
     auto val = consumeSelector(lex);
-
-    Cursor<Sst> sst{val};
-    return parseSelector(sst);
+    return parseSelector(val);
 };
 
 Style::TypeSelector const htmlSel = Style::TypeSelector{TagName::make("html", Vaev::HTML)};
@@ -58,8 +56,8 @@ test$("vaev-css-parse-subsequent-selectors") {
 }
 
 test$("vaev-css-parse-mixed-selectors") {
-    // expectEq$(parse("html > .className#idName"), Style::Selector::descendant(Style::Selector::child(htmlSel, classSel), idSel));
-    // expectEq$(parse("html#idName .className"), Style::Selector::descendant(Style::Selector::child(htmlSel, classSel), idSel));
+    expectEq$(parse("html > .className#idName"), Style::Selector::child(htmlSel, Style::Selector::and_(Vec<Style::Selector>{classSel, idSel})));
+    expectEq$(parse("html#idName .className"), Style::Selector::descendant(Style::Selector::child(htmlSel, idSel), classSel));
 
     return Ok();
 }

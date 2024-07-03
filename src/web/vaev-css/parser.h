@@ -86,6 +86,8 @@ Sst consumeBlock(Lexer &lex, Token::Type term);
 
 Sst consumeFunc(Lexer &lex);
 
+Content consumeSelector(Lexer &lex);
+
 } // namespace Vaev::Css
 
 Reflectable$(Vaev::Css::Sst, type, token, prefix, content);

@@ -4,15 +4,15 @@ namespace Vaev::Css {
 
 // enum order is the operator priority (the lesser the most important)
 enum struct OpCode {
-    DESCENDANT,
-    CHILD,
-    ADJACENT,
-    SUBSEQUENT,
-    NOT,
-    WHERE,
-    OR,
-    AND,
-    COLUMN,
+    DESCENDANT, // ' '
+    CHILD,      // >
+    ADJACENT,   // +
+    SUBSEQUENT, // ~
+    NOT,        // :not()
+    WHERE,      // :where()
+    OR,         // ,
+    AND,        // a.b
+    COLUMN,     // ||
     NOP
 };
 
@@ -48,32 +48,50 @@ Style::Selector parseSelectorElement(Slice<Sst> prefix, usize &i) {
 
 OpCode sstNode2OpCode(Slice<Sst> content, usize &i) {
     switch (content[i].token.type) {
-    case Token::Type::COMMA:
+    case Token::COMMA:
         if (i + 1 >= content.len()) {
             logError("ERROR : unterminated selector");
             return OpCode::NOP;
         }
         i++;
         return OpCode::OR;
-    case Token::Type::WHITESPACE:
+    case Token::WHITESPACE:
+
         // a white space could be an operator or be ignored if followed by another op
         if (i + 1 >= content.len()) {
             return OpCode::NOP;
         }
-        if (content[i + 1] == Token::IDENT || content[i + 1] == Token::HASH || content[i + 1] == Token::DELIM || content[i + 1].token.data == "*") {
+        if (content[i + 1] == Token::IDENT || content[i + 1] == Token::HASH || content[i + 1].token.data == "." || content[i + 1].token.data == "*") {
             i++;
             return OpCode::DESCENDANT;
         } else {
             i++;
             auto op = sstNode2OpCode(content, i);
             if (i >= content.len() - 1) {
-                logError("ERROR : unterminated selector");
                 return OpCode::NOP;
             }
-            if (content[i + 1].token.type == Token::Type::WHITESPACE) {
+            if (content[i + 1].token.type == Token::WHITESPACE) {
                 i++;
             }
             return op;
+        }
+    case Token::DELIM:
+        if (i + 1 >= content.len()) {
+            return OpCode::NOP;
+        }
+        if (content[i].token.data == ">") {
+            i++;
+            return OpCode::CHILD;
+        } else if (content[i].token.data == "~") {
+            i++;
+            return OpCode::SUBSEQUENT;
+        } else if (content[i].token.data == "+") {
+            i++;
+            return OpCode::ADJACENT;
+        } else if (content[i].token.data == "." || content[i].token.data == "*") {
+            return OpCode::AND;
+        } else {
+            return OpCode::NOP;
         }
     default:
         return OpCode::AND;

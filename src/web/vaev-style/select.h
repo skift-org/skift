@@ -87,12 +87,11 @@ static constexpr EmptySelector EMPTY = {};
 
 struct Infix {
     enum struct Type {
-        DESCENDANT,
-        CHILD,
-        ADJACENT,
-        SUBSEQUENT,
-        COLUMN,
-
+        DESCENDANT, // ' '
+        CHILD,      // >
+        ADJACENT,   // +
+        SUBSEQUENT, // ~
+        COLUMN,     // ||
         _LEN,
     };
 
@@ -114,7 +113,6 @@ struct Nfix {
         OR,    // :is(), ', '
         NOT,   // :not()
         WHERE, // :where()
-
         _LEN,
     };
 

@@ -314,4 +314,15 @@ Sst consumeFunc(Lexer &lex) {
     }
 }
 
+// NOSPEC specialized parser for selectors,
+// it's not used in the normal workflow but for testing purposes and querySelectors
+Content consumeSelector(Lexer &lex) {
+    Content value;
+
+    while ((lex.peek() != Token::END_OF_FILE and lex.peek() != Token::SEMICOLON and lex.peek() != Token::RIGHT_CURLY_BRACKET)) {
+        value.pushBack(consumeComponentValue(lex));
+    }
+    return value;
+}
+
 } // namespace Vaev::Css

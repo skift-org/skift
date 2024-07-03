@@ -16,50 +16,27 @@ enum struct FontDisplay {
     SWAP,
     FALLBACK,
     OPTIONAL,
+
+    _LEN,
 };
 
 struct FontStretch {
     enum struct _Named {
-        ULTRA_CONDENSED,
-        EXTRA_CONDENSED,
-        CONDENSED,
-        SEMI_CONDENSED,
-        NORMAL,
-        SEMI_EXPANDED,
-        EXPANDED,
-        EXTRA_EXPANDED,
-        ULTRA_EXPANDED,
+        ULTRA_CONDENSED = 500,
+        EXTRA_CONDENSED = 625,
+        CONDENSED = 750,
+        SEMI_CONDENSED = 875,
+        NORMAL = 1000,
+        SEMI_EXPANDED = 1125,
+        EXPANDED = 1250,
+        EXTRA_EXPANDED = 1500,
+        ULTRA_EXPANDED = 2000,
+
+        _LEN,
     };
 
     static Percent toPercent(_Named stretch) {
-        switch (stretch) {
-        case _Named::ULTRA_CONDENSED:
-            return Percent{50};
-
-        case _Named::EXTRA_CONDENSED:
-            return Percent{62.5};
-
-        case _Named::CONDENSED:
-            return Percent{75};
-
-        case _Named::SEMI_CONDENSED:
-            return Percent{87.5};
-
-        case _Named::NORMAL:
-            return Percent{100};
-
-        case _Named::SEMI_EXPANDED:
-            return Percent{112.5};
-
-        case _Named::EXPANDED:
-            return Percent{125};
-
-        case _Named::EXTRA_EXPANDED:
-            return Percent{150};
-
-        case _Named::ULTRA_EXPANDED:
-            return Percent{200};
-        }
+        return Percent{static_cast<int>(stretch) / 10.0};
     }
 
     using enum _Named;
@@ -92,6 +69,8 @@ struct FontStyle {
         NORMAL,
         ITALIC,
         OBLIQUE,
+
+        _LEN,
     };
 
     using enum _Named;
@@ -131,6 +110,8 @@ struct FontWeight {
         BOLD = 700,
         EXTRA_BOLD = 800,
         BLACK = 900,
+
+        _LEN,
     };
 
     using enum _Named;

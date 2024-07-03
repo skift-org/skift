@@ -9,6 +9,7 @@
 #include "image.h"
 #include "inline.h"
 #include "run.h"
+#include "table.h"
 
 namespace Vaev::Layout {
 
@@ -19,6 +20,9 @@ void buildChildren(Style::Computer &c, Vec<Strong<Dom::Node>> const &children, F
 }
 
 Strong<Flow> buildForDisplay(Display const &display, Strong<Style::Computed> style) {
+    if (display.type() == Display::INTERNAL)
+        return makeStrong<InlineFlow>(style);
+
     switch (display.inside()) {
     case Display::Inside::FLOW:
     case Display::Inside::FLOW_ROOT:
@@ -29,6 +33,9 @@ Strong<Flow> buildForDisplay(Display const &display, Strong<Style::Computed> sty
 
     case Display::Inside::GRID:
         return makeStrong<GridFlow>(style);
+
+    case Display::Inside::TABLE:
+        return makeStrong<TableFlow>(style);
 
     default:
         return makeStrong<InlineFlow>(style);

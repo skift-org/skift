@@ -5,7 +5,7 @@
 
 namespace Karm {
 
-template <typename T, typename TAG = struct _default_range_tag>
+template <typename T, typename TAG = struct _RangeTag>
 struct Range {
     T start{};
     T size{};

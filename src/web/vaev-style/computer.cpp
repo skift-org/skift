@@ -41,7 +41,16 @@ Strong<Computed> Computer::computeFor(Dom::Element const &el) {
     auto computed = makeStrong<Computed>();
     for (auto const *styleRule : matchingRules) {
         for (auto const &prop : styleRule->props) {
-            prop.apply(*computed);
+            if (prop.important == Important::NO)
+                prop.apply(*computed);
+        }
+    }
+
+    // TODO: We might want to find a better way to do that :^)
+    for (auto const *styleRule : matchingRules) {
+        for (auto const &prop : styleRule->props) {
+            if (prop.important == Important::YES)
+                prop.apply(*computed);
         }
     }
 

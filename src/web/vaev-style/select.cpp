@@ -8,6 +8,9 @@ namespace Vaev::Style {
 Spec spec(Selector const &s) {
     return s.visit(Visitor{
         [](Nfix const &n) {
+            if (n.type == Nfix::WHERE)
+                return Spec::ZERO;
+
             Spec sum = Spec::ZERO;
             for (auto &inner : n.inners)
                 sum = sum + spec(inner);

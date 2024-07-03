@@ -104,10 +104,10 @@ struct Infix {
 
 struct Nfix {
     enum struct Type {
-        AND, // ''
-        OR,  // :is(), ', '
-        NOT,
-        WHERE,
+        AND,   // ''
+        OR,    // :is(), ', '
+        NOT,   // :not()
+        WHERE, // :where()
 
         _LEN,
     };

@@ -87,6 +87,9 @@ struct Slice {
         : Slice(other.buf(), other.len()) {}
 
     constexpr T const &operator[](usize i) const {
+        if (i >= _len) {
+            panic("index out of bounds");
+        }
         return _buf[i];
     }
 
@@ -134,9 +137,19 @@ struct MutSlice {
     constexpr MutSlice(MutSliceable<T> auto &other)
         : MutSlice(other.buf(), other.len()) {}
 
-    constexpr T &operator[](usize i) { return _buf[i]; }
+    constexpr T &operator[](usize i) {
+        if (i >= _len) {
+            panic("index out of bounds");
+        }
+        return _buf[i];
+    }
 
-    constexpr T const &operator[](usize i) const { return _buf[i]; }
+    constexpr T const &operator[](usize i) const {
+        if (i >= _len) {
+            panic("index out of bounds");
+        }
+        return _buf[i];
+    }
 
     constexpr T *buf() { return _buf; }
 

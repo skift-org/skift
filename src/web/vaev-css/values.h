@@ -131,4 +131,34 @@ struct ValueParser<Update> {
     static Res<Update> parse(Cursor<Sst> &c);
 };
 
+template <>
+struct ValueParser<ReducedMotion> {
+    static Res<ReducedMotion> parse(Cursor<Sst> &c);
+};
+
+template <>
+struct ValueParser<ReducedTransparency> {
+    static Res<ReducedTransparency> parse(Cursor<Sst> &c);
+};
+
+template <>
+struct ValueParser<Contrast> {
+    static Res<Contrast> parse(Cursor<Sst> &c);
+};
+
+template <>
+struct ValueParser<Colors> {
+    static Res<Colors> parse(Cursor<Sst> &c);
+};
+
+template <>
+struct ValueParser<ColorScheme> {
+    static Res<ColorScheme> parse(Cursor<Sst> &c);
+};
+
+template <>
+struct ValueParser<ReducedData> {
+    static Res<ReducedData> parse(Cursor<Sst> &c);
+};
+
 } // namespace Vaev::Css

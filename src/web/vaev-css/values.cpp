@@ -527,4 +527,88 @@ Res<Update> ValueParser<Update>::parse(Cursor<Sst> &c) {
         return Error::invalidData("expected update value");
 }
 
+// MARK: ReducedMotion
+// https://drafts.csswg.org/mediaqueries/#reduced-motion
+Res<ReducedMotion> ValueParser<ReducedMotion>::parse(Cursor<Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Token::ident("no-preference")))
+        return Ok(ReducedMotion::NO_PREFERENCE);
+    else if (c.skip(Token::ident("reduce")))
+        return Ok(ReducedMotion::REDUCE);
+    else
+        return Error::invalidData("expected reduced motion value");
+}
+
+// MARK: ReducedTransparency
+// https://drafts.csswg.org/mediaqueries/#reduced-transparency
+Res<ReducedTransparency> ValueParser<ReducedTransparency>::parse(Cursor<Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Token::ident("no-preference")))
+        return Ok(ReducedTransparency::NO_PREFERENCE);
+    else if (c.skip(Token::ident("reduce")))
+        return Ok(ReducedTransparency::REDUCE);
+    else
+        return Error::invalidData("expected reduced transparency value");
+}
+
+// MARK: Contrast
+// https://drafts.csswg.org/mediaqueries/#contrast
+Res<Contrast> ValueParser<Contrast>::parse(Cursor<Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Token::ident("less")))
+        return Ok(Contrast::LESS);
+    else if (c.skip(Token::ident("more")))
+        return Ok(Contrast::MORE);
+    else
+        return Error::invalidData("expected contrast value");
+}
+
+// MARK: Colors
+// https://drafts.csswg.org/mediaqueries/#forced-colors
+Res<Colors> ValueParser<Colors>::parse(Cursor<Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Token::ident("none")))
+        return Ok(Colors::NONE);
+    else if (c.skip(Token::ident("active")))
+        return Ok(Colors::ACTIVE);
+    else
+        return Error::invalidData("expected colors value");
+}
+
+// MARK: ColorScheme
+// https://drafts.csswg.org/mediaqueries/#color-scheme
+Res<ColorScheme> ValueParser<ColorScheme>::parse(Cursor<Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Token::ident("light")))
+        return Ok(ColorScheme::LIGHT);
+    else if (c.skip(Token::ident("dark")))
+        return Ok(ColorScheme::DARK);
+    else
+        return Error::invalidData("expected color scheme value");
+}
+
+// MARK: ReducedData
+// https://drafts.csswg.org/mediaqueries/#reduced-data
+Res<ReducedData> ValueParser<ReducedData>::parse(Cursor<Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Token::ident("no-preference")))
+        return Ok(ReducedData::NO_PREFERENCE);
+    else if (c.skip(Token::ident("reduce")))
+        return Ok(ReducedData::REDUCE);
+    else
+        return Error::invalidData("expected reduced data value");
+}
+
 } // namespace Vaev::Css

@@ -25,6 +25,13 @@ static Media const TEST_MEDIA = {
     .hover = Hover::NONE,
     .anyPointer = Pointer::FINE,
     .anyHover = Hover::HOVER,
+
+    .prefersReducedMotion = ReducedMotion::REDUCE,
+    .prefersReducedTransparency = ReducedTransparency::NO_PREFERENCE,
+    .prefersContrast = Contrast::LESS,
+    .forcedColors = Colors::NONE,
+    .prefersColorScheme = ColorScheme::LIGHT,
+    .prefersReducedData = ReducedData::REDUCE,
 };
 
 test$("logical-and") {

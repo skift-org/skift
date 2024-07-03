@@ -25,6 +25,13 @@ static Media const TEST_MEDIA = {
     .hover = Hover::NONE,
     .anyPointer = Pointer::FINE,
     .anyHover = Hover::HOVER,
+
+    .prefersReducedMotion = ReducedMotion::REDUCE,
+    .prefersReducedTransparency = ReducedTransparency::NO_PREFERENCE,
+    .prefersContrast = Contrast::LESS,
+    .forcedColors = Colors::NONE,
+    .prefersColorScheme = ColorScheme::LIGHT,
+    .prefersReducedData = ReducedData::REDUCE,
 };
 
 test$("feature-type") {
@@ -197,6 +204,48 @@ test$("feature-any-pointer") {
 
 test$("feature-any-hover") {
     expect$(AnyHoverFeature{Hover::HOVER}
+                .match(TEST_MEDIA));
+
+    return Ok();
+}
+
+test$("feature-prefers-reduced-motion") {
+    expect$(PrefersReducedMotionFeature{ReducedMotion::REDUCE}
+                .match(TEST_MEDIA));
+
+    return Ok();
+}
+
+test$("feature-prefers-reduced-transparency") {
+    expect$(PrefersReducedTransparencyFeature{ReducedTransparency::NO_PREFERENCE}
+                .match(TEST_MEDIA));
+
+    return Ok();
+}
+
+test$("feature-prefers-contrast") {
+    expect$(PrefersContrastFeature{Contrast::LESS}
+                .match(TEST_MEDIA));
+
+    return Ok();
+}
+
+test$("feature-forced-colors") {
+    expect$(ForcedColorsFeature{Colors::NONE}
+                .match(TEST_MEDIA));
+
+    return Ok();
+}
+
+test$("feature-prefers-color-scheme") {
+    expect$(PrefersColorSchemeFeature{ColorScheme::LIGHT}
+                .match(TEST_MEDIA));
+
+    return Ok();
+}
+
+test$("feature-prefers-reduced-data") {
+    expect$(PrefersReducedDataFeature{ReducedData::REDUCE}
                 .match(TEST_MEDIA));
 
     return Ok();

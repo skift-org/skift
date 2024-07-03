@@ -94,6 +94,39 @@ struct Media {
     /// 7.4. Any Hover: the any-hover feature
     /// https://drafts.csswg.org/mediaqueries/#any-input
     Hover anyHover;
+
+    // 11. MARK: User Preference Media Features
+
+    // 11.1. Detecting the desire for less motion on the page:
+    //       the prefers-reduced-motion feature
+    //
+    // https://drafts.csswg.org/mediaqueries-5/#prefers-reduced-motion
+    ReducedMotion prefersReducedMotion;
+
+    // 11.2. Detecting the desire for reduced transparency on the page:
+    //       the prefers-reduced-transparency feature
+    // https://drafts.csswg.org/mediaqueries-5/#prefers-reduced-transparency
+    ReducedTransparency prefersReducedTransparency;
+
+    // 11.3. Detecting the desire for increased or decreased color contrast
+    //       from elements on the page: the prefers-contrast feature
+    //
+    // https://drafts.csswg.org/mediaqueries-5/#prefers-contrast
+    Contrast prefersContrast;
+
+    // 11.4. Detecting Forced Colors Mode: the forced-colors feature
+    // https://drafts.csswg.org/mediaqueries-5/#forced-colors
+    Colors forcedColors;
+
+    // 11.5. Detecting the desire for light or dark color schemes:
+    //       the prefers-color-scheme feature
+    // https://drafts.csswg.org/mediaqueries-5/#prefers-color-scheme
+    ColorScheme prefersColorScheme;
+
+    // 11.6. Detecting the desire for reduced data usage when loading a page:
+    //       the prefers-reduced-data feature
+    // https://drafts.csswg.org/mediaqueries-5/#prefers-reduced-data
+    ReducedData prefersReducedData;
 };
 
 // MARK: Media Features --------------------------------------------------------
@@ -336,6 +369,39 @@ using AnyPointerFeature = DiscreteFeature<"pointer", Pointer, &Media::anyPointer
 /// https://drafts.csswg.org/mediaqueries/#any-hover
 using AnyHoverFeature = DiscreteFeature<"hover", Hover, &Media::anyHover>;
 
+// 11. MARK: User Preference Media Features ------------------------------------
+
+// 11.1. Detecting the desire for less motion on the page:
+//       the prefers-reduced-motion feature
+//
+// https://drafts.csswg.org/mediaqueries-5/#prefers-reduced-motion
+using PrefersReducedMotionFeature = DiscreteFeature<"prefers-reduced-motion", ReducedMotion, &Media::prefersReducedMotion>;
+
+// 11.2. Detecting the desire for reduced transparency on the page:
+//       the prefers-reduced-transparency feature
+// https://drafts.csswg.org/mediaqueries-5/#prefers-reduced-transparency
+using PrefersReducedTransparencyFeature = DiscreteFeature<"prefers-reduced-transparency", ReducedTransparency, &Media::prefersReducedTransparency>;
+
+// 11.3. Detecting the desire for increased or decreased color contrast
+//       from elements on the page: the prefers-contrast feature
+//
+// https://drafts.csswg.org/mediaqueries-5/#prefers-contrast
+using PrefersContrastFeature = DiscreteFeature<"prefers-contrast", Contrast, &Media::prefersContrast>;
+
+// 11.4. Detecting Forced Colors Mode: the forced-colors feature
+// https://drafts.csswg.org/mediaqueries-5/#forced-colors
+using ForcedColorsFeature = DiscreteFeature<"forced-colors", Colors, &Media::forcedColors>;
+
+// 11.5. Detecting the desire for light or dark color schemes:
+//       the prefers-color-scheme feature
+// https://drafts.csswg.org/mediaqueries-5/#prefers-color-scheme
+using PrefersColorSchemeFeature = DiscreteFeature<"prefers-color-scheme", ColorScheme, &Media::prefersColorScheme>;
+
+// 11.6. Detecting the desire for reduced data usage when loading a page:
+//       the prefers-reduced-data feature
+// https://drafts.csswg.org/mediaqueries-5/#prefers-reduced-data
+using PrefersReducedDataFeature = DiscreteFeature<"prefers-reduced-data", ReducedData, &Media::prefersReducedData>;
+
 // MARK: Media Feature ---------------------------------------------------------
 
 using _Feature = Union<
@@ -357,7 +423,13 @@ using _Feature = Union<
     PointerFeature,
     HoverFeature,
     AnyPointerFeature,
-    AnyHoverFeature>;
+    AnyHoverFeature,
+    PrefersReducedMotionFeature,
+    PrefersReducedTransparencyFeature,
+    PrefersContrastFeature,
+    ForcedColorsFeature,
+    PrefersColorSchemeFeature,
+    PrefersReducedDataFeature>;
 
 struct Feature : public _Feature {
     using _Feature::_Feature;

@@ -36,6 +36,13 @@ struct View : public Ui::View<View> {
             .hover = Hover::HOVER,
             .anyPointer = Pointer::FINE,
             .anyHover = Hover::HOVER,
+
+            .prefersReducedMotion = ReducedMotion::NO_PREFERENCE,
+            .prefersReducedTransparency = ReducedTransparency::NO_PREFERENCE,
+            .prefersContrast = Contrast::NO_PREFERENCE,
+            .forcedColors = Colors::NONE,
+            .prefersColorScheme = ColorScheme::DARK,
+            .prefersReducedData = ReducedData::NO_PREFERENCE,
         };
     }
 

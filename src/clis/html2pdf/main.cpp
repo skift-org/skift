@@ -32,6 +32,13 @@ Style::Media constructMedia(Vec2Px pageSize) {
         .hover = Hover::HOVER,
         .anyPointer = Pointer::FINE,
         .anyHover = Hover::HOVER,
+
+        .prefersReducedMotion = ReducedMotion::REDUCE,
+        .prefersReducedTransparency = ReducedTransparency::NO_PREFERENCE,
+        .prefersContrast = Contrast::NO_PREFERENCE,
+        .forcedColors = Colors::NONE,
+        .prefersColorScheme = ColorScheme::LIGHT,
+        .prefersReducedData = ReducedData::NO_PREFERENCE,
     };
 }
 

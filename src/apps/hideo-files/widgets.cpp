@@ -233,34 +233,24 @@ Ui::Child openFileDialog() {
         [](auto const &d) {
             auto maybeDir = Sys::Dir::open(d.currentUrl());
 
-            auto msgLbl = Ui::titleMedium("Select a file to open.");
-
-            auto openBtn = Ui::button(
-                Ui::closeDialog,
-                Ui::ButtonStyle::primary(), "Open"
-            );
-
-            return dialogScafold(
-                Math::Align::FILL,
-                Ui::vflow(
-                    Kr::dialogTitleBar("Open file…"s),
-                    toolbar(d),
-                    maybeDir
-                        ? directoryListing(d, maybeDir.unwrap()) |
-                              Ui::grow()
-                        : alert(
-                              d,
-                              "Can't access this location"s,
-                              Io::toStr(maybeDir.none()).unwrap()
-                          ) |
-                              Ui::grow(),
-                    Ui::separator()
-                ),
-                {
+            return Kr::dialogContent({
+                Kr::dialogTitleBar("Open file…"s),
+                toolbar(d),
+                (maybeDir
+                     ? directoryListing(d, maybeDir.unwrap())
+                     : alert(
+                           d,
+                           "Can't access this location"s,
+                           Io::toStr(maybeDir.none()).unwrap()
+                       )
+                ) | Ui::pinSize({400, 260}),
+                Ui::separator(),
+                Kr::dialogFooter({
                     Ui::grow(NONE),
-                    openBtn,
-                }
-            );
+                    Kr::dialogCancel(),
+                    Kr::dialogAction(Ui::NOP, "Open"s),
+                }),
+            });
         }
     );
 }

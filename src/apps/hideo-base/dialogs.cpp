@@ -10,23 +10,6 @@
 
 namespace Hideo {
 
-// MARK: Dialogs Scaffolding ---------------------------------------------------
-
-Ui::Child dialogScafold(Math::Align, Ui::Child content, Ui::Children actions) {
-    return Kr::dialogContent({
-        content | Ui::grow(),
-        hflow(8, actions) | Ui::spacing(8),
-    });
-}
-
-Ui::Child dialogCloseButton() {
-    return button(
-        Ui::closeDialog,
-        Ui::ButtonStyle::primary(),
-        "Close"
-    );
-}
-
 // MARK: Dialogs ---------------------------------------------------------------
 
 Ui::Child versionBadge() {

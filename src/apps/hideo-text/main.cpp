@@ -66,16 +66,6 @@ Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
             text,
         },
         [](State const &s) {
-            if (s.error) {
-                return scafold({
-                    .icon = Mdi::TEXT,
-                    .title = "Text"s,
-                    .body = [=] {
-                        return alert("Unable to load text"s, Io::toStr(s.error).unwrap());
-                    },
-                });
-            }
-
             return scafold({
                 .icon = Mdi::TEXT,
                 .title = "Text"s,
@@ -101,7 +91,7 @@ Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
                             }),
                         Ui::separator(),
 
-                        editor(s.text),
+                        s.error ? alert("Unable to load text"s, Io::toStr(s.error).unwrap()) | Ui::grow() : editor(s.text),
                         Ui::separator(),
                         Ui::hflow(
                             6,

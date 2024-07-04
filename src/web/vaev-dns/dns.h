@@ -1,7 +1,6 @@
 #pragma once
 
 #include <karm-base/endian.h>
-#include <karm-crypto/base64.h>
 #include <karm-io/bscan.h>
 #include <karm-logger/logger.h>
 #include <karm-sys/chan.h>

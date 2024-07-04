@@ -41,13 +41,26 @@ Style::Selector parseSelectorElement(Slice<Sst> prefix, usize &i) {
         } else if (prefix[i].token.data == "*") {
             return Style::UniversalSelector{};
         }
+    case Token::COLON:
+        if (i + 1 >= prefix.len()) {
+            logError("ERROR : unterminated selector");
+            return Style::EmptySelector{};
+        }
+        i++;
+        if (prefix[i].token.type == Token::COLON) {
+            if (i + 1 >= prefix.len()) {
+                logError("ERROR : unterminated selector");
+                return Style::EmptySelector{};
+            }
+            i++;
+        }
+        return Style::Pseudo{Style::Pseudo::make(prefix[i].token.data)};
     default:
         return Style::ClassSelector{prefix[i].token.data};
     }
 }
 
 OpCode sstNode2OpCode(Slice<Sst> content, usize &i) {
-    logDebug("CONVERT {}", content[i]);
     switch (content[i].token.type) {
     case Token::COMMA:
         if (i + 1 >= content.len()) {
@@ -62,7 +75,6 @@ OpCode sstNode2OpCode(Slice<Sst> content, usize &i) {
         if (i + 1 >= content.len()) {
             return OpCode::NOP;
         }
-        logDebug("ITESPACE {}", content[i + 1].token.data);
 
         if (content[i + 1] == Token::IDENT || content[i + 1] == Token::HASH || content[i + 1].token.data == "." || content[i + 1].token.data == "*") {
             i++;
@@ -96,6 +108,7 @@ OpCode sstNode2OpCode(Slice<Sst> content, usize &i) {
         } else {
             return OpCode::NOP;
         }
+    case Token::COLON:
     default:
         return OpCode::AND;
     }
@@ -136,7 +149,6 @@ Style::Selector parseNfixExpr(Style::Selector lhs, OpCode op, Slice<Sst> content
                 break;
             }
 
-            logDebug("new INFIX");
             selectors.pushBack(parseInfixExpr(parseSelectorElement(content, i), content, i, nextOpCode));
         }
     }
@@ -155,7 +167,6 @@ Style::Selector parseInfixExpr(Style::Selector lhs, Slice<Sst> content, usize &i
     if (opCode == OpCode::NOP) {
         opCode = sstNode2OpCode(content, i);
     }
-    logDebug("op {}", opCode);
 
     switch (opCode) {
     case OpCode::NOP:
@@ -190,7 +201,6 @@ Style::Selector parseSelector(Slice<Sst> content) {
     while (i + 1 < content.len()) {
         i++;
         currentSelector = parseInfixExpr(currentSelector, content, i);
-        logDebug("currentSEl {}", content[i]);
     }
     return currentSelector;
 }

@@ -34,7 +34,7 @@ Spec spec(Selector const &s) {
         [](ClassSelector const &) {
             return Spec::B;
         },
-        [](PseudoClass const &) {
+        [](Pseudo const &) {
             return Spec::ZERO;
         },
         [](AttributeSelector const &) {

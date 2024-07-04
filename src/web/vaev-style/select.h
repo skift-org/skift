@@ -164,6 +164,8 @@ struct AnB {
     void repr(Io::Emit &e) const {
         e("{}n{}{}", a, b < 0 ? "-"s : "+"s, b);
     }
+
+    bool operator==(AnB const &) const = default;
 };
 
 enum struct Dir {
@@ -171,20 +173,42 @@ enum struct Dir {
     RTL,
 };
 
-struct PseudoClass {
+struct Pseudo {
     enum struct Type {
-#define PSEUDO_CLASS(ID, ...) ID,
-#include "defs/pseudo-class.inc"
-#undef PSEUDO_CLASS
+#define PSEUDO(ID, ...) ID,
+#include "defs/pseudo.inc"
+#undef PSEUDO
 
         _LEN,
     };
+
+    static Opt<Type> _Type(Str name) {
+#define PSEUDO(IDENT, NAME) \
+    if (name == NAME)       \
+        return Type::IDENT;
+#include "defs/pseudo.inc"
+#undef PSEUDO
+
+        return NONE;
+    }
+
+    static Type make(Str name) {
+        auto id = _Type(name);
+        // logDebug("make type {} {}", name, id);
+        if (id) {
+            auto result = Type{*id};
+            return result;
+        }
+        return Type{0};
+    }
 
     using enum Type;
     using Extra = Union<None, String, AnB, Dir>;
 
     Type type;
     Extra extra = NONE;
+
+    bool operator==(Pseudo const &) const = default;
 
     void repr(Io::Emit &e) const {
         e("{}", type);
@@ -221,6 +245,8 @@ struct AttributeSelector {
     void repr(Io::Emit &e) const {
         e("[{} {} {} {}]", name, case_, match, value);
     }
+
+    bool operator==(AttributeSelector const &) const = default;
 };
 
 using _Selector = Union<
@@ -231,7 +257,7 @@ using _Selector = Union<
     EmptySelector,
     IdSelector,
     ClassSelector,
-    PseudoClass,
+    Pseudo,
     AttributeSelector>;
 
 struct Selector : public _Selector {

@@ -13,7 +13,7 @@ test$("lru-access") {
     }
 
     for (int i = 0; i < 10; i++) {
-        auto val = cache.get(i);
+        auto val = cache.tryGet(i);
         expectEq$(val, i * 10);
     }
 
@@ -58,7 +58,7 @@ test$("lru-evict") {
     }
 
     for (int i = 0; i < 10; i++) {
-        auto val = cache.get(i);
+        auto val = cache.tryGet(i);
         expectEq$(val, i * 10);
     }
 

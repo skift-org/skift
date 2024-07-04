@@ -72,11 +72,11 @@ struct Element : public Node {
     }
 
     bool hasAttribute(AttrName name) const {
-        return this->attributes.get(name) != NONE;
+        return this->attributes.tryGet(name) != NONE;
     }
 
     Opt<String> getAttribute(AttrName name) const {
-        auto attr = this->attributes.get(name);
+        auto attr = this->attributes.tryGet(name);
         if (attr == NONE)
             return NONE;
         return (*attr)->value;

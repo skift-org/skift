@@ -176,11 +176,7 @@ struct DarwinSched :
             return Ok();
 
         usize id = ev.udata;
-        auto promise =
-            _promises
-                .take(id)
-                .take("no promise found for event");
-
+        auto promise = _promises.take(id);
         promise.resolve(Ok());
         return Ok();
     }

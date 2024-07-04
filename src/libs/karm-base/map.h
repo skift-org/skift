@@ -25,22 +25,32 @@ struct Map {
         _els.pushBack(Cons<K, V>{key, std::move(value)});
     }
 
-    Opt<V> get(K const &key) const {
+    V &get(K const &key) {
         for (auto &i : _els) {
             if (i.car == key) {
                 return i.cdr;
             }
         }
 
-        return NONE;
+        panic("key not found");
     }
 
-    Opt<V> take(K const &key) {
+    V take(K const &key) {
         for (usize i = 0; i < _els.len(); i++) {
             if (_els[i].car == key) {
                 V value = std::move(_els[i].cdr);
                 _els.removeAt(i);
                 return value;
+            }
+        }
+
+        panic("key not found");
+    }
+
+    Opt<V> tryGet(K const &key) const {
+        for (auto &i : _els) {
+            if (i.car == key) {
+                return i.cdr;
             }
         }
 

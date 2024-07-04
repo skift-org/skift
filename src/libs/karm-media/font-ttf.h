@@ -38,7 +38,7 @@ struct TtfFontface : public Fontface {
     }
 
     Glyph glyph(Rune rune) override {
-        auto glyph = _cachedEntries.get(rune);
+        auto glyph = _cachedEntries.tryGet(rune);
         if (glyph.has())
             return glyph.unwrap();
         auto g = _ttf.glyph(rune);
@@ -47,7 +47,7 @@ struct TtfFontface : public Fontface {
     }
 
     f64 advance(Glyph glyph) override {
-        auto advance = _cachedAdvances.get(glyph);
+        auto advance = _cachedAdvances.tryGet(glyph);
         if (advance.has())
             return advance.unwrap();
         auto a = _ttf.glyphMetrics(glyph).advance;
@@ -56,7 +56,7 @@ struct TtfFontface : public Fontface {
     }
 
     f64 kern(Glyph prev, Glyph curr) override {
-        auto kern = _cachedKerns.get({prev, curr});
+        auto kern = _cachedKerns.tryGet({prev, curr});
         if (kern.has())
             return kern.unwrap();
 

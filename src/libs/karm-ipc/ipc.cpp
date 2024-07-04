@@ -39,7 +39,7 @@ Async::Task<> Server::runAsync() {
         };
 
         Header header = co_try$(Io::unpack<Header>(req));
-        auto maybeObject = _objects.get(header.oid);
+        auto maybeObject = _objects.tryGet(header.oid);
 
         if (maybeObject) {
             auto *object = *maybeObject;
@@ -51,7 +51,7 @@ Async::Task<> Server::runAsync() {
             continue;
         }
 
-        auto maybePending = _pending.get(header.seq);
+        auto maybePending = _pending.tryGet(header.seq);
         if (maybePending) {
             auto *pending = *maybePending;
             pending->complete(req);

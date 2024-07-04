@@ -254,7 +254,7 @@ struct Value {
         if (not isObject()) {
             return NONE;
         }
-        return try$(asObject().get(key));
+        return try$(asObject().tryGet(key));
     }
 
     Value get(usize index) const {

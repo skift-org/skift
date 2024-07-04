@@ -52,7 +52,7 @@ Async::Task<usize> _fetch(Mime::Url const &url, Sys::_Connection &conn, Io::Writ
     if (resp.code != Http::Code::OK)
         co_return Error::invalidData("http error");
 
-    auto contentLength = co_try$(Io::atou(co_try$(resp.headers.get("Content-Length"))));
+    auto contentLength = co_try$(Io::atou(co_try$(resp.headers.tryGet("Content-Length"))));
     auto remData = bytes(s.remStr());
     auto written = co_try$(out.write(sub(remData, 0, contentLength)));
     if (written < contentLength)

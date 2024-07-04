@@ -30,7 +30,7 @@ struct Lru {
     }
 
     Item *_lookup(K const &key) {
-        Opt<Item *> item = _map.get(key);
+        Opt<Item *> item = _map.tryGet(key);
         if (item.has()) {
             _ll.detach(*item);
             _ll.prepend(*item, _ll.head());
@@ -61,7 +61,7 @@ struct Lru {
         return item->value;
     }
 
-    Opt<V> get(K const &key) {
+    Opt<V> tryGet(K const &key) {
         auto item = _lookup(key);
         if (item) {
             return item->value;

@@ -48,7 +48,7 @@ Async::Task<> entryPointAsync(Sys::Context &) {
         while (ev) {
             co_try$(Hj::_signal(ev->cap, Hj::Sigs::NONE, Hj::Sigs::TRIGGERED));
 
-            auto irq = cap2irq.get(ev->cap);
+            auto irq = cap2irq.tryGet(ev->cap);
             if (irq) {
                 auto e = Sys::makeEvent<Grund::Device::IrqEvent>(*irq);
                 co_try$(root->event(*e));

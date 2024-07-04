@@ -32,15 +32,6 @@ struct Array {
 
     always_inline constexpr T const *buf() const { return _buf; }
 
-    always_inline constexpr bool operator==(Array const &other) const {
-        for (usize i = 0; i < N; i++) {
-            if (_buf[i] != other._buf[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     always_inline constexpr Array reversed() const {
         Array res{};
         for (usize i = 0; i < N; i++)

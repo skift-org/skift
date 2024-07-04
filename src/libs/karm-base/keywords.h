@@ -1,5 +1,7 @@
 #pragma once
 
+#include <compare>
+
 #include "bool.h"
 
 namespace Karm {
@@ -29,6 +31,10 @@ struct None {
     constexpr None() {}
 
     explicit operator bool() const { return false; }
+
+    bool operator==(None const &) const = default;
+
+    auto operator<=>(None const &) const = default;
 };
 
 constexpr inline auto NONE = None{};

@@ -174,34 +174,36 @@ struct Union {
     }
 
     template <Meta::Contains<Ts...> T>
+        requires Meta::Equatable<T>
     bool operator==(T const &other) const {
-        if constexpr (Meta::Equatable<T>)
-            if (is<T>())
-                return unwrap<T>() == other;
+        if (is<T>())
+            return unwrap<T>() == other;
         return false;
     }
 
-    std::partial_ordering operator<=>(Union const &other) const {
+    std::partial_ordering operator<=>(Union const &other) const
+        requires(Meta::Comparable<Ts> && ...)
+    {
         if (_index == other._index)
-            return visit([&]<typename T>(T const &ptr) {
-                if constexpr (Meta::Comparable<T>) {
+            return visit(
+                [&]<typename T>(T const &ptr)
+                    requires Meta::Comparable<T>
+                {
                     return ptr <=> other.unwrap<T>();
-                } else {
-                    return std::partial_ordering::unordered;
                 }
-            });
+            );
         return std::partial_ordering::unordered;
     }
 
-    bool operator==(Union const &other) const {
+    bool operator==(Union const &other) const
+        requires(Meta::Equatable<Ts> && ...)
+    {
         if (_index == other._index)
-            return visit([&]<typename T>(T const &ptr) {
-                if constexpr (Meta::Equatable<T>) {
+            return visit(
+                [&]<typename T>(T const &ptr) {
                     return ptr == other.unwrap<T>();
-                } else {
-                    return false;
                 }
-            });
+            );
         return false;
     }
 };

@@ -59,8 +59,8 @@ static inline Demo MESH_DEMO{
         mesh.offset(200.0);
         return Ui::reducer<Model>(mesh, [](Math::Mesh2f const &s) {
             auto canvas = Ui::canvas(
-                [=](Gfx::Context &g, Math::Vec2i) {
-                    Gfx::Paint paint = Media::loadImageOrFallback("file:./src/specs/qoi/tests/res/kodim23.qoi"_url).unwrap();
+                [=, image = Media::loadImageOrFallback("file:./src/specs/qoi/tests/res/kodim23.qoi"_url).unwrap()](Gfx::Context &g, Math::Vec2i) {
+                    Gfx::Paint paint = image.pixels();
 
                     for (usize i = 0; i + 2 < s.index.len(); i += 3) {
                         auto a = s.verts[s.index[i]];

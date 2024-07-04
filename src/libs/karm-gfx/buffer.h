@@ -240,6 +240,64 @@ using Pixels = _Pixels<false>;
 
 using MutPixels = _Pixels<true>;
 
+// MARK: Surface --------------------------------------------------------------
+
+struct Surface {
+    Buf<u8> _buf;
+    Math::Vec2i _size;
+    usize _stride;
+    Gfx::Fmt _fmt;
+
+    static Strong<Surface> alloc(Math::Vec2i size, Gfx::Fmt fmt = Gfx::RGBA8888) {
+        return makeStrong<Surface>(
+            Buf<u8>::init(size.x * size.y * fmt.bpp()),
+            size,
+            size.x * fmt.bpp(),
+            fmt
+        );
+    }
+
+    static Strong<Surface> fallback() {
+        auto img = alloc({2, 2}, Gfx::RGBA8888);
+        img->mutPixels().clear(Gfx::Color::fromHex(0xFF00FF));
+        return img;
+    }
+
+    always_inline operator Gfx::Pixels() const {
+        return pixels();
+    }
+
+    always_inline operator Gfx::MutPixels() {
+        return mutPixels();
+    }
+
+    always_inline Gfx::Pixels pixels() const {
+        return {_buf.buf(), _size, _stride, _fmt};
+    }
+
+    always_inline Gfx::MutPixels mutPixels() {
+        return {_buf.buf(), _size, _stride, _fmt};
+    }
+
+    always_inline isize width() const {
+        return _size.x;
+    }
+
+    always_inline isize height() const {
+        return _size.y;
+    }
+
+    always_inline Math::Recti bound() const {
+        return {0, 0, width(), height()};
+    }
+
+    always_inline Gfx::Color sample(Math::Vec2f pos) const {
+        return pixels().sample(pos);
+    }
+};
+
+// MARK: Blitting --------------------------------------------------------------
+
 void blitUnsafe(MutPixels dst, Pixels src);
 
 } // namespace Karm::Gfx

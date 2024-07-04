@@ -6,44 +6,28 @@
 namespace Karm::Media {
 
 struct Image {
-    Strong<Buf<u8>> _buf;
-    Math::Vec2i _size;
-    usize _stride;
-    Gfx::Fmt _fmt;
+    Strong<Gfx::Surface const> _surface;
 
-    static Image alloc(Math::Vec2i size, Gfx::Fmt fmt = Gfx::RGBA8888) {
-        auto buf = makeStrong<Buf<u8>>(Buf<u8>::init(size.x * size.y * fmt.bpp()));
-        return {std::move(buf), size, size.x * fmt.bpp(), fmt};
-    }
+    Image(Strong<Gfx::Surface const> surface)
+        : _surface(std::move(surface)) {}
 
-    static Image fallback() {
-        auto img = alloc({2, 2}, Gfx::RGBA8888);
-        img.mutPixels().clear(Gfx::Color::fromHex(0xFF00FF));
-        return img;
-    }
+    Image(Strong<Gfx::Surface> surface)
+        : _surface(std::move(surface)) {}
 
     always_inline operator Gfx::Pixels() const {
         return pixels();
     }
 
-    always_inline operator Gfx::MutPixels() {
-        return mutPixels();
-    }
-
     always_inline Gfx::Pixels pixels() const {
-        return {_buf->buf(), _size, _stride, _fmt};
-    }
-
-    always_inline Gfx::MutPixels mutPixels() {
-        return {_buf->buf(), _size, _stride, _fmt};
+        return _surface->pixels();
     }
 
     always_inline isize width() const {
-        return _size.x;
+        return _surface->width();
     }
 
     always_inline isize height() const {
-        return _size.y;
+        return _surface->height();
     }
 
     always_inline Math::Recti bound() const {

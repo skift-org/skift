@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-math/align.h>
+#include <karm-media/icon.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/node.h>
 

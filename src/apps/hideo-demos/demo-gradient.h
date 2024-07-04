@@ -20,9 +20,6 @@ static inline Demo GRADIENT_DEMO{
 
                 g.fillStyle(colors);
                 g.fill(bound);
-
-                g.fillStyle(Gfx::WHITE);
-                g.fill({16, 26}, "Graphic design is my passion");
             }
         );
     },

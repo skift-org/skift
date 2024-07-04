@@ -178,11 +178,22 @@ Math::Vec2f Text::layout(f64 width) {
 
 // MARK: Paint -------------------------------------------------------------
 
+static void _fillGlyph(Gfx::Context &g, Media::Font const &font, Math::Vec2f baseline, Media::Glyph glyph) {
+    g._useSpaa = true;
+    g.save();
+    g.begin();
+    g.translate(baseline);
+    g.scale(font.scale());
+    font.fontface->contour(g, glyph);
+    g.fill();
+    g.restore();
+    g._useSpaa = false;
+}
+
 void Text::paint(Context &ctx) const {
     auto m = _style.font.metrics();
 
     ctx.save();
-    ctx.textFont(_style.font);
     if (_style.color)
         ctx.fillStyle(*_style.color);
 
@@ -198,7 +209,7 @@ void Text::paint(Context &ctx) const {
                     ));
                     ctx.stroke();
                 } else {
-                    ctx.fill({block.pos + cell.pos, line.baseline}, cell.glyph);
+                    _fillGlyph(ctx, _style.font, {block.pos + cell.pos, line.baseline}, cell.glyph);
                 }
             }
         }

@@ -9,13 +9,13 @@ struct EfiHost :
     public Host {
     Efi::SimpleTextInputProtocol *_stip = nullptr;
     Gfx::MutPixels _front;
-    Media::Image _back;
+    Strong<Gfx::Surface> _back;
 
     EfiHost(
         Child root,
         Efi::SimpleTextInputProtocol *stip,
         Gfx::MutPixels front,
-        Media::Image back
+        Strong<Gfx::Surface> back
     )
         : Host(root),
           _stip(stip),
@@ -25,12 +25,12 @@ struct EfiHost :
     }
 
     Gfx::MutPixels mutPixels() override {
-        return _back;
+        return *_back;
     }
 
     void flip(Slice<Math::Recti> dirty) override {
         for (auto d : dirty)
-            Gfx::blitUnsafe(_front.clip(d), _back.pixels());
+            Gfx::blitUnsafe(_front.clip(d), mutPixels());
     }
 
     Res<> wait(TimeStamp) override {
@@ -61,7 +61,7 @@ Res<Strong<Host>> makeHost(Child root) {
         Gfx::BGRA8888,
     };
 
-    auto back = Media::Image::alloc({front.width(), front.height()}, Gfx::BGRA8888);
+    auto back = Gfx::Surface::alloc({front.width(), front.height()}, Gfx::BGRA8888);
 
     return Ok(makeStrong<EfiHost>(root, stip, front, back));
 }

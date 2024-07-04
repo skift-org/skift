@@ -1,7 +1,5 @@
 #pragma once
 
-#include <karm-media/icon.h>
-
 #include "buffer.h"
 #include "filters.h"
 #include "paint.h"
@@ -25,8 +23,6 @@ struct Context {
     struct Scope {
         Paint paint = Gfx::WHITE;
         StrokeStyle strokeStyle{};
-        Media::Font textFont = Media::Font::fallback();
-
         Math::Recti clip{};
         Math::Trans2f trans = Math::Trans2f::identity();
     };
@@ -77,15 +73,15 @@ struct Context {
     // karm-ui draws the new layer into the current context.
     void layer(Math::Vec2i offset, auto inner) {
         auto old = mutPixels();
-        auto layer = Media::Image::alloc(
+        auto layer = Surface::alloc(
             pixels().size(),
             pixels().fmt()
         );
 
-        _pixels = layer.mutPixels();
+        _pixels = layer->mutPixels();
         inner(*this);
         _pixels = old;
-        blit(offset, layer.pixels());
+        blit(offset, layer->pixels());
     }
 
     // MARK: Origin & Clipping -------------------------------------------------
@@ -128,17 +124,11 @@ struct Context {
     // Get the current stroke style.
     StrokeStyle const &strokeStyle();
 
-    // Get the current text font.
-    Media::Font &textFont();
-
     // Set the current fill style.
     Context &fillStyle(Paint style);
 
     // Set the current stroke style.
     Context &strokeStyle(StrokeStyle style);
-
-    // Set the current text font.
-    Context &textFont(Media::Font style);
 
     // MARK: Drawing -----------------------------------------------------------
 
@@ -193,30 +183,6 @@ struct Context {
 
     // Fill an ellipse.
     void fill(Math::Ellipsei e);
-
-    // Stroke an icon
-    void stroke(Math::Vec2i pos, Media::Icon icon);
-
-    // Fill an icon
-    void fill(Math::Vec2i pos, Media::Icon icon);
-
-    // Stroke a text glyph
-    void stroke(Math::Vec2f baseline, Media::Glyph glyph);
-
-    // Fill a text glyph
-    void fill(Math::Vec2f baseline, Media::Glyph glyph);
-
-    // Stroke a text rune
-    void stroke(Math::Vec2f baseline, Rune rune);
-
-    // Fill a text rune
-    void fill(Math::Vec2f baseline, Rune rune);
-
-    // Stroke a text string
-    void stroke(Math::Vec2f baseline, Str str);
-
-    // Fill a text string
-    void fill(Math::Vec2f baseline, Str str);
 
     // MARK: Debug -------------------------------------------------------------
     // These functions are mostly for debugging purposes. They let you draw

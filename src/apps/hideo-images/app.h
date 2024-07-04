@@ -8,13 +8,13 @@ namespace Hideo::Images {
 
 using Hist = Array<Math::Vec3f, 64>;
 
-static inline void computeHistogram(Hist &hist, Media::Image const &image) {
+static inline void computeHistogram(Hist &hist, Gfx::Pixels pixels) {
     f64 max = 0;
     hist = {};
 
-    for (auto y = 0; y < image.width(); ++y) {
-        for (auto x = 0; x < image.height(); ++x) {
-            auto pixel = image.pixels().load({x, y});
+    for (auto y = 0; y < pixels.width(); ++y) {
+        for (auto x = 0; x < pixels.height(); ++x) {
+            auto pixel = pixels.load({x, y});
 
             hist[pixel.red / 4].x += 1;
             hist[pixel.green / 4].y += 1;

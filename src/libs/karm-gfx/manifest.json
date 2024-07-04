@@ -4,7 +4,6 @@
     "type": "lib",
     "description": "A graphics library",
     "requires": [
-        "karm-media",
         "karm-math",
         "karm-io"
     ]

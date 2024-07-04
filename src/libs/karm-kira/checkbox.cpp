@@ -26,7 +26,7 @@ struct Checkbox : public Ui::View<Checkbox> {
             g.fill(bound(), 4);
 
             g.fillStyle(Gfx::GRAY50);
-            g.fill(bound().topStart(), Media::Icon{Mdi::CHECK_BOLD, 26});
+            Media::Icon{Mdi::CHECK_BOLD, 26}.fill(g, bound().topStart());
 
             if (_mouseListener.isPress()) {
                 g.strokeStyle(Gfx::stroke(Ui::ACCENT600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));

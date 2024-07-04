@@ -5,6 +5,7 @@
 #include <karm-math/trans.h>
 #include <karm-media/image.h>
 
+#include "buffer.h"
 #include "color.h"
 #include "colors.h"
 
@@ -158,7 +159,7 @@ struct Gradient {
 using _Paints = Union<
     Color,
     Gradient,
-    Media::Image>;
+    Pixels>;
 
 struct Paint : public _Paints {
     using _Paints::_Paints;
@@ -166,9 +167,11 @@ struct Paint : public _Paints {
     Paint(Color color = ALPHA) : _Paints(color) {}
 
     always_inline Color sample(Math::Vec2f pos) const {
-        return visit([&](auto const &p) {
-            return p.sample(pos);
-        });
+        return visit(
+            [&](auto const &p) {
+                return p.sample(pos);
+            }
+        );
     }
 };
 

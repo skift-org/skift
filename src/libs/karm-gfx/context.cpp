@@ -104,10 +104,6 @@ StrokeStyle const &Context::strokeStyle() {
     return current().strokeStyle;
 }
 
-Media::Font &Context::textFont() {
-    return current().textFont;
-}
-
 Context &Context::fillStyle(Paint paint) {
     current().paint = paint;
     return *this;
@@ -115,11 +111,6 @@ Context &Context::fillStyle(Paint paint) {
 
 Context &Context::strokeStyle(StrokeStyle style) {
     current().strokeStyle = style;
-    return *this;
-}
-
-Context &Context::textFont(Media::Font font) {
-    current().textFont = font;
     return *this;
 }
 
@@ -256,90 +247,6 @@ void Context::fill(Math::Ellipsei e) {
     begin();
     ellipse(e.cast<f64>());
     fill();
-}
-
-void Context::stroke(Math::Vec2i pos, Media::Icon icon) {
-    _useSpaa = true;
-    icon.stroke(*this, pos);
-    _useSpaa = false;
-}
-
-void Context::fill(Math::Vec2i pos, Media::Icon icon) {
-    _useSpaa = true;
-    icon.fill(*this, pos);
-    _useSpaa = false;
-}
-
-void Context::stroke(Math::Vec2f baseline, Media::Glyph glyph) {
-    auto f = textFont();
-
-    _useSpaa = true;
-    save();
-    begin();
-    translate(baseline);
-    scale(f.scale());
-    f.fontface->contour(*this, glyph);
-    stroke();
-    restore();
-    _useSpaa = false;
-}
-
-void Context::fill(Math::Vec2f baseline, Media::Glyph glyph) {
-    auto f = textFont();
-
-    _useSpaa = true;
-    save();
-    begin();
-    translate(baseline);
-    scale(f.scale());
-    f.fontface->contour(*this, glyph);
-    fill();
-    restore();
-    _useSpaa = false;
-}
-
-void Context::stroke(Math::Vec2f baseline, Rune rune) {
-    stroke(baseline, textFont().glyph(rune));
-}
-
-void Context::fill(Math::Vec2f baseline, Rune rune) {
-    fill(baseline, textFont().glyph(rune));
-}
-
-void Context::stroke(Math::Vec2f baseline, Str str) {
-    auto f = textFont();
-
-    bool first = true;
-    Media::Glyph prev{0};
-    for (auto rune : iterRunes(str)) {
-        auto curr = f.glyph(rune);
-        if (not first)
-            baseline.x += f.kern(prev, curr);
-        else
-            first = false;
-
-        stroke(baseline, curr);
-        baseline.x += f.advance(curr);
-        prev = curr;
-    }
-}
-
-void Context::fill(Math::Vec2f baseline, Str str) {
-    auto f = textFont();
-
-    bool first = true;
-    Media::Glyph prev{0};
-    for (auto rune : iterRunes(str)) {
-        auto curr = f.glyph(rune);
-        if (not first)
-            baseline.x += f.kern(prev, curr);
-        else
-            first = false;
-
-        fill(baseline, curr);
-        baseline.x += f.advance(curr);
-        prev = curr;
-    }
 }
 
 // MARK: Debug -----------------------------------------------------------------

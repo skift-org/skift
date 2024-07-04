@@ -52,29 +52,29 @@ Res<Font> loadFontOrFallback(f64 size, Mime::Url url) {
 
 static Res<Image> loadBmp(Bytes bytes) {
     auto bmp = try$(Bmp::Image::load(bytes));
-    auto img = Image::alloc({bmp.width(), bmp.height()});
-    try$(bmp.decode(img));
+    auto img = Gfx::Surface::alloc({bmp.width(), bmp.height()});
+    try$(bmp.decode(*img));
     return Ok(img);
 }
 
 static Res<Image> loadQoi(Bytes bytes) {
     auto qoi = try$(Qoi::Image::load(bytes));
-    auto img = Image::alloc({qoi.width(), qoi.height()});
-    try$(qoi.decode(img.mutPixels()));
+    auto img = Gfx::Surface::alloc({qoi.width(), qoi.height()});
+    try$(qoi.decode(*img));
     return Ok(img);
 }
 
 static Res<Image> loadPng(Bytes bytes) {
     auto png = try$(Png::Image::load(bytes));
-    auto img = Image::alloc({png.width(), png.height()});
-    try$(png.decode(img));
+    auto img = Gfx::Surface::alloc({png.width(), png.height()});
+    try$(png.decode(*img));
     return Ok(img);
 }
 
 static Res<Image> loadJpeg(Bytes bytes) {
     auto jpeg = try$(Jpeg::Image::load(bytes));
-    auto img = Image::alloc({jpeg.width(), jpeg.height()});
-    try$(jpeg.decode(img));
+    auto img = Gfx::Surface::alloc({jpeg.width(), jpeg.height()});
+    try$(jpeg.decode(*img));
     return Ok(img);
 }
 
@@ -102,7 +102,7 @@ Res<Image> loadImageOrFallback(Mime::Url url) {
     if (auto result = loadImage(url); result) {
         return result;
     }
-    return Ok(Image::fallback());
+    return Ok(Gfx::Surface::fallback());
 }
 
 } // namespace Karm::Media

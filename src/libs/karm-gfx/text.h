@@ -106,8 +106,7 @@ struct Text {
             return cellRange.empty();
         }
 
-        bool
-        spaces(Text const &t) const {
+        bool spaces(Text const &t) const {
             if (empty())
                 return false;
             return last(cells(t)).space(t);

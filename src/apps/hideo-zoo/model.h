@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-media/icon.h>
 #include <karm-ui/reducer.h>
 
 namespace Hideo::Zoo {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-media/icon.h>
 #include <karm-sys/context.h>
 #include <karm-ui/box.h>
 #include <karm-ui/dialog.h>

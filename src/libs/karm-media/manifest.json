@@ -4,6 +4,7 @@
     "type": "lib",
     "description": "A media loader library",
     "requires": [
+        "karm-gfx",
         "karm-math",
         "karm-sys",
         "karm-logger",

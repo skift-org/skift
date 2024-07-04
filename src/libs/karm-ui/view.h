@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-gfx/text.h>
+#include <karm-media/icon.h>
 
 #include "node.h"
 

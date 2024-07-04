@@ -2,7 +2,6 @@
 
 #include <karm-math/radius.h>
 #include <karm-math/vec.h>
-#include <karm-media/font.h>
 
 #include "paint.h"
 

@@ -6,6 +6,7 @@
     "requires": [
         "textbox-spec",
         "karm-ui-impl",
+        "karm-media",
         "karm-gfx",
         "karm-events",
         "fira-code-font",

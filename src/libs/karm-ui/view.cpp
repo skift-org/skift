@@ -270,7 +270,7 @@ struct Icon : public View<Icon> {
         g.save();
         if (_color)
             g.fillStyle(_color.unwrap());
-        g.fill(bound().topStart(), _icon);
+        _icon.fill(g, bound().topStart());
         if (debugShowLayoutBounds)
             g.plot(bound(), Gfx::CYAN);
         g.restore();
@@ -305,7 +305,7 @@ struct Image : public View<Image> {
         g.save();
 
         if (_radius) {
-            g.fillStyle(_image);
+            g.fillStyle(_image.pixels());
             g.fill(bound(), *_radius);
         } else {
             g.blit(bound(), _image);

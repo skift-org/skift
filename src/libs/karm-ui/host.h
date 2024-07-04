@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/ring.h>
+#include <karm-gfx/text.h>
 #include <karm-sys/time.h>
 
 #include "node.h"
@@ -93,8 +94,13 @@ struct PerfGraph {
         }
 
         auto text = Io::format("FPS: {}", (isize)fps()).take();
+        Gfx::Text gText{Gfx::TextStyle{.font = Media::Font::fallback()}};
+        gText.append(text.str());
+        gText.layout(256);
+
         g.fillStyle(Gfx::WHITE);
-        g.fill({8, 16}, text);
+        g.origin({8, 8});
+        gText.paint(g);
 
         g.restore();
     }
@@ -179,7 +185,6 @@ struct Host : public Node {
 
         if (debugShowPerfGraph)
             _perf.paint(_g);
-
         _g.end();
 
         flip(_dirty);

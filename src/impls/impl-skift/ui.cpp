@@ -8,21 +8,21 @@ namespace Karm::Ui::_Embed {
 struct SkiftHost :
     public Host {
     Gfx::MutPixels _front;
-    Media::Image _back;
+    Strong<Gfx::Surface> _back;
 
-    SkiftHost(Child root, Gfx::MutPixels front, Media::Image back)
+    SkiftHost(Child root, Gfx::MutPixels front, Strong<Gfx::Surface> back)
         : Host(root),
           _front(front),
           _back(back) {
     }
 
     Gfx::MutPixels mutPixels() override {
-        return _back;
+        return _back->mutPixels();
     }
 
     void flip(Slice<Math::Recti> dirty) override {
         for (auto d : dirty) {
-            Gfx::blitUnsafe(_front.clip(d), _back.pixels().clip(d));
+            Gfx::blitUnsafe(_front.clip(d), _back->pixels().clip(d));
         }
     }
 
@@ -52,7 +52,7 @@ Res<Strong<Host>> makeHost(Child root) {
         Gfx::BGRA8888,
     };
 
-    auto back = Media::Image::alloc(
+    auto back = Gfx::Surface::alloc(
         front.size(), Gfx::BGRA8888
     );
 

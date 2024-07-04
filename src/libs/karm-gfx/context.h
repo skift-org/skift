@@ -5,7 +5,7 @@
 #include "paint.h"
 #include "path.h"
 #include "rast.h"
-#include "style.h"
+#include "stroke.h"
 
 namespace Karm::Gfx {
 
@@ -22,7 +22,7 @@ static LcdLayout VRGB = {{0.0, +0.33}, {0.0, 0.0}, {0.0, -0.33}};
 struct Context {
     struct Scope {
         Paint paint = Gfx::WHITE;
-        StrokeStyle strokeStyle{};
+        Stroke stroke{};
         Math::Recti clip{};
         Math::Trans2f trans = Math::Trans2f::identity();
     };
@@ -122,13 +122,13 @@ struct Context {
     Paint const &fillStyle();
 
     // Get the current stroke style.
-    StrokeStyle const &strokeStyle();
+    Stroke const &strokeStyle();
 
     // Set the current fill style.
     Context &fillStyle(Paint style);
 
     // Set the current stroke style.
-    Context &strokeStyle(StrokeStyle style);
+    Context &strokeStyle(Stroke style);
 
     // MARK: Drawing -----------------------------------------------------------
 
@@ -257,7 +257,7 @@ struct Context {
     void stroke();
 
     // Stroke the current path with the given style.
-    void stroke(StrokeStyle style);
+    void stroke(Stroke style);
 
     // MARK: Filters -----------------------------------------------------------
 

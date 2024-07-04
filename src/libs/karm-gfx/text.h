@@ -188,7 +188,7 @@ struct Text {
 
         g.moveTo(cs);
         g.lineTo(ce);
-        g.stroke(Gfx::stroke(color).withAlign(Gfx::CENTER_ALIGN).withWidth(2));
+        g.strokeStyle(Gfx::stroke(color).withAlign(Gfx::CENTER_ALIGN).withWidth(2));
     }
 
     struct Lbc {

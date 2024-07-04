@@ -27,7 +27,13 @@ static inline Demo BEZIER_DEMO{
                     g.begin();
                     g.moveTo(s.a);
                     g.cubicTo(s.b, s.c, s.d);
-                    g.strokeStyle(Gfx::stroke(Gfx::WHITE).withWidth(2).withAlign(Gfx::CENTER_ALIGN));
+
+                    g.strokeStyle(Gfx::Stroke{
+                        .paint = Gfx::WHITE,
+                        .width = 2,
+                        .align = Gfx::CENTER_ALIGN,
+                    });
+
                     g.stroke();
 
                     auto minusOffset = s.offset2(-50);

@@ -100,8 +100,8 @@ Paint const &Context::fillStyle() {
     return current().paint;
 }
 
-StrokeStyle const &Context::strokeStyle() {
-    return current().strokeStyle;
+Stroke const &Context::strokeStyle() {
+    return current().stroke;
 }
 
 Context &Context::fillStyle(Paint paint) {
@@ -109,8 +109,8 @@ Context &Context::fillStyle(Paint paint) {
     return *this;
 }
 
-Context &Context::strokeStyle(StrokeStyle style) {
-    current().strokeStyle = style;
+Context &Context::strokeStyle(Stroke style) {
+    current().stroke = style;
     return *this;
 }
 
@@ -192,7 +192,7 @@ void Context::fill(Math::Edgei edge, f64 thickness) {
     begin();
     moveTo(edge.start.cast<f64>());
     lineTo(edge.end.cast<f64>());
-    stroke(StrokeStyle().withWidth(thickness));
+    stroke(Stroke{}.withWidth(thickness));
 }
 
 void Context::stroke(Math::Recti r, Math::Radiusf radius) {
@@ -407,7 +407,7 @@ void Context::stroke() {
     stroke(strokeStyle());
 }
 
-void Context::stroke(StrokeStyle style) {
+void Context::stroke(Stroke style) {
     _poly.clear();
     createStroke(_poly, _path, style);
     _fill(style.paint);

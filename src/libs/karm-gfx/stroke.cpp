@@ -67,7 +67,7 @@ static void _createJoinRound(Math::Polyf &poly, Math::Edgef curr, Math::Edgef ne
     _createArc(poly, corner, curr.end, next.start, startAngle, delta, radius);
 }
 
-static void _createJoin(Math::Polyf &poly, StrokeStyle stroke, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, f64 radius) {
+static void _createJoin(Math::Polyf &poly, Stroke stroke, Math::Edgef curr, Math::Edgef next, Math::Vec2f corner, f64 radius) {
     // Make sure that the edge is not degenerate
     if (Math::Edgef{curr.end, next.start}.degenerated())
         return;
@@ -122,7 +122,7 @@ static void _createCapRound(Math::Polyf &poly, Cap cap, f64 width) {
     _createArc(poly, cap.center, cap.start, cap.end, startAngle, delta, width / 2);
 }
 
-static void _createCap(Math::Polyf &poly, StrokeStyle stroke, Cap cap) {
+static void _createCap(Math::Polyf &poly, Stroke stroke, Cap cap) {
     switch (stroke.cap) {
     case BUTT_CAP:
         _createCapButt(poly, cap);
@@ -140,7 +140,7 @@ static void _createCap(Math::Polyf &poly, StrokeStyle stroke, Cap cap) {
 
 // MARK: Public Api ------------------------------------------------------------
 
-[[gnu::flatten]] void createStroke(Math::Polyf &poly, Path const &path, StrokeStyle stroke) {
+[[gnu::flatten]] void createStroke(Math::Polyf &poly, Path const &path, Stroke stroke) {
     f64 outerDist = 0;
 
     if (stroke.align == CENTER_ALIGN) {

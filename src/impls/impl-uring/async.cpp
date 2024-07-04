@@ -331,7 +331,7 @@ struct UringSched : public Sys::Sched {
                 break;
 
             auto id = cqe->user_data;
-            auto job = _jobs.get(id).unwrap("invalid job id");
+            auto job = _jobs.get(id);
             job->complete(cqe);
             _jobs.del(id);
             io_uring_cqe_seen(&_ring, cqe);

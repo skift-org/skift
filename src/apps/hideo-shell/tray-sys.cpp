@@ -1,6 +1,7 @@
-#include <hideo-base/dialogs.h>
+#include <karm-kira/about-dialog.h>
 #include <karm-kira/slider.h>
 #include <karm-ui/box.h>
+#include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
@@ -91,7 +92,7 @@ Ui::Child quickTools(State const &) {
         Ui::button(
             [](auto &n) {
                 Model::bubble(n, Activate{Panel::NIL});
-                Ui::showDialog(n, aboutDialog(Mdi::SHIP_WHEEL, "Shell"s));
+                Ui::showDialog(n, Kr::aboutDialog("Shell"s));
             },
             Ui::ButtonStyle::secondary(),
             Mdi::INFORMATION

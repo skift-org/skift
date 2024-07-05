@@ -1,6 +1,7 @@
-#include <hideo-base/dialogs.h>
 #include <hideo-base/scafold.h>
 #include <karm-base/witty.h>
+#include <karm-kira/about-dialog.h>
+#include <karm-kira/badge.h>
 #include <karm-sys/time.h>
 #include <karm-ui/input.h>
 #include <karm-ui/view.h>
@@ -40,7 +41,7 @@ Ui::Child app() {
 
             auto licenseBtn = Ui::button(
                 [](auto &n) {
-                    Ui::showDialog(n, licenseDialog());
+                    Ui::showDialog(n, Kr::licenseDialog());
                 },
                 Ui::ButtonStyle::outline(),
                 Mdi::LICENSE,
@@ -52,7 +53,7 @@ Ui::Child app() {
                        Ui::hflow(
                            8,
                            titleText,
-                           versionBadge() | Ui::center()
+                           Kr::versionBadge() | Ui::center()
                        ),
                        Ui::empty(),
                        bodyText,

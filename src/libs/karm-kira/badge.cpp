@@ -1,4 +1,5 @@
 #include <karm-ui/box.h>
+#include <karm-ui/layout.h>
 
 #include "badge.h"
 
@@ -24,6 +25,22 @@ Ui::Child badge(BadgeStyle style, String t) {
     };
 
     return badge(COLORS[static_cast<u8>(style)], t);
+}
+
+Ui::Child versionBadge() {
+    Ui::Children badges = {};
+    badges.pushBack(Kr::badge(
+        Kr::BadgeStyle::INFO,
+        stringify$(__ck_version_value) ""s
+    ));
+#ifdef __ck_branch_nightly__
+    badges.pushBack(Kr::badge(Gfx::INDIGO400, "Nightly"s));
+#elif defined(__ck_branch_stable__)
+    // No badge for stable
+#else
+    badges.pushBack(Kr::badge(Gfx::EMERALD, "Dev"s));
+#endif
+    return Ui::hflow(4, badges);
 }
 
 } // namespace Karm::Kira

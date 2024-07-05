@@ -1,3 +1,4 @@
+#include <karm-kira/about-dialog.h>
 #include <karm-sys/context.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
@@ -6,7 +7,6 @@
 #include <karm-ui/popover.h>
 #include <karm-ui/view.h>
 
-#include "dialogs.h"
 #include "scafold.h"
 
 namespace Hideo {
@@ -17,7 +17,9 @@ static Ui::BoxStyle TOOLBAR = {
 
 Ui::Child aboutButton(Mdi::Icon icon, String title) {
     return Ui::button(
-        rbind(showAboutDialog, icon, title),
+        [title](auto &n) {
+            Ui::showDialog(n, Kr::aboutDialog(title));
+        },
         Ui::ButtonStyle::subtle(), icon, title
     );
 }

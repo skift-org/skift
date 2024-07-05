@@ -1,5 +1,4 @@
 #include <hideo-base/alert.h>
-#include <hideo-base/dialogs.h>
 #include <hideo-base/scafold.h>
 #include <karm-kira/context-menu.h>
 #include <karm-kira/dialog.h>

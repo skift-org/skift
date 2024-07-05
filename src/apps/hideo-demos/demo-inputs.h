@@ -1,6 +1,5 @@
 #pragma once
 
-#include <hideo-base/dialogs.h>
 #include <hideo-base/row.h>
 #include <hideo-base/scafold.h>
 #include <karm-kira/dialog.h>

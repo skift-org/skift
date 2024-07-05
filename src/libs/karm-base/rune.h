@@ -265,35 +265,6 @@ struct Utf32 {
 
 static_assert(StaticEncoding<Utf32>);
 
-// MARK: Pure ------------------------------------------------------------------
-
-struct Pure {
-    using Unit = Rune;
-    using One = _Single<Unit>;
-
-    always_inline static constexpr usize unitLen(Unit) {
-        return 1;
-    }
-
-    always_inline static constexpr usize runeLen(Rune) {
-        return 1;
-    }
-
-    always_inline static bool decodeUnit(Rune &result, DecodeInput<Unit> auto &in) {
-        result = in.next();
-        return true;
-    }
-
-    always_inline static bool encodeUnit(Rune c, EncodeOutput<Unit> auto &out) {
-        out.put(c);
-        return true;
-    }
-};
-
-[[gnu::used]] inline Pure PURE;
-
-static_assert(StaticEncoding<Pure>);
-
 // MARK: Ascii -----------------------------------------------------------------
 
 struct Ascii {

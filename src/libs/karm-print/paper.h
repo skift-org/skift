@@ -73,4 +73,14 @@ static constexpr PaperStock DLE = {"DLE", 110.0, 220.0};
 
 static constexpr Array ENVELOPE_SERIES = {C5E, COMM10E, DLE};
 
+// MARK: All Paper Stocks ------------------------------------------------------
+
+static constexpr Array PAPER_STOCKS = {
+    sub(A_SERIES),
+    B_SERIES,
+    C_SERIES,
+    US_SERIES,
+    ENVELOPE_SERIES,
+};
+
 } // namespace Karm::Print

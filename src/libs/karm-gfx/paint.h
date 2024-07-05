@@ -3,7 +3,6 @@
 #include <karm-base/union.h>
 #include <karm-base/vec.h>
 #include <karm-math/trans.h>
-#include <karm-media/image.h>
 
 #include "buffer.h"
 #include "color.h"

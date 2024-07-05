@@ -2,6 +2,7 @@
 
 // https://web.archive.org/web/20050408192410/http://sw-shader.sourceforge.net/rasterizer.html
 
+#include <karm-image/loader.h>
 #include <karm-math/edge.h>
 #include <karm-math/mesh.h>
 #include <karm-ui/box.h>
@@ -59,7 +60,7 @@ static inline Demo MESH_DEMO{
         mesh.offset(200.0);
         return Ui::reducer<Model>(mesh, [](Math::Mesh2f const &s) {
             auto canvas = Ui::canvas(
-                [=, image = Media::loadImageOrFallback("file:./src/specs/qoi/tests/res/kodim23.qoi"_url).unwrap()](Gfx::Context &g, Math::Vec2i) {
+                [=, image = Image::loadOrFallback("file:./src/specs/qoi/tests/res/kodim23.qoi"_url).unwrap()](Gfx::Context &g, Math::Vec2i) {
                     Gfx::Paint paint = image.pixels();
 
                     for (usize i = 0; i + 2 < s.index.len(); i += 3) {

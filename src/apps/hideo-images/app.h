@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-image/picture.h>
 #include <karm-ui/reducer.h>
 
 namespace Hideo::Images {
@@ -31,11 +32,11 @@ static inline void computeHistogram(Hist &hist, Gfx::Pixels pixels) {
 
 struct State {
     bool isEditor = false;
-    Res<Media::Image> image;
+    Res<Image::Picture> image;
     Hist hist;
     Gfx::Filter filter = Gfx::Unfiltered{};
 
-    State(Res<Media::Image> i) : image(i) {}
+    State(Res<Image::Picture> i) : image(i) {}
 };
 
 struct Refresh {};

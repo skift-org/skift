@@ -4,9 +4,10 @@
     "type": "lib",
     "description": "A graphical user interface library",
     "requires": [
-        "textbox-spec",
         "karm-ui-impl",
+        "karm-image",
         "karm-media",
+        "karm-text",
         "karm-gfx",
         "karm-events",
         "fira-code-font",

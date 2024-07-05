@@ -6,157 +6,157 @@ namespace Karm::Ui {
 
 // MARK: Text ------------------------------------------------------------------
 
-static Opt<Strong<Media::Fontface>> _regularFontface = NONE;
-Strong<Media::Fontface> regularFontface() {
+static Opt<Strong<Text::Fontface>> _regularFontface = NONE;
+Strong<Text::Fontface> regularFontface() {
     if (not _regularFontface) {
-        _regularFontface = Media::loadFontfaceOrFallback("bundle://inter-font/fonts/Inter-Regular.ttf"_url).unwrap();
+        _regularFontface = Text::loadFontfaceOrFallback("bundle://inter-font/fonts/Inter-Regular.ttf"_url).unwrap();
     }
     return *_regularFontface;
 }
 
-static Opt<Strong<Media::Fontface>> _mediumFontface = NONE;
-Strong<Media::Fontface> mediumFontface() {
+static Opt<Strong<Text::Fontface>> _mediumFontface = NONE;
+Strong<Text::Fontface> mediumFontface() {
     if (not _mediumFontface) {
-        _mediumFontface = Media::loadFontfaceOrFallback("bundle://inter-font/fonts/Inter-Medium.ttf"_url).unwrap();
+        _mediumFontface = Text::loadFontfaceOrFallback("bundle://inter-font/fonts/Inter-Medium.ttf"_url).unwrap();
     }
     return *_mediumFontface;
 }
 
-static Opt<Strong<Media::Fontface>> _boldFontface = NONE;
-Strong<Media::Fontface> boldFontface() {
+static Opt<Strong<Text::Fontface>> _boldFontface = NONE;
+Strong<Text::Fontface> boldFontface() {
     if (not _boldFontface) {
-        _boldFontface = Media::loadFontfaceOrFallback("bundle://inter-font/fonts/Inter-Bold.ttf"_url).unwrap();
+        _boldFontface = Text::loadFontfaceOrFallback("bundle://inter-font/fonts/Inter-Bold.ttf"_url).unwrap();
     }
     return *_boldFontface;
 }
 
-static Opt<Strong<Media::Fontface>> _italicFontface = NONE;
-Strong<Media::Fontface> italicFontface() {
+static Opt<Strong<Text::Fontface>> _italicFontface = NONE;
+Strong<Text::Fontface> italicFontface() {
     if (not _italicFontface) {
-        _italicFontface = Media::loadFontfaceOrFallback("bundle://inter-font/fonts/Inter-Italic.ttf"_url).unwrap();
+        _italicFontface = Text::loadFontfaceOrFallback("bundle://inter-font/fonts/Inter-Italic.ttf"_url).unwrap();
     }
     return *_italicFontface;
 }
 
-static Opt<Strong<Media::Fontface>> _codeFontface = NONE;
-Strong<Media::Fontface> codeFontface() {
+static Opt<Strong<Text::Fontface>> _codeFontface = NONE;
+Strong<Text::Fontface> codeFontface() {
     if (not _codeFontface) {
-        _codeFontface = Media::loadFontfaceOrFallback("bundle://fira-code-font/fonts/FiraCode-Regular.ttf"_url).unwrap();
+        _codeFontface = Text::loadFontfaceOrFallback("bundle://fira-code-font/fonts/FiraCode-Regular.ttf"_url).unwrap();
     }
     return *_codeFontface;
 }
 
-Gfx::TextStyle TextStyles::displayLarge() {
+Text::ProseStyle TextStyles::displayLarge() {
     return {
-        .font = Media::Font{
+        .font = Text::Font{
             regularFontface(),
             57,
         },
     };
 }
 
-Gfx::TextStyle TextStyles::displayMedium() {
+Text::ProseStyle TextStyles::displayMedium() {
     return {
-        .font = Media::Font{
+        .font = Text::Font{
             regularFontface(),
             45,
         },
     };
 }
 
-Gfx::TextStyle TextStyles::displaySmall() {
+Text::ProseStyle TextStyles::displaySmall() {
     return {
-        .font = Media::Font{
+        .font = Text::Font{
             regularFontface(),
             36,
         },
     };
 }
 
-Gfx::TextStyle TextStyles::headlineLarge() {
+Text::ProseStyle TextStyles::headlineLarge() {
     return {
-        .font = Media::Font{
+        .font = Text::Font{
             regularFontface(),
             32,
         },
     };
 }
 
-Gfx::TextStyle TextStyles::headlineMedium() {
+Text::ProseStyle TextStyles::headlineMedium() {
     return {
-        .font = Media::Font{
+        .font = Text::Font{
             regularFontface(),
             28,
         },
     };
 }
 
-Gfx::TextStyle TextStyles::headlineSmall() {
+Text::ProseStyle TextStyles::headlineSmall() {
     return {
-        .font = Media::Font{
+        .font = Text::Font{
             regularFontface(),
             24,
         },
     };
 }
 
-Gfx::TextStyle TextStyles::titleLarge() {
+Text::ProseStyle TextStyles::titleLarge() {
     return {
-        .font = Media::Font{
+        .font = Text::Font{
             regularFontface(),
             22,
         },
     };
 }
 
-Gfx::TextStyle TextStyles::titleMedium() {
+Text::ProseStyle TextStyles::titleMedium() {
     return {
-        .font = Media::Font{
+        .font = Text::Font{
             mediumFontface(),
             16,
         },
     };
 }
 
-Gfx::TextStyle TextStyles::titleSmall() {
+Text::ProseStyle TextStyles::titleSmall() {
     return {
-        .font = Media::Font{
+        .font = Text::Font{
             mediumFontface(),
             14,
         },
     };
 }
 
-Gfx::TextStyle TextStyles::labelLarge() {
+Text::ProseStyle TextStyles::labelLarge() {
     return {
-        .font = Media::Font{
+        .font = Text::Font{
             mediumFontface(),
             14,
         },
     };
 }
 
-Gfx::TextStyle TextStyles::labelMedium() {
+Text::ProseStyle TextStyles::labelMedium() {
     return {
-        .font = Media::Font{
+        .font = Text::Font{
             mediumFontface(),
             12,
         },
     };
 }
 
-Gfx::TextStyle TextStyles::labelSmall() {
+Text::ProseStyle TextStyles::labelSmall() {
     return {
-        .font = Media::Font{
+        .font = Text::Font{
             mediumFontface(),
             11,
         },
     };
 }
 
-Gfx::TextStyle TextStyles::bodyLarge() {
+Text::ProseStyle TextStyles::bodyLarge() {
     return {
-        .font = Media::Font{
+        .font = Text::Font{
             regularFontface(),
             16,
         },
@@ -164,9 +164,9 @@ Gfx::TextStyle TextStyles::bodyLarge() {
     };
 }
 
-Gfx::TextStyle TextStyles::bodyMedium() {
+Text::ProseStyle TextStyles::bodyMedium() {
     return {
-        .font = Media::Font{
+        .font = Text::Font{
             regularFontface(),
             14,
         },
@@ -174,9 +174,9 @@ Gfx::TextStyle TextStyles::bodyMedium() {
     };
 }
 
-Gfx::TextStyle TextStyles::bodySmall() {
+Text::ProseStyle TextStyles::bodySmall() {
     return {
-        .font = Media::Font{
+        .font = Text::Font{
             regularFontface(),
             12,
         },
@@ -184,9 +184,9 @@ Gfx::TextStyle TextStyles::bodySmall() {
     };
 }
 
-Gfx::TextStyle TextStyles::codeLarge() {
+Text::ProseStyle TextStyles::codeLarge() {
     return {
-        .font = Media::Font{
+        .font = Text::Font{
             codeFontface(),
             16,
         },
@@ -194,9 +194,9 @@ Gfx::TextStyle TextStyles::codeLarge() {
     };
 }
 
-Gfx::TextStyle TextStyles::codeMedium() {
+Text::ProseStyle TextStyles::codeMedium() {
     return {
-        .font = Media::Font{
+        .font = Text::Font{
             codeFontface(),
             14,
         },
@@ -204,9 +204,9 @@ Gfx::TextStyle TextStyles::codeMedium() {
     };
 }
 
-Gfx::TextStyle TextStyles::codeSmall() {
+Text::ProseStyle TextStyles::codeSmall() {
     return {
-        .font = Media::Font{
+        .font = Text::Font{
             codeFontface(),
             12,
         },
@@ -215,9 +215,9 @@ Gfx::TextStyle TextStyles::codeSmall() {
 }
 
 struct Text : public View<Text> {
-    Gfx::Text _text;
+    Karm::Text::Prose _text;
 
-    Text(Gfx::TextStyle style, Str text)
+    Text(::Text::ProseStyle style, Str text)
         : _text(style, text) {}
 
     void reconcile(Text &o) override {
@@ -244,7 +244,7 @@ struct Text : public View<Text> {
     }
 };
 
-Child text(Gfx::TextStyle style, Str text) {
+Child text(Karm::Text::ProseStyle style, Str text) {
     return makeStrong<Text>(style, text);
 }
 
@@ -292,13 +292,13 @@ Child icon(Mdi::Icon i, f64 size, Opt<Gfx::Color> color) {
 // MARK: Image -----------------------------------------------------------------
 
 struct Image : public View<Image> {
-    Media::Image _image;
+    Karm::Image::Picture _image;
     Opt<Math::Radiusf> _radius;
 
-    Image(Media::Image image)
+    Image(Karm::Image::Picture image)
         : _image(image) {}
 
-    Image(Media::Image image, Math::Radiusf radius)
+    Image(Karm::Image::Picture image, Math::Radiusf radius)
         : _image(image), _radius(radius) {}
 
     void paint(Gfx::Context &g, Math::Recti) override {
@@ -321,11 +321,11 @@ struct Image : public View<Image> {
     }
 };
 
-Child image(Media::Image image) {
+Child image(Karm::Image::Picture image) {
     return makeStrong<Image>(image);
 }
 
-Child image(Media::Image image, Math::Radiusf radius) {
+Child image(Karm::Image::Picture image, Math::Radiusf radius) {
     return makeStrong<Image>(image, radius);
 }
 

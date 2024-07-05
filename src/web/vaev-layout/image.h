@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-media/image.h>
+#include <karm-image/picture.h>
 
 #include "frag.h"
 
@@ -9,9 +9,9 @@ namespace Vaev::Layout {
 struct ImageFrag : public Frag {
     static constexpr auto TYPE = IMAGE;
 
-    Media::Image _image;
+    Image::Picture _image;
 
-    ImageFrag(Strong<Style::Computed> style, Media::Image image)
+    ImageFrag(Strong<Style::Computed> style, Image::Picture image)
         : Frag(style), _image(image) {
     }
 

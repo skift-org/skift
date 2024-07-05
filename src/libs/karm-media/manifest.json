@@ -4,14 +4,7 @@
     "type": "lib",
     "description": "A media loader library",
     "requires": [
-        "karm-gfx",
-        "karm-math",
-        "karm-sys",
-        "karm-logger",
-        "jpeg-spec",
-        "png-spec",
-        "qoi-spec",
-        "ttf-spec",
+        "karm-text",
         "mdi-spec"
     ]
 }

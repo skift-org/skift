@@ -53,7 +53,7 @@ Ui::Child icon(Entry const &e) {
         [&](Mdi::Icon i) {
             return Ui::icon(i, 64);
         },
-        [&](Media::Image i) {
+        [&](Image::Picture i) {
             return Ui::pinSize(64, Ui::image(i));
         },
         [&](None) {

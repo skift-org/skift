@@ -1,9 +1,7 @@
 #pragma once
 
+#include <karm-text/loader.h>
 #include <mdi/spec.h>
-
-#include "font.h"
-#include "loader.h"
 
 namespace Karm::Media {
 
@@ -11,7 +9,7 @@ struct Icon {
     Mdi::Icon _code;
     f64 _size;
 
-    static Strong<Fontface> fontface();
+    static Strong<Text::Fontface> fontface();
 
     static Res<Icon> byName(Str query, f64 size = 18) {
         return Ok(Icon(try$(Mdi::byName(query)), size));

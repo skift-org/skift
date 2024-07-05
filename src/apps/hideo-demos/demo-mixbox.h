@@ -2,8 +2,8 @@
 
 #pragma once
 
+#include <karm-gfx/mixbox/mixbox.h>
 #include <karm-ui/view.h>
-#include <mixbox/mixbox.h>
 
 #include "base.h"
 

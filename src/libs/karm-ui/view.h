@@ -1,7 +1,8 @@
 #pragma once
 
-#include <karm-gfx/text.h>
+#include <karm-image/picture.h>
 #include <karm-media/icon.h>
+#include <karm-text/prose.h>
 
 #include "node.h"
 
@@ -29,37 +30,37 @@ private:
     TextStyles() = default;
 
 public:
-    static Gfx::TextStyle displayLarge();
-    static Gfx::TextStyle displayMedium();
-    static Gfx::TextStyle displaySmall();
+    static Text::ProseStyle displayLarge();
+    static Text::ProseStyle displayMedium();
+    static Text::ProseStyle displaySmall();
 
-    static Gfx::TextStyle headlineLarge();
-    static Gfx::TextStyle headlineMedium();
-    static Gfx::TextStyle headlineSmall();
+    static Text::ProseStyle headlineLarge();
+    static Text::ProseStyle headlineMedium();
+    static Text::ProseStyle headlineSmall();
 
-    static Gfx::TextStyle titleLarge();
-    static Gfx::TextStyle titleMedium();
-    static Gfx::TextStyle titleSmall();
+    static Text::ProseStyle titleLarge();
+    static Text::ProseStyle titleMedium();
+    static Text::ProseStyle titleSmall();
 
-    static Gfx::TextStyle labelLarge();
-    static Gfx::TextStyle labelMedium();
-    static Gfx::TextStyle labelSmall();
+    static Text::ProseStyle labelLarge();
+    static Text::ProseStyle labelMedium();
+    static Text::ProseStyle labelSmall();
 
-    static Gfx::TextStyle bodyLarge();
-    static Gfx::TextStyle bodyMedium();
-    static Gfx::TextStyle bodySmall();
+    static Text::ProseStyle bodyLarge();
+    static Text::ProseStyle bodyMedium();
+    static Text::ProseStyle bodySmall();
 
-    static Gfx::TextStyle codeLarge();
-    static Gfx::TextStyle codeMedium();
-    static Gfx::TextStyle codeSmall();
+    static Text::ProseStyle codeLarge();
+    static Text::ProseStyle codeMedium();
+    static Text::ProseStyle codeSmall();
 };
 
-Child text(Gfx::TextStyle style, Str text);
+Child text(Text::ProseStyle style, Str text);
 
 Child text(Str text);
 
 template <typename... Args>
-inline Child text(Gfx::TextStyle style, Str format, Args &&...args) {
+inline Child text(Text::ProseStyle style, Str format, Args &&...args) {
     return text(style, Io::format(format, std::forward<Args>(args)...).unwrap());
 }
 
@@ -109,9 +110,9 @@ Child icon(Mdi::Icon icon, f64 size, Opt<Gfx::Color> color = NONE);
 
 // MARK: Image -----------------------------------------------------------------
 
-Child image(Media::Image image);
+Child image(Image::Picture image);
 
-Child image(Media::Image image, Math::Radiusf radius);
+Child image(Image::Picture image, Math::Radiusf radius);
 
 // MARK: Canvas ----------------------------------------------------------------
 

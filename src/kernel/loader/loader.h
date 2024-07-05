@@ -1,8 +1,8 @@
 #pragma once
 
+#include <karm-image/loader.h>
 #include <karm-logger/logger.h>
 #include <karm-media/icon.h>
-#include <karm-media/image.h>
 #include <karm-sys/context.h>
 #include <karm-sys/file.h>
 #include <vaev-json/json.h>
@@ -33,7 +33,7 @@ struct Blob {
 };
 
 struct Entry {
-    Union<None, Mdi::Icon, Media::Image> icon = NONE;
+    Union<None, Mdi::Icon, Image::Picture> icon = NONE;
     String name;
     Blob kernel;
     Vec<Blob> blobs;
@@ -46,7 +46,7 @@ struct Entry {
 
         auto maybeIcon = json.get("icon").take<String>();
         if (maybeIcon) {
-            auto maybeImage = Media::loadImage(Mime::Url::parse(*maybeIcon));
+            auto maybeImage = Image::load(Mime::Url::parse(*maybeIcon));
             if (not maybeImage) {
                 entry.icon = Mdi::byName(*maybeIcon).unwrap();
             } else {

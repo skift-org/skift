@@ -1,4 +1,5 @@
 #include <hideo-base/scafold.h>
+#include <karm-image/loader.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
@@ -28,11 +29,11 @@ Ui::Child app(State initial) {
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto &args = useArgs(ctx);
-    Res<Media::Image> image = Error::invalidInput("No image provided");
+    Res<Image::Picture> image = Error::invalidInput("No image provided");
 
     if (args.len()) {
         auto url = co_try$(Mime::parseUrlOrPath(args[0]));
-        image = Media::loadImage(url);
+        image = Image::load(url);
     }
 
     co_return Ui::runApp(ctx, Hideo::Images::app(image));

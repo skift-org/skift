@@ -1,3 +1,4 @@
+#include <karm-image/loader.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 
@@ -10,7 +11,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     Hideo::Shell::State state = {
         .isMobile = isMobile,
         .dateTime = Sys::dateTime(),
-        .background = co_try$(Media::loadImageOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url)),
+        .background = co_try$(Image::loadOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url)),
         .noti = {},
         .manifests = {
             makeStrong<Hideo::Shell::Manifest>(Mdi::INFORMATION_OUTLINE, "About"s, Gfx::BLUE_RAMP),

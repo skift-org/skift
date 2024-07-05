@@ -4,6 +4,7 @@
 #include <karm-io/funcs.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
+#include <karm-text/edit.h>
 #include <karm-ui/app.h>
 #include <karm-ui/scroll.h>
 
@@ -12,7 +13,7 @@ namespace Hideo::Text {
 struct State {
     Opt<Mime::Url> url;
     Opt<Error> error;
-    Strong<Textbox::Model> text;
+    Strong<Karm::Text::Model> text;
 };
 
 struct New {
@@ -22,17 +23,17 @@ struct Save {
     bool prompt = false;
 };
 
-using Action = Union<Textbox::Action, New, Save>;
+using Action = Union<Karm::Text::Action, New, Save>;
 
 void reduce(State &s, Action a) {
     a.visit(::Visitor{
-        [&](Textbox::Action &t) {
+        [&](Karm::Text::Action &t) {
             s.text->reduce(t);
         },
         [&](New &) {
             s.url = NONE;
             s.error = NONE;
-            s.text = makeStrong<Textbox::Model>();
+            s.text = makeStrong<Karm::Text::Model>();
         },
         [&](Save &) {
 
@@ -42,7 +43,7 @@ void reduce(State &s, Action a) {
 
 using Model = Ui::Model<State, Action, reduce>;
 
-Ui::Child editor(Strong<Textbox::Model> text) {
+Ui::Child editor(Strong<Karm::Text::Model> text) {
     return Ui::input(text, [](Ui::Node &n, Action a) {
                Model::bubble(n, a);
            }) |
@@ -50,7 +51,7 @@ Ui::Child editor(Strong<Textbox::Model> text) {
 }
 
 Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
-    auto text = makeStrong<Textbox::Model>();
+    auto text = makeStrong<Karm::Text::Model>();
     Opt<Error> error = NONE;
 
     if (str) {
@@ -77,7 +78,7 @@ Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
                                Ui::ButtonStyle::subtle(), Mdi::FOLDER),
                     Ui::button(Model::bindIf(s.text->dirty(), Save{}), Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE), Ui::button(Model::bindIf(s.text->dirty(), Save{true}), Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE_PLUS)
                 ),
-                .endTools = slots$(Ui::button(Model::bindIf<Textbox::Action>(s.text->canUndo(), Textbox::Action::UNDO), Ui::ButtonStyle::subtle(), Mdi::UNDO), Ui::button(Model::bindIf<Textbox::Action>(s.text->canRedo(), Textbox::Action::REDO), Ui::ButtonStyle::subtle(), Mdi::REDO)),
+                .endTools = slots$(Ui::button(Model::bindIf<Karm::Text::Action>(s.text->canUndo(), Karm::Text::Action::UNDO), Ui::ButtonStyle::subtle(), Mdi::UNDO), Ui::button(Model::bindIf<Karm::Text::Action>(s.text->canRedo(), Karm::Text::Action::REDO), Ui::ButtonStyle::subtle(), Mdi::REDO)),
                 .body = [=] {
                     return Ui::vflow(
                         Ui::hflow(

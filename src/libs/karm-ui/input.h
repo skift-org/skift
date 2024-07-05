@@ -1,6 +1,6 @@
 #pragma once
 
-#include <textbox/model.h>
+#include <karm-text/edit.h>
 
 #include "box.h"
 #include "funcs.h"
@@ -158,9 +158,9 @@ Child button(OnPress onPress, Mdi::Icon i, Str t);
 
 // MARK: Input -----------------------------------------------------------------
 
-Child input(Gfx::TextStyle style, Strong<Textbox::Model> text, OnChange<Textbox::Action> onChange);
+Child input(Text::ProseStyle style, Strong<Text::Model> text, OnChange<Text::Action> onChange);
 
-Child input(Strong<Textbox::Model> text, OnChange<Textbox::Action> onChange);
+Child input(Strong<Text::Model> text, OnChange<Text::Action> onChange);
 
 // MARK: Slider ----------------------------------------------------------------
 

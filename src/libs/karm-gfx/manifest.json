@@ -6,5 +6,8 @@
     "requires": [
         "karm-math",
         "karm-io"
+    ],
+    "subdirs": [
+        "mixbox"
     ]
 }

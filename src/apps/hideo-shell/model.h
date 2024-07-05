@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-image/picture.h>
 #include <karm-ui/reducer.h>
 
 #include "instance.h"
@@ -33,7 +34,7 @@ struct State : Meta::NoCopy {
 
     DateTime dateTime;
 
-    Media::Image background;
+    Image::Picture background;
     Vec<Noti> noti;
     Vec<Strong<Manifest>> manifests;
     Vec<Strong<Instance>> instances;

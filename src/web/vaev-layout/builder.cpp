@@ -46,7 +46,7 @@ void buildElement(Style::Computer &c, Dom::Element const &el, Flow &parent) {
     auto style = c.computeFor(el);
 
     if (el.tagName == Html::IMG) {
-        Media::Image img = Gfx::Surface::fallback();
+        Image::Picture img = Gfx::Surface::fallback();
         parent.add(makeStrong<ImageFrag>(style, img));
         return;
     }

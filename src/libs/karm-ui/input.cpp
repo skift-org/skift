@@ -266,14 +266,14 @@ Child button(OnPress onPress, Mdi::Icon i, Str t) {
 // MARK: Input -----------------------------------------------------------------
 
 struct Input : public View<Input> {
-    Gfx::TextStyle _style;
+    Text::ProseStyle _style;
 
-    Strong<Textbox::Model> _model;
-    OnChange<Textbox::Action> _onChange;
+    Strong<Text::Model> _model;
+    OnChange<Text::Action> _onChange;
 
-    Opt<Gfx::Text> _text;
+    Opt<Text::Prose> _text;
 
-    Input(Gfx::TextStyle style, Strong<Textbox::Model> model, OnChange<Textbox::Action> onChange)
+    Input(Text::ProseStyle style, Strong<Text::Model> model, OnChange<Text::Action> onChange)
         : _style(style), _model(model), _onChange(std::move(onChange)) {}
 
     void reconcile(Input &o) override {
@@ -286,9 +286,9 @@ struct Input : public View<Input> {
         _text = NONE;
     }
 
-    Gfx::Text &_ensureText() {
+    Text::Prose &_ensureText() {
         if (not _text) {
-            _text = Gfx::Text(_style);
+            _text = Text::Prose(_style);
             _text->append(_model->runes());
         }
         return *_text;
@@ -310,7 +310,7 @@ struct Input : public View<Input> {
     }
 
     void event(Sys::Event &e) override {
-        auto a = Textbox::Action::fromEvent(e);
+        auto a = Text::Action::fromEvent(e);
         if (a) {
             e.accept();
             _onChange(*this, *a);
@@ -328,17 +328,13 @@ struct Input : public View<Input> {
     }
 };
 
-Child input(Gfx::TextStyle style, Strong<Textbox::Model> text, OnChange<Textbox::Action> onChange) {
+Child input(Text::ProseStyle style, Strong<Text::Model> text, OnChange<Text::Action> onChange) {
     return makeStrong<Input>(style, text, std::move(onChange));
 }
 
-Child input(Strong<Textbox::Model> text, OnChange<Textbox::Action> onChange) {
+Child input(Strong<Text::Model> text, OnChange<Text::Action> onChange) {
     return makeStrong<Input>(TextStyles::bodyMedium(), text, std::move(onChange));
 }
-
-// MARK: Checkbox --------------------------------------------------------------
-
-// MARK: Radio ------------------------------------------------------------------
 
 // MARK: Slider -----------------------------------------------------------------
 

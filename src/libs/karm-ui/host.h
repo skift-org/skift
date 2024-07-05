@@ -1,8 +1,9 @@
 #pragma once
 
 #include <karm-base/ring.h>
-#include <karm-gfx/text.h>
 #include <karm-sys/time.h>
+#include <karm-text/loader.h>
+#include <karm-text/prose.h>
 
 #include "node.h"
 
@@ -94,7 +95,7 @@ struct PerfGraph {
         }
 
         auto text = Io::format("FPS: {}", (isize)fps()).take();
-        Gfx::Text gText{Gfx::TextStyle{.font = Media::Font::fallback()}};
+        Text::Prose gText{Text::ProseStyle{.font = Text::Font::fallback()}};
         gText.append(text.str());
         gText.layout(256);
 

@@ -1,5 +1,6 @@
 #include <hideo-base/scafold.h>
 #include <karm-base/witty.h>
+#include <karm-image/loader.h>
 #include <karm-kira/about-dialog.h>
 #include <karm-kira/badge.h>
 #include <karm-sys/time.h>
@@ -29,7 +30,7 @@ Ui::Child app() {
                 auto body = Ui::hflow(
                     8,
                     Math::Align::CENTER,
-                    Ui::image(Media::loadImage("bundle://hideo-about/pride.qoi"_url).unwrap(), 4),
+                    Ui::image(Image::load("bundle://hideo-about/pride.qoi"_url).unwrap(), 4),
                     Ui::bodySmall(wholesome(v))
                 );
 

@@ -1,9 +1,0 @@
-{
-    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "qoi-spec",
-    "type": "lib",
-    "description": "QOI image format specification",
-    "requires": [
-        "karm-base"
-    ]
-}

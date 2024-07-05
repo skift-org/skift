@@ -1,3 +1,4 @@
+#include <karm-image/loader.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 
@@ -25,7 +26,7 @@ Ui::Child app() {
     );
 
     return Ui::stack(
-               Ui::image(Media::loadImageOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url).unwrap()) | Ui::cover(),
+               Ui::image(Image::loadOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url).unwrap()) | Ui::cover(),
                clock | Ui::center()
            ) |
            Ui::maxSize(192);

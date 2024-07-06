@@ -43,6 +43,28 @@ class Image:
         product = self.install(componentSpec, targetSpec)
         self.cp(str(product.path), dest=dest)
 
+    def _installProduct(self, product: builder.ProductScope):
+        component = product.component
+        target = product.target
+
+        for depId in component.resolved[target.id].required + [component.id]:
+            dep = self._registry.lookup(depId, model.Component)
+            if dep is None:
+                raise Exception(f"Component {depId} not found")
+
+            for res in builder.listRes(dep):
+                rel = Path(res).relative_to(dep.subpath("res"))
+
+                self.cpRef("_index", res, f"{depId}/{rel}")
+                self.cpRef(component.id, res, f"{depId}/{rel}")
+
+        if component.type == model.Kind.EXE:
+            self.cpRef("_index", str(product.path), f"{component.id}/_bin")
+            self.cpRef(component.id, str(product.path), f"{component.id}/_bin")
+        else:
+            self.cpRef("_index", str(product.path), f"{component.id}/_lib")
+            self.cpRef(component.id, str(product.path), f"{component.id}/_lib")
+
     def install(self, componentSpec: str, targetSpec: str) -> builder.ProductScope:
         self._logger.info(f"Installing {componentSpec}...")
         component = self._registry.lookup(componentSpec, model.Component)
@@ -54,20 +76,20 @@ class Image:
         scope = builder.TargetScope(self._registry, target)
         product = builder.build(scope, component)[0]
 
-        for depId in component.resolved[target.id].required + [componentSpec]:
-            dep = self._registry.lookup(depId, model.Component)
-            if dep is None:
-                raise Exception(f"Component {depId} not found")
-
-            for res in builder.listRes(dep):
-                rel = Path(res).relative_to(dep.subpath("res"))
-                self.cpRef("_index", res, f"{depId}/{rel}")
-                self.cpRef(componentSpec, res, f"{depId}/{rel}")
-
-        self.cpRef("_index", str(product.path), f"{componentSpec}/_bin")
-        self.cpRef(componentSpec, str(product.path), f"{componentSpec}/_bin")
+        self._installProduct(product)
 
         return product
+
+    def installAll(self, targetSpec: str) -> list[builder.ProductScope]:
+        target = self._registry.lookup(targetSpec, model.Target)
+        assert target is not None
+
+        scope = builder.TargetScope(self._registry, target)
+        products = builder.build(scope, "all")
+        for product in products:
+            self._installProduct(product)
+
+        return products
 
     def cp(self, src: str, dest: str):
         self._logger.info(f"Copying {src} to {dest}...")
@@ -84,6 +106,8 @@ class Image:
     def finalize(self) -> str:
         if not self._finalized:
             for k, v in self._paks.items():
-                self._store.write(json.dumps(v, indent=4).encode("utf-8"), f"bundles/{k}.json")
+                self._store.write(
+                    json.dumps(v, indent=4).encode("utf-8"), f"bundles/{k}.json"
+                )
             self._finalized = self._store.finalize()
         return self._finalized

@@ -173,6 +173,11 @@ def _():
     everythingIsOk = everythingIsOk & commandIsAvailable("chatty")
     everythingIsOk = everythingIsOk & commandIsAvailable("pkg-config")
 
+    everythingIsOk = everythingIsOk & commandIsAvailable("sgdisk")
+    everythingIsOk = everythingIsOk & commandIsAvailable("mformat")
+    everythingIsOk = everythingIsOk & commandIsAvailable("mcopy")
+    everythingIsOk = everythingIsOk & commandIsAvailable("mmd")
+
     HEADERS = {
         "coroutine": [
             "std::coroutine_handle",

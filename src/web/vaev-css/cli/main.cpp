@@ -3,7 +3,7 @@
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <karm-sys/time.h>
-#include <vaev-css/mod.h>
+#include <vaev-css/parse.h>
 #include <vaev-css/parser.h>
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {

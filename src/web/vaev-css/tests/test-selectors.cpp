@@ -1,8 +1,10 @@
 #include <karm-test/macros.h>
 #include <vaev-css/selectors.h>
 
-#include "vaev-css/mod.h"
+#include "../parse.h"
+
 namespace Vaev::Css::Tests {
+
 // setup
 static Style::Selector parse(Str input) {
     // logDebug("input: '{}'", input);
@@ -28,6 +30,7 @@ test$("vaev-css-parse-simple-selectors") {
 
     return Ok();
 }
+
 test$("vaev-css-parse-nfix-selectors") {
     static auto const htmlSel = Style::TypeSelector{Vaev::Html::HTML};
     static auto const classSel = Style::ClassSelector{"className"s};
@@ -41,6 +44,7 @@ test$("vaev-css-parse-nfix-selectors") {
 
     return Ok();
 }
+
 test$("vaev-css-parse-infix-selectors") {
     static auto const htmlSel = Style::TypeSelector{Vaev::Html::HTML};
     static auto const classSel = Style::ClassSelector{"className"s};

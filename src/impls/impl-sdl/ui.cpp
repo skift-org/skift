@@ -544,6 +544,15 @@ struct SdlHost :
                 SDL_SetWindowPosition(_window, pos.x, pos.y);
             }
             event.accept();
+        } else if (event.is<Events::RequestMinimizeEvent>()) {
+            SDL_MinimizeWindow(_window);
+            event.accept();
+        } else if (event.is<Events::RequestMaximizeEvent>()) {
+            if (SDL_GetWindowFlags(_window) & SDL_WINDOW_MAXIMIZED)
+                SDL_RestoreWindow(_window);
+            else
+                SDL_MaximizeWindow(_window);
+            event.accept();
         }
 
         Host::bubble(event);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "edge.h"
+#include "trans.h"
 #include "vec.h"
 
 namespace Karm::Math {
@@ -63,6 +64,14 @@ struct Poly {
     void clear() {
         _edges.clear();
         _bound = NONE;
+    }
+
+    void transform(Trans2<T> const &trans) {
+        _bound = NONE;
+        for (auto &e : _edges) {
+            e.start = trans.apply(e.start);
+            e.end = trans.apply(e.end);
+        }
     }
 };
 

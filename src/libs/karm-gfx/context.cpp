@@ -12,7 +12,6 @@ void Context::begin(MutPixels p) {
     _stack.pushBack({
         .clip = pixels().bound(),
     });
-    _updateTransform();
 }
 
 void Context::end() {
@@ -52,7 +51,6 @@ void Context::restore() {
         panic("restore without save");
 
     _stack.popBack();
-    _updateTransform();
 }
 
 // MARK: Origin & Clipping -----------------------------------------------------
@@ -71,7 +69,6 @@ void Context::origin(Math::Vec2i pos) {
 void Context::transform(Math::Trans2f trans) {
     auto &t = current().trans;
     t = trans.multiply(t);
-    _updateTransform();
 }
 
 void Context::translate(Math::Vec2f pos) {
@@ -400,6 +397,7 @@ void Context::fill(FillRule rule) {
 void Context::fill(Paint paint, FillRule rule) {
     _poly.clear();
     createSolid(_poly, _path);
+    _poly.transform(current().trans);
     _fill(paint, rule);
 }
 
@@ -410,6 +408,7 @@ void Context::stroke() {
 void Context::stroke(Stroke style) {
     _poly.clear();
     createStroke(_poly, _path, style);
+    _poly.transform(current().trans);
     _fill(style.paint);
 }
 

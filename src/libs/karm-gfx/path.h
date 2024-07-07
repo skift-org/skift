@@ -76,7 +76,6 @@ struct Path {
 
     Math::Vec2f _lastCp;
     Math::Vec2f _lastP;
-    Math::Trans2f _trans = Math::Trans2f::identity();
 
     auto iterContours() const {
         struct _Contour : public Slice<Math::Vec2f> {
@@ -114,16 +113,6 @@ struct Path {
     void _flattenQuadraticTo(Math::Vec2f start, Math::Vec2f cp, Math::Vec2f point);
 
     void _flattenArcTo(Math::Vec2f start, Math::Vec2f radius, f64 angle, Flags flags, Math::Vec2f point);
-
-    // MARK: Transform ---------------------------------------------------------
-
-    void transform(Math::Trans2f trans) {
-        _trans = trans;
-    }
-
-    Math::Trans2f transform() {
-        return _trans;
-    }
 
     // MARK: Operations --------------------------------------------------------
 

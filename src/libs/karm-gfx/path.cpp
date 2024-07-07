@@ -19,7 +19,6 @@ void Path::_flattenClose() {
 }
 
 [[gnu::flatten]] void Path::_flattenLineTo(Math::Vec2f p) {
-    p = _trans.apply(p);
     _flattenLineToNoTrans(p);
 }
 
@@ -39,11 +38,6 @@ void Path::_flattenLineToNoTrans(Math::Vec2f p) {
 }
 
 [[gnu::flatten]] void Path::_flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d) {
-    a = _trans.apply(a);
-    b = _trans.apply(b);
-    c = _trans.apply(c);
-    d = _trans.apply(d);
-
     _flattenCubicToNoTrans(a, b, c, d, 0);
 }
 

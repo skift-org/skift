@@ -1,5 +1,6 @@
 #include <hideo-base/scafold.h>
 #include <karm-kira/navbar.h>
+#include <karm-kira/toggle.h>
 #include <karm-sys/time.h>
 #include <karm-ui/anim.h>
 
@@ -45,6 +46,78 @@ struct Clock : public Ui::View<Clock> {
     }
 };
 
+Ui::Child clock(Time time) {
+    return makeStrong<Clock>(time);
+}
+
+// MARK: Alarm Page ------------------------------------------------------------
+
+Ui::Child alarmCard(Time alarm, bool enabled) {
+    return Ui::hflow(
+               24,
+               Math::Align::CENTER,
+               Ui::displayMedium("{02}:{02}", alarm.hour, alarm.minute),
+               Ui::grow(NONE),
+               Kr::toggle(enabled, NONE)
+           ) |
+           Ui::box({
+               .padding = 12,
+               .borderRadius = 12,
+               .backgroundPaint = Ui::GRAY900,
+           });
+}
+
+Ui::Child alarmPage() {
+    return Ui::vflow(
+               12,
+               alarmCard({0, 0, 8}, true),
+               alarmCard({0, 0, 12}, false),
+               alarmCard({0, 0, 18}, true),
+               alarmCard({0, 0, 22}, false)
+           ) |
+           Ui::spacing(12);
+}
+
+// MARK: Clock Page ------------------------------------------------------------
+
+Ui::Child clockPage(State const &s) {
+    auto time = s.dateTime.time;
+
+    return Ui::vflow(
+               12,
+               clock(time) | Ui::pinSize({200, 200}),
+               Ui::displayMedium("{02}:{02}:{02}", time.hour, time.minute, time.second) | Ui::center()
+           ) |
+           Ui::spacing(12);
+}
+
+// MARK: Timer Page ------------------------------------------------------------
+
+Ui::Child timerPage() {
+    return Ui::labelLarge("Timer");
+}
+
+// MARK: Stopwatch Page --------------------------------------------------------
+
+Ui::Child stopwatchPage() {
+    return Ui::labelLarge("Stopwatch");
+}
+
+// MARK: App -------------------------------------------------------------------
+
+Ui::Child appContent(State const &s) {
+    switch (s.page) {
+    case Page::ALARM:
+        return alarmPage();
+    case Page::CLOCK:
+        return clockPage(s);
+    case Page::TIMER:
+        return timerPage();
+    case Page::STOPWATCH:
+        return stopwatchPage();
+    }
+}
+
 Ui::Child app() {
     return Ui::reducer<Model>(
         [](State const &s) {
@@ -80,22 +153,15 @@ Ui::Child app() {
                         ),
                     });
 
-                    auto body = Ui::carousel(
-                        (usize)s.page,
-                        {
-                            Ui::labelLarge("Alarm"),
-                            makeStrong<Clock>(Sys::dateTime().time),
-                            Ui::labelLarge("Timer"),
-                            Ui::labelLarge("Stopwatch"),
-                        }
-                    );
-
                     return Ui::vflow(
-                        Ui::vflow(
-                            Ui::titleLarge(toStr(s.page)) | Ui::hcenter(),
-                            body | Ui::grow()
-                        ) |
-                            Ui::spacing({8, 24, 8, 0}) | Ui::grow(),
+                        Ui::hflow(
+                            0,
+                            Math::Align::CENTER,
+                            Ui::titleLarge(toStr(s.page)),
+                            Ui::grow(NONE),
+                            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::DOTS_HORIZONTAL)
+                        ) | Ui::spacing({18, 18, 18, 0}),
+                        appContent(s) | Ui::grow(),
                         navbar
                     );
                 },

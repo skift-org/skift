@@ -48,10 +48,11 @@ struct PerfRecord {
 struct PerfGraph {
     usize _index{};
     Array<PerfRecord, 256> _records{};
-    f64 _frameTime = 0;
+    f64 _frameTime = 1;
 
     void record(PerfEvent e) {
-        _records[_index % 256] = PerfRecord{e, Sys::now(), 0};
+        auto now = Sys::now();
+        _records[_index % 256] = PerfRecord{e, now, now};
     }
 
     auto end() {
@@ -71,7 +72,7 @@ struct PerfGraph {
     }
 
     Math::Recti bound() {
-        return {0, 0, 256, 100};
+        return {0, 0, 256, 64};
     }
 
     void paint(Gfx::Context &g) {
@@ -83,7 +84,7 @@ struct PerfGraph {
         g.strokeStyle(Gfx::stroke(Gfx::GREEN.withOpacity(0.5)).withAlign(Gfx::INSIDE_ALIGN));
         g.stroke();
         g.strokeStyle(Gfx::stroke(Gfx::WHITE.withOpacity(0.5)).withAlign(Gfx::INSIDE_ALIGN));
-        g.stroke(Math::Edgei{0, (isize)(FRAME_TIME * 1000 * 2), 256, (isize)(FRAME_TIME * 1000 * 2)});
+        g.stroke(Math::Edgei{0, (isize)(FRAME_TIME * 1000 * 2), bound().width, (isize)(FRAME_TIME * 1000 * 2)});
 
         for (isize i = 0; i < 256; ++i) {
             auto e = _records[(_index + i) % 256];
@@ -100,7 +101,7 @@ struct PerfGraph {
         gText.layout(256);
 
         g.fillStyle(Gfx::WHITE);
-        g.origin({8, 8});
+        g.origin({8, 4});
         gText.paint(g);
 
         g.restore();
@@ -163,6 +164,9 @@ struct Host : public Node {
             g.stroke(r);
         }
 
+        if (debugShowPerfGraph)
+            _perf.paint(_g);
+
         g.restore();
     }
 
@@ -184,8 +188,6 @@ struct Host : public Node {
             maxStutter = elapsed.toMSecs();
         }
 
-        if (debugShowPerfGraph)
-            _perf.paint(_g);
         _g.end();
 
         flip(_dirty);

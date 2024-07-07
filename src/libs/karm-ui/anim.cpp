@@ -68,6 +68,48 @@ Child slideIn(SlideFrom from, Ui::Child child) {
     return makeStrong<SlideIn>(from, std::move(child));
 }
 
+// MARK: Scale In --------------------------------------------------------------
+
+struct ScaleIn : public ProxyNode<ScaleIn> {
+    Easedf _scale{};
+
+    ScaleIn(Ui::Child child)
+        : ProxyNode(std::move(child)) {
+    }
+
+    Math::Vec2f scale() {
+        return {_scale.value(), _scale.value()};
+    }
+
+    void paint(Gfx::Context &g, Math::Recti r) override {
+        g.save();
+        g.clip(bound());
+        g.origin(bound().center());
+        g.scale(scale());
+        g.origin(-bound().center());
+        child().paint(g, r);
+        g.restore();
+    }
+
+    void event(Sys::Event &e) override {
+        if (_scale.needRepaint(*this, e)) {
+            Ui::shouldRepaint(*this, bound());
+        }
+
+        Ui::ProxyNode<ScaleIn>::event(e);
+    }
+
+    void attach(Node *parent) override {
+        Ui::ProxyNode<ScaleIn>::attach(parent);
+        _scale.set(*this, 0.9);
+        _scale.animate(*this, 1.0, 0.25, Math::Easing::cubicOut);
+    }
+};
+
+Child scaleIn(Child child) {
+    return makeStrong<ScaleIn>(std::move(child));
+}
+
 // MARK: Carousel --------------------------------------------------------------
 
 struct Carousel : public GroupNode<Carousel> {

@@ -53,7 +53,7 @@ Ui::Child contextMenuContent(Ui::Children children) {
                .backgroundPaint = Ui::GRAY900,
                .shadowStyle = Gfx::BoxShadow::elevated(4),
            }) |
-           Ui::slideIn(Ui::SlideFrom::TOP);
+           Ui::scaleIn();
 }
 
 Ui::Child contextMenuItem(Ui::OnPress onPress, Opt<Mdi::Icon> i, Str t) {

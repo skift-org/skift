@@ -45,7 +45,7 @@ struct Eased {
     }
 
     void animate(Node &n, T target, f64 duration = 1.0, Math::Easing easing = {}) {
-        if (Math::epsilonEq(_value, target, 0.1)) {
+        if (Math::epsilonEq(_value, target, 0.01)) {
             _value = target;
             _target = target;
             _elapsed = 0;
@@ -187,6 +187,16 @@ Child slideIn(SlideFrom from, Child child);
 inline auto slideIn(SlideFrom from) {
     return [=](Child child) {
         return slideIn(from, child);
+    };
+}
+
+// MARK: Scale In --------------------------------------------------------------
+
+Child scaleIn(Child child);
+
+inline auto scaleIn() {
+    return [](Child child) {
+        return scaleIn(child);
     };
 }
 

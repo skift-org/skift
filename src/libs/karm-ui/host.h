@@ -152,9 +152,6 @@ struct Host : public Node {
 
         _root->paint(g, r);
 
-        g.strokeStyle(Gfx::stroke(Ui::GRAY800).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
-        g.stroke(bound(), 12);
-
         if (debugShowRepaintBounds) {
             static auto hue = 0.0;
             g.strokeStyle(Gfx::stroke(Gfx::hsvToRgb({hue, 1, 1}).withOpacity(0.5)).withWidth(4).withAlign(Gfx::INSIDE_ALIGN));

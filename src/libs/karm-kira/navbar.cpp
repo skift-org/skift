@@ -19,24 +19,17 @@ Ui::Child navbarContent(Ui::Children children) {
 }
 
 Ui::Child navbarItem(Ui::OnPress onPress, Mdi::Icon icon, Str text, bool selected) {
-    auto indicator = box(
-        {
-            .borderRadius = 99,
-            .backgroundPaint = selected ? Ui::ACCENT600 : Gfx::ALPHA,
-        },
-        Ui::empty({16, 2})
-    );
-
     return Ui::button(
                std::move(onPress),
-               selected ? Ui::ButtonStyle::regular() : Ui::ButtonStyle::subtle(),
+               selected
+                   ? Ui::ButtonStyle::regular().withForegroundPaint(Ui::ACCENT500)
+                   : Ui::ButtonStyle::subtle(),
                Ui::vflow(
                    0,
                    Math::Align::CENTER,
                    Ui::icon(icon),
                    Ui::empty(4),
-                   Ui::labelMedium(text),
-                   indicator
+                   Ui::labelSmall(text)
                ) |
                    Ui::spacing({8, 10, 8, 6})
            ) |

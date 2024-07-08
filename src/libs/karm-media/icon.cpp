@@ -7,7 +7,7 @@ namespace Karm::Media {
 static Opt<Strong<Text::Fontface>> _fontface = NONE;
 Strong<Text::Fontface> Icon::fontface() {
     if (not _fontface)
-        _fontface = Text::loadFontfaceOrFallback("bundle://mdi-font/Material-Design-Icons.ttf"_url).unwrap();
+        _fontface = Text::loadFontfaceOrFallback("bundle://fonts-mdi/fonts/Material-Design-Icons.ttf"_url).unwrap();
     return *_fontface;
 }
 

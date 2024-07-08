@@ -5,6 +5,6 @@
     "description": "Material Design Icons",
     "requires": [
         "karm-base",
-        "mdi-font"
+        "fonts-mdi"
     ]
 }

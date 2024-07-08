@@ -15,9 +15,9 @@
                     }
                 },
                 "bundle://skift-wallpapers/images/abstract.qoi",
-                "bundle://inter-font/fonts/Inter-Regular.ttf",
-                "bundle://inter-font/fonts/Inter-Medium.ttf",
-                "bundle://mdi-font/Material-Design-Icons.ttf"
+                "bundle://fonts-inter/fonts/Inter-Regular.ttf",
+                "bundle://fonts-inter/fonts/Inter-Medium.ttf",
+                "bundle://fonts-mdi/fonts/Material-Design-Icons.ttf"
             ]
         }
     ]

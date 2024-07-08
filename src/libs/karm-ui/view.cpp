@@ -9,7 +9,7 @@ namespace Karm::Ui {
 static Opt<Strong<Text::Fontface>> _regularFontface = NONE;
 Strong<Text::Fontface> regularFontface() {
     if (not _regularFontface) {
-        _regularFontface = Text::loadFontfaceOrFallback("bundle://inter-font/fonts/Inter-Regular.ttf"_url).unwrap();
+        _regularFontface = Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Regular.ttf"_url).unwrap();
     }
     return *_regularFontface;
 }
@@ -17,7 +17,7 @@ Strong<Text::Fontface> regularFontface() {
 static Opt<Strong<Text::Fontface>> _mediumFontface = NONE;
 Strong<Text::Fontface> mediumFontface() {
     if (not _mediumFontface) {
-        _mediumFontface = Text::loadFontfaceOrFallback("bundle://inter-font/fonts/Inter-Medium.ttf"_url).unwrap();
+        _mediumFontface = Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Medium.ttf"_url).unwrap();
     }
     return *_mediumFontface;
 }
@@ -25,7 +25,7 @@ Strong<Text::Fontface> mediumFontface() {
 static Opt<Strong<Text::Fontface>> _boldFontface = NONE;
 Strong<Text::Fontface> boldFontface() {
     if (not _boldFontface) {
-        _boldFontface = Text::loadFontfaceOrFallback("bundle://inter-font/fonts/Inter-Bold.ttf"_url).unwrap();
+        _boldFontface = Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Bold.ttf"_url).unwrap();
     }
     return *_boldFontface;
 }
@@ -33,7 +33,7 @@ Strong<Text::Fontface> boldFontface() {
 static Opt<Strong<Text::Fontface>> _italicFontface = NONE;
 Strong<Text::Fontface> italicFontface() {
     if (not _italicFontface) {
-        _italicFontface = Text::loadFontfaceOrFallback("bundle://inter-font/fonts/Inter-Italic.ttf"_url).unwrap();
+        _italicFontface = Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Italic.ttf"_url).unwrap();
     }
     return *_italicFontface;
 }
@@ -41,7 +41,7 @@ Strong<Text::Fontface> italicFontface() {
 static Opt<Strong<Text::Fontface>> _codeFontface = NONE;
 Strong<Text::Fontface> codeFontface() {
     if (not _codeFontface) {
-        _codeFontface = Text::loadFontfaceOrFallback("bundle://fira-code-font/fonts/FiraCode-Regular.ttf"_url).unwrap();
+        _codeFontface = Text::loadFontfaceOrFallback("bundle://fonts-fira-code/fonts/FiraCode-Regular.ttf"_url).unwrap();
     }
     return *_codeFontface;
 }

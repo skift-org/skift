@@ -1,7 +1,7 @@
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
-#include <ttf/spec.h>
+#include <karm-text/ttf/parser.h>
 
 void dumpGpos(Ttf::Gpos const &gpos) {
     Sys::println("GPOS table:");
@@ -46,7 +46,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto url = co_try$(Mime::parseUrlOrPath(args[0]));
     auto file = co_try$(Sys::File::open(url));
     auto map = co_try$(Sys::mmap().map(file));
-    auto ttf = co_try$(Ttf::Font::load(map.bytes()));
+    auto ttf = co_try$(Ttf::Parser::init(map.bytes()));
 
     Sys::println("ttf is valid");
     dumpGpos(ttf._gpos);

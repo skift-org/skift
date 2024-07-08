@@ -38,7 +38,7 @@ struct Metrics {
     f64 maxWidth;
 };
 
-struct Font {
+struct Parser {
     Bytes _slice;
 
     Head _head;
@@ -51,7 +51,7 @@ struct Font {
     Gpos _gpos;
     Gsub _gsub;
 
-    static Res<Cmap::Table> chooseCmap(Font &font) {
+    static Res<Cmap::Table> chooseCmap(Parser &font) {
         Opt<Cmap::Table> bestCmap = NONE;
         isize bestScore = 0;
 
@@ -90,13 +90,13 @@ struct Font {
         return Ok(*bestCmap);
     }
 
-    static bool isTtf(Bytes slice) {
+    static bool sniff(Bytes slice) {
         return slice.len() >= 4 and slice[0] == 0x00 and slice[1] == 0x01 and
                slice[2] == 0x00 and slice[3] == 0x00;
     }
 
-    static Res<Font> load(Bytes slice) {
-        Font font{slice};
+    static Res<Parser> init(Bytes slice) {
+        Parser font{slice};
 
         if (font.version() != 0x00010000 and
             font.version() != 0x4F54544F) {
@@ -117,7 +117,7 @@ struct Font {
         return Ok(font);
     }
 
-    Font(Bytes slice) : _slice(slice) {}
+    Parser(Bytes slice) : _slice(slice) {}
 
     // MARK: Parsing Api -------------------------------------------------------
 

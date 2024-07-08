@@ -97,7 +97,7 @@ struct Gpos : public Io::BChunk {
                     if (pair)
                         return Ok(*pair);
                 } else {
-                    logWarn("Unsupported GPOS lookup subtable");
+                    logWarn("unsupported GPOS lookup subtable");
                 }
             }
         }

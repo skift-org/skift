@@ -6,6 +6,7 @@
     "requires": [
         "karm-gfx",
         "karm-sys",
-        "karm-logger"
+        "karm-logger",
+        "fonts-all"
     ]
 }

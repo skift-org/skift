@@ -5,23 +5,23 @@
 #include <karm-sys/mmap.h>
 
 #include "font.h"
-#include "ttf/spec.h"
+#include "ttf/parser.h"
 
 namespace Karm::Text {
 
 struct TtfFontface : public Fontface {
     Sys::Mmap _mmap;
-    Ttf::Font _ttf;
+    Ttf::Parser _ttf;
     Map<Rune, Glyph> _cachedEntries;
     Map<Glyph, f64> _cachedAdvances;
     Map<Cons<Glyph>, f64> _cachedKerns;
 
     static Res<Strong<TtfFontface>> load(Sys::Mmap &&mmap) {
-        auto ttf = try$(Ttf::Font::load(mmap.bytes()));
+        auto ttf = try$(Ttf::Parser::init(mmap.bytes()));
         return Ok(makeStrong<TtfFontface>(std::move(mmap), ttf));
     }
 
-    TtfFontface(Sys::Mmap &&mmap, Ttf::Font ttf)
+    TtfFontface(Sys::Mmap &&mmap, Ttf::Parser ttf)
         : _mmap(std::move(mmap)),
           _ttf(std::move(ttf)) {
     }

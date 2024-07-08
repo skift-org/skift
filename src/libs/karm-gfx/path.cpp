@@ -37,11 +37,7 @@ void Path::_flattenLineToNoTrans(Math::Vec2f p) {
     last(_contours).end++;
 }
 
-[[gnu::flatten]] void Path::_flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d) {
-    _flattenCubicToNoTrans(a, b, c, d, 0);
-}
-
-void Path::_flattenCubicToNoTrans(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d, isize depth) {
+void Path::_flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d, isize depth) {
     isize const MAX_DEPTH = 16;
     f64 const TOLERANCE = 0.25;
 
@@ -64,8 +60,8 @@ void Path::_flattenCubicToNoTrans(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, M
     auto bcd = (bc + cd) / 2;
     auto abcd = (abc + bcd) / 2;
 
-    _flattenCubicToNoTrans(a, ab, abc, abcd, depth + 1);
-    _flattenCubicToNoTrans(abcd, bcd, cd, d, depth + 1);
+    _flattenCubicTo(a, ab, abc, abcd, depth + 1);
+    _flattenCubicTo(abcd, bcd, cd, d, depth + 1);
 }
 
 [[gnu::flatten]] void Path::_flattenQuadraticTo(Math::Vec2f start, Math::Vec2f cp, Math::Vec2f point) {

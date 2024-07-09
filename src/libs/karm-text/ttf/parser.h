@@ -11,6 +11,7 @@
 #include "table-hmtx.h"
 #include "table-loca.h"
 #include "table-maxp.h"
+#include "table-name.h"
 
 // https://tchayen.github.io/posts/ttf-file-parsing
 // http://stevehanov.ca/blog/?id=143
@@ -50,6 +51,7 @@ struct Parser {
     Hmtx _hmtx;
     Gpos _gpos;
     Gsub _gsub;
+    Name _name;
 
     static Res<Cmap::Table> chooseCmap(Parser &font) {
         Opt<Cmap::Table> bestCmap = NONE;
@@ -84,7 +86,7 @@ struct Parser {
 
         if (not bestCmap) {
             logError("ttf: no suitable cmap table found");
-            return Error::other("no cmap table");
+            return Error::other("no suitable cmap table found");
         }
 
         return Ok(*bestCmap);
@@ -113,6 +115,7 @@ struct Parser {
         font._hmtx = try$(font.requireTable<Hmtx>());
         font._gpos = font.lookupTable<Gpos>();
         font._gsub = font.lookupTable<Gsub>();
+        font._name = font.lookupTable<Name>();
 
         return Ok(font);
     }

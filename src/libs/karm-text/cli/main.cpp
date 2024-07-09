@@ -3,7 +3,7 @@
 #include <karm-sys/mmap.h>
 #include <karm-text/ttf/parser.h>
 
-void dumpGpos(Ttf::Gpos const &gpos) {
+static void _dumpGpos(Ttf::Gpos const &gpos) {
     Sys::println("GPOS table:");
     if (not gpos.present()) {
         Sys::println("  not present");
@@ -36,6 +36,21 @@ void dumpGpos(Ttf::Gpos const &gpos) {
     Sys::println("  LookupList (len:{})", gpos.lookupList().len());
 }
 
+static void _dumpName(Ttf::Name const &name) {
+    Sys::println("Name table:");
+    if (not name.present()) {
+        Sys::println("  not present");
+        return;
+    }
+
+    Sys::println("  Records");
+    for (auto record : name.iterRecords()) {
+        if (not record.isUnicode())
+            continue;
+        Sys::println("    {}:{}:{} {}={#}", record.platformId, record.encodingId, record.languageId, record.nameId, name.string(record));
+    }
+}
+
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto &args = useArgs(ctx);
 
@@ -49,7 +64,8 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto ttf = co_try$(Ttf::Parser::init(map.bytes()));
 
     Sys::println("ttf is valid");
-    dumpGpos(ttf._gpos);
+    _dumpGpos(ttf._gpos);
+    _dumpName(ttf._name);
 
     co_return Ok();
 }

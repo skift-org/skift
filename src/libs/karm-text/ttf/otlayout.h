@@ -375,7 +375,7 @@ struct LookupTable : public Io::BChunk {
         case ClassPairAdjustment::FORMAT:
             return ClassPairAdjustment{subtable.remBytes()};
         default:
-            logWarn("ttf: Unknown lookup subtable format {x}", format);
+            logWarn("ttf: unknown lookup subtable format {x}", format);
             return GlyphPairAdjustment{subtable.remBytes()};
         }
     }

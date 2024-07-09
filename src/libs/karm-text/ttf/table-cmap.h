@@ -50,7 +50,7 @@ struct Cmap : public Io::BChunk {
                 return Text::Glyph(s.skip(offset).nextU16be());
             }
 
-            logWarn("ttf: Glyph not found for rune {x}", r);
+            logWarn("ttf: glyph not found for rune {x}", r);
             return Text::Glyph(0);
         }
 
@@ -98,15 +98,16 @@ struct Cmap : public Io::BChunk {
             if (i == numTables) {
                 return NONE;
             }
-
-            u16 platformId = s.nextU16be();
-            u16 encodingId = s.nextU16be();
-            u32 offset = s.nextU32be();
-            auto slice = sub(_slice, offset, _slice.len());
-            u16 type = Io::BScan{slice}.nextU16be();
             i++;
 
-            return Table{platformId, encodingId, type, slice};
+            Table t;
+            t.platformId = s.nextU16be();
+            t.encodingId = s.nextU16be();
+            u32 offset = s.nextU32be();
+            t.slice = sub(_slice, offset, _slice.len());
+            t.type = Io::BScan{t.slice}.nextU16be();
+
+            return t;
         }};
     }
 };

@@ -30,7 +30,7 @@ struct Cmap : public Io::BChunk {
 
                 u16 endCode = s.skip(i * 2).peekU16be();
 
-                if (r >= endCode)
+                if (r > endCode)
                     continue;
 
                 // + 2 for reserved padding

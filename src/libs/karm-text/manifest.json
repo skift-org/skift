@@ -8,6 +8,6 @@
         "karm-sys",
         "karm-pkg",
         "karm-logger",
-        "fonts-all"
+        "fonts-core"
     ]
 }

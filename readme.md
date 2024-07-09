@@ -17,7 +17,7 @@
 - **Karm**: A modern C++ core library providing foundational building blocks.
 - **KarmUI**: A reactive UI framework for building elegant user interfaces.
 - **Hideo**: A beautiful desktop environment prioritizing intuitive design.
-- **Hjert**: A capability-based "Pragmatic" microkernel.
+- **Hjert**: A capability-based "pragmatic" microkernel.
 - **CuteKit**: A versatile build system and package manager designed for cross-compilation and complex project management.
 - **Vaev**: A browser engine built for speed, accuracy, and simplicity.
 

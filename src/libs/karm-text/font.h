@@ -8,42 +8,6 @@
 
 namespace Karm::Text {
 
-enum FontWeight {
-    THIN = 100,
-    EXTRA_LIGHT = 200,
-    LIGHT = 300,
-    REGULAR = 400,
-    MEDIUM = 500,
-    SEMI_BOLD = 600,
-    BOLD = 700,
-    EXTRA_BOLD = 800,
-    BLACK = 900,
-};
-
-enum FontWidth {
-    ULTRA_CONDENSED = 100,
-    EXTRA_CONDENSED = 200,
-    CONDENSED = 300,
-    SEMI_CONDENSED = 400,
-    NORMAL = 500,
-    SEMI_EXPANDED = 600,
-    EXPANDED = 700,
-    EXTRA_EXPANDED = 800,
-    ULTRA_EXPANDED = 900
-};
-
-enum FontSlant {
-    UPRIGHT = 0,
-    ITALIC = 1,
-    OBLIQUE = 2,
-};
-
-struct FontAttrs {
-    FontWeight weight = REGULAR;
-    FontWidth width = NORMAL;
-    FontSlant slant = UPRIGHT;
-};
-
 /**
    _____       _             _                          <- ascend
   / ____|     | |           | |                         <- captop
@@ -81,6 +45,8 @@ struct Fontface {
     virtual ~Fontface() = default;
 
     virtual FontMetrics metrics() const = 0;
+
+    virtual FontAttrs attrs() const = 0;
 
     virtual Glyph glyph(Rune rune) = 0;
 

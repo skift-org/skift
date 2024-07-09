@@ -25,6 +25,13 @@ struct VgaFontface : public Fontface {
         };
     }
 
+    FontAttrs attrs() const override {
+        return {
+            .family = "IBM VGA8"s,
+            .monospace = Monospace::YES,
+        };
+    }
+
     Glyph glyph(Rune rune) override {
         One<Ibm437> one;
         encodeOne<Ibm437>(rune, one);

@@ -28,4 +28,6 @@ struct timespec toTimespec(TimeStamp ts);
 
 struct timespec toTimespec(TimeSpan ts);
 
+Res<Str> repoRoot();
+
 } // namespace Posix

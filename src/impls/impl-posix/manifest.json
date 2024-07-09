@@ -12,6 +12,7 @@
     "requires": [],
     "provides": [
         "karm-logger-impl",
-        "karm-sys-impl"
+        "karm-sys-impl",
+        "karm-pkg-impl"
     ]
 }

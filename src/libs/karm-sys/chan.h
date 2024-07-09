@@ -68,21 +68,21 @@ Out &out();
 
 Err &err();
 
-inline void print(Str str, auto &&...args) {
+inline void print(Str str = "", auto &&...args) {
     (void)Io::format(out(), str, std::forward<decltype(args)>(args)...);
 }
 
-inline void err(Str str, auto &&...args) {
+inline void err(Str str = "", auto &&...args) {
     (void)Io::format(err(), str, std::forward<decltype(args)>(args)...);
 }
 
-inline void println(Str str, auto &&...args) {
+inline void println(Str str = "", auto &&...args) {
     (void)Io::format(out(), str, std::forward<decltype(args)>(args)...);
     (void)out().writeStr(Sys::LINE_ENDING);
     (void)out().flush();
 }
 
-inline void errln(Str str, auto &&...args) {
+inline void errln(Str str = "", auto &&...args) {
     (void)Io::format(err(), str, std::forward<decltype(args)>(args)...);
     (void)err().writeStr(Sys::LINE_ENDING);
     (void)err().flush();

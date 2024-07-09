@@ -41,18 +41,12 @@ Res<Mime::Path> resolve(Mime::Url const &url) {
 
         resolved = Mime::Path::parse(runtimeDir).join(path);
     } else if (url.scheme == "bundle") {
-        auto *maybeRepo = getenv("CK_BUILDDIR");
-
-        if (not maybeRepo)
-            maybeRepo = getenv("SKIFT_BUNDLES");
-
-        if (not maybeRepo)
-            return Error::notFound("SKIFT_BUNDLES not set");
+        auto repo = try$(Posix::repoRoot());
 
         auto path = url.path;
         path.rooted = false;
 
-        resolved = Mime::Path::parse(maybeRepo)
+        resolved = Mime::Path::parse(repo)
                        .join(url.host)
                        .join("__res__")
                        .join(path);

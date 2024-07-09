@@ -251,4 +251,16 @@ struct timespec toTimespec(TimeSpan ts) {
     return pts;
 }
 
+Res<Str> repoRoot() {
+    auto *maybeRepo = getenv("CK_BUILDDIR");
+
+    if (not maybeRepo)
+        maybeRepo = getenv("SKIFT_BUNDLES");
+
+    if (not maybeRepo)
+        return Error::notFound("SKIFT_BUNDLES not set");
+
+    return Ok(Str::fromNullterminated(maybeRepo));
+}
+
 } // namespace Posix

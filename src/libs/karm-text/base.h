@@ -3,6 +3,7 @@
 #include <karm-base/checked.h>
 #include <karm-base/distinct.h>
 #include <karm-base/string.h>
+#include <karm-io/emit.h>
 
 namespace Karm::Text {
 
@@ -26,6 +27,8 @@ enum struct FontStyle {
     NORMAL,
     OBLIQUE,
     ITALIC,
+
+    _LEN,
 };
 
 // MARK: Fonteight -------------------------------------------------------------
@@ -42,6 +45,29 @@ struct FontWeight : public Distinct<u16, struct _FontWeightTag> {
     static FontWeight const BOLD;
     static FontWeight const EXTRA_BOLD;
     static FontWeight const BLACK;
+
+    void repr(Io::Emit &e) const {
+        if (value() <= 100)
+            e("THIN");
+        else if (value() <= 200)
+            e("EXTRA_LIGHT");
+        else if (value() <= 300)
+            e("LIGHT");
+        else if (value() <= 400)
+            e("REGULAR");
+        else if (value() <= 500)
+            e("MEDIUM");
+        else if (value() <= 600)
+            e("SEMI_BOLD");
+        else if (value() <= 700)
+            e("BOLD");
+        else if (value() <= 800)
+            e("EXTRA_BOLD");
+        else if (value() <= 900)
+            e("BLACK");
+        else
+            e("UNKNOWN");
+    }
 };
 
 constexpr FontWeight FontWeight::THIN{100};
@@ -68,6 +94,29 @@ struct FontStretch : public Distinct<u16, struct _FontStretchTag> {
     static FontStretch const EXPANDED;
     static FontStretch const EXTRA_EXPANDED;
     static FontStretch const ULTRA_EXPANDED;
+
+    void repr(Io::Emit &e) const {
+        if (value() <= 100)
+            e("ULTRA_CONDENSED");
+        else if (value() <= 200)
+            e("EXTRA_CONDENSED");
+        else if (value() <= 300)
+            e("CONDENSED");
+        else if (value() <= 400)
+            e("SEMI_CONDENSED");
+        else if (value() <= 500)
+            e("NORMAL");
+        else if (value() <= 600)
+            e("SEMI_EXPANDED");
+        else if (value() <= 700)
+            e("EXPANDED");
+        else if (value() <= 800)
+            e("EXTRA_EXPANDED");
+        else if (value() <= 900)
+            e("ULTRA_EXPANDED");
+        else
+            e("UNKNOWN");
+    }
 };
 
 constexpr FontStretch FontStretch::ULTRA_CONDENSED{100};
@@ -85,6 +134,8 @@ constexpr FontStretch FontStretch::ULTRA_EXPANDED{900};
 enum struct Monospace {
     NO,
     YES,
+
+    _LEN,
 };
 
 // MARK: Family ----------------------------------------------------------------
@@ -114,6 +165,14 @@ struct FontAttrs {
     FontStretch stretch = FontStretch::NORMAL;
     FontStyle style = FontStyle::NORMAL;
     Monospace monospace = Monospace::NO;
+
+    void repr(Io::Emit &e) const {
+        e.ln("family: {#}", family);
+        e.ln("weight: {}", weight);
+        e.ln("stretch: {}", stretch);
+        e.ln("style: {}", style);
+        e.ln("monospace: {}", monospace);
+    }
 };
 
 } // namespace Karm::Text

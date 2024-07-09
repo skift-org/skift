@@ -40,6 +40,11 @@ struct TtfFontface : public Fontface {
     FontAttrs attrs() const override {
         FontAttrs attrs;
 
+        if (_parser._name.present()) {
+            auto name = _parser._name;
+            attrs.family = name.string(name.lookupRecord(Ttf::Name::FAMILY));
+        }
+
         if (_parser._post.present()) {
             if (_parser._post.isFixedPitch())
                 attrs.monospace = Monospace::YES;

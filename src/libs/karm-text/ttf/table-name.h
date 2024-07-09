@@ -80,6 +80,15 @@ struct Name : public Io::BChunk {
         }};
     }
 
+    Record lookupRecord(NameId nameId) const {
+        for (auto record : iterRecords()) {
+            if (record.nameId == nameId and record.isUnicode())
+                return record;
+        }
+
+        return {};
+    }
+
     String string(Record const &r) const {
         if (not r.isUnicode())
             return ""s;

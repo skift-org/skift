@@ -1,7 +1,9 @@
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
-#include <karm-text/ttf/parser.h>
+#include <karm-text/book.h>
+#include <karm-text/loader.h>
+#include <karm-text/ttf.h>
 
 static void _dumpGpos(Ttf::Gpos const &gpos) {
     Sys::println("GPOS table:");
@@ -54,17 +56,39 @@ static void _dumpName(Ttf::Name const &name) {
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto &args = useArgs(ctx);
 
-    if (args.len() == 0)
-        co_return Error::invalidInput("Usage: ttf-dump <dtb-file>");
+    if (args.len() < 1)
+        co_return Error::invalidInput("Usage: karm-text.cli <verb> <args...>");
 
-    auto url = co_try$(Mime::parseUrlOrPath(args[0]));
-    auto file = co_try$(Sys::File::open(url));
-    auto map = co_try$(Sys::mmap().map(file));
-    auto ttf = co_try$(Ttf::Parser::init(map.bytes()));
+    auto verb = args[0];
 
-    Sys::println("ttf is valid");
-    _dumpGpos(ttf._gpos);
-    _dumpName(ttf._name);
+    if (verb == "dump-ttf") {
+        if (args.len() != 2)
+            co_return Error::invalidInput("Usage: karm-text.cli dump-ttf <url>");
 
-    co_return Ok();
+        auto url = co_try$(Mime::parseUrlOrPath(args[1]));
+        auto file = co_try$(Sys::File::open(url));
+        auto map = co_try$(Sys::mmap().map(file));
+        auto ttf = co_try$(Ttf::Parser::init(map.bytes()));
+
+        Sys::println("ttf is valid");
+        _dumpGpos(ttf._gpos);
+        _dumpName(ttf._name);
+
+        co_return Ok();
+    } else if (verb == "dump-db") {
+        auto book = co_try$(Text::loadAll());
+        co_return Ok();
+    } else if (verb == "dump-attr") {
+        if (args.len() != 2)
+            co_return Error::invalidInput("Usage: karm-text.cli dump-attr <url>");
+
+        auto url = co_try$(Mime::parseUrlOrPath(args[1]));
+        auto font = co_try$(Text::loadFontface(url));
+
+        Sys::println("{}", font->attrs());
+        co_return Ok();
+    } else {
+        Sys::errln("unknown verb: {} (expected: dump-ttf, dump-db, dump-attr)", verb);
+        co_return Error::invalidInput();
+    }
 }

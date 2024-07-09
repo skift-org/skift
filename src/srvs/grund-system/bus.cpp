@@ -27,7 +27,7 @@ Res<Strong<Unit>> Unit::load(Sys::Context &ctx, Str id) {
     logInfo("system: validating elf...");
     Elf::Image image{elfRange.bytes()};
     if (not image.valid())
-        return Error::invalidInput("Invalid elf");
+        return Error::invalidInput("invalid elf");
 
     logInfo("system: mapping the elf...");
     for (auto prog : image.programs()) {

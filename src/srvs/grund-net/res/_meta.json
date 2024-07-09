@@ -2,8 +2,11 @@
     "id": "grund-net",
     "props": {
         "unit.consumes": [
-            "Grund::Bus"
+            "Grund::Bus",
+            "Grund::Device"
         ],
-        "unit.provides": []
+        "unit.provides": [
+            "Grund::Net"
+        ]
     }
 }

@@ -2,8 +2,11 @@
     "id": "grund-dhcp",
     "props": {
         "unit.consumes": [
-            "Grund::Bus"
+            "Grund::Bus",
+            "Grund::Net"
         ],
-        "unit.provides": []
+        "unit.provides": [
+            "Grund::Dhcp"
+        ]
     }
 }

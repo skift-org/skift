@@ -4,6 +4,8 @@
         "unit.consumes": [
             "Grund::Bus"
         ],
-        "unit.provides": []
+        "unit.provides": [
+            "Grund::Echo"
+        ]
     }
 }

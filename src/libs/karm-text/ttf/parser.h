@@ -12,6 +12,8 @@
 #include "table-loca.h"
 #include "table-maxp.h"
 #include "table-name.h"
+#include "table-os2.h"
+#include "table-post.h"
 
 // https://tchayen.github.io/posts/ttf-file-parsing
 // http://stevehanov.ca/blog/?id=143
@@ -52,6 +54,8 @@ struct Parser {
     Gpos _gpos;
     Gsub _gsub;
     Name _name;
+    Post _post;
+    Os2 _os2;
 
     static Res<Cmap::Table> chooseCmap(Parser &font) {
         Opt<Cmap::Table> bestCmap = NONE;
@@ -116,6 +120,13 @@ struct Parser {
         font._gpos = font.lookupTable<Gpos>();
         font._gsub = font.lookupTable<Gsub>();
         font._name = font.lookupTable<Name>();
+        font._post = font.lookupTable<Post>();
+        if (not font._post.present())
+            logWarn("ttf: 'post' table not found");
+
+        font._os2 = font.lookupTable<Os2>();
+        if (not font._os2.present())
+            logWarn("ttf: 'OS/2' table not found");
 
         return Ok(font);
     }

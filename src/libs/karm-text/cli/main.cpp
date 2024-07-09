@@ -54,9 +54,8 @@ static void _dumpName(Ttf::Name const &name) {
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto &args = useArgs(ctx);
 
-    if (args.len() == 0) {
-        co_return Error::invalidInput("Usage: dtb-dump <dtb-file>");
-    }
+    if (args.len() == 0)
+        co_return Error::invalidInput("Usage: ttf-dump <dtb-file>");
 
     auto url = co_try$(Mime::parseUrlOrPath(args[0]));
     auto file = co_try$(Sys::File::open(url));

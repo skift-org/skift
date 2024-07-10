@@ -76,7 +76,8 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
 
         co_return Ok();
     } else if (verb == "dump-db") {
-        auto book = co_try$(Text::loadAll());
+        Text::FontBook book;
+        co_try$(book.loadAll());
         co_return Ok();
     } else if (verb == "dump-attr") {
         if (args.len() != 2)

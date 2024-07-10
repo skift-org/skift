@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/set.h>
 #include <karm-mime/url.h>
 #include <karm-sys/mmap.h>
 
@@ -10,16 +11,15 @@ namespace Karm::Text {
 
 struct FontQuery {
     Family family = GenericFamily::SYSTEM;
-    Opt<FontWeight> weight = FontWeight::REGULAR;
-    Opt<FontStretch> stretch = FontStretch::NORMAL;
-    Opt<FontStyle> style = FontStyle::NORMAL;
-    Opt<Monospace> monospace = Monospace::NO;
+    FontWeight weight = FontWeight::REGULAR;
+    FontStretch stretch = FontStretch::NORMAL;
+    FontStyle style = FontStyle::NORMAL;
 };
 
 struct FontInfo {
     Mime::Url url;
     FontAttrs attrs;
-    Opt<Strong<Fontface>> face = NONE;
+    Strong<Fontface> face;
 };
 
 struct FontBook {
@@ -36,32 +36,34 @@ struct FontBook {
 
     FaceId load(Mime::Url url, Opt<FontAttrs> attrs = NONE);
 
-    Res<Strong<Fontface>> get(FaceId id);
+    Res<> loadAll();
 
-    FaceId find(FontQuery query) {
-        for (auto &[id, info] : _faces.iter()) {
-            bool match = true;
-
-            if (query.weight and info.attrs.weight != query.weight)
-                match = false;
-
-            if (query.stretch and info.attrs.stretch != query.stretch)
-                match = false;
-
-            if (query.style and info.attrs.style != query.style)
-                match = false;
-
-            if (query.monospace and info.attrs.monospace != query.monospace)
-                match = false;
-
-            if (match)
-                return id;
-        }
-
-        return FaceId{0};
+    Res<FontInfo> get(FaceId id) const {
+        auto res = _faces.tryGet(id);
+        if (not res)
+            return Error::notFound("font not found");
+        return Ok(res.unwrap());
     }
-};
 
-Res<FontBook> loadAll();
+    Set<String> families() const {
+        Set<String> families;
+        for (auto &[id, info] : _faces.iter())
+            families.put(info.attrs.family);
+        return families;
+    }
+
+    Str _resolveFamily(Family family) const {
+        if (auto *gf = family.is<GenericFamily>()) {
+            return _genericFamily[toUnderlyingType(*gf)];
+        }
+        return family.unwrap<Str>();
+    }
+
+    FaceId queryExact(FontQuery query) const;
+
+    FaceId queryClosest(FontQuery query) const;
+
+    Vec<FaceId> queryFamily(String family) const;
+};
 
 } // namespace Karm::Text

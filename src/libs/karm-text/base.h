@@ -28,6 +28,7 @@ enum struct FontStyle {
     OBLIQUE,
     ITALIC,
 
+    NO_MATCH,
     _LEN,
 };
 
@@ -45,6 +46,8 @@ struct FontWeight : public Distinct<u16, struct _FontWeightTag> {
     static FontWeight const BOLD;
     static FontWeight const EXTRA_BOLD;
     static FontWeight const BLACK;
+
+    static FontWeight const NO_MATCH;
 
     void repr(Io::Emit &e) const {
         if (value() <= 100)
@@ -65,8 +68,18 @@ struct FontWeight : public Distinct<u16, struct _FontWeightTag> {
             e("EXTRA_BOLD");
         else if (value() <= 900)
             e("BLACK");
+        else if (value() == NO_MATCH.value())
+            e("NO_MATCH");
         else
             e("UNKNOWN");
+    }
+
+    u16 delta(FontWeight other) {
+        if (other > *this) {
+            return (other - *this).value();
+        } else {
+            return (*this - other).value();
+        }
     }
 };
 
@@ -79,6 +92,8 @@ constexpr FontWeight FontWeight::SEMI_BOLD{600};
 constexpr FontWeight FontWeight::BOLD{700};
 constexpr FontWeight FontWeight::EXTRA_BOLD{800};
 constexpr FontWeight FontWeight::BLACK{900};
+
+constexpr FontWeight FontWeight::NO_MATCH{Limits<u16>::MAX};
 
 // MARK: FontStretch -----------------------------------------------------------
 
@@ -94,6 +109,8 @@ struct FontStretch : public Distinct<u16, struct _FontStretchTag> {
     static FontStretch const EXPANDED;
     static FontStretch const EXTRA_EXPANDED;
     static FontStretch const ULTRA_EXPANDED;
+
+    static FontStretch const NO_MATCH;
 
     void repr(Io::Emit &e) const {
         if (value() <= 100)
@@ -114,8 +131,18 @@ struct FontStretch : public Distinct<u16, struct _FontStretchTag> {
             e("EXTRA_EXPANDED");
         else if (value() <= 900)
             e("ULTRA_EXPANDED");
+        else if (value() == NO_MATCH.value())
+            e("NO_MATCH");
         else
             e("UNKNOWN");
+    }
+
+    u16 delta(FontStretch other) {
+        if (other > *this) {
+            return (other - *this).value();
+        } else {
+            return (*this - other).value();
+        }
     }
 };
 
@@ -128,6 +155,8 @@ constexpr FontStretch FontStretch::SEMI_EXPANDED{600};
 constexpr FontStretch FontStretch::EXPANDED{700};
 constexpr FontStretch FontStretch::EXTRA_EXPANDED{800};
 constexpr FontStretch FontStretch::ULTRA_EXPANDED{900};
+
+constexpr FontStretch FontStretch::NO_MATCH{Limits<u16>::MAX};
 
 // MARK: Monospace -------------------------------------------------------------
 

@@ -111,7 +111,7 @@ Style::MediaQuery parseMediaQuery(Cursor<Sst> &c) {
     return lhs;
 }
 
-// MARK: Properties ------------------------------------------------------------
+// MARK: Style Properties ------------------------------------------------------
 
 // NOTE: Please keep this alphabetically sorted.
 
@@ -216,7 +216,7 @@ Res<> _parseProp(Cursor<Sst> &c, Style::MaxHeightProp &p) {
     return Ok();
 }
 
-// MARK: Properties Common
+// MARK: Parse Properties ------------------------------------------------------
 
 Res<Style::Prop> parseProperty(Sst const &sst) {
     if (sst != Sst::DECL)
@@ -267,6 +267,95 @@ Vec<Style::Prop> parseProperties(Sst const &sst) {
     }
 
     return res;
+}
+
+// MARK: Font Properties -------------------------------------------------------
+
+Res<> _parseFontProp(Cursor<Sst> &c, Style::AscentOverrideProp &p) {
+    if (c.skip(Token::ident("normal"))) {
+        p.value = NONE;
+    } else {
+        p.value = try$(parseValue<Percent>(c));
+    }
+    return Ok();
+}
+
+Res<> _parseFontProp(Cursor<Sst> &c, Style::DescentOverrideProp &p) {
+    if (c.skip(Token::ident("normal"))) {
+        p.value = NONE;
+    } else {
+        p.value = try$(parseValue<Percent>(c));
+    }
+    return Ok();
+}
+
+Res<> _parseFontProp(Cursor<Sst> &c, Style::FontDisplayProp &p) {
+    if (c.skip(Token::ident("auto"))) {
+        p.value = Style::FontDisplay::AUTO;
+    } else if (c.skip(Token::ident("block"))) {
+        p.value = Style::FontDisplay::BLOCK;
+    } else if (c.skip(Token::ident("swap"))) {
+        p.value = Style::FontDisplay::SWAP;
+    } else if (c.skip(Token::ident("fallback"))) {
+        p.value = Style::FontDisplay::FALLBACK;
+    } else if (c.skip(Token::ident("optional"))) {
+        p.value = Style::FontDisplay::OPTIONAL;
+    } else {
+        logWarn("expected font-display value");
+        return Error::invalidData("expected font-display value");
+    }
+    return Ok();
+}
+
+Res<> _parseFontProp(Cursor<Sst> &c, Style::FontFamilyProp &p) {
+    while (not c.ended()) {
+        if (c.peek() == Token::STRING) {
+            p.value.pushBack(try$(parseValue<String>(c)));
+        } else if (c.peek() == Token::IDENT) {
+            p.value.pushBack(c.next().token.data);
+        } else {
+            break;
+        }
+        c.skip(Token::COMMA);
+    }
+
+    return Ok();
+}
+
+
+// MARK: Parse Font Properties -------------------------------------------------
+
+Res<Style::FontProp> parseFontProperty(Sst const &sst) {
+    if (sst != Sst::DECL)
+        panic("expected declaration");
+
+    if (sst.token != Token::IDENT)
+        panic("expected ident");
+
+    Res<Style::FontProp> resProp = Error::invalidData("unknown property");
+
+    Style::FontProp::any([&]<typename T>(Meta::Type<T>) -> bool {
+        if (sst.token.data != T::name())
+            return false;
+
+        if constexpr (not requires(Cursor<Sst> &c, T &t) { _parseFontProp(c, t); }) {
+            logError("missing parser for property: {}", T::name());
+            return false;
+        } else {
+            T prop;
+            Cursor<Sst> c = sst.content;
+            auto res = _parseFontProp(c, prop);
+            if (not res)
+                logWarn("failed to parse property {#}: {#} - {}", T::name(), sst.content, res);
+            resProp = Ok(std::move(prop));
+            return true;
+        }
+    });
+
+    if (not resProp)
+        logWarn("failed to parse property: {} - {}", sst.token, resProp);
+
+    return resProp;
 }
 
 // MARK: Rules -----------------------------------------------------------------
@@ -333,7 +422,7 @@ Style::FontFaceRule parseFontFaceRule(Sst const &sst) {
 
     for (auto const &item : sst.content) {
         if (item == Sst::DECL) {
-            auto prop = parseProperty(item);
+            auto prop = parseFontProperty(item);
             if (prop)
                 res.props.pushBack(prop.take());
         } else {

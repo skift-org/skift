@@ -7,6 +7,7 @@
 #include <karm-mime/url.h>
 #include <vaev-css/lexer.h>
 
+#include "font-props.h"
 #include "media.h"
 #include "props.h"
 #include "select.h"
@@ -46,7 +47,7 @@ struct MediaRule {
 
 // https://www.w3.org/TR/css-fonts-4/#cssfontfacerule
 struct FontFaceRule {
-    Vec<Prop> props;
+    Vec<FontProp> props;
 
     void repr(Io::Emit &e) const;
 };

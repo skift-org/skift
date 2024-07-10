@@ -177,7 +177,6 @@ static auto const RE_STRING =
             ),
             '\''_re
         )
-
     );
 
 Token Lexer::_nextIdent(Io::SScan &s) const {
@@ -248,7 +247,7 @@ Token Lexer::_next(Io::SScan &s) const {
     } else if (s.skip(RE_DELIM)) {
         return {Token::DELIM, s.end()};
     } else {
-        logWarn("error at {#c}", s.curr());
+        logWarn("unrecognized token: {}", s.end());
         s.next();
         return {Token::OTHER, s.end()};
     }

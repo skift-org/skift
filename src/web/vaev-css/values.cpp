@@ -102,8 +102,7 @@ Res<ColorGamut> ValueParser<ColorGamut>::parse(Cursor<Sst> &c) {
 // MARK: Display
 // https://drafts.csswg.org/css-display-3/#propdef-display
 
-static Res<Display>
-_parseLegacyDisplay(Cursor<Sst> &c) {
+static Res<Display> _parseLegacyDisplay(Cursor<Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -509,6 +508,32 @@ Res<Size> ValueParser<Size>::parse(Cursor<Sst> &c) {
     }
 
     return Error::invalidData("expected size");
+}
+
+// MARK: String
+// https://drafts.csswg.org/css-values/#strings
+
+Res<String> ValueParser<String>::parse(Cursor<Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.peek() == Token::STRING) {
+        // TODO: Handle escape sequences
+        Io::SScan s = c.next().token.data;
+        StringBuilder sb{s.rem()};
+        auto quote = s.next();
+        while (not s.skip(quote) and not s.ended()) {
+            if (s.skip('\\') and not s.ended()) {
+                if (s.skip('\\'))
+                    sb.append(s.next());
+            } else {
+                sb.append(s.next());
+            }
+        }
+        return Ok(sb.take());
+    }
+
+    return Error::invalidData("expected string");
 }
 
 // MARK: Update

@@ -127,6 +127,11 @@ struct ValueParser<Size> {
 };
 
 template <>
+struct ValueParser<String> {
+    static Res<String> parse(Cursor<Sst> &c);
+};
+
+template <>
 struct ValueParser<Update> {
     static Res<Update> parse(Cursor<Sst> &c);
 };

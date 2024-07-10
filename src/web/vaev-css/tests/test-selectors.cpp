@@ -105,4 +105,22 @@ test$("vaev-css-parse-pseudo-selectors") {
     return Ok();
 }
 
+test$("vaev-css-parse-attribute-selectors") {
+    static auto const classSel = Style::ClassSelector{"className"s};
+    auto const INSENSITIVE = Style::AttributeSelector::INSENSITIVE;
+    auto const SENSITIVE = Style::AttributeSelector::SENSITIVE;
+    auto const PRESENT = Style::AttributeSelector::Match{Style::AttributeSelector::PRESENT};
+    auto const EXACT = Style::AttributeSelector::Match{Style::AttributeSelector::EXACT};
+    auto const STR_END_WITH = Style::AttributeSelector::Match{Style::AttributeSelector::STR_END_WITH};
+    Str name = "type";
+
+    expectEq$(parse(".className[type]"), Style::Selector::and_({classSel, Style::AttributeSelector{name, INSENSITIVE, PRESENT, ""s}}));
+    expectEq$(parse(".className[type='text']"), Style::Selector::and_({classSel, Style::AttributeSelector{name, INSENSITIVE, EXACT, "text"s}}));
+    expectEq$(parse(".className[ type = 'text' ]"), Style::Selector::and_({classSel, Style::AttributeSelector{name, INSENSITIVE, EXACT, "text"s}}));
+    expectEq$(parse(".className[type*='text']"), Style::Selector::and_({classSel, Style::AttributeSelector{name, INSENSITIVE, STR_END_WITH, "text"s}}));
+    expectEq$(parse(".className[type='text' s]"), Style::Selector::and_({classSel, Style::AttributeSelector{name, SENSITIVE, EXACT, "text"s}}));
+
+    return Ok();
+}
+
 } // namespace Vaev::Css::Tests

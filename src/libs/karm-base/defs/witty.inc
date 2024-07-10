@@ -32,6 +32,8 @@
 "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
 "Huh",
 "I blame Cyp",
+"I blame Lou",
+"I blame Box<T>",
 "I blame Monax. ",
 "I swear I'm a professional..."
 "I'm not feeling so good...",

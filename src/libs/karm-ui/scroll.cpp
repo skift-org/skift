@@ -191,4 +191,67 @@ Child vscroll(Child child) {
     return makeStrong<Scroll>(child, Math::Orien::VERTICAL);
 }
 
+// MARK: Clip ------------------------------------------------------------------
+
+struct Clip : public ProxyNode<Clip> {
+    static constexpr isize SCROLL_BAR_WIDTH = 4;
+
+    Math::Orien _orient{};
+    Math::Recti _bound{};
+
+    Clip(Child child, Math::Orien orient)
+        : ProxyNode(child), _orient(orient) {}
+
+    void paint(Gfx::Context &g, Math::Recti r) override {
+        g.save();
+        g.clip(_bound);
+        child().paint(g, r);
+        g.restore();
+    }
+
+    void layout(Math::Recti r) override {
+        _bound = r;
+        auto childSize = child().size(_bound.size(), Hint::MAX);
+        if (_orient == Math::Orien::HORIZONTAL) {
+            childSize.height = r.height;
+        } else if (_orient == Math::Orien::VERTICAL) {
+            childSize.width = r.width;
+        }
+        r.wh = childSize;
+        child().layout(r);
+    }
+
+    Math::Vec2i size(Math::Vec2i s, Hint hint) override {
+        auto childSize = child().size(s, hint);
+
+        if (hint == Hint::MIN) {
+            if (_orient == Math::Orien::HORIZONTAL) {
+                childSize.x = min(childSize.x, s.x);
+            } else if (_orient == Math::Orien::VERTICAL) {
+                childSize.y = min(childSize.y, s.y);
+            } else {
+                childSize = childSize.min(s);
+            }
+        }
+
+        return childSize;
+    }
+
+    Math::Recti bound() override {
+        return _bound;
+    }
+};
+
+Child vhclip(Child child) {
+    return makeStrong<Clip>(child, Math::Orien::BOTH);
+}
+
+Child hclip(Child child) {
+    return makeStrong<Clip>(child, Math::Orien::HORIZONTAL);
+}
+
+Child vclip(Child child) {
+    return makeStrong<Clip>(child, Math::Orien::VERTICAL);
+}
+
 } // namespace Karm::Ui

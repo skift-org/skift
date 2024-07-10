@@ -7,6 +7,8 @@
 
 namespace Karm::Ui {
 
+// MARK: Scroll ----------------------------------------------------------------
+
 Child vhscroll(Child child);
 
 inline auto vhscroll() {
@@ -31,10 +33,30 @@ inline auto vscroll() {
     };
 }
 
-using BuildItem = Func<Child(usize)>;
+// MARK: Clip ------------------------------------------------------------------
 
-Child hlist(usize len, BuildItem child);
+Child vhclip(Child child);
 
-Child vlist(usize len, BuildItem child);
+inline auto vhclip() {
+    return [](Child child) {
+        return vhclip(child);
+    };
+}
+
+Child hclip(Child child);
+
+inline auto hclip() {
+    return [](Child child) {
+        return hclip(child);
+    };
+}
+
+Child vclip(Child child);
+
+inline auto vclip() {
+    return [](Child child) {
+        return vclip(child);
+    };
+}
 
 } // namespace Karm::Ui

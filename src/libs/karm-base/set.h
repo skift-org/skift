@@ -131,6 +131,23 @@ struct Set {
         _len = 0;
     }
 
+    auto iter() const {
+        return Iter{[&, i = 0uz]() mutable -> T const * {
+            if (i == _cap)
+                return nullptr;
+
+            while (i < _cap and _slots[i].state != Slot::USED)
+                i++;
+
+            if (i == _cap)
+                return nullptr;
+
+            auto *res = &_slots[i].unwrap();
+            i++;
+            return res;
+        }};
+    }
+
     usize len() const {
         return _len;
     }

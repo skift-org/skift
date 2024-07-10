@@ -111,13 +111,13 @@ test$("vaev-css-parse-attribute-selectors") {
     auto const SENSITIVE = Style::AttributeSelector::SENSITIVE;
     auto const PRESENT = Style::AttributeSelector::Match{Style::AttributeSelector::PRESENT};
     auto const EXACT = Style::AttributeSelector::Match{Style::AttributeSelector::EXACT};
-    auto const STR_END_WITH = Style::AttributeSelector::Match{Style::AttributeSelector::STR_END_WITH};
+    auto const STR_CONTAIN = Style::AttributeSelector::Match{Style::AttributeSelector::STR_CONTAIN};
     Str name = "type";
 
     expectEq$(parse(".className[type]"), Style::Selector::and_({classSel, Style::AttributeSelector{name, INSENSITIVE, PRESENT, ""s}}));
     expectEq$(parse(".className[type='text']"), Style::Selector::and_({classSel, Style::AttributeSelector{name, INSENSITIVE, EXACT, "text"s}}));
     expectEq$(parse(".className[ type = 'text' ]"), Style::Selector::and_({classSel, Style::AttributeSelector{name, INSENSITIVE, EXACT, "text"s}}));
-    expectEq$(parse(".className[type*='text']"), Style::Selector::and_({classSel, Style::AttributeSelector{name, INSENSITIVE, STR_END_WITH, "text"s}}));
+    expectEq$(parse(".className[type*='text']"), Style::Selector::and_({classSel, Style::AttributeSelector{name, INSENSITIVE, STR_CONTAIN, "text"s}}));
     expectEq$(parse(".className[type='text' s]"), Style::Selector::and_({classSel, Style::AttributeSelector{name, SENSITIVE, EXACT, "text"s}}));
 
     return Ok();

@@ -20,10 +20,25 @@ bool ended(Slice<Sst> content, usize &i) {
     return i + 1 >= content.len();
 }
 
+String betterStringParser(Str string) {
+    Io::SScan s = string;
+    StringBuilder sb{s.rem()};
+    auto quote = s.next();
+    while (not s.skip(quote) and not s.ended()) {
+        if (s.skip('\\') and not s.ended()) {
+            if (s.skip('\\'))
+                sb.append(s.next());
+        } else {
+            sb.append(s.next());
+        }
+    }
+    return sb.take();
+}
+
 Style::Selector parseAttributeSelector(Slice<Sst> content) {
     Style::AttributeSelector::Case caze = Style::AttributeSelector::INSENSITIVE;
     Str name = "";
-    Str value = "";
+    String value = ""s;
     Style::AttributeSelector::Match match = Style::AttributeSelector::Match{Style::AttributeSelector::PRESENT};
 
     usize step = 0;
@@ -64,7 +79,7 @@ Style::Selector parseAttributeSelector(Slice<Sst> content) {
             step++;
             break;
         case 2:
-            value = content[i].token.data;
+            value = betterStringParser(content[i].token.data);
             step++;
             break;
         case 3:

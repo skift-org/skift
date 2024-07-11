@@ -22,48 +22,29 @@ struct FontInfo {
     Strong<Fontface> face;
 };
 
+Str commonFamily(Str lhs, Str rhs);
+
 struct FontBook {
-    FaceId _nextId = FaceId{1};
-    Map<FaceId, FontInfo> _faces;
+    Vec<FontInfo> _faces;
     Array<String, toUnderlyingType(GenericFamily::_LEN)> _genericFamily;
 
-    FaceId add(FontInfo info) {
-        auto id = _nextId;
-        _nextId++;
-        _faces.put(id, info);
-        return id;
+    void add(FontInfo info) {
+        _faces.pushBack(info);
     }
 
-    FaceId load(Mime::Url url, Opt<FontAttrs> attrs = NONE);
+    Strong<Fontface> load(Mime::Url url, Opt<FontAttrs> attrs = NONE);
 
     Res<> loadAll();
 
-    Res<FontInfo> get(FaceId id) const {
-        auto res = _faces.tryGet(id);
-        if (not res)
-            return Error::notFound("font not found");
-        return Ok(res.unwrap());
-    }
+    Vec<String> families() const;
 
-    Set<String> families() const {
-        Set<String> families;
-        for (auto &[id, info] : _faces.iter())
-            families.put(info.attrs.family);
-        return families;
-    }
+    Str _resolveFamily(Family family) const;
 
-    Str _resolveFamily(Family family) const {
-        if (auto *gf = family.is<GenericFamily>()) {
-            return _genericFamily[toUnderlyingType(*gf)];
-        }
-        return family.unwrap<Str>();
-    }
+    Opt<Strong<Fontface>> queryExact(FontQuery query) const;
 
-    FaceId queryExact(FontQuery query) const;
+    Opt<Strong<Fontface>> queryClosest(FontQuery query) const;
 
-    FaceId queryClosest(FontQuery query) const;
-
-    Vec<FaceId> queryFamily(String family) const;
+    Vec<Strong<Fontface>> queryFamily(String family) const;
 };
 
 } // namespace Karm::Text

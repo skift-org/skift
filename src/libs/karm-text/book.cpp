@@ -48,8 +48,81 @@ Res<> FontBook::loadAll() {
     return Ok();
 }
 
+// MARK: Family Gathering ------------------------------------------------------
+
+static Str _nextWord(Io::SScan &s) {
+    s.eat(Re::space());
+    s.eat(Re::word());
+    return s.end();
+}
+
+static Str _peekWord(Io::SScan s) {
+    return _nextWord(s);
+}
+
+Str commonFamily(Str lhs, Str rhs) {
+    Io::SScan l(lhs);
+    Io::SScan r(rhs);
+
+    l.eat(Re::space());
+    r.eat(Re::space());
+
+    l.begin();
+    r.begin();
+
+    do {
+        Str lword = _peekWord(l);
+        Str rword = _peekWord(r);
+
+        if (lword != rword)
+            break;
+
+        _nextWord(l);
+        _nextWord(r);
+    } while (not(l.ended() or l.ended()));
+
+    return r.end();
+}
+
+Vec<String> FontBook::families() const {
+    Vec<String> families;
+    for (auto &info : _faces) {
+        bool found = false;
+        for (auto &f : families) {
+            auto prefix = commonFamily(f, info.attrs.family);
+            if (prefix) {
+                found = true;
+                f = prefix;
+                break;
+            }
+        }
+
+        if (not found)
+            families.pushBack(info.attrs.family);
+    }
+
+    sort(families);
+    return families;
+}
+
 // MARK: Font Matching ---------------------------------------------------------
 // https://www.w3.org/TR/css-fonts-3/#font-matching-algorithm
+
+Str _pickFamily(Str curr, Str best, Str desired) {
+    if (curr == desired)
+        return curr;
+
+    if (best == desired)
+        return best;
+
+    auto currPrefix = commonFamily(curr, desired);
+    auto bestPrefix = commonFamily(best, desired);
+
+    if (currPrefix.len() > bestPrefix.len())
+        return curr;
+
+    return best;
+}
 
 FontStretch _pickFontStretch(FontStretch curr, FontStretch best, FontStretch desired) {
     if (best == FontStretch::NO_MATCH)
@@ -127,41 +200,51 @@ FontStyle _pickFontStyle(FontStyle curr, FontStyle best, FontStyle desired) {
     return best;
 }
 
-FaceId FontBook::queryExact(FontQuery query) const {
+Str FontBook::_resolveFamily(Family family) const {
+    if (auto *gf = family.is<GenericFamily>())
+        return _genericFamily[toUnderlyingType(*gf)];
+    return family.unwrap<Str>();
+}
+
+Opt<Strong<Fontface>> FontBook::queryExact(FontQuery query) const {
     auto family = _resolveFamily(query.family);
 
-    for (auto &[id, info] : _faces.iter()) {
+    for (auto &info : _faces) {
         auto &attrs = info.attrs;
 
         if (attrs.family == family and
             attrs.weight == query.weight and
             attrs.stretch == query.stretch and
             attrs.style == query.style)
-            return id;
+            return info.face;
     }
 
-    return FaceId{0};
+    return NONE;
 }
 
-FaceId FontBook::queryClosest(FontQuery query) const {
-    Str family = _resolveFamily(query.family);
+Opt<Strong<Fontface>> FontBook::queryClosest(FontQuery query) const {
+    Str desiredfamily = _resolveFamily(query.family);
 
-    FaceId matchingFace{0};
+    Opt<Strong<Fontface>> matchingFace;
+    auto matchingFamily = ""s;
     auto matchingStretch = FontStretch::NO_MATCH;
     auto matchingStyle = FontStyle::NO_MATCH;
     auto matchingWeight = FontWeight::NO_MATCH;
 
-    for (auto &[id, info] : _faces.iter()) {
+    for (auto &info : _faces) {
         auto const &attrs = info.attrs;
 
-        if (attrs.family != family)
-            continue;
-
+        auto currFamily = matchingFamily;
         auto currStretch = matchingStretch;
         auto currStyle = matchingStyle;
         auto currWeight = matchingWeight;
 
-        currStretch = _pickFontStretch(attrs.stretch, matchingStretch, query.stretch);
+        currFamily = _pickFamily(attrs.family, matchingFamily, desiredfamily);
+
+        if (attrs.family != currFamily)
+            continue;
+
+        currStretch = _pickFontStretch(attrs.stretch, currStretch, query.stretch);
         if (attrs.stretch != currStretch)
             continue;
 
@@ -170,18 +253,18 @@ FaceId FontBook::queryClosest(FontQuery query) const {
             currWeight = FontWeight::NO_MATCH;
         }
 
-        currStyle = _pickFontStyle(attrs.style, matchingStyle, query.style);
+        currStyle = _pickFontStyle(attrs.style, currStyle, query.style);
         if (attrs.style != currStyle)
             continue;
 
         if (currStyle != matchingStyle)
             currWeight = FontWeight::NO_MATCH;
 
-        currWeight = _pickFontWeight(attrs.weight, matchingWeight, query.weight);
+        currWeight = _pickFontWeight(attrs.weight, currWeight, query.weight);
         if (attrs.weight != currWeight)
             continue;
 
-        matchingFace = id;
+        matchingFace = info.face;
         matchingStretch = currStretch;
         matchingStyle = currStyle;
         matchingWeight = currWeight;
@@ -190,12 +273,12 @@ FaceId FontBook::queryClosest(FontQuery query) const {
     return matchingFace;
 }
 
-Vec<FaceId> FontBook::queryFamily(String family) const {
-    Vec<FaceId> ids;
-    for (auto &[id, info] : _faces.iter()) {
+Vec<Strong<Fontface>> FontBook::queryFamily(String family) const {
+    Vec<Strong<Fontface>> res;
+    for (auto &info : _faces)
         if (info.attrs.family == family)
-            ids.pushBack(id);
-    }
-    return ids;
+            res.pushBack(info.face);
+    return res;
 }
+
 } // namespace Karm::Text

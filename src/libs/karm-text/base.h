@@ -15,12 +15,6 @@ struct Glyph : public Distinct<usize, struct _GlyphTag> {
 
 constexpr Glyph Glyph::TOFU{Limits<usize>::MIN};
 
-// MARK: FaceId ----------------------------------------------------------------
-
-struct FaceId : public Distinct<usize, struct _FaceIdTag> {
-    using Distinct::Distinct;
-};
-
 // MARK: FontStyle -------------------------------------------------------------
 
 enum struct FontStyle {

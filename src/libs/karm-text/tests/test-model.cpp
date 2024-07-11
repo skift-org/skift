@@ -3,7 +3,7 @@
 
 namespace Karm::Text::Tests {
 
-test$("model-moves") {
+test$("karm-text-model-moves") {
     Model mdl{"foo bar baz"};
 
     mdl.moveNext();

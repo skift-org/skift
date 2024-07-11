@@ -196,6 +196,29 @@ struct FontAttrs {
         e.ln("style: {}", style);
         e.ln("monospace: {}", monospace);
     }
+
+    bool normal() const {
+        return weight == FontWeight::REGULAR and
+               stretch == FontStretch::NORMAL and
+               style == FontStyle::NORMAL and
+               monospace == Monospace::NO;
+    }
+
+    auto operator<=>(FontAttrs const &other) const {
+        auto ordr = family <=> other.family;
+        if (ordr != 0)
+            return ordr;
+
+        ordr = style <=> other.style;
+        if (ordr != 0)
+            return ordr;
+
+        ordr = stretch <=> other.stretch;
+        if (ordr != 0)
+            return ordr;
+
+        return weight <=> other.weight;
+    }
 };
 
 } // namespace Karm::Text

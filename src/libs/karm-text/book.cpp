@@ -276,8 +276,12 @@ Opt<Strong<Fontface>> FontBook::queryClosest(FontQuery query) const {
 Vec<Strong<Fontface>> FontBook::queryFamily(String family) const {
     Vec<Strong<Fontface>> res;
     for (auto &info : _faces)
-        if (info.attrs.family == family)
+        if (commonFamily(info.attrs.family, family) == family)
             res.pushBack(info.face);
+
+    sort(res, [](auto &lhs, auto &rhs) {
+        return lhs->attrs() <=> rhs->attrs();
+    });
     return res;
 }
 

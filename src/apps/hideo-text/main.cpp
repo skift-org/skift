@@ -87,9 +87,7 @@ Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
                             Ui::labelSmall("{}{}", s.url ? s.url->basename() : "Untitled", s.text->dirty() ? "*" : ""),
                             Ui::icon(Mdi::CIRCLE_SMALL, Ui::GRAY700) | Ui::spacing({-3, 0}),
                             Ui::text(Ui::TextStyles::labelSmall().withColor(Ui::GRAY500), "{}", s.url)
-                        ) | Ui::box({
-                                .padding = {16, 6},
-                            }),
+                        ) | Ui::spacing({16, 6}),
                         Ui::separator(),
 
                         s.error ? alert("Unable to load text"s, Io::toStr(s.error).unwrap()) | Ui::grow() : editor(s.text),

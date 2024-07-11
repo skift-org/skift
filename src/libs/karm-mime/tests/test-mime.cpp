@@ -3,7 +3,7 @@
 
 namespace Karm::Mime::Tests {
 
-test$("mime-parse") {
+test$("karm-mime-mime-parse") {
     auto mime = "text/plain"_mime;
     expectEq$(mime.type(), "text"s);
     expectEq$(mime.subtype(), "plain"s);

@@ -14,8 +14,13 @@ Path Path::parse(Io::SScan &s, bool inUrl, bool stopAtWhitespace) {
     }
 
     s.begin();
-    while (not s.ended() and (inUrl or (s.curr() != '?' and s.curr() != '#')) and
-           (not stopAtWhitespace or not isAsciiSpace(s.curr()))) {
+    while (not s.ended()) {
+        if (inUrl and (s.curr() == '?' or s.curr() == '#'))
+            break;
+
+        if (stopAtWhitespace and isAsciiSpace(s.curr()))
+            break;
+
         if (s.curr() == SEP) {
             path._parts.pushBack(s.end());
             s.next();
@@ -102,14 +107,20 @@ bool Path::isParentOf(Path const &other) const {
 Res<usize> Path::write(Io::TextWriter &writer) const {
     usize written = 0;
 
-    if (not rooted)
+    if (not rooted and len() == 0)
         written += try$(writer.writeRune('.'));
 
     if (rooted and len() == 0)
         written += try$(writer.writeRune(SEP));
 
-    for (auto part : iter())
-        written += try$(Io::format(writer, "{c}{}", SEP, part));
+    bool first = not rooted;
+
+    for (auto part : iter()) {
+        if (not first)
+            try$(writer.writeRune(SEP));
+        written += try$(writer.writeStr(part));
+        first = false;
+    }
 
     return Ok(written);
 }

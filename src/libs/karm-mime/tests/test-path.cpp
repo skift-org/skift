@@ -3,7 +3,7 @@
 
 namespace Karm::Mime::Tests {
 
-test$("path-up-down") {
+test$("karm-mime-path-up-down") {
     auto path = "/a/b/c/d/e/f"_path;
 
     auto up1 = path.parent(1);
@@ -27,7 +27,7 @@ test$("path-up-down") {
     return Ok();
 }
 
-test$("path-parent-of") {
+test$("karm-mime-path-parent-of") {
     expect$(""_path.isParentOf(""_path));
     expect$("/a"_path.isParentOf("/a"_path));
     expect$("/a"_path.isParentOf("/a/b"_path));
@@ -35,6 +35,18 @@ test$("path-parent-of") {
     expect$("/a/b"_path.isParentOf("/a/b/c"_path));
     expectNot$("/a/c"_path.isParentOf("/a/b/c"_path));
     expect$("."_path.isParentOf("."_path));
+
+    return Ok();
+}
+
+test$("karm-mime-path-str") {
+    expectEq$(""_path.str(), ".");
+    expectEq$("/a/b/c"_path.str(), "/a/b/c");
+    expectEq$("a/b/c"_path.str(), "a/b/c");
+    expectEq$("a/b/c/"_path.str(), "a/b/c");
+    expectEq$("a/b/c/."_path.str(), "a/b/c/.");
+    expectEq$("a/b/c/.."_path.str(), "a/b/c/..");
+    expectEq$("a/b/c/../"_path.str(), "a/b/c/..");
 
     return Ok();
 }

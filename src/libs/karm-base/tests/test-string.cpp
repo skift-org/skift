@@ -23,6 +23,7 @@ test$("string-value-constructed-inline") {
 
 test$("string-default-constructed") {
     String str;
+
     expectEq$(str.len(), 0uz);
     expectEq$(str, ""s);
     // We have to use _buf here because in the case of a default

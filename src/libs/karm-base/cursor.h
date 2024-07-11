@@ -194,6 +194,14 @@ struct MutCursor {
     always_inline constexpr usize len() const {
         return _end - _begin;
     }
+
+    always_inline constexpr Bytes bytes() const {
+        return Bytes{_begin, _end};
+    }
+
+    always_inline constexpr MutBytes bytes() {
+        return MutBytes{_begin, _end};
+    }
 };
 
 } // namespace Karm

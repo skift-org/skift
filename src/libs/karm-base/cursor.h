@@ -1,5 +1,6 @@
 #pragma once
 
+#include "defer.h"
 #include "slice.h"
 
 namespace Karm {
@@ -96,6 +97,15 @@ struct Cursor {
 
     always_inline constexpr MutBytes bytes() {
         return MutBytes{_begin, _end};
+    }
+
+    /// Creates a rollback point for the cursor. If not manually disarmed,
+    /// the cursor's state will be restored to its position at the time of
+    /// this rollback point's creation when it goes out of scope.
+    auto rollbackPoint() {
+        return ArmedDefer{[&, saved = *this] {
+            *this = saved;
+        }};
     }
 };
 
@@ -201,6 +211,15 @@ struct MutCursor {
 
     always_inline constexpr MutBytes bytes() {
         return MutBytes{_begin, _end};
+    }
+
+    /// Creates a rollback point for the cursor. If not manually disarmed,
+    /// the cursor's state will be restored to its position at the time of
+    /// this rollback point's creation when it goes out of scope.
+    auto rollbackPoint() {
+        return ArmedDefer{[&, saved = *this] {
+            *this = saved;
+        }};
     }
 };
 

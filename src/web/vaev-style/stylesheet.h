@@ -65,7 +65,7 @@ struct Rule : public _Rule {
     void repr(Io::Emit &e) const;
 };
 
-// https:// www.w3.org/TR/cssom-1/#css-style-sheets
+// https://www.w3.org/TR/cssom-1/#css-style-sheets
 struct StyleSheet {
     Mime::Mime mime = "text/css"_mime;
     Mime::Url href = ""_url;

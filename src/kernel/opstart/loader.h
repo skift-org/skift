@@ -7,7 +7,7 @@
 #include <karm-sys/file.h>
 #include <vaev-json/json.h>
 
-namespace Loader {
+namespace Opstart {
 
 Res<Sys::File> openUrl(Mime::Url const &url);
 
@@ -97,4 +97,4 @@ Res<> showMenu(Sys::Context &ctx, Configs const &c);
 
 Res<> loadEntry(Entry const &);
 
-} // namespace Loader
+} // namespace Opstart

@@ -10,7 +10,7 @@ def generateSystem(img: image.Image) -> None:
 
     img.mkdir("EFI")
     img.mkdir("EFI/BOOT")
-    img.installTo("loader", "efi-x86_64", "EFI/BOOT/BOOTX64.EFI")
+    img.installTo("opstart", "efi-x86_64", "EFI/BOOT/BOOTX64.EFI")
     img.install("hjert", "kernel-x86_64")
     img.installAll("skift-x86_64")
 

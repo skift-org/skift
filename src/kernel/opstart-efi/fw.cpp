@@ -1,10 +1,10 @@
 #include <efi/base.h>
 #include <karm-base/align.h>
-#include <loader/fw.h>
+#include <opstart/fw.h>
 
 #include <hal-x86_64/vmm.h>
 
-namespace Loader::Fw {
+namespace Opstart::Fw {
 
 struct EfiPmm : public Hal::Pmm {
     Res<Hal::PmmRange> allocRange(usize size, Hal::PmmFlags) override {
@@ -150,4 +150,4 @@ void enterKernel(usize entry, Handover::Payload &payload, usize stack, Hal::Vmm 
     __enterKernel(entry, (usize)&payload + Handover::KERNEL_BASE, stack, vmm.root());
 }
 
-} // namespace Loader::Fw
+} // namespace Opstart::Fw

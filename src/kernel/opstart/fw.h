@@ -5,7 +5,7 @@
 #include <karm-base/rc.h>
 #include <karm-base/res.h>
 
-namespace Loader::Fw {
+namespace Opstart::Fw {
 
 Res<Strong<Hal::Vmm>> createVmm();
 
@@ -15,4 +15,4 @@ void enterKernel(usize entry, Handover::Payload &payload, usize stack, Hal::Vmm 
 
 Hal::PmmRange imageRange();
 
-} // namespace Loader::Fw
+} // namespace Opstart::Fw

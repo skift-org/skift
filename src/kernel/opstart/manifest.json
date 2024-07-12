@@ -1,6 +1,6 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "loader",
+    "id": "opstart",
     "description": "A simple and configurable bootloader",
     "type": "exe",
     "enableIf": {
@@ -11,7 +11,7 @@
     "requires": [
         "hideo-base",
         "karm-sys",
-        "loader-impl",
+        "opstart-impl",
         "vaev-json"
     ]
 }

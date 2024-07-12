@@ -1,6 +1,5 @@
 {
-    "title": "Welcome to skiftOS",
-    "subtitle": "Select an entry",
+    "subtitle": "Select an Operating System to boot",
     "entries": [
         {
             "name": "skiftOS",

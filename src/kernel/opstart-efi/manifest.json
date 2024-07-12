@@ -1,6 +1,6 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "loader-efi",
+    "id": "opstart-efi",
     "type": "lib",
     "description": "Efi implementation of kernel loading",
     "enableIf": {
@@ -13,6 +13,6 @@
         "karm-logger"
     ],
     "provides": [
-        "loader-impl"
+        "opstart-impl"
     ]
 }

@@ -5,6 +5,8 @@
 #include "loader.h"
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
+    logInfo("Opstart ►");
+
     logInfo("loading configs...");
     auto file = co_try$(Sys::File::open("file:/boot/loader.json"_url));
 
@@ -15,10 +17,10 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     logInfo("validating configs...");
     logInfo("configs: {}", json);
 
-    auto configs = co_try$(Loader::Configs::fromJson(json));
+    auto configs = co_try$(Opstart::Configs::fromJson(json));
 
     if (configs.entries.len() > 1 or configs.entries.len() == 0)
-        co_return Loader::showMenu(ctx, configs);
+        co_return Opstart::showMenu(ctx, configs);
 
-    co_return Loader::loadEntry(configs.entries[0]);
+    co_return Opstart::loadEntry(configs.entries[0]);
 }

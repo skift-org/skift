@@ -6,7 +6,7 @@
 
 #include "loader.h"
 
-namespace Loader {
+namespace Opstart {
 
 // MARK: Model -----------------------------------------------------------------
 
@@ -37,7 +37,7 @@ void reduce(State &s, Action a) {
         [&](SelectAction) {
             if (s.error)
                 s.error = NONE;
-            auto res = Loader::loadEntry(s.configs.entries[s.selected]);
+            auto res = Opstart::loadEntry(s.configs.entries[s.selected]);
             if (not res)
                 s.error = String{res.none().msg()};
         },
@@ -135,23 +135,24 @@ Ui::Child menu(Configs const &c) {
                     s.error.unwrap()
                 );
 
+            Ui::Children children;
+
+            if (s.configs.title)
+                children.pushBack(Ui::headlineLarge(*s.configs.title));
+
+            if (s.configs.subtitle)
+                children.pushBack(Ui::titleLarge(Ui::GRAY400, *s.configs.subtitle));
+
+            children.pushBack(list(s) | Ui::grow());
+
+            children.pushBack(Ui::labelMedium("Use ← and → to navigate, and press ENTER to select an entry."));
+
+            children.pushBack(Ui::labelSmall(Ui::GRAY500, "Powered by Opstart ►"));
+
             return Ui::vflow(
                        16,
                        Math::Align::CENTER,
-                       Ui::headlineLarge(
-                           s.configs.title
-                               ? *s.configs.title
-                               : String{"Welcome!"}
-                       ),
-                       Ui::titleLarge(
-                           Ui::GRAY400,
-                           s.configs.subtitle
-                               ? *s.configs.subtitle
-                               : String{"Select an operating system"}
-                       ),
-                       list(s) | Ui::grow(4),
-                       Ui::labelMedium("Use the [ARROW KEYS] to navigate, and press [ENTER] to select an entry."),
-                       Ui::labelSmall(Ui::GRAY500, "Powered by Opstart ►")
+                       children
                    ) |
                    Ui::spacing(64) |
                    Ui::intent(intent);
@@ -160,7 +161,7 @@ Ui::Child menu(Configs const &c) {
 }
 
 Res<> showMenu(Sys::Context &ctx, Configs const &c) {
-    return Ui::runApp(ctx, Loader::menu(c));
+    return Ui::runApp(ctx, Opstart::menu(c));
 }
 
-} // namespace Loader
+} // namespace Opstart

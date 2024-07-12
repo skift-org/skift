@@ -194,8 +194,10 @@ void Prose::paint(Gfx::Context &ctx) const {
     auto m = _style.font.metrics();
 
     ctx.save();
-    if (_style.color)
+    if (_style.color) {
         ctx.fillStyle(*_style.color);
+    }
+    ctx.strokeStyle(Gfx::Stroke{.paint = ctx.current().paint, .width = 1, .align = Gfx::INSIDE_ALIGN});
 
     for (auto const &line : _lines) {
         for (auto &block : line.blocks(*this)) {
@@ -203,11 +205,14 @@ void Prose::paint(Gfx::Context &ctx) const {
                 auto glyph = cell.glyph;
 
                 if (glyph == Glyph::TOFU) {
-                    ctx.rect(Math::Rectf::fromTwoPoint(
-                        {block.pos + cell.pos, line.baseline - m.ascend},
-                        {block.pos + cell.pos + cell.adv, line.baseline + m.descend}
-                    ));
-                    ctx.stroke();
+                    ctx.stroke(
+                        Math::Rectf::fromTwoPoint(
+                            {block.pos + cell.pos, line.baseline - m.ascend},
+                            {block.pos + cell.pos + cell.adv, line.baseline + m.descend}
+                        )
+                            .shrink(4)
+                            .cast<isize>()
+                    );
                 } else {
                     _fillGlyph(ctx, _style.font, {block.pos + cell.pos, line.baseline}, cell.glyph);
                 }

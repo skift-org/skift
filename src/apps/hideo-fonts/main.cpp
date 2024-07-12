@@ -69,9 +69,10 @@ Ui::Child allFamiliesItem(State const &s, Str family) {
     return Ui::vflow(
                8,
                Ui::labelMedium(Ui::GRAY500, "{} · {} {}", family, nStyle, nStyle == 1 ? "Style" : "Styles"),
-               Ui::text(Text::ProseStyle{font}, PANGRAM) | Ui::hclip()
+               Ui::text(Text::ProseStyle{font}, PANGRAM)
            ) |
-           Ui::spacing({8, 8, 0, 8}) |
+           Ui::spacing({12, 8, 0, 8}) |
+           Ui::hclip() |
            Ui::button(Model::bind<SelectFamily>(family), Ui::ButtonStyle::outline());
 }
 
@@ -126,10 +127,11 @@ Ui::Child familyItem(State const &, Strong<Text::Fontface> fontface) {
     return Ui::vflow(
                8,
                Ui::labelMedium(Ui::GRAY500, "{}", attrs.family),
-               Ui::text(Text::ProseStyle{font}, PANGRAM) | Ui::hclip(),
+               Ui::text(Text::ProseStyle{font}, PANGRAM),
                fontfaceTags(attrs)
            ) |
-           Ui::spacing({8, 8, 0, 8}) |
+           Ui::spacing({12, 8, 0, 8}) |
+           Ui::hclip() |
            Ui::button(Model::bind<SelectFace>(fontface), Ui::ButtonStyle::outline());
 }
 

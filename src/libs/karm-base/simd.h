@@ -48,6 +48,10 @@ using u32x8 = u32 __attribute__((vector_size(32)));
 using u64x2 = u64 __attribute__((vector_size(16)));
 using u64x4 = u64 __attribute__((vector_size(32)));
 
+using f16x2 = __fp16 __attribute__((vector_size(4)));
+using f16x4 = __fp16 __attribute__((vector_size(8)));
+using f16x8 = __fp16 __attribute__((vector_size(16)));
+
 using f32x2 = float __attribute__((vector_size(8)));
 using f32x4 = float __attribute__((vector_size(16)));
 using f32x8 = float __attribute__((vector_size(32)));

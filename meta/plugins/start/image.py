@@ -54,6 +54,13 @@ class Image:
 
             for res in builder.listRes(dep):
                 rel = Path(res).relative_to(dep.subpath("res"))
+                if rel.name == "_meta.json":
+                    with open(res, "r") as f:
+                        meta = json.load(f)
+                        pak = self.ensurePak(depId)
+                        for k, v in meta.items():
+                            pak[k] = v
+                    continue
 
                 self.cpRef("_index", res, f"{depId}/{rel}")
                 self.cpRef(component.id, res, f"{depId}/{rel}")

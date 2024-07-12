@@ -68,6 +68,7 @@ class StartArgs:
         default="x86_64",
     )
     dint: bool = cli.arg(None, "dint", "Debug interrupts")
+    clean: bool = cli.arg(None, "clean", "Clean the image before starting")
 
 
 @cli.command("s", "image/start", "Boot the system")
@@ -79,7 +80,11 @@ def _(args: StartArgs) -> None:
 
     registry = model.Registry.use(rargs)
 
-    img = image.Image(registry, store.Dir(f"image-efi-{args.arch}"))
+    dirStore = store.Dir(f"image-efi-{args.arch}")
+    if args.clean:
+        dirStore.clean()
+
+    img = image.Image(registry, dirStore)
 
     if args.arch == "x86_64":
         generateSystem(img)

@@ -8,17 +8,13 @@ from pathlib import Path
 
 
 class Storage(Protocol):
-    def store(self, src: str, dest: str) -> None:
-        ...
+    def store(self, src: str, dest: str) -> None: ...
 
-    def mkdir(self, path: str):
-        ...
+    def mkdir(self, path: str): ...
 
-    def write(self, data: bytes, dest: str) -> None:
-        ...
+    def write(self, data: bytes, dest: str) -> None: ...
 
-    def finalize(self) -> str:
-        ...
+    def finalize(self) -> str: ...
 
 
 class Dir(Storage):
@@ -47,6 +43,9 @@ class Dir(Storage):
 
     def finalize(self) -> str:
         return self._root
+
+    def clean(self) -> None:
+        shell.rmrf(self._root)
 
 
 class RawHdd(Storage):

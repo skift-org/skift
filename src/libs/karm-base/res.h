@@ -50,7 +50,7 @@ struct [[nodiscard]] Res {
         : _inner(err) {}
 
     always_inline constexpr Res(None)
-        : _inner(Error::other("none")) {}
+        : _inner(Error::other("unexpected none")) {}
 
     template <typename U>
     always_inline constexpr Res(Res<U, E> other)

@@ -26,3 +26,5 @@
 "Trans rights are human rights",
 "Water is life",
 "You are worthy",
+"Be political",
+"Being non-political is a political stance"

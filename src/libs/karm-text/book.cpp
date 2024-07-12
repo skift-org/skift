@@ -42,6 +42,14 @@ Res<> FontBook::loadAll() {
         }
     }
 
+    auto ibmVga = Fontface::fallback();
+
+    add({
+        .url = ""_url,
+        .attrs = ibmVga->attrs(),
+        .face = ibmVga,
+    });
+
     auto elapsed = Sys::now() - start;
     logDebug("Loaded {} fonts in {}", count, elapsed);
 

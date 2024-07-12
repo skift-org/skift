@@ -189,7 +189,8 @@ void Context::fill(Math::Edgei edge, f64 thickness) {
     begin();
     moveTo(edge.start.cast<f64>());
     lineTo(edge.end.cast<f64>());
-    stroke(Stroke{}.withWidth(thickness));
+    auto copy = strokeStyle();
+    stroke(copy.withWidth(thickness));
 }
 
 void Context::stroke(Math::Recti r, Math::Radiusf radius) {
@@ -296,7 +297,7 @@ void Context::plot(Gfx::Color color) {
 
 // MARK: Paths -----------------------------------------------------------------
 
-[[gnu::flatten]] void Context::_fillImpl(auto paint, auto format, FillRule fillRule) {
+void Context::_fillImpl(auto paint, auto format, FillRule fillRule) {
     _rast.fill(_poly, current().clip, fillRule, [&](Rast::Frag frag) {
         auto pixels = mutPixels();
         auto *pixel = pixels.pixelUnsafe(frag.xy);
@@ -307,7 +308,7 @@ void Context::plot(Gfx::Color color) {
     });
 }
 
-[[gnu::flatten]] void Context::_FillSmoothImpl(auto paint, auto format, FillRule fillRule) {
+void Context::_FillSmoothImpl(auto paint, auto format, FillRule fillRule) {
     Math::Vec2f last = {0, 0};
     auto fillComponent = [&](auto comp, Math::Vec2f pos) {
         _poly.offset(pos - last);

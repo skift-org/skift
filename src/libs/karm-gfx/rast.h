@@ -11,7 +11,7 @@ enum struct FillRule {
 };
 
 struct Rast {
-    static constexpr auto AA = 4;
+    static constexpr auto AA = 3;
     static constexpr auto UNIT = 1.0f / AA;
     static constexpr auto HALF_UNIT = 1.0f / AA / 2.0;
 

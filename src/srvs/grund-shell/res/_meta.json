@@ -1,9 +1,9 @@
 {
-    "id": "grund-dns",
+    "id": "grund-shell",
     "props": {
         "service.requires": [
             "grund-system",
-            "grund-net"
+            "grund-device"
         ]
     }
 }

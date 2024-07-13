@@ -41,6 +41,8 @@ Async::Task<> entryPointAsync(Sys::Context &) {
         irqs.pushBack(std::move(irq));
     }
 
+    logInfo("service started");
+
     while (true) {
         co_try$(listener.poll(TimeStamp::endOfTime()));
 

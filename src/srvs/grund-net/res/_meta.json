@@ -1,12 +1,9 @@
 {
     "id": "grund-net",
     "props": {
-        "unit.consumes": [
-            "Grund::Bus",
-            "Grund::Device"
-        ],
-        "unit.provides": [
-            "Grund::Net"
+        "service.requires": [
+            "grund-system",
+            "grund-device"
         ]
     }
 }

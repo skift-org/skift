@@ -1,8 +1,7 @@
+#include <hideo-shell/app.h>
 #include <karm-image/loader.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
-
-#include "../app.h"
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto args = useArgs(ctx);

@@ -8,48 +8,36 @@
 
 namespace Grund::System {
 
-struct Unit {
+struct Service {
     Hj::Task _task;
     Hj::Channel _in;
     Hj::Channel _out;
 
-    static Res<Strong<Unit>> load(Sys::Context &ctx, Str id);
+    static Res<Strong<Service>> load(Sys::Context &ctx, Str id);
 };
 
-struct Object {
-    usize _id;
-    usize _port;
-    Strong<Unit> _unit;
-
-    static Res<Strong<Object>> create(usize port, Strong<Unit> unit) {
-        static usize id = 0;
-        return Ok(makeStrong<Object>(id++, port, unit));
-    }
-};
-
-struct Bus {
+struct System {
     Sys::Context &context;
     Hj::Listener _listener;
     Hj::Domain _domain;
 
-    Vec<Strong<Unit>> _units{};
-    Vec<Strong<Object>> _objs{};
+    Vec<Strong<Service>> _services{};
 
-    static Res<Bus> create(Sys::Context &ctx) {
+    static Res<System> create(Sys::Context &ctx) {
         auto domain = try$(Hj::Domain::create(Hj::ROOT));
         auto listener = try$(Hj::Listener::create(Hj::ROOT));
-        return Ok(Bus{ctx, std::move(listener), std::move(domain)});
+        return Ok(System{ctx, std::move(listener), std::move(domain)});
     }
 
-    Res<> target(Str id) {
-        auto deviceUnit = try$(Unit::load(context, id));
-        try$(_attach(deviceUnit));
+    Res<> load(Str id) {
+        auto service = try$(Service::load(context, id));
+        try$(_attach(service));
         return Ok();
     }
 
-    Res<> _attach(Strong<Unit> unit) {
-        try$(_listener.listen(unit->_out, Hj::Sigs::READABLE, Hj::Sigs::NONE));
-        _units.pushBack(std::move(unit));
+    Res<> _attach(Strong<Service> service) {
+        try$(_listener.listen(service->_out, Hj::Sigs::READABLE, Hj::Sigs::NONE));
+        _services.pushBack(std::move(service));
         return Ok();
     }
 

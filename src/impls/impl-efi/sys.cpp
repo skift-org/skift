@@ -272,14 +272,14 @@ static Res<Mime::Path> resolve(Mime::Url url) {
 
         if (not object.isObject()) {
             logError("invalid object");
-            return Error::invalidData();
+            return Error::invalidData("invalid object");
         }
 
         auto ref = object.get("ref");
 
         if (not ref.isStr()) {
             logError("invalid ref");
-            return Error::invalidData();
+            return Error::invalidData("invalid ref");
         }
 
         auto refStr = ref.asStr();

@@ -57,9 +57,21 @@ inline void logPrint(Format format, Args &&...va) {
 }
 
 template <typename... Args>
+inline void logPrintIf(bool condition, Format format, Args &&...va) {
+    if (condition)
+        logPrint(format, std::forward<Args>(va)...);
+}
+
+template <typename... Args>
 inline void logDebug(Format format, Args &&...va) {
     Io::Args<Args...> args{std::forward<Args>(va)...};
     _log(DEBUG, format, args);
+}
+
+template <typename... Args>
+inline void logDebugIf(bool condition, Format format, Args &&...va) {
+    if (condition)
+        logDebug(format, std::forward<Args>(va)...);
 }
 
 template <typename... Args>
@@ -69,19 +81,42 @@ inline void logInfo(Format format, Args &&...va) {
 }
 
 template <typename... Args>
+inline void logInfoIf(bool condition, Format format, Args &&...va) {
+    if (condition)
+        logInfo(format, std::forward<Args>(va)...);
+}
+
+template <typename... Args>
 inline void logWarn(Format format, Args &&...va) {
     Io::Args<Args...> args{std::forward<Args>(va)...};
     _log(WARNING, format, args);
+}
+
+template <typename... Args>
+inline void logWarnIf(bool condition, Format format, Args &&...va) {
+    if (condition)
+        logWarn(format, std::forward<Args>(va)...);
 }
 
 inline void logTodo(Loc loc = Loc::current()) {
     logWarn("todo: {}", loc.func);
 }
 
+inline void logTodoIf(bool condition, Loc loc = Loc::current()) {
+    if (condition)
+        logTodo(loc);
+}
+
 template <typename... Args>
 inline void logError(Format format, Args &&...va) {
     Io::Args<Args...> args{std::forward<Args>(va)...};
     _log(ERROR, format, args);
+}
+
+template <typename... Args>
+inline void logErrorIf(bool condition, Format format, Args &&...va) {
+    if (condition)
+        logError(format, std::forward<Args>(va)...);
 }
 
 template <typename... Args>

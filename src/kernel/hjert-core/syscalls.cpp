@@ -28,6 +28,8 @@ Res<> doLog(Task &self, UserSlice<Str> msg) {
         auto styledLabel = Cli::styled(self.label(), Cli::style(Cli::random(self.id())));
         try$(Io::format(Hjert::Arch::globalOut(), "{} | ", Io::aligned(styledLabel, Io::Align::LEFT, 26)));
         try$(Hjert::Arch::globalOut().writeStr(str));
+        if (str.len() == 0 or str[str.len() - 1] != '\n')
+            try$(Hjert::Arch::globalOut().writeStr("\n"));
         return Ok();
     });
 }

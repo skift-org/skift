@@ -1,12 +1,9 @@
 {
     "id": "grund-seat",
     "props": {
-        "unit.consumes": [
-            "Grund::Bus",
-            "Grund::Device"
-        ],
-        "unit.provides": [
-            "Grund::Seat"
+        "service.requires": [
+            "grund-system",
+            "grund-device"
         ]
     }
 }

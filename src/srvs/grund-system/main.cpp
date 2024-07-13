@@ -4,18 +4,27 @@
 #include <karm-logger/logger.h>
 #include <karm-sys/entry.h>
 
-#include "bus.h"
+#include "system.h"
 
 using namespace Grund::System;
 
 Res<> entryPoint(Sys::Context &ctx) {
     try$(Hj::Task::self().label("grund-system"));
 
-    auto bus = try$(Bus::create(ctx));
-    try$(bus.target("grund-device"s));
-    try$(bus.target("hideo-shell.main"s));
+    auto system = try$(System::create(ctx));
 
-    return bus.run();
+    try$(system.load("grund-audio"s));
+    try$(system.load("grund-conf"s));
+    try$(system.load("grund-device"s));
+    try$(system.load("grund-dhcp"s));
+    try$(system.load("grund-dns"s));
+    try$(system.load("grund-echo"s));
+    try$(system.load("grund-fs"s));
+    try$(system.load("grund-net"s));
+    try$(system.load("grund-seat"s));
+    try$(system.load("grund-shell"s));
+
+    return system.run();
 }
 
 // NOTE: We can't use the normal entryPointAsync because

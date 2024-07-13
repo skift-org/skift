@@ -13,16 +13,16 @@ Res<> entryPoint(Sys::Context &ctx) {
 
     auto system = try$(System::create(ctx));
 
-    try$(system.load("grund-audio"s));
-    try$(system.load("grund-conf"s));
-    try$(system.load("grund-device"s));
-    try$(system.load("grund-dhcp"s));
-    try$(system.load("grund-dns"s));
-    try$(system.load("grund-echo"s));
-    try$(system.load("grund-fs"s));
-    try$(system.load("grund-net"s));
-    try$(system.load("grund-seat"s));
-    try$(system.load("grund-shell"s));
+    try$(system.prepare("grund-audio"s));
+    try$(system.prepare("grund-conf"s));
+    try$(system.prepare("grund-device"s));
+    try$(system.prepare("grund-dhcp"s));
+    try$(system.prepare("grund-dns"s));
+    try$(system.prepare("grund-echo"s));
+    try$(system.prepare("grund-fs"s));
+    try$(system.prepare("grund-net"s));
+    try$(system.prepare("grund-seat"s));
+    try$(system.prepare("grund-shell"s));
 
     return system.run();
 }

@@ -9,15 +9,18 @@
 namespace Grund::System {
 
 struct Service {
-    Hj::Task _task;
+    String _id;
     Hj::Channel _in;
     Hj::Channel _out;
+    Opt<Hj::Task> _task = NONE;
 
-    static Res<Strong<Service>> load(Sys::Context &ctx, Str id);
+    static Res<Strong<Service>> prepare(Sys::Context &ctx, Str id);
+
+    Res<> activate(Sys::Context &ctx);
 };
 
 struct System {
-    Sys::Context &context;
+    Sys::Context &_context;
     Hj::Listener _listener;
     Hj::Domain _domain;
 
@@ -29,8 +32,8 @@ struct System {
         return Ok(System{ctx, std::move(listener), std::move(domain)});
     }
 
-    Res<> load(Str id) {
-        auto service = try$(Service::load(context, id));
+    Res<> prepare(Str id) {
+        auto service = try$(Service::prepare(_context, id));
         try$(_attach(service));
         return Ok();
     }
@@ -42,6 +45,10 @@ struct System {
     }
 
     Res<> run() {
+        for (auto &service : _services) {
+            try$(service->activate(_context));
+        }
+
         while (true) {
             try$(_listener.poll(TimeStamp::endOfTime()));
             auto ev = _listener.next();

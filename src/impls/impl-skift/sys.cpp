@@ -104,7 +104,7 @@ Res<Sys::MmapResult> memMap(Sys::MmapOptions const &) {
 Res<Sys::MmapResult> memMap(Sys::MmapOptions const &, Strong<Sys::Fd> fd) {
     auto *vmoFd = fd.is<Skift::VmoFd>();
     if (not vmoFd)
-        return Error::invalidInput();
+        return Error::invalidInput("expected VmoFd");
 
     auto &vmo = vmoFd->vmo();
     auto range = try$(Hj::Space::self().map(vmo, Hj::MapFlags::READ | Hj::MapFlags::WRITE));

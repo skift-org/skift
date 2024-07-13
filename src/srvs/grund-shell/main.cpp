@@ -1,14 +1,12 @@
 #include <hideo-shell/app.h>
 #include <karm-image/loader.h>
 #include <karm-sys/entry.h>
-#include <karm-ui/app.h>
+
+#include "host.h"
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
-    auto args = useArgs(ctx);
-    bool isMobile = Sys::useFormFactor() == Sys::FormFactor::MOBILE;
-
     Hideo::Shell::State state = {
-        .isMobile = isMobile,
+        .isMobile = false,
         .dateTime = Sys::dateTime(),
         .background = co_try$(Image::loadOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url)),
         .noti = {},
@@ -31,5 +29,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
         .instances = {}
     };
 
-    co_return Ui::runApp(ctx, Hideo::Shell::app(std::move(state)));
+    auto app = Hideo::Shell::app(std::move(state));
+    auto host = co_try$(Grund::Shell::makeHost(ctx, app));
+    co_return host->run();
 }

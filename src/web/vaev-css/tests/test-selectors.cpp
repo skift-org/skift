@@ -7,7 +7,7 @@ namespace Vaev::Css::Tests {
 
 // setup
 static Style::Selector parse(Str input) {
-    // logDebug("input: '{}'", input);
+    logDebug("input: '{}'", input);
     auto lex = Lexer{input};
     auto val = consumeSelector(lex);
     return parseSelector(val);

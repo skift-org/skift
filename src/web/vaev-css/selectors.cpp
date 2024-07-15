@@ -1,6 +1,6 @@
 #include "selectors.h"
 
-#include "vaev-css/values.h"
+#include "values.h"
 
 namespace Vaev::Css {
 

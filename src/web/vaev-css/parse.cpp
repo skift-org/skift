@@ -3,6 +3,7 @@
 #include "builder.h"
 #include "parse.h"
 #include "parser.h"
+#include "selectors.h"
 
 namespace Vaev::Css {
 
@@ -20,5 +21,16 @@ Res<Style::StyleSheet> fetchStylesheet(Mime::Url url) {
     Io::SScan s{buf};
     return Ok(parseStylesheet(s));
 }
+
+Style::Selector parseSelector(Io::SScan &s) {
+    auto lex = Lexer{s};
+    auto val = consumeSelector(lex);
+    return parseSelector(val);
+};
+
+Style::Selector parseSelector(Str input) {
+    Io::SScan s{input};
+    return parseSelector(s);
+};
 
 } // namespace Vaev::Css

@@ -5,7 +5,14 @@
     "props": {
         "cpp-excluded": true
     },
+    "enableIf": {
+        "sys": [
+            "skift"
+        ]
+    },
     "requires": [
-        "hideo-shell"
+        "hideo-shell",
+        "karm-ipc",
+        "karm-sys"
     ]
 }

@@ -5,7 +5,6 @@
     "description": "Host Vaev web content",
     "requires": [
         "karm-ui",
-        "vaev-layout",
-        "vaev-css"
+        "vaev-driver"
     ]
 }

@@ -1,14 +1,13 @@
 #include <karm-ui/view.h>
-#include <vaev-base/color.h>
+#include <vaev-driver/render.h>
 
-#include "render.h"
 #include "view.h"
 
 namespace Vaev::View {
 
 struct View : public Ui::View<View> {
     Strong<Dom::Document> _dom;
-    Opt<RenderResult> _renderResult;
+    Opt<Driver::RenderResult> _renderResult;
 
     View(Strong<Dom::Document> dom) : _dom(dom) {}
 
@@ -54,7 +53,7 @@ struct View : public Ui::View<View> {
     void paint(Gfx::Context &g, Math::Recti) override {
         if (not _renderResult) {
             auto media = _constructMedia();
-            _renderResult = render(*_dom, media, bound().size().cast<Px>());
+            _renderResult = Driver::render(*_dom, media, bound().size().cast<Px>());
         }
 
         g.save();

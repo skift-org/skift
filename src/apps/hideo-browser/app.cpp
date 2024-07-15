@@ -9,51 +9,11 @@
 #include <karm-ui/input.h>
 #include <karm-ui/popover.h>
 #include <karm-ui/scroll.h>
-#include <vaev-html/parser.h>
+#include <vaev-driver/fetcher.h>
 #include <vaev-view/inspect.h>
 #include <vaev-view/view.h>
-#include <vaev-xml/parser.h>
 
 namespace Hideo::Browser {
-
-Res<Strong<Vaev::Dom::Document>> fetch(Mime::Url url) {
-    logInfo("fetching: {}", url);
-
-    if (url.scheme == "about") {
-        if (url.path.str() == "./blank")
-            return fetch("bundle://hideo-browser/blank.xhtml"_url);
-
-        if (url.path.str() == "./start")
-            return fetch("bundle://hideo-browser/start-page.xhtml"_url);
-
-        return Error::invalidInput("unsupported about page");
-    }
-
-    auto mime = Mime::sniffSuffix(url.path.suffix());
-
-    if (not mime.has())
-        return Error::invalidInput("cannot determine MIME type");
-
-    auto dom = makeStrong<Vaev::Dom::Document>();
-    auto file = try$(Sys::File::open(url));
-    auto buf = try$(Io::readAllUtf8(file));
-
-    if (mime->is("text/html"_mime)) {
-        Vaev::Html::Parser parser{dom};
-        parser.write(buf);
-
-        return Ok(dom);
-    } else if (mime->is("application/xhtml+xml"_mime)) {
-        Io::SScan scan{buf};
-        Vaev::Xml::Parser parser;
-        dom = try$(parser.parse(scan, Vaev::HTML));
-
-        return Ok(dom);
-    } else {
-        logError("unsupported MIME type: {}", mime);
-        return Error::invalidInput("unsupported MIME type");
-    }
-}
 
 enum struct SidePanel {
     CLOSE,
@@ -86,7 +46,7 @@ using Action = Union<Reload, GoBack, GoForward, SidePanel>;
 void reduce(State &s, Action a) {
     a.visit(Visitor{
         [&](Reload) {
-            s.dom = fetch(s.url);
+            s.dom = Vaev::Driver::fetchDocument(s.url);
         },
         [&](GoBack) {
         },

@@ -1,12 +1,14 @@
 #include "values.h"
 
-namespace Vaev::Css {
+namespace Vaev::Style {
+
+// MARK: Parser ----------------------------------------------------------------
 
 // NOTE: Please keep this alphabetically sorted.
 
 // MARK: Boolean
 // https://drafts.csswg.org/mediaqueries/#grid
-Res<bool> ValueParser<bool>::parse(Cursor<Sst> &c) {
+Res<bool> ValueParser<bool>::parse(Cursor<Css::Sst> &c) {
     auto val = try$(parseValue<Integer>(c));
     return Ok(val > 0);
 }
@@ -53,15 +55,15 @@ static Res<Gfx::Color> _parseHexColor(Io::SScan &s) {
     }
 }
 
-Res<Color> ValueParser<Color>::parse(Cursor<Sst> &c) {
+Res<Color> ValueParser<Color>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.peek() == Token::HASH) {
+    if (c.peek() == Css::Token::HASH) {
         Io::SScan scan = c->token.data;
         c.next();
         return Ok(try$(_parseHexColor(scan)));
-    } else if (c.peek() == Token::IDENT) {
+    } else if (c.peek() == Css::Token::IDENT) {
         Str data = c->token.data;
         c.next();
 
@@ -85,15 +87,15 @@ Res<Color> ValueParser<Color>::parse(Cursor<Sst> &c) {
 
 // MARK: Color Gamut
 // https://drafts.csswg.org/mediaqueries/#color-gamut
-Res<ColorGamut> ValueParser<ColorGamut>::parse(Cursor<Sst> &c) {
+Res<ColorGamut> ValueParser<ColorGamut>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("srgb")))
+    if (c.skip(Css::Token::ident("srgb")))
         return Ok(ColorGamut::SRGB);
-    else if (c.skip(Token::ident("p3")))
+    else if (c.skip(Css::Token::ident("p3")))
         return Ok(ColorGamut::DISPLAY_P3);
-    else if (c.skip(Token::ident("rec2020")))
+    else if (c.skip(Css::Token::ident("rec2020")))
         return Ok(ColorGamut::REC2020);
     else
         return Error::invalidData("expected color gamut");
@@ -102,108 +104,108 @@ Res<ColorGamut> ValueParser<ColorGamut>::parse(Cursor<Sst> &c) {
 // MARK: Display
 // https://drafts.csswg.org/css-display-3/#propdef-display
 
-static Res<Display> _parseLegacyDisplay(Cursor<Sst> &c) {
+static Res<Display> _parseLegacyDisplay(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("inline-block"))) {
+    if (c.skip(Css::Token::ident("inline-block"))) {
         return Ok(Display{Display::FLOW_ROOT, Display::INLINE});
-    } else if (c.skip(Token::ident("inline-table"))) {
+    } else if (c.skip(Css::Token::ident("inline-table"))) {
         return Ok(Display{Display::TABLE, Display::INLINE});
-    } else if (c.skip(Token::ident("inline-flex"))) {
+    } else if (c.skip(Css::Token::ident("inline-flex"))) {
         return Ok(Display{Display::FLEX, Display::INLINE});
-    } else if (c.skip(Token::ident("inline-grid"))) {
+    } else if (c.skip(Css::Token::ident("inline-grid"))) {
         return Ok(Display{Display::GRID, Display::INLINE});
     }
 
     return Error::invalidData("expected legacy display value");
 }
 
-static Res<Display::Outside> _parseOutsideDisplay(Cursor<Sst> &c) {
+static Res<Display::Outside> _parseOutsideDisplay(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("block"))) {
+    if (c.skip(Css::Token::ident("block"))) {
         return Ok(Display::BLOCK);
-    } else if (c.skip(Token::ident("inline"))) {
+    } else if (c.skip(Css::Token::ident("inline"))) {
         return Ok(Display::INLINE);
-    } else if (c.skip(Token::ident("run-in"))) {
+    } else if (c.skip(Css::Token::ident("run-in"))) {
         return Ok(Display::RUN_IN);
     }
 
     return Error::invalidData("expected outside value");
 }
 
-static Res<Display::Inside> _parseInsideDisplay(Cursor<Sst> &c) {
+static Res<Display::Inside> _parseInsideDisplay(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("flow"))) {
+    if (c.skip(Css::Token::ident("flow"))) {
         return Ok(Display::FLOW);
-    } else if (c.skip(Token::ident("flow-root"))) {
+    } else if (c.skip(Css::Token::ident("flow-root"))) {
         return Ok(Display::FLOW_ROOT);
-    } else if (c.skip(Token::ident("flex"))) {
+    } else if (c.skip(Css::Token::ident("flex"))) {
         return Ok(Display::FLEX);
-    } else if (c.skip(Token::ident("grid"))) {
+    } else if (c.skip(Css::Token::ident("grid"))) {
         return Ok(Display::GRID);
-    } else if (c.skip(Token::ident("ruby"))) {
+    } else if (c.skip(Css::Token::ident("ruby"))) {
         return Ok(Display::RUBY);
-    } else if (c.skip(Token::ident("table"))) {
+    } else if (c.skip(Css::Token::ident("table"))) {
         return Ok(Display::TABLE);
-    } else if (c.skip(Token::ident("math"))) {
+    } else if (c.skip(Css::Token::ident("math"))) {
         return Ok(Display::MATH);
     }
 
     return Error::invalidData("expected inside value");
 }
 
-static Res<Display> _parseInternalDisplay(Cursor<Sst> &c) {
+static Res<Display> _parseInternalDisplay(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("table-row-group"))) {
+    if (c.skip(Css::Token::ident("table-row-group"))) {
         return Ok(Display::TABLE_ROW_GROUP);
-    } else if (c.skip(Token::ident("table-header-group"))) {
+    } else if (c.skip(Css::Token::ident("table-header-group"))) {
         return Ok(Display::TABLE_HEADER_GROUP);
-    } else if (c.skip(Token::ident("table-footer-group"))) {
+    } else if (c.skip(Css::Token::ident("table-footer-group"))) {
         return Ok(Display::TABLE_FOOTER_GROUP);
-    } else if (c.skip(Token::ident("table-row"))) {
+    } else if (c.skip(Css::Token::ident("table-row"))) {
         return Ok(Display::TABLE_ROW);
-    } else if (c.skip(Token::ident("table-cell"))) {
+    } else if (c.skip(Css::Token::ident("table-cell"))) {
         return Ok(Display::TABLE_CELL);
-    } else if (c.skip(Token::ident("table-column-group"))) {
+    } else if (c.skip(Css::Token::ident("table-column-group"))) {
         return Ok(Display::TABLE_COLUMN_GROUP);
-    } else if (c.skip(Token::ident("table-column"))) {
+    } else if (c.skip(Css::Token::ident("table-column"))) {
         return Ok(Display::TABLE_COLUMN);
-    } else if (c.skip(Token::ident("table-caption"))) {
+    } else if (c.skip(Css::Token::ident("table-caption"))) {
         return Ok(Display::TABLE_CAPTION);
-    } else if (c.skip(Token::ident("ruby-base"))) {
+    } else if (c.skip(Css::Token::ident("ruby-base"))) {
         return Ok(Display::RUBY_BASE);
-    } else if (c.skip(Token::ident("ruby-text"))) {
+    } else if (c.skip(Css::Token::ident("ruby-text"))) {
         return Ok(Display::RUBY_TEXT);
-    } else if (c.skip(Token::ident("ruby-base-container"))) {
+    } else if (c.skip(Css::Token::ident("ruby-base-container"))) {
         return Ok(Display::RUBY_BASE_CONTAINER);
-    } else if (c.skip(Token::ident("ruby-text-container"))) {
+    } else if (c.skip(Css::Token::ident("ruby-text-container"))) {
         return Ok(Display::RUBY_TEXT_CONTAINER);
     }
 
     return Error::invalidData("expected internal value");
 }
 
-static Res<Display> _parseBoxDisplay(Cursor<Sst> &c) {
+static Res<Display> _parseBoxDisplay(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("contents"))) {
+    if (c.skip(Css::Token::ident("contents"))) {
         return Ok(Display::CONTENTS);
-    } else if (c.skip(Token::ident("none"))) {
+    } else if (c.skip(Css::Token::ident("none"))) {
         return Ok(Display::NONE);
     }
 
     return Error::invalidData("expected box value");
 }
 
-Res<Display> ValueParser<Display>::parse(Cursor<Sst> &c) {
+Res<Display> ValueParser<Display>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -218,7 +220,7 @@ Res<Display> ValueParser<Display>::parse(Cursor<Sst> &c) {
 
     auto inside = _parseInsideDisplay(c);
     auto outside = _parseOutsideDisplay(c);
-    auto item = c.skip(Token::ident("list-item"))
+    auto item = c.skip(Css::Token::ident("list-item"))
                     ? Display::Item::YES
                     : Display::Item::NO;
 
@@ -234,13 +236,13 @@ Res<Display> ValueParser<Display>::parse(Cursor<Sst> &c) {
 
 // MARK: Hover
 // https://drafts.csswg.org/mediaqueries/#hover
-Res<Hover> ValueParser<Hover>::parse(Cursor<Sst> &c) {
+Res<Hover> ValueParser<Hover>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("none")))
+    if (c.skip(Css::Token::ident("none")))
         return Ok(Hover::NONE);
-    else if (c.skip(Token::ident("hover")))
+    else if (c.skip(Css::Token::ident("hover")))
         return Ok(Hover::HOVER);
     else
         return Error::invalidData("expected hover value");
@@ -248,11 +250,11 @@ Res<Hover> ValueParser<Hover>::parse(Cursor<Sst> &c) {
 
 // MARK: Integer
 // https://drafts.csswg.org/css-values/#integers
-Res<Integer> ValueParser<Integer>::parse(Cursor<Sst> &c) {
+Res<Integer> ValueParser<Integer>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.peek() == Token::NUMBER) {
+    if (c.peek() == Css::Token::NUMBER) {
         Io::SScan scan = c->token.data;
         return Ok(try$(Io::atoi(scan)));
     }
@@ -273,16 +275,16 @@ static Res<Length::Unit> _parseLengthUnit(Str unit) {
     return Error::invalidData("unknown length unit");
 }
 
-Res<Length> ValueParser<Length>::parse(Cursor<Sst> &c) {
+Res<Length> ValueParser<Length>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.peek() == Token::DIMENSION) {
+    if (c.peek() == Css::Token::DIMENSION) {
         Io::SScan scan = c->token.data;
         auto value = tryOr(Io::atof(scan), 0.0);
         auto unit = try$(_parseLengthUnit(scan.remStr()));
         return Ok(Length{value, unit});
-    } else if (c.peek() == Token::number("0")) {
+    } else if (c.peek() == Css::Token::number("0")) {
         return Ok(Length{0.0, Length::Unit::PX});
     }
 
@@ -292,11 +294,11 @@ Res<Length> ValueParser<Length>::parse(Cursor<Sst> &c) {
 // MARL: MarginWidth
 // https://drafts.csswg.org/css-values/#margin-width
 
-Res<MarginWidth> ValueParser<MarginWidth>::parse(Cursor<Sst> &c) {
+Res<MarginWidth> ValueParser<MarginWidth>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c->token == Token::ident("auto")) {
+    if (c->token == Css::Token::ident("auto")) {
         c.next();
         return Ok(MarginWidth::AUTO);
     }
@@ -307,17 +309,17 @@ Res<MarginWidth> ValueParser<MarginWidth>::parse(Cursor<Sst> &c) {
 // MARK: MediaType
 // https://drafts.csswg.org/mediaqueries/#media-types
 
-Res<MediaType> ValueParser<MediaType>::parse(Cursor<Sst> &c) {
+Res<MediaType> ValueParser<MediaType>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("all")))
+    if (c.skip(Css::Token::ident("all")))
         return Ok(MediaType::ALL);
 
-    if (c.skip(Token::ident("print")))
+    if (c.skip(Css::Token::ident("print")))
         return Ok(MediaType::PRINT);
 
-    if (c.skip(Token::ident("screen")))
+    if (c.skip(Css::Token::ident("screen")))
         return Ok(MediaType::SCREEN);
 
     // NOTE: The spec says that we should reconize the following media types
@@ -334,7 +336,7 @@ Res<MediaType> ValueParser<MediaType>::parse(Cursor<Sst> &c) {
     };
 
     for (auto const &item : OTHER) {
-        if (c.skip(Token::ident(item)))
+        if (c.skip(Css::Token::ident(item)))
             return Ok(MediaType::OTHER);
     }
     return Error::invalidData("expected media type");
@@ -343,11 +345,11 @@ Res<MediaType> ValueParser<MediaType>::parse(Cursor<Sst> &c) {
 // MARK: Number
 // https://drafts.csswg.org/css-values/#numbers
 
-Res<Number> ValueParser<Number>::parse(Cursor<Sst> &c) {
+Res<Number> ValueParser<Number>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.peek() == Token::NUMBER) {
+    if (c.peek() == Css::Token::NUMBER) {
         Io::SScan scan = c->token.data;
         return Ok(try$(Io::atof(scan)));
     }
@@ -357,13 +359,13 @@ Res<Number> ValueParser<Number>::parse(Cursor<Sst> &c) {
 
 // MARK: Orientation
 // https://drafts.csswg.org/mediaqueries/#orientation
-Res<Orientation> ValueParser<Orientation>::parse(Cursor<Sst> &c) {
+Res<Orientation> ValueParser<Orientation>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("portrait")))
+    if (c.skip(Css::Token::ident("portrait")))
         return Ok(Orientation::PORTRAIT);
-    else if (c.skip(Token::ident("landscape")))
+    else if (c.skip(Css::Token::ident("landscape")))
         return Ok(Orientation::LANDSCAPE);
     else
         return Error::invalidData("expected orientation");
@@ -371,15 +373,15 @@ Res<Orientation> ValueParser<Orientation>::parse(Cursor<Sst> &c) {
 
 // MARK: OverflowBlock
 // https://drafts.csswg.org/mediaqueries/#mf-overflow-block
-Res<OverflowBlock> ValueParser<OverflowBlock>::parse(Cursor<Sst> &c) {
+Res<OverflowBlock> ValueParser<OverflowBlock>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("none")))
+    if (c.skip(Css::Token::ident("none")))
         return Ok(OverflowBlock::NONE);
-    else if (c.skip(Token::ident("scroll")))
+    else if (c.skip(Css::Token::ident("scroll")))
         return Ok(OverflowBlock::SCROLL);
-    else if (c.skip(Token::ident("paged")))
+    else if (c.skip(Css::Token::ident("paged")))
         return Ok(OverflowBlock::PAGED);
     else
         return Error::invalidData("expected overflow block value");
@@ -387,13 +389,13 @@ Res<OverflowBlock> ValueParser<OverflowBlock>::parse(Cursor<Sst> &c) {
 
 // MARK: OverflowInline
 // https://drafts.csswg.org/mediaqueries/#mf-overflow-inline
-Res<OverflowInline> ValueParser<OverflowInline>::parse(Cursor<Sst> &c) {
+Res<OverflowInline> ValueParser<OverflowInline>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("none")))
+    if (c.skip(Css::Token::ident("none")))
         return Ok(OverflowInline::NONE);
-    else if (c.skip(Token::ident("scroll")))
+    else if (c.skip(Css::Token::ident("scroll")))
         return Ok(OverflowInline::SCROLL);
     else
         return Error::invalidData("expected overflow inline value");
@@ -402,11 +404,11 @@ Res<OverflowInline> ValueParser<OverflowInline>::parse(Cursor<Sst> &c) {
 // MARK: Percentage
 // https://drafts.csswg.org/css-values/#percentages
 
-Res<Percent> ValueParser<Percent>::parse(Cursor<Sst> &c) {
+Res<Percent> ValueParser<Percent>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.peek() == Token::PERCENTAGE) {
+    if (c.peek() == Css::Token::PERCENTAGE) {
         Io::SScan scan = c->token.data;
         auto value = tryOr(Io::atof(scan), 0.0);
         if (scan.remStr() != "%")
@@ -420,15 +422,15 @@ Res<Percent> ValueParser<Percent>::parse(Cursor<Sst> &c) {
 
 // MARK: Pointer
 // https://drafts.csswg.org/mediaqueries/#pointer
-Res<Pointer> ValueParser<Pointer>::parse(Cursor<Sst> &c) {
+Res<Pointer> ValueParser<Pointer>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("none")))
+    if (c.skip(Css::Token::ident("none")))
         return Ok(Pointer::NONE);
-    else if (c.skip(Token::ident("coarse")))
+    else if (c.skip(Css::Token::ident("coarse")))
         return Ok(Pointer::COARSE);
-    else if (c.skip(Token::ident("fine")))
+    else if (c.skip(Css::Token::ident("fine")))
         return Ok(Pointer::FINE);
     else
         return Error::invalidData("expected pointer value");
@@ -448,11 +450,11 @@ static Res<Resolution::Unit> _parseResolutionUnit(Str unit) {
         return Error::invalidData("unknown resolution unit");
 }
 
-Res<Resolution> ValueParser<Resolution>::parse(Cursor<Sst> &c) {
+Res<Resolution> ValueParser<Resolution>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.peek() == Token::DIMENSION) {
+    if (c.peek() == Css::Token::DIMENSION) {
         Io::SScan scan = c->token.data;
         auto value = tryOr(Io::atof(scan), 0.0);
         auto unit = try$(_parseResolutionUnit(scan.remStr()));
@@ -464,13 +466,13 @@ Res<Resolution> ValueParser<Resolution>::parse(Cursor<Sst> &c) {
 
 // MARK: Scan
 // https://drafts.csswg.org/mediaqueries/#scan
-Res<Scan> ValueParser<Scan>::parse(Cursor<Sst> &c) {
+Res<Scan> ValueParser<Scan>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("interlace")))
+    if (c.skip(Css::Token::ident("interlace")))
         return Ok(Scan::INTERLACE);
-    else if (c.skip(Token::ident("progressive")))
+    else if (c.skip(Css::Token::ident("progressive")))
         return Ok(Scan::PROGRESSIVE);
     else
         return Error::invalidData("expected scan value");
@@ -479,11 +481,11 @@ Res<Scan> ValueParser<Scan>::parse(Cursor<Sst> &c) {
 // MARK: Size
 // https://drafts.csswg.org/css-sizing-4/#sizing-values
 
-Res<Size> ValueParser<Size>::parse(Cursor<Sst> &c) {
+Res<Size> ValueParser<Size>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.peek() == Token::IDENT) {
+    if (c.peek() == Css::Token::IDENT) {
         auto data = c.next().token.data;
         if (data == "auto") {
             return Ok(Size::AUTO);
@@ -494,15 +496,15 @@ Res<Size> ValueParser<Size>::parse(Cursor<Sst> &c) {
         } else if (data == "max-content") {
             return Ok(Size::MAX_CONTENT);
         }
-    } else if (c.peek() == Token::PERCENTAGE) {
+    } else if (c.peek() == Css::Token::PERCENTAGE) {
         return Ok(try$(parseValue<Percent>(c)));
-    } else if (c.peek() == Token::DIMENSION) {
+    } else if (c.peek() == Css::Token::DIMENSION) {
         return Ok(try$(parseValue<Length>(c)));
-    } else if (c.peek() == Sst::FUNC) {
+    } else if (c.peek() == Css::Sst::FUNC) {
         auto const &prefix = c.next().prefix.unwrap();
         auto prefixToken = prefix->token;
         if (prefixToken.data == "fit-content") {
-            Cursor<Sst> content = prefix->content;
+            Cursor<Css::Sst> content = prefix->content;
             return Ok(Size{Size::FIT_CONTENT, try$(parseValue<Length>(content))});
         }
     }
@@ -513,11 +515,11 @@ Res<Size> ValueParser<Size>::parse(Cursor<Sst> &c) {
 // MARK: String
 // https://drafts.csswg.org/css-values/#strings
 
-Res<String> ValueParser<String>::parse(Cursor<Sst> &c) {
+Res<String> ValueParser<String>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.peek() == Token::STRING) {
+    if (c.peek() == Css::Token::STRING) {
         // TODO: Handle escape sequences
         Io::SScan s = c.next().token.data;
         StringBuilder sb{s.rem()};
@@ -538,15 +540,15 @@ Res<String> ValueParser<String>::parse(Cursor<Sst> &c) {
 
 // MARK: Update
 // https://drafts.csswg.org/mediaqueries/#update
-Res<Update> ValueParser<Update>::parse(Cursor<Sst> &c) {
+Res<Update> ValueParser<Update>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("none")))
+    if (c.skip(Css::Token::ident("none")))
         return Ok(Update::NONE);
-    else if (c.skip(Token::ident("slow")))
+    else if (c.skip(Css::Token::ident("slow")))
         return Ok(Update::SLOW);
-    else if (c.skip(Token::ident("fast")))
+    else if (c.skip(Css::Token::ident("fast")))
         return Ok(Update::FAST);
     else
         return Error::invalidData("expected update value");
@@ -554,13 +556,13 @@ Res<Update> ValueParser<Update>::parse(Cursor<Sst> &c) {
 
 // MARK: ReducedMotion
 // https://drafts.csswg.org/mediaqueries/#reduced-motion
-Res<ReducedMotion> ValueParser<ReducedMotion>::parse(Cursor<Sst> &c) {
+Res<ReducedMotion> ValueParser<ReducedMotion>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("no-preference")))
+    if (c.skip(Css::Token::ident("no-preference")))
         return Ok(ReducedMotion::NO_PREFERENCE);
-    else if (c.skip(Token::ident("reduce")))
+    else if (c.skip(Css::Token::ident("reduce")))
         return Ok(ReducedMotion::REDUCE);
     else
         return Error::invalidData("expected reduced motion value");
@@ -568,13 +570,13 @@ Res<ReducedMotion> ValueParser<ReducedMotion>::parse(Cursor<Sst> &c) {
 
 // MARK: ReducedTransparency
 // https://drafts.csswg.org/mediaqueries/#reduced-transparency
-Res<ReducedTransparency> ValueParser<ReducedTransparency>::parse(Cursor<Sst> &c) {
+Res<ReducedTransparency> ValueParser<ReducedTransparency>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("no-preference")))
+    if (c.skip(Css::Token::ident("no-preference")))
         return Ok(ReducedTransparency::NO_PREFERENCE);
-    else if (c.skip(Token::ident("reduce")))
+    else if (c.skip(Css::Token::ident("reduce")))
         return Ok(ReducedTransparency::REDUCE);
     else
         return Error::invalidData("expected reduced transparency value");
@@ -582,13 +584,13 @@ Res<ReducedTransparency> ValueParser<ReducedTransparency>::parse(Cursor<Sst> &c)
 
 // MARK: Contrast
 // https://drafts.csswg.org/mediaqueries/#contrast
-Res<Contrast> ValueParser<Contrast>::parse(Cursor<Sst> &c) {
+Res<Contrast> ValueParser<Contrast>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("less")))
+    if (c.skip(Css::Token::ident("less")))
         return Ok(Contrast::LESS);
-    else if (c.skip(Token::ident("more")))
+    else if (c.skip(Css::Token::ident("more")))
         return Ok(Contrast::MORE);
     else
         return Error::invalidData("expected contrast value");
@@ -596,13 +598,13 @@ Res<Contrast> ValueParser<Contrast>::parse(Cursor<Sst> &c) {
 
 // MARK: Colors
 // https://drafts.csswg.org/mediaqueries/#forced-colors
-Res<Colors> ValueParser<Colors>::parse(Cursor<Sst> &c) {
+Res<Colors> ValueParser<Colors>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("none")))
+    if (c.skip(Css::Token::ident("none")))
         return Ok(Colors::NONE);
-    else if (c.skip(Token::ident("active")))
+    else if (c.skip(Css::Token::ident("active")))
         return Ok(Colors::ACTIVE);
     else
         return Error::invalidData("expected colors value");
@@ -610,13 +612,13 @@ Res<Colors> ValueParser<Colors>::parse(Cursor<Sst> &c) {
 
 // MARK: ColorScheme
 // https://drafts.csswg.org/mediaqueries/#color-scheme
-Res<ColorScheme> ValueParser<ColorScheme>::parse(Cursor<Sst> &c) {
+Res<ColorScheme> ValueParser<ColorScheme>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("light")))
+    if (c.skip(Css::Token::ident("light")))
         return Ok(ColorScheme::LIGHT);
-    else if (c.skip(Token::ident("dark")))
+    else if (c.skip(Css::Token::ident("dark")))
         return Ok(ColorScheme::DARK);
     else
         return Error::invalidData("expected color scheme value");
@@ -624,16 +626,16 @@ Res<ColorScheme> ValueParser<ColorScheme>::parse(Cursor<Sst> &c) {
 
 // MARK: ReducedData
 // https://drafts.csswg.org/mediaqueries/#reduced-data
-Res<ReducedData> ValueParser<ReducedData>::parse(Cursor<Sst> &c) {
+Res<ReducedData> ValueParser<ReducedData>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
-    if (c.skip(Token::ident("no-preference")))
+    if (c.skip(Css::Token::ident("no-preference")))
         return Ok(ReducedData::NO_PREFERENCE);
-    else if (c.skip(Token::ident("reduce")))
+    else if (c.skip(Css::Token::ident("reduce")))
         return Ok(ReducedData::REDUCE);
     else
         return Error::invalidData("expected reduced data value");
 }
 
-} // namespace Vaev::Css
+} // namespace Vaev::Style

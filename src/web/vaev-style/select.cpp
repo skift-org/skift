@@ -1,5 +1,7 @@
 #include "select.h"
 
+#include "values.h"
+
 namespace Vaev::Style {
 
 // MARK: Selector Specificity ---------------------------------------------------
@@ -165,4 +167,324 @@ bool Selector::match(Dom::Element const &el) const {
         }
     );
 }
+
+// MARK: Parser ----------------------------------------------------------------
+
+// enum order is the operator priority (the lesser the most important)
+enum struct OpCode {
+    OR,         // ,
+    DESCENDANT, // ' '
+    CHILD,      // >
+    ADJACENT,   // +
+    SUBSEQUENT, // ~
+    NOT,        // :not()
+    WHERE,      // :where()
+    AND,        // a.b
+    COLUMN,     // ||
+    NOP
+};
+
+static Selector _parseAttributeSelector(Slice<Css::Sst> content) {
+    auto caze = AttributeSelector::INSENSITIVE;
+    Str name = "";
+    String value = ""s;
+    auto match = AttributeSelector::Match{AttributeSelector::PRESENT};
+
+    usize step = 0;
+    Cursor<Css::Sst> cur = content;
+
+    while (not cur.ended() and cur->token.data != "]"s) {
+        if (cur->token == Css::Token::WHITESPACE) {
+            cur.next();
+            continue;
+        }
+
+        switch (step) {
+        case 0:
+            name = cur->token.data;
+            step++;
+            break;
+        case 1:
+            if (cur->token.data != "="s) {
+                if (cur.ended() or cur.peek(1).token.data != "="s) {
+                    break;
+                }
+                if (cur->token.data == "~") {
+                    match = AttributeSelector::Match{AttributeSelector::CONTAINS};
+                } else if (cur->token.data == "|") {
+                    match = AttributeSelector::Match{AttributeSelector::HYPHENATED};
+                } else if (cur->token.data == "^") {
+                    match = AttributeSelector::Match{AttributeSelector::STR_START_WITH};
+                } else if (cur->token.data == "$") {
+                    match = AttributeSelector::Match{AttributeSelector::STR_END_WITH};
+                } else if (cur->token.data == "*") {
+                    match = AttributeSelector::Match{AttributeSelector::STR_CONTAIN};
+                } else {
+                    break;
+                }
+                cur.next();
+            } else {
+                match = AttributeSelector::Match{AttributeSelector::EXACT};
+            }
+            step++;
+            break;
+        case 2:
+            value = parseValue<String>(cur).unwrap();
+            step++;
+            break;
+        case 3:
+            if (cur->token.data == "s") {
+                caze = AttributeSelector::SENSITIVE;
+            }
+            break;
+        }
+
+        if (cur.ended()) {
+            break;
+        }
+        cur.next();
+    }
+
+    return AttributeSelector{name, caze, match, value};
+}
+
+static Selector _parseSelectorElement(Cursor<Css::Sst> &cur) {
+    Selector val;
+
+    if (*cur == Css::Sst::TOKEN) {
+        switch (cur->token.type) {
+        case Css::Token::WHITESPACE:
+            if (cur.ended()) {
+                // logError("ERROR : unterminated selector");
+                return EmptySelector{};
+            }
+            cur.next();
+            return _parseSelectorElement(cur);
+        case Css::Token::HASH:
+            if (cur.ended()) {
+                // logError("ERROR : unterminated selector");
+                return EmptySelector{};
+            }
+            val = IdSelector{next(cur->token.data, 1)};
+            break;
+        case Css::Token::IDENT:
+            val = TypeSelector{TagName::make(cur->token.data, Vaev::HTML)};
+            break;
+        case Css::Token::DELIM:
+            if (cur->token.data == ".") {
+                cur.next();
+                if (cur.ended()) {
+                    logError("ERROR : unterminated selector");
+                    return EmptySelector{};
+                }
+                val = ClassSelector{cur->token.data};
+            } else if (cur->token.data == "*") {
+                val = UniversalSelector{};
+            }
+            break;
+        case Css::Token::COLON:
+            cur.next();
+            if (cur.ended()) {
+                logError("ERROR : unterminated selector");
+                return EmptySelector{};
+            }
+            if (cur->token.type == Css::Token::COLON) {
+                cur.next();
+                if (cur.ended()) {
+                    logError("ERROR : unterminated selector");
+                    return EmptySelector{};
+                }
+            }
+            val = Pseudo{Pseudo::make(cur->token.data)};
+            break;
+        default:
+            val = ClassSelector{cur->token.data};
+            break;
+        }
+    } else if (cur->type == Css::Sst::BLOCK) {
+        val = _parseAttributeSelector(cur->content);
+    } else {
+        return EmptySelector{};
+    }
+
+    cur.next();
+    return val;
+}
+
+static OpCode _peekOpCode(Cursor<Css::Sst> &cur) {
+    if (*cur != Css::Sst::TOKEN)
+        return OpCode::AND;
+
+    switch (cur->token.type) {
+    case Css::Token::COMMA:
+        if (cur.ended()) {
+            return OpCode::NOP;
+        }
+        cur.next();
+        return OpCode::OR;
+
+    case Css::Token::WHITESPACE:
+        cur.next();
+        // a white space could be an operator or be ignored if followed by another op
+        if (cur.ended()) {
+            return OpCode::NOP;
+        }
+
+        if (
+            cur.peek() == Css::Token::IDENT or
+            cur.peek() == Css::Token::HASH or
+            cur.peek().token.data == "." or
+            cur.peek().token.data == "*"
+        ) {
+            return OpCode::DESCENDANT;
+        } else {
+            auto op = _peekOpCode(cur);
+
+            if (cur.peek(1).token.type == Css::Token::WHITESPACE) {
+                if (cur.ended()) {
+                    return OpCode::NOP;
+                }
+                cur.next();
+            }
+            return op;
+        }
+
+    case Css::Token::DELIM:
+        if (cur.rem() <= 1) {
+            return OpCode::NOP;
+        }
+
+        if (cur->token.data == ">") {
+            if (cur.ended()) {
+                return OpCode::NOP;
+            }
+            cur.next();
+            return OpCode::CHILD;
+        } else if (cur->token.data == "~") {
+            if (cur.ended()) {
+                return OpCode::NOP;
+            }
+            cur.next();
+            return OpCode::SUBSEQUENT;
+        } else if (cur->token.data == "+") {
+            if (cur.ended()) {
+                return OpCode::NOP;
+            }
+            cur.next();
+            return OpCode::ADJACENT;
+        } else if (cur->token.data == "." or cur->token.data == "*") {
+            return OpCode::AND;
+        } else {
+            return OpCode::NOP;
+        }
+
+    case Css::Token::COLON:
+        if (cur.ended())
+            return OpCode::NOP;
+
+    default:
+        return OpCode::AND;
+    }
+}
+
+static Selector _parseInfixExpr(Selector lhs, Cursor<Css::Sst> &cur, OpCode opCode = OpCode::NOP);
+
+static Selector _parseNfixExpr(Selector lhs, OpCode op, Cursor<Css::Sst> &cur) {
+    Vec<Selector> selectors = {lhs, _parseSelectorElement(cur)};
+    while (true) {
+        if (cur.ended()) {
+            break;
+        }
+
+        Cursor<Css::Sst> rollBack = cur;
+
+        OpCode nextOpCode = _peekOpCode(cur);
+
+        if (nextOpCode == OpCode::NOP) {
+            break;
+        } else if (nextOpCode == op) {
+            // adding the selector to the nfix
+            selectors.pushBack(_parseSelectorElement(cur));
+        } else if (nextOpCode == OpCode::COLUMN or nextOpCode == OpCode::OR or nextOpCode == OpCode::AND) {
+            // parse new nfix
+
+            if (nextOpCode < op) {
+                cur = rollBack;
+                break;
+            }
+
+            last(selectors) = _parseNfixExpr(last(selectors), nextOpCode, cur);
+        } else {
+            // parse new infix
+            if (nextOpCode < op) {
+                cur = rollBack;
+                break;
+            }
+
+            selectors.pushBack(_parseInfixExpr(_parseSelectorElement(cur), cur, nextOpCode));
+        }
+    }
+
+    switch (op) {
+    case OpCode::AND:
+        return Selector::and_(selectors);
+    case OpCode::OR:
+        return Selector::or_(selectors);
+    default:
+        return Selector::and_(selectors);
+    }
+}
+
+static Selector _parseInfixExpr(Selector lhs, Cursor<Css::Sst> &cur, OpCode opCode) {
+    if (opCode == OpCode::NOP)
+        opCode = _peekOpCode(cur);
+
+    switch (opCode) {
+    case OpCode::NOP:
+        return lhs;
+    case OpCode::DESCENDANT:
+        return Selector::descendant(lhs, _parseSelectorElement(cur));
+    case OpCode::CHILD:
+        return Selector::child(lhs, _parseSelectorElement(cur));
+    case OpCode::ADJACENT:
+        return Selector::adjacent(lhs, _parseSelectorElement(cur));
+    case OpCode::SUBSEQUENT:
+        return Selector::subsequent(lhs, _parseSelectorElement(cur));
+    case OpCode::NOT:
+        return Selector::not_(_parseSelectorElement(cur));
+    case OpCode::WHERE:
+        return Selector::where(_parseSelectorElement(cur));
+    case OpCode::COLUMN:
+    case OpCode::OR:
+    case OpCode::AND:
+        return _parseNfixExpr(lhs, opCode, cur);
+    }
+}
+
+Selector Selector::parse(Cursor<Css::Sst> &c) {
+    if (!c) {
+        logWarn("empty selector");
+        return EmptySelector{};
+    }
+
+    Selector currentSelector = _parseSelectorElement(c);
+
+    while (not c.ended()) {
+        currentSelector = _parseInfixExpr(currentSelector, c);
+    }
+    return currentSelector;
+}
+
+Selector Selector::parse(Io::SScan &s) {
+    Css::Lexer lex = s;
+    auto val = consumeSelector(lex);
+    Cursor<Css::Sst> c{val};
+    return parse(c);
+};
+
+Selector Selector::parse(Str input) {
+    Io::SScan s{input};
+    return parse(s);
+};
+
 } // namespace Vaev::Style

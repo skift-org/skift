@@ -5,6 +5,7 @@
 #include <vaev-base/media.h>
 #include <vaev-base/numbers.h>
 #include <vaev-base/resolution.h>
+#include <vaev-css/parser.h>
 
 namespace Vaev::Style {
 
@@ -586,5 +587,9 @@ struct MediaQuery {
         });
     }
 };
+
+// MARK: Parser ----------------------------------------------------------------
+
+MediaQuery parseMediaQuery(Cursor<Css::Sst> &c);
 
 } // namespace Vaev::Style

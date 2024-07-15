@@ -2,57 +2,7 @@
 
 namespace Vaev::Style {
 
-void StyleRule::repr(Io::Emit &e) const {
-    e("(style-rule");
-    e.indent();
-    e("\nselector: {}", selector);
-    if (props) {
-        e.newline();
-        e("props: [");
-        e.indentNewline();
-        for (auto const &prop : props) {
-            e("{}\n", prop);
-        }
-        e.deindent();
-        e("]\n");
-    }
-    e.deindent();
-    e(")");
-}
-
-void ImportRule::repr(Io::Emit &e) const {
-    e("(import-rule {})", url);
-}
-
-void MediaRule::repr(Io::Emit &e) const {
-    e("(media-rule");
-    e.indent();
-    e("\nmedia: {}", media);
-    if (rules) {
-        e.newline();
-        e("rules: [");
-        e.indentNewline();
-        for (auto const &rule : rules) {
-            e("{}\n", rule);
-        }
-        e.deindent();
-        e("]\n");
-    }
-}
-
-bool MediaRule::match(Media const &m) const {
-    return media.match(m);
-}
-
-void FontFaceRule::repr(Io::Emit &e) const {
-    e("(font-face-rule {})", props);
-}
-
-void Rule::repr(Io::Emit &e) const {
-    visit([&](auto const &r) {
-        e("{}", r);
-    });
-}
+// MARK: StyleSheet ------------------------------------------------------------
 
 void StyleSheet::repr(Io::Emit &e) const {
     e("(style-sheet {} {} {}", mime, href, title);
@@ -71,6 +21,24 @@ void StyleSheet::repr(Io::Emit &e) const {
     e.deindent();
     e(")");
 }
+
+StyleSheet StyleSheet::parse(Css::Sst const &sst) {
+    if (sst != Css::Sst::LIST)
+        panic("expected list");
+
+    Style::StyleSheet res;
+    for (auto const &item : sst.content) {
+        if (item == Css::Sst::RULE) {
+            res.rules.pushBack(Rule::parse(item));
+        } else {
+            logWarn("unexpected item in stylesheet: {}", item.type);
+        }
+    }
+
+    return res;
+}
+
+// MARK: StyleBook -------------------------------------------------------------
 
 void StyleBook::repr(Io::Emit &e) const {
     e("(style-book {})", styleSheets);

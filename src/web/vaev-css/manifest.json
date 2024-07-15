@@ -4,8 +4,8 @@
     "type": "lib",
     "description": "Implementation of CSS Snapshot 2023 (https://www.w3.org/TR/css-2023/)",
     "requires": [
-        "karm-sys",
         "vaev-base",
-        "vaev-style"
+        "karm-io",
+        "karm-logger"
     ]
 }

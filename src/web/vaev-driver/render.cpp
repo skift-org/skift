@@ -1,33 +1,42 @@
 #include <karm-sys/time.h>
-#include <vaev-css/parse.h>
 #include <vaev-dom/element.h>
 #include <vaev-layout/builder.h>
 #include <vaev-paint/stack.h>
 #include <vaev-style/computer.h>
 
+#include "fetcher.h"
 #include "render.h"
 
-namespace Vaev::View {
+namespace Vaev::Driver {
 
 static void _collectStyle(Dom::Node const &node, Style::StyleBook &sb) {
     auto *el = node.is<Dom::Element>();
     if (el and el->tagName == Html::STYLE) {
         auto text = el->textContent();
         Io::SScan textScan{text};
-        auto sheet = Css::parseStylesheet(textScan);
+        auto sheet = Style::StyleSheet::parse(textScan);
         sb.add(std::move(sheet));
     } else if (el and el->tagName == Html::LINK) {
         auto rel = el->getAttribute(Html::REL_ATTR);
         if (rel == "stylesheet"s) {
             auto href = el->getAttribute(Html::HREF_ATTR);
-            if (not href)
+            if (not href) {
+                logWarn("link element missing href attribute");
                 return;
+            }
+
             auto url = Mime::parseUrlOrPath(*href);
-            if (not url)
+            if (not url) {
+                logWarn("link element href attribute is not a valid URL: {}", *href);
                 return;
-            auto sheet = Css::fetchStylesheet(url.take());
-            if (not sheet)
+            }
+
+            auto sheet = fetchStylesheet(url.take());
+            if (not sheet) {
+                logWarn("failed to fetch stylesheet: {}", sheet);
                 return;
+            }
+
             sb.add(sheet.take());
         }
     } else {
@@ -38,12 +47,15 @@ static void _collectStyle(Dom::Node const &node, Style::StyleBook &sb) {
 
 RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px viewport) {
     Style::StyleBook stylebook;
-    stylebook.add(Css::fetchStylesheet("bundle://vaev-view/user-agent.css"_url).take("user agent stylesheet not available"));
+    stylebook.add(
+        fetchStylesheet("bundle://vaev-view/user-agent.css"_url)
+            .take("user agent stylesheet not available")
+    );
 
     auto start = Sys::now();
     _collectStyle(dom, stylebook);
     auto elapsed = Sys::now() - start;
-    logDebug("style collection time: {}ms", elapsed.toUSecs() / 1000.0);
+    logDebug("style collection time: {}", elapsed);
 
     Style::Computer computer{media, stylebook};
     auto layoutRoot = Layout::build(computer, dom);
@@ -56,4 +68,4 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
     return {layoutRoot, paintRoot};
 }
 
-} // namespace Vaev::View
+} // namespace Vaev::Driver

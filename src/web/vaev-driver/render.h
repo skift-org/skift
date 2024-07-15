@@ -6,7 +6,7 @@
 #include <vaev-paint/base.h>
 #include <vaev-style/media.h>
 
-namespace Vaev::View {
+namespace Vaev::Driver {
 
 struct RenderResult {
     Strong<Layout::Frag> layout;
@@ -15,4 +15,4 @@ struct RenderResult {
 
 RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px viewport);
 
-} // namespace Vaev::View
+} // namespace Vaev::Driver

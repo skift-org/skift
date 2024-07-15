@@ -3,8 +3,7 @@
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <karm-sys/time.h>
-#include <vaev-css/parse.h>
-#include <vaev-css/parser.h>
+#include <vaev-driver/fetcher.h>
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto args = Sys::useArgs(ctx);
@@ -19,7 +18,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
 
     if (verb == "dump-stylesheet") {
         auto start = Sys::now();
-        auto stylesheet = co_try$(Vaev::Css::fetchStylesheet(url));
+        auto stylesheet = co_try$(Vaev::Driver::fetchStylesheet(url));
         auto elapsed = Sys::now() - start;
         logInfo("fetched in {}ms", elapsed.toUSecs() / 1000.0);
 

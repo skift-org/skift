@@ -200,7 +200,7 @@ Content consumeDeclarationBlock(Lexer &lex) {
 
 // https://www.w3.org/TR/css-syntax-3/#consume-declaration
 static void eatWhitespace(Lexer &lex) {
-    while (lex.peek() == Token::WHITESPACE)
+    while (lex.peek() == Token::WHITESPACE and not lex.ended())
         lex.next();
 }
 

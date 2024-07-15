@@ -1,14 +1,14 @@
 #include <karm-test/macros.h>
 #include <vaev-css/parser.h>
-#include <vaev-css/values.h>
+#include <vaev-style/values.h>
 
-namespace Vaev::Css::Tests {
+namespace Vaev::Style::Tests {
 
 test$("vaev-css-build-display") {
     auto testCase = [&](Str input, Display expected) -> Res<> {
-        auto lex = Lexer{input};
+        auto lex = Css::Lexer{input};
         auto val = consumeDeclarationValue(lex);
-        Cursor<Sst> sst{val};
+        Cursor<Css::Sst> sst{val};
         auto res = parseValue<Display>(sst);
         expect$(res);
         expectEq$(res.unwrap(), expected);
@@ -64,4 +64,4 @@ test$("vaev-css-build-display") {
     return Ok();
 }
 
-} // namespace Vaev::Css::Tests
+} // namespace Vaev::Style::Tests

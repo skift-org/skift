@@ -1,6 +1,7 @@
 #pragma once
 
-#include "computed.h"
 #include "computer.h"
-#include "font-face.h"
+#include "fonts.h"
+#include "styles.h"
 #include "stylesheet.h"
+#include "values.h"

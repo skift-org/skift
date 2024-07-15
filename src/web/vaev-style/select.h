@@ -1,6 +1,8 @@
+#pragma once
+
 #include <karm-base/box.h>
 #include <karm-base/vec.h>
-#include <karm-logger/logger.h>
+#include <vaev-css/parser.h>
 #include <vaev-dom/element.h>
 #include <vaev-html/tags.h>
 
@@ -350,6 +352,12 @@ struct Selector : public _Selector {
     bool match(Dom::Element const &el) const;
 
     bool operator==(Selector const &) const = default;
+
+    static Selector parse(Cursor<Css::Sst> &c);
+
+    static Selector parse(Io::SScan &s);
+
+    static Selector parse(Str input);
 };
 
 inline bool Infix::operator==(Infix const &) const = default;

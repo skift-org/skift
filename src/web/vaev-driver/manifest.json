@@ -1,13 +1,13 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "vaev-style",
+    "id": "vaev-driver",
     "type": "lib",
-    "description": "The Stylish styling engine",
+    "description": "Drive Vaev web content",
     "requires": [
-        "vaev-base",
-        "vaev-css",
+        "vaev-layout",
         "vaev-html",
-        "vaev-svg",
-        "vaev-mathml"
+        "vaev-xml",
+        "karm-mime",
+        "karm-sys"
     ]
 }

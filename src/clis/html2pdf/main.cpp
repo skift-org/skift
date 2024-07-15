@@ -1,10 +1,7 @@
-#include <karm-mime/mime.h>
 #include <karm-sys/entry.h>
-#include <karm-sys/file.h>
 #include <karm-sys/time.h>
-#include <vaev-html/parser.h>
-#include <vaev-view/render.h>
-#include <vaev-xml/parser.h>
+#include <vaev-driver/fetcher.h>
+#include <vaev-driver/render.h>
 
 namespace Vaev {
 
@@ -42,53 +39,6 @@ Style::Media constructMedia(Vec2Px pageSize) {
     };
 }
 
-Res<Strong<Dom::Document>>
-fetch(Mime::Url url) {
-
-    if (url.scheme == "about") {
-        if (url.path.str() == "./blank")
-            return fetch("bundle://hideo-browser/blank.xhtml"_url);
-
-        if (url.path.str() == "./start")
-            return fetch("bundle://hideo-browser/start-page.xhtml"_url);
-
-        return Error::invalidInput("unsupported about page");
-    } // namespace Vaev
-
-    auto start = Sys::now();
-
-    auto mime = Mime::sniffSuffix(url.path.suffix());
-
-    if (not mime.has())
-        return Error::invalidInput("cannot determine MIME type");
-
-    auto dom = makeStrong<Dom::Document>();
-    auto file = try$(Sys::File::open(url));
-    auto buf = try$(Io::readAllUtf8(file));
-
-    if (mime->is("text/html"_mime)) {
-        Html::Parser parser{dom};
-        parser.write(buf);
-
-        auto elapsed = Sys::now() - start;
-        logDebug("parse time: {}ms", elapsed.toUSecs() / 1000.0);
-
-        return Ok(dom);
-    } else if (mime->is("application/xhtml+xml"_mime)) {
-        Io::SScan scan{buf};
-        Xml::Parser parser;
-        dom = try$(parser.parse(scan, HTML));
-
-        auto elapsed = Sys::now() - start;
-        logDebug("parse time: {}ms", elapsed.toUSecs() / 1000.0);
-
-        return Ok(dom);
-    } else {
-        logError("unsupported MIME type: {}", mime);
-        return Error::invalidInput("unsupported MIME type");
-    }
-}
-
 } // namespace Vaev
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
@@ -99,15 +49,15 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     }
 
     auto input = co_try$(Mime::parseUrlOrPath(args[0]));
-    auto dom = co_try$(Vaev::fetch(input));
+    auto dom = co_try$(Vaev::Driver::fetchDocument(input));
 
     Vaev::Vec2Px viewport{Vaev::Px{800}, Vaev::Px{600}};
     auto media = Vaev::constructMedia(viewport);
 
     auto start = Sys::now();
-    auto result = Vaev::View::render(*dom, media, viewport);
+    auto result = Vaev::Driver::render(*dom, media, viewport);
     auto elapsed = Sys::now() - start;
-    logDebug("render time: {}ms", elapsed.toUSecs() / 1000.0);
+    logDebug("render time: {}", elapsed);
 
     logDebug("layout tree: {}", result.layout);
     logDebug("paint tree: {}", result.paint);

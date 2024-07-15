@@ -2,7 +2,7 @@
 #include <karm-io/funcs.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
-#include <vaev-style/props.h>
+#include <vaev-style/styles.h>
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto args = Sys::useArgs(ctx);
@@ -15,7 +15,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto verb = args[0];
 
     if (verb == "list-props") {
-        Vaev::Style::Prop::any([]<typename T>(Meta::Type<T>) {
+        Vaev::Style::StyleProp::any([]<typename T>(Meta::Type<T>) {
             Sys::println("{}", T::name());
             return false;
         });

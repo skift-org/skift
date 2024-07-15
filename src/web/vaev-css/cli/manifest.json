@@ -5,6 +5,7 @@
     "description": "Css engine testing tool",
     "requires": [
         "karm-sys",
-        "vaev-css"
+        "vaev-css",
+        "vaev-driver"
     ]
 }

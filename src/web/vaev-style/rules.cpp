@@ -1,5 +1,7 @@
 #include "rules.h"
 
+#include "decls.h"
+
 namespace Vaev::Style {
 
 // MARK: StyleRule -------------------------------------------------------------
@@ -39,7 +41,7 @@ StyleRule StyleRule::parse(Css::Sst const &sst) {
     // Parse the properties.
     for (auto const &item : sst.content) {
         if (item == Css::Sst::DECL) {
-            auto prop = parseProperty<StyleProp>(item);
+            auto prop = parseDeclaration<StyleProp>(item);
             if (prop)
                 res.props.pushBack(prop.take());
         } else {
@@ -111,23 +113,11 @@ MediaRule MediaRule::parse(Css::Sst const &sst) {
 // MARK: FontFaceRule ----------------------------------------------------------
 
 void FontFaceRule::repr(Io::Emit &e) const {
-    e("(font-face-rule {})", props);
+    e("(font-face-rule {})", descs);
 }
 
 FontFaceRule FontFaceRule::parse(Css::Sst const &sst) {
-    Style::FontFaceRule res;
-
-    for (auto const &item : sst.content) {
-        if (item == Css::Sst::DECL) {
-            auto prop = parseProperty<FontProp>(item);
-            if (prop)
-                res.props.pushBack(prop.take());
-        } else {
-            logWarn("unexpected item in font-face rule: {}", item.type);
-        }
-    }
-
-    return res;
+    return {parseDeclarations<FontDesc>(sst)};
 }
 
 // MARK: Rule ------------------------------------------------------------------

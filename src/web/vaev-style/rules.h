@@ -2,7 +2,6 @@
 
 #include "fonts.h"
 #include "media.h"
-#include "props.h"
 #include "select.h"
 #include "styles.h"
 
@@ -47,7 +46,7 @@ struct MediaRule {
 
 // https://www.w3.org/TR/css-fonts-4/#cssfontfacerule
 struct FontFaceRule {
-    Vec<FontProp> props;
+    Vec<FontDesc> descs;
 
     void repr(Io::Emit &e) const;
 

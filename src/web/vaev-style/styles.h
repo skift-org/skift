@@ -245,6 +245,79 @@ struct MarginLeftProp {
     }
 };
 
+// MARK: Overflow --------------------------------------------------------------
+// https://www.w3.org/TR/css-overflow/#overflow-control
+
+struct OverflowXProp {
+    Overflow value = initial();
+
+    static Str name() { return "overflow-x"; }
+
+    static Overflow initial() { return Overflow::VISIBLE; }
+
+    void apply(Computed &c) const {
+        c.overflows.x = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Overflow>(c));
+        return Ok();
+    }
+};
+
+struct OverflowYProp {
+    Overflow value = initial();
+
+    static Str name() { return "overflow-y"; }
+
+    static Overflow initial() { return Overflow::VISIBLE; }
+
+    void apply(Computed &c) const {
+        c.overflows.y = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Overflow>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-overflow/#overflow-block
+struct OverflowBlockProp {
+    Overflow value = initial();
+
+    static Str name() { return "overflow-block"; }
+
+    static Overflow initial() { return Overflow::VISIBLE; }
+
+    void apply(Computed &c) const {
+        c.overflows.block = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Overflow>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-overflow/#overflow-inline
+struct OverflowInlineProp {
+    Overflow value = initial();
+
+    static Str name() { return "overflow-inline"; }
+
+    static Overflow initial() { return Overflow::VISIBLE; }
+
+    void apply(Computed &c) const {
+        c.overflows.inline_ = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Overflow>(c));
+        return Ok();
+    }
+};
+
 // MARK: Padding ---------------------------------------------------------------
 
 // https://www.w3.org/TR/css-box-3/#propdef-padding

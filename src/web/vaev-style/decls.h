@@ -27,12 +27,15 @@ Res<P> parseDeclaration(Css::Sst const &sst) {
     Res<P> resDecl = Error::invalidData("unknown declaration");
 
     P::any([&]<typename T>(Meta::Type<T>) -> bool {
-        if (sst != Css::Token::ident(T::name()))
+        if (sst.token != Css::Token::ident(T::name()))
             return false;
+
         Cursor<Css::Sst> cursor = sst.content;
         auto res = parseDeclarationValue<T>(cursor);
-        if (not res)
+        if (not res) {
+            resDecl = res.none();
             return false;
+        }
 
         resDecl = Ok(res.take());
         return true;

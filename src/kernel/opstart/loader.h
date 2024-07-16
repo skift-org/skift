@@ -3,9 +3,9 @@
 #include <karm-image/loader.h>
 #include <karm-logger/logger.h>
 #include <karm-media/icon.h>
+#include <karm-net/json/json.h>
 #include <karm-sys/context.h>
 #include <karm-sys/file.h>
-#include <vaev-json/json.h>
 
 namespace Opstart {
 
@@ -13,9 +13,9 @@ Res<Sys::File> openUrl(Mime::Url const &url);
 
 struct Blob {
     Mime::Url url;
-    Vaev::Json::Value props;
+    Net::Json::Value props;
 
-    static Res<Blob> fromJson(Vaev::Json::Value const &json) {
+    static Res<Blob> fromJson(Net::Json::Value const &json) {
         if (json.isStr())
             return Ok(Blob{
                 .url = Mime::Url::parse(json.asStr()),
@@ -38,7 +38,7 @@ struct Entry {
     Blob kernel;
     Vec<Blob> blobs;
 
-    static Res<Entry> fromJson(Vaev::Json::Value const &json) {
+    static Res<Entry> fromJson(Net::Json::Value const &json) {
         if (not json.isObject())
             return Error::invalidInput("expected object");
 
@@ -58,7 +58,7 @@ struct Entry {
         auto kernelJson = json.get("kernel");
         entry.kernel = try$(Blob::fromJson(kernelJson));
 
-        auto blobsJson = try$(json.get("blobs").take<Vaev::Json::Array>());
+        auto blobsJson = try$(json.get("blobs").take<Net::Json::Array>());
         for (auto const &blobJson : blobsJson) {
             auto blob = try$(Blob::fromJson(blobJson));
             entry.blobs.pushBack(blob);
@@ -73,7 +73,7 @@ struct Configs {
     Opt<String> subtitle;
     Vec<Entry> entries;
 
-    static Res<Configs> fromJson(Vaev::Json::Value const &json) {
+    static Res<Configs> fromJson(Net::Json::Value const &json) {
         if (not json.isObject()) {
             return Error::invalidInput("expected array");
         }
@@ -83,7 +83,7 @@ struct Configs {
         configs.title = json.get("title").take<String>();
         configs.subtitle = json.get("subtitle").take<String>();
 
-        auto entriesJson = try$(json.get("entries").take<Vaev::Json::Array>());
+        auto entriesJson = try$(json.get("entries").take<Net::Json::Array>());
         for (auto const &entryJson : entriesJson) {
             auto entry = try$(Entry::fromJson(entryJson));
             configs.entries.pushBack(entry);

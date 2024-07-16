@@ -11,7 +11,7 @@
     "requires": [
         "efi",
         "abi",
-        "vaev-json"
+        "karm-net.json"
     ],
     "provides": [
         "karm-logger-impl",

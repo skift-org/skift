@@ -1,9 +1,0 @@
-{
-    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "vaev-dns.cli",
-    "type": "exe",
-    "description": "A command line interface for vaev-dns",
-    "requires": [
-        "vaev-dns"
-    ]
-}

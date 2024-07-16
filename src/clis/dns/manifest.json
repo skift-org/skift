@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "dns",
+    "type": "exe",
+    "description": "A command line interface for vaev-dns",
+    "requires": [
+        "karm-net",
+        "karm-sys"
+    ]
+}

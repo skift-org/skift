@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "serv",
+    "type": "exe",
+    "description": "A simple HTTP server",
+    "requires": [
+        "karm-net",
+        "karm-sys"
+    ]
+}

@@ -11,12 +11,12 @@ struct View : public Ui::View<View> {
 
     View(Strong<Dom::Document> dom) : _dom(dom) {}
 
-    Style::Media _constructMedia() {
+    Style::Media _constructMedia(Math::Vec2i viewport) {
         return {
             .type = MediaType::SCREEN,
-            .width = Px{bound().width},
-            .height = Px{bound().height},
-            .aspectRatio = bound().width / (f64)bound().height,
+            .width = Px{viewport.width},
+            .height = Px{viewport.height},
+            .aspectRatio = viewport.width / (f64)viewport.height,
             .orientation = Orientation::LANDSCAPE,
 
             .resolution = Resolution::fromDpi(96),
@@ -51,16 +51,17 @@ struct View : public Ui::View<View> {
     }
 
     void paint(Gfx::Context &g, Math::Recti) override {
+        auto viewport = bound().size();
         if (not _renderResult) {
-            auto media = _constructMedia();
-            _renderResult = Driver::render(*_dom, media, bound().size().cast<Px>());
+            auto media = _constructMedia(viewport);
+            _renderResult = Driver::render(*_dom, media, viewport.cast<Px>());
         }
 
         g.save();
 
         g.origin(bound().xy);
-        g.clip(bound().size());
-        g.clear(bound().size(), WHITE);
+        g.clip(viewport);
+        g.clear(viewport, WHITE);
 
         auto [layout, paint] = *_renderResult;
 
@@ -76,8 +77,15 @@ struct View : public Ui::View<View> {
         Ui::View<View>::layout(bound);
     }
 
-    Math::Vec2i size(Math::Vec2i, Ui::Hint) override {
-        return {};
+    Math::Vec2i size(Math::Vec2i size, Ui::Hint) override {
+        // FIXME: This is wasteful, we should cache the result
+        auto media = _constructMedia(size);
+        auto [layout, _] = Driver::render(*_dom, media, size.cast<Px>());
+
+        return {
+            layout->contentInlineSize().toInt<isize>(),
+            layout->contentBlockSize().toInt<isize>(),
+        };
     }
 };
 

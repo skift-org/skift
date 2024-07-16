@@ -73,7 +73,7 @@ struct Scroll : public ProxyNode<Scroll> {
             auto scrollBarWidth = (bound().width) * bound().width / childBound.width;
             auto scrollBarX = bound().start() + (-_scroll.x * bound().width / childBound.width);
 
-            g.fillStyle(Gfx::GRAY500.withOpacity(0.3 * clamp01(_scrollOpacity.value())));
+            g.fillStyle(Gfx::GRAY500.withOpacity(0.5 * clamp01(_scrollOpacity.value())));
             g.fill(Math::Recti{(isize)scrollBarX, bound().bottom() - SCROLL_BAR_WIDTH, scrollBarWidth, SCROLL_BAR_WIDTH});
         }
 
@@ -81,7 +81,7 @@ struct Scroll : public ProxyNode<Scroll> {
             auto scrollBarHeight = (bound().height) * bound().height / childBound.height;
             auto scrollBarY = bound().top() + (-_scroll.y * bound().height / childBound.height);
 
-            g.fillStyle(Ui::GRAY500.withOpacity(0.3 * clamp01(_scrollOpacity.value())));
+            g.fillStyle(Ui::GRAY500.withOpacity(0.5 * clamp01(_scrollOpacity.value())));
             g.fill(Math::Recti{bound().end() - SCROLL_BAR_WIDTH, (isize)scrollBarY, SCROLL_BAR_WIDTH, scrollBarHeight});
         }
 

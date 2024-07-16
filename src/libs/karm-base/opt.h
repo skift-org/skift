@@ -29,6 +29,11 @@ struct [[nodiscard]] Opt {
         : _present(false), _empty() {}
 
     template <typename U = T>
+    always_inline constexpr Opt(U const &value)
+        requires(not Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> and Meta::CopyConstructible<T, U>)
+        : _present(true), _value(value) {}
+
+    template <typename U = T>
     always_inline constexpr Opt(U &&value)
         requires(not Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> and Meta::MoveConstructible<T, U>)
         : _present(true), _value(std::forward<U>(value)) {}
@@ -55,14 +60,18 @@ struct [[nodiscard]] Opt {
         return *this;
     }
 
-    always_inline constexpr Opt &operator=(T const &value) {
+    template <typename U = T>
+        requires(not Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> and Meta::Convertible<U, T>)
+    always_inline constexpr Opt &operator=(U const &value) {
         clear();
         _present = true;
         std::construct_at(&_value, value);
         return *this;
     }
 
-    always_inline constexpr Opt &operator=(T &&value) {
+    template <typename U = T>
+        requires(not Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> and Meta::MoveConstructible<U, T>)
+    always_inline constexpr Opt &operator=(U &&value) {
         clear();
         _present = true;
         std::construct_at(&_value, std::move(value));

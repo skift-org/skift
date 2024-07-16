@@ -123,7 +123,7 @@ Res<String> readAllUtf8(Mime::Url const &url) {
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto &args = useArgs(ctx);
     Opt<Mime::Url> url;
-    Res<String> text = Ok<String>();
+    Res<String> text = Ok(""s);
     if (args.len()) {
         url = co_try$(Mime::parseUrlOrPath(args[0]));
         text = Hideo::Text::readAllUtf8(*url);

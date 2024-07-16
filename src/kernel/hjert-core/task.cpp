@@ -12,8 +12,6 @@ Res<Strong<Task>> Task::create(
     Opt<Strong<Space>> space,
     Opt<Strong<Domain>> domain
 ) {
-
-    logInfo("task: creating task...");
     auto stack = try$(Stack::create());
     auto task = makeStrong<Task>(mode, std::move(stack), space, domain);
     return Ok(task);
@@ -53,7 +51,6 @@ Res<> Task::pledge(Hj::Pledge pledge) {
 }
 
 Res<> Task::ready(usize ip, usize sp, Hj::Args args) {
-    logInfo("{} readying for execution (ip: {x}, sp: {x}) starting...", *this, ip, sp);
     ObjectLockScope scope(*this);
     _ctx = try$(Arch::createContext(_mode, ip, sp, stack().loadSp(), args));
     return Ok();
@@ -84,7 +81,7 @@ State Task::eval(TimeStamp now) {
         return State::EXITED;
 
     if (_block) {
-        if ((*_block)() == now) {
+        if ((*_block)() > now) {
             return State::BLOCKED;
         }
         _block = NONE;

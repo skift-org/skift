@@ -9,7 +9,6 @@ namespace Hjert::Core {
 // MARK: Stack ------------------------------------------------------------------
 
 Res<Stack> Stack::create() {
-    logInfo("task: creating stack...");
     auto mem = try$(kmm().allocOwned(DEFAULT_SIZE));
     auto base = mem.range().end();
     return Ok(Stack{std::move(mem), base});

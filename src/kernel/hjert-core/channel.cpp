@@ -1,5 +1,6 @@
-#include "channel.h"
+#include <karm-logger/logger.h>
 
+#include "channel.h"
 #include "domain.h"
 
 namespace Hjert::Core {
@@ -12,6 +13,7 @@ Channel::Channel(usize bufCap, usize capsCap)
     : _sr(max(bufCap / 16, 16uz)),
       _bytes(bufCap),
       _caps(capsCap) {
+    _updateSignalsUnlock();
 }
 
 Res<> Channel::_ensureOpen() {
@@ -26,9 +28,8 @@ void Channel::_updateSignalsUnlock() {
             (_sr.rem() > 0 ? Hj::Sigs::WRITABLE : Hj::Sigs::NONE) |
             (_closed ? Hj::Sigs::CLOSED : Hj::Sigs::NONE),
 
-        (_sr.len() > 0 ? Hj::Sigs::READABLE : Hj::Sigs::NONE) |
-            (_sr.rem() > 0 ? Hj::Sigs::WRITABLE : Hj::Sigs::NONE) |
-            (_closed ? Hj::Sigs::NONE : Hj::Sigs::CLOSED)
+        (_sr.len() > 0 ? Hj::Sigs::NONE : Hj::Sigs::READABLE) |
+            (_sr.rem() > 0 ? Hj::Sigs::NONE : Hj::Sigs::WRITABLE)
     );
 }
 

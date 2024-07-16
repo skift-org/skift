@@ -289,10 +289,10 @@ struct Listener : public Object {
         return _listen(_cap, cap, Sigs::NONE, Sigs::NONE);
     }
 
-    Res<> poll(TimeStamp deadline) {
+    Res<> poll(TimeStamp until) {
         _evs.resize(256);
         _len = 0;
-        return _poll(_cap, _evs.buf(), _evs.len(), &_len, deadline);
+        return _poll(_cap, _evs.buf(), _evs.len(), &_len, until);
     }
 
     Opt<Event> next() {

@@ -67,6 +67,9 @@ struct UserSlice {
     }
 
     Res<Slice> _acquire(Space &space) {
+        if (_len == 0uz)
+            return Ok(Slice{nullptr, 0uz});
+
         if (_addr == 0)
             return Error::invalidInput("null pointer");
 
@@ -83,7 +86,7 @@ static inline Res<> with(Space &space, auto f, Args &&...args) {
         try$(a);
         return Ok();
     }));
-    return acquired.apply([&](auto &...args) {
+    return acquired.apply([&](auto &...args) -> Res<> {
         return f(args.unwrap()...);
     });
 }

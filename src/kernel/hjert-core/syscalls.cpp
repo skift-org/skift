@@ -1,4 +1,3 @@
-
 #include <karm-base/defer.h>
 #include <karm-cli/style.h>
 #include <karm-logger/logger.h>
@@ -15,6 +14,8 @@
 #include "user.h"
 
 namespace Hjert::Core {
+
+static constexpr bool DEBUG_SYSCALLS = false;
 
 Res<> doNow(Task &self, User<TimeStamp> ts) {
     return ts.store(self.space(), Sched::instance()._stamp);
@@ -80,7 +81,6 @@ Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
                 }
 
                 if (props.len > gib(2)) {
-                    logError("Vmo size too large: {}", props.len);
                     return Error::invalidInput("Vmo size too large");
                 }
 
@@ -184,7 +184,7 @@ Res<> doOut(Task &self, Hj::Cap cap, Hj::IoLen len, usize port, Hj::Arg val) {
 }
 
 Res<> doSend(Task &self, Hj::Cap cap, UserSlice<Bytes> buf, UserSlice<Slice<Hj::Cap>> caps) {
-    return try$(with(
+    return with(
         self.space(),
         [&](auto buf, auto caps) -> Res<> {
             auto obj = try$(self.domain().get<Channel>(cap));
@@ -192,11 +192,11 @@ Res<> doSend(Task &self, Hj::Cap cap, UserSlice<Bytes> buf, UserSlice<Slice<Hj::
             return Ok();
         },
         buf, caps
-    ));
+    );
 }
 
 Res<> doRecv(Task &self, Hj::Cap cap, UserSlice<MutBytes> buf, User<Hj::Arg> bufLen, UserSlice<MutSlice<Hj::Cap>> caps, User<Hj::Arg> capLen) {
-    return try$(with(
+    return with(
         self.space(),
         [&](auto buf, auto bufLen, auto caps, auto capLen) -> Res<> {
             auto obj = try$(self.domain().get<Channel>(cap));
@@ -207,7 +207,7 @@ Res<> doRecv(Task &self, Hj::Cap cap, UserSlice<MutBytes> buf, User<Hj::Arg> buf
             return Ok();
         },
         buf, bufLen, caps, capLen
-    ));
+    );
 }
 
 Res<> doClose(Task &self, Hj::Cap cap) {
@@ -232,14 +232,15 @@ Res<> doListen(Task &self, Hj::Cap cap, Hj::Cap target, Flags<Hj::Sigs> set, Fla
     return obj->listen(target, targetObj, set, unset);
 }
 
-Res<> doPoll(Task &self, Hj::Cap cap, UserSlice<MutSlice<Hj::Event>> events, User<usize> evLen, TimeStamp deadline) {
+Res<> doPoll(Task &self, Hj::Cap cap, UserSlice<MutSlice<Hj::Event>> events, User<usize> evLen, TimeStamp until) {
     auto obj = try$(self.domain().get<Listener>(cap));
 
     try$(self.block([&] {
         auto events = obj->pollEvents();
-        if (events.len() > 0)
+        if (events.len() > 0) {
             return TimeStamp::epoch();
-        return deadline;
+        }
+        return until;
     }));
 
     ObjectLockScope lock{*obj};
@@ -295,7 +296,12 @@ Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
         return doOut(self, Hj::Cap{args[0]}, (Hj::IoLen)args[1], args[2], args[3]);
 
     case Hj::Syscall::SEND:
-        return doSend(self, Hj::Cap{args[0]}, {args[1], args[2]}, {args[3], args[4]});
+        return doSend(
+            self,
+            Hj::Cap{args[0]},
+            {args[1], args[2]},
+            {args[3], args[4]}
+        );
 
     case Hj::Syscall::RECV: {
         User<Hj::Arg> bufLen = args[2];
@@ -330,9 +336,12 @@ Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
 Res<> doSyscall(Hj::Syscall syscall, Hj::Args args) {
     auto &self = Task::self();
     self.enter(Mode::SUPER);
+
+    logDebugIf(DEBUG_SYSCALLS, "{}: Syscall {}({}) with params {:#x}", self, Hj::toStr(syscall), (Hj::Arg)syscall, args);
     auto res = dispatchSyscall(self, syscall, args);
     if (not res)
-        logError("Syscall {}({}) with params {} failed: {}", Hj::toStr(syscall), (Hj::Arg)syscall, args, res.none().msg());
+        logError("{}: Syscall {}({}) with params {:#x} failed: {}", self, Hj::toStr(syscall), (Hj::Arg)syscall, args, res.none().msg());
+
     self.leave();
     return res;
 }

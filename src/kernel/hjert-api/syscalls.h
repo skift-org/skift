@@ -38,6 +38,6 @@ Res<> _signal(Cap cap, Flags<Sigs> set, Flags<Sigs> unset);
 
 Res<> _listen(Cap cap, Cap target, Flags<Sigs> set, Flags<Sigs> unset);
 
-Res<> _poll(Cap cap, Event *ev, usize evCap, usize *evLen, TimeStamp deadline);
+Res<> _poll(Cap cap, Event *ev, usize evCap, usize *evLen, TimeStamp until);
 
 } // namespace Hj

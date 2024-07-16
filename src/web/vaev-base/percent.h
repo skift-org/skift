@@ -6,21 +6,7 @@
 
 namespace Vaev {
 
-struct Percent : public Distinct<f64, struct _PercentTag> {
-    using Distinct::Distinct;
-
-    static Percent const ZERO;
-
-    static Percent from(f64 val) {
-        return Percent(val);
-    }
-
-    void repr(Io::Emit &e) const {
-        e("{}%", value());
-    }
-};
-
-inline Percent const Percent::ZERO = Percent(0);
+using Percent = Distinct<f64, struct _PercentTag>;
 
 template <typename T>
 struct PercentOf {
@@ -46,17 +32,15 @@ struct PercentOr {
         T _value;
     };
 
-    static PercentOr ZERO;
-
-    PercentOr()
-        : PercentOr(Percent::ZERO) {
+    constexpr PercentOr()
+        : PercentOr(Percent{}) {
     }
 
-    PercentOr(Percent percent)
+    constexpr PercentOr(Percent percent)
         : _type(Type::PERCENT), _percent(percent) {
     }
 
-    PercentOr(T value)
+    constexpr PercentOr(T value)
         : _type(Type::VALUE), _value(value) {
     }
 
@@ -68,11 +52,11 @@ struct PercentOr {
         }
     }
 
-    bool operator==(Type type) const {
+    constexpr bool operator==(Type type) const {
         return _type == type;
     }
 
-    bool resolved() const {
+    constexpr bool resolved() const {
         return _type == Type::VALUE and _value.resolved();
     }
 
@@ -89,7 +73,11 @@ struct PercentOr {
     }
 };
 
-template <typename T>
-inline PercentOr<T> PercentOr<T>::ZERO = Percent::ZERO;
-
 } // namespace Vaev
+
+template <>
+struct Karm::Io::Repr<Vaev::Percent> {
+    static void repr(Io::Emit &e, Vaev::Percent const &v) {
+        e("{}%", v.value());
+    }
+};

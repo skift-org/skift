@@ -2,10 +2,12 @@
 
 #include <vaev-base/color.h>
 #include <vaev-base/display.h>
+#include <vaev-base/font.h>
 #include <vaev-base/insets.h>
 #include <vaev-base/length.h>
 #include <vaev-base/media.h>
 #include <vaev-base/numbers.h>
+#include <vaev-base/overflow.h>
 #include <vaev-base/resolution.h>
 #include <vaev-base/sizing.h>
 #include <vaev-css/parser.h>
@@ -25,6 +27,11 @@ always_inline static Res<T> parseValue(Cursor<Css::Sst> &c) {
 }
 
 template <>
+struct ValueParser<Angle> {
+    static Res<Angle> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
 struct ValueParser<bool> {
     static Res<bool> parse(Cursor<Css::Sst> &c);
 };
@@ -42,6 +49,21 @@ struct ValueParser<ColorGamut> {
 template <>
 struct ValueParser<Display> {
     static Res<Display> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
+struct ValueParser<FontStyle> {
+    static Res<FontStyle> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
+struct ValueParser<FontWeight> {
+    static Res<FontWeight> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
+struct ValueParser<FontWidth> {
+    static Res<FontWidth> parse(Cursor<Css::Sst> &c);
 };
 
 template <>
@@ -77,6 +99,11 @@ struct ValueParser<Number> {
 template <>
 struct ValueParser<Orientation> {
     static Res<Orientation> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
+struct ValueParser<Overflow> {
+    static Res<Overflow> parse(Cursor<Css::Sst> &c);
 };
 
 template <>

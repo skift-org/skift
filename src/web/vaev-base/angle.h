@@ -19,31 +19,31 @@ struct Angle {
     f64 _val;
     Unit _unit;
 
-    static Angle fromDegree(f64 val) {
+    static constexpr Angle fromDegree(f64 val) {
         return {val, Unit::DEGREE};
     }
 
-    static Angle fromRadian(f64 val) {
+    static constexpr Angle fromRadian(f64 val) {
         return {val, Unit::RADIAN};
     }
 
-    static Angle fromGrad(f64 val) {
+    static constexpr Angle fromGrad(f64 val) {
         return {val, Unit::GRAD};
     }
 
-    static Angle fromTurn(f64 val) {
+    static constexpr Angle fromTurn(f64 val) {
         return {val, Unit::TURN};
     }
 
-    f64 val() const {
+    constexpr f64 val() const {
         return _val;
     }
 
-    Unit unit() const {
+    constexpr Unit unit() const {
         return _unit;
     }
 
-    f64 toDegree() const {
+    constexpr f64 toDegree() const {
         switch (_unit) {
         case Unit::DEGREE:
             return _val;
@@ -56,7 +56,7 @@ struct Angle {
         }
     }
 
-    f64 toRadian() const {
+    constexpr f64 toRadian() const {
         switch (_unit) {
         case Unit::DEGREE:
             return _val * Math::PI / 180.0;
@@ -69,19 +69,19 @@ struct Angle {
         }
     }
 
-    bool operator==(Angle const &other) const {
+    constexpr bool operator==(Angle const &other) const {
         return toRadian() == other.toRadian();
     }
 
-    std::partial_ordering operator<=>(Angle const &other) const {
+    constexpr std::partial_ordering operator<=>(Angle const &other) const {
         return toRadian() <=> other.toRadian();
     }
 
-    Angle operator+(Angle other) const {
+    constexpr Angle operator+(Angle other) const {
         return fromRadian(toRadian() + other.toRadian());
     }
 
-    Angle operator-(Angle other) const {
+    constexpr Angle operator-(Angle other) const {
         return fromRadian(toRadian() - other.toRadian());
     }
 

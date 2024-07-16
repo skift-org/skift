@@ -48,11 +48,11 @@ struct Borders {
     Border top, right, bottom, left;
     Math::Radius<PercentOr<Length>> radii;
 
-    void all(Border b) {
+    constexpr void all(Border b) {
         top = right = bottom = left = b;
     }
 
-    void set(BorderEdge edge, Border b) {
+    constexpr void set(BorderEdge edge, Border b) {
         switch (edge) {
         case BorderEdge::ALL:
             all(b);

@@ -30,16 +30,16 @@ struct Color {
         SystemColor system;
     };
 
-    Color()
+    constexpr Color()
         : type(Type::SRGB), srgb(Gfx::ALPHA) {}
 
-    Color(Type type)
+    constexpr Color(Type type)
         : type(type) {}
 
-    Color(Gfx::Color srgb)
+    constexpr Color(Gfx::Color srgb)
         : type(Type::SRGB), srgb(srgb) {}
 
-    Color(SystemColor system)
+    constexpr Color(SystemColor system)
         : type(Type::SYSTEM), system(system) {}
 
     void repr(Io::Emit &e) const {
@@ -67,7 +67,7 @@ struct ColorContext {
 #undef COLOR
     };
 
-    Gfx::Color resolve(Color const &c) const {
+    constexpr Gfx::Color resolve(Color const &c) const {
         switch (c.type) {
         case Color::Type::SRGB:
             return c.srgb;

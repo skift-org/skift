@@ -18,23 +18,23 @@ struct Time {
     f64 _val;
     Unit _unit;
 
-    static Time fromSecond(f64 val) {
+    static constexpr Time fromSecond(f64 val) {
         return {val, Unit::S};
     }
 
-    static Time fromMillisecond(f64 val) {
+    static constexpr Time fromMillisecond(f64 val) {
         return {val, Unit::MS};
     }
 
-    f64 val() const {
+    constexpr f64 val() const {
         return _val;
     }
 
-    Unit unit() const {
+    constexpr Unit unit() const {
         return _unit;
     }
 
-    f64 toSecond() const {
+    constexpr f64 toSecond() const {
         switch (_unit) {
         case Unit::S:
             return _val;
@@ -43,7 +43,7 @@ struct Time {
         }
     }
 
-    f64 toMillisecond() const {
+    constexpr f64 toMillisecond() const {
         switch (_unit) {
         case Unit::S:
             return _val * 1000.0;
@@ -52,11 +52,11 @@ struct Time {
         }
     }
 
-    bool operator==(Time const &other) const {
+    constexpr bool operator==(Time const &other) const {
         return _val == other._val && _unit == other._unit;
     }
 
-    auto operator<=>(Time const &other) const {
+    constexpr auto operator<=>(Time const &other) const {
         return toSecond() <=> other.toSecond();
     }
 };

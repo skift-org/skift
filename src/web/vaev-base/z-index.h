@@ -15,8 +15,9 @@ struct ZIndex {
     bool auto_;
     isize value;
 
-    ZIndex(_Auto) : auto_(true) {}
-    ZIndex(isize value) : auto_(false), value(value) {}
+    constexpr ZIndex(_Auto) : auto_(true) {}
+
+    constexpr ZIndex(isize value) : auto_(false), value(value) {}
 
     void repr(Io::Emit &e) const {
         if (auto_) {

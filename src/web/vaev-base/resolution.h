@@ -37,15 +37,15 @@ struct Resolution {
         return {0.0, Unit::INFINITE};
     }
 
-    f64 val() const {
+    constexpr f64 val() const {
         return _val;
     }
 
-    Unit unit() const {
+    constexpr Unit unit() const {
         return _unit;
     }
 
-    f64 toDpi() const {
+    constexpr f64 toDpi() const {
         switch (_unit) {
         case Unit::DPI:
             return _val;
@@ -58,7 +58,7 @@ struct Resolution {
         }
     }
 
-    f64 toDpcm() const {
+    constexpr f64 toDpcm() const {
         switch (_unit) {
         case Unit::DPI:
             return _val / 2.54;
@@ -71,7 +71,7 @@ struct Resolution {
         }
     }
 
-    f64 toDppx() const {
+    constexpr f64 toDppx() const {
         switch (_unit) {
         case Unit::DPI:
             return _val / 96.0;
@@ -84,7 +84,7 @@ struct Resolution {
         }
     }
 
-    bool operator==(Resolution const &other) const {
+    constexpr bool operator==(Resolution const &other) const {
         return _val == other._val and _unit == other._unit;
     }
 
@@ -92,7 +92,7 @@ struct Resolution {
         return toDpi() <=> other.toDpi();
     }
 
-    void repr(Io::Emit &e) const {
+    constexpr void repr(Io::Emit &e) const {
         switch (_unit) {
         case Unit::DPI:
             e("{}dpi", _val);

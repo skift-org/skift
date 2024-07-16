@@ -6,6 +6,36 @@ namespace Vaev::Style {
 
 // NOTE: Please keep this alphabetically sorted.
 
+// MARK: Angle
+// https://drafts.csswg.org/css-values/#angles
+
+static Res<Angle::Unit> _parseAngleUnit(Str unit) {
+    if (eqCi(unit, "deg"s))
+        return Ok(Angle::Unit::DEGREE);
+    else if (eqCi(unit, "grad"s))
+        return Ok(Angle::Unit::GRAD);
+    else if (eqCi(unit, "rad"s))
+        return Ok(Angle::Unit::RADIAN);
+    else if (eqCi(unit, "turn"s))
+        return Ok(Angle::Unit::TURN);
+    else
+        return Error::invalidData("unknown length unit");
+}
+
+Res<Angle> ValueParser<Angle>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.peek() == Css::Token::DIMENSION) {
+        Io::SScan scan = c->token.data;
+        auto value = tryOr(Io::atof(scan), 0.0);
+        auto unit = try$(_parseAngleUnit(scan.remStr()));
+        return Ok(Angle{value, unit});
+    }
+
+    return Error::invalidData("expected angle");
+}
+
 // MARK: Boolean
 // https://drafts.csswg.org/mediaqueries/#grid
 Res<bool> ValueParser<bool>::parse(Cursor<Css::Sst> &c) {
@@ -234,6 +264,77 @@ Res<Display> ValueParser<Display>::parse(Cursor<Css::Sst> &c) {
     });
 }
 
+// MARK: FontStyle
+// https://drafts.csswg.org/css-fonts-4/#propdef-font-style
+
+Res<FontStyle> ValueParser<FontStyle>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Css::Token::ident("normal"))) {
+        return Ok(FontStyle::NORMAL);
+    } else if (c.skip(Css::Token::ident("italic"))) {
+        return Ok(FontStyle::ITALIC);
+    } else if (c.skip(Css::Token::ident("oblique"))) {
+        auto angle = parseValue<Angle>(c);
+        if (angle)
+            return Ok(angle.unwrap());
+
+        return Ok(FontStyle::OBLIQUE);
+    }
+
+    return Error::invalidData("expected font style");
+}
+
+// MARK: FontWeight
+// https://www.w3.org/TR/css-fonts-4/#font-weight-absolute-values
+
+Res<FontWeight> ValueParser<FontWeight>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Css::Token::ident("normal"))) {
+        return Ok(FontWeight::NORMAL);
+    } else if (c.skip(Css::Token::ident("bold"))) {
+        return Ok(FontWeight::BOLD);
+    } else if (c.skip(Css::Token::ident("bolder"))) {
+        return Ok(FontWeight::BOLDER);
+    } else if (c.skip(Css::Token::ident("lighter"))) {
+        return Ok(FontWeight::LIGHTER);
+    } else {
+        return Ok(try$(parseValue<Integer>(c)));
+    }
+}
+
+// MARK: FontWidth
+// https://www.w3.org/TR/css-fonts-4/#propdef-font-width
+Res<FontWidth> ValueParser<FontWidth>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Css::Token::ident("normal"))) {
+        return Ok(FontWidth::NORMAL);
+    } else if (c.skip(Css::Token::ident("condensed"))) {
+        return Ok(FontWidth::CONDENSED);
+    } else if (c.skip(Css::Token::ident("expanded"))) {
+        return Ok(FontWidth::EXPANDED);
+    } else if (c.skip(Css::Token::ident("ultra-condensed"))) {
+        return Ok(FontWidth::ULTRA_CONDENSED);
+    } else if (c.skip(Css::Token::ident("extra-condensed"))) {
+        return Ok(FontWidth::EXTRA_CONDENSED);
+    } else if (c.skip(Css::Token::ident("semi-condensed"))) {
+        return Ok(FontWidth::SEMI_CONDENSED);
+    } else if (c.skip(Css::Token::ident("semi-expanded"))) {
+        return Ok(FontWidth::SEMI_EXPANDED);
+    } else if (c.skip(Css::Token::ident("extra-expanded"))) {
+        return Ok(FontWidth::EXTRA_EXPANDED);
+    } else if (c.skip(Css::Token::ident("ultra-expanded"))) {
+        return Ok(FontWidth::ULTRA_EXPANDED);
+    }
+
+    return Ok(try$(parseValue<Percent>(c)));
+}
+
 // MARK: Hover
 // https://drafts.csswg.org/mediaqueries/#hover
 Res<Hover> ValueParser<Hover>::parse(Cursor<Css::Sst> &c) {
@@ -369,6 +470,27 @@ Res<Orientation> ValueParser<Orientation>::parse(Cursor<Css::Sst> &c) {
         return Ok(Orientation::LANDSCAPE);
     else
         return Error::invalidData("expected orientation");
+}
+
+// MARK: Overflow
+// https://www.w3.org/TR/css-overflow/#overflow-control
+Res<Overflow> ValueParser<Overflow>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Css::Token::ident("overlay")))
+        // https://www.w3.org/TR/css-overflow/#valdef-overflow-overlay
+        return Ok(Overflow::AUTO);
+    else if (c.skip(Css::Token::ident("visible")))
+        return Ok(Overflow::VISIBLE);
+    else if (c.skip(Css::Token::ident("hidden")))
+        return Ok(Overflow::HIDDEN);
+    else if (c.skip(Css::Token::ident("scroll")))
+        return Ok(Overflow::SCROLL);
+    else if (c.skip(Css::Token::ident("auto")))
+        return Ok(Overflow::AUTO);
+    else
+        return Error::invalidData("expected overflow value");
 }
 
 // MARK: OverflowBlock

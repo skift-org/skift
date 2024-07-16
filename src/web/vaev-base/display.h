@@ -90,27 +90,27 @@ struct Display {
         Internal _internal;
     };
 
-    Display()
+    constexpr Display()
         : Display(Display::FLOW, Display::INLINE) {}
 
-    Display(Box box)
+    constexpr Display(Box box)
         : _type(Type::BOX), _box(box) {}
 
-    Display(Internal internal)
+    constexpr Display(Internal internal)
         : _type(Type::INTERNAL), _internal(internal) {}
 
-    Display(Inside inside, Outside outside, Item item = Item::NO)
+    constexpr Display(Inside inside, Outside outside, Item item = Item::NO)
         : _type(Type::DEFAULT), _inside(inside), _outside(outside), _item(item) {}
 
-    bool is(Type type) const {
+    constexpr bool is(Type type) const {
         return _type == type;
     }
 
-    Type type() const {
+    constexpr Type type() const {
         return _type;
     }
 
-    bool operator==(Type type) const {
+    constexpr bool operator==(Type type) const {
         return _type == type;
     }
 

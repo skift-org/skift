@@ -20,23 +20,23 @@ struct MarginWidth {
         Length _value;
     };
 
-    MarginWidth()
-        : MarginWidth(Percent::ZERO) {
+    constexpr MarginWidth()
+        : MarginWidth(Percent{}) {
     }
 
-    MarginWidth(Type type)
+    constexpr MarginWidth(Type type)
         : _type(type) {
     }
 
-    MarginWidth(Percent percent)
+    constexpr MarginWidth(Percent percent)
         : _type(Type::PERCENT), _percent(percent) {
     }
 
-    MarginWidth(Length value)
+    constexpr MarginWidth(Length value)
         : _type(Type::VALUE), _value(value) {
     }
 
-    MarginWidth(PercentOr<Length> val) {
+    constexpr MarginWidth(PercentOr<Length> val) {
         if (val == PercentOr<Length>::PERCENT) {
             _type = Type::PERCENT;
             _percent = val._percent;

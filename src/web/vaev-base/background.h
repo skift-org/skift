@@ -33,18 +33,18 @@ struct BackgroundPosition {
     VerticalPosition verticalAnchor;
     PercentOr<Length> vertical;
 
-    BackgroundPosition()
+    constexpr BackgroundPosition()
         : horizontalAnchor(HorizontalAnchor::LEFT),
           horizontal(Percent{0}),
           verticalAnchor(VerticalPosition::TOP),
           vertical(Percent{0}) {
     }
 
-    BackgroundPosition(PercentOr<Length> horizontal, PercentOr<Length> vertical)
+    constexpr BackgroundPosition(PercentOr<Length> horizontal, PercentOr<Length> vertical)
         : horizontalAnchor(HorizontalAnchor::LEFT), horizontal(horizontal), verticalAnchor(VerticalPosition::TOP), vertical(vertical) {
     }
 
-    BackgroundPosition(HorizontalAnchor horizontalAnchor, PercentOr<Length> horizontal, VerticalPosition verticalAnchor, PercentOr<Length> vertical)
+    constexpr BackgroundPosition(HorizontalAnchor horizontalAnchor, PercentOr<Length> horizontal, VerticalPosition verticalAnchor, PercentOr<Length> vertical)
         : horizontalAnchor(horizontalAnchor), horizontal(horizontal), verticalAnchor(verticalAnchor), vertical(vertical) {
     }
 
@@ -92,7 +92,7 @@ struct BackgroundRepeat {
 
     u8 _val;
 
-    BackgroundRepeat(_Val val = REPEAT)
+    constexpr BackgroundRepeat(_Val val = REPEAT)
         : _val(static_cast<u8>(val)) {
     }
 

@@ -39,13 +39,11 @@ struct Length {
     f64 _val = 0;
     Unit _unit = Unit::PX;
 
-    static Length const ZERO;
-
-    f64 val() const {
+    constexpr f64 val() const {
         return _val;
     }
 
-    Unit unit() const {
+    constexpr Unit unit() const {
         return _unit;
     }
 
@@ -55,9 +53,9 @@ struct Length {
         : _val(val), _unit(unit) {}
 
     constexpr Length(Px val)
-        : _val(val), _unit(Unit::PX) {}
+        : _val(val) {}
 
-    bool isAbsolute() const {
+    constexpr bool isAbsolute() const {
         switch (_unit) {
         case Unit::CM:
         case Unit::MM:
@@ -72,7 +70,7 @@ struct Length {
         }
     }
 
-    bool isFontRelative() const {
+    constexpr bool isFontRelative() const {
         switch (_unit) {
         case Unit::EM:
         case Unit::REM:
@@ -93,7 +91,7 @@ struct Length {
         }
     }
 
-    bool isViewportRelative() const {
+    constexpr bool isViewportRelative() const {
         switch (_unit) {
         case Unit::VW:
         case Unit::SVW:
@@ -125,15 +123,15 @@ struct Length {
         }
     }
 
-    bool isRelative() const {
+    constexpr bool isRelative() const {
         return not isAbsolute();
     }
 
-    bool operator==(Length const &other) const {
+    constexpr bool operator==(Length const &other) const {
         return _val == other._val and _unit == other._unit;
     }
 
-    std::partial_ordering operator<=>(Length const &other) const {
+    constexpr std::partial_ordering operator<=>(Length const &other) const {
         if (_unit != other._unit)
             return std::partial_ordering::unordered;
         return _val <=> other._val;
@@ -143,8 +141,6 @@ struct Length {
         e("{}{}", _val, _unit);
     }
 };
-
-constexpr Length Length::ZERO = Length(0, Length::Unit::PX);
 
 struct FontMetrics {
     Px fontSize;
@@ -172,7 +168,7 @@ struct LengthContext {
     FontMetrics fontMetrics;
     FontMetrics rootFontMetrics;
 
-    Px resolve(Length const &l) const {
+    constexpr Px resolve(Length const &l) const {
         switch (l.unit()) {
             // Font-relative
 

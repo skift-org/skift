@@ -27,19 +27,19 @@ struct Size {
     Type type;
     PercentOr<Length> value;
 
-    Size() : type(AUTO), value(Length::ZERO) {
+    constexpr Size() : type(AUTO), value(Length{}) {
     }
 
-    Size(Type type) : type(type), value(Length::ZERO) {
+    constexpr Size(Type type) : type(type), value(Length{}) {
     }
 
-    Size(Type type, PercentOr<Length> value) : type(type), value(value) {
+    constexpr Size(Type type, PercentOr<Length> value) : type(type), value(value) {
     }
 
-    Size(Percent value) : type(LENGTH), value(value) {
+    constexpr Size(Percent value) : type(LENGTH), value(value) {
     }
 
-    Size(Length value) : type(LENGTH), value(value) {
+    constexpr Size(Length value) : type(LENGTH), value(value) {
     }
 
     bool operator==(Type type) const {

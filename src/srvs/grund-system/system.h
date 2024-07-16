@@ -48,13 +48,12 @@ struct System {
             try$(service->activate(_context));
         }
 
+        logDebug("running system event loop");
         while (true) {
             try$(_listener.poll(TimeStamp::endOfTime()));
-            auto ev = _listener.next();
-            while (ev) {
+            while (auto ev = _listener.next()) {
                 logInfo("handling system event");
-                // ignore
-                ev = _listener.next();
+                try$(Hj::_signal(ev->cap, Hj::Sigs::NONE, Hj::Sigs::READABLE));
             }
         }
     }

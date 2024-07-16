@@ -46,8 +46,7 @@ Async::Task<> entryPointAsync(Sys::Context &) {
     while (true) {
         co_try$(listener.poll(TimeStamp::endOfTime()));
 
-        auto ev = listener.next();
-        while (ev) {
+        while (auto ev = listener.next()) {
             co_try$(Hj::_signal(ev->cap, Hj::Sigs::NONE, Hj::Sigs::TRIGGERED));
 
             auto irq = cap2irq.tryGet(ev->cap);
@@ -55,7 +54,6 @@ Async::Task<> entryPointAsync(Sys::Context &) {
                 auto e = Sys::makeEvent<Grund::Device::IrqEvent>(*irq);
                 co_try$(root->event(*e));
             }
-            ev = listener.next();
         }
     }
 

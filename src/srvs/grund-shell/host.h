@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-sys/context.h>
+#include <karm-sys/proc.h>
 #include <karm-ui/host.h>
 
 namespace Grund::Shell {
@@ -26,7 +27,8 @@ struct RootHost :
         }
     }
 
-    Res<> wait(TimeStamp) override {
+    Res<> wait(TimeStamp until) override {
+        try$(Sys::sleepUntil(until));
         return Ok();
     }
 

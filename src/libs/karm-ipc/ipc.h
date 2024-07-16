@@ -4,16 +4,12 @@
 #include <karm-sys/context.h>
 #include <karm-sys/socket.h>
 
+#include "base.h"
 #include "hook.h"
 
 namespace Karm::Ipc {
 
 struct _Object;
-
-struct Header {
-    u64 from, to;
-    u64 oid, uid, mid, seq;
-};
 
 struct _Pending {
     u64 seq;

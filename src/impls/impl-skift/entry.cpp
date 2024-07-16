@@ -28,7 +28,7 @@ extern "C" [[gnu::weak]] void __entryPoint(usize rawHandover, usize rawIn, usize
     auto fd = makeStrong<Skift::IpcFd>(Hj::Cap{rawIn}, Hj::Cap{rawOut});
     ctx.add<ChannelHook>(Sys::IpcConnection{fd, ""_url});
 
-    auto res = Async::run(entryPointAsync(ctx));
+    auto res = Sys::run(entryPointAsync(ctx));
 
     auto self = Hj::Task::self();
 

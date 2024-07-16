@@ -19,5 +19,6 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     Grund::Echo::Service service{server};
 
     logInfo("service started");
+
     co_return co_trya$(server.runAsync());
 }

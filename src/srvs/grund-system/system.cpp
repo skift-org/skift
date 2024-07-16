@@ -84,7 +84,7 @@ Res<> Service::activate(Sys::Context &ctx) {
 
     logInfoIf(DEBUG_TASK, "attaching channels...");
     auto inCap = try$(domain.attach(_in));
-    auto outCap = try$(domain.attach(_in));
+    auto outCap = try$(domain.attach(_out));
 
     logInfoIf(DEBUG_TASK, "starting the task...");
     try$(task.start(

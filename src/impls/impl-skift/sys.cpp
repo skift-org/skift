@@ -148,8 +148,15 @@ Res<> populate(Vec<Sys::UserInfo> &) {
 
 // MARK: Process Managment -----------------------------------------------------
 
-Res<> sleep(TimeSpan) {
-    notImplemented();
+Res<> sleep(TimeSpan span) {
+    return sleepUntil(now() + span);
+}
+
+Res<> sleepUntil(TimeStamp until) {
+    // HACK: listerner abuses ahead
+    auto listener = try$(Hj::Listener::create(Hj::ROOT));
+    try$(listener.poll(until));
+    return Ok();
 }
 
 Res<> exit(i32) {

@@ -25,6 +25,16 @@ struct Map {
         _els.pushBack(Cons<K, V>{key, std::move(value)});
     }
 
+    bool has(K const &key) const {
+        for (auto &i : _els) {
+            if (i.car == key) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     V &get(K const &key) {
         for (auto &i : _els) {
             if (i.car == key) {

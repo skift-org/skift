@@ -10,11 +10,8 @@ inline Res<> sleep(TimeSpan span) {
     return _Embed::sleep(span);
 }
 
-inline Res<> sleepUntil(TimeStamp stamp) {
-    auto n = now();
-    if (stamp < n)
-        return Ok();
-    return sleep(stamp - n);
+inline Res<> sleepUntil(TimeStamp until) {
+    return _Embed::sleepUntil(until);
 }
 
 } // namespace Karm::Sys

@@ -85,6 +85,8 @@ Res<> populate(Vec<Sys::UserInfo> &);
 
 Res<> sleep(TimeSpan);
 
+Res<> sleepUntil(TimeStamp);
+
 Res<> exit(i32);
 
 // MARK: Asynchronous I/O ------------------------------------------------------

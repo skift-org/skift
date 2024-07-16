@@ -247,6 +247,22 @@ void Context::fill(Math::Ellipsei e) {
     fill();
 }
 
+// stroke a path
+void Context::stroke(Gfx::Path const &path) {
+    _poly.clear();
+    createStroke(_poly, path, current().stroke);
+    _poly.transform(current().trans);
+    _fill(current().stroke.paint);
+}
+
+// fill a path
+void Context::fill(Gfx::Path const &path, FillRule rule) {
+    _poly.clear();
+    createSolid(_poly, path);
+    _poly.transform(current().trans);
+    _fill(current().paint, rule);
+}
+
 // MARK: Debug -----------------------------------------------------------------
 
 void Context::plot(Math::Vec2i point, Color color) {

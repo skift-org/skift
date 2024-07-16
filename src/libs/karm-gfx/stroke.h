@@ -68,6 +68,6 @@ inline Stroke stroke(auto... args) {
 
 void createStroke(Math::Polyf &poly, Path const &path, Stroke stroke);
 
-void createSolid(Math::Polyf &poly, Path &path);
+void createSolid(Math::Polyf &poly, Path const &path);
 
 } // namespace Karm::Gfx

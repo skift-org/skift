@@ -180,6 +180,12 @@ struct Context {
     // Fill an ellipse.
     void fill(Math::Ellipsei e);
 
+    // stroke a path
+    void stroke(Gfx::Path const &path);
+
+    // fill a path
+    void fill(Gfx::Path const &path, FillRule rule = FillRule::NONZERO);
+
     // MARK: Debug -------------------------------------------------------------
     // These functions are mostly for debugging purposes. They let you draw
     // non-antialiased shapes and lines.

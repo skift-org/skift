@@ -201,7 +201,7 @@ static void _createCap(Math::Polyf &poly, Stroke stroke, Cap cap) {
     }
 }
 
-void createSolid(Math::Polyf &poly, Path &path) {
+void createSolid(Math::Polyf &poly, Path const &path) {
     for (auto contour : path.iterContours()) {
         for (usize i = 0; i < contour.len(); i++) {
             Math::Edgef e = {contour[i], contour[(i + 1) % contour.len()]};

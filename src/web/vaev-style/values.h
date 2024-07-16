@@ -52,6 +52,11 @@ struct ValueParser<Display> {
 };
 
 template <>
+struct ValueParser<FontSize> {
+    static Res<FontSize> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
 struct ValueParser<FontStyle> {
     static Res<FontStyle> parse(Cursor<Css::Sst> &c);
 };

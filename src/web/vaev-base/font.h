@@ -2,6 +2,7 @@
 
 #include <karm-mime/url.h>
 #include <vaev-base/angle.h>
+#include <vaev-base/length.h>
 #include <vaev-base/percent.h>
 
 namespace Vaev {
@@ -39,19 +40,19 @@ struct FontWidth {
 
     Percent _val;
 
-    FontWidth()
+    constexpr FontWidth()
         : FontWidth(NORMAL) {
     }
 
-    FontWidth(_Named named)
+    constexpr FontWidth(_Named named)
         : _val(toPercent(named)) {
     }
 
-    FontWidth(Percent value)
+    constexpr FontWidth(Percent value)
         : _val(value) {
     }
 
-    auto val() const {
+    constexpr auto val() const {
         return _val;
     }
 
@@ -90,11 +91,11 @@ struct FontStyle {
     _Named val;
     Angle obliqueAngle;
 
-    FontStyle(_Named named = NORMAL)
+    constexpr FontStyle(_Named named = NORMAL)
         : val(named) {
     }
 
-    FontStyle(Angle angle)
+    constexpr FontStyle(Angle angle)
         : val(OBLIQUE), obliqueAngle(angle) {}
 
     void repr(Io::Emit &e) const {
@@ -168,6 +169,50 @@ struct FontWeight {
         if (isRelative() or other.isRelative())
             return std::partial_ordering::unordered;
         return val <=> other.val;
+    }
+};
+
+struct FontSize {
+    enum _Named {
+        // absolute
+        XX_SMALL,
+        X_SMALL,
+        SMALL,
+        MEDIUM,
+        LARGE,
+        X_LARGE,
+        XX_LARGE,
+
+        // relative
+        LARGER,
+        SMALLER,
+
+        // length/percent
+        LENGTH,
+
+        // math
+        MATH,
+
+        _LEN,
+    };
+
+    _Named val;
+    PercentOr<Length> size;
+
+    constexpr FontSize(_Named named = MEDIUM)
+        : val(named), size(Length{}) {
+    }
+
+    constexpr FontSize(PercentOr<Length> size)
+        : val(LENGTH), size(size) {
+    }
+
+    void repr(Io::Emit &e) const {
+        if (val == LENGTH) {
+            e("{}", size);
+        } else {
+            e("{}", val);
+        }
     }
 };
 

@@ -173,6 +173,102 @@ struct DisplayProp {
     }
 };
 
+// MARK: Fonts -----------------------------------------------------------------
+
+// https://www.w3.org/TR/css-fonts-4/#font-family-prop
+struct FontFamilyProp {
+    Vec<String> value = initial();
+
+    static constexpr Str name() { return "font-family"; }
+
+    static Array<String, 1> initial() { return {"sans-serif"s}; }
+
+    void apply(Computed &) const {
+        // TODO
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        eatWhitespace(c);
+        while (not c.ended()) {
+            value.pushBack(try$(parseValue<String>(c)));
+            eatWhitespace(c);
+        }
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-fonts-4/#font-weight-prop
+struct FontWeightProp {
+    FontWeight value = initial();
+
+    static constexpr Str name() { return "font-weight"; }
+
+    static constexpr FontWeight initial() { return FontWeight::NORMAL; }
+
+    void apply(Computed &) const {
+        // TODO
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<FontWeight>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-fonts-4/#font-width-prop
+struct FontWidthProp {
+    FontWidth value = initial();
+
+    static constexpr Str name() { return "font-width"; }
+
+    static constexpr FontWidth initial() { return FontWidth::NORMAL; }
+
+    void apply(Computed &) const {
+        // TODO
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<FontWidth>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-fonts-4/#font-style-prop
+struct FontStyleProp {
+    FontStyle value = initial();
+
+    static constexpr Str name() { return "font-style"; }
+
+    static constexpr FontStyle initial() { return FontStyle::NORMAL; }
+
+    void apply(Computed &) const {
+        // TODO
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<FontStyle>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-fonts-4/#font-size-prop
+struct FontSizeProp {
+    FontSize value = initial();
+
+    static constexpr Str name() { return "font-size"; }
+
+    static constexpr FontSize initial() { return FontSize::MEDIUM; }
+
+    void apply(Computed &) const {
+        // TODO
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<FontSize>(c));
+        return Ok();
+    }
+};
+
 // MARK: Margin ----------------------------------------------------------------
 
 // https://www.w3.org/TR/css-box-3/#propdef-margin
@@ -559,6 +655,13 @@ using _StyleProp = Union<
     BackgroundRepeatProp,
     ColorStyleProp,
     DisplayProp,
+
+    // Font
+    FontFamilyProp,
+    FontWeightProp,
+    FontWidthProp,
+    FontStyleProp,
+    FontSizeProp,
 
     // Margin
     MarginTopProp,

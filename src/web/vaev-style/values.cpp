@@ -264,6 +264,37 @@ Res<Display> ValueParser<Display>::parse(Cursor<Css::Sst> &c) {
     });
 }
 
+// MARK: FontSize
+// https://www.w3.org/TR/css-fonts-4/#font-size-prop
+
+Res<FontSize> ValueParser<FontSize>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Css::Token::ident("xx-small")))
+        return Ok(FontSize::XX_SMALL);
+    else if (c.skip(Css::Token::ident("x-small")))
+        return Ok(FontSize::X_SMALL);
+    else if (c.skip(Css::Token::ident("small")))
+        return Ok(FontSize::SMALL);
+    else if (c.skip(Css::Token::ident("medium")))
+        return Ok(FontSize::MEDIUM);
+    else if (c.skip(Css::Token::ident("large")))
+        return Ok(FontSize::LARGE);
+    else if (c.skip(Css::Token::ident("x-large")))
+        return Ok(FontSize::X_LARGE);
+    else if (c.skip(Css::Token::ident("xx-large")))
+        return Ok(FontSize::XX_LARGE);
+    else if (c.skip(Css::Token::ident("smaller")))
+        return Ok(FontSize::SMALLER);
+    else if (c.skip(Css::Token::ident("larger")))
+        return Ok(FontSize::LARGER);
+    else if (c.skip(Css::Token::ident("math")))
+        return Ok(FontSize::MATH);
+    else
+        return Ok(try$(parseValue<PercentOr<Length>>(c)));
+}
+
 // MARK: FontStyle
 // https://drafts.csswg.org/css-fonts-4/#propdef-font-style
 

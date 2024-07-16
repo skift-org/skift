@@ -9,6 +9,7 @@
 #include <vaev-base/float.h>
 #include <vaev-base/insets.h>
 #include <vaev-base/numbers.h>
+#include <vaev-base/overflow.h>
 #include <vaev-base/sizing.h>
 #include <vaev-base/visibility.h>
 
@@ -22,6 +23,7 @@ struct Computed {
     Margin margin;
     Padding padding;
     Sizing sizing;
+    Overflows overflows;
 
     // CSS Writing Modes Level 3
     // https://www.w3.org/TR/css-writing-modes-3

@@ -3,10 +3,10 @@
 #include <karm-io/emit.h>
 #include <karm-mime/url.h>
 #include <vaev-base/color.h>
+#include <vaev-base/font.h>
 
 #include "base.h"
 #include "computed.h"
-#include "props.h"
 #include "values.h"
 
 // https://www.w3.org/TR/CSS22/propidx.html
@@ -18,12 +18,14 @@ namespace Vaev::Style {
 // NOTE: This list should be kept alphabetically sorted.
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-attachment
-struct BackgroundAttachmentStyleProp {
-    Vec<BackgroundAttachment> value{};
+struct BackgroundAttachmentProp {
+    Vec<BackgroundAttachment> value = initial();
 
-    static Str name() { return "background-attachment"; }
+    static constexpr Str name() { return "background-attachment"; }
 
-    static auto initial() { return BackgroundAttachment::SCROLL; }
+    static constexpr Array<BackgroundAttachment, 1> initial() {
+        return {BackgroundAttachment::SCROLL};
+    }
 
     Res<> parse(Computed &c) const {
         c.backgrounds.resize(max(c.backgrounds.len(), value.len()));
@@ -34,12 +36,12 @@ struct BackgroundAttachmentStyleProp {
 };
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-color
-struct BackgroundColorStyleProp {
-    Vec<Color> value{};
+struct BackgroundColorProp {
+    Vec<Color> value = initial();
 
-    static Str name() { return "background-color"; }
+    static constexpr Str name() { return "background-color"; }
 
-    static auto initial() { return TRANSPARENT; }
+    static constexpr Array<Color, 1> initial() { return {TRANSPARENT}; }
 
     void apply(Computed &c) const {
         c.backgrounds.resize(max(c.backgrounds.len(), value.len()));
@@ -58,12 +60,12 @@ struct BackgroundColorStyleProp {
 };
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-image
-struct BackgroundImageStyleProp {
-    Vec<Opt<Mime::Url>> value{};
+struct BackgroundImageProp {
+    Vec<Opt<Mime::Url>> value = initial();
 
-    static Str name() { return "background-image"; }
+    static constexpr Str name() { return "background-image"; }
 
-    static auto initial() { return NONE; }
+    static Array<Opt<Mime::Url>, 1> initial() { return {NONE}; }
 
     void apply(Computed &) const {
         // computed.backgroundImage = value;
@@ -71,12 +73,14 @@ struct BackgroundImageStyleProp {
 };
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-position
-struct BackgroundPositionStyleProp {
-    Vec<BackgroundPosition> value{};
+struct BackgroundPositionProp {
+    Vec<BackgroundPosition> value = initial();
 
-    static Str name() { return "background-position"; }
+    static constexpr Str name() { return "background-position"; }
 
-    static BackgroundPosition initial() { return {Percent{0}, Percent{0}}; }
+    static constexpr Array<BackgroundPosition, 1> initial() {
+        return {BackgroundPosition{Percent{0}, Percent{0}}};
+    }
 
     void apply(Computed &c) const {
         c.backgrounds.resize(max(c.backgrounds.len(), value.len()));
@@ -86,12 +90,14 @@ struct BackgroundPositionStyleProp {
 };
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-repeat
-struct BackgroundRepeatStyleProp {
-    Vec<BackgroundRepeat> value{};
+struct BackgroundRepeatProp {
+    Vec<BackgroundRepeat> value = initial();
 
-    static Str name() { return "background-repeat"; }
+    static constexpr Str name() { return "background-repeat"; }
 
-    static BackgroundRepeat initial() { return BackgroundRepeat::REPEAT; }
+    static constexpr Array<BackgroundRepeat, 1> initial() {
+        return {BackgroundRepeat::REPEAT};
+    }
 
     void apply(Computed &c) const {
         c.backgrounds.resize(max(c.backgrounds.len(), value.len()));
@@ -102,11 +108,11 @@ struct BackgroundRepeatStyleProp {
 
 // https://www.w3.org/TR/CSS22/tables.html#propdef-border-collapse
 struct BorderCollapseProp {
-    BorderCollapse value{};
+    BorderCollapse value = initial();
 
-    static Str name() { return "border-collapse"; }
+    static constexpr Str name() { return "border-collapse"; }
 
-    static auto initial() { return BorderCollapse::SEPARATE; }
+    static constexpr BorderCollapse initial() { return BorderCollapse::SEPARATE; }
 
     void apply(Computed &) const {
         // TODO
@@ -115,24 +121,29 @@ struct BorderCollapseProp {
 
 // https://www.w3.org/TR/CSS22/box.html#propdef-border-color
 struct BorderColorProp {
-    Color value;
+    Color value = initial();
 
-    static Str name() { return "border-color"; }
+    static constexpr Str name() { return "border-color"; }
 
-    static auto initial() { return BLACK; }
+    static constexpr Color initial() { return BLACK; }
 
     void apply(Computed &) const {
         // TODO
     }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Color>(c));
+        return Ok();
+    }
 };
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-color
-struct ColorStyleStyleProp {
-    Color value;
+struct ColorStyleProp {
+    Color value = initial();
 
-    static Str name() { return "color"; }
+    static constexpr Str name() { return "color"; }
 
-    static auto initial() { return BLACK; }
+    static constexpr Color initial() { return BLACK; }
 
     void apply(Computed &c) const {
         c.color = value;
@@ -145,12 +156,12 @@ struct ColorStyleStyleProp {
 };
 
 // https://www.w3.org/TR/CSS22/visuren.html#propdef-display
-struct DisplayStyleProp {
-    Display value;
+struct DisplayProp {
+    Display value = initial();
 
-    static Str name() { return "display"; }
+    static constexpr Str name() { return "display"; }
 
-    static Display initial() { return {Display::FLOW, Display::INLINE}; }
+    static constexpr Display initial() { return {Display::FLOW, Display::INLINE}; }
 
     void apply(Computed &s) const {
         s.display = value;
@@ -166,12 +177,12 @@ struct DisplayStyleProp {
 
 // https://www.w3.org/TR/css-box-3/#propdef-margin
 
-struct MarginTopStyleProp {
-    MarginWidth value;
+struct MarginTopProp {
+    MarginWidth value = initial();
 
     static Str name() { return "margin-top"; }
 
-    static auto initial() { return Length::ZERO; }
+    static constexpr Length initial() { return Length{}; }
 
     void apply(Computed &c) const {
         c.margin.top = value;
@@ -183,12 +194,12 @@ struct MarginTopStyleProp {
     }
 };
 
-struct MarginRightStyleProp {
-    MarginWidth value;
+struct MarginRightProp {
+    MarginWidth value = initial();
 
     static Str name() { return "margin-right"; }
 
-    static auto initial() { return Length::ZERO; }
+    static constexpr Length initial() { return Length{}; }
 
     void apply(Computed &c) const {
         c.margin.right = value;
@@ -200,12 +211,12 @@ struct MarginRightStyleProp {
     }
 };
 
-struct MarginBottomStyleProp {
-    MarginWidth value;
+struct MarginBottomProp {
+    MarginWidth value = initial();
 
-    static Str name() { return "margin-bottom"; }
+    static constexpr Str name() { return "margin-bottom"; }
 
-    static auto initial() { return Length::ZERO; }
+    static constexpr Length initial() { return Length{}; }
 
     void apply(Computed &c) const {
         c.margin.bottom = value;
@@ -217,12 +228,12 @@ struct MarginBottomStyleProp {
     }
 };
 
-struct MarginLeftStyleProp {
-    MarginWidth value;
+struct MarginLeftProp {
+    MarginWidth value = initial();
 
     static Str name() { return "margin-left"; }
 
-    static auto initial() { return Length::ZERO; }
+    static Length initial() { return Length{}; }
 
     void apply(Computed &c) const {
         c.margin.left = value;
@@ -238,12 +249,12 @@ struct MarginLeftStyleProp {
 
 // https://www.w3.org/TR/css-box-3/#propdef-padding
 
-struct PaddingTopStyleProp {
-    PercentOr<Length> value;
+struct PaddingTopProp {
+    PercentOr<Length> value = initial();
 
     static Str name() { return "padding-top"; }
 
-    static Length initial() { return Length::ZERO; }
+    static Length initial() { return Length{}; }
 
     void apply(Computed &c) const {
         c.padding.top = value;
@@ -255,12 +266,12 @@ struct PaddingTopStyleProp {
     }
 };
 
-struct PaddingRightStyleProp {
-    PercentOr<Length> value;
+struct PaddingRightProp {
+    PercentOr<Length> value = initial();
 
     static Str name() { return "padding-right"; }
 
-    static auto initial() { return Length::ZERO; }
+    static Length initial() { return Length{}; }
 
     void apply(Computed &c) const {
         c.padding.right = value;
@@ -272,12 +283,12 @@ struct PaddingRightStyleProp {
     }
 };
 
-struct PaddingBottomStyleProp {
-    PercentOr<Length> value;
+struct PaddingBottomProp {
+    PercentOr<Length> value = initial();
 
     static Str name() { return "padding-bottom"; }
 
-    static auto initial() { return Length::ZERO; }
+    static Length initial() { return Length{}; }
 
     void apply(Computed &c) const {
         c.padding.bottom = value;
@@ -289,12 +300,12 @@ struct PaddingBottomStyleProp {
     }
 };
 
-struct PaddingLeftStyleProp {
-    PercentOr<Length> value;
+struct PaddingLeftProp {
+    PercentOr<Length> value = initial();
 
     static Str name() { return "padding-left"; }
 
-    static auto initial() { return Length::ZERO; }
+    static Length initial() { return {}; }
 
     void apply(Computed &c) const {
         c.padding.left = value;
@@ -308,11 +319,11 @@ struct PaddingLeftStyleProp {
 
 // https://www.w3.org/TR/css-display-3/#order-property
 struct OrderProp {
-    Integer value;
+    Integer value = initial();
 
     static Str name() { return "order"; }
 
-    static auto initial() { return 0; }
+    static Integer initial() { return 0; }
 
     void apply(Computed &c) const {
         c.order = value;
@@ -328,26 +339,37 @@ struct OrderProp {
 // https://www.w3.org/TR/css-sizing-3
 
 // https://www.w3.org/TR/css-sizing-3/#box-sizing
-struct BoxSizingStyleProp {
-    BoxSizing value;
+struct BoxSizingProp {
+    BoxSizing value = initial();
 
-    static Str name() { return "box-sizing"; }
+    static constexpr Str name() { return "box-sizing"; }
 
-    static auto initial() { return BoxSizing::CONTENT_BOX; }
+    static constexpr BoxSizing initial() { return BoxSizing::CONTENT_BOX; }
 
     void apply(Computed &c) const {
         c.sizing.boxSizing = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        if (c.skip(Css::Token::ident("border-box")))
+            value = BoxSizing::BORDER_BOX;
+        else if (c.skip(Css::Token::ident("content-box")))
+            value = BoxSizing::CONTENT_BOX;
+        else
+            return Error::invalidData("expected 'border-box' or 'content-box'");
+
+        return Ok();
     }
 };
 
 // https://www.w3.org/TR/css-sizing-3/#propdef-width
 
-struct WidthStyleProp {
-    Size value;
+struct WidthProp {
+    Size value = initial();
 
-    static Str name() { return "width"; }
+    static constexpr Str name() { return "width"; }
 
-    static auto initial() { return Size::AUTO; }
+    static constexpr Size initial() { return Size::AUTO; }
 
     void apply(Computed &c) const {
         c.sizing.width = value;
@@ -361,12 +383,12 @@ struct WidthStyleProp {
 
 // https://www.w3.org/TR/css-sizing-3/#propdef-height
 
-struct HeightStyleProp {
-    Size value;
+struct HeightProp {
+    Size value = initial();
 
-    static Str name() { return "height"; }
+    static constexpr Str name() { return "height"; }
 
-    static auto initial() { return Size::AUTO; }
+    static constexpr Size initial() { return Size::AUTO; }
 
     void apply(Computed &c) const {
         c.sizing.height = value;
@@ -380,12 +402,12 @@ struct HeightStyleProp {
 
 // https://www.w3.org/TR/css-sizing-3/#propdef-min-width
 
-struct MinWidthStyleProp {
-    Size value;
+struct MinWidthProp {
+    Size value = initial();
 
-    static Str name() { return "min-width"; }
+    static constexpr Str name() { return "min-width"; }
 
-    static auto initial() { return Size::AUTO; }
+    static constexpr Size initial() { return Size::AUTO; }
 
     void apply(Computed &c) const {
         c.sizing.minWidth = value;
@@ -399,12 +421,12 @@ struct MinWidthStyleProp {
 
 // https://www.w3.org/TR/css-sizing-3/#propdef-min-height
 
-struct MinHeightStyleProp {
-    Size value;
+struct MinHeightProp {
+    Size value = initial();
 
-    static Str name() { return "min-height"; }
+    static constexpr Str name() { return "min-height"; }
 
-    static auto initial() { return Size::AUTO; }
+    static constexpr Size initial() { return Size::AUTO; }
 
     void apply(Computed &c) const {
         c.sizing.minHeight = value;
@@ -418,12 +440,12 @@ struct MinHeightStyleProp {
 
 // https://www.w3.org/TR/css-sizing-3/#propdef-max-width
 
-struct MaxWidthStyleProp {
-    Size value;
+struct MaxWidthProp {
+    Size value = initial();
 
-    static Str name() { return "max-width"; }
+    static constexpr Str name() { return "max-width"; }
 
-    static auto initial() { return Size::NONE; }
+    static constexpr Size initial() { return Size::NONE; }
 
     void apply(Computed &c) const {
         c.sizing.maxWidth = value;
@@ -437,12 +459,12 @@ struct MaxWidthStyleProp {
 
 // https://www.w3.org/TR/css-sizing-3/#propdef-max-height
 
-struct MaxHeightStyleProp {
-    Size value;
+struct MaxHeightProp {
+    Size value = initial();
 
-    static Str name() { return "max-height"; }
+    static constexpr Str name() { return "max-height"; }
 
-    static auto initial() { return Size::NONE; }
+    static constexpr Size initial() { return Size::NONE; }
 
     void apply(Computed &c) const {
         c.sizing.maxHeight = value;
@@ -457,34 +479,40 @@ struct MaxHeightStyleProp {
 // MARK: Prop ------------------------------------------------------------------
 
 using _StyleProp = Union<
-    BackgroundAttachmentStyleProp,
-    BackgroundColorStyleProp,
-    BackgroundImageStyleProp,
-    BackgroundPositionStyleProp,
-    BackgroundRepeatStyleProp,
-    ColorStyleStyleProp,
-    DisplayStyleProp,
+    BackgroundAttachmentProp,
+    BackgroundColorProp,
+    BackgroundImageProp,
+    BackgroundPositionProp,
+    BackgroundRepeatProp,
+    ColorStyleProp,
+    DisplayProp,
 
     // Margin
-    MarginTopStyleProp,
-    MarginRightStyleProp,
-    MarginBottomStyleProp,
-    MarginLeftStyleProp,
+    MarginTopProp,
+    MarginRightProp,
+    MarginBottomProp,
+    MarginLeftProp,
+
+    // Overflow
+    OverflowXProp,
+    OverflowYProp,
+    OverflowBlockProp,
+    OverflowInlineProp,
 
     // Padding
-    PaddingTopStyleProp,
-    PaddingRightStyleProp,
-    PaddingBottomStyleProp,
-    PaddingLeftStyleProp,
+    PaddingTopProp,
+    PaddingRightProp,
+    PaddingBottomProp,
+    PaddingLeftProp,
 
     // Sizing
-    BoxSizingStyleProp,
-    WidthStyleProp,
-    HeightStyleProp,
-    MinWidthStyleProp,
-    MinHeightStyleProp,
-    MaxWidthStyleProp,
-    MaxHeightStyleProp
+    BoxSizingProp,
+    WidthProp,
+    HeightProp,
+    MinWidthProp,
+    MinHeightProp,
+    MaxWidthProp,
+    MaxHeightProp
 
     /**/
     >;

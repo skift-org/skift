@@ -7,16 +7,20 @@ namespace Karm {
 
 template <typename T, typename TAG = struct _RangeTag>
 struct Range {
-    T start{};
-    T size{};
+    using Size = decltype(std::declval<T>() - std::declval<T>());
 
-    static constexpr Range fromStartEnd(T start, T end) {
-        return {start, end - start};
+    T start{};
+    Size size{};
+
+    static constexpr Range fromStartEnd(T a, T b) {
+        if (a < b)
+            return {a, b - a};
+        return {b, a - b};
     }
 
     constexpr Range() = default;
 
-    constexpr Range(T start, T size = 0)
+    constexpr Range(T start, Size size = {})
         : start(start), size(size) {
     }
 
@@ -29,7 +33,7 @@ struct Range {
     }
 
     constexpr bool empty() const {
-        return size == T{};
+        return size == Size{};
     }
 
     constexpr bool any() const {
@@ -37,7 +41,7 @@ struct Range {
     }
 
     constexpr bool valid() const {
-        return size >= T{};
+        return size >= Size{};
     }
 
     constexpr bool contains(T value) const {
@@ -71,11 +75,11 @@ struct Range {
         return {};
     }
 
-    constexpr Range slice(T off, T size) const {
+    constexpr Range slice(Size off, Size size) const {
         return {start + off, size};
     }
 
-    constexpr Range slice(T off) const {
+    constexpr Range slice(Size off) const {
         return slice(off, size - off);
     }
 

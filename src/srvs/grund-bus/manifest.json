@@ -1,6 +1,6 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "grund-system",
+    "id": "grund-bus",
     "type": "exe",
     "description": "Main system service responsible for managing other services",
     "enableIf": {

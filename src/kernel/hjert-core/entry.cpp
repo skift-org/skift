@@ -52,7 +52,7 @@ Res<> validateAndDump(u64 magic, Handover::Payload &payload) {
 }
 
 Res<> enterUserspace(Handover::Payload &payload) {
-    auto const *record = payload.fileByName("bundle://grund-system/_bin");
+    auto const *record = payload.fileByName("bundle://grund-bus/_bin");
     if (not record) {
         logInfo("entry: handover: no init file");
         return Error::invalidInput("No init file");

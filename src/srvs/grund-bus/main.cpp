@@ -4,14 +4,14 @@
 #include <karm-logger/logger.h>
 #include <karm-sys/entry.h>
 
-#include "system.h"
+#include "bus.h"
 
-using namespace Grund::System;
+using namespace Grund::Bus;
 
 Res<> entryPoint(Sys::Context &ctx) {
-    try$(Hj::Task::self().label("grund-system"));
+    try$(Hj::Task::self().label("grund-bus"));
 
-    auto system = try$(System::create(ctx));
+    auto system = try$(Bus::create(ctx));
 
     try$(system.prepare("grund-audio"s));
     try$(system.prepare("grund-conf"s));
@@ -40,7 +40,7 @@ extern "C" void __entryPoint(usize rawHandover) {
     Karm::registerPanicHandler(__panicHandler);
 
     auto &ctx = Sys::globalContext();
-    char const *argv[] = {"grund-system", nullptr};
+    char const *argv[] = {"grund-bus", nullptr};
     ctx.add<Sys::ArgsHook>(1, argv);
     ctx.add<HandoverHook>((Handover::Payload *)rawHandover);
 

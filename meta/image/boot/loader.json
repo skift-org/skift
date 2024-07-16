@@ -25,7 +25,7 @@
                 "bundle://grund-seat/_meta.json",
                 "bundle://grund-shell/_bin",
                 "bundle://grund-shell/_meta.json",
-                "bundle://grund-system/_bin",
+                "bundle://grund-bus/_bin",
                 "bundle://skift-wallpapers/images/abstract.qoi",
                 "bundle://fonts-inter/fonts/Inter-Regular.ttf",
                 "bundle://fonts-inter/fonts/Inter-Medium.ttf",

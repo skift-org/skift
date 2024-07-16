@@ -3,9 +3,9 @@
 #include <karm-base/size.h>
 #include <karm-logger/logger.h>
 
-#include "system.h"
+#include "bus.h"
 
-namespace Grund::System {
+namespace Grund::Bus {
 
 static constexpr bool DEBUG_TASK = false;
 static constexpr bool DEBUG_ELF = false;
@@ -102,4 +102,4 @@ Res<> Service::activate(Sys::Context &ctx) {
     return Ok();
 }
 
-} // namespace Grund::System
+} // namespace Grund::Bus

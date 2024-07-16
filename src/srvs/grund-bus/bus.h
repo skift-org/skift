@@ -5,7 +5,7 @@
 #include <karm-mime/url.h>
 #include <karm-sys/context.h>
 
-namespace Grund::System {
+namespace Grund::Bus {
 
 struct Service {
     String _id;
@@ -18,17 +18,17 @@ struct Service {
     Res<> activate(Sys::Context &ctx);
 };
 
-struct System {
+struct Bus {
     Sys::Context &_context;
     Hj::Listener _listener;
     Hj::Domain _domain;
 
     Vec<Strong<Service>> _services{};
 
-    static Res<System> create(Sys::Context &ctx) {
+    static Res<Bus> create(Sys::Context &ctx) {
         auto domain = try$(Hj::Domain::create(Hj::ROOT));
         auto listener = try$(Hj::Listener::create(Hj::ROOT));
-        return Ok(System{ctx, std::move(listener), std::move(domain)});
+        return Ok(Bus{ctx, std::move(listener), std::move(domain)});
     }
 
     Res<> prepare(Str id) {
@@ -52,6 +52,7 @@ struct System {
         while (true) {
             try$(_listener.poll(TimeStamp::endOfTime()));
             while (auto ev = _listener.next()) {
+
                 logInfo("handling system event");
                 try$(Hj::_signal(ev->cap, Hj::Sigs::NONE, Hj::Sigs::READABLE));
             }
@@ -59,4 +60,4 @@ struct System {
     }
 };
 
-} // namespace Grund::System
+} // namespace Grund::Bus

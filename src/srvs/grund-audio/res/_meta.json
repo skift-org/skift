@@ -1,9 +1,12 @@
 {
     "id": "grund-audio",
     "props": {
-        "service.requires": [
-            "grund-system",
-            "grund-device"
+        "unit.consumes": [
+            "Grund::Bus",
+            "Grund::Device"
+        ],
+        "unit.provides": [
+            "Grund::Audio"
         ]
     }
 }

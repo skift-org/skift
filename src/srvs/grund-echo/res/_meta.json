@@ -1,8 +1,11 @@
 {
     "id": "grund-echo",
     "props": {
-        "service.requires": [
-            "grund-system"
+        "unit.consumes": [
+            "Grund::Bus"
+        ],
+        "unit.provides": [
+            "Grund::Echo"
         ]
     }
 }

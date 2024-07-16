@@ -172,7 +172,7 @@ Ui::Child webview(State const &s) {
     if (not s.dom)
         return alert(s, "The page could not be loaded"s, Io::toStr(s.dom).unwrap());
 
-    return Vaev::View::view(s.dom.unwrap()) | Kr::contextMenu(slot$(contextMenu(s))) | Ui::vscroll();
+    return Vaev::View::view(s.dom.unwrap()) | Ui::vscroll() | Kr::contextMenu(slot$(contextMenu(s)));
 }
 
 Ui::Child appContent(State const &s) {

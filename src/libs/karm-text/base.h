@@ -7,13 +7,18 @@
 
 namespace Karm::Text {
 
-struct Glyph : public Distinct<usize, struct _GlyphTag> {
-    using Distinct<usize, struct _GlyphTag>::Distinct;
+struct Glyph {
+    u16 index;
+    u16 font;
 
     static Glyph const TOFU;
+
+    bool operator==(Glyph const &other) const = default;
+
+    auto operator<=>(Glyph const &other) const = default;
 };
 
-constexpr Glyph Glyph::TOFU{Limits<usize>::MIN};
+constexpr Glyph Glyph::TOFU{0, 0};
 
 // MARK: FontStyle -------------------------------------------------------------
 

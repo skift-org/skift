@@ -93,6 +93,26 @@ struct Ranges {
 
         _r.pushBack(range);
     }
+
+    bool contains(R range) const {
+        for (usize i = 0; i < _r.len(); i++) {
+            if (_r[i].contains(range)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool colides(R range) const {
+        for (usize i = 0; i < _r.len(); i++) {
+            if (_r[i].colides(range)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 };
 
 } // namespace Karm

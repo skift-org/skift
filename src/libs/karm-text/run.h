@@ -99,7 +99,7 @@ struct Run {
     Math::Vec2f layout() {
         auto xpos = 0.0f;
         bool first = true;
-        Glyph prev{0};
+        Glyph prev = Glyph::TOFU;
         for (auto &cell : _cells) {
             if (not first)
                 xpos += _font.kern(prev, cell.glyph);

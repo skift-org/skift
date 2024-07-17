@@ -36,6 +36,8 @@ struct SdlHost :
 
     Gfx::MutPixels mutPixels() override {
         SDL_Surface *s = SDL_GetWindowSurface(_window);
+        if (not s)
+            panic("Failed to get window surface");
 
         return {
             s->pixels,

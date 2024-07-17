@@ -60,7 +60,7 @@ void Prose::_measureBlocks() {
     for (auto &block : _blocks) {
         auto adv = 0.0f;
         bool first = true;
-        Glyph prev{0};
+        Glyph prev = Glyph::TOFU;
         for (auto &cell : block.cells(*this)) {
             if (not first)
                 adv += _style.font.kern(prev, cell.glyph);
@@ -183,7 +183,7 @@ static void _fillGlyph(Gfx::Context &g, Font const &font, Math::Vec2f baseline, 
     g.save();
     g.begin();
     g.translate(baseline);
-    g.scale(font.scale());
+    g.scale(font.fontsize);
     font.fontface->contour(g, glyph);
     g.fill();
     g.restore();
@@ -194,10 +194,15 @@ void Prose::paint(Gfx::Context &ctx) const {
     auto m = _style.font.metrics();
 
     ctx.save();
-    if (_style.color) {
+
+    if (_style.color)
         ctx.fillStyle(*_style.color);
-    }
-    ctx.strokeStyle(Gfx::Stroke{.paint = ctx.current().paint, .width = 1, .align = Gfx::INSIDE_ALIGN});
+
+    ctx.strokeStyle({
+        .paint = ctx.current().paint,
+        .width = 1,
+        .align = Gfx::INSIDE_ALIGN,
+    });
 
     for (auto const &line : _lines) {
         for (auto &block : line.blocks(*this)) {

@@ -1,4 +1,5 @@
 #include <karm-gfx/context.h>
+#include <karm-logger/logger.h>
 
 #include "font.h"
 #include "vga.h"
@@ -16,18 +17,14 @@ Font Font::fallback() {
     };
 }
 
-f64 Font::scale() const {
-    return fontsize / fontface->units();
-}
-
 FontMetrics Font::metrics() const {
     auto m = fontface->metrics();
 
-    m.advance *= scale();
-    m.ascend *= scale();
-    m.captop *= scale();
-    m.descend *= scale();
-    m.linegap *= scale();
+    m.advance *= fontsize;
+    m.ascend *= fontsize;
+    m.captop *= fontsize;
+    m.descend *= fontsize;
+    m.linegap *= fontsize;
 
     // Spread linegap evenly between lines
     m.linegap += (lineheight - 1) * (m.ascend + m.descend);
@@ -40,11 +37,11 @@ Glyph Font::glyph(Rune rune) {
 }
 
 f64 Font::advance(Glyph glyph) {
-    return fontface->advance(glyph) * scale();
+    return fontface->advance(glyph) * fontsize;
 }
 
 f64 Font::kern(Glyph prev, Glyph curr) {
-    return fontface->kern(prev, curr) * scale();
+    return fontface->kern(prev, curr) * fontsize;
 }
 
 FontMeasure Font::measure(Glyph r) {
@@ -57,4 +54,5 @@ FontMeasure Font::measure(Glyph r) {
         .baseline = {0, m.ascend},
     };
 }
+
 } // namespace Karm::Text

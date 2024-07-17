@@ -74,7 +74,7 @@ struct Cmap : public Io::BChunk {
                 }
             }
 
-            logWarn("ttf: glyph not found for rune {x}", r);
+            logWarn("ttf: glyph not found for rune {c}", r);
             return Text::Glyph(0);
         }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/ranges.h>
 #include <karm-base/rc.h>
 #include <karm-gfx/context.h>
 #include <karm-math/rect.h>
@@ -31,6 +32,16 @@ struct FontMetrics {
     f64 lineheight() {
         return ascend + descend + linegap;
     }
+
+    FontMetrics combine(FontMetrics other) {
+        return {
+            .ascend = ::max(ascend, other.ascend),
+            .captop = ::max(captop, other.captop),
+            .descend = ::max(descend, other.descend),
+            .linegap = ::max(linegap, other.linegap),
+            .advance = ::max(advance, other.advance),
+        };
+    }
 };
 
 struct FontMeasure {
@@ -55,8 +66,6 @@ struct Fontface {
     virtual f64 kern(Glyph prev, Glyph curr) = 0;
 
     virtual void contour(Gfx::Context &g, Glyph glyph) const = 0;
-
-    virtual f64 units() const = 0;
 };
 
 struct Font {
@@ -65,8 +74,6 @@ struct Font {
     f64 lineheight = 1.2;
 
     static Font fallback();
-
-    f64 scale() const;
 
     FontMetrics metrics() const;
 
@@ -77,6 +84,11 @@ struct Font {
     f64 kern(Glyph prev, Glyph curr);
 
     FontMeasure measure(Glyph glyph);
+
+    void contour(Gfx::Context &g, Glyph glyph) {
+        g.scale(fontsize);
+        fontface->contour(g, glyph);
+    }
 };
 
 } // namespace Karm::Text

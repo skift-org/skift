@@ -203,9 +203,9 @@ struct Parser {
     }
 
     GlyphMetrics glyphMetrics(Text::Glyph glyph) const {
-        auto glyfOffset = _loca.glyfOffset(glyph.value(), _head);
+        auto glyfOffset = _loca.glyfOffset(glyph.index, _head);
         auto glyf = _glyf.metrics(glyfOffset);
-        auto hmtx = _hmtx.metrics(glyph.value(), _hhea);
+        auto hmtx = _hmtx.metrics(glyph.index, _hhea);
 
         return {
             (f64)glyf.xMin,
@@ -221,7 +221,7 @@ struct Parser {
         if (not _gpos.present())
             return 0;
 
-        auto positioning = _gpos.adjustments(prev.value(), curr.value());
+        auto positioning = _gpos.adjustments(prev.index, curr.index);
 
         if (not positioning)
             return 0;
@@ -230,9 +230,9 @@ struct Parser {
     }
 
     void glyphContour(Gfx::Context &g, Text::Glyph glyph) const {
-        auto glyfOffset = _loca.glyfOffset(glyph.value(), _head);
+        auto glyfOffset = _loca.glyfOffset(glyph.index, _head);
 
-        if (glyfOffset == _loca.glyfOffset(glyph.value() + 1, _head))
+        if (glyfOffset == _loca.glyfOffset(glyph.index + 1, _head))
             return;
 
         _glyf.contour(g, glyfOffset);

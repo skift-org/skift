@@ -252,6 +252,12 @@ Opt<Strong<Fontface>> FontBook::queryClosest(FontQuery query) const {
         if (attrs.family != currFamily)
             continue;
 
+        if (currFamily != matchingFamily) {
+            currStretch = FontStretch::NO_MATCH;
+            currStyle = FontStyle::NO_MATCH;
+            currWeight = FontWeight::NO_MATCH;
+        }
+
         currStretch = _pickFontStretch(attrs.stretch, currStretch, query.stretch);
         if (attrs.stretch != currStretch)
             continue;
@@ -273,6 +279,7 @@ Opt<Strong<Fontface>> FontBook::queryClosest(FontQuery query) const {
             continue;
 
         matchingFace = info.face;
+        matchingFamily = currFamily;
         matchingStretch = currStretch;
         matchingStyle = currStyle;
         matchingWeight = currWeight;

@@ -10,6 +10,7 @@ namespace Karm::Text {
 struct VgaFontface : public Fontface {
     static constexpr isize WIDTH = 8;
     static constexpr isize HEIGHT = 8;
+    static constexpr f64 UNIT_PER_EM = 8;
 
     static constexpr Array<u8, 1024> const DATA = {
 #include "vga.inc"
@@ -17,11 +18,11 @@ struct VgaFontface : public Fontface {
 
     FontMetrics metrics() const override {
         return {
-            .ascend = 12,
-            .captop = 10,
-            .descend = 4,
-            .linegap = 4,
-            .advance = 8,
+            .ascend = 12 / UNIT_PER_EM,
+            .captop = 10 / UNIT_PER_EM,
+            .descend = 4 / UNIT_PER_EM,
+            .linegap = 4 / UNIT_PER_EM,
+            .advance = 8 / UNIT_PER_EM,
         };
     }
 
@@ -39,7 +40,7 @@ struct VgaFontface : public Fontface {
     }
 
     f64 advance(Glyph) override {
-        return 8;
+        return WIDTH / UNIT_PER_EM;
     }
 
     f64 kern(Glyph, Glyph) override {
@@ -47,18 +48,15 @@ struct VgaFontface : public Fontface {
     }
 
     void contour(Gfx::Context &g, Glyph glyph) const override {
+        g.scale(1 / UNIT_PER_EM);
         for (isize y = 0; y < HEIGHT; y++) {
             for (isize x = 0; x < WIDTH; x++) {
-                u8 byte = DATA[glyph.value() * HEIGHT + y];
+                u8 byte = DATA[glyph.index * HEIGHT + y];
                 if (byte & (0x80 >> x)) {
                     g.rect(Math::Recti{x, y - 8, 1, 1}.cast<f64>());
                 }
             }
         }
-    }
-
-    f64 units() const override {
-        return 8;
     }
 };
 

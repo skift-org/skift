@@ -42,9 +42,9 @@ struct Radius {
         : a(all), b(all), c(all), d(all), e(all), f(all), g(all), h(all) {}
 
     constexpr Radius(T StartEnd, T EndStart)
-        : Radius(StartEnd, StartEnd, EndStart, EndStart) {}
+        : Radius(StartEnd, EndStart, StartEnd, EndStart) {}
 
-    constexpr Radius(T topStart, T topEnd, T bottomStart, T bottomEnd)
+    constexpr Radius(T topStart, T topEnd, T bottomEnd, T bottomStart)
         : a(topStart), b(topStart),
           c(topEnd), d(topEnd),
           e(bottomEnd), f(bottomEnd),
@@ -71,7 +71,7 @@ struct Radius {
 
     Radius reduceOverlap(Vec2<T> size) const {
         auto res = *this;
-        auto scaleAll = [&](auto factor) {
+        auto scaleAll = [&](T factor) {
             if (factor >= 1)
                 return;
             for (auto &radius : res.radii)
@@ -79,16 +79,16 @@ struct Radius {
         };
 
         auto sumTop = res.b + res.c;
-        scaleAll(sumTop > T{} ? size.width / sumTop : T{});
+        scaleAll(sumTop > T{} ? size.width / sumTop : 1);
 
         auto sumEnd = res.d + res.e;
-        scaleAll(sumEnd > T{} ? size.height / sumEnd : T{});
+        scaleAll(sumEnd > T{} ? size.height / sumEnd : 1);
 
         auto sumBottom = res.f + res.g;
-        scaleAll(sumBottom > T{} ? size.width / sumBottom : T{});
+        scaleAll(sumBottom > T{} ? size.width / sumBottom : 1);
 
         auto sumStart = res.h + res.a;
-        scaleAll(sumStart > T{} ? size.height / sumStart : T{});
+        scaleAll(sumStart > T{} ? size.height / sumStart : 1);
         return res;
     }
 };

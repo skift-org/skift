@@ -25,10 +25,10 @@ Ui::Child quickSetting(QuickSettingProps props) {
                      : Ui::ButtonStyle::secondary();
 
     auto primaryStyle = props.more
-                            ? style.withRadius({4, 0, 4, 0})
+                            ? style.withRadius({4, 0, 0, 4})
                             : style;
 
-    auto secondaryStyle = style.withRadius({0, 4, 0, 4});
+    auto secondaryStyle = style.withRadius({0, 4, 4, 0});
 
     auto primary = [&] {
         if (props.name)

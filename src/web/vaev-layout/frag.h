@@ -44,11 +44,19 @@ struct Frag {
     virtual ~Frag() = default;
     virtual Type type() const = 0;
 
-    virtual void layout(RectPx bound) {
+    virtual void placeChildren(RectPx bound) {
         _borderBox = bound;
     }
 
-    virtual void paint(Paint::Stack &stack) {
+    virtual Px computeWidth() {
+        return Px{100};
+    }
+
+    virtual Px computeHeight() {
+        return Px{100};
+    }
+
+    virtual void makePaintables(Paint::Stack &stack) {
         if (style().backgrounds.len()) {
             Paint::Box box;
             box.backgrounds = style().backgrounds;
@@ -57,20 +65,13 @@ struct Frag {
         }
     }
 
-    virtual void debug(Gfx::Context &g) {
+    virtual void paintWireframe(Gfx::Context &g) {
+        g.strokeStyle({.paint = Gfx::GREEN, .width = 1, .align = Gfx::INSIDE_ALIGN});
         g.stroke(_borderBox.cast<isize>());
     }
 
     virtual void repr(Io::Emit &e) const {
         e("({} {})", type(), _borderBox);
-    }
-
-    virtual Px contentInlineSize() const {
-        return Px{100};
-    }
-
-    virtual Px contentBlockSize() const {
-        return Px{100};
     }
 
     Style::Computed const &style() const {

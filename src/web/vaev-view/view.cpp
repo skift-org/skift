@@ -66,8 +66,11 @@ struct View : public Ui::View<View> {
         auto [layout, paint] = *_renderResult;
 
         paint->paint(g);
-        if (Ui::debugShowLayoutBounds)
-            layout->debug(g);
+        if (Ui::debugShowLayoutBounds) {
+            logDebug("layout tree: {}", layout);
+            logDebug("paint tree: {}", paint);
+            layout->paintWireframe(g);
+        }
 
         g.restore();
     }
@@ -83,8 +86,8 @@ struct View : public Ui::View<View> {
         auto [layout, _] = Driver::render(*_dom, media, size.cast<Px>());
 
         return {
-            layout->contentInlineSize().toInt<isize>(),
-            layout->contentBlockSize().toInt<isize>(),
+            layout->computeWidth().toInt<isize>(),
+            layout->computeHeight().toInt<isize>(),
         };
     }
 };

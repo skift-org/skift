@@ -41,12 +41,12 @@ struct GridFlow : public Flow {
         });
     }
 
-    void layout(RectPx bound) override {
+    void placeChildren(RectPx bound) override {
         _clear();
         _createCells();
         _sortByOrder();
 
-        Flow::layout(bound);
+        Flow::placeChildren(bound);
     }
 };
 

@@ -183,8 +183,8 @@ struct FontFamilyProp {
 
     static Array<String, 1> initial() { return {"sans-serif"s}; }
 
-    void apply(Computed &) const {
-        // TODO
+    void apply(Computed &c) const {
+        c.fontFamilies = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -205,8 +205,8 @@ struct FontWeightProp {
 
     static constexpr FontWeight initial() { return FontWeight::NORMAL; }
 
-    void apply(Computed &) const {
-        // TODO
+    void apply(Computed &c) const {
+        c.fontWeigh = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -223,8 +223,8 @@ struct FontWidthProp {
 
     static constexpr FontWidth initial() { return FontWidth::NORMAL; }
 
-    void apply(Computed &) const {
-        // TODO
+    void apply(Computed &c) const {
+        c.fontWidth = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -241,8 +241,8 @@ struct FontStyleProp {
 
     static constexpr FontStyle initial() { return FontStyle::NORMAL; }
 
-    void apply(Computed &) const {
-        // TODO
+    void apply(Computed &c) const {
+        c.fontStyle = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -259,8 +259,8 @@ struct FontSizeProp {
 
     static constexpr FontSize initial() { return FontSize::MEDIUM; }
 
-    void apply(Computed &) const {
-        // TODO
+    void apply(Computed &c) const {
+        c.fontsize = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -342,8 +342,8 @@ struct MarginLeftProp {
 };
 
 // MARK: Overflow --------------------------------------------------------------
-// https://www.w3.org/TR/css-overflow/#overflow-control
 
+// https://www.w3.org/TR/css-overflow/#overflow-control
 struct OverflowXProp {
     Overflow value = initial();
 
@@ -361,6 +361,7 @@ struct OverflowXProp {
     }
 };
 
+// https://www.w3.org/TR/css-overflow/#overflow-control
 struct OverflowYProp {
     Overflow value = initial();
 
@@ -645,7 +646,7 @@ struct MaxHeightProp {
     }
 };
 
-// MARK: Prop ------------------------------------------------------------------
+// MARK: Style Property  -------------------------------------------------------
 
 using _StyleProp = Union<
     BackgroundAttachmentProp,

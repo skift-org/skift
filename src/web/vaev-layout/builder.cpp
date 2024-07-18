@@ -1,3 +1,4 @@
+#include <karm-text/loader.h>
 #include <vaev-dom/document.h>
 #include <vaev-dom/element.h>
 #include <vaev-dom/text.h>
@@ -66,11 +67,37 @@ void buildElement(Style::Computer &c, Dom::Element const &el, Flow &parent) {
     parent.add(frag);
 }
 
+static Opt<Strong<Text::Fontface>> _regularFontface = NONE;
+Strong<Text::Fontface> regularFontface() {
+    if (not _regularFontface) {
+        _regularFontface = Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Regular.ttf"_url).unwrap();
+    }
+    return *_regularFontface;
+}
+
+void buildRun(Style::Computer &, Dom::Text const &node, Flow &parent) {
+    auto style = makeStrong<Style::Computed>(parent.style());
+    auto font = Text::Font{regularFontface(), 16};
+    Io::SScan scan{node.data};
+    scan.eat(Re::space());
+    if (scan.ended())
+        return;
+    auto run = makeStrong<Text::Run>(font);
+    while (not scan.ended()) {
+        run->append(scan.next());
+        if (scan.eat(Re::space())) {
+            run->append(' ');
+        }
+    }
+
+    parent.add(makeStrong<Run>(style, run));
+}
+
 void build(Style::Computer &c, Dom::Node const &node, Flow &parent) {
     if (auto *el = node.is<Dom::Element>()) {
         buildElement(c, *el, parent);
     } else if (auto *text = node.is<Dom::Text>()) {
-        parent.add(makeStrong<Run>(parent._style, text->data));
+        buildRun(c, *text, parent);
     } else if (auto *doc = node.is<Dom::Document>()) {
         buildChildren(c, doc->children(), parent);
     }

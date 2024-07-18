@@ -59,10 +59,10 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
 
     Style::Computer computer{media, stylebook};
     auto layoutRoot = Layout::build(computer, dom);
-    layoutRoot->layout(viewport);
+    layoutRoot->placeChildren(viewport);
 
     auto paintRoot = makeStrong<Paint::Stack>();
-    layoutRoot->paint(*paintRoot);
+    layoutRoot->makePaintables(*paintRoot);
     paintRoot->prepare();
 
     return {layoutRoot, paintRoot};

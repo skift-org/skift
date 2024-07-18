@@ -1,6 +1,8 @@
 #pragma once
 
 #include <karm-text/font.h>
+#include <karm-text/run.h>
+#include <vaev-paint/text.h>
 
 #include "frag.h"
 
@@ -8,31 +10,34 @@ namespace Vaev::Layout {
 
 struct Run : public Frag {
     static constexpr auto TYPE = RUN;
-    String _text;
+    Strong<Text::Run> _run;
 
-    Run(Strong<Style::Computed> style, String text)
-        : Frag(style), _text(text) {
+    Run(Strong<Style::Computed> style, Strong<Text::Run> run)
+        : Frag(style), _run(run) {
     }
 
     Type type() const override {
         return TYPE;
     }
 
-    void layout(RectPx) override {
+    void placeChildren(RectPx bound) override {
+        Frag::placeChildren(bound);
     }
 
-    Px contentInlineSize() const override {
-        return Px{0};
+    Px computeWidth() override {
+        return Px{_run->layout().width};
     }
 
-    Px contentBlockSize() const override {
-        return Px{0};
+    Px computeHeight() override {
+        return Px{_run->layout().height};
     }
 
-    void paint(Paint::Stack &) override {}
+    void makePaintables(Paint::Stack &s) override {
+        s.add(makeStrong<Paint::Text>(_borderBox.topStart().cast<f64>(), _run));
+    }
 
     void repr(Io::Emit &e) const override {
-        e("({} {} {#})", type(), _borderBox, _text);
+        e("({} {})", type(), _borderBox);
     }
 };
 

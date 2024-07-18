@@ -22,7 +22,7 @@ struct Node {
     virtual void print(Print::Context &) {}
 
     virtual void repr(Io::Emit &e) const {
-        e("Node");
+        e("(node)");
     }
 };
 

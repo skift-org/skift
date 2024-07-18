@@ -13,23 +13,30 @@ struct BlockFlow : public Flow {
         return TYPE;
     }
 
-    void layout(RectPx bound) override {
-        Frag::layout(bound);
+    void placeChildren(RectPx bound) override {
+        Frag::placeChildren(bound);
 
-        Px res = Px{0};
+        Px res = Px{bound.top()};
+        auto inlineSize = computeWidth();
         for (auto &c : _frags) {
-            auto inlineSize = c->contentInlineSize();
-            auto blockSize = c->contentBlockSize();
-            c->layout(RectPx{inlineSize, blockSize}.offset({Px{0}, res}));
+            auto blockSize = c->computeHeight();
+            c->placeChildren(RectPx{inlineSize, blockSize}.offset({bound.start(), res}));
             res += blockSize;
         }
     }
 
-    Px contentBlockSize() const override {
+    Px computeHeight() override {
         Px res = Px{};
         for (auto &c : _frags)
-            res += c->contentBlockSize();
-        return max(res, Px{100});
+            res += c->computeHeight();
+        return res;
+    }
+
+    Px computeWidth() override {
+        Px res = Px{};
+        for (auto &c : _frags)
+            res = max(res, c->computeWidth());
+        return res;
     }
 };
 

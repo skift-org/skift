@@ -40,12 +40,34 @@ struct FlexFlow : public Flow {
         });
     }
 
-    void layout(RectPx bound) override {
+    void placeChildren(RectPx bound) override {
+        Frag::placeChildren(bound);
+
         _clear();
         _createItems();
         _sortByOrder();
 
-        Flow::layout(bound);
+        Px res = bound.start();
+        auto blockSize = computeHeight();
+        for (auto &c : _frags) {
+            auto inlineSize = c->computeWidth();
+            c->placeChildren(RectPx{inlineSize, blockSize}.offset({res, bound.top()}));
+            res += blockSize;
+        }
+    }
+
+    Px computeHeight() override {
+        Px res = Px{};
+        for (auto &c : _frags)
+            res = max(res, c->computeHeight());
+        return res;
+    }
+
+    Px computeWidth() override {
+        Px res{};
+        for (auto &c : _frags)
+            res += c->computeWidth();
+        return res;
     }
 };
 

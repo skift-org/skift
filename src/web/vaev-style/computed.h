@@ -7,6 +7,7 @@
 #include <vaev-base/display.h>
 #include <vaev-base/flex.h>
 #include <vaev-base/float.h>
+#include <vaev-base/font.h>
 #include <vaev-base/insets.h>
 #include <vaev-base/numbers.h>
 #include <vaev-base/overflow.h>
@@ -35,6 +36,14 @@ struct Computed {
     Display display = {Display::FLOW, Display::INLINE};
     Integer order = 0;
     Visibility visibility = Visibility::VISIBLE;
+
+    // CSS Fonts Module Level 4
+    // https://www.w3.org/TR/css-fonts-4/
+    Vec<String> fontFamilies;
+    FontWeight fontWeigh;
+    FontWidth fontWidth;
+    FontStyle fontStyle;
+    FontSize fontsize;
 
     Flex flex;
 

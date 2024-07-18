@@ -25,27 +25,33 @@ struct Flow : public Frag {
         _frags.pushBack(frag);
     }
 
-    void layout(RectPx bound) override {
-        Frag::layout(bound);
+    void placeChildren(RectPx bound) override {
+        Frag::placeChildren(bound);
+
         for (auto &c : _frags) {
-            c->layout(bound);
+            c->placeChildren(bound);
         }
     }
 
-    void paint(Paint::Stack &stack) override {
-        Frag::paint(stack);
+    void makePaintables(Paint::Stack &stack) override {
+        Frag::makePaintables(stack);
 
         for (auto &c : _frags) {
-            c->paint(stack);
+            c->makePaintables(stack);
         }
     }
 
-    void debug(Gfx::Context &g) override {
+    void paintWireframe(Gfx::Context &g) override {
         for (auto &c : _frags) {
-            c->debug(g);
+            c->paintWireframe(g);
         }
 
-        g.plot(_borderBox.cast<isize>(), Gfx::RED);
+        g.strokeStyle({
+            .paint = Gfx::BLACK,
+            .width = 1,
+            .align = Gfx::INSIDE_ALIGN,
+        });
+        g.stroke(_borderBox.cast<isize>());
     }
 
     void repr(Io::Emit &e) const override {

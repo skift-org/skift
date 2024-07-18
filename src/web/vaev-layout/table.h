@@ -20,8 +20,8 @@ struct TableFlow : public Flow {
         return TYPE;
     }
 
-    void layout(RectPx bound) override {
-        Flow::layout(bound);
+    void placeChildren(RectPx bound) override {
+        Flow::placeChildren(bound);
     }
 };
 

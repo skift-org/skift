@@ -19,10 +19,11 @@ struct ImageFrag : public Frag {
         return TYPE;
     }
 
-    void layout(RectPx) override {
+    void placeChildren(RectPx bound) override {
+        Frag::placeChildren(bound);
     }
 
-    void paint(Paint::Stack &) override {}
+    void makePaintables(Paint::Stack &) override {}
 };
 
 } // namespace Vaev::Layout

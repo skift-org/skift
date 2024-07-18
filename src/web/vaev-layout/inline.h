@@ -23,8 +23,30 @@ struct InlineFlow : public Flow {
         return TYPE;
     }
 
-    void layout(RectPx bound) override {
-        Flow::layout(bound);
+    void placeChildren(RectPx bound) override {
+        Frag::placeChildren(bound);
+
+        Px res = bound.start();
+        for (auto &c : _frags) {
+            auto inlineSize = c->computeWidth();
+            auto blockSize = c->computeHeight();
+            c->placeChildren(RectPx{inlineSize, blockSize}.offset({res, bound.top()}));
+            res += blockSize;
+        }
+    }
+
+    Px computeHeight() override {
+        Px res = Px{};
+        for (auto &c : _frags)
+            res = max(res, c->computeHeight());
+        return res;
+    }
+
+    Px computeWidth() override {
+        Px res{};
+        for (auto &c : _frags)
+            res += c->computeWidth();
+        return res;
     }
 };
 

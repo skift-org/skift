@@ -4,7 +4,6 @@
 
 #include "box.h"
 #include "rc.h"
-#include "std.h"
 
 namespace Karm {
 

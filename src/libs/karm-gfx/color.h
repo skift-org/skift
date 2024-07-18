@@ -1,6 +1,5 @@
 #pragma once
 
-#include <karm-base/std.h>
 #include <karm-io/fmt.h>
 #include <karm-math/vec.h>
 

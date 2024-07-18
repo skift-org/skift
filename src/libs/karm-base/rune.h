@@ -6,7 +6,6 @@
 #include "array.h"
 #include "buf.h"
 #include "cursor.h"
-#include "std.h"
 
 namespace Karm {
 

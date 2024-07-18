@@ -1,6 +1,5 @@
 #pragma once
 
-#include "std.h"
 #include "string.h"
 
 namespace Karm {

@@ -1,8 +1,7 @@
 #pragma once
 
+#include <karm-base/base.h>
 #include <karm-meta/traits.h>
-
-#include "std.h"
 
 namespace Karm {
 

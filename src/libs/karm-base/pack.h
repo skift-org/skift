@@ -3,8 +3,6 @@
 #include <karm-io/traits.h>
 #include <karm-meta/traits.h>
 
-#include "std.h"
-
 namespace Karm {
 
 Res<usize> pack(Io::Writable auto &writer, Meta::Trivial auto const &v) {

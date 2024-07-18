@@ -3,7 +3,6 @@
 #include <karm-meta/callable.h>
 #include <karm-meta/traits.h>
 
-#include "macros.h"
 #include "panic.h"
 #include "try.h"
 

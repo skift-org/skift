@@ -1,7 +1,6 @@
 #pragma once
 
 #include <karm-base/size.h>
-#include <karm-base/std.h>
 
 static constexpr usize PAGE_SIZE = kib(64);
 

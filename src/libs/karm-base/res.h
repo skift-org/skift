@@ -1,7 +1,6 @@
 #pragma once
 
 #include "error.h"
-#include "std.h"
 #include "union.h"
 
 namespace Karm {

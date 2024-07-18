@@ -2,7 +2,7 @@
 
 // https://five-embeddev.com/riscv-isa-manual/latest/priv-csrs.html
 
-#include <karm-base/std.h>
+#include <karm-base/base.h>
 
 namespace Riscv {
 

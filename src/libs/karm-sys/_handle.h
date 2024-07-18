@@ -3,7 +3,6 @@
 // This file should not include other headers from karm-sys
 
 #include <karm-base/distinct.h>
-#include <karm-base/std.h>
 
 namespace Karm::Sys {
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <karm-base/std.h>
-
 #include "rect.h"
 #include "vec.h"
 

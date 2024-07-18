@@ -1,7 +1,6 @@
 #pragma once
 
 #include "enum.h"
-#include "macros.h"
 #include "string.h"
 #include "tuple.h"
 

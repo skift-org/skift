@@ -2,7 +2,6 @@
 
 #include <karm-base/cursor.h>
 #include <karm-base/enum.h>
-#include <karm-base/std.h>
 #include <karm-base/string.h>
 
 namespace Elf {

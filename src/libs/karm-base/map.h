@@ -1,6 +1,5 @@
 #pragma once
 
-#include "std.h"
 #include "vec.h"
 
 namespace Karm {

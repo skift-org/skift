@@ -2,8 +2,7 @@
 
 #include <karm-meta/cvrp.h>
 
-#include "bool.h"
-#include "std.h"
+#include "base.h"
 
 namespace Karm {
 

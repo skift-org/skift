@@ -2,7 +2,6 @@
 
 #include <hal/vmm.h>
 #include <karm-base/opt.h>
-#include <karm-base/std.h>
 
 namespace x86_64 {
 

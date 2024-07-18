@@ -1,7 +1,6 @@
 #pragma once
 
 #include <karm-base/panic.h>
-#include <karm-base/std.h>
 #include <karm-io/emit.h>
 
 namespace Vaev {

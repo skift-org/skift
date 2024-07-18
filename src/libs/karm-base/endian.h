@@ -1,7 +1,6 @@
 #pragma once
 
 #include "slice.h"
-#include "std.h"
 
 namespace Karm {
 

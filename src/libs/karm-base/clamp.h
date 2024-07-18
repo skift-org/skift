@@ -1,8 +1,6 @@
 #pragma once
 
 #include "limits.h"
-#include "macros.h"
-#include "std.h"
 
 namespace Karm {
 

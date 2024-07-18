@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ints.h"
+#include <karm-base/base.h>
 
 namespace Karm {
 

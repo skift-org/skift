@@ -1,5 +1,7 @@
 #pragma once
 
+#include "base.h"
+
 namespace Karm {
 
 enum class PanicKind {

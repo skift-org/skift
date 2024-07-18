@@ -2,7 +2,6 @@
 
 #include <karm-base/cstr.h>
 #include <karm-base/limits.h>
-#include <karm-base/std.h>
 
 namespace Handover {
 

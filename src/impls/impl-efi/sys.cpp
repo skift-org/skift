@@ -1,7 +1,6 @@
 #include <efi/base.h>
 #include <hal/mem.h>
 #include <karm-base/align.h>
-#include <karm-base/macros.h>
 #include <karm-io/funcs.h>
 #include <karm-io/impls.h>
 #include <karm-logger/logger.h>

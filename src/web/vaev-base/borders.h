@@ -37,22 +37,22 @@ enum struct BorderStyle {
 };
 
 struct Border {
-    f64 width;
+    Length width;
     BorderStyle style;
+    Gfx::Color color = Gfx::BLACK;
 };
 
 struct Borders {
-    Gfx::Paint paint = Gfx::BLACK;
     BorderCollapse collapse;
 
     Border top, right, bottom, left;
     Math::Radius<PercentOr<Length>> radii;
 
-    constexpr void all(Border b) {
+    void all(Border b) {
         top = right = bottom = left = b;
     }
 
-    constexpr void set(BorderEdge edge, Border b) {
+    void set(BorderEdge edge, Border b) {
         switch (edge) {
         case BorderEdge::ALL:
             all(b);

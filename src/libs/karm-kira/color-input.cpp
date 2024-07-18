@@ -56,7 +56,7 @@ struct HsvSquare : public Ui::View<HsvSquare> {
         auto pos = coordinates(_value);
 
         g.fillStyle(Gfx::WHITE);
-        g.fill(Math::Ellipsei{pos, 8});
+        g.fill(Math::Ellipsef{pos.cast<f64>(), 8.});
 
         g.strokeStyle(
             Gfx::stroke(Gfx::BLACK
@@ -67,7 +67,7 @@ struct HsvSquare : public Ui::View<HsvSquare> {
         g.stroke();
 
         g.fillStyle(Gfx::hsvToRgb(_value));
-        g.fill(Math::Ellipsei{pos, 6});
+        g.fill(Math::Ellipsef{pos.cast<f64>(), 6});
 
         g.restore();
     }

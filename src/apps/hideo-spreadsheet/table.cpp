@@ -129,11 +129,11 @@ struct Table : public Ui::View<Table> {
         g.fill(Gfx::FillRule::EVENODD);
 
         g.strokeStyle(Gfx::stroke(Ui::ACCENT500).withAlign(Gfx::OUTSIDE_ALIGN).withWidth(2));
-        g.stroke(all.grow(3), 4);
+        g.stroke(all.grow(3).cast<f64>(), 4);
 
         auto handle = all.bottomEnd() + 3;
         g.fillStyle(Ui::ACCENT500);
-        g.fill(Math::Ellipsei{handle, 4});
+        g.fill(Math::Ellipsef{handle.cast<f64>(), 4});
 
         g.strokeStyle(Gfx::stroke(Ui::GRAY950).withAlign(Gfx::OUTSIDE_ALIGN).withWidth(2));
         g.stroke();

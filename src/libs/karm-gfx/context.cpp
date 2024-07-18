@@ -178,24 +178,24 @@ void Context::blit(Math::Vec2i dest, Pixels pixels) {
 
 // MARK: Shapes ----------------------------------------------------------------
 
-void Context::stroke(Math::Edgei edge) {
+void Context::stroke(Math::Edgef edge) {
     begin();
-    moveTo(edge.start.cast<f64>());
-    lineTo(edge.end.cast<f64>());
+    moveTo(edge.start);
+    lineTo(edge.end);
     stroke();
 }
 
-void Context::fill(Math::Edgei edge, f64 thickness) {
+void Context::fill(Math::Edgef edge, f64 thickness) {
     begin();
-    moveTo(edge.start.cast<f64>());
-    lineTo(edge.end.cast<f64>());
+    moveTo(edge.start);
+    lineTo(edge.end);
     auto copy = strokeStyle();
     stroke(copy.withWidth(thickness));
 }
 
-void Context::stroke(Math::Recti r, Math::Radiusf radius) {
+void Context::stroke(Math::Rectf r, Math::Radiusf radius) {
     begin();
-    rect(r.cast<f64>(), radius);
+    rect(r, radius);
     stroke();
 }
 
@@ -235,15 +235,21 @@ void Context::fill(Math::Recti r, Math::Radiusf radius) {
     }
 }
 
-void Context::stroke(Math::Ellipsei e) {
+void Context::fill(Math::Rectf r, Math::Radiusf radius) {
     begin();
-    ellipse(e.cast<f64>());
+    rect(r, radius);
+    fill();
+}
+
+void Context::stroke(Math::Ellipsef e) {
+    begin();
+    ellipse(e);
     stroke();
 }
 
-void Context::fill(Math::Ellipsei e) {
+void Context::fill(Math::Ellipsef e) {
     begin();
-    ellipse(e.cast<f64>());
+    ellipse(e);
     fill();
 }
 

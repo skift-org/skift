@@ -51,7 +51,7 @@ struct Flow : public Frag {
             .width = 1,
             .align = Gfx::INSIDE_ALIGN,
         });
-        g.stroke(_borderBox.cast<isize>());
+        g.stroke(_borderBox.cast<f64>());
     }
 
     void repr(Io::Emit &e) const override {

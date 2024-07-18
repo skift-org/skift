@@ -16,7 +16,7 @@ struct Box : public Node {
         ColorContext colorContext; // FIXME: Resolving color should happen in the layout phase
         for (auto &background : backgrounds) {
             ctx.fillStyle(colorContext.resolve(background.paint));
-            ctx.fill(bound.cast<isize>());
+            ctx.fill(bound.cast<f64>());
         }
     }
 

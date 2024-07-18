@@ -84,7 +84,7 @@ struct PerfGraph {
         g.strokeStyle(Gfx::stroke(Gfx::GREEN.withOpacity(0.5)).withAlign(Gfx::INSIDE_ALIGN));
         g.stroke();
         g.strokeStyle(Gfx::stroke(Gfx::WHITE.withOpacity(0.5)).withAlign(Gfx::INSIDE_ALIGN));
-        g.stroke(Math::Edgei{0, (isize)(FRAME_TIME * 1000 * 2), bound().width, (isize)(FRAME_TIME * 1000 * 2)});
+        g.stroke(Math::Edgef{0, (isize)(FRAME_TIME * 1000 * 2), (f64)bound().width, FRAME_TIME * 1000 * 2});
 
         for (isize i = 0; i < 256; ++i) {
             auto e = _records[(_index + i) % 256];
@@ -158,7 +158,7 @@ struct Host : public Node {
             hue += 1;
             if (hue > 360)
                 hue = 0;
-            g.stroke(r);
+            g.stroke(r.cast<f64>());
         }
 
         if (debugShowPerfGraph)

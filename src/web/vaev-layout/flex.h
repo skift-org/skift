@@ -52,7 +52,7 @@ struct FlexFlow : public Flow {
         for (auto &c : _frags) {
             auto inlineSize = c->computeWidth();
             c->placeChildren(RectPx{inlineSize, blockSize}.offset({res, bound.top()}));
-            res += blockSize;
+            res += inlineSize;
         }
     }
 

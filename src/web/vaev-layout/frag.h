@@ -67,7 +67,7 @@ struct Frag {
 
     virtual void paintWireframe(Gfx::Context &g) {
         g.strokeStyle({.paint = Gfx::GREEN, .width = 1, .align = Gfx::INSIDE_ALIGN});
-        g.stroke(_borderBox.cast<isize>());
+        g.stroke(_borderBox.cast<f64>());
     }
 
     virtual void repr(Io::Emit &e) const {

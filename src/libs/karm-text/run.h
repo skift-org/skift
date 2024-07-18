@@ -152,7 +152,6 @@ struct Run {
                         {cell.xpos + cell.adv, 0 + m.descend}
                     )
                         .shrink(4)
-                        .cast<isize>()
                 );
             } else {
                 _fillGlyph(ctx, _font, {cell.xpos, 0}, cell.glyph);

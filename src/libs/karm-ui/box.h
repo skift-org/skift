@@ -86,7 +86,7 @@ struct BoxStyle {
             g.strokeStyle(Gfx::stroke(*borderPaint)
                               .withWidth(borderWidth)
                               .withAlign(Gfx::INSIDE_ALIGN));
-            g.stroke(bound, borderRadius);
+            g.stroke(bound.cast<f64>(), borderRadius);
         }
 
         g.restore();

@@ -160,13 +160,13 @@ struct Context {
     // MARK: Shapes ------------------------------------------------------------
 
     // Stroke a line
-    void stroke(Math::Edgei edge);
+    void stroke(Math::Edgef edge);
 
     // Fill a line with the given thickness.
-    void fill(Math::Edgei edge, f64 thickness = 1.0f);
+    void fill(Math::Edgef edge, f64 thickness = 1.0f);
 
     // Stroke a rectangle.
-    void stroke(Math::Recti rect, Math::Radiusf radius = 0);
+    void stroke(Math::Rectf rect, Math::Radiusf radius = 0);
 
     // Fast path for filling simple rectangles without a border radius.
     void _fillRect(Math::Recti r, Gfx::Color color);
@@ -174,11 +174,14 @@ struct Context {
     // Fill a rectangle.
     void fill(Math::Recti rect, Math::Radiusf radius = 0);
 
+    // Fill a rectangle.
+    void fill(Math::Rectf rect, Math::Radiusf radius = 0);
+
     // Stroke an ellipse.
-    void stroke(Math::Ellipsei e);
+    void stroke(Math::Ellipsef e);
 
     // Fill an ellipse.
-    void fill(Math::Ellipsei e);
+    void fill(Math::Ellipsef e);
 
     // stroke a path
     void stroke(Gfx::Path const &path);

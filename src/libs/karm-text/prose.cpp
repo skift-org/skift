@@ -216,7 +216,6 @@ void Prose::paint(Gfx::Context &ctx) const {
                             {block.pos + cell.pos + cell.adv, line.baseline + m.descend}
                         )
                             .shrink(4)
-                            .cast<isize>()
                     );
                 } else {
                     _fillGlyph(ctx, _style.font, {block.pos + cell.pos, line.baseline}, cell.glyph);

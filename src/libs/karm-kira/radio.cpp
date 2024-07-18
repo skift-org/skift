@@ -27,7 +27,7 @@ struct Radio : public Ui::View<Radio> {
 
             if (_mouseListener.isPress()) {
                 g.strokeStyle(Gfx::stroke(Ui::ACCENT600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
-                g.stroke(bound(), 999);
+                g.stroke(bound().cast<f64>(), 999);
             }
         } else {
             g.fillStyle(_mouseListener.isHover() ? Ui::GRAY600 : Ui::GRAY700);
@@ -35,7 +35,7 @@ struct Radio : public Ui::View<Radio> {
 
             if (_mouseListener.isPress()) {
                 g.strokeStyle(Gfx::stroke(Ui::GRAY600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
-                g.stroke(bound(), 999);
+                g.stroke(bound().cast<f64>(), 999);
             }
         }
         g.restore();

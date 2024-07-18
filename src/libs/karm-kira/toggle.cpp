@@ -51,7 +51,7 @@ struct Toggle : public Ui::View<Toggle> {
             g.strokeStyle(Gfx::stroke(_value ? activePressed : inactivePressed)
                               .withWidth(1)
                               .withAlign(Gfx::INSIDE_ALIGN));
-            g.stroke(bound(), 999);
+            g.stroke(bound().cast<f64>(), 999);
         }
 
         g.restore();

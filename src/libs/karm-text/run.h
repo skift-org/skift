@@ -118,6 +118,49 @@ struct Run {
             lineheight(),
         };
     }
+
+    static inline void _fillGlyph(Gfx::Context &g, Font const &font, Math::Vec2f baseline, Glyph glyph) {
+        g._useSpaa = true;
+        g.save();
+        g.begin();
+        g.translate(baseline);
+        g.scale(font.fontsize);
+        font.fontface->contour(g, glyph);
+        g.fill();
+        g.restore();
+        g._useSpaa = false;
+    }
+
+    void paint(Gfx::Context &ctx) const {
+        auto m = _font.metrics();
+
+        ctx.save();
+
+        ctx.strokeStyle({
+            .paint = ctx.current().paint,
+            .width = 1,
+            .align = Gfx::INSIDE_ALIGN,
+        });
+
+        for (auto &cell : _cells) {
+            auto glyph = cell.glyph;
+
+            if (glyph == Glyph::TOFU) {
+                ctx.stroke(
+                    Math::Rectf::fromTwoPoint(
+                        {cell.xpos, 0 - m.ascend},
+                        {cell.xpos + cell.adv, 0 + m.descend}
+                    )
+                        .shrink(4)
+                        .cast<isize>()
+                );
+            } else {
+                _fillGlyph(ctx, _font, {cell.xpos, 0}, cell.glyph);
+            }
+        }
+
+        ctx.restore();
+    }
 };
 
 } // namespace Karm::Text

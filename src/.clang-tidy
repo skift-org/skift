@@ -1,1 +1,10 @@
-Checks: '-*,clang-diagnostic-*,llvm-*,misc-*,modernize-loop-convert,modernize-avoid-c-arrays,modernize-use-default-member-init'
+Checks: >
+    -*,
+    modernize-loop-convert,
+    modernize-avoid-c-arrays,
+    modernize-use-default-member-init,
+    readability-non-const-parameter,
+    readability-function-cognitive-complexity,
+    clang-diagnostic-*,
+    llvm-*,
+    misc-*

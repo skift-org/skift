@@ -98,15 +98,6 @@ inline void logWarnIf(bool condition, Format format, Args &&...va) {
         logWarn(format, std::forward<Args>(va)...);
 }
 
-inline void logTodo(Loc loc = Loc::current()) {
-    logWarn("todo: {}", loc.func);
-}
-
-inline void logTodoIf(bool condition, Loc loc = Loc::current()) {
-    if (condition)
-        logTodo(loc);
-}
-
 template <typename... Args>
 inline void logError(Format format, Args &&...va) {
     Io::Args<Args...> args{std::forward<Args>(va)...};

@@ -153,7 +153,7 @@ struct Glyf : public Io::BChunk {
     }
 
     void contourComposite(Gfx::Context &, Metrics, Io::BScan &) const {
-        logTodo();
+        logDebug("composite glyph not implemented");
     }
 
     void contour(Gfx::Context &g, usize glyfOffset) const {

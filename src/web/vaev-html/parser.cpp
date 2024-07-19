@@ -41,7 +41,7 @@ void reconstructActiveFormattingElements(Parser &) {
 
 // https://html.spec.whatwg.org/multipage/parsing.html#acknowledge-self-closing-flag
 void acknowledgeSelfClosingFlag(Token const &) {
-    logTodo();
+    logDebug("acknowledgeSelfClosingFlag not implemented");
 }
 
 // 13.2.6 MARK: Tree construction

@@ -174,7 +174,10 @@ struct Program {
     }
 
     Bytes bytes() const {
-        return Bytes{(Byte *)buf(), _header->filesz};
+        return Bytes{
+            (Byte *)buf(),
+            static_cast<usize>(_header->filesz),
+        };
     }
 
     usize filez() const {

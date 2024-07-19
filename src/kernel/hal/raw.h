@@ -12,11 +12,13 @@ struct RawPortIo : public Io {
     RawPortIo(PortRange range) : _range(range) {
     }
 
-    Res<usize> in(usize offset, usize size) override {
+    Res<usize> in(usize offset, [[maybe_unused]] usize size) override {
         u16 addr = _range.start + offset;
 
         if (not _range.contains(addr))
             return Error::invalidInput("out of range");
+
+#ifdef __ck_arch_x86_64__
 
         if (size == 1) {
             u8 res = 0;
@@ -44,14 +46,18 @@ struct RawPortIo : public Io {
         } else {
             return Error::invalidInput("unsupported size");
         }
+#else
+        return Error::invalidInput("not implemented");
+#endif
     }
 
-    Res<> out(usize offset, usize size, usize value) override {
+    Res<> out(usize offset, [[maybe_unused]] usize size, [[maybe_unused]] usize value) override {
         u16 addr = _range.start + offset;
 
         if (not _range.contains(addr))
             return Error::invalidInput("out of range");
 
+#ifdef __ck_arch_x86_64__
         if (size == 1) {
             u8 val = value;
             asm volatile("outb %0, %1"
@@ -76,6 +82,9 @@ struct RawPortIo : public Io {
         }
 
         return Ok();
+#else
+        return Error::invalidInput("not implemented");
+#endif
     }
 };
 

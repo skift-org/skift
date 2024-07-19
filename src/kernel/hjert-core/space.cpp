@@ -11,7 +11,11 @@ Res<Strong<Space>> Space::create() {
 }
 
 Space::Space(Strong<Hal::Vmm> vmm) : _vmm(vmm) {
+#ifdef __ck_bits_64__
     _ranges.add({Hal::PAGE_SIZE, 0x800000000000});
+#else
+    _ranges.add({Hal::PAGE_SIZE, 0xC0000000});
+#endif
 }
 
 Space::~Space() {

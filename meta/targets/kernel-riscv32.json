@@ -1,0 +1,63 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.target.v1",
+    "id": "kernel-riscv32",
+    "type": "target",
+    "props": {
+        "toolchain": "clang",
+        "arch": "riscv32",
+        "bits": "32",
+        "sys": "hjert",
+        "abi": "sysv",
+        "freestanding": true,
+        "host": false,
+        "version": "{jexpr.include('./meta/scripts/version.json')}",
+        "karm-sys-encoding": "utf8",
+        "karm-sys-line-ending": "lf",
+        "karm-sys-path-separator": "slash",
+        "karm-cli-backend": "ansi"
+    },
+    "tools": {
+        "cc": {
+            "cmd": "{shell.latest('clang')}",
+            "args": [
+                "--target=riscv32",
+                "-nostdlib",
+                "-ffreestanding"
+            ]
+        },
+        "cxx": {
+            "cmd": "{shell.latest('clang++')}",
+            "args": [
+                "--target=riscv32",
+                "-nostdlib",
+                "-ffreestanding"
+            ]
+        },
+        "ld": {
+            "cmd": "{shell.latest('ld.lld')}",
+            "args": [
+                "-m",
+                "elf32lriscv",
+                "-Tmeta/targets/kernel-riscv32.ld",
+                "-z",
+                "max-page-size=0x1000"
+            ],
+            "files": [
+                "meta/targets/kernel-riscv32.ld"
+            ]
+        },
+        "ar": {
+            "cmd": "{shell.latest('llvm-ar')}",
+            "args": [
+                "rcs"
+            ]
+        },
+        "as": {
+            "cmd": "{shell.latest('clang')}",
+            "args": [
+                "--target=riscv32",
+                "-c"
+            ]
+        }
+    }
+}

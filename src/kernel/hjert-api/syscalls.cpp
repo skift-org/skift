@@ -24,16 +24,16 @@ Res<> _syscall(Syscall s, Arg a0 = 0, Arg a1 = 0, Arg a2 = 0, Arg a3 = 0, Arg a4
 
 Res<> _syscall(Syscall s, Arg a0 = 0, Arg a1 = 0, Arg a2 = 0, Arg a3 = 0, Arg a4 = 0, Arg a5 = 0) {
     Error::Code c = {};
-    register Arg x8 asm("x8") = (Arg)s;
-    register Arg x0 asm("x0") = a0;
-    register Arg x1 asm("x1") = a1;
-    register Arg x2 asm("x2") = a2;
-    register Arg x3 asm("x3") = a3;
-    register Arg x4 asm("x4") = a4;
-    register Arg x5 asm("x5") = a5;
+    register Arg r8 asm("x8") = (Arg)s;
+    register Arg r0 asm("x0") = a0;
+    register Arg r1 asm("x1") = a1;
+    register Arg r2 asm("x2") = a2;
+    register Arg r3 asm("x3") = a3;
+    register Arg r4 asm("x4") = a4;
+    register Arg r5 asm("x5") = a5;
     asm volatile("svc #0"
                  : "=r"(c)
-                 : "r"(x8), "r"(x0), "r"(x1), "r"(x2), "r"(x3), "r"(x4), "r"(x5)
+                 : "r"(r8), "r"(r0), "r"(r1), "r"(r2), "r"(r3), "r"(r4), "r"(r5)
                  : "memory");
 
     if (c != Error::Code::_OK)
@@ -46,16 +46,16 @@ Res<> _syscall(Syscall s, Arg a0 = 0, Arg a1 = 0, Arg a2 = 0, Arg a3 = 0, Arg a4
 
 Res<> _syscall(Syscall s, Arg a0 = 0, Arg a1 = 0, Arg a2 = 0, Arg a3 = 0, Arg a4 = 0, Arg a5 = 0) {
     Error::Code c = {};
-    register Arg a7 asm("a7") = (Arg)s;
-    register Arg a0 asm("a0") = a0;
-    register Arg a1 asm("a1") = a1;
-    register Arg a2 asm("a2") = a2;
-    register Arg a3 asm("a3") = a3;
-    register Arg a4 asm("a4") = a4;
-    register Arg a5 asm("a5") = a5;
+    register Arg r7 asm("a7") = (Arg)s;
+    register Arg r0 asm("a0") = a0;
+    register Arg r1 asm("a1") = a1;
+    register Arg r2 asm("a2") = a2;
+    register Arg r3 asm("a3") = a3;
+    register Arg r4 asm("a4") = a4;
+    register Arg r5 asm("a5") = a5;
     asm volatile("ecall"
                  : "=r"(c)
-                 : "r"(a7), "r"(a0), "r"(a1), "r"(a2), "r"(a3), "r"(a4), "r"(a5)
+                 : "r"(r7), "r"(r0), "r"(r1), "r"(r2), "r"(r3), "r"(r4), "r"(r5)
                  : "memory");
 
     if (c != Error::Code::_OK)

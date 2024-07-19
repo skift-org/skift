@@ -6,6 +6,7 @@
     "requires": [
         "karm-math",
         "karm-gfx",
+        "karm-text",
         "vaev-dom",
         "vaev-style",
         "vaev-paint"

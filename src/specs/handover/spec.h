@@ -107,8 +107,8 @@ struct Record {
     template <typename R>
     R range() const {
         return R{
-            start,
-            size,
+            static_cast<usize>(start),
+            static_cast<usize>(size),
         };
     }
 };

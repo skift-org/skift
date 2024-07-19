@@ -126,10 +126,10 @@ Hal::PmmRange _findBitmapSpace(Handover::Payload &payload, usize bitmapSize) {
             continue;
 
         if (record.start == 0 and (record.size >= bitmapSize + Hal::PAGE_SIZE))
-            return {record.start + Hal::PAGE_SIZE, bitmapSize};
+            return {static_cast<usize>(record.start) + Hal::PAGE_SIZE, bitmapSize};
 
         if (record.size >= bitmapSize)
-            return {record.start, bitmapSize};
+            return {static_cast<usize>(record.start), bitmapSize};
     }
 
     logFatal("mem: no usable memory for bitmap");
@@ -170,7 +170,7 @@ Res<> init(Handover::Payload &payload) {
     for (auto &record : payload) {
         if (record.tag == Handover::Tag::FREE) {
             logInfo("mem: free memory at {p} {p} ({}kib)", record.start, record.start + record.size, record.size / kib(1));
-            try$(pmm().free({record.start, record.size}));
+            try$(pmm().free({static_cast<usize>(record.start), static_cast<usize>(record.size)}));
         }
     }
 

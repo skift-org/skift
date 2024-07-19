@@ -9,6 +9,8 @@
 #include <utility>
 #include <memory>
 #include <compare>
+#include <stdint.h>
+#include <stddef.h>
 
 
 #include <math.h>

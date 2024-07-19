@@ -189,11 +189,11 @@ Error fromStatus(isize status) {
 Res<> consumeErrno() {
     if (errno == 0) {
         return Ok();
-    } else {
-        auto err = fromLastErrno();
-        errno = 0;
-        return err;
     }
+    
+    auto err = fromLastErrno();
+    errno = 0;
+    return err;
 }
 
 struct sockaddr_in toSockAddr(Sys::SocketAddr addr) {
@@ -228,7 +228,7 @@ Sys::Stat fromStat(struct stat const &buf) {
 struct timespec toTimespec(TimeStamp ts) {
     struct timespec pts;
     if (ts.isEndOfTime()) {
-        pts.tv_sec = LONG_MAX;
+        pts.tv_sec = Limits<long>::MAX;
         pts.tv_nsec = 0;
         return pts;
     } else {
@@ -241,7 +241,7 @@ struct timespec toTimespec(TimeStamp ts) {
 struct timespec toTimespec(TimeSpan ts) {
     struct timespec pts;
     if (ts.isInfinite()) {
-        pts.tv_sec = LONG_MAX;
+        pts.tv_sec = Limits<long>::MAX;
         pts.tv_nsec = 0;
         return pts;
     } else {

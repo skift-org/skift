@@ -11,7 +11,6 @@
 #include <compare>
 
 
-#include <limits.h>
 #include <math.h>
 
 #ifdef __ck_sys_darwin__
@@ -20,8 +19,6 @@
 #undef DOMAIN
 #endif
 
-#include <stddef.h>
-#include <stdint.h>
 #include <string.h>
 
 #ifndef KARM_NO_TOP_LEVEL_USING

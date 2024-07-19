@@ -186,6 +186,21 @@ struct Strong {
 
     // MARK: Methods -----------------------------------------------------------
 
+    /// Returns the number of strong references to the object.
+    constexpr usize strong() const {
+        return _cell ? _cell->_strong : 0;
+    }
+
+    /// Returns the number of weak references to the object.
+    constexpr usize weak() const {
+        return _cell ? _cell->_weak : 0;
+    }
+
+    /// Returns the total number of references to the object.
+    constexpr usize refs() const {
+        return strong() + weak();
+    }
+
     constexpr void ensure() const {
         if (not _cell) [[unlikely]]
             panic("null dereference");

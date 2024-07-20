@@ -44,7 +44,7 @@ Strong<Flow> buildForDisplay(Display const &display, Strong<Style::Computed> sty
 }
 
 void buildElement(Style::Computer &c, Dom::Element const &el, Flow &parent) {
-    auto style = c.computeFor(el);
+    auto style = c.computeFor(parent.style(), el);
 
     if (el.tagName == Html::IMG) {
         Image::Picture img = Gfx::Surface::fallback();

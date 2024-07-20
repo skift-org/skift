@@ -27,6 +27,10 @@ struct BackgroundAttachmentProp {
         return {BackgroundAttachment::SCROLL};
     }
 
+    void apply(Computed &) const {
+        // TODO
+    }
+
     Res<> parse(Computed &c) const {
         c.backgrounds.resize(max(c.backgrounds.len(), value.len()));
         for (usize i = 0; i < value.len(); ++i)
@@ -68,7 +72,7 @@ struct BackgroundImageProp {
     static Array<Opt<Mime::Url>, 1> initial() { return {NONE}; }
 
     void apply(Computed &) const {
-        // computed.backgroundImage = value;
+        // TODO
     }
 };
 
@@ -106,44 +110,17 @@ struct BackgroundRepeatProp {
     }
 };
 
-// https://www.w3.org/TR/CSS22/tables.html#propdef-border-collapse
-struct BorderCollapseProp {
-    BorderCollapse value = initial();
-
-    static constexpr Str name() { return "border-collapse"; }
-
-    static constexpr BorderCollapse initial() { return BorderCollapse::SEPARATE; }
-
-    void apply(Computed &) const {
-        // TODO
-    }
-};
-
-// https://www.w3.org/TR/CSS22/box.html#propdef-border-color
-struct BorderColorProp {
-    Color value = initial();
-
-    static constexpr Str name() { return "border-color"; }
-
-    static constexpr Color initial() { return BLACK; }
-
-    void apply(Computed &) const {
-        // TODO
-    }
-
-    Res<> parse(Cursor<Css::Sst> &c) {
-        value = try$(parseValue<Color>(c));
-        return Ok();
-    }
-};
-
 // https://www.w3.org/TR/CSS22/colors.html#propdef-color
-struct ColorStyleProp {
+struct ColorProp {
     Color value = initial();
 
     static constexpr Str name() { return "color"; }
 
     static constexpr Color initial() { return BLACK; }
+
+    static void inherit(Computed const &parent, Computed &child) {
+        child.color = parent.color;
+    }
 
     void apply(Computed &c) const {
         c.color = value;
@@ -173,6 +150,167 @@ struct DisplayProp {
     }
 };
 
+// MARK: Borders ---------------------------------------------------------------
+
+// https://www.w3.org/TR/CSS22/tables.html#propdef-border-collapse
+struct BorderCollapseProp {
+    BorderCollapse value = initial();
+
+    static constexpr Str name() { return "border-collapse"; }
+
+    static constexpr BorderCollapse initial() { return BorderCollapse::SEPARATE; }
+
+    void apply(Computed &) const {
+        // TODO
+    }
+};
+
+// https://www.w3.org/TR/CSS22/box.html#propdef-border-color
+struct BorderTopColorProp {
+    Color value = initial();
+
+    static constexpr Str name() { return "border-top-color"; }
+
+    static constexpr Color initial() { return BLACK; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().top.color = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Color>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/CSS22/box.html#propdef-border-color
+struct BorderRightColorProp {
+    Color value = initial();
+
+    static constexpr Str name() { return "border-right-color"; }
+
+    static constexpr Color initial() { return BLACK; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().right.color = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Color>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/CSS22/box.html#propdef-border-color
+struct BorderBottomColorProp {
+    Color value = initial();
+
+    static constexpr Str name() { return "border-bottom-color"; }
+
+    static constexpr Color initial() { return BLACK; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().bottom.color = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Color>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/CSS22/box.html#propdef-border-color
+struct BorderLeftColorProp {
+    Color value = initial();
+
+    static constexpr Str name() { return "border-left-color"; }
+
+    static constexpr Color initial() { return BLACK; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().bottom.color = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Color>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-backgrounds-3/#border-width
+struct BorderTopWidthProp {
+    Length value = initial();
+
+    static constexpr Str name() { return "border-top-width"; }
+
+    static constexpr Length initial() { return Borders::MEDIUM; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().top.width = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Length>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-backgrounds-3/#border-width
+struct BorderRightWidthProp {
+    Length value = initial();
+
+    static constexpr Str name() { return "border-rignt-width"; }
+
+    static constexpr Length initial() { return Borders::MEDIUM; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().right.width = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Length>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-backgrounds-3/#border-width
+struct BorderBottomWidthProp {
+    Length value = initial();
+
+    static constexpr Str name() { return "border-bottom-width"; }
+
+    static constexpr Length initial() { return Borders::MEDIUM; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().right.width = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Length>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-backgrounds-3/#border-width
+struct BorderLeftWidthProp {
+    Length value = initial();
+
+    static constexpr Str name() { return "border-left-width"; }
+
+    static constexpr Length initial() { return Borders::MEDIUM; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().left.width = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Length>(c));
+        return Ok();
+    }
+};
+
+// MARK: Flex ------------------------------------------------------------------
+
 // MARK: Fonts -----------------------------------------------------------------
 
 // https://www.w3.org/TR/css-fonts-4/#font-family-prop
@@ -183,8 +321,13 @@ struct FontFamilyProp {
 
     static Array<String, 1> initial() { return {"sans-serif"s}; }
 
+    static void inherit(Computed const &parent, Computed &child) {
+        if (not child.font.sameInstance(parent.font))
+            child.font.cow().families = parent.font->families;
+    }
+
     void apply(Computed &c) const {
-        c.fontFamilies = value;
+        c.font.cow().families = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -205,8 +348,13 @@ struct FontWeightProp {
 
     static constexpr FontWeight initial() { return FontWeight::NORMAL; }
 
+    static void inherit(Computed const &parent, Computed &child) {
+        if (not child.font.sameInstance(parent.font))
+            child.font.cow().weight = parent.font->weight;
+    }
+
     void apply(Computed &c) const {
-        c.fontWeigh = value;
+        c.font.cow().weight = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -223,8 +371,13 @@ struct FontWidthProp {
 
     static constexpr FontWidth initial() { return FontWidth::NORMAL; }
 
+    static void inherit(Computed const &parent, Computed &child) {
+        if (not child.font.sameInstance(parent.font))
+            child.font.cow().width = parent.font->width;
+    }
+
     void apply(Computed &c) const {
-        c.fontWidth = value;
+        c.font.cow().width = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -241,8 +394,13 @@ struct FontStyleProp {
 
     static constexpr FontStyle initial() { return FontStyle::NORMAL; }
 
+    static void inherit(Computed const &parent, Computed &child) {
+        if (not child.font.sameInstance(parent.font))
+            child.font.cow().style = parent.font->style;
+    }
+
     void apply(Computed &c) const {
-        c.fontStyle = value;
+        c.font.cow().style = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -259,8 +417,13 @@ struct FontSizeProp {
 
     static constexpr FontSize initial() { return FontSize::MEDIUM; }
 
+    static void inherit(Computed const &parent, Computed &child) {
+        if (not child.font.sameInstance(parent.font))
+            child.font.cow().size = parent.font->size;
+    }
+
     void apply(Computed &c) const {
-        c.fontsize = value;
+        c.font.cow().size = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -654,8 +817,19 @@ using _StyleProp = Union<
     BackgroundImageProp,
     BackgroundPositionProp,
     BackgroundRepeatProp,
-    ColorStyleProp,
+    ColorProp,
     DisplayProp,
+
+    // Borders
+    BorderTopColorProp,
+    BorderRightColorProp,
+    BorderBottomColorProp,
+    BorderLeftColorProp,
+
+    BorderTopWidthProp,
+    BorderRightWidthProp,
+    BorderBottomWidthProp,
+    BorderLeftWidthProp,
 
     // Font
     FontFamilyProp,
@@ -707,6 +881,13 @@ struct StyleProp : public _StyleProp {
     Str name() const {
         return visit([](auto const &p) {
             return p.name();
+        });
+    }
+
+    void inherit(Computed const &parent, Computed &child) const {
+        visit([&](auto const &p) {
+            if constexpr (requires { p.inherit(parent, child); })
+                p.inherit(parent, child);
         });
     }
 

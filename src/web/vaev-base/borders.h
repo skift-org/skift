@@ -3,6 +3,7 @@
 #include <karm-gfx/paint.h>
 #include <karm-math/radius.h>
 
+#include "color.h"
 #include "length.h"
 #include "percent.h"
 
@@ -39,10 +40,14 @@ enum struct BorderStyle {
 struct Border {
     Length width;
     BorderStyle style;
-    Gfx::Color color = Gfx::BLACK;
+    Color color = Color::CURRENT;
 };
 
 struct Borders {
+    static constexpr Length THIN = Px{1};
+    static constexpr Length MEDIUM = Px{3};
+    static constexpr Length THICK = Px{5};
+
     BorderCollapse collapse;
 
     Border top, right, bottom, left;

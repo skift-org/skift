@@ -23,28 +23,28 @@ struct _Fixed {
 
     T _val;
 
-    static _Fixed fromRaw(T val) {
+    static constexpr _Fixed fromRaw(T val) {
         _Fixed f;
         f._val = val;
         return f;
     }
 
     template <Meta::SignedIntegral I>
-    static _Fixed fromInt(I val) {
+    static constexpr _Fixed fromInt(I val) {
         if (val < MIN or val > MAX)
             return fromRaw(val < MIN ? MIN : MAX);
         return fromRaw(static_cast<T>(val << FRAC));
     }
 
     template <Meta::UnsignedIntegral U>
-    static _Fixed fromUint(U val) {
+    static constexpr _Fixed fromUint(U val) {
         if (val > MAX)
             return fromRaw(MAX);
         return fromRaw(static_cast<T>(val << FRAC));
     }
 
     template <Meta::Float F>
-    static _Fixed fromFloatNearest(F val) {
+    static constexpr _Fixed fromFloatNearest(F val) {
         T raw = 0;
         if (not isnan(val))
             raw = clampTo<T>(val * DENO);
@@ -52,7 +52,7 @@ struct _Fixed {
     }
 
     template <Meta::Float F>
-    static _Fixed fromFloatFloor(F val) {
+    static constexpr _Fixed fromFloatFloor(F val) {
         T raw = 0;
         if (not isnan(val))
             raw = clampTo<T>(floor(val * DENO));
@@ -60,7 +60,7 @@ struct _Fixed {
     }
 
     template <Meta::Float F>
-    static _Fixed fromFloatCeil(F val) {
+    static constexpr _Fixed fromFloatCeil(F val) {
         T raw = 0;
         if (not isnan(val))
             raw = clampTo<T>(ceil(val * DENO));
@@ -70,45 +70,45 @@ struct _Fixed {
     constexpr _Fixed() : _val(0) {}
 
     template <Meta::Float F>
-    explicit _Fixed(F from) : _val(fromFloatNearest(from)._val) {}
+    explicit constexpr _Fixed(F from) : _val(fromFloatNearest(from)._val) {}
 
     template <Meta::SignedIntegral I>
-    explicit _Fixed(I from) : _val(fromInt<I>(from)._val) {}
+    explicit constexpr _Fixed(I from) : _val(fromInt<I>(from)._val) {}
 
     template <Meta::UnsignedIntegral U>
-    explicit _Fixed(U from) : _val(fromUint<U>(from)._val) {}
+    explicit constexpr _Fixed(U from) : _val(fromUint<U>(from)._val) {}
 
-    T raw() const {
+    constexpr T raw() const {
         return _val;
     }
 
     template <Meta::SignedIntegral I>
-    I toInt() const {
+    constexpr I toInt() const {
         return static_cast<I>(_val >> FRAC);
     }
 
     template <Meta::UnsignedIntegral U>
-    U toUint() const {
+    constexpr U toUint() const {
         return static_cast<U>(_val >> FRAC);
     }
 
     template <Meta::Float F>
-    F toFloat() const {
+    constexpr F toFloat() const {
         return static_cast<F>(_val) / DENO;
     }
 
     template <Meta::SignedIntegral I>
-    explicit operator I() const {
+    explicit constexpr operator I() const {
         return toInt<I>();
     }
 
     template <Meta::UnsignedIntegral U>
-    explicit operator U() const {
+    explicit constexpr operator U() const {
         return toUint<U>();
     }
 
     template <Meta::Float F>
-    explicit operator F() const {
+    explicit constexpr operator F() const {
         return toFloat<F>();
     }
 

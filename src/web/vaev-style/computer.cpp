@@ -2,6 +2,17 @@
 
 namespace Vaev::Style {
 
+Computed const &Computed::initial() {
+    static Computed computed = [] {
+        Computed res{};
+        StyleProp::any([&]<typename T>(Meta::Type<T>) {
+            T{}.apply(res);
+        });
+        return res;
+    }();
+    return computed;
+}
+
 void Computer::_evalRule(Rule const &rule, Dom::Element const &el, MatchingRules &matches) {
     rule.visit(Visitor{
         [&](StyleRule const &r) {
@@ -19,7 +30,7 @@ void Computer::_evalRule(Rule const &rule, Dom::Element const &el, MatchingRules
     });
 }
 
-Strong<Computed> Computer::computeFor(Dom::Element const &el) {
+Strong<Computed> Computer::computeFor(Computed const &parent, Dom::Element const &el) {
     MatchingRules matchingRules;
 
     // Collect matching styles rules
@@ -38,7 +49,9 @@ Strong<Computed> Computer::computeFor(Dom::Element const &el) {
     );
 
     // Compute computed style
-    auto computed = makeStrong<Computed>();
+    auto computed = makeStrong<Computed>(Computed::initial());
+    computed->inherit(parent);
+
     for (auto const *styleRule : matchingRules) {
         for (auto const &prop : styleRule->props) {
             if (prop.important == Important::NO)

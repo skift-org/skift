@@ -15,7 +15,7 @@ struct Computer {
 
     void _evalRule(Rule const &rule, Dom::Element const &el, MatchingRules &matches);
 
-    Strong<Computed> computeFor(Dom::Element const &el);
+    Strong<Computed> computeFor(Computed const &parent, Dom::Element const &el);
 };
 
 } // namespace Vaev::Style

@@ -41,70 +41,88 @@ Spec spec(Selector const &s) {
         },
         [](AttributeSelector const &) {
             return Spec::ZERO;
+        },
+        [](auto const &s) {
+            logWarn("unimplemented selector: {}", s);
+            return Spec::ZERO;
         }
     });
 }
 
 // MARK: Selector Matching -----------------------------------------------------
 
-bool _match(Infix const &s, Dom::Element const &e) {
-    switch (s.type) {
-    // https://www.w3.org/TR/selectors-4/#descendant-combinators
-    case Infix::Type::DESCENDANT: {
-        Dom::Node const *curr = &e;
-        while (curr->hasParent()) {
-            auto &parent = curr->parentNode();
-            if (auto *el = parent.is<Dom::Element>())
-                if (s.lhs->match(*el))
-                    return true;
-            curr = &parent;
-        }
-        return false;
-    } break;
-
-    // https://www.w3.org/TR/selectors-4/#child-combinators
-    case Infix::Type::CHILD: {
-        if (not e.hasParent())
-            return false;
-
-        auto &parent = e.parentNode();
+// https://www.w3.org/TR/selectors-4/#descendant-combinators
+static bool _matchDescendant(Selector const &s, Dom::Element const &e) {
+    Dom::Node const *curr = &e;
+    while (curr->hasParent()) {
+        auto &parent = curr->parentNode();
         if (auto *el = parent.is<Dom::Element>())
-            return s.lhs->match(*el);
-        return false;
+            if (s.match(*el))
+                return true;
+        curr = &parent;
     }
+    return false;
+}
 
-    // https://www.w3.org/TR/selectors-4/#adjacent-sibling-combinators
-    case Infix::Type::ADJACENT: {
-        if (not e.hasPreviousSibling())
-            return false;
+// https://www.w3.org/TR/selectors-4/#child-combinators
+static bool _matchChild(Selector const &s, Dom::Element const &e) {
+    if (not e.hasParent())
+        return false;
 
-        auto prev = e.previousSibling();
+    auto &parent = e.parentNode();
+    if (auto *el = parent.is<Dom::Element>())
+        return s.match(*el);
+    return false;
+}
+
+// https://www.w3.org/TR/selectors-4/#adjacent-sibling-combinators
+static bool _matchAdjacent(Selector const &s, Dom::Element const &e) {
+    if (not e.hasPreviousSibling())
+        return false;
+
+    auto prev = e.previousSibling();
+    if (auto *el = prev.is<Dom::Element>())
+        return s.match(*el);
+    return false;
+}
+
+// https://www.w3.org/TR/selectors-4/#general-sibling-combinators
+static bool _matchSubsequent(Selector const &s, Dom::Element const &e) {
+    Dom::Node const *curr = &e;
+    while (curr->hasPreviousSibling()) {
+        auto prev = curr->previousSibling();
         if (auto *el = prev.is<Dom::Element>())
-            return s.lhs->match(*el);
-        return false;
+            if (s.match(*el))
+                return true;
+        curr = &prev.unwrap();
     }
+    return false;
+}
 
-    // https://www.w3.org/TR/selectors-4/#general-sibling-combinators
-    case Infix::Type::SUBSEQUENT: {
-        Dom::Node const *curr = &e;
-        while (curr->hasPreviousSibling()) {
-            auto prev = curr->previousSibling();
-            if (auto *el = prev.is<Dom::Element>())
-                if (s.lhs->match(*el))
-                    return true;
-            curr = &prev.unwrap();
-        }
+static bool _match(Infix const &s, Dom::Element const &e) {
+    if (not s.lhs->match(e))
         return false;
-    }
 
-    // https://www.w3.org/TR/selectors-4/#the-column-combinator
-    case Infix::Type::COLUMN:
+    switch (s.type) {
+    case Infix::Type::DESCENDANT:
+        return _matchDescendant(*s.rhs, e);
+
+    case Infix::Type::CHILD:
+        return _matchChild(*s.rhs, e);
+
+    case Infix::Type::ADJACENT:
+        return _matchAdjacent(*s.rhs, e);
+
+    case Infix::Type::SUBSEQUENT:
+        return _matchSubsequent(*s.rhs, e);
+
     default:
-        unreachable();
+        logWarn("unimplemented selector: {}", s);
+        return false;
     }
 }
 
-bool _match(Nfix const &s, Dom::Element const &el) {
+static bool _match(Nfix const &s, Dom::Element const &el) {
     switch (s.type) {
     case Nfix::AND:
         for (auto &inner : s.inners)
@@ -130,31 +148,32 @@ bool _match(Nfix const &s, Dom::Element const &el) {
         return not s.inners[0].match(el);
 
     default:
-        unreachable();
+        logWarn("unimplemented selector: {}", s);
+        return false;
     }
 }
 
 // 5.1. Type (tag name) selector
 // https://www.w3.org/TR/selectors-4/#type
-bool _match(TypeSelector const &s, Dom::Element const &el) {
+static bool _match(TypeSelector const &s, Dom::Element const &el) {
     return el.tagName == s.type;
 }
 
-bool _match(IdSelector const &s, Dom::Element const &el) {
+static bool _match(IdSelector const &s, Dom::Element const &el) {
     return el.id() == s.id;
 }
 
-bool _match(ClassSelector const &s, Dom::Element const &el) {
+static bool _match(ClassSelector const &s, Dom::Element const &el) {
     return el.classList.contains(s.class_);
 }
 
 // 5.2. Universal selector
 // https://www.w3.org/TR/selectors-4/#the-universal-selector
-bool _match(UniversalSelector const &, Dom::Element const &) {
+static bool _match(UniversalSelector const &, Dom::Element const &) {
     return true;
 }
 
-// MARK: Selector -------- -----------------------------------------------------
+// MARK: Selector --------------------------------------------------------------
 
 bool Selector::match(Dom::Element const &el) const {
     return visit(
@@ -194,10 +213,8 @@ static Selector _parseAttributeSelector(Slice<Css::Sst> content) {
     Cursor<Css::Sst> cur = content;
 
     while (not cur.ended() and cur->token.data != "]"s) {
-        if (cur->token == Css::Token::WHITESPACE) {
-            cur.next();
+        if (cur.skip(Css::Token::WHITESPACE))
             continue;
-        }
 
         switch (step) {
         case 0:
@@ -209,6 +226,7 @@ static Selector _parseAttributeSelector(Slice<Css::Sst> content) {
                 if (cur.ended() or cur.peek(1).token.data != "="s) {
                     break;
                 }
+
                 if (cur->token.data == "~") {
                     match = AttributeSelector::Match{AttributeSelector::CONTAINS};
                 } else if (cur->token.data == "|") {
@@ -239,10 +257,8 @@ static Selector _parseAttributeSelector(Slice<Css::Sst> content) {
             break;
         }
 
-        if (cur.ended()) {
-            break;
-        }
-        cur.next();
+        if (not cur.ended())
+            cur.next();
     }
 
     return AttributeSelector{name, caze, match, value};
@@ -391,18 +407,17 @@ static Selector _parseInfixExpr(Selector lhs, Cursor<Css::Sst> &cur, OpCode opCo
 
 static Selector _parseNfixExpr(Selector lhs, OpCode op, Cursor<Css::Sst> &cur) {
     Vec<Selector> selectors = {lhs, _parseSelectorElement(cur)};
-    while (true) {
-        if (cur.ended()) {
-            break;
-        }
 
+    while (not cur.ended()) {
         Cursor<Css::Sst> rollBack = cur;
 
         OpCode nextOpCode = _peekOpCode(cur);
 
         if (nextOpCode == OpCode::NOP) {
             break;
-        } else if (nextOpCode == op) {
+        }
+
+        if (nextOpCode == op) {
             // adding the selector to the nfix
             selectors.pushBack(_parseSelectorElement(cur));
         } else if (nextOpCode == OpCode::COLUMN or nextOpCode == OpCode::OR or nextOpCode == OpCode::AND) {
@@ -428,8 +443,10 @@ static Selector _parseNfixExpr(Selector lhs, OpCode op, Cursor<Css::Sst> &cur) {
     switch (op) {
     case OpCode::AND:
         return Selector::and_(selectors);
+
     case OpCode::OR:
         return Selector::or_(selectors);
+
     default:
         return Selector::and_(selectors);
     }
@@ -442,18 +459,25 @@ static Selector _parseInfixExpr(Selector lhs, Cursor<Css::Sst> &cur, OpCode opCo
     switch (opCode) {
     case OpCode::NOP:
         return lhs;
+
     case OpCode::DESCENDANT:
         return Selector::descendant(lhs, _parseSelectorElement(cur));
+
     case OpCode::CHILD:
         return Selector::child(lhs, _parseSelectorElement(cur));
+
     case OpCode::ADJACENT:
         return Selector::adjacent(lhs, _parseSelectorElement(cur));
+
     case OpCode::SUBSEQUENT:
         return Selector::subsequent(lhs, _parseSelectorElement(cur));
+
     case OpCode::NOT:
         return Selector::not_(_parseSelectorElement(cur));
+
     case OpCode::WHERE:
         return Selector::where(_parseSelectorElement(cur));
+
     case OpCode::COLUMN:
     case OpCode::OR:
     case OpCode::AND:

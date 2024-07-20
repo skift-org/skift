@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-gfx/color.h>
+#include <karm-base/cow.h>
 #include <vaev-base/background.h>
 #include <vaev-base/borders.h>
 #include <vaev-base/color.h>
@@ -17,10 +17,12 @@
 namespace Vaev::Style {
 
 struct Computed {
+    static Computed const &initial();
+
     Color color;
 
     Vec<Background> backgrounds;
-    Borders borders;
+    Cow<Borders> borders;
     Margin margin;
     Padding padding;
     Sizing sizing;
@@ -28,27 +30,28 @@ struct Computed {
 
     // CSS Writing Modes Level 3
     // https://www.w3.org/TR/css-writing-modes-3
-    WritingMode writingMode = WritingMode::HORIZONTAL_TB;
-    Direction direction = Direction::LTR;
+    WritingMode writingMode;
+    Direction direction;
 
     // CSS Display Module Level 3
     // https://www.w3.org/TR/css-display-3
-    Display display = {Display::FLOW, Display::INLINE};
-    Integer order = 0;
-    Visibility visibility = Visibility::VISIBLE;
+    Display display;
+    Integer order;
+    Visibility visibility;
 
     // CSS Fonts Module Level 4
     // https://www.w3.org/TR/css-fonts-4/
-    Vec<String> fontFamilies;
-    FontWeight fontWeigh;
-    FontWidth fontWidth;
-    FontStyle fontStyle;
-    FontSize fontsize;
+    Cow<Font> font;
 
     Flex flex;
 
     Float float_ = Float::NONE;
     Clear clear = Clear::NONE;
+
+    void inherit(Computed const &parent) {
+        color = parent.color;
+        font = parent.font;
+    }
 };
 
 } // namespace Vaev::Style

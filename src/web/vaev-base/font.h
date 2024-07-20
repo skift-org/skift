@@ -286,4 +286,12 @@ struct FontSource {
     }
 };
 
+struct Font {
+    Vec<String> families;
+    FontWeight weight;
+    FontWidth width;
+    FontStyle style;
+    FontSize size;
+};
+
 } // namespace Vaev

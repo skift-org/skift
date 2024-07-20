@@ -6,7 +6,8 @@ namespace Karm {
 
 template <typename T>
 struct Cow {
-    Strong<T> _inner;
+    static Strong<T> BASE;
+    Strong<T> _inner = BASE;
 
     T &cow() {
         if (_inner.refs() > 1)
@@ -26,6 +27,9 @@ struct Cow {
         return &_inner == &other._inner;
     }
 };
+
+template <typename T>
+Strong<T> Cow<T>::BASE = makeStrong<T>();
 
 template <typename T>
 Cow<T> makeCow(T const &value) {

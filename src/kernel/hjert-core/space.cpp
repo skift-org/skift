@@ -116,7 +116,7 @@ void Space::dump() {
         auto vrange = map.vrange;
         auto prange = map.prange();
         auto size = vrange.size / 1024;
-        logDebug("space {}: map: {x}-{x} -> {x}-{x} {} {}kib", id(), vrange.start, vrange.end(), prange.start, prange.end(), map.vmo->label(), size);
+        logDebug("{}: map: {x}-{x} -> {x}-{x} {} {}kib", *this, vrange.start, vrange.end(), prange.start, prange.end(), map.vmo->label(), size);
     }
     _vmm->dump();
 }

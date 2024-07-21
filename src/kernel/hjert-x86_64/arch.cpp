@@ -150,7 +150,7 @@ void switchTask(TimeSpan span, Frame &frame) {
 }
 
 void uPanic(Frame &frame) {
-    logError("task '{}' caused a '{}'", Core::Task::self().label(), _faultMsg[frame.intNo]);
+    logError("{} caused a '{}'", Core::Task::self(), _faultMsg[frame.intNo]);
     logError("int={} err={} rip={p} rsp={p} rbp={p} cr2={p} cr3={p}", frame.intNo, frame.errNo, frame.rip, frame.rsp, frame.rbp, x86_64::rdcr2(), x86_64::rdcr3());
     Core::Task::self().space().dump();
     Core::Task::self().crash();

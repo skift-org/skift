@@ -21,7 +21,7 @@ static constinit Heap _heapImpl = {
     },
     .log = [](void *, enum HeapLogType type, char const *msg, va_list) -> void {
         if (type == HEAP_ERROR)
-            logError("heap: {}", msg);
+            panic(msg);
     },
     .root = nullptr,
     .best = nullptr,

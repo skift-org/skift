@@ -79,7 +79,7 @@ struct Packer<None> {
         return Ok();
     }
 
-    static Res<None> unpack(BScan &) {
+    static Res<None> unpack(PackScan &) {
         return NONE;
     }
 };
@@ -112,6 +112,8 @@ struct Packer<Union<Ts...>> {
 
     static Res<Union<Ts...>> unpack(PackScan &s) {
         auto index = try$(Io::unpack<u8>(s));
+        if (index >= sizeof...(Ts))
+            return Error::invalidData("invalid union index");
         return Meta::indexCast<Ts...>(index, nullptr, [&]<typename T>(T *) -> Res<Union<Ts...>> {
             return Io::unpack<T>(s);
         });
@@ -190,12 +192,11 @@ struct Packer<Vec<T>> {
 
     static Res<Vec<T>> unpack(PackScan &s) {
         auto len = s.nextU64le();
-        Vec<T> res;
-        res.ensure(len);
+        Vec<T> res{len};
         for (usize i = 0; i < len; i++) {
             res.emplaceBack(try$(Io::unpack<T>(s)));
         }
-        return Ok(res);
+        return Ok(std::move(res));
     }
 };
 
@@ -210,11 +211,7 @@ struct Packer<_String<E>> {
     }
 
     static Res<String> unpack(PackScan &s) {
-        StringBuilder b;
-        auto len = s.nextU64le();
-        b.ensure(len);
-        b.append(s.nextStr(len));
-        return Ok(b.take());
+        return Ok(s.nextStr(s.nextU64le()));
     }
 };
 

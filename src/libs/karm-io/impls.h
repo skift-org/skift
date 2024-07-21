@@ -149,6 +149,7 @@ struct BufferWriter : public Writer, public Flusher {
 
     Res<usize> write(Bytes bytes) override {
         usize written = 0;
+        _buf.ensure(_buf.len() + sizeOf(bytes));
         for (auto byte : iter(bytes)) {
             _buf.insert(_buf.len(), std::move(byte));
             written += 1;

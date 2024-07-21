@@ -407,9 +407,11 @@ struct _Task {
     _Task(std::coroutine_handle<promise_type> coro = nullptr)
         : _coro{coro} {}
 
-    _Task(_Task &other) = delete;
+    _Task(_Task const &other) = delete;
 
     _Task(_Task &&other) : _coro(std::exchange(other._coro, nullptr)) {}
+
+    _Task &operator=(_Task const &other) = delete;
 
     _Task &operator=(_Task &&other) {
         std::swap(_coro, other._coro);

@@ -58,6 +58,8 @@ struct [[nodiscard]] Error {
 #define ITER(NAME, _) NAME,
         FOREACH_ERROR(ITER)
 #undef ITER
+
+            _LEN,
     } _code;
 
     char const *_msg = nullptr;

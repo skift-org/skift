@@ -23,9 +23,10 @@ struct Computed {
 
     Vec<Background> backgrounds;
     Cow<Borders> borders;
-    Margin margin;
-    Padding padding;
-    Sizing sizing;
+    Cow<Margin> margin;
+    Cow<Padding> padding;
+    BoxSizing boxSizing;
+    Cow<Sizing> sizing;
     Overflows overflows;
 
     // CSS Writing Modes Level 3

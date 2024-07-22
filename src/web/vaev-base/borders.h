@@ -13,9 +13,9 @@ enum struct BorderEdge {
     ALL,
 
     TOP,
-    RIGHT,
+    END,
     BOTTOM,
-    LEFT,
+    START,
 };
 
 enum struct BorderCollapse {
@@ -50,11 +50,11 @@ struct Borders {
 
     BorderCollapse collapse;
 
-    Border top, right, bottom, left;
+    Border top, start, bottom, end;
     Math::Radius<PercentOr<Length>> radii;
 
     void all(Border b) {
-        top = right = bottom = left = b;
+        top = start = bottom = end = b;
     }
 
     void set(BorderEdge edge, Border b) {
@@ -65,14 +65,14 @@ struct Borders {
         case BorderEdge::TOP:
             top = b;
             break;
-        case BorderEdge::RIGHT:
-            right = b;
+        case BorderEdge::START:
+            start = b;
             break;
         case BorderEdge::BOTTOM:
             bottom = b;
             break;
-        case BorderEdge::LEFT:
-            left = b;
+        case BorderEdge::END:
+            end = b;
             break;
         }
     }

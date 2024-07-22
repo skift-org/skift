@@ -7,11 +7,14 @@
 
 namespace Vaev {
 
+// https://www.w3.org/TR/css-sizing-3/#box-sizing
 enum struct BoxSizing {
     CONTENT_BOX,
     BORDER_BOX,
 };
 
+// https://www.w3.org/TR/css-sizing-3/#propdef-width
+// https://www.w3.org/TR/css-sizing-3/#propdef-height
 struct Size {
     enum struct Type {
         NONE,
@@ -51,6 +54,7 @@ struct Size {
         case Type::NONE:
             e("none");
             break;
+
         case Type::AUTO:
             e("auto");
             break;
@@ -78,8 +82,8 @@ struct Size {
     }
 };
 
+
 struct Sizing {
-    BoxSizing boxSizing;
     Size width, height;
     Size minWidth, minHeight;
     Size maxWidth, maxHeight;

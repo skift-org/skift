@@ -61,18 +61,8 @@ struct MarginWidth {
     }
 };
 
-struct Margin {
-    MarginWidth top;
-    MarginWidth right;
-    MarginWidth bottom;
-    MarginWidth left;
-};
+using Margin = Math::Spacing<MarginWidth>;
 
-struct Padding {
-    PercentOr<Length> top;
-    PercentOr<Length> right;
-    PercentOr<Length> bottom;
-    PercentOr<Length> left;
-};
+using Padding = Math::Spacing<PercentOr<Length>>;
 
 } // namespace Vaev

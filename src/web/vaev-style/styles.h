@@ -192,7 +192,7 @@ struct BorderRightColorProp {
     static constexpr Color initial() { return BLACK; }
 
     void apply(Computed &c) const {
-        c.borders.cow().right.color = value;
+        c.borders.cow().end.color = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -228,7 +228,7 @@ struct BorderLeftColorProp {
     static constexpr Color initial() { return BLACK; }
 
     void apply(Computed &c) const {
-        c.borders.cow().bottom.color = value;
+        c.borders.cow().start.color = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -259,12 +259,12 @@ struct BorderTopWidthProp {
 struct BorderRightWidthProp {
     Length value = initial();
 
-    static constexpr Str name() { return "border-rignt-width"; }
+    static constexpr Str name() { return "border-right-width"; }
 
     static constexpr Length initial() { return Borders::MEDIUM; }
 
     void apply(Computed &c) const {
-        c.borders.cow().right.width = value;
+        c.borders.cow().end.width = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -282,7 +282,7 @@ struct BorderBottomWidthProp {
     static constexpr Length initial() { return Borders::MEDIUM; }
 
     void apply(Computed &c) const {
-        c.borders.cow().right.width = value;
+        c.borders.cow().bottom.width = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -300,7 +300,7 @@ struct BorderLeftWidthProp {
     static constexpr Length initial() { return Borders::MEDIUM; }
 
     void apply(Computed &c) const {
-        c.borders.cow().left.width = value;
+        c.borders.cow().start.width = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -444,7 +444,7 @@ struct MarginTopProp {
     static constexpr Length initial() { return Length{}; }
 
     void apply(Computed &c) const {
-        c.margin.top = value;
+        c.margin.cow().top = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -461,7 +461,7 @@ struct MarginRightProp {
     static constexpr Length initial() { return Length{}; }
 
     void apply(Computed &c) const {
-        c.margin.right = value;
+        c.margin.cow().start = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -478,7 +478,7 @@ struct MarginBottomProp {
     static constexpr Length initial() { return Length{}; }
 
     void apply(Computed &c) const {
-        c.margin.bottom = value;
+        c.margin.cow().bottom = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -495,7 +495,7 @@ struct MarginLeftProp {
     static Length initial() { return Length{}; }
 
     void apply(Computed &c) const {
-        c.margin.left = value;
+        c.margin.cow().end = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -590,7 +590,7 @@ struct PaddingTopProp {
     static Length initial() { return Length{}; }
 
     void apply(Computed &c) const {
-        c.padding.top = value;
+        c.padding.cow().top = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -607,7 +607,7 @@ struct PaddingRightProp {
     static Length initial() { return Length{}; }
 
     void apply(Computed &c) const {
-        c.padding.right = value;
+        c.padding.cow().start = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -624,7 +624,7 @@ struct PaddingBottomProp {
     static Length initial() { return Length{}; }
 
     void apply(Computed &c) const {
-        c.padding.bottom = value;
+        c.padding.cow().bottom = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -641,7 +641,7 @@ struct PaddingLeftProp {
     static Length initial() { return {}; }
 
     void apply(Computed &c) const {
-        c.padding.left = value;
+        c.padding.cow().end = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -680,7 +680,7 @@ struct BoxSizingProp {
     static constexpr BoxSizing initial() { return BoxSizing::CONTENT_BOX; }
 
     void apply(Computed &c) const {
-        c.sizing.boxSizing = value;
+        c.boxSizing = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -705,7 +705,7 @@ struct WidthProp {
     static constexpr Size initial() { return Size::AUTO; }
 
     void apply(Computed &c) const {
-        c.sizing.width = value;
+        c.sizing.cow().width = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -724,7 +724,7 @@ struct HeightProp {
     static constexpr Size initial() { return Size::AUTO; }
 
     void apply(Computed &c) const {
-        c.sizing.height = value;
+        c.sizing.cow().height = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -743,7 +743,7 @@ struct MinWidthProp {
     static constexpr Size initial() { return Size::AUTO; }
 
     void apply(Computed &c) const {
-        c.sizing.minWidth = value;
+        c.sizing.cow().minWidth = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -762,7 +762,7 @@ struct MinHeightProp {
     static constexpr Size initial() { return Size::AUTO; }
 
     void apply(Computed &c) const {
-        c.sizing.minHeight = value;
+        c.sizing.cow().minHeight = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -781,7 +781,7 @@ struct MaxWidthProp {
     static constexpr Size initial() { return Size::NONE; }
 
     void apply(Computed &c) const {
-        c.sizing.maxWidth = value;
+        c.sizing.cow().maxWidth = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -800,7 +800,7 @@ struct MaxHeightProp {
     static constexpr Size initial() { return Size::NONE; }
 
     void apply(Computed &c) const {
-        c.sizing.maxHeight = value;
+        c.sizing.cow().maxHeight = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {

@@ -2,6 +2,7 @@
 
 #include <vaev-base/color.h>
 #include <vaev-base/display.h>
+#include <vaev-base/flex.h>
 #include <vaev-base/font.h>
 #include <vaev-base/insets.h>
 #include <vaev-base/length.h>
@@ -52,6 +53,21 @@ struct ValueParser<Display> {
 };
 
 template <>
+struct ValueParser<FlexDirection> {
+    static Res<FlexDirection> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
+struct ValueParser<FlexWrap> {
+    static Res<FlexWrap> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
+struct ValueParser<FlexBasis> {
+    static Res<FlexBasis> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
 struct ValueParser<FontSize> {
     static Res<FontSize> parse(Cursor<Css::Sst> &c);
 };
@@ -87,8 +103,8 @@ struct ValueParser<Length> {
 };
 
 template <>
-struct ValueParser<MarginWidth> {
-    static Res<MarginWidth> parse(Cursor<Css::Sst> &c);
+struct ValueParser<Width> {
+    static Res<Width> parse(Cursor<Css::Sst> &c);
 };
 
 template <>

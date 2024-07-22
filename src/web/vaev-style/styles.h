@@ -311,6 +311,96 @@ struct BorderLeftWidthProp {
 
 // MARK: Flex ------------------------------------------------------------------
 
+// https://www.w3.org/TR/css-flexbox-1/#flex-basis-property
+struct FlexBasisProp {
+    FlexBasis value = initial();
+
+    static constexpr Str name() { return "flex-basis"; }
+
+    static constexpr FlexBasis initial() { return Width{Width::AUTO}; }
+
+    void apply(Computed &c) const {
+        c.flex.basis = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<FlexBasis>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-flexbox-1/#propdef-flex-direction
+struct FlexDirectionProp {
+    FlexDirection value = initial();
+
+    static constexpr Str name() { return "flex-direction"; }
+
+    static constexpr FlexDirection initial() { return FlexDirection::ROW; }
+
+    void apply(Computed &c) const {
+        c.flex.direction = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<FlexDirection>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-flexbox-1/#flex-grow-property
+struct FlexGrowProp {
+    f64 value = initial();
+
+    static constexpr Str name() { return "flex-grow"; }
+
+    static constexpr f64 initial() { return 0; }
+
+    void apply(Computed &c) const {
+        c.flex.grow = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<f64>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-flexbox-1/#propdef-flex-shrink
+struct FlexShrinkProp {
+    f64 value = initial();
+
+    static constexpr Str name() { return "flex-shrink"; }
+
+    static constexpr f64 initial() { return 1; }
+
+    void apply(Computed &c) const {
+        c.flex.shrink = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<f64>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-flexbox-1/#propdef-flex-wrap
+struct FlexWrapProp {
+    FlexWrap value = initial();
+
+    static constexpr Str name() { return "flex-wrap"; }
+
+    static constexpr FlexWrap initial() { return FlexWrap::NOWRAP; }
+
+    void apply(Computed &c) const {
+        c.flex.wrap = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<FlexWrap>(c));
+        return Ok();
+    }
+};
+
 // MARK: Fonts -----------------------------------------------------------------
 
 // https://www.w3.org/TR/css-fonts-4/#font-family-prop
@@ -437,69 +527,69 @@ struct FontSizeProp {
 // https://www.w3.org/TR/css-box-3/#propdef-margin
 
 struct MarginTopProp {
-    MarginWidth value = initial();
+    Width value = initial();
 
     static Str name() { return "margin-top"; }
 
-    static constexpr Length initial() { return Length{}; }
+    static constexpr Width initial() { return Length{}; }
 
     void apply(Computed &c) const {
         c.margin.cow().top = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
-        value = try$(parseValue<MarginWidth>(c));
+        value = try$(parseValue<Width>(c));
         return Ok();
     }
 };
 
 struct MarginRightProp {
-    MarginWidth value = initial();
+    Width value = initial();
 
     static Str name() { return "margin-right"; }
 
-    static constexpr Length initial() { return Length{}; }
+    static constexpr Width initial() { return Length{}; }
 
     void apply(Computed &c) const {
         c.margin.cow().start = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
-        value = try$(parseValue<MarginWidth>(c));
+        value = try$(parseValue<Width>(c));
         return Ok();
     }
 };
 
 struct MarginBottomProp {
-    MarginWidth value = initial();
+    Width value = initial();
 
     static constexpr Str name() { return "margin-bottom"; }
 
-    static constexpr Length initial() { return Length{}; }
+    static constexpr Width initial() { return Length{}; }
 
     void apply(Computed &c) const {
         c.margin.cow().bottom = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
-        value = try$(parseValue<MarginWidth>(c));
+        value = try$(parseValue<Width>(c));
         return Ok();
     }
 };
 
 struct MarginLeftProp {
-    MarginWidth value = initial();
+    Width value = initial();
 
     static Str name() { return "margin-left"; }
 
-    static Length initial() { return Length{}; }
+    static Width initial() { return Length{}; }
 
     void apply(Computed &c) const {
         c.margin.cow().end = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
-        value = try$(parseValue<MarginWidth>(c));
+        value = try$(parseValue<Width>(c));
         return Ok();
     }
 };
@@ -830,6 +920,13 @@ using _StyleProp = Union<
     BorderRightWidthProp,
     BorderBottomWidthProp,
     BorderLeftWidthProp,
+
+    // Flex
+    FlexBasisProp,
+    FlexDirectionProp,
+    FlexGrowProp,
+    FlexShrinkProp,
+    FlexWrapProp,
 
     // Font
     FontFamilyProp,

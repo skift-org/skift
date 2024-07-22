@@ -264,6 +264,52 @@ Res<Display> ValueParser<Display>::parse(Cursor<Css::Sst> &c) {
     });
 }
 
+// MARK: FlexDirection
+// https://drafts.csswg.org/css-flexbox-1/#flex-direction-property
+Res<FlexDirection> ValueParser<FlexDirection>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Css::Token::ident("row")))
+        return Ok(FlexDirection::ROW);
+    else if (c.skip(Css::Token::ident("row-reverse")))
+        return Ok(FlexDirection::ROW_REVERSE);
+    else if (c.skip(Css::Token::ident("column")))
+        return Ok(FlexDirection::COLUMN);
+    else if (c.skip(Css::Token::ident("column-reverse")))
+        return Ok(FlexDirection::COLUMN_REVERSE);
+    else
+        return Error::invalidData("expected flex direction");
+}
+
+// Mark: FlexWrap
+// https://drafts.csswg.org/css-flexbox-1/#flex-wrap-property
+Res<FlexWrap> ValueParser<FlexWrap>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Css::Token::ident("nowrap")))
+        return Ok(FlexWrap::NOWRAP);
+    else if (c.skip(Css::Token::ident("wrap")))
+        return Ok(FlexWrap::WRAP);
+    else if (c.skip(Css::Token::ident("wrap-reverse")))
+        return Ok(FlexWrap::WRAP_REVERSE);
+    else
+        return Error::invalidData("expected flex wrap");
+}
+
+// MARK: FlexBasis
+// https://drafts.csswg.org/css-flexbox-1/#flex-basis-property
+Res<FlexBasis> ValueParser<FlexBasis>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Css::Token::ident("content")))
+        return Ok(FlexBasis{FlexBasis::CONTENT});
+
+    return Ok(try$(parseValue<Width>(c)));
+}
+
 // MARK: FontSize
 // https://www.w3.org/TR/css-fonts-4/#font-size-prop
 
@@ -426,13 +472,13 @@ Res<Length> ValueParser<Length>::parse(Cursor<Css::Sst> &c) {
 // MARL: MarginWidth
 // https://drafts.csswg.org/css-values/#margin-width
 
-Res<MarginWidth> ValueParser<MarginWidth>::parse(Cursor<Css::Sst> &c) {
+Res<Width> ValueParser<Width>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
     if (c->token == Css::Token::ident("auto")) {
         c.next();
-        return Ok(MarginWidth::AUTO);
+        return Ok(Width::AUTO);
     }
 
     return Ok(try$(parseValue<PercentOr<Length>>(c)));

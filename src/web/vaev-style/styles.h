@@ -320,7 +320,7 @@ struct FlexBasisProp {
     static constexpr FlexBasis initial() { return Width{Width::AUTO}; }
 
     void apply(Computed &c) const {
-        c.flex.basis = value;
+        c.flex.cow().basis = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -338,7 +338,7 @@ struct FlexDirectionProp {
     static constexpr FlexDirection initial() { return FlexDirection::ROW; }
 
     void apply(Computed &c) const {
-        c.flex.direction = value;
+        c.flex.cow().direction = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -356,7 +356,7 @@ struct FlexGrowProp {
     static constexpr f64 initial() { return 0; }
 
     void apply(Computed &c) const {
-        c.flex.grow = value;
+        c.flex.cow().grow = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -374,7 +374,7 @@ struct FlexShrinkProp {
     static constexpr f64 initial() { return 1; }
 
     void apply(Computed &c) const {
-        c.flex.shrink = value;
+        c.flex.cow().shrink = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -392,7 +392,7 @@ struct FlexWrapProp {
     static constexpr FlexWrap initial() { return FlexWrap::NOWRAP; }
 
     void apply(Computed &c) const {
-        c.flex.wrap = value;
+        c.flex.cow().wrap = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -594,6 +594,30 @@ struct MarginLeftProp {
     }
 };
 
+// https://www.w3.org/TR/css-color-4/#propdef-opacity
+
+struct OpacityProp {
+    Number value = initial();
+
+    static Str name() { return "opacity"; }
+
+    static f64 initial() { return 1; }
+
+    void apply(Computed &c) const {
+        c.opacity = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        auto maybePercent = parseValue<Percent>(c);
+        if (maybePercent) {
+            value = maybePercent.unwrap().value() / 100;
+        } else {
+            value = try$(parseValue<Number>(c));
+        }
+        return Ok();
+    }
+};
+
 // MARK: Overflow --------------------------------------------------------------
 
 // https://www.w3.org/TR/css-overflow/#overflow-control
@@ -754,6 +778,98 @@ struct OrderProp {
 
     Res<> parse(Cursor<Css::Sst> &c) {
         value = try$(parseValue<Integer>(c));
+        return Ok();
+    }
+};
+
+// MARK: Positioning -----------------------------------------------------------
+
+// https://www.w3.org/TR/CSS22/visuren.html#positioning-scheme
+struct PositionProp {
+    Position value = initial();
+
+    static Str name() { return "position"; }
+
+    static Position initial() { return Position::STATIC; }
+
+    void apply(Computed &c) const {
+        c.position = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Position>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/CSS22/visuren.html#propdef-top
+struct TopProp {
+    Width value = initial();
+
+    static Str name() { return "top"; }
+
+    static Width initial() { return Width::AUTO; }
+
+    void apply(Computed &c) const {
+        c.offsets.cow().top = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Width>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/CSS22/visuren.html#propdef-right
+struct RightProp {
+    Width value = initial();
+
+    static Str name() { return "right"; }
+
+    static Width initial() { return Width::AUTO; }
+
+    void apply(Computed &c) const {
+        c.offsets.cow().end = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Width>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/CSS22/visuren.html#propdef-bottom
+struct BottomProp {
+    Width value = initial();
+
+    static Str name() { return "bottom"; }
+
+    static Width initial() { return Width::AUTO; }
+
+    void apply(Computed &c) const {
+        c.offsets.cow().bottom = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Width>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/CSS22/visuren.html#propdef-left
+struct LeftProp {
+    Width value = initial();
+
+    static Str name() { return "left"; }
+
+    static Width initial() { return Width::AUTO; }
+
+    void apply(Computed &c) const {
+        c.offsets.cow().start = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Width>(c));
         return Ok();
     }
 };
@@ -947,11 +1063,20 @@ using _StyleProp = Union<
     OverflowBlockProp,
     OverflowInlineProp,
 
+    OpacityProp,
+
     // Padding
     PaddingTopProp,
     PaddingRightProp,
     PaddingBottomProp,
     PaddingLeftProp,
+
+    // Positioning
+    PositionProp,
+    TopProp,
+    RightProp,
+    BottomProp,
+    LeftProp,
 
     // Sizing
     BoxSizingProp,

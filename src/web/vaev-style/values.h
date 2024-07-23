@@ -161,6 +161,11 @@ struct ValueParser<Pointer> {
 };
 
 template <>
+struct ValueParser<Position> {
+    static Res<Position> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
 struct ValueParser<Resolution> {
     static Res<Resolution> parse(Cursor<Css::Sst> &c);
 };

@@ -635,6 +635,26 @@ Res<Pointer> ValueParser<Pointer>::parse(Cursor<Css::Sst> &c) {
         return Error::invalidData("expected pointer value");
 }
 
+// MARK: Position
+// https://drafts.csswg.org/css-position-3/#propdef-position
+Res<Position> ValueParser<Position>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Css::Token::ident("static")))
+        return Ok(Position::STATIC);
+    else if (c.skip(Css::Token::ident("relative")))
+        return Ok(Position::RELATIVE);
+    else if (c.skip(Css::Token::ident("absolute")))
+        return Ok(Position::ABSOLUTE);
+    else if (c.skip(Css::Token::ident("fixed")))
+        return Ok(Position::FIXED);
+    else if (c.skip(Css::Token::ident("sticky")))
+        return Ok(Position::STICKY);
+    else
+        return Error::invalidData("expected position");
+}
+
 // Mark: Resolution
 // https://drafts.csswg.org/css-values/#resolution
 

@@ -20,6 +20,7 @@ struct Computed {
     static Computed const &initial();
 
     Color color;
+    Number opacity;
 
     Vec<Background> backgrounds;
     Cow<Borders> borders;
@@ -28,6 +29,11 @@ struct Computed {
     BoxSizing boxSizing;
     Cow<Sizing> sizing;
     Overflows overflows;
+
+    // 9.3 Positioning schemes
+    // https://www.w3.org/TR/CSS22/visuren.html#positioning-scheme
+    Position position;
+    Cow<Offsets> offsets;
 
     // CSS Writing Modes Level 3
     // https://www.w3.org/TR/css-writing-modes-3
@@ -44,7 +50,7 @@ struct Computed {
     // https://www.w3.org/TR/css-fonts-4/
     Cow<Font> font;
 
-    Flex flex;
+    Cow<Flex> flex;
 
     Float float_ = Float::NONE;
     Clear clear = Clear::NONE;

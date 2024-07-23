@@ -6,7 +6,7 @@
 namespace Vaev::Style {
 
 struct [[gnu::packed]] Align {
-    enum Perfix {
+    enum Perfix : u8 {
         NO_PREFIX,
 
         LEGACY,
@@ -18,7 +18,7 @@ struct [[gnu::packed]] Align {
         _LEN0,
     };
 
-    enum Keywords {
+    enum Keywords : u8 {
         NO_KEYWORD,
 
         AUTO,

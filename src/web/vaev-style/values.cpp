@@ -6,6 +6,70 @@ namespace Vaev::Style {
 
 // NOTE: Please keep this alphabetically sorted.
 
+// MARK: Align
+// https://drafts.csswg.org/css-align-3/#propdef-align-content
+// https://drafts.csswg.org/css-align-3/#propdef-justify-content
+// https://drafts.csswg.org/css-align-3/#propdef-justify-self
+// https://drafts.csswg.org/css-align-3/#propdef-align-self
+// https://drafts.csswg.org/css-align-3/#propdef-justify-items
+// https://drafts.csswg.org/css-align-3/#propdef-align-items
+
+Res<Align> ValueParser<Align>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    Align align;
+
+    if (c.skip(Css::Token::ident("legacy"))) {
+        align.perfix = Align::Perfix::LEGACY;
+    } else if (c.skip(Css::Token::ident("safe"))) {
+        align.perfix = Align::Perfix::SAFE;
+    } else if (c.skip(Css::Token::ident("unsafe"))) {
+        align.perfix = Align::Perfix::UNSAFE;
+    }
+
+    if (c.skip(Css::Token::ident("auto"))) {
+        align.keyword = Align::Keywords::AUTO;
+    } else if (c.skip(Css::Token::ident("normal"))) {
+        align.keyword = Align::Keywords::NORMAL;
+    } else if (c.skip(Css::Token::ident("center"))) {
+        align.keyword = Align::Keywords::CENTER;
+    } else if (c.skip(Css::Token::ident("start"))) {
+        align.keyword = Align::Keywords::START;
+    } else if (c.skip(Css::Token::ident("end"))) {
+        align.keyword = Align::Keywords::END;
+    } else if (c.skip(Css::Token::ident("self-start"))) {
+        align.keyword = Align::Keywords::SELF_START;
+    } else if (c.skip(Css::Token::ident("self-end"))) {
+        align.keyword = Align::Keywords::SELF_END;
+    } else if (c.skip(Css::Token::ident("flex-start"))) {
+        align.keyword = Align::Keywords::FLEX_START;
+    } else if (c.skip(Css::Token::ident("flex-end"))) {
+        align.keyword = Align::Keywords::FLEX_END;
+    } else if (c.skip(Css::Token::ident("left"))) {
+        align.keyword = Align::Keywords::LEFT;
+    } else if (c.skip(Css::Token::ident("right"))) {
+        align.keyword = Align::Keywords::RIGHT;
+    } else if (c.skip(Css::Token::ident("first-baseline"))) {
+        align.keyword = Align::Keywords::FIRST_BASELINE;
+    } else if (c.skip(Css::Token::ident("last-baseline"))) {
+        align.keyword = Align::Keywords::LAST_BASELINE;
+    } else if (c.skip(Css::Token::ident("stretch"))) {
+        align.keyword = Align::Keywords::STRETCH;
+    } else if (c.skip(Css::Token::ident("space-between"))) {
+        align.keyword = Align::Keywords::SPACE_BETWEEN;
+    } else if (c.skip(Css::Token::ident("space-around"))) {
+        align.keyword = Align::Keywords::SPACE_AROUND;
+    } else if (c.skip(Css::Token::ident("space-evenly"))) {
+        align.keyword = Align::Keywords::SPACE_EVENLY;
+    }
+
+    if (align == Align::NO_PREFIX and align == Align::NO_KEYWORD)
+        return Error::invalidData("expected align value");
+
+    return Ok(align);
+}
+
 // MARK: Angle
 // https://drafts.csswg.org/css-values/#angles
 

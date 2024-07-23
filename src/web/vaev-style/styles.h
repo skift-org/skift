@@ -17,6 +17,155 @@ namespace Vaev::Style {
 
 // NOTE: This list should be kept alphabetically sorted.
 
+// MARK: Align -----------------------------------------------------------------
+// https://drafts.csswg.org/css-align-3
+
+// https://drafts.csswg.org/css-align-3/#propdef-align-content
+struct AlignContentProp {
+    Align value = initial();
+
+    static constexpr Str name() { return "align-content"; }
+
+    static constexpr Align initial() { return {}; }
+
+    void apply(Computed &c) const {
+        c.aligns.alignContent = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Align>(c));
+        return Ok();
+    }
+};
+
+// https://drafts.csswg.org/css-align-3/#propdef-justify-content
+struct JustifyContentProp {
+    Align value = initial();
+
+    static constexpr Str name() { return "justify-content"; }
+
+    static constexpr Align initial() { return {}; }
+
+    void apply(Computed &c) const {
+        c.aligns.justifyContent = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Align>(c));
+        return Ok();
+    }
+};
+
+// https://drafts.csswg.org/css-align-3/#propdef-justify-self
+struct JustifySelfProp {
+    Align value = initial();
+
+    static constexpr Str name() { return "justify-self"; }
+
+    static constexpr Align initial() { return {}; }
+
+    void apply(Computed &c) const {
+        c.aligns.justifySelf = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Align>(c));
+        return Ok();
+    }
+};
+
+// https://drafts.csswg.org/css-align-3/#propdef-align-self
+struct AlignSelfProp {
+    Align value = initial();
+
+    static constexpr Str name() { return "align-self"; }
+
+    static constexpr Align initial() { return {}; }
+
+    void apply(Computed &c) const {
+        c.aligns.alignSelf = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Align>(c));
+        return Ok();
+    }
+};
+
+// https://drafts.csswg.org/css-align-3/#propdef-justify-items
+struct JustifyItemsProp {
+    Align value = initial();
+
+    static constexpr Str name() { return "justify-items"; }
+
+    static constexpr Align initial() { return {}; }
+
+    void apply(Computed &c) const {
+        c.aligns.justifyItems = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Align>(c));
+        return Ok();
+    }
+};
+
+// https://drafts.csswg.org/css-align-3/#propdef-align-items
+struct AlignItemsProp {
+    Align value = initial();
+
+    static constexpr Str name() { return "align-items"; }
+
+    static constexpr Align initial() { return {}; }
+
+    void apply(Computed &c) const {
+        c.aligns.alignItems = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Align>(c));
+        return Ok();
+    }
+};
+
+// https://drafts.csswg.org/css-align-3/#column-row-gap
+struct RowGapProp {
+    PercentOr<Length> value = initial();
+
+    static constexpr Str name() { return "row-gap"; }
+
+    static constexpr PercentOr<Length> initial() { return {}; }
+
+    void apply(Computed &c) const {
+        c.gaps.y = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<PercentOr<Length>>(c));
+        return Ok();
+    }
+};
+
+// https://drafts.csswg.org/css-align-3/#column-row-gap
+struct ColumnGapProp {
+    PercentOr<Length> value = initial();
+
+    static constexpr Str name() { return "column-gap"; }
+
+    static constexpr PercentOr<Length> initial() { return {}; }
+
+    void apply(Computed &c) const {
+        c.gaps.x = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<PercentOr<Length>>(c));
+        return Ok();
+    }
+};
+
+// MARK: Background ------------------------------------------------------------
+
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-attachment
 struct BackgroundAttachmentProp {
     Vec<BackgroundAttachment> value = initial();
@@ -1018,6 +1167,18 @@ struct MaxHeightProp {
 // MARK: Style Property  -------------------------------------------------------
 
 using _StyleProp = Union<
+    // Align
+    AlignContentProp,
+    JustifyContentProp,
+    JustifySelfProp,
+    AlignSelfProp,
+    JustifyItemsProp,
+    AlignItemsProp,
+
+    RowGapProp,
+    ColumnGapProp,
+
+    // Background
     BackgroundAttachmentProp,
     BackgroundColorProp,
     BackgroundImageProp,
@@ -1099,6 +1260,13 @@ enum struct Important {
 struct StyleProp : public _StyleProp {
     using _StyleProp::_StyleProp;
     Important important = Important::NO;
+
+    static constexpr Array LEGACY_ALIAS = {
+        // https://drafts.csswg.org/css-align-3/#gap-legacy
+        Cons<Str>{"grid-row-gap", "row-gap"},
+        Cons<Str>{"grid-column-gap", "column-gap"},
+        Cons<Str>{"grid-gap", "gap"},
+    };
 
     Str name() const {
         return visit([](auto const &p) {

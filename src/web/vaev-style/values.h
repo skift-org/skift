@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vaev-base/align.h>
 #include <vaev-base/color.h>
 #include <vaev-base/display.h>
 #include <vaev-base/flex.h>
@@ -26,6 +27,11 @@ template <typename T>
 always_inline static Res<T> parseValue(Cursor<Css::Sst> &c) {
     return ValueParser<T>::parse(c);
 }
+
+template <>
+struct ValueParser<Align> {
+    static Res<Align> parse(Cursor<Css::Sst> &c);
+};
 
 template <>
 struct ValueParser<Angle> {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/cow.h>
+#include <vaev-base/align.h>
 #include <vaev-base/background.h>
 #include <vaev-base/borders.h>
 #include <vaev-base/color.h>
@@ -21,6 +22,9 @@ struct Computed {
 
     Color color;
     Number opacity;
+
+    Aligns aligns;
+    Math::Vec2<PercentOr<Length>> gaps;
 
     Vec<Background> backgrounds;
     Cow<Borders> borders;

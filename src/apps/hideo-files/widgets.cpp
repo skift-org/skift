@@ -1,7 +1,7 @@
-#include <hideo-base/alert.h>
 #include <hideo-base/scafold.h>
 #include <karm-kira/context-menu.h>
 #include <karm-kira/dialog.h>
+#include <karm-kira/error-page.h>
 #include <karm-mime/mime.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/input.h>
@@ -15,17 +15,14 @@ namespace Hideo::Files {
 // MARK: Common Widgets --------------------------------------------------------
 
 Ui::Child alert(State const &state, String title, String body) {
-    return Ui::vflow(
-               16,
-               Math::Align::CENTER,
-               Hideo::alert(title, body),
-               Ui::hflow(
-                   16,
-                   Ui::button(Model::bindIf<GoBack>(state.canGoBack()), "Go Back"),
-                   Ui::button(Model::bind<Refresh>(), Ui::ButtonStyle::primary(), "Retry")
-               )
-           ) |
-           Ui::center();
+    return Kr::errorPageContent({
+        Kr::errorPageTitle(Mdi::ALERT_DECAGRAM, title),
+        Kr::errorPageBody(body),
+        Kr::errorPageFooter({
+            Ui::button(Model::bindIf<GoBack>(state.canGoBack()), "Go Back"),
+            Ui::button(Model::bind<Refresh>(), Ui::ButtonStyle::primary(), "Retry"),
+        }),
+    });
 }
 
 Ui::ButtonStyle itemStyle(bool odd) {

@@ -1,5 +1,5 @@
-#include <hideo-base/alert.h>
 #include <hideo-base/scafold.h>
+#include <karm-kira/error-page.h>
 #include <karm-ui/input.h>
 
 #include "app.h"
@@ -15,12 +15,8 @@ Ui::Child viewer(State const &state) {
 }
 
 Ui::Child viewerPreview(State const &state) {
-    if (not state.image) {
-        return Hideo::alert(
-            "Unable to display this image"s,
-            Io::toStr(state.image.none()).unwrap()
-        );
-    }
+    if (not state.image)
+        return Kr::errorPage(Mdi::ALERT_DECAGRAM, "No Image"s, "Unable to display this image."s);
 
     return Ui::image(state.image.unwrap()) |
            Ui::box({

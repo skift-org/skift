@@ -1,4 +1,3 @@
-#include <hideo-base/alert.h>
 #include <hideo-base/scafold.h>
 #include <karm-kira/badge.h>
 #include <karm-sys/entry.h>

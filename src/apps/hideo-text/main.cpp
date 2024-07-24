@@ -1,7 +1,7 @@
-#include <hideo-base/alert.h>
 #include <hideo-base/scafold.h>
 #include <hideo-files/widgets.h>
 #include <karm-io/funcs.h>
+#include <karm-kira/error-page.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <karm-text/edit.h>
@@ -90,7 +90,9 @@ Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
                         ) | Ui::spacing({16, 6}),
                         Ui::separator(),
 
-                        s.error ? alert("Unable to load text"s, Io::toStr(s.error).unwrap()) | Ui::grow() : editor(s.text),
+                        s.error
+                            ? Kr::errorPage(Mdi::ALERT_DECAGRAM, "Unable to load text"s, Io::toStr(s.error).unwrap()) | Ui::grow()
+                            : editor(s.text),
                         Ui::separator(),
                         Ui::hflow(
                             6,

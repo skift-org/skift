@@ -1,4 +1,4 @@
-#include <hideo-base/alert.h>
+#include <karm-kira/error-page.h>
 #include <karm-ui/app.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
@@ -98,7 +98,7 @@ Ui::Child alert(String title, String subtitle) {
     return Ui::vflow(
                16,
                Math::Align::CENTER,
-               Hideo::alert(title, subtitle) | Ui::grow(),
+               Kr::errorPage(Mdi::ALERT_DECAGRAM, title, subtitle) | Ui::grow(),
                Ui::bodyMedium("Press [ENTER] to continue.")
            ) |
            Ui::spacing(64);

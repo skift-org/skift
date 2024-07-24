@@ -1,7 +1,7 @@
-#include <hideo-base/alert.h>
 #include <hideo-base/scafold.h>
 #include <karm-kira/context-menu.h>
 #include <karm-kira/dialog.h>
+#include <karm-kira/error-page.h>
 #include <karm-kira/side-panel.h>
 #include <karm-mime/mime.h>
 #include <karm-sys/file.h>
@@ -155,17 +155,14 @@ Ui::Child sidePanel(State const &s) {
 }
 
 Ui::Child alert(State const &s, String title, String body) {
-    return Ui::vflow(
-               16,
-               Math::Align::CENTER,
-               Hideo::alert(title, body),
-               Ui::hflow(
-                   16,
-                   Ui::button(Model::bindIf<GoBack>(s.canGoBack()), "Go Back"),
-                   Ui::button(Model::bind<Reload>(), Ui::ButtonStyle::primary(), "Reload")
-               )
-           ) |
-           Ui::center();
+    return Kr::errorPageContent({
+        Kr::errorPageTitle(Mdi::ALERT_DECAGRAM, title),
+        Kr::errorPageBody(body),
+        Kr::errorPageFooter({
+            Ui::button(Model::bindIf<GoBack>(s.canGoBack()), "Go Back"),
+            Ui::button(Model::bind<Reload>(), Ui::ButtonStyle::primary(), "Reload"),
+        }),
+    });
 }
 
 Ui::Child webview(State const &s) {

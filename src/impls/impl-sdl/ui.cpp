@@ -523,7 +523,7 @@ struct SdlHost :
         // NOTE: A better option would be to have SDL in a separeted thread
         //       and do the communication over an inter-thread channel but
         //       but this would require to make the Framework thread safe
-        auto delay = TimeSpan::fromMSecs((usize)(FRAME_TIME * 1000 * 2));
+        auto delay = TimeSpan::fromMSecs((usize)(FRAME_TIME * 1000));
         auto cappedWait = min(ts, Sys::now() + delay);
         try$(Sys::globalSched().wait(cappedWait));
 

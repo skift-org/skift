@@ -895,7 +895,7 @@ struct Formatter<char const *> : public StringFormatter<Utf8> {
 template <>
 struct Formatter<TimeSpan> {
     Res<usize> format(Io::TextWriter &writer, TimeSpan const &val) {
-        return Io::format(writer, "{}.{03}s", val.toSecs(), val.toUSecs() % 1000);
+        return Io::format(writer, "{}.{03}s", val.toSecs(), val.toMSecs() % 1000);
     }
 };
 

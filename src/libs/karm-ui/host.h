@@ -280,7 +280,8 @@ struct Host : public Node {
             if (_dirty.len() > 0)
                 doPaint();
 
-            try$(wait(nextFrame));
+            try$(wait(nextFrameScheduled ? nextFrame : TimeStamp::endOfTime()));
+            nextFrameScheduled = false;
         }
 
         return _res.unwrap();

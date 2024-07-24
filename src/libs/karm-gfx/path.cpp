@@ -309,6 +309,11 @@ void Path::line(Math::Edgef edge) {
     lineTo(edge.end);
 }
 
+void Path::curve(Math::Curvef curve) {
+    moveTo(curve.a);
+    cubicTo(curve.b, curve.c, curve.d);
+}
+
 void Path::rect(Math::Rectf rect, Math::Radiusf radius) {
     if (radius.zero()) {
         moveTo(rect.topStart());

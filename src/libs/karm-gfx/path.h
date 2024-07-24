@@ -6,6 +6,7 @@
 #include <karm-io/expr.h>
 #include <karm-io/sscan.h>
 #include <karm-math/const.h>
+#include <karm-math/curve.h>
 #include <karm-math/edge.h>
 #include <karm-math/ellipse.h>
 #include <karm-math/funcs.h>
@@ -141,6 +142,8 @@ struct Path {
     // MARK: Shapes ------------------------------------------------------------
 
     void line(Math::Edgef edge);
+
+    void curve(Math::Curvef curve);
 
     void rect(Math::Rectf rect, Math::Radiusf radius = 0);
 

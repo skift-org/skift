@@ -405,6 +405,10 @@ void Context::line(Math::Edgef line) {
     _path.line(line);
 }
 
+void Context::curve(Math::Curvef curve) {
+    _path.curve(curve);
+}
+
 void Context::rect(Math::Rectf rect, Math::Radiusf radius) {
     _path.rect(rect, radius);
 }

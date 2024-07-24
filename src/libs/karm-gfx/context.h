@@ -246,6 +246,9 @@ struct Context {
     // Add a line segment to the current path.
     void line(Math::Edgef line);
 
+    // Add a curve to the current path.
+    void curve(Math::Curvef curve);
+
     // Add a rectangle to the current path.
     void rect(Math::Rectf rect, Math::Radiusf radius = 0);
 

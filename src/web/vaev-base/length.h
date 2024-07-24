@@ -6,6 +6,7 @@
 #include <karm-math/rect.h>
 #include <karm-math/spacing.h>
 
+#include "base.h"
 #include "writing.h"
 
 namespace Vaev {
@@ -150,8 +151,11 @@ struct FontMetrics {
     Px lineHeight;
 };
 
-struct LengthContext {
-    Px dpi;
+template <>
+struct ValueContext<Length> {
+    using Resolved = Px;
+
+    Px dpi = Px{96};
 
     // https://drafts.csswg.org/css-values/#small-viewport-size
     Math::Rect<Px> smallViewport;

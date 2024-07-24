@@ -181,7 +181,7 @@ struct Host : public Node {
 
         static usize maxStutter = 31;
         if (elapsed.toMSecs() > maxStutter) {
-            logWarn("Stutter detected, paint took {} ms for {} nodes", elapsed.toMSecs(), debugNodeCount);
+            logWarn("Stutter detected, paint took {} for {} nodes", elapsed, debugNodeCount);
             maxStutter = elapsed.toMSecs();
         }
 
@@ -197,7 +197,7 @@ struct Host : public Node {
         auto elapsed = _perf.end();
         static usize maxStutter = 1;
         if (elapsed.toMSecs() > maxStutter) {
-            logWarn("Stutter detected, layout took {}ms for {} nodes", elapsed.toMSecs(), debugNodeCount);
+            logWarn("Stutter detected, layout took {} for {} nodes", elapsed, debugNodeCount);
             maxStutter = elapsed.toMSecs();
         }
     }
@@ -208,7 +208,7 @@ struct Host : public Node {
         auto elapsed = _perf.end();
         static usize maxStutter = 1;
         if (elapsed.toMSecs() > maxStutter) {
-            logWarn("Stutter detected, event took {} ms for {} nodes", elapsed.toMSecs(), debugNodeCount);
+            logWarn("Stutter detected, event took {} for {} nodes", elapsed, debugNodeCount);
             maxStutter = elapsed.toMSecs();
         }
     }

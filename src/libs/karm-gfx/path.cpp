@@ -177,8 +177,6 @@ void Path::_flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Ve
         current = p;
         ptan = tan;
     }
-
-    //_flattenLineTo(point);
 }
 
 // MARK: Operations --------------------------------------------------------

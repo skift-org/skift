@@ -87,6 +87,7 @@ union Curve {
         auto u = 1 - t;
         auto uu = u * u;
         auto tt = t * t;
+
         return (b - a) * 3 * uu + (c - b) * 6 * u * t + (d - c) * 3 * tt;
     }
 

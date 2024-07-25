@@ -19,7 +19,10 @@ static LcdLayout RGB = {{+0.33, 0.0}, {0.0, 0.0}, {-0.33, 0.0}};
 static LcdLayout BGR = {{-0.33, 0.0}, {0.0, 0.0}, {+0.33, 0.0}};
 static LcdLayout VRGB = {{0.0, +0.33}, {0.0, 0.0}, {0.0, -0.33}};
 
-struct Context {
+struct Context : public Meta::NoCopy {
+    // NOTE: Context is marked as NoCopy because it doesn't make sense to copy
+    // a context. And it's also a good way to prevent accidental copies.
+
     struct Scope {
         Paint paint = Gfx::WHITE;
         Stroke stroke{};

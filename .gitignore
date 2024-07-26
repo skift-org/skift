@@ -10,3 +10,4 @@ skift.iml
 compile_commands.json
 _local/
 *._local
+*.trace

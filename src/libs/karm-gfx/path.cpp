@@ -67,6 +67,7 @@ void Path::_flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Ve
 [[gnu::flatten]] void Path::_flattenQuadraticTo(Math::Vec2f start, Math::Vec2f cp, Math::Vec2f point) {
     auto cp1 = start + ((cp - start) * (2.0f / 3.0f));
     auto cp2 = point + ((cp - point) * (2.0f / 3.0f));
+
     _flattenCubicTo(start, cp1, cp2, point);
 }
 

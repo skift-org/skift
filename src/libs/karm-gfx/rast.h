@@ -71,7 +71,6 @@ struct Rast {
                     auto sample = yy + HALF_UNIT;
 
                     if (edge.bound().top() <= sample and sample < edge.bound().bottom()) {
-
                         _active.pushBack({
                             .x = edge.sx + (sample - edge.sy) / (edge.ey - edge.sy) * (edge.ex - edge.sx),
                             .sign = edge.sy > edge.ey ? 1 : -1,

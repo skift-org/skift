@@ -1,9 +1,20 @@
-#include <karm-ipc/ipc.h>
 #include <karm-sys/entry.h>
+#include <karm-sys/ipc.h>
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
-    auto server = co_try$(Ipc::Server::create(ctx));
+namespace Grund::Net {
+
+Async::Task<> serv(Sys::Context &ctx) {
+    Sys::Ipc ipc = Sys::Ipc::create(ctx);
 
     logInfo("service started");
-    co_return co_trya$(server.runAsync());
+    while (true) {
+        co_trya$(ipc.recvAsync());
+        logDebug("received message from system");
+    }
+}
+
+} // namespace Grund::Net
+
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
+    return Grund::Net::serv(ctx);
 }

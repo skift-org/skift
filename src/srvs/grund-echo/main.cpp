@@ -1,24 +1,25 @@
-#include <grund-echo/api.h>
-#include <karm-ipc/ipc.h>
 #include <karm-sys/entry.h>
+#include <karm-sys/ipc.h>
+
+#include "api.h"
 
 namespace Grund::Echo {
 
-struct Service : public Ipc::Object<Grund::IEcho> {
-    using Ipc::Object<Grund::IEcho>::Object;
-
-    Async::Task<String> echoAsync(String msg) override {
-        co_return msg;
+Async::Task<> serv(Sys::Context &ctx) {
+    Sys::Ipc ipc = Sys::Ipc::create(ctx);
+    while (true) {
+        auto msg = co_trya$(ipc.recvAsync());
+        if (msg.is<Request>()) {
+            auto req = co_try$(msg.unpack<Request>());
+            co_try$(ipc.resp<Request>(msg, Ok(req.msg)));
+        }
     }
-};
+
+    co_return Ok();
+}
 
 } // namespace Grund::Echo
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
-    auto server = co_try$(Ipc::Server::create(ctx));
-    Grund::Echo::Service service{server};
-
-    logInfo("service started");
-
-    co_return co_trya$(server.runAsync());
+    return Grund::Echo::serv(ctx);
 }

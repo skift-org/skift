@@ -1,7 +1,0 @@
-module Grund::Bus
-
-include "karm-sys/async.h"
-
-Bus {
-}
-

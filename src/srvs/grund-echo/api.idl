@@ -1,7 +1,0 @@
-module Grund
-
-include "karm-sys/async.h"
-
-Echo {
-    echoAsync(msg : String) -> Async::Task<String>,
-}

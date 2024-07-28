@@ -1,7 +1,7 @@
 #include <karm-sys/entry.h>
 #include <karm-sys/ipc.h>
 
-namespace Grund::Dhcp {
+namespace Grund::Av {
 
 Async::Task<> serv(Sys::Context &ctx) {
     Sys::Ipc ipc = Sys::Ipc::create(ctx);
@@ -13,8 +13,8 @@ Async::Task<> serv(Sys::Context &ctx) {
     }
 }
 
-} // namespace Grund::Dhcp
+} // namespace Grund::Av
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
-    return Grund::Dhcp::serv(ctx);
+    return Grund::Av::serv(ctx);
 }

@@ -1,18 +1,26 @@
-#include <grund-echo/api.h>
-#include <karm-ipc/ipc.h>
 #include <karm-sys/entry.h>
+#include <karm-sys/ipc.h>
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
-    auto server = co_try$(Ipc::Server::create(ctx));
+#include "../grund-echo/api.h"
+
+namespace Grund::Dns {
+
+Async::Task<> serv(Sys::Context &ctx) {
+    Sys::Ipc ipc = Sys::Ipc::create(ctx);
+
+    logDebug("sending nonsens to system");
+    auto res = co_trya$(ipc.callAsync<Echo::Request>({}, "nonsens"s));
+    logDebug("received response from system: ", res);
 
     logInfo("service started");
+    while (true) {
+        co_trya$(ipc.recvAsync());
+        logDebug("received message from system");
+    }
+}
 
-    logDebug("sending nonsense to system ---------------------------------------");
+} // namespace Grund::Dns
 
-    auto object = Ipc::open<Grund::IEcho>(server, 0);
-    auto res = co_trya$(object->echoAsync("hello"s));
-
-    logDebug("received response from system -----------------------------------");
-
-    co_return co_trya$(server.runAsync());
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
+    return Grund::Dns::serv(ctx);
 }

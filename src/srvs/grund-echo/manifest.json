@@ -2,14 +2,13 @@
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
     "id": "grund-echo",
     "type": "exe",
-    "description": "Repeat incoming messages",
+    "description": "Skift's sample system service",
     "enableIf": {
         "sys": [
             "skift"
         ]
     },
     "requires": [
-        "karm-ipc",
         "karm-sys"
     ]
 }

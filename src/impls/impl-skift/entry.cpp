@@ -2,9 +2,9 @@
 #include <handover/hook.h>
 #include <hjert-api/api.h>
 #include <karm-base/panic.h>
-#include <karm-ipc/hook.h>
 #include <karm-logger/logger.h>
 #include <karm-sys/context.h>
+#include <karm-sys/ipc.h>
 
 #include "fd.h"
 

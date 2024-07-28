@@ -13,7 +13,7 @@ Res<> entryPoint(Sys::Context &ctx) {
 
     auto system = try$(Bus::create(ctx));
 
-    try$(system.prepare("grund-audio"s));
+    try$(system.prepare("grund-av"s));
     try$(system.prepare("grund-conf"s));
     try$(system.prepare("grund-device"s));
     try$(system.prepare("grund-dhcp"s));

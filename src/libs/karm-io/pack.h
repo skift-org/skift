@@ -171,8 +171,9 @@ struct Packer<T> {
 
     static Res<T> unpack(PackScan &s) {
         T res;
-        try$(iterFields(res, [&](auto, auto const &v) {
-            return Io::unpack(s, v);
+        try$(iterFields(res, [&]<typename U>(auto, U &v) -> Res<> {
+            v = try$(Io::unpack<U>(s));
+            return Ok();
         }));
         return Ok(res);
     }

@@ -1,9 +1,0 @@
-{
-    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "karm-ipc",
-    "type": "lib",
-    "description": "Inter-process communication framework",
-    "requires": [
-        "karm-sys"
-    ]
-}

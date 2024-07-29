@@ -20,11 +20,6 @@ struct BlockFlow : public Flow {
         Axis mainAxis = Axis::VERTICAL;
 
         Px res = box.borderBox.start();
-        auto inlineSize = computePreferredBorderSize(
-            ctx,
-            mainAxis.cross(),
-            box.borderBox.width
-        );
 
         for (auto &c : _frags) {
             auto childcontext = ctx.subContext(
@@ -37,6 +32,12 @@ struct BlockFlow : public Flow {
                 childcontext,
                 mainAxis,
                 max(Px{0}, box.borderBox.height - res)
+            );
+
+            auto inlineSize = computePreferredBorderSize(
+                childcontext,
+                mainAxis.cross(),
+                box.borderBox.width
             );
 
             RectPx borderBox = RectPx{

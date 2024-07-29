@@ -9,7 +9,15 @@
 #include <vaev-paint/stack.h>
 #include <vaev-style/computed.h>
 
+#include "box.h"
+#include "context.h"
+
 namespace Vaev::Layout {
+
+enum struct IntrinsicSize {
+    MIN_CONTENT,
+    MAX_CONTENT,
+};
 
 #define FOREACH_TYPE(ITER) \
     ITER(BLOCK)            \
@@ -32,27 +40,22 @@ struct Frag {
     using enum Type;
 
     Strong<Style::Computed> _style;
-
-    RectPx _borderBox;
-    SpacingPx _BorderPadding;
-    SpacingPx _margin;
+    Box _box;
 
     Frag(Strong<Style::Computed> style)
         : _style(style) {
     }
 
     virtual ~Frag() = default;
+
     virtual Type type() const = 0;
 
-    virtual void placeChildren(RectPx bound) {
-        _borderBox = bound;
+    virtual void placeChildren(Context &, Box box) {
+        _box = box;
     }
 
-    virtual Px computeWidth() {
-        return Px{100};
-    }
-
-    virtual Px computeHeight() {
+    virtual Px computeIntrinsicSize(Context &, Axis, IntrinsicSize, Px availableSpace) {
+        (void)availableSpace;
         return Px{100};
     }
 
@@ -60,18 +63,18 @@ struct Frag {
         if (style().backgrounds.len()) {
             Paint::Box box;
             box.backgrounds = style().backgrounds;
-            box.bound = _borderBox;
+            box.bound = _box.borderBox;
             stack.add(makeStrong<Paint::Box>(std::move(box)));
         }
     }
 
     virtual void paintWireframe(Gfx::Context &g) {
         g.strokeStyle({.paint = Gfx::GREEN, .width = 1, .align = Gfx::INSIDE_ALIGN});
-        g.stroke(_borderBox.cast<f64>());
+        g.stroke(_box.borderBox.cast<f64>());
     }
 
     virtual void repr(Io::Emit &e) const {
-        e("({} {})", type(), _borderBox);
+        e("({} {})", type(), _box);
     }
 
     Style::Computed const &style() const {

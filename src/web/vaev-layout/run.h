@@ -20,24 +20,12 @@ struct Run : public Frag {
         return TYPE;
     }
 
-    void placeChildren(RectPx bound) override {
-        Frag::placeChildren(bound);
-    }
-
-    Px computeWidth() override {
-        return Px{_run->layout().width};
-    }
-
-    Px computeHeight() override {
-        return Px{_run->layout().height};
+    Px computeIntrinsicSize(Context &, Axis axis, IntrinsicSize, Px) override {
+        return Px{_run->layout()[axis.index()]};
     }
 
     void makePaintables(Paint::Stack &s) override {
-        s.add(makeStrong<Paint::Text>(_borderBox.topStart().cast<f64>(), _run));
-    }
-
-    void repr(Io::Emit &e) const override {
-        e("({} {})", type(), _borderBox);
+        s.add(makeStrong<Paint::Text>(_box.borderBox.topStart().cast<f64>(), _run));
     }
 };
 

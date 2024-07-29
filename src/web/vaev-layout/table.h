@@ -19,10 +19,6 @@ struct TableFlow : public Flow {
     Type type() const override {
         return TYPE;
     }
-
-    void placeChildren(RectPx bound) override {
-        Flow::placeChildren(bound);
-    }
 };
 
 } // namespace Vaev::Layout

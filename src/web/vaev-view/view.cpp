@@ -1,5 +1,6 @@
 #include <karm-ui/view.h>
 #include <vaev-driver/render.h>
+#include <vaev-layout/sizing.h>
 
 #include "view.h"
 
@@ -86,8 +87,8 @@ struct View : public Ui::View<View> {
         auto [layout, _] = Driver::render(*_dom, media, size.cast<Px>());
 
         return {
-            layout->computeWidth().toInt<isize>(),
-            layout->computeHeight().toInt<isize>(),
+            layout->_box.borderBox.width.toInt<isize>(),
+            layout->_box.borderBox.height.toInt<isize>(),
         };
     }
 };

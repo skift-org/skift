@@ -1,6 +1,7 @@
 #pragma once
 
 #include "flow.h"
+#include "sizing.h"
 
 namespace Vaev::Layout {
 
@@ -40,33 +41,71 @@ struct FlexFlow : public Flow {
         });
     }
 
-    void placeChildren(RectPx bound) override {
-        Frag::placeChildren(bound);
+    void placeChildren(Context &ctx, Box box) override {
+        Frag::placeChildren(ctx, box);
 
         _clear();
         _createItems();
         _sortByOrder();
 
-        Px res = bound.start();
-        auto blockSize = computeHeight();
+        Axis mainAxis = Axis::HORIZONTAL;
+
+        Px res = box.borderBox.start();
+        auto blockSize = computePreferredBorderSize(
+            ctx,
+            mainAxis.cross(),
+            box.borderBox.height
+        );
+
         for (auto &c : _frags) {
-            auto inlineSize = c->computeWidth();
-            c->placeChildren(RectPx{inlineSize, blockSize}.offset({res, bound.top()}));
+            auto childcontext = ctx.subContext(
+                *c,
+                mainAxis,
+                box.borderBox
+            );
+
+            auto inlineSize = computePreferredOuterSize(
+                childcontext, mainAxis,
+                max(Px{0}, box.borderBox.width - res)
+            );
+
+            RectPx borderBox = RectPx{
+                res,
+                box.borderBox.top(),
+                inlineSize,
+                blockSize,
+            };
+
+            auto box = computeBox(childcontext, borderBox);
+            c->placeChildren(childcontext, box);
+
             res += inlineSize;
         }
     }
 
-    Px computeHeight() override {
+    Px computeIntrinsicSize(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px) override {
         Px res = Px{};
-        for (auto &c : _frags)
-            res = max(res, c->computeHeight());
-        return res;
-    }
 
-    Px computeWidth() override {
-        Px res{};
-        for (auto &c : _frags)
-            res += c->computeWidth();
+        for (auto &c : _frags) {
+            auto childCtx = ctx.subContext(
+                *c,
+                axis,
+                Vec2Px::ZERO
+            );
+
+            if (axis == Axis::HORIZONTAL) {
+                auto size = computePreferredOuterSize(childCtx, axis);
+                if (intrinsic == IntrinsicSize::MAX_CONTENT) {
+                    res += size;
+                } else {
+                    res = max(res, size);
+                }
+            } else {
+                auto size = computePreferredOuterSize(childCtx, axis);
+                res = max(res, size);
+            }
+        }
+
         return res;
     }
 };

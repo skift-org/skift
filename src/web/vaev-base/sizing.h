@@ -4,11 +4,12 @@
 
 #include "length.h"
 #include "percent.h"
+#include "writing.h"
 
 namespace Vaev {
 
 // https://www.w3.org/TR/css-sizing-3/#box-sizing
-enum struct BoxSizing {
+enum struct BoxSizing : u8 {
     CONTENT_BOX,
     BORDER_BOX,
 };
@@ -16,7 +17,7 @@ enum struct BoxSizing {
 // https://www.w3.org/TR/css-sizing-3/#propdef-width
 // https://www.w3.org/TR/css-sizing-3/#propdef-height
 struct Size {
-    enum struct Type {
+    enum struct Type : u8 {
         NONE,
         AUTO,
         LENGTH,
@@ -82,11 +83,34 @@ struct Size {
     }
 };
 
-
 struct Sizing {
     Size width, height;
     Size minWidth, minHeight;
     Size maxWidth, maxHeight;
+
+    Size &size(Axis axis) {
+        return axis == Axis::HORIZONTAL ? width : height;
+    }
+
+    Size const size(Axis axis) const {
+        return axis == Axis::HORIZONTAL ? width : height;
+    }
+
+    Size &minSize(Axis axis) {
+        return axis == Axis::HORIZONTAL ? minWidth : minHeight;
+    }
+
+    Size const minSize(Axis axis) const {
+        return axis == Axis::HORIZONTAL ? minWidth : minHeight;
+    }
+
+    Size &maxSize(Axis axis) {
+        return axis == Axis::HORIZONTAL ? maxWidth : maxHeight;
+    }
+
+    Size const maxSize(Axis axis) const {
+        return axis == Axis::HORIZONTAL ? maxWidth : maxHeight;
+    }
 };
 
 } // namespace Vaev

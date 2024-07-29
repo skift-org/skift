@@ -59,7 +59,21 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
 
     Style::Computer computer{media, stylebook};
     auto layoutRoot = Layout::build(computer, dom);
-    layoutRoot->placeChildren(viewport);
+
+    Layout::Viewport vp{.small = viewport};
+    Layout::Context ctx{
+        .viewport = vp,
+        .frag = *layoutRoot,
+        .axis = Axis::VERTICAL,
+        .containingBlock = vp.small,
+        .font = Text::Font::fallback(),
+    };
+
+    Layout::Box containingBox = {
+        .borderBox = vp.small,
+    };
+
+    layoutRoot->placeChildren(ctx, containingBox);
 
     auto paintRoot = makeStrong<Paint::Stack>();
     layoutRoot->makePaintables(*paintRoot);

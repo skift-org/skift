@@ -3,8 +3,6 @@
 #include <karm-base/distinct.h>
 #include <karm-io/emit.h>
 
-#include "base.h"
-
 namespace Vaev {
 
 using Percent = Distinct<f64, struct _PercentTag>;
@@ -58,7 +56,7 @@ struct PercentOr {
     }
 
     constexpr bool resolved() const {
-        return _type == Type::VALUE and _value.resolved();
+        return _type == Type::VALUE;
     }
 
     T value() const {
@@ -71,20 +69,6 @@ struct PercentOr {
         if (_type == Type::VALUE)
             panic("cannot get percent of value");
         return _percent;
-    }
-};
-
-template <typename T>
-struct ValueContext<PercentOr<T>> : public ValueContext<T> {
-    using Resolved = ValueContext<T>::Resolved;
-
-    T percentRelative;
-
-    Resolved resolve(PercentOr<T> value) {
-        if (value == PercentOr<T>::Type::PERCENT) {
-            return {percentRelative * (value.percent().value() / 100.)};
-        }
-        return ValueContext<T>::resolve(value.value());
     }
 };
 

@@ -25,11 +25,11 @@ struct Flow : public Frag {
         _frags.pushBack(frag);
     }
 
-    void placeChildren(RectPx bound) override {
-        Frag::placeChildren(bound);
+    void placeChildren(Context &ctx, Box box) override {
+        Frag::placeChildren(ctx, box);
 
         for (auto &c : _frags) {
-            c->placeChildren(bound);
+            c->placeChildren(ctx, box);
         }
     }
 
@@ -51,11 +51,11 @@ struct Flow : public Frag {
             .width = 1,
             .align = Gfx::INSIDE_ALIGN,
         });
-        g.stroke(_borderBox.cast<f64>());
+        g.stroke(_box.borderBox.cast<f64>());
     }
 
     void repr(Io::Emit &e) const override {
-        e("({} {}", type(), _borderBox);
+        e("({} {}", type(), _box.borderBox);
         if (_frags) {
             e.indentNewline();
             for (auto &c : _frags) {

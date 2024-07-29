@@ -13,18 +13,14 @@ struct Width {
 
     using enum Type;
 
-    Type type = Type::VALUE;
+    Type type;
     PercentOr<Length> value;
-
-    constexpr Width()
-        : Width(Percent{}) {
-    }
 
     constexpr Width(Type type)
         : type(type) {
     }
 
-    constexpr Width(PercentOr<Length> percent)
+    constexpr Width(PercentOr<Length> percent = {})
         : type(Type::VALUE), value(percent) {
     }
 

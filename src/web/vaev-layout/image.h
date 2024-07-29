@@ -19,10 +19,6 @@ struct ImageFrag : public Frag {
         return TYPE;
     }
 
-    void placeChildren(RectPx bound) override {
-        Frag::placeChildren(bound);
-    }
-
     void makePaintables(Paint::Stack &) override {}
 };
 

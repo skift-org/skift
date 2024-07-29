@@ -20,6 +20,11 @@ struct Run : public Frag {
         return TYPE;
     }
 
+    void placeChildren(Context &ctx, Box box) override {
+        Frag::placeChildren(ctx, box);
+        _run->layout();
+    }
+
     Px computeIntrinsicSize(Context &, Axis axis, IntrinsicSize, Px) override {
         return Px{_run->layout()[axis.index()]};
     }

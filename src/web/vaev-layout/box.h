@@ -15,6 +15,14 @@ struct Box {
         e("(box paddings: {} borders: {} borderBox: {} margins: {} radius: {})",
           paddings, borders, borderBox, margins, radius);
     }
+
+    RectPx paddingBox() const {
+        return borders.shrink(Math::Flow::LEFT_TO_RIGHT, borderBox);
+    }
+
+    RectPx contentBox() const {
+        return paddings.shrink(Math::Flow::LEFT_TO_RIGHT, paddingBox());
+    }
 };
 
 } // namespace Vaev::Layout

@@ -33,24 +33,24 @@ struct InlineFlow : public Flow {
         auto blockSize = computePreferredBorderSize(
             ctx,
             mainAxis.cross(),
-            box.borderBox.height
+            box.contentBox().height
         );
 
         for (auto &c : _frags) {
             auto childCtx = ctx.subContext(
                 *c,
                 mainAxis,
-                box.borderBox
+                box.contentBox()
             );
 
             auto inlineSize = computePreferredOuterSize(
                 childCtx, mainAxis,
-                box.borderBox.width - res
+                box.contentBox().width - res
             );
 
             RectPx borderBox = RectPx{
                 res,
-                box.borderBox.top(),
+                box.contentBox().top(),
                 inlineSize,
                 blockSize,
             };

@@ -50,28 +50,28 @@ struct FlexFlow : public Flow {
 
         Axis mainAxis = Axis::HORIZONTAL;
 
-        Px res = box.borderBox.start();
+        Px res = box.contentBox().start();
         auto blockSize = computePreferredBorderSize(
             ctx,
             mainAxis.cross(),
-            box.borderBox.height
+            box.contentBox().height
         );
 
         for (auto &c : _frags) {
             auto childcontext = ctx.subContext(
                 *c,
                 mainAxis,
-                box.borderBox
+                box.contentBox()
             );
 
             auto inlineSize = computePreferredOuterSize(
                 childcontext, mainAxis,
-                max(Px{0}, box.borderBox.width - res)
+                max(Px{0}, box.contentBox().width - res)
             );
 
             RectPx borderBox = RectPx{
                 res,
-                box.borderBox.top(),
+                box.contentBox().top(),
                 inlineSize,
                 blockSize,
             };

@@ -8,6 +8,7 @@
 // https://pomax.github.io/bezierinfo/#offsetting
 // https://gasiulis.name/cubic-curve-offsetting/
 
+#include "tri.h"
 #include "vec.h"
 
 namespace Karm::Math {
@@ -27,31 +28,31 @@ union Curve {
 
     Array<Vec2<T>, 4> _pts;
 
-    Curve()
+    constexpr Curve()
         : _els{} {}
 
-    Curve(Vec2<T> a, Vec2<T> b, Vec2<T> c, Vec2<T> d)
+    constexpr Curve(Vec2<T> a, Vec2<T> b, Vec2<T> c, Vec2<T> d)
         : a(a), b(b), c(c), d(d) {}
 
-    static Curve cubic(Vec2<T> a, Vec2<T> b, Vec2<T> c, Vec2<T> d) {
+    static constexpr Curve cubic(Vec2<T> a, Vec2<T> b, Vec2<T> c, Vec2<T> d) {
         return {a, b, c, d};
     }
 
-    static Curve quadratic(Vec2<T> a, Vec2<T> b, Vec2<T> c) {
+    static constexpr Curve quadratic(Vec2<T> a, Vec2<T> b, Vec2<T> c) {
         return {a, a * 2 / 3 + b / 3, c * 2 / 3 + b / 3, c};
     }
 
-    static Curve linear(Vec2<T> a, Vec2<T> b) {
+    static constexpr Curve linear(Vec2<T> a, Vec2<T> b) {
         return quadratic(a, (a + b) / 2, b);
     }
 
-    bool degenerated(T epsilon = Limits<T>::EPSILON) const {
+    constexpr bool degenerated(T epsilon = Limits<T>::EPSILON) const {
         return epsilonEq(a, b, epsilon) and
                epsilonEq(b, c, epsilon) and
                epsilonEq(c, d, epsilon);
     }
 
-    bool straight(T epsilon = Limits<T>::EPSILON) const {
+    constexpr bool straight(T epsilon = Limits<T>::EPSILON) const {
         auto minx = min(ax, dy);
         auto miny = min(ay, dy);
         auto maxx = max(ax, dx);
@@ -73,7 +74,15 @@ union Curve {
             epsilonEq(Tri2(a, c, d).turn(), 0.0, epsilon);
     }
 
-    Vec2<T> eval(T t) const {
+    constexpr bool straightish(T tolerance) {
+        auto d1 = d - a;
+        auto d2 = Math::abs((b.x - d.x) * d1.y - (b.y - d.y) * d1.x);
+        auto d3 = Math::abs((c.x - d.x) * d1.y - (c.y - d.y) * d1.x);
+
+        return (d2 + d3) * (d2 + d3) < tolerance * (d1.x * d1.x + d1.y * d1.y);
+    }
+
+    constexpr Vec2<T> eval(T t) const {
         auto u = 1 - t;
         auto uu = u * u;
         auto uuu = uu * u;
@@ -83,7 +92,7 @@ union Curve {
         return a * uuu + b * 3 * uu * t + c * 3 * u * tt + d * ttt;
     }
 
-    Vec2<T> derivative(T t) const {
+    constexpr Vec2<T> derivative(T t) const {
         auto u = 1 - t;
         auto uu = u * u;
         auto tt = t * t;
@@ -91,16 +100,17 @@ union Curve {
         return (b - a) * 3 * uu + (c - b) * 6 * u * t + (d - c) * 3 * tt;
     }
 
-    Vec2<T> derivative2(T t) const {
+    constexpr Vec2<T> derivative2(T t) const {
         auto u = 1 - t;
+
         return (c - b) * 6 * u + (d - c) * 6 * t;
     }
 
-    Vec2<T> normal(T t) const {
+    constexpr Vec2<T> normal(T t) const {
         return derivative(t).normal();
     }
 
-    Curve offset(T offset) const {
+    constexpr Curve offset(T offset) const {
         Vec2<T> d1 = b - a;
         Vec2<T> d2 = c - d;
         auto div = d1.cross(d2);
@@ -124,13 +134,27 @@ union Curve {
         auto a = bxby.cross(d2) / div;
         auto b = d1.cross(bxby) / div;
 
-        Vec2<T> p1(p0.x + a * d1.x, p0.y + a * d1.y);
-        Vec2<T> p2(p3.x + b * d2.x, p3.y + b * d2.y);
+        Vec2<T> p1{p0.x + a * d1.x, p0.y + a * d1.y};
+        Vec2<T> p2{p3.x + b * d2.x, p3.y + b * d2.y};
 
         return {p0, p1, p2, p3};
     }
 
-    Curve offset2(T offset) const {
+    constexpr Pair<Curve> split(T t = 0.5) const {
+        auto e = (a + b) * t;
+        auto f = (b + c) * t;
+        auto g = (c + d) * t;
+        auto h = (e + f) * t;
+        auto j = (f + g) * t;
+        auto k = (h + j) * t;
+
+        return {
+            {a, e, h, k},
+            {k, j, g, d},
+        };
+    }
+
+    constexpr Curve offset2(T offset) const {
         Curve res;
         for (usize i = 0; i < 4; i++)
             res._pts[i] = _pts[i] + normal(i / 3.0).unit() * offset;

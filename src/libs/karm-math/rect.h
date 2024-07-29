@@ -268,6 +268,10 @@ union Rect {
     always_inline T area() const {
         return width * height;
     }
+
+    always_inline T aspect() const {
+        return width / height;
+    }
 };
 
 template <typename T>
@@ -288,4 +292,4 @@ using Rectf = Rect<f64>;
 } // namespace Karm::Math
 
 template <typename T>
-ReflectableTemplate$(Math::Rect<T>, x, y, width, height);
+ReflectableTemplate$(Karm::Math::Rect<T>, x, y, width, height);

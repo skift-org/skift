@@ -24,17 +24,16 @@ struct Flow {
 
     _Flow _flow{};
 
-    Flow() = default;
+    constexpr Flow(_Flow flow = LEFT_TO_RIGHT)
+        : _flow(flow) {}
 
-    Flow(_Flow flow) : _flow(flow) {}
-
-    Orien orien() const {
+    constexpr Orien orien() const {
         return (_flow == LEFT_TO_RIGHT or _flow == RIGHT_TO_LEFT)
                    ? Orien::HORIZONTAL
                    : Orien::VERTICAL;
     }
 
-    Flow relative(Flow child) const {
+    constexpr Flow relative(Flow child) const {
         Flow table[4 * 4] = {
             LEFT_TO_RIGHT,
             RIGHT_TO_LEFT,

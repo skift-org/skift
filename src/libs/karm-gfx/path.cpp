@@ -1,4 +1,5 @@
 #include <karm-logger/logger.h>
+#include <karm-math/curve.h>
 
 #include "path.h"
 
@@ -19,10 +20,6 @@ void Path::_flattenClose() {
 }
 
 [[gnu::flatten]] void Path::_flattenLineTo(Math::Vec2f p) {
-    _flattenLineToNoTrans(p);
-}
-
-void Path::_flattenLineToNoTrans(Math::Vec2f p) {
     if (not _contours.len()) {
         logError("path: move to must be called before line to");
         return;
@@ -37,42 +34,22 @@ void Path::_flattenLineToNoTrans(Math::Vec2f p) {
     last(_contours).end++;
 }
 
-void Path::_flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d, isize depth) {
-    isize const MAX_DEPTH = 16;
-    f64 const TOLERANCE = 0.25;
-
-    if (depth > MAX_DEPTH)
+void Path::_flattenCurveTo(Math::Curvef curve, isize depth) {
+    if (depth > 16)
         return;
 
-    auto d1 = d - a;
-    auto d2 = Math::abs((b.x - d.x) * d1.y - (b.y - d.y) * d1.x);
-    auto d3 = Math::abs((c.x - d.x) * d1.y - (c.y - d.y) * d1.x);
-
-    if ((d2 + d3) * (d2 + d3) < TOLERANCE * (d1.x * d1.x + d1.y * d1.y)) {
-        _flattenLineToNoTrans(d);
+    if (curve.straightish(0.25)) {
+        _flattenLineTo(curve.d);
         return;
     }
 
-    auto ab = (a + b) / 2;
-    auto bc = (b + c) / 2;
-    auto cd = (c + d) / 2;
-    auto abc = (ab + bc) / 2;
-    auto bcd = (bc + cd) / 2;
-    auto abcd = (abc + bcd) / 2;
-
-    _flattenCubicTo(a, ab, abc, abcd, depth + 1);
-    _flattenCubicTo(abcd, bcd, cd, d, depth + 1);
-}
-
-[[gnu::flatten]] void Path::_flattenQuadraticTo(Math::Vec2f start, Math::Vec2f cp, Math::Vec2f point) {
-    auto cp1 = start + ((cp - start) * (2.0f / 3.0f));
-    auto cp2 = point + ((cp - point) * (2.0f / 3.0f));
-
-    _flattenCubicTo(start, cp1, cp2, point);
+    auto [left, right] = curve.split(0.5);
+    _flattenCurveTo(left, depth + 1);
+    _flattenCurveTo(right, depth + 1);
 }
 
 [[gnu::flatten]] void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radius, f64 angle, Flags flags, Math::Vec2f point) {
-    // Ported from canvg (https://code.google.com/p/canvg/)
+    // Ported from canvg (https://github.com/canvg/canvg)
     f64 x1 = start.x;
     f64 y1 = start.y;
     f64 x2 = point.x;
@@ -171,9 +148,8 @@ void Path::_flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Ve
         Math::Vec2f p = t.apply(Math::Vec2f{dx * radius.x, dy * radius.y});
         Math::Vec2f tan = t.applyVector({-dy * radius.x * kappa, dx * radius.y * kappa});
 
-        if (i > 0) {
-            _flattenCubicTo(current, current + ptan, p - tan, p);
-        }
+        if (i > 0)
+            _flattenCurveTo(Math::Curvef::cubic(current, current + ptan, p - tan, p));
 
         current = p;
         ptan = tan;
@@ -232,15 +208,13 @@ void Path::evalOp(Op op) {
     case CUBIC_TO:
         if (op.flags & SMOOTH)
             op.cp1 = _lastP * 2 - _lastCp;
-
-        _flattenCubicTo(_lastP, op.cp1, op.cp2, op.p);
+        _flattenCurveTo(Math::Curvef::cubic(_lastP, op.cp1, op.cp2, op.p));
         break;
 
     case QUAD_TO:
         if (op.flags & SMOOTH)
             op.cp2 = _lastP * 2 - _lastCp;
-
-        _flattenQuadraticTo(_lastP, op.cp2, op.p);
+        _flattenCurveTo(Math::Curvef::quadratic(_lastP, op.cp2, op.p));
         break;
 
     case ARC_TO:

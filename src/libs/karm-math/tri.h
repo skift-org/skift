@@ -48,4 +48,11 @@ union Tri2 {
     }
 };
 
+using Tri2i = Tri2<isize>;
+using Tri2u = Tri2<usize>;
+using Tri2f = Tri2<f64>;
+
 } // namespace Karm::Math
+
+template <typename T>
+ReflectableTemplate$(Karm::Math::Tri2<T>, a, b, c);

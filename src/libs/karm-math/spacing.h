@@ -67,3 +67,6 @@ using Spacingi = Spacing<isize>;
 using Spacingf = Spacing<f64>;
 
 } // namespace Karm::Math
+
+template <typename T>
+ReflectableTemplate$(Karm::Math::Spacing<T>, start, top, end, bottom);

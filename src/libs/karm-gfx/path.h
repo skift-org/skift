@@ -105,11 +105,7 @@ struct Path {
 
     void _flattenLineTo(Math::Vec2f p);
 
-    void _flattenLineToNoTrans(Math::Vec2f p);
-
-    void _flattenCubicTo(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2f d, isize depth = 0);
-
-    void _flattenQuadraticTo(Math::Vec2f start, Math::Vec2f cp, Math::Vec2f point);
+    void _flattenCurveTo(Math::Curvef c, isize depth = 0);
 
     void _flattenArcTo(Math::Vec2f start, Math::Vec2f radius, f64 angle, Flags flags, Math::Vec2f point);
 

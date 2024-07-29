@@ -97,3 +97,6 @@ using Radiusi = Radius<isize>;
 using Radiusf = Radius<f64>;
 
 } // namespace Karm::Math
+
+template <typename T>
+ReflectableTemplate$(Karm::Math::Radius<T>, a, b, c, d, e, f, g, h);

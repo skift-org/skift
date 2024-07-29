@@ -26,8 +26,11 @@ Px allInsets(Context &ctx, Axis axis) {
         res += computeInset(ctx, axis, style.padding->start);
         res += computeInset(ctx, axis, style.padding->end);
 
-        res += computeInset(ctx, axis, style.borders->start.width);
-        res += computeInset(ctx, axis, style.borders->end.width);
+        if (style.borders->start.style != BorderStyle::NONE)
+            res += computeInset(ctx, axis, style.borders->start.width);
+
+        if (style.borders->end.style != BorderStyle::NONE)
+            res += computeInset(ctx, axis, style.borders->end.width);
 
         res += computeInset(ctx, axis, style.margin->start);
         res += computeInset(ctx, axis, style.margin->end);
@@ -35,8 +38,11 @@ Px allInsets(Context &ctx, Axis axis) {
         res += computeInset(ctx, axis, style.padding->top);
         res += computeInset(ctx, axis, style.padding->bottom);
 
-        res += computeInset(ctx, axis, style.borders->top.width);
-        res += computeInset(ctx, axis, style.borders->bottom.width);
+        if (style.borders->top.style != BorderStyle::NONE)
+            res += computeInset(ctx, axis, style.borders->top.width);
+
+        if (style.borders->bottom.style != BorderStyle::NONE)
+            res += computeInset(ctx, axis, style.borders->bottom.width);
 
         res += computeInset(ctx, axis, style.margin->top);
         res += computeInset(ctx, axis, style.margin->bottom);
@@ -97,14 +103,20 @@ Px computeSpecifiedSize(Context &ctx, Axis axis, Size size, Px availableSpace) {
         res += max(Px{0}, computeInset(ctx, axis, style.padding->start));
         res += max(Px{0}, computeInset(ctx, axis, style.padding->end));
 
-        res += max(Px{0}, computeInset(ctx, axis, style.borders->start.width));
-        res += max(Px{0}, computeInset(ctx, axis, style.borders->end.width));
+        if (style.borders->start.style != BorderStyle::NONE)
+            res += max(Px{0}, computeInset(ctx, axis, style.borders->start.width));
+
+        if (style.borders->end.style != BorderStyle::NONE)
+            res += max(Px{0}, computeInset(ctx, axis, style.borders->end.width));
     } else {
         res += max(Px{0}, computeInset(ctx, axis, style.padding->top));
         res += max(Px{0}, computeInset(ctx, axis, style.padding->bottom));
 
-        res += max(Px{0}, computeInset(ctx, axis, style.borders->top.width));
-        res += max(Px{0}, computeInset(ctx, axis, style.borders->bottom.width));
+        if (style.borders->top.style != BorderStyle::NONE)
+            res += max(Px{0}, computeInset(ctx, axis, style.borders->top.width));
+
+        if (style.borders->bottom.style != BorderStyle::NONE)
+            res += max(Px{0}, computeInset(ctx, axis, style.borders->bottom.width));
     }
 
     return res;
@@ -150,14 +162,20 @@ Px computePreferredBorderSize(Context &ctx, Axis axis, Px availableSpace) {
         res += computeInset(ctx, axis, style.padding->start);
         res += computeInset(ctx, axis, style.padding->end);
 
-        res += computeInset(ctx, axis, style.borders->start.width);
-        res += computeInset(ctx, axis, style.borders->end.width);
+        if (style.borders->start.style != BorderStyle::NONE)
+            res += computeInset(ctx, axis, style.borders->start.width);
+
+        if (style.borders->end.style != BorderStyle::NONE)
+            res += computeInset(ctx, axis, style.borders->end.width);
     } else {
         res += computeInset(ctx, axis, style.padding->top);
         res += computeInset(ctx, axis, style.padding->bottom);
 
-        res += computeInset(ctx, axis, style.borders->top.width);
-        res += computeInset(ctx, axis, style.borders->bottom.width);
+        if (style.borders->top.style != BorderStyle::NONE)
+            res += computeInset(ctx, axis, style.borders->top.width);
+
+        if (style.borders->bottom.style != BorderStyle::NONE)
+            res += computeInset(ctx, axis, style.borders->bottom.width);
     }
 
     return res;
@@ -189,10 +207,17 @@ Box computeBox(Context &ctx, RectPx borderBox) {
     res.paddings.bottom = computeInset(ctx, Axis::VERTICAL, ctx.style().padding->bottom);
     res.paddings.start = computeInset(ctx, Axis::HORIZONTAL, ctx.style().padding->start);
 
-    res.borders.top = computeInset(ctx, Axis::VERTICAL, ctx.style().borders->top.width);
-    res.borders.end = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->end.width);
-    res.borders.bottom = computeInset(ctx, Axis::VERTICAL, ctx.style().borders->bottom.width);
-    res.borders.start = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->start.width);
+    if (ctx.style().borders->top.style != BorderStyle::NONE)
+        res.borders.top = computeInset(ctx, Axis::VERTICAL, ctx.style().borders->top.width);
+
+    if (ctx.style().borders->end.style != BorderStyle::NONE)
+        res.borders.end = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->end.width);
+
+    if (ctx.style().borders->bottom.style != BorderStyle::NONE)
+        res.borders.bottom = computeInset(ctx, Axis::VERTICAL, ctx.style().borders->bottom.width);
+
+    if (ctx.style().borders->start.style != BorderStyle::NONE)
+        res.borders.start = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->start.width);
 
     res.borderBox = borderBox;
 

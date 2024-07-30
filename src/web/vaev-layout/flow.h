@@ -25,47 +25,13 @@ struct Flow : public Frag {
         _frags.pushBack(frag);
     }
 
-    void placeChildren(Context &ctx, Box box) override {
-        Frag::placeChildren(ctx, box);
+    void placeChildren(Context &ctx, Box box) override;
 
-        for (auto &c : _frags) {
-            c->placeChildren(ctx, box);
-        }
-    }
+    void makePaintables(Paint::Stack &stack) override;
 
-    void makePaintables(Paint::Stack &stack) override {
-        Frag::makePaintables(stack);
+    void paintWireframe(Gfx::Context &g) override;
 
-        for (auto &c : _frags) {
-            c->makePaintables(stack);
-        }
-    }
-
-    void paintWireframe(Gfx::Context &g) override {
-        for (auto &c : _frags) {
-            c->paintWireframe(g);
-        }
-
-        g.strokeStyle({
-            .paint = Gfx::BLACK,
-            .width = 1,
-            .align = Gfx::INSIDE_ALIGN,
-        });
-        g.stroke(_box.borderBox.cast<f64>());
-    }
-
-    void repr(Io::Emit &e) const override {
-        e("({} {}", type(), _box.borderBox);
-        if (_frags) {
-            e.indentNewline();
-            for (auto &c : _frags) {
-                c->repr(e);
-                e.newline();
-            }
-            e.deindent();
-        }
-        e(")");
-    }
+    void repr(Io::Emit &e) const override;
 };
 
 } // namespace Vaev::Layout

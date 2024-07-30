@@ -73,4 +73,5 @@ test$("karm-base-promise-multiple-futures") {
 
     return Ok();
 }
+
 } // namespace Karm::Base::Tests

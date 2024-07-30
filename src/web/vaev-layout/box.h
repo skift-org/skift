@@ -23,6 +23,10 @@ struct Box {
     RectPx contentBox() const {
         return paddings.shrink(Math::Flow::LEFT_TO_RIGHT, paddingBox());
     }
+
+    RectPx marginBox() const {
+        return margins.grow(Math::Flow::LEFT_TO_RIGHT, borderBox);
+    }
 };
 
 } // namespace Vaev::Layout

@@ -233,9 +233,9 @@ using i8f24 = _Fixed<i32, 24>;
 
 template <typename T, usize F>
 struct Karm::Limits<Math::_Fixed<T, F>> {
-    static constexpr long double MIN = Math::_Fixed<T, F>::fromRaw(0);
-    static constexpr long double MAX = Math::_Fixed<T, F>::fromRaw(Limits<T>::MAX);
-    static constexpr long double EPSILON = Math::_Fixed<T, F>::fromRaw(1);
+    static constexpr Math::_Fixed<T, F> MIN = Math::_Fixed<T, F>::fromRaw(0);
+    static constexpr Math::_Fixed<T, F> MAX = Math::_Fixed<T, F>::fromRaw(Limits<T>::MAX);
+    static constexpr Math::_Fixed<T, F> EPSILON = Math::_Fixed<T, F>::fromRaw(1);
     static constexpr bool SIGNED = false;
 };
 

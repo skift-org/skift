@@ -103,7 +103,7 @@ struct Map {
     }
 
     auto iter() {
-        return mutIter(_els);
+        return ::iter(_els);
     }
 
     auto iter() const {

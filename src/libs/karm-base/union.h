@@ -180,9 +180,7 @@ struct Union {
         return false;
     }
 
-    std::partial_ordering operator<=>(Union const &other) const
-        requires(Meta::Comparable<Ts> && ...)
-    {
+    std::partial_ordering operator<=>(Union const &other) const {
         if (_index == other._index)
             return visit(
                 [&]<typename T>(T const &ptr)
@@ -194,9 +192,7 @@ struct Union {
         return std::partial_ordering::unordered;
     }
 
-    bool operator==(Union const &other) const
-        requires(Meta::Equatable<Ts> && ...)
-    {
+    bool operator==(Union const &other) const {
         if (_index == other._index)
             return visit(
                 [&]<typename T>(T const &ptr) {

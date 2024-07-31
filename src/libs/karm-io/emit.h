@@ -113,7 +113,7 @@ struct Emit : public Io::TextWriterBase<> {
     Res<usize> flush() override {
         try$(_error);
         if (_newline)
-            _tryWrapper(_writer.writeRune('\n'));
+            try$(_insertNewline());
         return Ok(_total);
     }
 };

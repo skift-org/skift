@@ -39,179 +39,81 @@ enum struct TextRenderMode {
 struct Graphic {
     Io::Emit &e;
 
-    // Graphics state operators
+    // MARK: Graphics state operators ------------------------------------------
 
-    void save() {
-        e("q");
-    }
+    void save();
 
-    void restore() {
-        e("Q");
-    }
+    void restore();
 
-    void transform(Math::Trans2f t) {
-        e(t.xx);
-        e(' ');
-        e(t.xy);
-        e(' ');
-        e(t.yx);
-        e(' ');
-        e(t.yy);
-        e(' ');
-        e(t.ox);
-        e(' ');
-        e(t.oy);
-        e(" cm");
-    }
+    void transform(Math::Trans2f t);
 
-    void lineWidth(f64 w) {
-        e("{} w", w);
-    }
+    void lineWidth(f64 w);
 
-    void lineCap(LineCap cap) {
-        e("{} J", toUnderlyingType(cap));
-    }
+    void lineCap(LineCap cap);
 
-    void lineJoin(LineJoin join) {
-        e("{} j", toUnderlyingType(join));
-    }
+    void lineJoin(LineJoin join);
 
-    void miterLimit(f64 m) {
-        e("{} M", m);
-    }
+    void miterLimit(f64 m);
 
-    void dash(Slice<f64> const &d, f64 o) {
-        e("[");
-        for (usize i = 0; i < d.len(); ++i) {
-            if (i > 0) {
-                e(' ');
-            }
-            e(d[i]);
-        }
-        e("] ");
-        e(o);
-        e(" d");
-    }
+    void dash(Slice<f64> const &d, f64 o);
 
-    // Path construction operators
+    // MARK: Path construction operators ---------------------------------------
 
-    void moveTo(Math::Vec2f p) {
-        e("{} {} m", p.x, p.y);
-    }
+    void moveTo(Math::Vec2f p);
 
-    void lineTo(Math::Vec2f p) {
-        e("{} {} l", p.x, p.y);
-    }
+    void lineTo(Math::Vec2f p);
 
-    void curveTo(Math::Vec2f c1, Math::Vec2f c2, Math::Vec2f p) {
-        e("{} {} {} {} {} {} c", c1.x, c1.y, c2.x, c2.y, p.x, p.y);
-    }
+    void curveTo(Math::Vec2f c1, Math::Vec2f c2, Math::Vec2f p);
 
-    void closePath() {
-        e("h");
-    }
+    void closePath();
 
-    void rectangle(Math::Rectf r) {
-        e("{} {} {} {} re", r.x, r.y, r.width, r.height);
-    }
+    void rectangle(Math::Rectf r);
 
-    // Path painting operators
+    // MARK: Path painting operators -------------------------------------------
 
-    void stroke() {
-        e("S");
-    }
+    void stroke();
 
-    void closeStroke() {
-        e("s");
-    }
+    void closeStroke();
 
-    void fill(FillRule rule = FillRule::NONZERO) {
-        if (rule == FillRule::NONZERO) {
-            e("f");
-        } else {
-            e("f*");
-        }
-    }
+    void fill(FillRule rule = FillRule::NONZERO);
 
-    void fillStroke(FillRule rule = FillRule::NONZERO) {
-        if (rule == FillRule::NONZERO) {
-            e("B");
-        } else {
-            e("B*");
-        }
-    }
+    void fillStroke(FillRule rule = FillRule::NONZERO);
 
-    void closeFillStroke(FillRule rule = FillRule::NONZERO) {
-        if (rule == FillRule::NONZERO) {
-            e("b");
-        } else {
-            e("b*");
-        }
-    }
+    void closeFillStroke(FillRule rule = FillRule::NONZERO);
 
-    void endPath() {
-        e("n");
-    }
+    void endPath();
 
-    // Clipping path operators
+    // MARK: Clipping path operators -------------------------------------------
 
-    void clip(FillRule rule = FillRule::NONZERO) {
-        if (rule == FillRule::NONZERO) {
-            e("W");
-        } else {
-            e("W*");
-        }
-    }
+    void clip(FillRule rule = FillRule::NONZERO);
 
-    // Text object operators
+    // MARK: Text object operators ---------------------------------------------
 
-    void beginText() {
-        e("BT");
-    }
+    void beginText();
 
-    void endText() {
-        e("ET");
-    }
+    void endText();
 
-    // Text state operators
+    // MARK: Text state operators ----------------------------------------------
 
-    void charSpacing(f64 s) {
-        e("{} Tc", s);
-    }
+    void charSpacing(f64 s);
 
-    void wordSpacing(f64 s) {
-        e("{} Tw", s);
-    }
+    void wordSpacing(f64 s);
 
-    void horizScaling(f64 s) {
-        e("{} Tz", s);
-    }
+    void horizScaling(f64 s);
 
-    void textLeading(f64 l) {
-        e("{} TL", l);
-    }
+    void textLeading(f64 l);
 
-    void fontSize(Name const &font, f64 size) {
-        e("/{} {} Tf", font.value, size);
-    }
+    void fontSize(Name const &font, f64 size);
 
-    void textRenderMode(TextRenderMode mode) {
-        e("{} Tr", toUnderlyingType(mode));
-    }
+    void textRenderMode(TextRenderMode mode);
 
-    void rise(f64 r) {
-        e("{} Ts", r);
-    }
+    void rise(f64 r);
 
-    // Text-positioning operators
+    // MARK: Text-positioning operators ----------------------------------------
 
-    void moveText(Math::Vec2f p) {
-        e("{} {} Td", p.x, p.y);
-    }
+    void moveText(Math::Vec2f p);
 
-    void moveTextSet(Math::Vec2f p) {
-        e("{} {} Tm", p.x, p.y);
-    }
+    void moveTextSet(Math::Vec2f p);
 };
 
 } // namespace Pdf

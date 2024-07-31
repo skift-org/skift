@@ -700,7 +700,7 @@ struct MarginRightProp {
     static constexpr Width initial() { return Length{}; }
 
     void apply(Computed &c) const {
-        c.margin.cow().start = value;
+        c.margin.cow().end = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -734,7 +734,7 @@ struct MarginLeftProp {
     static Width initial() { return Length{}; }
 
     void apply(Computed &c) const {
-        c.margin.cow().end = value;
+        c.margin.cow().start = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -870,7 +870,7 @@ struct PaddingRightProp {
     static Length initial() { return Length{}; }
 
     void apply(Computed &c) const {
-        c.padding.cow().start = value;
+        c.padding.cow().end = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -904,7 +904,7 @@ struct PaddingLeftProp {
     static Length initial() { return {}; }
 
     void apply(Computed &c) const {
-        c.padding.cow().end = value;
+        c.padding.cow().start = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {

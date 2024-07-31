@@ -118,8 +118,6 @@ struct Kmm : public Hal::Kmm {
 static Opt<Pmm> _pmm = NONE;
 static Opt<Kmm> _kmm = NONE;
 
-namespace Mem {
-
 Hal::PmmRange _findBitmapSpace(Handover::Payload &payload, usize bitmapSize) {
     for (auto &record : payload) {
         if (record.tag != Handover::Tag::FREE)
@@ -135,7 +133,7 @@ Hal::PmmRange _findBitmapSpace(Handover::Payload &payload, usize bitmapSize) {
     logFatal("mem: no usable memory for bitmap");
 }
 
-Res<> init(Handover::Payload &payload) {
+Res<> initMem(Handover::Payload &payload) {
     auto usableRange = payload.usableRange<Hal::PmmRange>();
 
     if (usableRange.empty()) {
@@ -215,8 +213,6 @@ Res<> init(Handover::Payload &payload) {
 
     return Ok();
 }
-
-} // namespace Mem
 
 Hal::Pmm &pmm() {
     if (not _pmm)

@@ -18,7 +18,7 @@ Res<Strong<Task>> Task::create(
 }
 
 Task &Task::self() {
-    return *Sched::instance()._curr;
+    return *globalSched()._curr;
 }
 
 Task::Task(
@@ -57,8 +57,8 @@ Res<> Task::ready(usize ip, usize sp, Hj::Args args) {
 }
 
 Res<> Task::block(Blocker blocker) {
-    // NOTE: Can't use ObjectLockScope here because we need to yield
-    //       outside of the lock.
+    // NOTE: Can't use ObjectLockScope here because
+    //       we need to yield outside of the lock.
     _lock.acquire();
     _block = std::move(blocker);
     _lock.release();
@@ -107,8 +107,8 @@ void Task::enter(Mode mode) {
 }
 
 void Task::leave() {
-    // NOTE: Can't use ObjectLockScope here because we need to yield
-    //       outside of the lock.
+    // NOTE: Can't use ObjectLockScope here because
+    //       we need to yield outside of the lock.
     _lock.acquire();
     _mode = Mode::USER;
     bool yield = _ret();

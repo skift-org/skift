@@ -11,6 +11,8 @@ using namespace Grund::Bus;
 Res<> entryPoint(Sys::Context &ctx) {
     try$(Hj::Task::self().label("grund-bus"));
 
+    logInfo("skiftOS " stringify$(__ck_version_value));
+
     auto system = try$(Bus::create(ctx));
 
     try$(system.prepare("grund-av"s));

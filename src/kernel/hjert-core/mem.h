@@ -7,11 +7,7 @@
 
 namespace Hjert::Core {
 
-namespace Mem {
-
-Res<> init(Handover::Payload &);
-
-} // namespace Mem
+Res<> initMem(Handover::Payload &);
 
 Hal::Kmm &kmm();
 

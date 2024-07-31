@@ -111,16 +111,19 @@ Res<> enterUserspace(Handover::Payload &payload) {
     task->label("init-task");
 
     try$(task->ready(image.header().entry, stackRange.end(), {handoverRange.start}));
-    try$(Sched::instance().enqueue(task));
+    try$(globalSched().enqueue(task));
 
     return Ok();
 }
 
 Res<> init(u64 magic, Handover::Payload &payload) {
     try$(Arch::init(payload));
+
+    logInfo("hjert " stringify$(__ck_version_value));
+
     try$(validateAndDump(magic, payload));
-    try$(Mem::init(payload));
-    try$(Sched::init(payload));
+    try$(initMem(payload));
+    try$(initSched(payload));
 
     logInfo("entry: everything is ready, enabling interrupts...");
     Arch::globalCpu().retainEnable();

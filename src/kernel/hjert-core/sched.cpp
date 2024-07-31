@@ -1,7 +1,6 @@
 #include <karm-logger/logger.h>
 
 #include "arch.h"
-#include "mem.h"
 #include "sched.h"
 #include "space.h"
 #include "task.h"
@@ -10,7 +9,7 @@ namespace Hjert::Core {
 
 static Opt<Sched> _sched;
 
-Res<> Sched::init(Handover::Payload &) {
+Res<> initSched(Handover::Payload &) {
     logInfo("sched: initializing...");
     auto bootTask = try$(Task::create(Mode::SUPER, try$(Space::create())));
     bootTask->label("entry");
@@ -19,7 +18,7 @@ Res<> Sched::init(Handover::Payload &) {
     return Ok();
 }
 
-Sched &Sched::instance() {
+Sched &globalSched() {
     return *_sched;
 }
 
@@ -42,8 +41,9 @@ void Sched::schedule(TimeSpan span) {
     _stamp += span;
     _prev = _curr;
     _curr->_sliceEnd = _stamp;
+
     auto next = _idle;
-    // HACK: to make sure the idle task is always scheduled last
+    // NOTE: to make sure the idle task is always scheduled last
     _idle->_sliceEnd = _stamp + 1;
 
     for (usize i = 0; i < _tasks.len(); ++i) {

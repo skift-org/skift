@@ -18,7 +18,7 @@ namespace Hjert::Core {
 static constexpr bool DEBUG_SYSCALLS = false;
 
 Res<> doNow(Task &self, User<TimeStamp> ts) {
-    return ts.store(self.space(), Sched::instance()._stamp);
+    return ts.store(self.space(), globalSched()._stamp);
 }
 
 Res<> doLog(Task &self, UserSlice<Str> msg) {
@@ -26,11 +26,14 @@ Res<> doLog(Task &self, UserSlice<Str> msg) {
     return msg.with(self.space(), [&](Str str) -> Res<> {
         Logger::_Embed::loggerLock();
         defer$(Logger::_Embed::loggerUnlock());
+
         auto styledLabel = Cli::styled(self.label(), Cli::style(Cli::random(self.id())));
         try$(Io::format(Hjert::Arch::globalOut(), "{} | ", Io::aligned(styledLabel, Io::Align::LEFT, 26)));
+
         try$(Hjert::Arch::globalOut().writeStr(str));
-        if (str.len() == 0 or str[str.len() - 1] != '\n')
+        if (str.len() == 0 or last(str) != '\n')
             try$(Hjert::Arch::globalOut().writeStr("\n"));
+
         return Ok();
     });
 }
@@ -142,7 +145,7 @@ Res<> doStart(Task &self, Hj::Cap cap, usize ip, usize sp, User<Hj::Args const> 
     (void)args;
     auto obj = try$(self.domain().get<Task>(cap));
     try$(obj->ready(ip, sp, try$(args.load(self.space()))));
-    try$(Sched::instance().enqueue(obj));
+    try$(globalSched().enqueue(obj));
     return Ok();
 }
 

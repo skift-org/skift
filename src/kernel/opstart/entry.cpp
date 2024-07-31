@@ -5,7 +5,7 @@
 #include "loader.h"
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
-    logInfo("Opstart ►");
+    logInfo("opstart " stringify$(__ck_version_value));
 
     logInfo("loading configs...");
     auto file = co_try$(Sys::File::open("file:/boot/loader.json"_url));

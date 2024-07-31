@@ -52,8 +52,8 @@ struct Bus {
         while (true) {
             try$(_listener.poll(TimeStamp::endOfTime()));
             while (auto ev = _listener.next()) {
-
                 logInfo("handling system event");
+
                 try$(Hj::_signal(ev->cap, Hj::Sigs::NONE, Hj::Sigs::READABLE));
             }
         }

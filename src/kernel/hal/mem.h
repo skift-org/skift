@@ -29,6 +29,7 @@ inline bool isPageAlign(usize addr) {
 struct IdentityMapper {
     template <typename T>
     T map(T addr) { return addr; }
+
     template <typename T>
     T unmap(T addr) { return addr; }
 };

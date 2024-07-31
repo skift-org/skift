@@ -25,9 +25,8 @@ struct Vmm : public Hal::Vmm {
     Res<Pml<L - 1> *> pml(Pml<L> &upper, usize vaddr) {
         auto page = upper.pageAt(vaddr);
 
-        if (not page.present()) {
+        if (not page.present())
             return Error::invalidInput("page not present");
-        }
 
         return Ok(_mapper.map(page.template as<Pml<L - 1>>()));
     }
@@ -96,6 +95,7 @@ struct Vmm : public Hal::Vmm {
         for (usize page = 0; page < vaddr.size; page += Hal::PAGE_SIZE) {
             try$(freePage(vaddr.start + page));
         }
+
         return Ok();
     }
 
@@ -107,6 +107,7 @@ struct Vmm : public Hal::Vmm {
         for (usize i = 0; i < vaddr.size; i += Hal::PAGE_SIZE) {
             x86_64::invlpg(vaddr.start + i);
         }
+
         return Ok();
     }
 
@@ -152,14 +153,13 @@ struct Vmm : public Hal::Vmm {
         for (usize i = 0; i < 512; i++) {
             auto page = pml[i];
             usize curr = pml.index2virt(i) | vaddr;
-
-            if constexpr (L == 1) {
-                if (page.present()) {
+            if (page.present()) {
+                if constexpr (L == 1) {
                     ctx.next(curr, page.paddr());
+                } else {
+                    auto &lower = *_mapper.map(page.template as<Pml<L - 1>>());
+                    _dumpPml(ctx, lower, curr);
                 }
-            } else if (page.present()) {
-                auto &lower = *_mapper.map(page.template as<Pml<L - 1>>());
-                _dumpPml(ctx, lower, curr);
             }
         }
     }

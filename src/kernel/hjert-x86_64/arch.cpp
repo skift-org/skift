@@ -7,10 +7,8 @@
 #include <hjert-core/syscalls.h>
 #include <hjert-core/task.h>
 #include <karm-base/witty.h>
-#include <karm-logger/logger.h>
 
 #include <hal-x86_64/com.h>
-#include <hal-x86_64/cpuid.h>
 #include <hal-x86_64/gdt.h>
 #include <hal-x86_64/idt.h>
 #include <hal-x86_64/pic.h>
@@ -145,7 +143,7 @@ void backtrace(usize rbp) {
 
 void switchTask(TimeSpan span, Frame &frame) {
     Core::Task::self().save(frame);
-    Core::Sched::instance().schedule(span);
+    Core::globalSched().schedule(span);
     Core::Task::self().load(frame);
 }
 

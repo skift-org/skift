@@ -10,8 +10,6 @@ namespace Hjert::Core {
 
 struct Task;
 
-// MARK: Sched -----------------------------------------------------------------
-
 struct Sched {
     TimeStamp _stamp{};
     Lock _lock{};
@@ -21,15 +19,15 @@ struct Sched {
     Strong<Task> _curr;
     Strong<Task> _idle;
 
-    static Res<> init(Handover::Payload &);
-
-    static Sched &instance();
-
     Sched(Strong<Task> boot);
 
     Res<> enqueue(Strong<Task> task);
 
     void schedule(TimeSpan span);
 };
+
+Res<> initSched(Handover::Payload &payload);
+
+Sched &globalSched();
 
 } // namespace Hjert::Core

@@ -80,7 +80,7 @@ struct PopoverLayer : public ProxyNode<PopoverLayer> {
 
         auto *e = event.is<Events::MouseEvent>();
 
-        if (e->type == Events::MouseEvent::PRESS) {
+        if (e and e->type == Events::MouseEvent::PRESS) {
             _closePopover();
             event.accept();
         }

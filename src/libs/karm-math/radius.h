@@ -90,6 +90,20 @@ struct Radius {
         scaleAll(sumStart > T{} ? size.height / sumStart : 1);
         return res;
     }
+
+    template <typename U>
+    constexpr Radius<U> cast() const {
+        return {
+            static_cast<U>(a),
+            static_cast<U>(b),
+            static_cast<U>(c),
+            static_cast<U>(d),
+            static_cast<U>(e),
+            static_cast<U>(f),
+            static_cast<U>(g),
+            static_cast<U>(h),
+        };
+    }
 };
 
 using Radiusi = Radius<isize>;

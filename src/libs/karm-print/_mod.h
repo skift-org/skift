@@ -1,4 +1,4 @@
 #pragma once
 
-#include "document.h"
+#include "base.h"
 #include "paper.h"

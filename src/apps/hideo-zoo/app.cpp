@@ -64,7 +64,7 @@ Ui::Child app() {
                         Ui::titleMedium(page->name),
                         Ui::empty(4),
                         Ui::bodySmall(page->description)
-                    ) | Ui::spacing(16),
+                    ) | Ui::insets(16),
                     Ui::separator(),
                     page->build() | Ui::grow()
                 );

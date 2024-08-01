@@ -70,7 +70,7 @@ Ui::Child allFamiliesItem(State const &s, Str family) {
                Ui::labelMedium(Ui::GRAY500, "{} · {} {}", family, nStyle, nStyle == 1 ? "Style" : "Styles"),
                Ui::text(Text::ProseStyle{font}, PANGRAM)
            ) |
-           Ui::spacing({12, 8, 0, 8}) |
+           Ui::insets({12, 8, 0, 8}) |
            Ui::hclip() |
            Ui::button(Model::bind<SelectFamily>(family), Ui::ButtonStyle::outline());
 }
@@ -84,7 +84,7 @@ Ui::Child allFamiliesContent(State const &s) {
     }
 
     return Ui::vflow(8, children) |
-           Ui::spacing(16) |
+           Ui::insets(16) |
            Ui::vscroll();
 }
 
@@ -129,7 +129,7 @@ Ui::Child familyItem(State const &, Strong<Text::Fontface> fontface) {
                Ui::text(Text::ProseStyle{font}, PANGRAM),
                fontfaceTags(attrs)
            ) |
-           Ui::spacing({12, 8, 0, 8}) |
+           Ui::insets({12, 8, 0, 8}) |
            Ui::hclip() |
            Ui::button(Model::bind<SelectFace>(fontface), Ui::ButtonStyle::outline());
 }
@@ -139,7 +139,7 @@ Ui::Child familyContent(State const &s) {
     auto &fontBook = s.fontBook;
     auto fontfaces = fontBook.queryFamily(s.fontFamily.unwrap());
 
-    auto header = Ui::labelSmall(s.fontFamily.unwrap()) | Ui::spacing({16, 6});
+    auto header = Ui::labelSmall(s.fontFamily.unwrap()) | Ui::insets({16, 6});
 
     for (auto const &fontface : fontfaces) {
         children.pushBack(familyItem(s, fontface));
@@ -148,7 +148,7 @@ Ui::Child familyContent(State const &s) {
     return Ui::vflow(
         header,
         Ui::separator(),
-        Ui::vflow(8, children) | Ui::spacing(16) | Ui::vscroll() | Ui::grow()
+        Ui::vflow(8, children) | Ui::insets(16) | Ui::vscroll() | Ui::grow()
     );
 }
 
@@ -168,7 +168,7 @@ Ui::Child pangrams(Strong<Text::Fontface> fontface) {
     }
 
     return Ui::vflow(8, children) |
-           Ui::spacing(16) |
+           Ui::insets(16) |
            Ui::vhscroll();
 }
 
@@ -182,7 +182,7 @@ Ui::Child fontfaceContent(State const &s) {
             Math::Align::CENTER,
             Ui::labelSmall(attrs.normal() ? "{}" : "{}  · ", attrs.family),
             fontfaceTags(attrs)
-        ) | Ui::spacing({16, 6}),
+        ) | Ui::insets({16, 6}),
         Ui::separator(),
         pangrams(fontface)
     );

@@ -41,7 +41,7 @@ Ui::Child app() {
                            Ui::hflow(16, decBtn, incBtn),
                            resetBtn
                        ) |
-                       Ui::spacing(32);
+                       Ui::insets(32);
             },
             .size = 420,
         });

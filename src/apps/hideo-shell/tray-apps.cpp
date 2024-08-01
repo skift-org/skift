@@ -17,7 +17,7 @@ Ui::Child searchInput() {
                Ui::text(Ui::TextStyles::labelMedium().withColor(Ui::GRAY400), "Search…") | Ui::grow(),
                Ui::icon(Mdi::MAGNIFY, 24)
            ) |
-           Ui::spacing({12, 8}) |
+           Ui::insets({12, 8}) |
            Ui::box({
                .borderRadii = 4,
                .borderWidth = 1,
@@ -28,7 +28,7 @@ Ui::Child searchInput() {
 
 Ui::Child appIcon(Mdi::Icon const &icon, Gfx::ColorRamp ramp, isize size = 22) {
     return Ui::icon(icon, size) |
-           Ui::spacing(size / 2.75) |
+           Ui::insets(size / 2.75) |
            Ui::center() |
            Ui::box({
                .borderRadii = size * 0.25,
@@ -47,7 +47,7 @@ Ui::Child appRow(Manifest const &manifest, usize i) {
                appIcon(manifest.icon, manifest.ramp),
                Ui::labelLarge(manifest.name)
            ) |
-               Ui::spacing(6) |
+               Ui::insets(6) |
                Ui::button(Model::bind<StartInstance>(i), Ui::ButtonStyle::subtle());
 }
 
@@ -91,7 +91,7 @@ Ui::Child runningApp(Instance const &, usize i) {
                    Ui::button(Model::bind<FocusInstance>(i)),
                Ui::button(Model::bind<CloseInstance>(i), Ui::ButtonStyle::secondary(), Mdi::CLOSE) |
                    Ui::align(Math::Align::TOP_END) |
-                   Ui::spacing({0, 6, 6, 0})
+                   Ui::insets({0, 6, 6, 0})
            ) |
            Ui::pinSize({120, 192});
 }
@@ -107,7 +107,7 @@ Ui::Child runningApps(State const &state) {
                    })
                    .collect<Ui::Children>()
            ) |
-           Ui::center() | Ui::spacing({0, 64, 0, 16});
+           Ui::center() | Ui::insets({0, 64, 0, 16});
 }
 
 Ui::Child apps(State const &state) {
@@ -135,7 +135,7 @@ Ui::Child apps(State const &state) {
         (state.isAppPanelThumbnails
              ? appsGrid(state)
              : appsList(state)) |
-            Ui::spacing({0, 12}) | Ui::vscroll() | Ui::grow()
+            Ui::insets({0, 12}) | Ui::vscroll() | Ui::grow()
     );
 }
 

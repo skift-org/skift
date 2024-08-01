@@ -19,7 +19,7 @@ Ui::Child sidePanelTitle(Ui::OnPress onClose, Str title) {
                    Ui::icon(Mdi::CLOSE) | Ui::center()
                )
            ) |
-           Ui::spacing(6);
+           Ui::insets(6);
 }
 
 } // namespace Karm::Kira

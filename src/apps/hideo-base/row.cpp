@@ -28,7 +28,7 @@ Ui::Child card(Ui::Children children) {
 Ui::Child row(Ui::Child child) {
     return child |
            Ui::vcenter() |
-           Ui::spacing(16) |
+           Ui::insets(16) |
            Ui::minSize({Ui::UNCONSTRAINED, 64});
 }
 
@@ -37,7 +37,7 @@ Ui::Child row(Opt<Ui::Child> leading, String title, Opt<String> subtitle, Opt<Ui
                     ? *leading |
                           Ui::center() |
                           Ui::sizing(26, {Ui::UNCONSTRAINED, 26}) |
-                          Ui::spacing({0, 0, 12, 0})
+                          Ui::insets({0, 0, 12, 0})
                     : Ui::empty();
 
     auto t = subtitle
@@ -52,12 +52,12 @@ Ui::Child row(Opt<Ui::Child> leading, String title, Opt<String> subtitle, Opt<Ui
                      ? *trailing |
                            Ui::center() |
                            Ui::sizing(26, {Ui::UNCONSTRAINED, 26}) |
-                           Ui::spacing({0, 0, 12, 0})
+                           Ui::insets({0, 0, 12, 0})
                      : Ui::empty();
 
     return minSize(
         {Ui::UNCONSTRAINED, 48},
-        spacing(
+        insets(
             {12, 0},
             hflow(
                 0,
@@ -72,7 +72,7 @@ Ui::Child row(Opt<Ui::Child> leading, String title, Opt<String> subtitle, Opt<Ui
 
 Ui::Child titleRow(String t) {
     return Ui::titleMedium(t) |
-           Ui::spacing({12, 16, 12, 8});
+           Ui::insets({12, 16, 12, 8});
 }
 
 Ui::Child pressableRow(Ui::OnPress onPress, Opt<Ui::Child> leading, String title, Opt<String> subtitle, Opt<Ui::Child> trailing) {
@@ -166,7 +166,7 @@ Ui::Child treeRow(Opt<Ui::Slot> leading, String title, Opt<String> subtitle, Ui:
                 subtitle,
                 Ui::icon(state ? Mdi::CHEVRON_UP : Mdi::CHEVRON_DOWN, 24)
             ),
-            state ? spacing(
+            state ? insets(
                         {38, 0, 0, 0},
                         child()
                     ) | slideIn(Ui::SlideFrom::TOP)

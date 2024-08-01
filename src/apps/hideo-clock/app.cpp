@@ -75,7 +75,7 @@ Ui::Child alarmPage() {
                alarmCard({0, 0, 18}, true),
                alarmCard({0, 0, 22}, false)
            ) |
-           Ui::spacing(12);
+           Ui::insets(12);
 }
 
 // MARK: Clock Page ------------------------------------------------------------
@@ -88,7 +88,7 @@ Ui::Child clockPage(State const &s) {
                clock(time) | Ui::pinSize({200, 200}),
                Ui::displayMedium("{02}:{02}:{02}", time.hour, time.minute, time.second) | Ui::center()
            ) |
-           Ui::spacing(12);
+           Ui::insets(12);
 }
 
 // MARK: Timer Page ------------------------------------------------------------
@@ -160,7 +160,7 @@ Ui::Child app() {
                             Ui::titleLarge(toStr(s.page)),
                             Ui::grow(NONE),
                             Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::DOTS_HORIZONTAL)
-                        ) | Ui::spacing({18, 18, 18, 0}),
+                        ) | Ui::insets({18, 18, 18, 0}),
                         appContent(s) | Ui::grow(),
                         navbar
                     );

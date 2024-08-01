@@ -34,7 +34,7 @@ Ui::Child lock(State const &state) {
     return Ui::stack(
         background(state),
         Ui::vflow(clock, Ui::grow(NONE), hintText | Ui::slideIn(Ui::SlideFrom::BOTTOM)) |
-            Ui::spacing(state.isMobile ? 64 : 128) |
+            Ui::insets(state.isMobile ? 64 : 128) |
             Ui::dragRegion() |
             Ui::dismisable(Model::bind<Unlock>(), Ui::DismisDir::TOP, 0.3) |
             Ui::align(Math::Align::VFILL | Math::Align::HCENTER)

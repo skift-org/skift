@@ -78,7 +78,7 @@ Ui::Child entry(State const &s, Entry const &e, usize i) {
     return tile |
            Ui::center() |
            Ui::pinSize({192, 128}) |
-           Ui::spacing(12) |
+           Ui::insets(12) |
            Ui::button(Ui::NOP, style);
 }
 
@@ -101,7 +101,7 @@ Ui::Child alert(String title, String subtitle) {
                Kr::errorPage(Mdi::ALERT_DECAGRAM, title, subtitle) | Ui::grow(),
                Ui::bodyMedium("Press [ENTER] to continue.")
            ) |
-           Ui::spacing(64);
+           Ui::insets(64);
 }
 
 void intent(Ui::Node &n, Sys::Event &e) {
@@ -154,7 +154,7 @@ Ui::Child menu(Configs const &c) {
                        Math::Align::CENTER,
                        children
                    ) |
-                   Ui::spacing(64) |
+                   Ui::insets(64) |
                    Ui::intent(intent);
         }
     );

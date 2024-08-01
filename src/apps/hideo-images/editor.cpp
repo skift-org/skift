@@ -61,7 +61,7 @@ Ui::Child editorPreview(State const &state) {
                .borderPaint = Ui::GRAY50.withOpacity(0.1),
            }) |
            Ui::foregroundFilter(state.filter) |
-           Ui::spacing(8) |
+           Ui::insets(8) |
            Ui::fit();
 }
 
@@ -90,7 +90,7 @@ Ui::Child editorFilterTile(Ui::OnPress onPress, Ui::ButtonStyle style, Mdi::Icon
                Ui::icon(icon, 36) | Ui::center() | Ui::grow(),
                Ui::text(text) | Ui::center()
            ) |
-           Ui::spacing(8) |
+           Ui::insets(8) |
            Ui::bound() |
            Ui::minSize({96, 72}) |
            Ui::button(std::move(onPress), style);
@@ -190,7 +190,7 @@ Ui::Child editorControls(State const &state) {
                4,
                editorFilterControls(state.filter),
                editorFilters(state) |
-                   Ui::spacing({8, 0, 8, 8}) |
+                   Ui::insets({8, 0, 8, 8}) |
                    Ui::hscroll()
            ) |
            Ui::slideIn(Ui::SlideFrom::BOTTOM);

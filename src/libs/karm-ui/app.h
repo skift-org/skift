@@ -17,7 +17,7 @@ Child inspector(Child child) {
         separator(),
         vflow(
             4,
-            icon(Mdi::FLASK, 24, GRAY600) | Ui::spacing(6) | Ui::center(),
+            icon(Mdi::FLASK, 24, GRAY600) | Ui::insets(6) | Ui::center(),
             separator(),
             button(
                 [](auto &n) {
@@ -60,7 +60,7 @@ Child inspector(Child child) {
                 Mdi::CHART_HISTOGRAM
             )
         ) |
-            Ui::spacing(4) |
+            Ui::insets(4) |
             Ui::box({
                 .backgroundPaint = GRAY800,
             })

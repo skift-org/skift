@@ -15,7 +15,7 @@ Ui::Child powerDialog() {
             Ui::button(Ui::closeDialog, Ui::ButtonStyle::subtle(), Mdi::RESTART, "Restart"),
             Ui::button(Ui::closeDialog, Ui::ButtonStyle::subtle(), Mdi::POWER_STANDBY, "Shutdown")
         ) |
-            Ui::spacing(4) |
+            Ui::insets(4) |
             Ui::minSize({260, Ui::UNCONSTRAINED}) |
             Ui::grow(),
     });

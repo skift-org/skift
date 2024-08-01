@@ -297,7 +297,7 @@ Ui::Child notiPanel(State const &state) {
     return Ui::vflow(
                8,
                Ui::labelMedium("Notifications") |
-                   Ui::spacing({12, 6, 0, 0}),
+                   Ui::insets({12, 6, 0, 0}),
                notifications(state) | Ui::grow()
            ) |
            panel({500, 400});
@@ -317,7 +317,7 @@ Ui::Child sysFlyout(State const &state) {
     body.pushBack(quickheader(state));
     if (state.isSysPanelColapsed) {
         body.pushBack(colapsedQuickSettings(state));
-        body.pushBack(Ui::labelMedium("Notifications") | Ui::spacing({12, 6, 0, 0}));
+        body.pushBack(Ui::labelMedium("Notifications") | Ui::insets({12, 6, 0, 0}));
         body.pushBack(notifications(state) | Ui::grow());
     } else {
         body.pushBack(expendedQuickSettings(state) | Ui::grow());

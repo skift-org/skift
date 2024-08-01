@@ -20,7 +20,7 @@ Ui::Child dialogContent(Ui::Children children) {
            box(boxStyle) |
            Ui::dragRegion() |
            Ui::align(Math::Align::CENTER | Math::Align::CLAMP) |
-           Ui::spacing(32);
+           Ui::insets(32);
 }
 Ui::Child dialogTitleBar(String title) {
     return Ui::vflow(
@@ -29,14 +29,14 @@ Ui::Child dialogTitleBar(String title) {
             Ui::grow(NONE),
             button(Ui::closeDialog, Ui::ButtonStyle::subtle(), Mdi::CLOSE)
         ) |
-            Ui::spacing({16, 4, 4, 4}),
+            Ui::insets({16, 4, 4, 4}),
         Ui::separator()
     );
 }
 
 Ui::Child dialogHeader(Ui::Children children) {
     return Ui::vflow(8, children) |
-           Ui::spacing({16, 16, 16, 8});
+           Ui::insets({16, 16, 16, 8});
 }
 
 Ui::Child dialogTitle(String text) {
@@ -60,7 +60,7 @@ Ui::Child dialogFooter(Ui::Children children) {
                },
                children
            ) |
-           Ui::spacing({16, 8, 16, 16});
+           Ui::insets({16, 8, 16, 16});
 }
 
 Ui::Child dialogAction(Ui::OnPress onPress, String text) {

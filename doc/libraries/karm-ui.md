@@ -143,7 +143,7 @@ Here is a non exaustive list of decorators
 
 **Padding and Margin**
 
- - `<node> | Ui::spacing(int spacing)` : Add spacing between the node and its children.
+ - `<node> | Ui::insets(int insets)` : Add insets between the node and its parent.
 
 ## State Management
 

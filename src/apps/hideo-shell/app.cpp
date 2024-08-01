@@ -15,7 +15,7 @@ namespace Hideo::Shell {
 Ui::Child indicator(Media::Icon icon) {
     return Ui::icon(icon) |
            Ui::center() |
-           Ui::spacing(4);
+           Ui::insets(4);
 }
 
 Ui::Child statusbar(State const &state) {
@@ -93,7 +93,7 @@ Ui::Child taskbar(State const &state) {
         ) |
 
             Ui::center() |
-            Ui::spacing({12, 6}) |
+            Ui::insets({12, 6}) |
             Ui::bound()
     );
 
@@ -217,7 +217,7 @@ Ui::Child desktopPanels(State const &state) {
                          Ui::slideIn(Ui::SlideFrom::TOP)
                    : Ui::empty()
            ) |
-           Ui::spacing({8, 38});
+           Ui::insets({8, 38});
 }
 
 Ui::Child desktop(State const &state) {

@@ -35,7 +35,7 @@ Ui::Child app() {
                 );
 
                 return body |
-                       Ui::spacing({12, 6, 16, 6}) |
+                       Ui::insets({12, 6, 16, 6}) |
                        Ui::minSize({Ui::UNCONSTRAINED, 36}) |
                        Ui::button(bind(v + 1), Ui::ButtonStyle::subtle());
             });
@@ -65,7 +65,7 @@ Ui::Child app() {
                            licenseBtn
                        )
                    ) |
-                   Ui::spacing(16);
+                   Ui::insets(16);
         },
         .size = {460, 320},
     });

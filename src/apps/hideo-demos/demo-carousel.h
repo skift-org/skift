@@ -38,7 +38,7 @@ static inline Demo CAROUSEL_DEMO{
                         Ui::ButtonStyle::subtle(),
                         Mdi::ARROW_LEFT
                     ) |
-                    Ui::spacing(8) | Ui::center();
+                    Ui::insets(8) | Ui::center();
 
                 auto nextBtn =
                     Ui::button(
@@ -46,7 +46,7 @@ static inline Demo CAROUSEL_DEMO{
                         Ui::ButtonStyle::subtle(),
                         Mdi::ARROW_RIGHT
                     ) |
-                    Ui::spacing(8) | Ui::center();
+                    Ui::insets(8) | Ui::center();
 
                 return Ui::stack(
                     Ui::carousel(

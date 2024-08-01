@@ -119,9 +119,9 @@ struct ButtonStyle {
 
     ButtonStyle withForegroundPaint(Gfx::Paint paint) const;
 
-    ButtonStyle withPadding(Math::Spacingi spacing) const;
+    ButtonStyle withPadding(Math::Insetsi insets) const;
 
-    ButtonStyle withMargin(Math::Spacingi spacing) const;
+    ButtonStyle withMargin(Math::Insetsi insets) const;
 };
 
 using OnPress = Opt<Func<void(Node &)>>;

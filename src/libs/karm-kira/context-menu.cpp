@@ -63,7 +63,7 @@ Ui::Child contextMenuItem(Ui::OnPress onPress, Opt<Mdi::Icon> i, Str t) {
                i ? Ui::icon(*i) : Ui::empty(18),
                Ui::text(t)
            ) |
-           Ui::spacing({10, 6, 6, 6}) |
+           Ui::insets({10, 6, 6, 6}) |
            Ui::minSize({Ui::UNCONSTRAINED, 36}) |
            Ui::button(
                [onPress = std::move(onPress)](auto &n) {
@@ -72,7 +72,7 @@ Ui::Child contextMenuItem(Ui::OnPress onPress, Opt<Mdi::Icon> i, Str t) {
                },
                Ui::ButtonStyle::subtle()
            ) |
-           Ui::spacing(4);
+           Ui::insets(4);
 }
 
 Ui::Child contextMenuDock(Ui::Children children) {
@@ -80,7 +80,7 @@ Ui::Child contextMenuDock(Ui::Children children) {
                2,
                children
            ) |
-           Ui::spacing(4);
+           Ui::insets(4);
 }
 
 Ui::Child contextMenuIcon(Ui::OnPress onPress, Mdi::Icon i) {

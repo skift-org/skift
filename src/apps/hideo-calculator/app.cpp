@@ -18,7 +18,7 @@ Ui::Child textButton(Ui::OnPress onPress, String t) {
 }
 
 Ui::Child keypad(State const &state) {
-    return Ui::spacing(
+    return Ui::insets(
         8,
         Ui::grid(
             Ui::GridStyle::simpleGrow(7, 4, 4),
@@ -81,7 +81,7 @@ Ui::Child screen(State const &state) {
                      : Ui::headlineMedium("{}", state.hasRhs ? state.rhs : state.lhs)) |
         Ui::align(Math::Align::VCENTER | Math::Align::END);
 
-    return Ui::vflow(8, /* debugExpr, */ currExpr, result) | Ui::spacing({16, 8});
+    return Ui::vflow(8, /* debugExpr, */ currExpr, result) | Ui::insets({16, 8});
 }
 
 Ui::Child app() {

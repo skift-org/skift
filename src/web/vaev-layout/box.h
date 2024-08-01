@@ -5,10 +5,10 @@
 namespace Vaev::Layout {
 
 struct Box {
-    SpacingPx paddings{};
-    SpacingPx borders{};
+    InsetsPx paddings{};
+    InsetsPx borders{};
     RectPx borderBox{};
-    SpacingPx margins{};
+    InsetsPx margins{};
     RadiiPx radii{};
 
     void repr(Io::Emit &e) const {

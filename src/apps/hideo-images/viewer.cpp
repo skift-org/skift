@@ -23,7 +23,7 @@ Ui::Child viewerPreview(State const &state) {
                .borderWidth = 1,
                .borderPaint = Ui::GRAY50.withOpacity(0.1),
            }) |
-           Ui::spacing(8) |
+           Ui::insets(8) |
            Ui::fit();
 }
 
@@ -47,7 +47,7 @@ Ui::Child viewerControls(State const &) {
                Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::Icon::ARROW_LEFT),
                Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::Icon::ARROW_RIGHT)
            ) |
-           Ui::spacing({0, 0, 0, 8}) |
+           Ui::insets({0, 0, 0, 8}) |
            Ui::center();
 }
 

@@ -6,22 +6,22 @@
 namespace Karm::Math {
 
 template <typename T>
-struct Spacing {
+struct Insets {
     T start;
     T top;
     T end;
     T bottom;
 
-    constexpr Spacing()
+    constexpr Insets()
         : start(), top(), end(), bottom() {}
 
-    constexpr Spacing(T all)
+    constexpr Insets(T all)
         : start(all), top(all), end(all), bottom(all) {}
 
-    constexpr Spacing(T horizontal, T vertical)
+    constexpr Insets(T horizontal, T vertical)
         : start(horizontal), top(vertical), end(horizontal), bottom(vertical) {}
 
-    constexpr Spacing(T start, T top, T end, T bottom)
+    constexpr Insets(T start, T top, T end, T bottom)
         : start(start), top(top), end(end), bottom(bottom) {}
 
     constexpr Math::Rect<T> shrink(Flow flow, Math::Rect<T> rect) const {
@@ -63,10 +63,10 @@ struct Spacing {
     }
 };
 
-using Spacingi = Spacing<isize>;
-using Spacingf = Spacing<f64>;
+using Insetsi = Insets<isize>;
+using Insetsf = Insets<f64>;
 
 } // namespace Karm::Math
 
 template <typename T>
-ReflectableTemplate$(Karm::Math::Spacing<T>, start, top, end, bottom);
+ReflectableTemplate$(Karm::Math::Insets<T>, start, top, end, bottom);

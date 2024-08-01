@@ -3,9 +3,9 @@
 #include <karm-base/distinct.h>
 #include <karm-io/emit.h>
 #include <karm-math/fixed.h>
+#include <karm-math/insets.h>
 #include <karm-math/radii.h>
 #include <karm-math/rect.h>
-#include <karm-math/spacing.h>
 
 namespace Vaev {
 
@@ -19,7 +19,7 @@ using RectPx = Math::Rect<Px>;
 
 using Vec2Px = Math::Vec2<Px>;
 
-using SpacingPx = Math::Spacing<Px>;
+using InsetsPx = Math::Insets<Px>;
 
 using RadiiPx = Math::Radii<Px>;
 

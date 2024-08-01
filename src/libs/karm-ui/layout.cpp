@@ -258,17 +258,17 @@ Child pinSize(isize size, Child child) {
     return pinSize(Math::Vec2i{size}, child);
 }
 
-// MARK: Spacing ---------------------------------------------------------------
+// MARK: Insets ---------------------------------------------------------------
 
-struct Spacing : public ProxyNode<Spacing> {
-    Math::Spacingi _spacing;
+struct Insets : public ProxyNode<Insets> {
+    Math::Insetsi _insets;
 
-    Spacing(Math::Spacingi spacing, Child child)
-        : ProxyNode(child), _spacing(spacing) {}
+    Insets(Math::Insetsi insets, Child child)
+        : ProxyNode(child), _insets(insets) {}
 
-    void reconcile(Spacing &o) override {
-        _spacing = o._spacing;
-        ProxyNode<Spacing>::reconcile(o);
+    void reconcile(Insets &o) override {
+        _insets = o._insets;
+        ProxyNode<Insets>::reconcile(o);
     }
 
     void paint(Gfx::Context &g, Math::Recti r) override {
@@ -279,20 +279,20 @@ struct Spacing : public ProxyNode<Spacing> {
     }
 
     void layout(Math::Recti rect) override {
-        child().layout(_spacing.shrink(Math::Flow::LEFT_TO_RIGHT, rect));
+        child().layout(_insets.shrink(Math::Flow::LEFT_TO_RIGHT, rect));
     }
 
     Math::Vec2i size(Math::Vec2i s, Hint hint) override {
-        return child().size(s - _spacing.all(), hint) + _spacing.all();
+        return child().size(s - _insets.all(), hint) + _insets.all();
     }
 
     Math::Recti bound() override {
-        return _spacing.grow(Math::Flow::LEFT_TO_RIGHT, child().bound());
+        return _insets.grow(Math::Flow::LEFT_TO_RIGHT, child().bound());
     }
 };
 
-Child spacing(Math::Spacingi s, Child child) {
-    return makeStrong<Spacing>(s, child);
+Child insets(Math::Insetsi s, Child child) {
+    return makeStrong<Insets>(s, child);
 }
 
 // MARK: Aspect Ratio ----------------------------------------------------------

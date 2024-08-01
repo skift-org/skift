@@ -9,7 +9,7 @@ namespace Karm::Kira {
 
 Ui::Child sidenav(Ui::Children children) {
     return Ui::vflow(8, children) |
-           Ui::spacing(8) |
+           Ui::insets(8) |
            Ui::vscroll() |
            Ui::minSize({198, Ui::UNCONSTRAINED});
 }
@@ -28,12 +28,12 @@ Ui::Child sidenavTree(Mdi::Icon icon, String title, Ui::Slot child) {
                         Ui::vcenter() |
                         Ui::grow(),
                     Ui::icon(state ? Mdi::CHEVRON_UP : Mdi::CHEVRON_DOWN, 18)
-                ) | Ui::spacing({0, 8, 12, 8})
+                ) | Ui::insets({0, 8, 12, 8})
             ),
 
             state
                 ? child() |
-                      Ui::spacing({32, 0, 0, 0}) |
+                      Ui::insets({32, 0, 0, 0}) |
                       Ui::slideIn(Ui::SlideFrom::TOP)
                 : Ui::empty()
         );
@@ -59,7 +59,7 @@ Ui::Child sidenavItem(bool selected, Ui::OnPress onPress, Mdi::Icon icon, String
     return Ui::button(
         std::move(onPress),
         buttonStyle,
-        Ui::spacing(
+        Ui::insets(
             {0, 8, 12, 8},
             hflow(
                 indicator,

@@ -54,7 +54,7 @@ Ui::Child titlebar(Mdi::Icon icon, String title, TitlebarStyle style) {
                Ui::grow(NONE),
                controls(style)
            ) |
-           Ui::spacing(8) |
+           Ui::insets(8) |
            Ui::dragRegion() | box(TOOLBAR);
 }
 
@@ -65,14 +65,14 @@ Ui::Child titlebar(Mdi::Icon icon, String title, Ui::Child tabs, TitlebarStyle s
                tabs | Ui::grow(),
                controls(style)
            ) |
-           Ui::spacing(8) |
+           Ui::insets(8) |
            Ui::dragRegion();
 }
 
 Ui::Child toolbar(Ui::Children children) {
     return Ui::vflow(
         Ui::hflow(4, children) |
-            Ui::spacing(8) |
+            Ui::insets(8) |
             box(TOOLBAR),
         Ui::separator()
     );
@@ -82,7 +82,7 @@ Ui::Child bottombar(Ui::Children children) {
     return Ui::vflow(
         Ui::separator(),
         Ui::hflow(4, children) |
-            Ui::spacing(8) |
+            Ui::insets(8) |
             Ui::box(TOOLBAR)
     );
 }

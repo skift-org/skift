@@ -10,7 +10,7 @@ Ui::Child errorPageTitle(Mdi::Icon icon, String text) {
     return Ui::vflow(
         0,
         Math::Align::CENTER,
-        Ui::icon(icon, 48) | Ui::spacing(16),
+        Ui::icon(icon, 48) | Ui::insets(16),
         Ui::titleLarge(text)
     );
 }

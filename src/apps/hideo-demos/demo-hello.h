@@ -18,7 +18,7 @@ static inline Demo HELLO_DEMO{
                    Ui::icon(Mdi::Icon::EMOTICON_HAPPY_OUTLINE, 64),
                    Ui::titleLarge("Hello, world!")
                ) |
-               Ui::spacing(16);
+               Ui::insets(16);
     },
 };
 

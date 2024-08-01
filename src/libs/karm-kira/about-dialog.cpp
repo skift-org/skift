@@ -22,7 +22,7 @@ Ui::Child licenseDialog() {
     return dialogContent({
         dialogTitleBar("License"s),
         Ui::bodySmall(LICENSE) |
-            Ui::spacing(16) |
+            Ui::insets(16) |
             Ui::vscroll() |
             Ui::maxSize({480, Ui::UNCONSTRAINED}) |
             Ui::grow(),

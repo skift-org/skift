@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-math/align.h>
-#include <karm-math/spacing.h>
+#include <karm-math/insets.h>
 
 #include "node.h"
 
@@ -201,13 +201,13 @@ inline auto pinSize(isize size) {
     };
 }
 
-// MARK: Spacing ---------------------------------------------------------------
+// MARK: Insets ---------------------------------------------------------------
 
-Child spacing(Math::Spacingi s, Child child);
+Child insets(Math::Insetsi s, Child child);
 
-inline auto spacing(Math::Spacingi s) {
+inline auto insets(Math::Insetsi s) {
     return [s](Child child) {
-        return spacing(s, child);
+        return insets(s, child);
     };
 }
 

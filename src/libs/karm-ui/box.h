@@ -1,15 +1,15 @@
 #pragma once
 
 #include <karm-gfx/shadow.h>
-#include <karm-math/spacing.h>
+#include <karm-math/insets.h>
 
 #include "node.h"
 
 namespace Karm::Ui {
 
 struct BoxStyle {
-    Math::Spacingi margin{};
-    Math::Spacingi padding{};
+    Math::Insetsi margin{};
+    Math::Insetsi padding{};
 
     Math::Radiif borderRadii{};
     f64 borderWidth{};
@@ -19,13 +19,13 @@ struct BoxStyle {
     Gfx::Paint foregroundPaint{GRAY50};
     Opt<Gfx::BoxShadow> shadowStyle{};
 
-    BoxStyle withMargin(Math::Spacingi margin) const {
+    BoxStyle withMargin(Math::Insetsi margin) const {
         auto copy = *this;
         copy.margin = margin;
         return copy;
     }
 
-    BoxStyle withPadding(Math::Spacingi padding) const {
+    BoxStyle withPadding(Math::Insetsi padding) const {
         auto copy = *this;
         copy.padding = padding;
         return copy;

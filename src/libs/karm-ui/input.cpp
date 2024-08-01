@@ -163,19 +163,19 @@ ButtonStyle ButtonStyle::withForegroundPaint(Gfx::Paint paint) const {
     };
 }
 
-ButtonStyle ButtonStyle::withPadding(Math::Spacingi spacing) const {
+ButtonStyle ButtonStyle::withPadding(Math::Insetsi insets) const {
     return {
-        idleStyle.withPadding(spacing),
-        hoverStyle.withPadding(spacing),
-        pressStyle.withPadding(spacing),
+        idleStyle.withPadding(insets),
+        hoverStyle.withPadding(insets),
+        pressStyle.withPadding(insets),
     };
 }
 
-ButtonStyle ButtonStyle::withMargin(Math::Spacingi spacing) const {
+ButtonStyle ButtonStyle::withMargin(Math::Insetsi insets) const {
     return {
-        idleStyle.withMargin(spacing),
-        hoverStyle.withMargin(spacing),
-        pressStyle.withMargin(spacing),
+        idleStyle.withMargin(insets),
+        hoverStyle.withMargin(insets),
+        pressStyle.withMargin(insets),
     };
 }
 
@@ -226,7 +226,7 @@ Child button(OnPress onPress, ButtonStyle style, Child child) {
 
 Child button(OnPress onPress, ButtonStyle style, Str t) {
     return text(t) |
-           spacing({16, 6}) |
+           insets({16, 6}) |
            center() |
            minSize({UNCONSTRAINED, 36}) |
            button(std::move(onPress), style);
@@ -234,7 +234,7 @@ Child button(OnPress onPress, ButtonStyle style, Str t) {
 
 Child button(OnPress onPress, ButtonStyle style, Media::Icon i) {
     return icon(i) |
-           spacing({6, 6}) |
+           insets({6, 6}) |
            center() |
            minSize({36, 36}) |
            button(std::move(onPress), style);
@@ -242,7 +242,7 @@ Child button(OnPress onPress, ButtonStyle style, Media::Icon i) {
 
 Child button(OnPress onPress, ButtonStyle style, Media::Icon i, Str t) {
     return hflow(8, Math::Align::CENTER, icon(i), text(t)) |
-           spacing({12, 6, 16, 6}) |
+           insets({12, 6, 16, 6}) |
            minSize({UNCONSTRAINED, 36}) |
            button(std::move(onPress), style);
 }

@@ -161,7 +161,7 @@ Child handle() {
                .borderRadii = 999,
                .backgroundPaint = GRAY50,
            }) |
-           spacing(12) |
+           insets(12) |
            center() |
            minSize({UNCONSTRAINED, 48});
 }

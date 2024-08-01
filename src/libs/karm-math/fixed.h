@@ -82,34 +82,18 @@ struct _Fixed {
         return _val;
     }
 
-    template <Meta::SignedIntegral I>
-    constexpr I toInt() const {
-        return static_cast<I>(_val >> FRAC);
+    template <typename U>
+    constexpr U cast() const {
+        if constexpr (Meta::Integral<U>)
+            return static_cast<U>(_val >> FRAC);
+        else
+            return static_cast<U>(_val) / DENO;
     }
 
-    template <Meta::UnsignedIntegral U>
-    constexpr U toUint() const {
-        return static_cast<U>(_val >> FRAC);
-    }
-
-    template <Meta::Float F>
-    constexpr F toFloat() const {
-        return static_cast<F>(_val) / DENO;
-    }
-
-    template <Meta::SignedIntegral I>
-    explicit constexpr operator I() const {
-        return toInt<I>();
-    }
-
-    template <Meta::UnsignedIntegral U>
+    template <typename U>
+        requires Meta::Float<U> or Meta::Integral<U>
     explicit constexpr operator U() const {
-        return toUint<U>();
-    }
-
-    template <Meta::Float F>
-    explicit constexpr operator F() const {
-        return toFloat<F>();
+        return cast<U>();
     }
 
     constexpr _Fixed &operator++() {
@@ -242,7 +226,7 @@ struct Karm::Limits<Math::_Fixed<T, F>> {
 template <Meta::SignedIntegral T, usize F>
 struct Karm::Io::Formatter<Math::_Fixed<T, F>> {
     Res<usize> format(Io::TextWriter &writer, Math::_Fixed<T, F> const &val) {
-        return Io::format(writer, "{}", val.template toFloat<f64>());
+        return Io::format(writer, "{}", val.template cast<f64>());
     }
 };
 

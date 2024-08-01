@@ -58,40 +58,40 @@ Px Context::resolve(Length l) {
         // Font-relative
 
     case Length::Unit::EM:
-        return Px::fromFloatNearest(l.val() * fontSize().toFloat<f64>());
+        return Px::fromFloatNearest(l.val() * fontSize().cast<f64>());
 
     case Length::Unit::REM:
-        return Px::fromFloatNearest(l.val() * fontSize().toFloat<f64>());
+        return Px::fromFloatNearest(l.val() * fontSize().cast<f64>());
 
     case Length::Unit::EX:
-        return Px::fromFloatNearest(l.val() * xHeight().toFloat<f64>());
+        return Px::fromFloatNearest(l.val() * xHeight().cast<f64>());
 
     case Length::Unit::REX:
-        return Px::fromFloatNearest(l.val() * xHeight().toFloat<f64>());
+        return Px::fromFloatNearest(l.val() * xHeight().cast<f64>());
 
     case Length::Unit::CAP:
-        return Px::fromFloatNearest(l.val() * capHeight().toFloat<f64>());
+        return Px::fromFloatNearest(l.val() * capHeight().cast<f64>());
 
     case Length::Unit::RCAP:
-        return Px::fromFloatNearest(l.val() * capHeight().toFloat<f64>());
+        return Px::fromFloatNearest(l.val() * capHeight().cast<f64>());
 
     case Length::Unit::CH:
-        return Px::fromFloatNearest(l.val() * zeroAdvance().toFloat<f64>());
+        return Px::fromFloatNearest(l.val() * zeroAdvance().cast<f64>());
 
     case Length::Unit::RCH:
-        return Px::fromFloatNearest(l.val() * zeroAdvance().toFloat<f64>());
+        return Px::fromFloatNearest(l.val() * zeroAdvance().cast<f64>());
 
     case Length::Unit::IC:
-        return Px::fromFloatNearest(l.val() * zeroAdvance().toFloat<f64>());
+        return Px::fromFloatNearest(l.val() * zeroAdvance().cast<f64>());
 
     case Length::Unit::RIC:
-        return Px::fromFloatNearest(l.val() * zeroAdvance().toFloat<f64>());
+        return Px::fromFloatNearest(l.val() * zeroAdvance().cast<f64>());
 
     case Length::Unit::LH:
-        return Px::fromFloatNearest(l.val() * lineHeight().toFloat<f64>());
+        return Px::fromFloatNearest(l.val() * lineHeight().cast<f64>());
 
     case Length::Unit::RLH:
-        return Px::fromFloatNearest(l.val() * lineHeight().toFloat<f64>());
+        return Px::fromFloatNearest(l.val() * lineHeight().cast<f64>());
 
     // Viewport-relative
 
@@ -100,48 +100,48 @@ Px Context::resolve(Length l) {
     // Equal to 1% of the width of current viewport.
     case Length::Unit::VW:
     case Length::Unit::LVW:
-        return Px::fromFloatNearest(l.val() * viewport.large.width.toFloat<f64>() / 100);
+        return Px::fromFloatNearest(l.val() * viewport.large.width.cast<f64>() / 100);
 
     case Length::Unit::SVW:
-        return Px::fromFloatNearest(l.val() * viewport.small.width.toFloat<f64>() / 100);
+        return Px::fromFloatNearest(l.val() * viewport.small.width.cast<f64>() / 100);
 
     case Length::Unit::DVW:
-        return Px::fromFloatNearest(l.val() * viewport.dynamic.width.toFloat<f64>() / 100);
+        return Px::fromFloatNearest(l.val() * viewport.dynamic.width.cast<f64>() / 100);
 
     // https://drafts.csswg.org/css-values/#vh
     // Equal to 1% of the height of current viewport.
     case Length::Unit::VH:
     case Length::Unit::LVH:
-        return Px::fromFloatNearest(l.val() * viewport.large.height.toFloat<f64>() / 100);
+        return Px::fromFloatNearest(l.val() * viewport.large.height.cast<f64>() / 100);
 
     case Length::Unit::SVH:
-        return Px::fromFloatNearest(l.val() * viewport.small.height.toFloat<f64>() / 100);
+        return Px::fromFloatNearest(l.val() * viewport.small.height.cast<f64>() / 100);
 
     case Length::Unit::DVH:
-        return Px::fromFloatNearest(l.val() * viewport.dynamic.height.toFloat<f64>() / 100);
+        return Px::fromFloatNearest(l.val() * viewport.dynamic.height.cast<f64>() / 100);
 
     // https://drafts.csswg.org/css-values/#vi
     // Equal to 1% of the size of the viewport in the box’s inline axis.
     case Length::Unit::VI:
     case Length::Unit::LVI:
         if (mainAxis() == Axis::HORIZONTAL) {
-            return Px::fromFloatNearest(l.val() * viewport.large.width.toFloat<f64>() / 100);
+            return Px::fromFloatNearest(l.val() * viewport.large.width.cast<f64>() / 100);
         } else {
-            return Px::fromFloatNearest(l.val() * viewport.large.height.toFloat<f64>() / 100);
+            return Px::fromFloatNearest(l.val() * viewport.large.height.cast<f64>() / 100);
         }
 
     case Length::Unit::SVI:
         if (mainAxis() == Axis::HORIZONTAL) {
-            return Px::fromFloatNearest(l.val() * viewport.small.width.toFloat<f64>() / 100);
+            return Px::fromFloatNearest(l.val() * viewport.small.width.cast<f64>() / 100);
         } else {
-            return Px::fromFloatNearest(l.val() * viewport.small.height.toFloat<f64>() / 100);
+            return Px::fromFloatNearest(l.val() * viewport.small.height.cast<f64>() / 100);
         }
 
     case Length::Unit::DVI:
         if (mainAxis() == Axis::HORIZONTAL) {
-            return Px::fromFloatNearest(l.val() * viewport.dynamic.width.toFloat<f64>() / 100);
+            return Px::fromFloatNearest(l.val() * viewport.dynamic.width.cast<f64>() / 100);
         } else {
-            return Px::fromFloatNearest(l.val() * viewport.dynamic.height.toFloat<f64>() / 100);
+            return Px::fromFloatNearest(l.val() * viewport.dynamic.height.cast<f64>() / 100);
         }
 
     // https://drafts.csswg.org/css-values/#vb
@@ -149,23 +149,23 @@ Px Context::resolve(Length l) {
     case Length::Unit::VB:
     case Length::Unit::LVB:
         if (crossAxis() == Axis::HORIZONTAL) {
-            return Px::fromFloatNearest(l.val() * viewport.large.width.toFloat<f64>() / 100);
+            return Px::fromFloatNearest(l.val() * viewport.large.width.cast<f64>() / 100);
         } else {
-            return Px::fromFloatNearest(l.val() * viewport.large.height.toFloat<f64>() / 100);
+            return Px::fromFloatNearest(l.val() * viewport.large.height.cast<f64>() / 100);
         }
 
     case Length::Unit::SVB:
         if (crossAxis() == Axis::HORIZONTAL) {
-            return Px::fromFloatNearest(l.val() * viewport.small.width.toFloat<f64>() / 100);
+            return Px::fromFloatNearest(l.val() * viewport.small.width.cast<f64>() / 100);
         } else {
-            return Px::fromFloatNearest(l.val() * viewport.small.height.toFloat<f64>() / 100);
+            return Px::fromFloatNearest(l.val() * viewport.small.height.cast<f64>() / 100);
         }
 
     case Length::Unit::DVB:
         if (crossAxis() == Axis::HORIZONTAL) {
-            return Px::fromFloatNearest(l.val() * viewport.dynamic.width.toFloat<f64>() / 100);
+            return Px::fromFloatNearest(l.val() * viewport.dynamic.width.cast<f64>() / 100);
         } else {
-            return Px::fromFloatNearest(l.val() * viewport.dynamic.height.toFloat<f64>() / 100);
+            return Px::fromFloatNearest(l.val() * viewport.dynamic.height.cast<f64>() / 100);
         }
 
     // https://drafts.csswg.org/css-values/#vmin
@@ -213,22 +213,22 @@ Px Context::resolve(Length l) {
     // Absolute
     // https://drafts.csswg.org/css-values/#absolute-lengths
     case Length::Unit::CM:
-        return Px::fromFloatNearest(l.val() * viewport.dpi.toFloat<f64>() / 2.54);
+        return Px::fromFloatNearest(l.val() * viewport.dpi.cast<f64>() / 2.54);
 
     case Length::Unit::MM:
-        return Px::fromFloatNearest(l.val() * viewport.dpi.toFloat<f64>() / 25.4);
+        return Px::fromFloatNearest(l.val() * viewport.dpi.cast<f64>() / 25.4);
 
     case Length::Unit::Q:
-        return Px::fromFloatNearest(l.val() * viewport.dpi.toFloat<f64>() / 101.6);
+        return Px::fromFloatNearest(l.val() * viewport.dpi.cast<f64>() / 101.6);
 
     case Length::Unit::IN:
-        return Px::fromFloatNearest(l.val() * viewport.dpi.toFloat<f64>());
+        return Px::fromFloatNearest(l.val() * viewport.dpi.cast<f64>());
 
     case Length::Unit::PT:
-        return Px::fromFloatNearest(l.val() * viewport.dpi.toFloat<f64>() / 72.0);
+        return Px::fromFloatNearest(l.val() * viewport.dpi.cast<f64>() / 72.0);
 
     case Length::Unit::PC:
-        return Px::fromFloatNearest(l.val() * viewport.dpi.toFloat<f64>() / 6.0);
+        return Px::fromFloatNearest(l.val() * viewport.dpi.cast<f64>() / 6.0);
 
     case Length::Unit::PX:
         return Px::fromFloatNearest(l.val());
@@ -241,7 +241,7 @@ Px Context::resolve(Length l) {
 Px Context::resolve(PercentOr<Length> p, Px relative) {
     if (p.resolved())
         return resolve(p.value());
-    return Px{relative.toFloat<f64>() * (p.percent().value() / 100.)};
+    return Px{relative.cast<f64>() * (p.percent().value() / 100.)};
 }
 
 Px Context::resolve(Width w, Px relative) {

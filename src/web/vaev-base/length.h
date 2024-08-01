@@ -54,7 +54,7 @@ struct Length {
         : _val(val), _unit(unit) {}
 
     constexpr Length(Px val)
-        : _val(val) {}
+        : _val(val.cast<f64>()) {}
 
     constexpr bool isAbsolute() const {
         switch (_unit) {

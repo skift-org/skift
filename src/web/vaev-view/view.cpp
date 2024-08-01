@@ -87,8 +87,8 @@ struct View : public Ui::View<View> {
         auto [layout, _] = Driver::render(*_dom, media, size.cast<Px>());
 
         return {
-            layout->_box.borderBox.width.toInt<isize>(),
-            layout->_box.borderBox.height.toInt<isize>(),
+            layout->_box.borderBox.width.cast<isize>(),
+            layout->_box.borderBox.height.cast<isize>(),
         };
     }
 };

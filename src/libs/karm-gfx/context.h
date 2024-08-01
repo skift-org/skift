@@ -167,16 +167,16 @@ struct Context : public Canvas {
     void fill(Math::Edgef edge, f64 thickness = 1.0f);
 
     // Stroke a rectangle.
-    void stroke(Math::Rectf rect, Math::Radiusf radius = 0);
+    void stroke(Math::Rectf rect, Math::Radiif radii = 0);
 
-    // Fast path for filling simple rectangles without a border radius.
+    // Fast path for filling simple rectangles without a border radii.
     void _fillRect(Math::Recti r, Gfx::Color color);
 
     // Fill a rectangle.
-    void fill(Math::Recti rect, Math::Radiusf radius = 0);
+    void fill(Math::Recti rect, Math::Radiif radii = 0);
 
     // Fill a rectangle.
-    void fill(Math::Rectf rect, Math::Radiusf radius = 0);
+    void fill(Math::Rectf rect, Math::Radiif radii = 0);
 
     // Stroke an ellipse.
     void stroke(Math::Ellipsef e);
@@ -239,7 +239,7 @@ struct Context : public Canvas {
     void quadTo(Math::Vec2f cp, Math::Vec2f p, Path::Flags flags = Path::DEFAULT) override;
 
     // Add an elliptical arc to the current path.
-    void arcTo(Math::Vec2f radius, f64 angle, Math::Vec2f p, Path::Flags flags = Path::DEFAULT) override;
+    void arcTo(Math::Vec2f radii, f64 angle, Math::Vec2f p, Path::Flags flags = Path::DEFAULT) override;
 
     // Evaluate the given SVG path and add it to the current path.
     bool evalSvg(Str path);
@@ -251,7 +251,7 @@ struct Context : public Canvas {
     void curve(Math::Curvef curve) override;
 
     // Add a rectangle to the current path.
-    void rect(Math::Rectf rect, Math::Radiusf radius = 0) override;
+    void rect(Math::Rectf rect, Math::Radiif radii = 0) override;
 
     // Add an ellipse to the current path.
     void ellipse(Math::Ellipsef ellipse) override;

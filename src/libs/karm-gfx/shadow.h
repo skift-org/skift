@@ -22,7 +22,7 @@ struct DropShadow {
         return *this;
     }
 
-    auto &withRadius(f64 r) {
+    auto &withRadii(f64 r) {
         radius = r;
         return *this;
     }

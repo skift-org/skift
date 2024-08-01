@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-gfx/paint.h>
-#include <karm-math/radius.h>
+#include <karm-math/radii.h>
 
 #include "color.h"
 #include "length.h"
@@ -51,7 +51,7 @@ struct Borders {
     BorderCollapse collapse;
 
     Border top, start, bottom, end;
-    Math::Radius<PercentOr<Length>> radii;
+    Math::Radii<PercentOr<Length>> radii;
 
     void all(Border b) {
         top = start = bottom = end = b;

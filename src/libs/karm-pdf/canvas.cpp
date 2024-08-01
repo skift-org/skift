@@ -61,7 +61,7 @@ void Canvas::ellipse(Math::Ellipsef) {
     notImplemented();
 }
 
-void Canvas::rect(Math::Rectf rect, Math::Radiusf) {
+void Canvas::rect(Math::Rectf rect, Math::Radiif) {
     moveTo(rect.topStart(), Gfx::Path::DEFAULT);
     lineTo(rect.topEnd(), Gfx::Path::DEFAULT);
     lineTo(rect.bottomEnd(), Gfx::Path::DEFAULT);

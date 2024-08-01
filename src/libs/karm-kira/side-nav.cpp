@@ -44,15 +44,17 @@ Ui::Child sidenavItem(bool selected, Ui::OnPress onPress, Mdi::Icon icon, String
     auto buttonStyle = Ui::ButtonStyle::regular();
 
     buttonStyle.idleStyle = {
-        .borderRadius = 4,
+        .borderRadii = 4,
         .backgroundPaint = selected ? Ui::GRAY900 : Gfx::ALPHA,
     };
 
-    auto indicator = box(Ui::BoxStyle{
-                             .borderRadius = 99,
-                             .backgroundPaint = selected ? Ui::ACCENT600 : Gfx::ALPHA,
-                         },
-                         Ui::empty(2));
+    auto indicator = box(
+        {
+            .borderRadii = 99,
+            .backgroundPaint = selected ? Ui::ACCENT600 : Gfx::ALPHA,
+        },
+        Ui::empty(2)
+    );
 
     return Ui::button(
         std::move(onPress),

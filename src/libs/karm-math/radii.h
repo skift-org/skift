@@ -8,7 +8,7 @@
 namespace Karm::Math {
 
 template <typename T>
-struct Radius {
+struct Radii {
     /*
         The radii are disposed in the following order
 
@@ -37,24 +37,24 @@ struct Radius {
         Array<T, 8> radii;
     };
 
-    constexpr Radius(T all = {})
+    constexpr Radii(T all = {})
         : a(all), b(all), c(all), d(all), e(all), f(all), g(all), h(all) {}
 
-    constexpr Radius(T StartEnd, T EndStart)
-        : Radius(StartEnd, EndStart, StartEnd, EndStart) {}
+    constexpr Radii(T StartEnd, T EndStart)
+        : Radii(StartEnd, EndStart, StartEnd, EndStart) {}
 
-    constexpr Radius(T topStart, T topEnd, T bottomEnd, T bottomStart)
+    constexpr Radii(T topStart, T topEnd, T bottomEnd, T bottomStart)
         : a(topStart), b(topStart),
           c(topEnd), d(topEnd),
           e(bottomEnd), f(bottomEnd),
           g(bottomStart), h(bottomStart) {}
 
-    constexpr Radius(T a, T b, T c, T d, T e, T f, T g, T h)
+    constexpr Radii(T a, T b, T c, T d, T e, T f, T g, T h)
         : a(a), b(b), c(c), d(d), e(e), f(f), g(g), h(h) {}
 
     bool zero() const {
-        return iter(radii).all([](T radius) {
-            return radius == 0;
+        return iter(radii).all([](T radii) {
+            return radii == 0;
         });
     }
 
@@ -63,18 +63,18 @@ struct Radius {
     }
 
     void all(T all) {
-        for (auto &radius : radii) {
-            radius = all;
+        for (auto &radii : radii) {
+            radii = all;
         }
     }
 
-    Radius reduceOverlap(Vec2<T> size) const {
+    Radii reduceOverlap(Vec2<T> size) const {
         auto res = *this;
         auto scaleAll = [&](T factor) {
             if (factor >= 1)
                 return;
-            for (auto &radius : res.radii)
-                radius *= factor;
+            for (auto &radii : res.radii)
+                radii *= factor;
         };
 
         auto sumTop = res.b + res.c;
@@ -92,7 +92,7 @@ struct Radius {
     }
 
     template <typename U>
-    constexpr Radius<U> cast() const {
+    constexpr Radii<U> cast() const {
         return {
             static_cast<U>(a),
             static_cast<U>(b),
@@ -106,11 +106,11 @@ struct Radius {
     }
 };
 
-using Radiusi = Radius<isize>;
+using Radiii = Radii<isize>;
 
-using Radiusf = Radius<f64>;
+using Radiif = Radii<f64>;
 
 } // namespace Karm::Math
 
 template <typename T>
-ReflectableTemplate$(Karm::Math::Radius<T>, a, b, c, d, e, f, g, h);
+ReflectableTemplate$(Karm::Math::Radii<T>, a, b, c, d, e, f, g, h);

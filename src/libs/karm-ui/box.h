@@ -11,7 +11,7 @@ struct BoxStyle {
     Math::Spacingi margin{};
     Math::Spacingi padding{};
 
-    Math::Radiusf borderRadius{};
+    Math::Radiif borderRadii{};
     f64 borderWidth{};
 
     Opt<Gfx::Paint> borderPaint{Gfx::ALPHA};
@@ -31,9 +31,9 @@ struct BoxStyle {
         return copy;
     }
 
-    BoxStyle withRadius(Math::Radiusf borderRadius) const {
+    BoxStyle withRadii(Math::Radiif borderRadii) const {
         auto copy = *this;
-        copy.borderRadius = borderRadius;
+        copy.borderRadii = borderRadii;
         return copy;
     }
 
@@ -76,7 +76,7 @@ struct BoxStyle {
 
         if (backgroundPaint) {
             g.fillStyle(*backgroundPaint);
-            g.fill(bound, borderRadius);
+            g.fill(bound, borderRadii);
         }
 
         g.fillStyle(foregroundPaint);
@@ -86,7 +86,7 @@ struct BoxStyle {
             g.strokeStyle(Gfx::stroke(*borderPaint)
                               .withWidth(borderWidth)
                               .withAlign(Gfx::INSIDE_ALIGN));
-            g.stroke(bound.cast<f64>(), borderRadius);
+            g.stroke(bound.cast<f64>(), borderRadii);
         }
 
         g.restore();

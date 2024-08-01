@@ -25,10 +25,10 @@ Ui::Child quickSetting(QuickSettingProps props) {
                      : Ui::ButtonStyle::secondary();
 
     auto primaryStyle = props.more
-                            ? style.withRadius({4, 0, 0, 4})
+                            ? style.withRadii({4, 0, 0, 4})
                             : style;
 
-    auto secondaryStyle = style.withRadius({0, 4, 4, 0});
+    auto secondaryStyle = style.withRadii({0, 4, 4, 0});
 
     auto primary = [&] {
         if (props.name)
@@ -261,7 +261,7 @@ Ui::Child noti(Noti const &noti, usize i) {
            ) |
            Ui::box({
                .padding = 12,
-               .borderRadius = 4,
+               .borderRadii = 4,
                .backgroundPaint = Ui::GRAY900,
            }) |
            Ui::dragRegion() |
@@ -307,7 +307,7 @@ Ui::Child sysFlyout(State const &state) {
     auto box = Ui::box({
         .margin = {8, 8, 8, 32},
         .padding = {12, 12, 12, 0},
-        .borderRadius = 8,
+        .borderRadii = 8,
         .borderWidth = 1,
         .borderPaint = Ui::GRAY800,
         .backgroundPaint = Ui::GRAY950,

@@ -11,7 +11,7 @@ static Ui::Child toolbar() {
                Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::EMOTICON),
                Ui::empty({128, 4}) |
                    Ui::box({
-                       .borderRadius = 999,
+                       .borderRadii = 999,
                        .backgroundPaint = Ui::GRAY50,
                    }) |
                    Ui::center() |

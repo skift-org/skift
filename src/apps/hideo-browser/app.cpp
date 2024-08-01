@@ -98,7 +98,7 @@ Ui::Child addressBar(Mime::Url const &url) {
            ) |
            Ui::box({
                .padding = {12, 0, 0, 0},
-               .borderRadius = 4,
+               .borderRadii = 4,
                .borderWidth = 1,
                .backgroundPaint = Ui::GRAY800,
            });

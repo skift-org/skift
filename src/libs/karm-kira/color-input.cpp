@@ -98,14 +98,14 @@ static Ui::Child _sliderThumb(Gfx::Color color) {
            Ui::bound() |
            Ui::aspectRatio(1) |
            Ui::box({
-               .borderRadius = 99,
+               .borderRadii = 99,
                .borderWidth = 2,
                .borderPaint = Gfx::WHITE,
                .backgroundPaint = color,
            }) |
            Ui::box({
                .padding = 1,
-               .borderRadius = 99,
+               .borderRadii = 99,
                .borderWidth = 1,
                .borderPaint = Gfx::BLACK.withOpacity(0.25),
            }) |
@@ -128,7 +128,7 @@ Ui::Child hsvValueSlider(Gfx::Hsv hsv, Ui::OnChange<Gfx::Hsv> onChange) {
            }) |
            Ui::box({
                .padding = 1,
-               .borderRadius = 99,
+               .borderRadii = 99,
                .borderWidth = 1,
                .borderPaint = Ui::GRAY100.withOpacity(0.2),
                .backgroundPaint = background,
@@ -160,7 +160,7 @@ Ui::Child hsvSaturationSlider(Gfx::Hsv hsv, Ui::OnChange<Gfx::Hsv> onChange) {
            }) |
            Ui::box({
                .padding = 1,
-               .borderRadius = 99,
+               .borderRadii = 99,
                .borderWidth = 1,
                .borderPaint = Ui::GRAY100.withOpacity(0.2),
                .backgroundPaint = background,
@@ -176,7 +176,7 @@ Ui::Child hsvHueSlider(Gfx::Hsv hsv, Ui::OnChange<Gfx::Hsv> onChange) {
            }) |
            Ui::box({
                .padding = 1,
-               .borderRadius = 99,
+               .borderRadii = 99,
                .borderWidth = 1,
                .borderPaint = Ui::GRAY100.withOpacity(0.2),
                .backgroundPaint = Gfx::Gradient::hsv().bake(),
@@ -240,7 +240,7 @@ Ui::Child colorPickerDialog() {
                 Ui::center() |
                 Ui::minSize(96) |
                 Ui::box({
-                    .borderRadius = 6,
+                    .borderRadii = 6,
                     .borderWidth = 1,
                     .borderPaint = Ui::GRAY100.withOpacity(0.1),
                     .backgroundPaint = Gfx::hsvToRgb(s.hsv),
@@ -295,7 +295,7 @@ Ui::Child colorInput(Gfx::Color color, Ui::OnChange<Gfx::Color>) {
         Ui::empty({18, 18}) |
         Ui::box({
             .margin = 4,
-            .borderRadius = 2,
+            .borderRadii = 2,
             .borderWidth = 1,
             .borderPaint = Gfx::GRAY50.withOpacity(0.1),
             .backgroundPaint = color,

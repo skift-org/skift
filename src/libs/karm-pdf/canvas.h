@@ -41,7 +41,7 @@ struct Canvas : public Gfx::Canvas {
 
     void quadTo(Math::Vec2f cp, Math::Vec2f p, Gfx::Path::Flags flags) override;
 
-    void arcTo(Math::Vec2f radius, f64 angle, Math::Vec2f p, Gfx::Path::Flags flags) override;
+    void arcTo(Math::Vec2f radii, f64 angle, Math::Vec2f p, Gfx::Path::Flags flags) override;
 
     void line(Math::Edgef line) override;
 
@@ -49,7 +49,7 @@ struct Canvas : public Gfx::Canvas {
 
     void ellipse(Math::Ellipsef ellipse) override;
 
-    void rect(Math::Rectf rect, Math::Radiusf radius = 0) override;
+    void rect(Math::Rectf rect, Math::Radiif radii = 0) override;
 
     void fill(Gfx::Paint paint, Gfx::FillRule rule) override;
 

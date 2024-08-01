@@ -19,7 +19,7 @@ Ui::Child searchInput() {
            ) |
            Ui::spacing({12, 8}) |
            Ui::box({
-               .borderRadius = 4,
+               .borderRadii = 4,
                .borderWidth = 1,
                .backgroundPaint = Ui::GRAY900,
            }) |
@@ -31,7 +31,7 @@ Ui::Child appIcon(Mdi::Icon const &icon, Gfx::ColorRamp ramp, isize size = 22) {
            Ui::spacing(size / 2.75) |
            Ui::center() |
            Ui::box({
-               .borderRadius = size * 0.25,
+               .borderRadii = size * 0.25,
                .borderWidth = 1,
                .borderPaint = ramp[5],
                .backgroundPaint = ramp[6],
@@ -153,7 +153,7 @@ Ui::Child appsFlyout(State const &state) {
             Ui::box({
                 .margin = {8, 8, 8, 8},
                 .padding = {12, 0},
-                .borderRadius = 8,
+                .borderRadii = 8,
                 .borderWidth = 1,
                 .borderPaint = Ui::GRAY800,
                 .backgroundPaint = Ui::GRAY950,

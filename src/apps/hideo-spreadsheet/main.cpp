@@ -14,7 +14,7 @@ namespace Hideo::Spreadsheet {
 Ui::Child formula() {
     return Ui::box(
         {
-            .borderRadius = 4,
+            .borderRadii = 4,
             .borderWidth = 1,
             .backgroundPaint = Ui::GRAY800,
         },

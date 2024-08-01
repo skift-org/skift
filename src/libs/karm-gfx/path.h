@@ -10,7 +10,7 @@
 #include <karm-math/edge.h>
 #include <karm-math/ellipse.h>
 #include <karm-math/funcs.h>
-#include <karm-math/radius.h>
+#include <karm-math/radii.h>
 #include <karm-math/rect.h>
 #include <karm-math/trans.h>
 #include <karm-math/vec.h>
@@ -44,7 +44,7 @@ struct Path {
         Code code{};
         Flags flags{};
 
-        Math::Vec2f radius{};
+        Math::Vec2f radii{};
         f64 angle{};
         Math::Vec2f cp1{};
         Math::Vec2f cp2{};
@@ -62,8 +62,8 @@ struct Path {
         Op(Code code, Math::Vec2f cp1, Math::Vec2f cp2, Math::Vec2f p, Flags flags = DEFAULT)
             : code(code), flags(flags), cp1(cp1), cp2(cp2), p(p) {}
 
-        Op(Code code, Math::Vec2f radius, f64 angle, Math::Vec2f p, Flags flags = DEFAULT)
-            : code(code), flags(flags), radius(radius), angle(angle), p(p) {}
+        Op(Code code, Math::Vec2f radii, f64 angle, Math::Vec2f p, Flags flags = DEFAULT)
+            : code(code), flags(flags), radii(radii), angle(angle), p(p) {}
     };
 
     struct Contour {
@@ -107,7 +107,7 @@ struct Path {
 
     void _flattenCurveTo(Math::Curvef c, isize depth = 0);
 
-    void _flattenArcTo(Math::Vec2f start, Math::Vec2f radius, f64 angle, Flags flags, Math::Vec2f point);
+    void _flattenArcTo(Math::Vec2f start, Math::Vec2f radii, f64 angle, Flags flags, Math::Vec2f point);
 
     // MARK: Operations --------------------------------------------------------
 
@@ -133,7 +133,7 @@ struct Path {
 
     void smoothQuadTo(Math::Vec2f p, Flags flags = DEFAULT);
 
-    void arcTo(Math::Vec2f radius, f64 angle, Math::Vec2f p, Flags flags = DEFAULT);
+    void arcTo(Math::Vec2f radii, f64 angle, Math::Vec2f p, Flags flags = DEFAULT);
 
     // MARK: Shapes ------------------------------------------------------------
 
@@ -141,7 +141,7 @@ struct Path {
 
     void curve(Math::Curvef curve);
 
-    void rect(Math::Rectf rect, Math::Radiusf radius = 0);
+    void rect(Math::Rectf rect, Math::Radiif radii = 0);
 
     void ellipse(Math::Ellipsef ellipse);
 

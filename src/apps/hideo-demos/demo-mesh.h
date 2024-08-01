@@ -89,7 +89,7 @@ static inline Demo MESH_DEMO{
             auto pointHandle = [](usize index, Math::Vec2f pos) {
                 return Ui::empty(8) |
                        Ui::box(Ui::BoxStyle{
-                           .borderRadius = 16,
+                           .borderRadii = 16,
                            .backgroundPaint = Gfx::WHITE,
                        }) |
                        Ui::center() |

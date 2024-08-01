@@ -9,7 +9,7 @@ namespace Karm::Kira {
 
 Ui::Child dialogContent(Ui::Children children) {
     Ui::BoxStyle const boxStyle = {
-        .borderRadius = 8,
+        .borderRadii = 8,
         .borderWidth = 1,
         .borderPaint = Ui::GRAY800,
         .backgroundPaint = Ui::GRAY900,

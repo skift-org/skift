@@ -16,7 +16,7 @@ static inline Child errorScope(Str what, auto callback) {
     return box(
         {
             .padding = 12,
-            .borderRadius = 6,
+            .borderRadii = 6,
             .borderWidth = 1,
             .borderPaint = Gfx::RED700,
             .backgroundPaint = Gfx::RED900,

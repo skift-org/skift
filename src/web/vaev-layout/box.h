@@ -9,11 +9,11 @@ struct Box {
     SpacingPx borders{};
     RectPx borderBox{};
     SpacingPx margins{};
-    RadiusPx radius{};
+    RadiiPx radii{};
 
     void repr(Io::Emit &e) const {
-        e("(box paddings: {} borders: {} borderBox: {} margins: {} radius: {})",
-          paddings, borders, borderBox, margins, radius);
+        e("(box paddings: {} borders: {} borderBox: {} margins: {} radii: {})",
+          paddings, borders, borderBox, margins, radii);
     }
 
     RectPx paddingBox() const {

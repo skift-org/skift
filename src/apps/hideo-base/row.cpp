@@ -14,7 +14,7 @@ namespace Hideo {
 Ui::Child card(Ui::Child child) {
     return Ui::box(
         {
-            .borderRadius = 4,
+            .borderRadii = 4,
             .backgroundPaint = Ui::GRAY900,
         },
         child

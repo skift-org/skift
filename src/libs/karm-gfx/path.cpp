@@ -48,7 +48,7 @@ void Path::_flattenCurveTo(Math::Curvef curve, isize depth) {
     _flattenCurveTo(right, depth + 1);
 }
 
-[[gnu::flatten]] void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radius, f64 angle, Flags flags, Math::Vec2f point) {
+[[gnu::flatten]] void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radii, f64 angle, Flags flags, Math::Vec2f point) {
     // Ported from canvg (https://github.com/canvg/canvg)
     f64 x1 = start.x;
     f64 y1 = start.y;
@@ -59,7 +59,7 @@ void Path::_flattenCurveTo(Math::Curvef curve, isize depth) {
     f64 dy = y1 - y2;
     f64 d = sqrtf(dx * dx + dy * dy);
 
-    if (d < 1e-6f or radius.x < 1e-6f or radius.y < 1e-6f) {
+    if (d < 1e-6f or radii.x < 1e-6f or radii.y < 1e-6f) {
         // The arc degenerates to a line
         _flattenLineTo(point);
         return;
@@ -76,17 +76,17 @@ void Path::_flattenCurveTo(Math::Curvef curve, isize depth) {
     f64 x1p = cosrx * dx / 2.0f + sinrx * dy / 2.0f;
     f64 y1p = -sinrx * dx / 2.0f + cosrx * dy / 2.0f;
 
-    d = Math::pow2(x1p) / Math::pow2(radius.x) + Math::pow2(y1p) / Math::pow2(radius.y);
+    d = Math::pow2(x1p) / Math::pow2(radii.x) + Math::pow2(y1p) / Math::pow2(radii.y);
 
     if (d > 1) {
         d = sqrtf(d);
-        radius.x *= d;
-        radius.y *= d;
+        radii.x *= d;
+        radii.y *= d;
     }
 
     // 2) Compute cx', cy'
-    f64 sa = Math::pow2(radius.x) * Math::pow2(radius.y) - Math::pow2(radius.x) * Math::pow2(y1p) - Math::pow2(radius.y) * Math::pow2(x1p);
-    f64 sb = Math::pow2(radius.x) * Math::pow2(y1p) + Math::pow2(radius.y) * Math::pow2(x1p);
+    f64 sa = Math::pow2(radii.x) * Math::pow2(radii.y) - Math::pow2(radii.x) * Math::pow2(y1p) - Math::pow2(radii.y) * Math::pow2(x1p);
+    f64 sb = Math::pow2(radii.x) * Math::pow2(y1p) + Math::pow2(radii.y) * Math::pow2(x1p);
 
     if (sa < 0.0f)
         sa = 0.0f;
@@ -103,16 +103,16 @@ void Path::_flattenCurveTo(Math::Curvef curve, isize depth) {
         s = -s;
     }
 
-    f64 cxp = s * radius.x * y1p / radius.y;
-    f64 cyp = s * -radius.y * x1p / radius.x;
+    f64 cxp = s * radii.x * y1p / radii.y;
+    f64 cyp = s * -radii.y * x1p / radii.x;
 
     // 3) Compute cx,cy from cx',cy'
     f64 cx = cosrx * cxp - sinrx * cyp + (x1 + x2) / 2.0f;
     f64 cy = sinrx * cxp + cosrx * cyp + (y1 + y2) / 2.0f;
 
     // 4) Calculate theta1, and delta theta.
-    Math::Vec2f u = {(x1p - cxp) / radius.x, (y1p - cyp) / radius.y};
-    Math::Vec2f v = {(-x1p - cxp) / radius.x, (-y1p - cyp) / radius.y};
+    Math::Vec2f u = {(x1p - cxp) / radii.x, (y1p - cyp) / radii.y};
+    Math::Vec2f v = {(-x1p - cxp) / radii.x, (-y1p - cyp) / radii.y};
 
     f64 a1 = Math::Vec2f(1, 0).angleWith(u); // Initial angle
     f64 da = u.angleWith(v);
@@ -145,8 +145,8 @@ void Path::_flattenCurveTo(Math::Curvef curve, isize depth) {
         dx = Math::cos(a);
         dy = Math::sin(a);
 
-        Math::Vec2f p = t.apply(Math::Vec2f{dx * radius.x, dy * radius.y});
-        Math::Vec2f tan = t.applyVector({-dy * radius.x * kappa, dx * radius.y * kappa});
+        Math::Vec2f p = t.apply(Math::Vec2f{dx * radii.x, dy * radii.y});
+        Math::Vec2f tan = t.applyVector({-dy * radii.x * kappa, dx * radii.y * kappa});
 
         if (i > 0)
             _flattenCurveTo(Math::Curvef::cubic(current, current + ptan, p - tan, p));
@@ -218,7 +218,7 @@ void Path::evalOp(Op op) {
         break;
 
     case ARC_TO:
-        _flattenArcTo(_lastP, op.radius, op.angle, op.flags, op.p);
+        _flattenArcTo(_lastP, op.radii, op.angle, op.flags, op.p);
         break;
 
     default:
@@ -271,8 +271,8 @@ void Path::smoothQuadTo(Math::Vec2f p, Flags flags) {
     evalOp({QUAD_TO, {}, p, flags | SMOOTH});
 }
 
-void Path::arcTo(Math::Vec2f radius, f64 angle, Math::Vec2f p, Flags flags) {
-    evalOp({ARC_TO, radius, angle, p, flags});
+void Path::arcTo(Math::Vec2f radii, f64 angle, Math::Vec2f p, Flags flags) {
+    evalOp({ARC_TO, radii, angle, p, flags});
 }
 
 // MARK: Shapes ----------------------------------------------------------------
@@ -287,57 +287,57 @@ void Path::curve(Math::Curvef curve) {
     cubicTo(curve.b, curve.c, curve.d);
 }
 
-void Path::rect(Math::Rectf rect, Math::Radiusf radius) {
-    if (radius.zero()) {
+void Path::rect(Math::Rectf rect, Math::Radiif radii) {
+    if (radii.zero()) {
         moveTo(rect.topStart());
         lineTo(rect.topEnd());
         lineTo(rect.bottomEnd());
         lineTo(rect.bottomStart());
         close();
     } else {
-        radius = radius.reduceOverlap(rect.size());
+        radii = radii.reduceOverlap(rect.size());
 
-        f64 cpa = radius.a - (radius.a * 0.5522847498);
-        f64 cpb = radius.b - (radius.b * 0.5522847498);
-        f64 cpc = radius.c - (radius.c * 0.5522847498);
-        f64 cpd = radius.d - (radius.d * 0.5522847498);
-        f64 cpe = radius.e - (radius.e * 0.5522847498);
-        f64 cpf = radius.f - (radius.f * 0.5522847498);
-        f64 cpg = radius.g - (radius.g * 0.5522847498);
-        f64 cph = radius.h - (radius.h * 0.5522847498);
+        f64 cpa = radii.a - (radii.a * 0.5522847498);
+        f64 cpb = radii.b - (radii.b * 0.5522847498);
+        f64 cpc = radii.c - (radii.c * 0.5522847498);
+        f64 cpd = radii.d - (radii.d * 0.5522847498);
+        f64 cpe = radii.e - (radii.e * 0.5522847498);
+        f64 cpf = radii.f - (radii.f * 0.5522847498);
+        f64 cpg = radii.g - (radii.g * 0.5522847498);
+        f64 cph = radii.h - (radii.h * 0.5522847498);
 
-        moveTo({rect.x + radius.b, rect.y});
+        moveTo({rect.x + radii.b, rect.y});
 
         // Top end edge
-        lineTo({rect.x + rect.width - radius.c, rect.y});
+        lineTo({rect.x + rect.width - radii.c, rect.y});
         cubicTo(
             {rect.x + rect.width - cpc, rect.y},
             {rect.x + rect.width, rect.y + cpd},
-            {rect.x + rect.width, rect.y + radius.d}
+            {rect.x + rect.width, rect.y + radii.d}
         );
 
         // Bottom end edge
-        lineTo({rect.x + rect.width, rect.y + rect.height - radius.e});
+        lineTo({rect.x + rect.width, rect.y + rect.height - radii.e});
         cubicTo(
             {rect.x + rect.width, rect.y + rect.height - cpe},
             {rect.x + rect.width - cpf, rect.y + rect.height},
-            {rect.x + rect.width - radius.f, rect.y + rect.height}
+            {rect.x + rect.width - radii.f, rect.y + rect.height}
         );
 
         // Bottom start edge
-        lineTo({rect.x + radius.g, rect.y + rect.height});
+        lineTo({rect.x + radii.g, rect.y + rect.height});
         cubicTo(
             {rect.x + cpg, rect.y + rect.height},
             {rect.x, rect.y + rect.height - cph},
-            {rect.x, rect.y + rect.height - radius.h}
+            {rect.x, rect.y + rect.height - radii.h}
         );
 
         // Top start edge
-        lineTo({rect.x, rect.y + radius.a});
+        lineTo({rect.x, rect.y + radii.a});
         cubicTo(
             {rect.x, rect.y + cpa},
             {rect.x + cpb, rect.y},
-            {rect.x + radius.b, rect.y}
+            {rect.x + radii.b, rect.y}
         );
 
         close();
@@ -347,8 +347,8 @@ void Path::rect(Math::Rectf rect, Math::Radiusf radius) {
 void Path::ellipse(Math::Ellipsef ellipse) {
     auto bound = ellipse.bound();
     moveTo(bound.topCenter());
-    arcTo(ellipse.radius, 0, bound.bottomCenter(), Gfx::Path::SWEEP);
-    arcTo(ellipse.radius, 0, bound.topCenter(), Gfx::Path::SWEEP);
+    arcTo(ellipse.radii, 0, bound.bottomCenter(), Gfx::Path::SWEEP);
+    arcTo(ellipse.radii, 0, bound.topCenter(), Gfx::Path::SWEEP);
     close();
 }
 
@@ -411,7 +411,7 @@ Opt<Path::Op> Path::parseOp(Io::SScan &s, Rune opcode) {
 
     case 'a': // arc to
     {
-        auto radius = try$(nextCoordPair());
+        auto radii = try$(nextCoordPair());
         auto angle = try$(nextCoord());
 
         nextSep();
@@ -421,7 +421,7 @@ Opt<Path::Op> Path::parseOp(Io::SScan &s, Rune opcode) {
         flags |= s.next() == '1' ? SWEEP : DEFAULT;
 
         auto p = try$(nextCoordPair());
-        return Op{ARC_TO, radius, angle, p, flags};
+        return Op{ARC_TO, radii, angle, p, flags};
     }
 
     default:

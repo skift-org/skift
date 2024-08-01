@@ -176,7 +176,7 @@ Ui::Child appStack(State const &state) {
                 .body = slot$(Ui::empty()),
             }) |
             Ui::box({
-                .borderRadius = 6,
+                .borderRadii = 6,
                 .borderWidth = 1,
                 .borderPaint = Ui::GRAY800,
                 .backgroundPaint = Ui::GRAY900,

@@ -115,7 +115,7 @@ struct ButtonStyle {
 
     static ButtonStyle destructive();
 
-    ButtonStyle withRadius(Math::Radiusf radius) const;
+    ButtonStyle withRadii(Math::Radiif radii) const;
 
     ButtonStyle withForegroundPaint(Gfx::Paint paint) const;
 

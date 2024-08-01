@@ -158,7 +158,7 @@ Child dragRegion(Child child) {
 Child handle() {
     return empty({128, 4}) |
            box({
-               .borderRadius = 999,
+               .borderRadii = 999,
                .backgroundPaint = GRAY50,
            }) |
            spacing(12) |

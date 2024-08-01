@@ -25,7 +25,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
             Ui::center() |
             Ui::box({
                 .padding = {16, 8},
-                .borderRadius = {32, 8, 0, 0, 0, 0, 0, 0},
+                .borderRadii = {32, 8, 0, 0, 0, 0, 0, 0},
                 .borderWidth = 10,
                 .borderPaint = Gfx::RED,
                 .backgroundPaint = Gfx::WHITE,

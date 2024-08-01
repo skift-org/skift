@@ -16,16 +16,16 @@ ButtonStyle ButtonStyle::none() {
 ButtonStyle ButtonStyle::regular(Gfx::ColorRamp ramp) {
     return {
         .idleStyle = {
-            .borderRadius = RADIUS,
+            .borderRadii = RADIUS,
             .backgroundPaint = ramp[8],
         },
         .hoverStyle = {
-            .borderRadius = RADIUS,
+            .borderRadii = RADIUS,
             .borderWidth = 1,
             .backgroundPaint = ramp[7],
         },
         .pressStyle = {
-            .borderRadius = RADIUS,
+            .borderRadii = RADIUS,
             .borderWidth = 1,
             .borderPaint = ramp[7],
             .backgroundPaint = ramp[8],
@@ -36,16 +36,16 @@ ButtonStyle ButtonStyle::regular(Gfx::ColorRamp ramp) {
 ButtonStyle ButtonStyle::secondary() {
     return {
         .idleStyle = {
-            .borderRadius = RADIUS,
+            .borderRadii = RADIUS,
             .backgroundPaint = GRAY900,
         },
         .hoverStyle = {
-            .borderRadius = RADIUS,
+            .borderRadii = RADIUS,
             .borderWidth = 1,
             .backgroundPaint = GRAY800,
         },
         .pressStyle = {
-            .borderRadius = RADIUS,
+            .borderRadii = RADIUS,
             .borderWidth = 1,
             .borderPaint = GRAY800,
             .backgroundPaint = GRAY900,
@@ -56,18 +56,18 @@ ButtonStyle ButtonStyle::secondary() {
 ButtonStyle ButtonStyle::primary() {
     return {
         .idleStyle = {
-            .borderRadius = RADIUS,
+            .borderRadii = RADIUS,
             .backgroundPaint = ACCENT700,
             .foregroundPaint = Gfx::WHITE,
         },
         .hoverStyle = {
-            .borderRadius = RADIUS,
+            .borderRadii = RADIUS,
             .borderWidth = 1,
             .backgroundPaint = ACCENT600,
             .foregroundPaint = Gfx::WHITE,
         },
         .pressStyle = {
-            .borderRadius = RADIUS,
+            .borderRadii = RADIUS,
             .borderWidth = 1,
             .borderPaint = ACCENT600,
             .backgroundPaint = ACCENT700,
@@ -79,17 +79,17 @@ ButtonStyle ButtonStyle::primary() {
 ButtonStyle ButtonStyle::outline() {
     return {
         .idleStyle = {
-            .borderRadius = RADIUS,
+            .borderRadii = RADIUS,
             .borderWidth = 1,
             .borderPaint = GRAY800,
         },
         .hoverStyle = {
-            .borderRadius = RADIUS,
+            .borderRadii = RADIUS,
             .borderWidth = 1,
             .backgroundPaint = GRAY700,
         },
         .pressStyle = {
-            .borderRadius = RADIUS,
+            .borderRadii = RADIUS,
             .borderWidth = 1,
             .borderPaint = GRAY700,
             .backgroundPaint = GRAY800,
@@ -103,12 +103,12 @@ ButtonStyle ButtonStyle::subtle() {
             .foregroundPaint = GRAY300,
         },
         .hoverStyle = {
-            .borderRadius = RADIUS,
+            .borderRadii = RADIUS,
             .borderWidth = 1,
             .backgroundPaint = GRAY700,
         },
         .pressStyle = {
-            .borderRadius = RADIUS,
+            .borderRadii = RADIUS,
             .borderWidth = 1,
             .borderPaint = GRAY700,
             .backgroundPaint = GRAY800,
@@ -130,16 +130,16 @@ ButtonStyle ButtonStyle::text() {
 ButtonStyle ButtonStyle::destructive() {
     return {
         .idleStyle = {
-            .borderRadius = RADIUS,
+            .borderRadii = RADIUS,
             .foregroundPaint = Gfx::RED500,
         },
         .hoverStyle = {
-            .borderRadius = RADIUS,
+            .borderRadii = RADIUS,
             .borderWidth = 1,
             .backgroundPaint = Gfx::RED600,
         },
         .pressStyle = {
-            .borderRadius = RADIUS,
+            .borderRadii = RADIUS,
             .borderWidth = 1,
             .borderPaint = Gfx::RED600,
             .backgroundPaint = Gfx::RED700,
@@ -147,11 +147,11 @@ ButtonStyle ButtonStyle::destructive() {
     };
 }
 
-ButtonStyle ButtonStyle::withRadius(Math::Radiusf radius) const {
+ButtonStyle ButtonStyle::withRadii(Math::Radiif radii) const {
     return {
-        idleStyle.withRadius(radius),
-        hoverStyle.withRadius(radius),
-        pressStyle.withRadius(radius),
+        idleStyle.withRadii(radii),
+        hoverStyle.withRadii(radii),
+        pressStyle.withRadii(radii),
     };
 }
 

@@ -293,20 +293,20 @@ Child icon(Mdi::Icon i, f64 size, Opt<Gfx::Color> color) {
 
 struct Image : public View<Image> {
     Karm::Image::Picture _image;
-    Opt<Math::Radiusf> _radius;
+    Opt<Math::Radiif> _radii;
 
     Image(Karm::Image::Picture image)
         : _image(image) {}
 
-    Image(Karm::Image::Picture image, Math::Radiusf radius)
-        : _image(image), _radius(radius) {}
+    Image(Karm::Image::Picture image, Math::Radiif radii)
+        : _image(image), _radii(radii) {}
 
     void paint(Gfx::Context &g, Math::Recti) override {
         g.save();
 
-        if (_radius) {
+        if (_radii) {
             g.fillStyle(_image.pixels());
-            g.fill(bound(), *_radius);
+            g.fill(bound(), *_radii);
         } else {
             g.blit(bound(), _image);
         }
@@ -325,8 +325,8 @@ Child image(Karm::Image::Picture image) {
     return makeStrong<Image>(image);
 }
 
-Child image(Karm::Image::Picture image, Math::Radiusf radius) {
-    return makeStrong<Image>(image, radius);
+Child image(Karm::Image::Picture image, Math::Radiif radii) {
+    return makeStrong<Image>(image, radii);
 }
 
 // MARK: Canvas ----------------------------------------------------------------
@@ -368,9 +368,9 @@ Child canvas(OnPaint onPaint) {
 struct BackgroundFilter : public ProxyNode<BackgroundFilter> {
     Gfx::Filter _filter;
 
-    BackgroundFilter(Gfx::Filter radius, Child child)
+    BackgroundFilter(Gfx::Filter filter, Child child)
         : ProxyNode<BackgroundFilter>(std::move(child)),
-          _filter(radius) {}
+          _filter(filter) {}
 
     void reconcile(BackgroundFilter &o) override {
         _filter = o._filter;
@@ -390,9 +390,9 @@ Child backgroundFilter(Gfx::Filter f, Child child) {
 struct ForegroundFilter : public ProxyNode<ForegroundFilter> {
     Gfx::Filter _filter;
 
-    ForegroundFilter(Gfx::Filter radius, Child child)
+    ForegroundFilter(Gfx::Filter filter, Child child)
         : ProxyNode<ForegroundFilter>(std::move(child)),
-          _filter(radius) {}
+          _filter(filter) {}
 
     void reconcile(ForegroundFilter &o) override {
         _filter = o._filter;

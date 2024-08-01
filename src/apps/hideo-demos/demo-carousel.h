@@ -22,7 +22,7 @@ static inline Demo CAROUSEL_DEMO{
                     return Ui::box(
                         {
                             .margin = 32,
-                            .borderRadius = 8,
+                            .borderRadii = 8,
                             .borderWidth = 1,
                             .borderPaint = Gfx::WHITE.withOpacity(0.1),
                             .backgroundPaint = color,

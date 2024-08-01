@@ -14,19 +14,19 @@ Ui::Child app() {
             .body = [&] {
                 auto decBtn = Ui::button(
                     Model::bind<DecrementAction>(),
-                    Ui::ButtonStyle::regular().withRadius(999),
+                    Ui::ButtonStyle::regular().withRadii(999),
                     Mdi::MINUS_THICK
                 );
 
                 auto incBtn = Ui::button(
                     Model::bind<IncrementAction>(),
-                    Ui::ButtonStyle::regular().withRadius(999),
+                    Ui::ButtonStyle::regular().withRadii(999),
                     Mdi::PLUS_THICK
                 );
 
                 auto resetBtn = Ui::button(
                     Model::bindIf<ResetAction>(not s.initial),
-                    Ui::ButtonStyle::subtle().withRadius(999),
+                    Ui::ButtonStyle::subtle().withRadii(999),
                     Mdi::REFRESH, "Reset"
                 );
 

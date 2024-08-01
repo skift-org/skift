@@ -157,7 +157,7 @@ Ui::Child breadcrumbRoot(Mime::Url const &url) {
 Ui::Child breadcrumb(State const &state) {
     return Ui::box(
         {
-            .borderRadius = 4,
+            .borderRadii = 4,
             .borderWidth = 1,
             .backgroundPaint = Ui::GRAY800,
         },

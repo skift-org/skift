@@ -193,9 +193,9 @@ void Context::fill(Math::Edgef edge, f64 thickness) {
     stroke(copy.withWidth(thickness));
 }
 
-void Context::stroke(Math::Rectf r, Math::Radiusf radius) {
+void Context::stroke(Math::Rectf r, Math::Radiif radii) {
     begin();
-    rect(r, radius);
+    rect(r, radii);
     stroke();
 }
 
@@ -219,12 +219,12 @@ void Context::stroke(Math::Rectf r, Math::Radiusf radius) {
     }
 }
 
-void Context::fill(Math::Recti r, Math::Radiusf radius) {
+void Context::fill(Math::Recti r, Math::Radiif radii) {
     begin();
-    rect(r.cast<f64>(), radius);
+    rect(r.cast<f64>(), radii);
 
     bool isSuitableForFastFill =
-        radius.zero() and
+        radii.zero() and
         current().paint.is<Color>() and
         current().trans.isIdentity();
 
@@ -235,9 +235,9 @@ void Context::fill(Math::Recti r, Math::Radiusf radius) {
     }
 }
 
-void Context::fill(Math::Rectf r, Math::Radiusf radius) {
+void Context::fill(Math::Rectf r, Math::Radiif radii) {
     begin();
-    rect(r, radius);
+    rect(r, radii);
     fill();
 }
 
@@ -393,8 +393,8 @@ void Context::quadTo(Math::Vec2f cp, Math::Vec2f p, Path::Flags flags) {
     _path.quadTo(cp, p, flags);
 }
 
-void Context::arcTo(Math::Vec2f radius, f64 angle, Math::Vec2f p, Path::Flags flags) {
-    _path.arcTo(radius, angle, p, flags);
+void Context::arcTo(Math::Vec2f radii, f64 angle, Math::Vec2f p, Path::Flags flags) {
+    _path.arcTo(radii, angle, p, flags);
 }
 
 bool Context::evalSvg(Str path) {
@@ -409,8 +409,8 @@ void Context::curve(Math::Curvef curve) {
     _path.curve(curve);
 }
 
-void Context::rect(Math::Rectf rect, Math::Radiusf radius) {
-    _path.rect(rect, radius);
+void Context::rect(Math::Rectf rect, Math::Radiif radii) {
+    _path.rect(rect, radii);
 }
 
 void Context::ellipse(Math::Ellipsef ellipse) {

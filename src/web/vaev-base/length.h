@@ -3,7 +3,7 @@
 #include <karm-base/distinct.h>
 #include <karm-io/emit.h>
 #include <karm-math/fixed.h>
-#include <karm-math/radius.h>
+#include <karm-math/radii.h>
 #include <karm-math/rect.h>
 #include <karm-math/spacing.h>
 
@@ -21,7 +21,7 @@ using Vec2Px = Math::Vec2<Px>;
 
 using SpacingPx = Math::Spacing<Px>;
 
-using RadiusPx = Math::Radius<Px>;
+using RadiiPx = Math::Radii<Px>;
 
 // 6. MARK: Distance Units: the <length> type
 // https://drafts.csswg.org/css-values/#lengths

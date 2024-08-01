@@ -3,6 +3,7 @@
 #include <karm-ui/reducer.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
+#include <vaev-dom/comment.h>
 #include <vaev-dom/document-type.h>
 #include <vaev-dom/element.h>
 #include <vaev-dom/text.h>
@@ -54,6 +55,8 @@ Ui::Child itemHeader(Dom::Node const &n) {
         return Ui::codeMedium("#text {#}", tx->data);
     } else if (auto *el = n.is<Dom::Element>()) {
         return Ui::hflow(n.children().len() ? Ui::icon(Mdi::CHEVRON_DOWN) : Ui::empty(), elementStartTag(*el));
+    } else if (auto *c = n.is<Dom::Comment>()) {
+        return Ui::codeMedium(Gfx::GREEN, "<!-- {} -->", c->data);
     } else {
         unreachable();
     }

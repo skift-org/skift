@@ -12,8 +12,8 @@ Ui::Child avatar() {
 Ui::Child avatar(String t) {
     Ui::BoxStyle boxStyle = {
         .borderRadii = 99,
-        .backgroundPaint = Ui::GRAY800,
-        .foregroundPaint = Ui::GRAY500
+        .backgroundFill = Ui::GRAY800,
+        .foregroundFill = Ui::GRAY500
     };
 
     return Ui::labelLarge(t) |
@@ -25,8 +25,8 @@ Ui::Child avatar(String t) {
 Ui::Child avatar(Mdi::Icon i) {
     Ui::BoxStyle boxStyle = {
         .borderRadii = 99,
-        .backgroundPaint = Ui::GRAY800,
-        .foregroundPaint = Ui::GRAY400
+        .backgroundFill = Ui::GRAY800,
+        .foregroundFill = Ui::GRAY400
     };
 
     return Ui::icon(i, 26) |

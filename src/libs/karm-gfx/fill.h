@@ -155,15 +155,15 @@ struct Gradient {
     }
 };
 
-using _Paints = Union<
+using _Fills = Union<
     Color,
     Gradient,
     Pixels>;
 
-struct Paint : public _Paints {
-    using _Paints::_Paints;
+struct Fill : public _Fills {
+    using _Fills::_Fills;
 
-    Paint(Color color = ALPHA) : _Paints(color) {}
+    Fill(Color color = ALPHA) : _Fills(color) {}
 
     always_inline Color sample(Math::Vec2f pos) const {
         return visit(

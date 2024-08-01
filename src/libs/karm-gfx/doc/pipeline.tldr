@@ -922,7 +922,7 @@
 				"dash": "draw",
 				"size": "m",
 				"font": "draw",
-				"text": "Paint",
+				"text": "Fill",
 				"align": "middle",
 				"verticalAlign": "middle",
 				"growY": 0,

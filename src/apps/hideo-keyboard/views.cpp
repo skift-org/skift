@@ -12,7 +12,7 @@ static Ui::Child toolbar() {
                Ui::empty({128, 4}) |
                    Ui::box({
                        .borderRadii = 999,
-                       .backgroundPaint = Ui::GRAY50,
+                       .backgroundFill = Ui::GRAY50,
                    }) |
                    Ui::center() |
                    Ui::grow(),
@@ -100,7 +100,7 @@ Ui::Child flyout() {
                        Ui::minSize({Ui::UNCONSTRAINED, 280}) |
                        Ui::box({
                            .padding = 8,
-                           .backgroundPaint = Ui::GRAY950,
+                           .backgroundFill = Ui::GRAY950,
                        })
                ) |
                Ui::align(Math::Align::HSTRETCH | Math::Align::BOTTOM) |

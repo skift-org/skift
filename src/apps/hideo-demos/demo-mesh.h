@@ -35,7 +35,7 @@ Math::Vec3f barycentric(Math::Vec2f a, Math::Vec2f b, Math::Vec2f c, Math::Vec2i
     return {u, v, w};
 }
 
-void fillTri(Math::Vert2f a, Math::Vert2f b, Math::Vert2f c, Gfx::Paint paint, Gfx::MutPixels buf) {
+void fillTri(Math::Vert2f a, Math::Vert2f b, Math::Vert2f c, Gfx::Fill fill, Gfx::MutPixels buf) {
     Math::Vec2i min = a.xy.min(b.xy).min(c.xy).cast<isize>();
     Math::Vec2i max = a.xy.max(b.xy).max(c.xy).cast<isize>();
 
@@ -45,7 +45,7 @@ void fillTri(Math::Vert2f a, Math::Vert2f b, Math::Vert2f c, Gfx::Paint paint, G
             auto uv = a.uv * bc.x + b.uv * bc.y + c.uv * bc.z;
             if (bc.x < 0 || bc.y < 0 || bc.z < 0)
                 continue;
-            buf.store({x, y}, paint.sample(uv));
+            buf.store({x, y}, fill.sample(uv));
         }
     }
 }
@@ -61,7 +61,7 @@ static inline Demo MESH_DEMO{
         return Ui::reducer<Model>(mesh, [](Math::Mesh2f const &s) {
             auto canvas = Ui::canvas(
                 [=, image = Image::loadOrFallback("file:./src/specs/qoi/tests/res/kodim23.qoi"_url).unwrap()](Gfx::Context &g, Math::Vec2i) {
-                    Gfx::Paint paint = image.pixels();
+                    Gfx::Fill fill = image.pixels();
 
                     for (usize i = 0; i + 2 < s.index.len(); i += 3) {
                         auto a = s.verts[s.index[i]];
@@ -70,7 +70,7 @@ static inline Demo MESH_DEMO{
                         b.xy = g.current().trans.apply(b.xy);
                         auto c = s.verts[s.index[i + 2]];
                         c.xy = g.current().trans.apply(c.xy);
-                        fillTri(a, b, c, paint, *g._pixels);
+                        fillTri(a, b, c, fill, *g._pixels);
                     }
 
                     g.strokeStyle(Gfx::stroke(Gfx::WHITE).withWidth(1).withAlign(Gfx::OUTSIDE_ALIGN));
@@ -90,7 +90,7 @@ static inline Demo MESH_DEMO{
                 return Ui::empty(8) |
                        Ui::box(Ui::BoxStyle{
                            .borderRadii = 16,
-                           .backgroundPaint = Gfx::WHITE,
+                           .backgroundFill = Gfx::WHITE,
                        }) |
                        Ui::center() |
                        Ui::bound() |

@@ -16,7 +16,7 @@ Ui::Child formula() {
         {
             .borderRadii = 4,
             .borderWidth = 1,
-            .backgroundPaint = Ui::GRAY800,
+            .backgroundFill = Ui::GRAY800,
         },
         Ui::hflow(
             Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FUNCTION),

@@ -24,8 +24,8 @@ static inline Demo CAROUSEL_DEMO{
                             .margin = 32,
                             .borderRadii = 8,
                             .borderWidth = 1,
-                            .borderPaint = Gfx::WHITE.withOpacity(0.1),
-                            .backgroundPaint = color,
+                            .borderFill = Gfx::WHITE.withOpacity(0.1),
+                            .backgroundFill = color,
                             .shadowStyle = Gfx::BoxShadow::elevated(24, color.withOpacity(0.5)),
                         },
                         Ui::displayLarge(text) | Ui::center() | Ui::bound()

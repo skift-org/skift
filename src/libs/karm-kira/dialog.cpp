@@ -11,8 +11,8 @@ Ui::Child dialogContent(Ui::Children children) {
     Ui::BoxStyle const boxStyle = {
         .borderRadii = 8,
         .borderWidth = 1,
-        .borderPaint = Ui::GRAY800,
-        .backgroundPaint = Ui::GRAY900,
+        .borderFill = Ui::GRAY800,
+        .backgroundFill = Ui::GRAY900,
         .shadowStyle = Gfx::BoxShadow::elevated(16)
     };
 

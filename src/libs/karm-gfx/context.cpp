@@ -93,16 +93,16 @@ void Context::identity() {
 
 // MARK: Fill & Stroke ---------------------------------------------------------
 
-Paint const &Context::fillStyle() {
-    return current().paint;
+Fill const &Context::fillStyle() {
+    return current().fill;
 }
 
 Stroke const &Context::strokeStyle() {
     return current().stroke;
 }
 
-Context &Context::fillStyle(Paint paint) {
-    current().paint = paint;
+Context &Context::fillStyle(Fill fill) {
+    current().fill = fill;
     return *this;
 }
 
@@ -225,11 +225,11 @@ void Context::fill(Math::Recti r, Math::Radiif radii) {
 
     bool isSuitableForFastFill =
         radii.zero() and
-        current().paint.is<Color>() and
+        current().fill.is<Color>() and
         current().trans.isIdentity();
 
     if (isSuitableForFastFill) {
-        _fillRect(r, current().paint.unwrap<Color>());
+        _fillRect(r, current().fill.unwrap<Color>());
     } else {
         fill();
     }
@@ -258,7 +258,7 @@ void Context::stroke(Gfx::Path const &path) {
     _poly.clear();
     createStroke(_poly, path, current().stroke);
     _poly.transform(current().trans);
-    _fill(current().stroke.paint);
+    _fill(current().stroke.fill);
 }
 
 // fill a path
@@ -266,7 +266,7 @@ void Context::fill(Gfx::Path const &path, FillRule rule) {
     _poly.clear();
     createSolid(_poly, path);
     _poly.transform(current().trans);
-    _fill(current().paint, rule);
+    _fill(current().fill, rule);
 }
 
 // MARK: Debug -----------------------------------------------------------------
@@ -319,18 +319,18 @@ void Context::plot(Gfx::Color color) {
 
 // MARK: Paths -----------------------------------------------------------------
 
-void Context::_fillImpl(auto paint, auto format, FillRule fillRule) {
+void Context::_fillImpl(auto fill, auto format, FillRule fillRule) {
     _rast.fill(_poly, current().clip, fillRule, [&](Rast::Frag frag) {
         auto pixels = mutPixels();
         auto *pixel = pixels.pixelUnsafe(frag.xy);
-        auto color = paint.sample(frag.uv);
+        auto color = fill.sample(frag.uv);
         auto c = format.load(pixel);
         c = color.withOpacity(frag.a).blendOver(c);
         format.store(pixel, c);
     });
 }
 
-void Context::_FillSmoothImpl(auto paint, auto format, FillRule fillRule) {
+void Context::_FillSmoothImpl(auto fill, auto format, FillRule fillRule) {
     Math::Vec2f last = {0, 0};
     auto fillComponent = [&](auto comp, Math::Vec2f pos) {
         _poly.offset(pos - last);
@@ -338,7 +338,7 @@ void Context::_FillSmoothImpl(auto paint, auto format, FillRule fillRule) {
 
         _rast.fill(_poly, current().clip, fillRule, [&](Rast::Frag frag) {
             u8 *pixel = static_cast<u8 *>(mutPixels().pixelUnsafe(frag.xy));
-            auto color = paint.sample(frag.uv);
+            auto color = fill.sample(frag.uv);
             auto c = format.load(pixel);
             c = color.withOpacity(frag.a).blendOverComponent(c, comp);
             format.store(pixel, c);
@@ -350,13 +350,13 @@ void Context::_FillSmoothImpl(auto paint, auto format, FillRule fillRule) {
     fillComponent(Color::BLUE_COMPONENT, _lcdLayout.blue);
 }
 
-void Context::_fill(Paint paint, FillRule fillRule) {
-    paint.visit([&](auto paint) {
+void Context::_fill(Fill fill, FillRule fillRule) {
+    fill.visit([&](auto fill) {
         pixels().fmt().visit([&](auto format) {
             if (_useSpaa)
-                _FillSmoothImpl(paint, format, fillRule);
+                _FillSmoothImpl(fill, format, fillRule);
             else
-                _fillImpl(paint, format, fillRule);
+                _fillImpl(fill, format, fillRule);
         });
     });
 }
@@ -421,11 +421,11 @@ void Context::fill(FillRule rule) {
     fill(fillStyle(), rule);
 }
 
-void Context::fill(Paint paint, FillRule rule) {
+void Context::fill(Fill fill, FillRule rule) {
     _poly.clear();
     createSolid(_poly, _path);
     _poly.transform(current().trans);
-    _fill(paint, rule);
+    _fill(fill, rule);
 }
 
 void Context::stroke() {
@@ -436,7 +436,7 @@ void Context::stroke(Stroke style) {
     _poly.clear();
     createStroke(_poly, _path, style);
     _poly.transform(current().trans);
-    _fill(style.paint);
+    _fill(style.fill);
 }
 
 // MARK: Effects ---------------------------------------------------------------

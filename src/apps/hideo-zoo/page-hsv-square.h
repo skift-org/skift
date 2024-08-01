@@ -15,7 +15,7 @@ static inline Page PAGE_HSV_SQUARE{
         return Kr::hsvSquare({}, Ui::IGNORE<Gfx::Hsv>) |
                Ui::box({
                    .borderWidth = 1,
-                   .borderPaint = Ui::GRAY800,
+                   .borderFill = Ui::GRAY800,
                }) |
                Ui::center();
     },

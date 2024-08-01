@@ -30,7 +30,7 @@ Ui::Child errorPageContent(Ui::Children children) {
                children
            ) |
            Ui::box({
-               .foregroundPaint = Ui::GRAY500,
+               .foregroundFill = Ui::GRAY500,
            }) |
            Ui::center();
     ;

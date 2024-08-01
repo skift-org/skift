@@ -58,7 +58,7 @@ Ui::Child editorPreview(State const &state) {
     return Ui::image(state.image.unwrap()) |
            Ui::box({
                .borderWidth = 1,
-               .borderPaint = Ui::GRAY50.withOpacity(0.1),
+               .borderFill = Ui::GRAY50.withOpacity(0.1),
            }) |
            Ui::foregroundFilter(state.filter) |
            Ui::insets(8) |

@@ -96,7 +96,7 @@ struct ButtonStyle {
     BoxStyle hoverStyle{};
     BoxStyle pressStyle{};
     BoxStyle disabledStyle = {
-        .foregroundPaint = GRAY600,
+        .foregroundFill = GRAY600,
     };
 
     static ButtonStyle none();
@@ -117,7 +117,7 @@ struct ButtonStyle {
 
     ButtonStyle withRadii(Math::Radiif radii) const;
 
-    ButtonStyle withForegroundPaint(Gfx::Paint paint) const;
+    ButtonStyle withForegroundFill(Gfx::Fill fill) const;
 
     ButtonStyle withPadding(Math::Insetsi insets) const;
 

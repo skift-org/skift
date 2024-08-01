@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-gfx/paint.h>
+#include <karm-gfx/fill.h>
 #include <karm-mime/url.h>
 
 #include "color.h"
@@ -111,7 +111,7 @@ struct BackgroundRepeat {
 };
 
 struct Background {
-    Color paint;
+    Color fill;
     BackgroundAttachment attachment;
     BackgroundPosition position;
     BackgroundRepeat repeat;

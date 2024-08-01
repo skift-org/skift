@@ -45,13 +45,13 @@ Ui::Child sidenavItem(bool selected, Ui::OnPress onPress, Mdi::Icon icon, String
 
     buttonStyle.idleStyle = {
         .borderRadii = 4,
-        .backgroundPaint = selected ? Ui::GRAY900 : Gfx::ALPHA,
+        .backgroundFill = selected ? Ui::GRAY900 : Gfx::ALPHA,
     };
 
     auto indicator = box(
         {
             .borderRadii = 99,
-            .backgroundPaint = selected ? Ui::ACCENT600 : Gfx::ALPHA,
+            .backgroundFill = selected ? Ui::ACCENT600 : Gfx::ALPHA,
         },
         Ui::empty(2)
     );

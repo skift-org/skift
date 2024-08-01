@@ -106,7 +106,7 @@ Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
                             Ui::labelSmall("LF")
                         ) | Ui::box({
                                 .padding = {12, 6},
-                                .backgroundPaint = Ui::GRAY900,
+                                .backgroundFill = Ui::GRAY900,
                             })
                     );
                 },

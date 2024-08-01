@@ -2,8 +2,8 @@
 
 #include "buffer.h"
 #include "canvas.h"
+#include "fill.h"
 #include "filters.h"
-#include "paint.h"
 #include "path.h"
 #include "rast.h"
 #include "stroke.h"
@@ -22,7 +22,7 @@ static LcdLayout VRGB = {{0.0, +0.33}, {0.0, 0.0}, {0.0, -0.33}};
 
 struct Context : public Canvas {
     struct Scope {
-        Paint paint = Gfx::WHITE;
+        Fill fill = Gfx::WHITE;
         Stroke stroke{};
         Math::Recti clip{};
         Math::Trans2f trans = Math::Trans2f::identity();
@@ -116,13 +116,13 @@ struct Context : public Canvas {
     // MARK: Fill & Stroke -----------------------------------------------------
 
     // Get the current fill style.
-    Paint const &fillStyle();
+    Fill const &fillStyle();
 
     // Get the current stroke style.
     Stroke const &strokeStyle();
 
     // Set the current fill style.
-    Context &fillStyle(Paint style);
+    Context &fillStyle(Fill style);
 
     // Set the current stroke style.
     Context &strokeStyle(Stroke style);
@@ -208,11 +208,11 @@ struct Context : public Canvas {
 
     // MARK: Paths -------------------------------------------------------------
 
-    // (internal) Fill the current shape with the given paint.
+    // (internal) Fill the current shape with the given fill.
     // NOTE: The shape must be flattened before calling this function.
-    void _fillImpl(auto paint, auto format, FillRule fillRule);
-    void _FillSmoothImpl(auto paint, auto format, FillRule fillRule);
-    void _fill(Paint paint, FillRule rule = FillRule::NONZERO);
+    void _fillImpl(auto fill, auto format, FillRule fillRule);
+    void _FillSmoothImpl(auto fill, auto format, FillRule fillRule);
+    void _fill(Fill fill, FillRule rule = FillRule::NONZERO);
 
     // Begin a new path.
     void begin() override;
@@ -259,8 +259,8 @@ struct Context : public Canvas {
     // Fill the current path.
     void fill(FillRule rule = FillRule::NONZERO);
 
-    // Fill the current path with the given paint.
-    void fill(Paint paint, FillRule rule = FillRule::NONZERO) override;
+    // Fill the current path with the given fill.
+    void fill(Fill fill, FillRule rule = FillRule::NONZERO) override;
 
     // Stroke the current path.
     void stroke();

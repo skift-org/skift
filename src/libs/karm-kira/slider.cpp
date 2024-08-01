@@ -17,13 +17,13 @@ Ui::Child slider(f64 value, Ui::OnChange<f64> onChange, Mdi::Icon icon, Str text
            ) |
            Ui::box({
                .borderRadii = 6,
-               .backgroundPaint = Ui::ACCENT600,
+               .backgroundFill = Ui::ACCENT600,
            }) |
            Ui::dragRegion() |
            Ui::slider(value, std::move(onChange)) |
            Ui::box({
                .borderRadii = 6,
-               .backgroundPaint = Ui::GRAY900,
+               .backgroundFill = Ui::GRAY900,
            }) |
            Ui::maxSize({Ui::UNCONSTRAINED, 36});
 }

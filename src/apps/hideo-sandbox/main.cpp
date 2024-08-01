@@ -27,8 +27,8 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
                 .padding = {16, 8},
                 .borderRadii = {32, 8, 0, 0, 0, 0, 0, 0},
                 .borderWidth = 10,
-                .borderPaint = Gfx::RED,
-                .backgroundPaint = Gfx::WHITE,
+                .borderFill = Gfx::RED,
+                .backgroundFill = Gfx::WHITE,
             })
     );
 }

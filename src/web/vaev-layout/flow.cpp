@@ -24,7 +24,7 @@ void Flow::paintWireframe(Gfx::Context &g) {
     }
 
     g.strokeStyle({
-        .paint = Gfx::BLACK,
+        .fill = Gfx::BLACK,
         .width = 1,
         .align = Gfx::INSIDE_ALIGN,
     });

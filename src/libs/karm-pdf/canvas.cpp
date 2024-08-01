@@ -69,8 +69,8 @@ void Canvas::rect(Math::Rectf rect, Math::Radiif) {
     close();
 }
 
-void Canvas::fill(Gfx::Paint paint, Gfx::FillRule rule) {
-    auto color = paint.unwrap<Gfx::Color>();
+void Canvas::fill(Gfx::Fill fill, Gfx::FillRule rule) {
+    auto color = fill.unwrap<Gfx::Color>();
     emit().ln("{} {} {} rg", color.red, color.green, color.blue);
     if (rule == Gfx::FillRule::NONZERO)
         emit().ln("f");
@@ -79,7 +79,7 @@ void Canvas::fill(Gfx::Paint paint, Gfx::FillRule rule) {
 }
 
 void Canvas::stroke(Gfx::Stroke style) {
-    auto color = style.paint.unwrap<Gfx::Color>();
+    auto color = style.fill.unwrap<Gfx::Color>();
     emit().ln("{} {} {} RG", color.red, color.green, color.blue);
 
     emit().ln("{} w", style.width);

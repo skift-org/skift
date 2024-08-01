@@ -51,7 +51,7 @@ struct Canvas : public Gfx::Canvas {
 
     void rect(Math::Rectf rect, Math::Radiif radii = 0) override;
 
-    void fill(Gfx::Paint paint, Gfx::FillRule rule) override;
+    void fill(Gfx::Fill fill, Gfx::FillRule rule) override;
 
     void stroke(Gfx::Stroke style) override;
 

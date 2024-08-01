@@ -199,7 +199,7 @@ void Prose::paint(Gfx::Context &ctx) const {
         ctx.fillStyle(*_style.color);
 
     ctx.strokeStyle({
-        .paint = ctx.current().paint,
+        .fill = ctx.current().fill,
         .width = 1,
         .align = Gfx::INSIDE_ALIGN,
     });

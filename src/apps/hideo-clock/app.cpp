@@ -63,7 +63,7 @@ Ui::Child alarmCard(Time alarm, bool enabled) {
            Ui::box({
                .padding = 12,
                .borderRadii = 12,
-               .backgroundPaint = Ui::GRAY900,
+               .backgroundFill = Ui::GRAY900,
            });
 }
 

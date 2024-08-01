@@ -49,8 +49,8 @@ Ui::Child contextMenuContent(Ui::Children children) {
                .margin = 4,
                .borderRadii = 6,
                .borderWidth = 1,
-               .borderPaint = Ui::GRAY800,
-               .backgroundPaint = Ui::GRAY900,
+               .borderFill = Ui::GRAY800,
+               .backgroundFill = Ui::GRAY900,
                .shadowStyle = Gfx::BoxShadow::elevated(4),
            }) |
            Ui::scaleIn();

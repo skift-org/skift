@@ -159,7 +159,7 @@ Child handle() {
     return empty({128, 4}) |
            box({
                .borderRadii = 999,
-               .backgroundPaint = GRAY50,
+               .backgroundFill = GRAY50,
            }) |
            insets(12) |
            center() |

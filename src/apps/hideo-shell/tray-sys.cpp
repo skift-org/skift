@@ -250,7 +250,7 @@ Ui::Child noti(Noti const &noti, usize i) {
                8,
                Ui::hflow(
                    4,
-                   Ui::icon(manifest.icon, 12) | Ui::box({.foregroundPaint = manifest.ramp[4]}),
+                   Ui::icon(manifest.icon, 12) | Ui::box({.foregroundFill = manifest.ramp[4]}),
                    Ui::text(Ui::TextStyles::labelMedium().withColor(Ui::GRAY400), manifest.name)
                ),
                Ui::vflow(
@@ -262,7 +262,7 @@ Ui::Child noti(Noti const &noti, usize i) {
            Ui::box({
                .padding = 12,
                .borderRadii = 4,
-               .backgroundPaint = Ui::GRAY900,
+               .backgroundFill = Ui::GRAY900,
            }) |
            Ui::dragRegion() |
            Ui::dismisable(
@@ -309,8 +309,8 @@ Ui::Child sysFlyout(State const &state) {
         .padding = {12, 12, 12, 0},
         .borderRadii = 8,
         .borderWidth = 1,
-        .borderPaint = Ui::GRAY800,
-        .backgroundPaint = Ui::GRAY950,
+        .borderFill = Ui::GRAY800,
+        .backgroundFill = Ui::GRAY950,
     });
 
     Ui::Children body;

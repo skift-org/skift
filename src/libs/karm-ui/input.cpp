@@ -17,18 +17,18 @@ ButtonStyle ButtonStyle::regular(Gfx::ColorRamp ramp) {
     return {
         .idleStyle = {
             .borderRadii = RADIUS,
-            .backgroundPaint = ramp[8],
+            .backgroundFill = ramp[8],
         },
         .hoverStyle = {
             .borderRadii = RADIUS,
             .borderWidth = 1,
-            .backgroundPaint = ramp[7],
+            .backgroundFill = ramp[7],
         },
         .pressStyle = {
             .borderRadii = RADIUS,
             .borderWidth = 1,
-            .borderPaint = ramp[7],
-            .backgroundPaint = ramp[8],
+            .borderFill = ramp[7],
+            .backgroundFill = ramp[8],
         },
     };
 }
@@ -37,18 +37,18 @@ ButtonStyle ButtonStyle::secondary() {
     return {
         .idleStyle = {
             .borderRadii = RADIUS,
-            .backgroundPaint = GRAY900,
+            .backgroundFill = GRAY900,
         },
         .hoverStyle = {
             .borderRadii = RADIUS,
             .borderWidth = 1,
-            .backgroundPaint = GRAY800,
+            .backgroundFill = GRAY800,
         },
         .pressStyle = {
             .borderRadii = RADIUS,
             .borderWidth = 1,
-            .borderPaint = GRAY800,
-            .backgroundPaint = GRAY900,
+            .borderFill = GRAY800,
+            .backgroundFill = GRAY900,
         },
     };
 }
@@ -57,21 +57,21 @@ ButtonStyle ButtonStyle::primary() {
     return {
         .idleStyle = {
             .borderRadii = RADIUS,
-            .backgroundPaint = ACCENT700,
-            .foregroundPaint = Gfx::WHITE,
+            .backgroundFill = ACCENT700,
+            .foregroundFill = Gfx::WHITE,
         },
         .hoverStyle = {
             .borderRadii = RADIUS,
             .borderWidth = 1,
-            .backgroundPaint = ACCENT600,
-            .foregroundPaint = Gfx::WHITE,
+            .backgroundFill = ACCENT600,
+            .foregroundFill = Gfx::WHITE,
         },
         .pressStyle = {
             .borderRadii = RADIUS,
             .borderWidth = 1,
-            .borderPaint = ACCENT600,
-            .backgroundPaint = ACCENT700,
-            .foregroundPaint = Gfx::WHITE,
+            .borderFill = ACCENT600,
+            .backgroundFill = ACCENT700,
+            .foregroundFill = Gfx::WHITE,
         },
     };
 }
@@ -81,18 +81,18 @@ ButtonStyle ButtonStyle::outline() {
         .idleStyle = {
             .borderRadii = RADIUS,
             .borderWidth = 1,
-            .borderPaint = GRAY800,
+            .borderFill = GRAY800,
         },
         .hoverStyle = {
             .borderRadii = RADIUS,
             .borderWidth = 1,
-            .backgroundPaint = GRAY700,
+            .backgroundFill = GRAY700,
         },
         .pressStyle = {
             .borderRadii = RADIUS,
             .borderWidth = 1,
-            .borderPaint = GRAY700,
-            .backgroundPaint = GRAY800,
+            .borderFill = GRAY700,
+            .backgroundFill = GRAY800,
         },
     };
 }
@@ -100,18 +100,18 @@ ButtonStyle ButtonStyle::outline() {
 ButtonStyle ButtonStyle::subtle() {
     return {
         .idleStyle = {
-            .foregroundPaint = GRAY300,
+            .foregroundFill = GRAY300,
         },
         .hoverStyle = {
             .borderRadii = RADIUS,
             .borderWidth = 1,
-            .backgroundPaint = GRAY700,
+            .backgroundFill = GRAY700,
         },
         .pressStyle = {
             .borderRadii = RADIUS,
             .borderWidth = 1,
-            .borderPaint = GRAY700,
-            .backgroundPaint = GRAY800,
+            .borderFill = GRAY700,
+            .backgroundFill = GRAY800,
         },
     };
 }
@@ -119,10 +119,10 @@ ButtonStyle ButtonStyle::subtle() {
 ButtonStyle ButtonStyle::text() {
     return {
         .idleStyle = {
-            .foregroundPaint = GRAY300,
+            .foregroundFill = GRAY300,
         },
         .pressStyle = {
-            .foregroundPaint = GRAY300,
+            .foregroundFill = GRAY300,
         },
     };
 }
@@ -131,18 +131,18 @@ ButtonStyle ButtonStyle::destructive() {
     return {
         .idleStyle = {
             .borderRadii = RADIUS,
-            .foregroundPaint = Gfx::RED500,
+            .foregroundFill = Gfx::RED500,
         },
         .hoverStyle = {
             .borderRadii = RADIUS,
             .borderWidth = 1,
-            .backgroundPaint = Gfx::RED600,
+            .backgroundFill = Gfx::RED600,
         },
         .pressStyle = {
             .borderRadii = RADIUS,
             .borderWidth = 1,
-            .borderPaint = Gfx::RED600,
-            .backgroundPaint = Gfx::RED700,
+            .borderFill = Gfx::RED600,
+            .backgroundFill = Gfx::RED700,
         },
     };
 }
@@ -155,11 +155,11 @@ ButtonStyle ButtonStyle::withRadii(Math::Radiif radii) const {
     };
 }
 
-ButtonStyle ButtonStyle::withForegroundPaint(Gfx::Paint paint) const {
+ButtonStyle ButtonStyle::withForegroundFill(Gfx::Fill fill) const {
     return {
-        idleStyle.withForegroundPaint(paint),
-        hoverStyle.withForegroundPaint(paint),
-        pressStyle.withForegroundPaint(paint),
+        idleStyle.withForegroundFill(fill),
+        hoverStyle.withForegroundFill(fill),
+        pressStyle.withForegroundFill(fill),
     };
 }
 

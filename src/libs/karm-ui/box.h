@@ -14,9 +14,9 @@ struct BoxStyle {
     Math::Radiif borderRadii{};
     f64 borderWidth{};
 
-    Opt<Gfx::Paint> borderPaint{Gfx::ALPHA};
-    Opt<Gfx::Paint> backgroundPaint{};
-    Gfx::Paint foregroundPaint{GRAY50};
+    Opt<Gfx::Fill> borderFill{Gfx::ALPHA};
+    Opt<Gfx::Fill> backgroundFill{};
+    Gfx::Fill foregroundFill{GRAY50};
     Opt<Gfx::BoxShadow> shadowStyle{};
 
     BoxStyle withMargin(Math::Insetsi margin) const {
@@ -43,21 +43,21 @@ struct BoxStyle {
         return copy;
     }
 
-    BoxStyle withBorderPaint(Gfx::Paint borderPaint) const {
+    BoxStyle withBorderFill(Gfx::Fill borderFill) const {
         auto copy = *this;
-        copy.borderPaint = borderPaint;
+        copy.borderFill = borderFill;
         return copy;
     }
 
-    BoxStyle withBackgroundPaint(Gfx::Paint backgroundPaint) const {
+    BoxStyle withBackgroundFill(Gfx::Fill backgroundFill) const {
         auto copy = *this;
-        copy.backgroundPaint = backgroundPaint;
+        copy.backgroundFill = backgroundFill;
         return copy;
     }
 
-    BoxStyle withForegroundPaint(Gfx::Paint foregroundPaint) const {
+    BoxStyle withForegroundFill(Gfx::Fill foregroundFill) const {
         auto copy = *this;
-        copy.foregroundPaint = foregroundPaint;
+        copy.foregroundFill = foregroundFill;
         return copy;
     }
 
@@ -74,16 +74,16 @@ struct BoxStyle {
         if (shadowStyle)
             shadowStyle->paint(g, bound);
 
-        if (backgroundPaint) {
-            g.fillStyle(*backgroundPaint);
+        if (backgroundFill) {
+            g.fillStyle(*backgroundFill);
             g.fill(bound, borderRadii);
         }
 
-        g.fillStyle(foregroundPaint);
+        g.fillStyle(foregroundFill);
         inner();
 
-        if (borderWidth and borderPaint) {
-            g.strokeStyle(Gfx::stroke(*borderPaint)
+        if (borderWidth and borderFill) {
+            g.strokeStyle(Gfx::stroke(*borderFill)
                               .withWidth(borderWidth)
                               .withAlign(Gfx::INSIDE_ALIGN));
             g.stroke(bound.cast<f64>(), borderRadii);

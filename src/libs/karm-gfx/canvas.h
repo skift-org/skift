@@ -2,7 +2,7 @@
 
 #include <karm-meta/nocopy.h>
 
-#include "paint.h"
+#include "fill.h"
 #include "path.h"
 #include "stroke.h"
 #include "types.h"
@@ -58,8 +58,8 @@ struct Canvas : public Meta::NoCopy {
     // Add an ellipse to the current path.
     virtual void ellipse(Math::Ellipsef ellipse) = 0;
 
-    // Fill the current path with the given paint.
-    virtual void fill(Paint paint, FillRule rule = FillRule::NONZERO) = 0;
+    // Fill the current path with the given fill.
+    virtual void fill(Fill fill, FillRule rule = FillRule::NONZERO) = 0;
 
     // Stroke the current path with the given style.
     virtual void stroke(Stroke style) = 0;

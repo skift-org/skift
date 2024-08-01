@@ -17,7 +17,7 @@ struct Box : public Node {
         for (auto &background : backgrounds) {
             ctx.begin();
             ctx.rect(bound.cast<f64>());
-            ctx.fill(colorContext.resolve(background.paint));
+            ctx.fill(colorContext.resolve(background.fill));
         }
     }
 

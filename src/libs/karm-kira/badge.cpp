@@ -9,8 +9,8 @@ Ui::Child badge(Gfx::Color color, String t) {
     Ui::BoxStyle boxStyle = {
         .padding = {6, 2},
         .borderRadii = 99,
-        .backgroundPaint = color.withOpacity(0.2),
-        .foregroundPaint = color,
+        .backgroundFill = color.withOpacity(0.2),
+        .foregroundFill = color,
     };
 
     return Ui::labelSmall(t) | box(boxStyle);

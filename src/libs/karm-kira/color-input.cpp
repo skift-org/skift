@@ -100,14 +100,14 @@ static Ui::Child _sliderThumb(Gfx::Color color) {
            Ui::box({
                .borderRadii = 99,
                .borderWidth = 2,
-               .borderPaint = Gfx::WHITE,
-               .backgroundPaint = color,
+               .borderFill = Gfx::WHITE,
+               .backgroundFill = color,
            }) |
            Ui::box({
                .padding = 1,
                .borderRadii = 99,
                .borderWidth = 1,
-               .borderPaint = Gfx::BLACK.withOpacity(0.25),
+               .borderFill = Gfx::BLACK.withOpacity(0.25),
            }) |
            Ui::dragRegion();
 }
@@ -130,8 +130,8 @@ Ui::Child hsvValueSlider(Gfx::Hsv hsv, Ui::OnChange<Gfx::Hsv> onChange) {
                .padding = 1,
                .borderRadii = 99,
                .borderWidth = 1,
-               .borderPaint = Ui::GRAY100.withOpacity(0.2),
-               .backgroundPaint = background,
+               .borderFill = Ui::GRAY100.withOpacity(0.2),
+               .backgroundFill = background,
            }) |
            Ui::maxSize({Ui::UNCONSTRAINED, 18});
 }
@@ -162,8 +162,8 @@ Ui::Child hsvSaturationSlider(Gfx::Hsv hsv, Ui::OnChange<Gfx::Hsv> onChange) {
                .padding = 1,
                .borderRadii = 99,
                .borderWidth = 1,
-               .borderPaint = Ui::GRAY100.withOpacity(0.2),
-               .backgroundPaint = background,
+               .borderFill = Ui::GRAY100.withOpacity(0.2),
+               .backgroundFill = background,
            }) |
            Ui::maxSize({Ui::UNCONSTRAINED, 18});
 }
@@ -178,8 +178,8 @@ Ui::Child hsvHueSlider(Gfx::Hsv hsv, Ui::OnChange<Gfx::Hsv> onChange) {
                .padding = 1,
                .borderRadii = 99,
                .borderWidth = 1,
-               .borderPaint = Ui::GRAY100.withOpacity(0.2),
-               .backgroundPaint = Gfx::Gradient::hsv().bake(),
+               .borderFill = Ui::GRAY100.withOpacity(0.2),
+               .backgroundFill = Gfx::Gradient::hsv().bake(),
            }) |
            Ui::maxSize({Ui::UNCONSTRAINED, 18});
 }
@@ -242,8 +242,8 @@ Ui::Child colorPickerDialog() {
                 Ui::box({
                     .borderRadii = 6,
                     .borderWidth = 1,
-                    .borderPaint = Ui::GRAY100.withOpacity(0.1),
-                    .backgroundPaint = Gfx::hsvToRgb(s.hsv),
+                    .borderFill = Ui::GRAY100.withOpacity(0.1),
+                    .backgroundFill = Gfx::hsvToRgb(s.hsv),
                     .shadowStyle = Gfx::BoxShadow::elevated(16, Gfx::hsvToRgb(s.hsv).withOpacity(0.5)),
                 });
 
@@ -297,8 +297,8 @@ Ui::Child colorInput(Gfx::Color color, Ui::OnChange<Gfx::Color>) {
             .margin = 4,
             .borderRadii = 2,
             .borderWidth = 1,
-            .borderPaint = Gfx::GRAY50.withOpacity(0.1),
-            .backgroundPaint = color,
+            .borderFill = Gfx::GRAY50.withOpacity(0.1),
+            .backgroundFill = color,
         });
 
     auto hexPreview =

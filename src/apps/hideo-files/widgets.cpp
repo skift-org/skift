@@ -29,17 +29,17 @@ Ui::ButtonStyle itemStyle(bool odd) {
     auto background = odd ? Ui::GRAY50.withOpacity(0.04) : Gfx::ALPHA;
     return {
         .idleStyle = {
-            .backgroundPaint = background,
-            .foregroundPaint = Ui::GRAY300,
+            .backgroundFill = background,
+            .foregroundFill = Ui::GRAY300,
         },
         .hoverStyle = {
             .borderWidth = 1,
-            .backgroundPaint = Ui::ACCENT900,
+            .backgroundFill = Ui::ACCENT900,
         },
         .pressStyle = {
             .borderWidth = 1,
-            .borderPaint = Ui::ACCENT900,
-            .backgroundPaint = Ui::ACCENT950,
+            .borderFill = Ui::ACCENT900,
+            .backgroundFill = Ui::ACCENT950,
         },
     };
 }
@@ -159,7 +159,7 @@ Ui::Child breadcrumb(State const &state) {
         {
             .borderRadii = 4,
             .borderWidth = 1,
-            .backgroundPaint = Ui::GRAY800,
+            .backgroundFill = Ui::GRAY800,
         },
         Ui::hflow(
             Ui::empty(12),

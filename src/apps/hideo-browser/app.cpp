@@ -100,7 +100,7 @@ Ui::Child addressBar(Mime::Url const &url) {
                .padding = {12, 0, 0, 0},
                .borderRadii = 4,
                .borderWidth = 1,
-               .backgroundPaint = Ui::GRAY800,
+               .backgroundFill = Ui::GRAY800,
            });
 }
 
@@ -172,7 +172,7 @@ Ui::Child webview(State const &s) {
     return Vaev::View::view(s.dom.unwrap()) |
            Ui::vscroll() |
            Ui::box({
-               .backgroundPaint = Gfx::WHITE,
+               .backgroundFill = Gfx::WHITE,
            }) |
            Kr::contextMenu(slot$(contextMenu(s)));
 }

@@ -13,7 +13,7 @@ Ui::Child navbarContent(Ui::Children children) {
         ) |
             Ui::box({
                 .padding = 8,
-                .backgroundPaint = Ui::GRAY900,
+                .backgroundFill = Ui::GRAY900,
             })
     );
 }
@@ -22,7 +22,7 @@ Ui::Child navbarItem(Ui::OnPress onPress, Mdi::Icon icon, Str text, bool selecte
     return Ui::button(
                std::move(onPress),
                selected
-                   ? Ui::ButtonStyle::regular().withForegroundPaint(Ui::ACCENT500)
+                   ? Ui::ButtonStyle::regular().withForegroundFill(Ui::ACCENT500)
                    : Ui::ButtonStyle::subtle(),
                Ui::vflow(
                    0,

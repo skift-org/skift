@@ -62,7 +62,7 @@ Child inspector(Child child) {
         ) |
             Ui::insets(4) |
             Ui::box({
-                .backgroundPaint = GRAY800,
+                .backgroundFill = GRAY800,
             })
     );
 }

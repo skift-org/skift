@@ -12,7 +12,7 @@
 namespace Hideo {
 
 static Ui::BoxStyle TOOLBAR = {
-    .backgroundPaint = Ui::GRAY900,
+    .backgroundFill = Ui::GRAY900,
 };
 
 Ui::Child aboutButton(Mdi::Icon icon, String title) {

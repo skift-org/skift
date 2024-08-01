@@ -199,7 +199,7 @@ struct BackgroundColorProp {
     void apply(Computed &c) const {
         c.backgrounds.resize(max(c.backgrounds.len(), value.len()));
         for (usize i = 0; i < value.len(); ++i)
-            c.backgrounds[i].paint = value[i];
+            c.backgrounds[i].fill = value[i];
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {

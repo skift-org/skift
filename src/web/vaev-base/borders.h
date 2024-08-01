@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-gfx/paint.h>
+#include <karm-gfx/fill.h>
 #include <karm-math/radii.h>
 
 #include "color.h"

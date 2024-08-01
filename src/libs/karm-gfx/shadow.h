@@ -5,7 +5,7 @@
 namespace Karm::Gfx {
 
 struct DropShadow {
-    Paint fill = Gfx::BLACK;
+    Fill fill = Gfx::BLACK;
     f64 radius{8};
     Math::Vec2i offset{};
 
@@ -17,7 +17,7 @@ struct DropShadow {
         };
     }
 
-    auto &withFill(Paint p) {
+    auto &withFill(Fill p) {
         fill = p;
         return *this;
     }

@@ -21,7 +21,7 @@ Ui::Child searchInput() {
            Ui::box({
                .borderRadii = 4,
                .borderWidth = 1,
-               .backgroundPaint = Ui::GRAY900,
+               .backgroundFill = Ui::GRAY900,
            }) |
            Ui::button(Keyboard::show);
 }
@@ -33,9 +33,9 @@ Ui::Child appIcon(Mdi::Icon const &icon, Gfx::ColorRamp ramp, isize size = 22) {
            Ui::box({
                .borderRadii = size * 0.25,
                .borderWidth = 1,
-               .borderPaint = ramp[5],
-               .backgroundPaint = ramp[6],
-               .foregroundPaint = ramp[1],
+               .borderFill = ramp[5],
+               .backgroundFill = ramp[6],
+               .foregroundFill = ramp[1],
            });
 }
 
@@ -155,8 +155,8 @@ Ui::Child appsFlyout(State const &state) {
                 .padding = {12, 0},
                 .borderRadii = 8,
                 .borderWidth = 1,
-                .borderPaint = Ui::GRAY800,
-                .backgroundPaint = Ui::GRAY950,
+                .borderFill = Ui::GRAY800,
+                .backgroundFill = Ui::GRAY950,
             }) |
             Ui::bound() |
             Ui::dismisable(

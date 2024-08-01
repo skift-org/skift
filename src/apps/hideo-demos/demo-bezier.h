@@ -29,7 +29,7 @@ static inline Demo BEZIER_DEMO{
                     g.cubicTo(s.b, s.c, s.d);
 
                     g.strokeStyle(Gfx::Stroke{
-                        .paint = Gfx::WHITE,
+                        .fill = Gfx::WHITE,
                         .width = 2,
                         .align = Gfx::CENTER_ALIGN,
                     });
@@ -85,7 +85,7 @@ static inline Demo BEZIER_DEMO{
                 return Ui::empty(8) |
                        Ui::box(Ui::BoxStyle{
                            .borderRadii = 16,
-                           .backgroundPaint = Gfx::WHITE,
+                           .backgroundFill = Gfx::WHITE,
                        }) |
                        Ui::center() |
                        Ui::bound() |

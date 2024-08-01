@@ -137,7 +137,7 @@ struct Run {
         ctx.save();
 
         ctx.strokeStyle({
-            .paint = ctx.current().paint,
+            .fill = ctx.current().fill,
             .width = 1,
             .align = Gfx::INSIDE_ALIGN,
         });

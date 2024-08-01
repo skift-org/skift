@@ -69,7 +69,11 @@ struct Frag {
     }
 
     virtual void paintWireframe(Gfx::Context &g) {
-        g.strokeStyle({.paint = Gfx::GREEN, .width = 1, .align = Gfx::INSIDE_ALIGN});
+        g.strokeStyle({
+            .fill = Gfx::GREEN,
+            .width = 1,
+            .align = Gfx::INSIDE_ALIGN,
+        });
         g.stroke(_box.borderBox.cast<f64>());
     }
 

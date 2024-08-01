@@ -15,7 +15,7 @@ Ui::Child card(Ui::Child child) {
     return Ui::box(
         {
             .borderRadii = 4,
-            .backgroundPaint = Ui::GRAY900,
+            .backgroundFill = Ui::GRAY900,
         },
         child
     );

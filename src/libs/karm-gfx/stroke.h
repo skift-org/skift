@@ -2,7 +2,7 @@
 
 #include <karm-math/poly.h>
 
-#include "paint.h"
+#include "fill.h"
 #include "path.h"
 
 namespace Karm::Gfx {
@@ -30,14 +30,14 @@ using enum StrokeCap;
 using enum StrokeJoin;
 
 struct Stroke {
-    Paint paint;
+    Fill fill;
     f64 width{1};
     StrokeAlign align{};
     StrokeCap cap{};
     StrokeJoin join{};
 
-    auto &withPaint(Paint p) {
-        paint = p;
+    auto &withFill(Fill p) {
+        fill = p;
         return *this;
     }
 

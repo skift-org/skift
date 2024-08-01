@@ -34,7 +34,7 @@ Ui::Child statusbar(State const &state) {
            }) |
            Ui::box({
                .padding = {12, 0},
-               .backgroundPaint = Ui::GRAY900,
+               .backgroundFill = Ui::GRAY900,
            });
 }
 
@@ -113,7 +113,7 @@ Ui::Child taskbar(State const &state) {
                ) |
                    Ui::box({
                        .padding = 6,
-                       .backgroundPaint = Ui::GRAY950.withOpacity(0.8),
+                       .backgroundFill = Ui::GRAY950.withOpacity(0.8),
                    }),
                Ui::separator()
            ) |
@@ -145,7 +145,7 @@ Ui::Child appHost(State const &state) {
 
     auto surface = state.instances[0];
     return Ui::empty() |
-           Ui::box({.backgroundPaint = surface->color});
+           Ui::box({.backgroundFill = surface->color});
 }
 
 Ui::Child tablet(State const &state) {
@@ -178,8 +178,8 @@ Ui::Child appStack(State const &state) {
             Ui::box({
                 .borderRadii = 6,
                 .borderWidth = 1,
-                .borderPaint = Ui::GRAY800,
-                .backgroundPaint = Ui::GRAY900,
+                .borderFill = Ui::GRAY800,
+                .backgroundFill = Ui::GRAY900,
                 .shadowStyle = Gfx::BoxShadow::elevated(index ? 4 : 16),
             }) |
             Ui::placed(s->bound) |

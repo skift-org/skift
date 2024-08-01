@@ -18,9 +18,9 @@ static inline Child errorScope(Str what, auto callback) {
             .padding = 12,
             .borderRadii = 6,
             .borderWidth = 1,
-            .borderPaint = Gfx::RED700,
-            .backgroundPaint = Gfx::RED900,
-            .foregroundPaint = Gfx::RED100,
+            .borderFill = Gfx::RED700,
+            .backgroundFill = Gfx::RED900,
+            .foregroundFill = Gfx::RED100,
         },
         hflow(
             6,

@@ -103,6 +103,32 @@ struct ValueParser<Integer> {
     static Res<Integer> parse(Cursor<Css::Sst> &c);
 };
 
+template <typename T>
+struct ValueParser<Math::Insets<T>> {
+    static Res<Math::Insets<T>> parse(Cursor<Css::Sst> &c) {
+        if (c.ended())
+            return Error::invalidData("unexpected end of input");
+
+        auto top = parseValue<T>(c);
+        if (not top)
+            return top.none();
+
+        auto right = parseValue<T>(c);
+        if (not right)
+            return Ok(Math::Insets<T>{top.take()});
+
+        auto bottom = parseValue<T>(c);
+        if (not bottom)
+            return Ok(Math::Insets<T>{top.take(), right.take()});
+
+        auto left = parseValue<T>(c);
+        if (not left)
+            return Ok(Math::Insets<T>{top.take(), right.take(), bottom.take()});
+
+        return Ok(Math::Insets<T>{top.take(), right.take(), bottom.take(), left.take()});
+    }
+};
+
 template <>
 struct ValueParser<Length> {
     static Res<Length> parse(Cursor<Css::Sst> &c);

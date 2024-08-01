@@ -514,6 +514,7 @@ static Res<Length::Unit> _parseLengthUnit(Str unit) {
 #include <vaev-base/defs/lengths.inc>
 #undef LENGTH
 
+    logWarn("unknown length unit: {}", unit);
     return Error::invalidData("unknown length unit");
 }
 
@@ -523,7 +524,7 @@ Res<Length> ValueParser<Length>::parse(Cursor<Css::Sst> &c) {
 
     if (c.peek() == Css::Token::DIMENSION) {
         Io::SScan scan = c->token.data;
-        auto value = tryOr(Io::atof(scan), 0.0);
+        auto value = tryOr(Io::atof(scan, {.allowExp = false}), 0.0);
         auto unit = try$(_parseLengthUnit(scan.remStr()));
         return Ok(Length{value, unit});
     } else if (c.peek() == Css::Token::number("0")) {

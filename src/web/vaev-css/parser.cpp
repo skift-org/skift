@@ -148,6 +148,7 @@ Content consumeDeclarationList(Lexer &lex) {
         switch (lex.peek().type) {
         case Token::WHITESPACE:
         case Token::SEMICOLON:
+        case Token::COMMENT:
             lex.next();
             break;
 

@@ -743,6 +743,23 @@ struct MarginLeftProp {
     }
 };
 
+struct MarginProp {
+    Math::Insets<Width> value = initial();
+
+    static Str name() { return "margin"; }
+
+    static Math::Insets<Width> initial() { return {}; }
+
+    void apply(Computed &c) const {
+        c.margin.cow() = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Math::Insets<Width>>(c));
+        return Ok();
+    }
+};
+
 // https://www.w3.org/TR/css-color-4/#propdef-opacity
 
 struct OpacityProp {
@@ -909,6 +926,23 @@ struct PaddingLeftProp {
 
     Res<> parse(Cursor<Css::Sst> &c) {
         value = try$(parseValue<PercentOr<Length>>(c));
+        return Ok();
+    }
+};
+
+struct PaddingProp {
+    Math::Insets<PercentOr<Length>> value = initial();
+
+    static Str name() { return "padding"; }
+
+    static Math::Insets<PercentOr<Length>> initial() { return {}; }
+
+    void apply(Computed &c) const {
+        c.padding.cow() = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Math::Insets<PercentOr<Length>>>(c));
         return Ok();
     }
 };
@@ -1217,6 +1251,7 @@ using _StyleProp = Union<
     MarginRightProp,
     MarginBottomProp,
     MarginLeftProp,
+    MarginProp,
 
     // Overflow
     OverflowXProp,
@@ -1231,6 +1266,7 @@ using _StyleProp = Union<
     PaddingRightProp,
     PaddingBottomProp,
     PaddingLeftProp,
+    PaddingProp,
 
     // Positioning
     PositionProp,

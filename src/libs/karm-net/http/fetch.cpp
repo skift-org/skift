@@ -1,4 +1,5 @@
 #include <karm-io/funcs.h>
+#include <karm-json/parse.h>
 #include <karm-logger/logger.h>
 #include <karm-net/dns/dns.h>
 #include <karm-net/http/http.h>

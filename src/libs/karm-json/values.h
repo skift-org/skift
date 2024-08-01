@@ -6,10 +6,8 @@
 #include <karm-base/vec.h>
 #include <karm-io/emit.h>
 #include <karm-io/expr.h>
-#include <karm-io/fmt.h>
-#include <karm-io/sscan.h>
 
-namespace Karm::Net::Json {
+namespace Karm::Json {
 
 struct Value;
 
@@ -310,25 +308,4 @@ struct Value {
     }
 };
 
-Res<Value> parse(Io::SScan &s);
-
-Res<Value> parse(Str s);
-
-Res<> stringify(Io::Emit &emit, Value const &v);
-
-Res<String> stringify(Value const &v);
-
-} // namespace Karm::Net::Json
-
-inline auto operator""_json(char const *str, usize len) {
-    return Karm::Net::Json::parse({str, len}).unwrap();
-}
-
-template <>
-struct Karm::Io::Formatter<Karm::Net::Json::Value> {
-    Res<usize> format(Io::TextWriter &writer, Karm::Net::Json::Value value) {
-        Io::Emit emit{writer};
-        try$(Karm::Net::Json::stringify(emit, value));
-        return Ok(emit.total());
-    }
-};
+} // namespace Karm::Json

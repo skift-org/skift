@@ -1,8 +1,8 @@
+#include <karm-json/parse.h>
 #include <karm-math/funcs.h>
-#include <karm-net/json/json.h>
 #include <karm-test/macros.h>
 
-namespace Vaev::Json::Tests {
+namespace Karm::Json::Tests {
 
 test$("json-parse-null") {
     auto val = "null"_json;
@@ -69,4 +69,4 @@ test$("json-parse-bool") {
     return Ok();
 }
 
-} // namespace Vaev::Json::Tests
+} // namespace Karm::Json::Tests

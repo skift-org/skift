@@ -12,6 +12,6 @@
         "hideo-base",
         "karm-sys",
         "opstart-impl",
-        "karm-net.json"
+        "karm-json"
     ]
 }

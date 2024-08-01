@@ -12,7 +12,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
 
     logInfo("parsing configs...");
     auto fileStr = co_try$(Io::readAllUtf8(file));
-    auto json = co_try$(Net::Json::parse(fileStr));
+    auto json = co_try$(Json::parse(fileStr));
 
     logInfo("validating configs...");
     logInfo("configs: {}", json);

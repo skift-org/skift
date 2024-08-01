@@ -1,38 +1,40 @@
+#include <karm-print/pdf.h>
 #include <karm-sys/entry.h>
+#include <karm-sys/file.h>
 #include <karm-sys/time.h>
 #include <vaev-driver/fetcher.h>
 #include <vaev-driver/render.h>
 
 namespace Vaev {
 
-Style::Media constructMedia(Vec2Px pageSize) {
+Style::Media constructMedia(Print::PaperStock paper) {
     return {
         .type = MediaType::SCREEN,
-        .width = Px{pageSize.width},
-        .height = Px{pageSize.height},
-        .aspectRatio = pageSize.width.toFloat<Number>() / pageSize.height.toFloat<Number>(),
+        .width = Px{paper.width},
+        .height = Px{paper.height},
+        .aspectRatio = paper.width / paper.height,
         .orientation = Orientation::LANDSCAPE,
 
         .resolution = Resolution::fromDpi(96),
         .scan = Scan::PROGRESSIVE,
         .grid = false,
-        .update = Update::FAST,
+        .update = Update::NONE,
 
-        .overflowBlock = OverflowBlock::SCROLL,
-        .overflowInline = OverflowInline::SCROLL,
+        .overflowBlock = OverflowBlock::PAGED,
+        .overflowInline = OverflowInline::NONE,
 
         .color = 8,
         .colorIndex = 0,
         .monochrome = 0,
         .colorGamut = ColorGamut::SRGB,
-        .pointer = Pointer::FINE,
-        .hover = Hover::HOVER,
-        .anyPointer = Pointer::FINE,
-        .anyHover = Hover::HOVER,
+        .pointer = Pointer::NONE,
+        .hover = Hover::NONE,
+        .anyPointer = Pointer::NONE,
+        .anyHover = Hover::NONE,
 
         .prefersReducedMotion = ReducedMotion::REDUCE,
-        .prefersReducedTransparency = ReducedTransparency::NO_PREFERENCE,
-        .prefersContrast = Contrast::NO_PREFERENCE,
+        .prefersReducedTransparency = ReducedTransparency::REDUCE,
+        .prefersContrast = Contrast::MORE,
         .forcedColors = Colors::NONE,
         .prefersColorScheme = ColorScheme::LIGHT,
         .prefersReducedData = ReducedData::NO_PREFERENCE,
@@ -49,18 +51,29 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     }
 
     auto input = co_try$(Mime::parseUrlOrPath(args[0]));
+    auto output = co_try$(Mime::parseUrlOrPath(args[1]));
+
     auto dom = co_try$(Vaev::Driver::fetchDocument(input));
 
-    Vaev::Vec2Px viewport{Vaev::Px{800}, Vaev::Px{600}};
-    auto media = Vaev::constructMedia(viewport);
+    auto paper = Print::A4;
+    auto media = Vaev::constructMedia(paper);
 
     auto start = Sys::now();
-    auto result = Vaev::Driver::render(*dom, media, viewport);
+    auto [layout, paint] = Vaev::Driver::render(*dom, media, paper);
     auto elapsed = Sys::now() - start;
     logDebug("render time: {}", elapsed);
 
-    logDebug("layout tree: {}", result.layout);
-    logDebug("paint tree: {}", result.paint);
+    logDebug("layout tree: {}", layout);
+    logDebug("paint tree: {}", paint);
+
+    Print::PdfPrinter printer;
+    paint->print(printer);
+
+    auto file = co_try$(Sys::File::create(output));
+    Io::TextEncoder<> encoder{file};
+    Io::Emit e{encoder};
+    printer.write(e);
+    co_try$(e.flush());
 
     co_return Ok();
 }

@@ -1,9 +1,9 @@
 #include <karm-io/aton.h>
 #include <karm-io/funcs.h>
 
-#include "json.h"
+#include "parse.h"
 
-namespace Karm::Net::Json {
+namespace Karm::Json {
 
 Res<Value> parse(Io::SScan &s);
 
@@ -239,4 +239,4 @@ Res<Value> parse(Str s) {
     return parse(scan);
 }
 
-} // namespace Karm::Net::Json
+} // namespace Karm::Json

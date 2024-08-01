@@ -4,9 +4,9 @@
     "type": "lib",
     "description": "Networking library",
     "requires": [
+        "karm-json",
         "karm-net.dns",
         "karm-net.http",
-        "karm-net.json",
         "karm-net.tls"
     ]
 }

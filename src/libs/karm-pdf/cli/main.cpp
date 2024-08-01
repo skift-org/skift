@@ -1,7 +1,7 @@
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 
-#include "../objects.h"
+#include "../values.h"
 
 Async::Task<> entryPointAsync(Sys::Context &) {
     Pdf::Ref ref;
@@ -29,11 +29,12 @@ Async::Task<> entryPointAsync(Sys::Context &) {
     Pdf::Dict pages;
     pages.put("Type"s, Pdf::Name{"Pages"s});
 
-    Pdf::Array mediaBox;
-    mediaBox.pushBack(isize{0});
-    mediaBox.pushBack(isize{0});
-    mediaBox.pushBack(isize{200});
-    mediaBox.pushBack(isize{200});
+    Pdf::Array mediaBox = {
+        isize{0},
+        isize{0},
+        isize{200},
+        isize{300},
+    };
 
     pages.put("MediaBox"s, mediaBox);
     pages.put("Count"s, isize{1});
@@ -88,7 +89,7 @@ ET)"s
     file.trailer.put("Size"s, (isize)file.body.len() + 1);
 
     Io::Emit out{Sys::out()};
-    Pdf::write(out, file);
+    file.write(out);
     co_try$(Sys::out().flush());
 
     co_return Ok();

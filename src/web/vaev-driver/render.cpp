@@ -1,6 +1,7 @@
 #include <karm-sys/time.h>
 #include <vaev-dom/element.h>
 #include <vaev-layout/builder.h>
+#include <vaev-paint/page.h>
 #include <vaev-paint/stack.h>
 #include <vaev-style/computer.h>
 
@@ -76,6 +77,49 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
     layoutRoot->placeChildren(ctx, containingBox);
 
     auto paintRoot = makeStrong<Paint::Stack>();
+    layoutRoot->makePaintables(*paintRoot);
+    paintRoot->prepare();
+
+    return {layoutRoot, paintRoot};
+}
+
+RenderResult render(Dom::Document &dom, Style::Media const &media, Print::PaperStock paper) {
+    Style::StyleBook stylebook;
+    stylebook.add(
+        fetchStylesheet("bundle://vaev-view/user-agent.css"_url)
+            .take("user agent stylesheet not available")
+    );
+
+    auto start = Sys::now();
+    _collectStyle(dom, stylebook);
+    auto elapsed = Sys::now() - start;
+    logDebug("style collection time: {}", elapsed);
+
+    Style::Computer computer{media, stylebook};
+    auto layoutRoot = Layout::build(computer, dom);
+
+    Layout::Viewport vp{
+        .small = {
+            Px{paper.width},
+            Px{paper.height},
+        },
+    };
+
+    Layout::Context ctx{
+        .viewport = vp,
+        .frag = *layoutRoot,
+        .axis = Axis::VERTICAL,
+        .containingBlock = vp.small,
+        .font = Text::Font::fallback(),
+    };
+
+    Layout::Box containingBox = {
+        .borderBox = vp.small,
+    };
+
+    layoutRoot->placeChildren(ctx, containingBox);
+
+    auto paintRoot = makeStrong<Paint::Page>();
     layoutRoot->makePaintables(*paintRoot);
     paintRoot->prepare();
 

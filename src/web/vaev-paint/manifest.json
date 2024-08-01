@@ -4,6 +4,8 @@
     "type": "lib",
     "description": "Painting engine of Vaev",
     "requires": [
+        "karm-gfx",
+        "karm-print",
         "vaev-style"
     ]
 }

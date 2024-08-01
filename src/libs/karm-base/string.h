@@ -303,7 +303,7 @@ struct _StringBuilder {
         return _buf;
     }
 
-    Bytes bytes() {
+    Bytes bytes() const {
         return ::bytes(_buf);
     }
 

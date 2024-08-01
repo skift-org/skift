@@ -5,10 +5,9 @@
 namespace Vaev::Paint {
 
 struct Page : public Stack {
-    void print(Print::Context &ctx) override {
-        for (auto &child : _children)
-            child->print(ctx);
-        ctx.pageBreak();
+    void print(Print::Printer &doc) override {
+        Stack::print(doc);
+        paint(doc.beginPage());
     }
 };
 

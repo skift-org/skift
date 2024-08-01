@@ -30,6 +30,12 @@ struct Buf {
         ensure(cap);
     }
 
+    Buf(Move, T *buf, usize len)
+        : _buf(buf),
+          _cap(len),
+          _len(len) {
+    }
+
     Buf(std::initializer_list<T> other) {
         ensure(other.size());
 

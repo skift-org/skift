@@ -1,8 +1,8 @@
 #pragma once
 
-#include <karm-gfx/context.h>
+#include <karm-gfx/canvas.h>
 #include <karm-io/emit.h>
-#include <karm-print/context.h>
+#include <karm-print/base.h>
 
 namespace Vaev::Paint {
 
@@ -17,9 +17,9 @@ struct Node {
     /// The bounding rectangle of the node
     virtual Math::Recti bound() { return {}; }
 
-    virtual void paint(Gfx::Context &) {}
+    virtual void paint(Gfx::Canvas &) {}
 
-    virtual void print(Print::Context &) {}
+    virtual void print(Print::Printer &) {}
 
     virtual void repr(Io::Emit &e) const {
         e("(node)");

@@ -14,12 +14,12 @@ struct Text : public Node {
         : _topLeft(topLeft), _run(run) {
     }
 
-    virtual void paint(Gfx::Context &g) {
-        g.save();
-        g.translate(_topLeft + Math::Vec2f{0, _run->baseline()});
-        g.fillStyle(Gfx::BLACK);
-        _run->paint(g);
-        g.restore();
+    virtual void paint(Gfx::Canvas &) {
+        // g.save();
+        // g.translate(_topLeft + Math::Vec2f{0, _run->baseline()});
+        // g.fillStyle(Gfx::BLACK);
+        // _run->paint(g);
+        // g.restore();
     }
 
     virtual void repr(Io::Emit &e) const {

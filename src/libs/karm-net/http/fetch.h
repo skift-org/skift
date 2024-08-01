@@ -1,7 +1,7 @@
 #pragma once
 
+#include <karm-json/values.h>
 #include <karm-mime/url.h>
-#include <karm-net/json/json.h>
 #include <karm-sys/async.h>
 
 namespace Karm::Net::Http {

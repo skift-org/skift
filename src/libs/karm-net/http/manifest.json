@@ -8,7 +8,7 @@
     },
     "requires": [
         "karm-net.dns",
-        "karm-net.json",
+        "karm-json",
         "karm-logger",
         "karm-sys"
     ]

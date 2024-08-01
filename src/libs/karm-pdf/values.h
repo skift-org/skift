@@ -3,9 +3,9 @@
 #include <karm-base/map.h>
 #include <karm-io/emit.h>
 
-namespace Pdf {
+namespace Karm::Pdf {
 
-struct Object;
+struct Value;
 
 struct Ref {
     usize num{};
@@ -23,20 +23,21 @@ struct Name : public String {
     using String::String;
 };
 
-using Array = Vec<Object>;
+using Array = Vec<Value>;
 
-using Dict = Map<Name, Object>;
+using Dict = Map<Name, Value>;
 
 struct Stream {
     Dict dict;
     Buf<Byte> data;
 };
 
-using _Object = Union<
+using _Value = Union<
     None,
     Ref,
     bool,
     isize,
+    usize,
     f64,
     String,
     Name,
@@ -44,24 +45,24 @@ using _Object = Union<
     Dict,
     Stream>;
 
-struct Object : public _Object {
-    using _Object::_Object;
-};
+struct Value : public _Value {
+    using _Value::_Value;
 
-void write(Io::Emit &e, Object const &o);
+    void write(Io::Emit &e) const;
+};
 
 struct File {
     String header;
-    Map<Ref, Object> body;
+    Map<Ref, Value> body;
     Dict trailer;
 
-    Ref add(Ref ref, Object object) {
-        body.put(ref, object);
+    Ref add(Ref ref, Value Value) {
+        body.put(ref, Value);
         return ref;
     }
-};
 
-void write(Io::Emit &e, File const &o);
+    void write(Io::Emit &e) const;
+};
 
 struct XRef {
     struct Entry {
@@ -75,8 +76,8 @@ struct XRef {
     void add(usize offset, usize gen) {
         entries.pushBack({offset, gen, true});
     }
+
+    void write(Io::Emit &e) const;
 };
 
-void write(Io::Emit &e, XRef const &xref);
-
-} // namespace Pdf
+} // namespace Karm::Pdf

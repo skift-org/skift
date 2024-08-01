@@ -111,4 +111,20 @@ struct TextWriterBase :
     }
 };
 
+template <StaticEncoding E = typename Sys::Encoding>
+struct TextEncoder :
+    public TextWriterBase<E> {
+
+    Io::Writer &_writer;
+
+    TextEncoder(Io::Writer &writer)
+        : _writer(writer) {}
+
+    Res<usize> write(Bytes bytes) override {
+        return _writer.write(bytes);
+    }
+
+    
+};
+
 } // namespace Karm::Io

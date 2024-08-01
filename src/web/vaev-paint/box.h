@@ -12,11 +12,12 @@ struct Box : public Node {
     Borders borders;
     Vec<Background> backgrounds;
 
-    void paint(Gfx::Context &ctx) override {
+    void paint(Gfx::Canvas &ctx) override {
         ColorContext colorContext; // FIXME: Resolving color should happen in the layout phase
         for (auto &background : backgrounds) {
-            ctx.fillStyle(colorContext.resolve(background.paint));
-            ctx.fill(bound.cast<f64>());
+            ctx.begin();
+            ctx.rect(bound.cast<f64>());
+            ctx.fill(colorContext.resolve(background.paint));
         }
     }
 

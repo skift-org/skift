@@ -15,4 +15,6 @@ struct RenderResult {
 
 RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px viewport);
 
+RenderResult render(Dom::Document &dom, Style::Media const &media, Print::PaperStock paper);
+
 } // namespace Vaev::Driver

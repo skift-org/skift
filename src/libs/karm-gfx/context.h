@@ -1,6 +1,7 @@
 #pragma once
 
 #include "buffer.h"
+#include "canvas.h"
 #include "filters.h"
 #include "paint.h"
 #include "path.h"
@@ -19,10 +20,7 @@ static LcdLayout RGB = {{+0.33, 0.0}, {0.0, 0.0}, {-0.33, 0.0}};
 static LcdLayout BGR = {{-0.33, 0.0}, {0.0, 0.0}, {+0.33, 0.0}};
 static LcdLayout VRGB = {{0.0, +0.33}, {0.0, 0.0}, {0.0, -0.33}};
 
-struct Context : public Meta::NoCopy {
-    // NOTE: Context is marked as NoCopy because it doesn't make sense to copy
-    // a context. And it's also a good way to prevent accidental copies.
-
+struct Context : public Canvas {
     struct Scope {
         Paint paint = Gfx::WHITE;
         Stroke stroke{};
@@ -217,58 +215,58 @@ struct Context : public Meta::NoCopy {
     void _fill(Paint paint, FillRule rule = FillRule::NONZERO);
 
     // Begin a new path.
-    void begin();
+    void begin() override;
 
     // Close the current path. This will connect the last point to the first
-    void close();
+    void close() override;
 
     // Begin a new subpath at the given point.
-    void moveTo(Math::Vec2f p, Path::Flags flags = Path::DEFAULT);
+    void moveTo(Math::Vec2f p, Path::Flags flags = Path::DEFAULT) override;
 
     // Add a line segment to the current path.
-    void lineTo(Math::Vec2f p, Path::Flags flags = Path::DEFAULT);
+    void lineTo(Math::Vec2f p, Path::Flags flags = Path::DEFAULT) override;
 
     // Add a horizontal line segment to the current path.
-    void hlineTo(f64 x, Path::Flags flags = Path::DEFAULT);
+    void hlineTo(f64 x, Path::Flags flags = Path::DEFAULT) override;
 
     // Add a vertical line segment to the current path.
-    void vlineTo(f64 y, Path::Flags flags = Path::DEFAULT);
+    void vlineTo(f64 y, Path::Flags flags = Path::DEFAULT) override;
 
     // Add a cubic Bezier curve to the current path.
-    void cubicTo(Math::Vec2f cp1, Math::Vec2f cp2, Math::Vec2f p, Path::Flags flags = Path::DEFAULT);
+    void cubicTo(Math::Vec2f cp1, Math::Vec2f cp2, Math::Vec2f p, Path::Flags flags = Path::DEFAULT) override;
 
     // Add a quadratic Bezier curve to the current path.
-    void quadTo(Math::Vec2f cp, Math::Vec2f p, Path::Flags flags = Path::DEFAULT);
+    void quadTo(Math::Vec2f cp, Math::Vec2f p, Path::Flags flags = Path::DEFAULT) override;
 
     // Add an elliptical arc to the current path.
-    void arcTo(Math::Vec2f radius, f64 angle, Math::Vec2f p, Path::Flags flags = Path::DEFAULT);
+    void arcTo(Math::Vec2f radius, f64 angle, Math::Vec2f p, Path::Flags flags = Path::DEFAULT) override;
 
     // Evaluate the given SVG path and add it to the current path.
     bool evalSvg(Str path);
 
     // Add a line segment to the current path.
-    void line(Math::Edgef line);
+    void line(Math::Edgef line) override;
 
     // Add a curve to the current path.
-    void curve(Math::Curvef curve);
+    void curve(Math::Curvef curve) override;
 
     // Add a rectangle to the current path.
-    void rect(Math::Rectf rect, Math::Radiusf radius = 0);
+    void rect(Math::Rectf rect, Math::Radiusf radius = 0) override;
 
     // Add an ellipse to the current path.
-    void ellipse(Math::Ellipsef ellipse);
+    void ellipse(Math::Ellipsef ellipse) override;
 
     // Fill the current path.
     void fill(FillRule rule = FillRule::NONZERO);
 
     // Fill the current path with the given paint.
-    void fill(Paint paint, FillRule rule = FillRule::NONZERO);
+    void fill(Paint paint, FillRule rule = FillRule::NONZERO) override;
 
     // Stroke the current path.
     void stroke();
 
     // Stroke the current path with the given style.
-    void stroke(Stroke style);
+    void stroke(Stroke style) override;
 
     // MARK: Filters -----------------------------------------------------------
 

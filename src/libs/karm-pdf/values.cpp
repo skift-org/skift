@@ -1,9 +1,9 @@
-#include "objects.h"
+#include "values.h"
 
-namespace Pdf {
+namespace Karm::Pdf {
 
-void write(Io::Emit &e, Object const &o) {
-    o.visit(Visitor{
+void Value::write(Io::Emit &e) const {
+    visit(Visitor{
         [&](None) {
             e("null");
         },
@@ -14,6 +14,9 @@ void write(Io::Emit &e, Object const &o) {
             e(b ? "true" : "false");
         },
         [&](isize i) {
+            e("{}", i);
+        },
+        [&](usize i) {
             e("{}", i);
         },
         [&](f64 f) {
@@ -31,7 +34,7 @@ void write(Io::Emit &e, Object const &o) {
                 if (i > 0) {
                     e(' ');
                 }
-                write(e, a[i]);
+                a[i].write(e);
             }
             e(']');
         },
@@ -41,13 +44,13 @@ void write(Io::Emit &e, Object const &o) {
                 e('/');
                 e(k);
                 e(' ');
-                write(e, v);
+                v.write(e);
                 e('\n');
             }
             e(">>");
         },
         [&](Stream const &s) {
-            write(e, Dict{s.dict});
+            Value{s.dict}.write(e);
             e("stream\n");
             (void)e.flush();
             (void)e.write(s.data);
@@ -56,39 +59,40 @@ void write(Io::Emit &e, Object const &o) {
     });
 }
 
-void write(Io::Emit &e, File const &f) {
-    e("%{}\n", f.header);
+void File::write(Io::Emit &e) const {
+    e("%{}\n", header);
+    e("% Powered By Karm PDF 🐢🏳️‍⚧️🦔\n", header);
 
     XRef xref;
 
-    for (auto const &[k, v] : f.body.iter()) {
+    for (auto const &[k, v] : body.iter()) {
         xref.add(e.total(), k.gen);
         e("{} {} obj\n", k.num, k.gen);
-        write(e, v);
+        v.write(e);
         e("\nendobj\n");
     }
 
     auto startxref = e.total();
 
     e("xref\n");
-    write(e, xref);
+    xref.write(e);
 
     e("trailer\n");
-    write(e, f.trailer);
+    Value{trailer}.write(e);
 
     e("startxref\n");
     e("{}\n", startxref);
     e("%%EOF");
 }
 
-void write(Io::Emit &e, XRef const &x) {
-    e("0 {}\n", x.entries.len() + 1);
-    for (usize i = 0; i < x.entries.len(); ++i) {
-        auto const &entry = x.entries[i];
+void XRef::write(Io::Emit &e) const {
+    e("0 {}\n", entries.len() + 1);
+    for (usize i = 0; i < entries.len(); ++i) {
+        auto const &entry = entries[i];
         if (entry.used) {
             e("{:010} {:05} n\n", entry.offset, entry.gen);
         }
     }
 }
 
-} // namespace Pdf
+} // namespace Karm::Pdf

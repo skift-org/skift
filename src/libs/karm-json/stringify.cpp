@@ -1,6 +1,6 @@
-#include "json.h"
+#include "stringify.h"
 
-namespace Karm::Net::Json {
+namespace Karm::Json {
 
 Res<> stringify(Io::Emit &emit, Value const &v) {
     return v.visit(
@@ -89,4 +89,4 @@ Res<String> stringify(Value const &v) {
     return Ok(sw.take());
 }
 
-} // namespace Karm::Net::Json
+} // namespace Karm::Json

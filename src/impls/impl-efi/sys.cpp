@@ -3,8 +3,8 @@
 #include <karm-base/align.h>
 #include <karm-io/funcs.h>
 #include <karm-io/impls.h>
+#include <karm-json>
 #include <karm-logger/logger.h>
-#include <karm-net/json/json.h>
 #include <karm-sys/file.h>
 
 #include <karm-sys/_embed.h>
@@ -237,7 +237,7 @@ Res<Strong<Fd>> listenIpc(Mime::Url) {
 
 // MARK: Files -----------------------------------------------------------------
 
-static Opt<Net::Json::Value> _index = NONE;
+static Opt<Json::Value> _index = NONE;
 
 static Res<Mime::Path> resolve(Mime::Url url) {
     if (url.scheme == "file") {
@@ -251,7 +251,7 @@ static Res<Mime::Path> resolve(Mime::Url url) {
 
             auto indexFile = try$(File::open("file:/bundles/_index.json"_url));
             auto indexStr = try$(Io::readAllUtf8(indexFile));
-            auto indexJson = try$(Net::Json::parse(indexStr));
+            auto indexJson = try$(Json::parse(indexStr));
 
             _index = indexJson.get("objects");
 

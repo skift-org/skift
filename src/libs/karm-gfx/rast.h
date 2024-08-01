@@ -3,12 +3,9 @@
 #include <karm-base/range.h>
 #include <karm-math/poly.h>
 
-namespace Karm::Gfx {
+#include "types.h"
 
-enum struct FillRule {
-    NONZERO,
-    EVENODD,
-};
+namespace Karm::Gfx {
 
 struct Rast {
     static constexpr auto AA = 3;

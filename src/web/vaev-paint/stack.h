@@ -27,14 +27,14 @@ struct Stack : public Node {
         return rect;
     }
 
-    void paint(Gfx::Context &ctx) override {
+    void paint(Gfx::Canvas &g) override {
         for (auto &child : _children)
-            child->paint(ctx);
+            child->paint(g);
     }
 
-    void print(Print::Context &ctx) override {
+    void print(Print::Printer &p) override {
         for (auto &child : _children)
-            child->print(ctx);
+            child->print(p);
     }
 
     void repr(Io::Emit &e) const override {

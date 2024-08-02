@@ -254,7 +254,7 @@ void Context::fill(Math::Ellipsef e) {
 }
 
 // stroke a path
-void Context::stroke(Gfx::Path const &path) {
+void Context::stroke(Math::Path const &path) {
     _poly.clear();
     createStroke(_poly, path, current().stroke);
     _poly.transform(current().trans);
@@ -262,7 +262,7 @@ void Context::stroke(Gfx::Path const &path) {
 }
 
 // fill a path
-void Context::fill(Gfx::Path const &path, FillRule rule) {
+void Context::fill(Math::Path const &path, FillRule rule) {
     _poly.clear();
     createSolid(_poly, path);
     _poly.transform(current().trans);
@@ -369,31 +369,31 @@ void Context::close() {
     _path.close();
 }
 
-void Context::moveTo(Math::Vec2f p, Path::Flags flags) {
+void Context::moveTo(Math::Vec2f p, Math::Path::Flags flags) {
     _path.moveTo(p, flags);
 }
 
-void Context::lineTo(Math::Vec2f p, Path::Flags flags) {
+void Context::lineTo(Math::Vec2f p, Math::Path::Flags flags) {
     _path.lineTo(p, flags);
 }
 
-void Context::hlineTo(f64 x, Path::Flags flags) {
+void Context::hlineTo(f64 x, Math::Path::Flags flags) {
     _path.hlineTo(x, flags);
 }
 
-void Context::vlineTo(f64 y, Path::Flags flags) {
+void Context::vlineTo(f64 y, Math::Path::Flags flags) {
     _path.vlineTo(y, flags);
 }
 
-void Context::cubicTo(Math::Vec2f cp1, Math::Vec2f cp2, Math::Vec2f p, Path::Flags flags) {
+void Context::cubicTo(Math::Vec2f cp1, Math::Vec2f cp2, Math::Vec2f p, Math::Path::Flags flags) {
     _path.cubicTo(cp1, cp2, p, flags);
 }
 
-void Context::quadTo(Math::Vec2f cp, Math::Vec2f p, Path::Flags flags) {
+void Context::quadTo(Math::Vec2f cp, Math::Vec2f p, Math::Path::Flags flags) {
     _path.quadTo(cp, p, flags);
 }
 
-void Context::arcTo(Math::Vec2f radii, f64 angle, Math::Vec2f p, Path::Flags flags) {
+void Context::arcTo(Math::Vec2f radii, f64 angle, Math::Vec2f p, Math::Path::Flags flags) {
     _path.arcTo(radii, angle, p, flags);
 }
 

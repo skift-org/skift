@@ -1,9 +1,9 @@
 #include <karm-logger/logger.h>
-#include <karm-math/curve.h>
 
 #include "path.h"
+#include "trans.h"
 
-namespace Karm::Gfx {
+namespace Karm::Math {
 
 // MARK: Flattening ------------------------------------------------------------
 
@@ -21,7 +21,7 @@ void Path::_flattenClose() {
 
 [[gnu::flatten]] void Path::_flattenLineTo(Math::Vec2f p) {
     if (not _contours.len()) {
-        logError("path: move to must be called before line to");
+        logError("path: moveTo must be called before lineTo");
         return;
     }
 
@@ -347,8 +347,8 @@ void Path::rect(Math::Rectf rect, Math::Radiif radii) {
 void Path::ellipse(Math::Ellipsef ellipse) {
     auto bound = ellipse.bound();
     moveTo(bound.topCenter());
-    arcTo(ellipse.radii, 0, bound.bottomCenter(), Gfx::Path::SWEEP);
-    arcTo(ellipse.radii, 0, bound.topCenter(), Gfx::Path::SWEEP);
+    arcTo(ellipse.radii, 0, bound.bottomCenter(), Path::SWEEP);
+    arcTo(ellipse.radii, 0, bound.topCenter(), Path::SWEEP);
     close();
 }
 
@@ -460,4 +460,4 @@ Path Path::fromSvg(Str svg) {
     return p;
 }
 
-} // namespace Karm::Gfx
+} // namespace Karm::Math

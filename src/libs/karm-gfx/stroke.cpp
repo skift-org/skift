@@ -140,7 +140,7 @@ static void _createCap(Math::Polyf &poly, Stroke stroke, Cap cap) {
 
 // MARK: Public Api ------------------------------------------------------------
 
-[[gnu::flatten]] void createStroke(Math::Polyf &poly, Path const &path, Stroke stroke) {
+[[gnu::flatten]] void createStroke(Math::Polyf &poly, Math::Path const &path, Stroke stroke) {
     f64 outerDist = 0;
 
     if (stroke.align == CENTER_ALIGN) {
@@ -201,7 +201,7 @@ static void _createCap(Math::Polyf &poly, Stroke stroke, Cap cap) {
     }
 }
 
-void createSolid(Math::Polyf &poly, Path const &path) {
+void createSolid(Math::Polyf &poly, Math::Path const &path) {
     for (auto contour : path.iterContours()) {
         for (usize i = 0; i < contour.len(); i++) {
             Math::Edgef e = {contour[i], contour[(i + 1) % contour.len()]};

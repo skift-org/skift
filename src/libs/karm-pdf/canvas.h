@@ -14,14 +14,14 @@ struct Canvas : public Gfx::Canvas {
         return _buf;
     }
 
-    Math::Vec2f _mapPoint(Math::Vec2f p, Gfx::Path::Flags flags) {
-        if (flags & Gfx::Path::RELATIVE)
+    Math::Vec2f _mapPoint(Math::Vec2f p, Math::Path::Flags flags) {
+        if (flags & Math::Path::RELATIVE)
             return p;
         else
             return _p + p;
     }
 
-    Math::Vec2f _mapPointAndUpdate(Math::Vec2f p, Gfx::Path::Flags flags) {
+    Math::Vec2f _mapPointAndUpdate(Math::Vec2f p, Math::Path::Flags flags) {
         return _p = _mapPoint(p, flags);
     }
 
@@ -29,19 +29,19 @@ struct Canvas : public Gfx::Canvas {
 
     void close() override;
 
-    void moveTo(Math::Vec2f p, Gfx::Path::Flags flags) override;
+    void moveTo(Math::Vec2f p, Math::Path::Flags flags) override;
 
-    void lineTo(Math::Vec2f p, Gfx::Path::Flags flags) override;
+    void lineTo(Math::Vec2f p, Math::Path::Flags flags) override;
 
-    void hlineTo(f64 x, Gfx::Path::Flags flags) override;
+    void hlineTo(f64 x, Math::Path::Flags flags) override;
 
-    void vlineTo(f64 y, Gfx::Path::Flags flags) override;
+    void vlineTo(f64 y, Math::Path::Flags flags) override;
 
-    void cubicTo(Math::Vec2f cp1, Math::Vec2f cp2, Math::Vec2f p, Gfx::Path::Flags flags) override;
+    void cubicTo(Math::Vec2f cp1, Math::Vec2f cp2, Math::Vec2f p, Math::Path::Flags flags) override;
 
-    void quadTo(Math::Vec2f cp, Math::Vec2f p, Gfx::Path::Flags flags) override;
+    void quadTo(Math::Vec2f cp, Math::Vec2f p, Math::Path::Flags flags) override;
 
-    void arcTo(Math::Vec2f radii, f64 angle, Math::Vec2f p, Gfx::Path::Flags flags) override;
+    void arcTo(Math::Vec2f radii, f64 angle, Math::Vec2f p, Math::Path::Flags flags) override;
 
     void line(Math::Edgef line) override;
 

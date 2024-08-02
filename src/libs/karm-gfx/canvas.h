@@ -1,9 +1,9 @@
 #pragma once
 
+#include <karm-math/path.h>
 #include <karm-meta/nocopy.h>
 
 #include "fill.h"
-#include "path.h"
 #include "stroke.h"
 #include "types.h"
 
@@ -26,25 +26,25 @@ struct Canvas : public Meta::NoCopy {
     virtual void close() = 0;
 
     // Begin a new subpath at the given point.
-    virtual void moveTo(Math::Vec2f p, Path::Flags flags = Path::DEFAULT) = 0;
+    virtual void moveTo(Math::Vec2f p, Math::Path::Flags flags = Math::Path::DEFAULT) = 0;
 
     // Add a line segment to the current path.
-    virtual void lineTo(Math::Vec2f p, Path::Flags flags = Path::DEFAULT) = 0;
+    virtual void lineTo(Math::Vec2f p, Math::Path::Flags flags = Math::Path::DEFAULT) = 0;
 
     // Add a horizontal line segment to the current path.
-    virtual void hlineTo(f64 x, Path::Flags flags = Path::DEFAULT) = 0;
+    virtual void hlineTo(f64 x, Math::Path::Flags flags = Math::Path::DEFAULT) = 0;
 
     // Add a vertical line segment to the current path.
-    virtual void vlineTo(f64 y, Path::Flags flags = Path::DEFAULT) = 0;
+    virtual void vlineTo(f64 y, Math::Path::Flags flags = Math::Path::DEFAULT) = 0;
 
     // Add a cubic Bezier curve to the current path.
-    virtual void cubicTo(Math::Vec2f cp1, Math::Vec2f cp2, Math::Vec2f p, Path::Flags flags = Path::DEFAULT) = 0;
+    virtual void cubicTo(Math::Vec2f cp1, Math::Vec2f cp2, Math::Vec2f p, Math::Path::Flags flags = Math::Path::DEFAULT) = 0;
 
     // Add a quadratic Bezier curve to the current path.
-    virtual void quadTo(Math::Vec2f cp, Math::Vec2f p, Path::Flags flags = Path::DEFAULT) = 0;
+    virtual void quadTo(Math::Vec2f cp, Math::Vec2f p, Math::Path::Flags flags = Math::Path::DEFAULT) = 0;
 
     // Add an elliptical arc to the current path.
-    virtual void arcTo(Math::Vec2f radius, f64 angle, Math::Vec2f p, Path::Flags flags = Path::DEFAULT) = 0;
+    virtual void arcTo(Math::Vec2f radius, f64 angle, Math::Vec2f p, Math::Path::Flags flags = Math::Path::DEFAULT) = 0;
 
     // Add a line segment to the current path.
     virtual void line(Math::Edgef line) = 0;

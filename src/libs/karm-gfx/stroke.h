@@ -1,9 +1,9 @@
 #pragma once
 
+#include <karm-math/path.h>
 #include <karm-math/poly.h>
 
 #include "fill.h"
-#include "path.h"
 
 namespace Karm::Gfx {
 
@@ -30,11 +30,11 @@ using enum StrokeCap;
 using enum StrokeJoin;
 
 struct Stroke {
-    Fill fill;
+    Fill fill = BLACK;
     f64 width{1};
-    StrokeAlign align{};
-    StrokeCap cap{};
-    StrokeJoin join{};
+    StrokeAlign align = CENTER_ALIGN;
+    StrokeCap cap = BUTT_CAP;
+    StrokeJoin join = BEVEL_JOIN;
 
     auto &withFill(Fill p) {
         fill = p;
@@ -66,8 +66,8 @@ inline Stroke stroke(auto... args) {
     return {args...};
 }
 
-void createStroke(Math::Polyf &poly, Path const &path, Stroke stroke);
+void createStroke(Math::Polyf &poly, Math::Path const &path, Stroke stroke);
 
-void createSolid(Math::Polyf &poly, Path const &path);
+void createSolid(Math::Polyf &poly, Math::Path const &path);
 
 } // namespace Karm::Gfx

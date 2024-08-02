@@ -5,17 +5,15 @@
 #include <karm-base/vec.h>
 #include <karm-io/expr.h>
 #include <karm-io/sscan.h>
-#include <karm-math/const.h>
-#include <karm-math/curve.h>
-#include <karm-math/edge.h>
-#include <karm-math/ellipse.h>
-#include <karm-math/funcs.h>
-#include <karm-math/radii.h>
-#include <karm-math/rect.h>
-#include <karm-math/trans.h>
-#include <karm-math/vec.h>
 
-namespace Karm::Gfx {
+#include "curve.h"
+#include "edge.h"
+#include "ellipse.h"
+#include "radii.h"
+#include "rect.h"
+#include "vec.h"
+
+namespace Karm::Math {
 
 struct Path {
     enum Code {
@@ -158,4 +156,4 @@ struct Path {
 
 FlagsEnum$(Path::Flags);
 
-} // namespace Karm::Gfx
+} // namespace Karm::Math

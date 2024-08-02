@@ -297,14 +297,14 @@ void Path::rect(Math::Rectf rect, Math::Radiif radii) {
     } else {
         radii = radii.reduceOverlap(rect.size());
 
-        f64 cpa = radii.a - (radii.a * 0.5522847498);
-        f64 cpb = radii.b - (radii.b * 0.5522847498);
-        f64 cpc = radii.c - (radii.c * 0.5522847498);
-        f64 cpd = radii.d - (radii.d * 0.5522847498);
-        f64 cpe = radii.e - (radii.e * 0.5522847498);
-        f64 cpf = radii.f - (radii.f * 0.5522847498);
-        f64 cpg = radii.g - (radii.g * 0.5522847498);
-        f64 cph = radii.h - (radii.h * 0.5522847498);
+        f64 cpa = radius.a * 0.5522847498;
+        f64 cpb = radius.b * 0.5522847498;
+        f64 cpc = radius.c * 0.5522847498;
+        f64 cpd = radius.d * 0.5522847498;
+        f64 cpe = radius.e * 0.5522847498;
+        f64 cpf = radius.f * 0.5522847498;
+        f64 cpg = radius.g * 0.5522847498;
+        f64 cph = radius.h * 0.5522847498;
 
         moveTo({rect.x + radii.b, rect.y});
 

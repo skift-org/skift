@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vaev-base/align.h>
+#include <vaev-base/borders.h>
 #include <vaev-base/color.h>
 #include <vaev-base/display.h>
 #include <vaev-base/flex.h>
@@ -41,6 +42,11 @@ struct ValueParser<Angle> {
 template <>
 struct ValueParser<bool> {
     static Res<bool> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
+struct ValueParser<BorderStyle> {
+    static Res<BorderStyle> parse(Cursor<Css::Sst> &c);
 };
 
 template <>

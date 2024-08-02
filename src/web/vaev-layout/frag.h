@@ -62,6 +62,28 @@ struct Frag {
     virtual void makePaintables(Paint::Stack &stack) {
         if (style().backgrounds.len()) {
             Paint::Box box;
+            ColorContext colorContext;
+            // FIXME colorContext should be context dependant
+
+            box.borders = Paint::Borders();
+            box.borders.radii = _box.radius.cast<f64>();
+
+            box.borders.top.width = _box.borders.top.toFloat<f64>();
+            box.borders.top.style = style().borders->top.style;
+            box.borders.top.fill = colorContext.resolve(style().borders->top.color);
+
+            box.borders.bottom.width = _box.borders.bottom.toFloat<f64>();
+            box.borders.bottom.style = style().borders->bottom.style;
+            box.borders.bottom.fill = colorContext.resolve(style().borders->bottom.color);
+
+            box.borders.start.width = _box.borders.start.toFloat<f64>();
+            box.borders.start.style = style().borders->start.style;
+            box.borders.start.fill = colorContext.resolve(style().borders->start.color);
+
+            box.borders.end.width = _box.borders.end.toFloat<f64>();
+            box.borders.end.style = style().borders->end.style;
+            box.borders.end.fill = colorContext.resolve(style().borders->end.color);
+
             box.backgrounds = style().backgrounds;
             box.bound = _box.borderBox;
             stack.add(makeStrong<Paint::Box>(std::move(box)));

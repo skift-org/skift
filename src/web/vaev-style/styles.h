@@ -386,6 +386,78 @@ struct BorderLeftColorProp {
     }
 };
 
+// https://www.w3.org/TR/CSS22/box.html#border-style-properties
+struct BorderLeftStyleProp {
+    BorderStyle value = initial();
+
+    static constexpr Str name() { return "border-left-style"; }
+
+    static constexpr BorderStyle initial() { return BorderStyle::NONE; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().start.style = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<BorderStyle>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/CSS22/box.html#border-style-properties
+struct BorderTopStyleProp {
+    BorderStyle value = initial();
+
+    static constexpr Str name() { return "border-top-style"; }
+
+    static constexpr BorderStyle initial() { return BorderStyle::NONE; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().top.style = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<BorderStyle>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/CSS22/box.html#border-style-properties
+struct BorderRightStyleProp {
+    BorderStyle value = initial();
+
+    static constexpr Str name() { return "border-right-style"; }
+
+    static constexpr BorderStyle initial() { return BorderStyle::NONE; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().end.style = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<BorderStyle>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/CSS22/box.html#border-style-properties
+struct BorderBottomStyleProp {
+    BorderStyle value = initial();
+
+    static constexpr Str name() { return "border-bottom-style"; }
+
+    static constexpr BorderStyle initial() { return BorderStyle::NONE; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().bottom.style = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<BorderStyle>(c));
+        return Ok();
+    }
+};
+
 // https://www.w3.org/TR/css-backgrounds-3/#border-width
 struct BorderTopWidthProp {
     Length value = initial();
@@ -454,6 +526,107 @@ struct BorderLeftWidthProp {
 
     Res<> parse(Cursor<Css::Sst> &c) {
         value = try$(parseValue<Length>(c));
+        return Ok();
+    }
+};
+
+// https://drafts.csswg.org/css-backgrounds/#the-border-radius
+struct BorderRadiusTopRight {
+    Array<PercentOr<Length>, 2> value = {initial(), initial()};
+
+    static constexpr Str name() { return "border-top-right-radius"; }
+
+    static constexpr Length initial() { return Px{0}; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().radii.a = value[0];
+        c.borders.cow().radii.b = value[1];
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value[0] = try$(parseValue<PercentOr<Length>>(c));
+        if (c.ended()) {
+            value[1] = value[0];
+        } else {
+            value[1] = try$(parseValue<PercentOr<Length>>(c));
+        }
+
+        return Ok();
+    }
+};
+
+// https://drafts.csswg.org/css-backgrounds/#the-border-radius
+struct BorderRadiusTopLeft {
+    Array<PercentOr<Length>, 2> value = {initial(), initial()};
+
+    static constexpr Str name() { return "border-top-left-radius"; }
+
+    static constexpr Length initial() { return Px{0}; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().radii.c = value[0];
+        c.borders.cow().radii.d = value[1];
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value[0] = try$(parseValue<PercentOr<Length>>(c));
+        eatWhitespace(c);
+        if (c.ended()) {
+            value[1] = value[0];
+        } else {
+            value[1] = try$(parseValue<PercentOr<Length>>(c));
+        }
+
+        return Ok();
+    }
+};
+
+// https://drafts.csswg.org/css-backgrounds/#the-border-radius
+struct BorderRadiusBottomRight {
+    Array<PercentOr<Length>, 2> value = {initial(), initial()};
+
+    static constexpr Str name() { return "border-bottom-right-radius"; }
+
+    static constexpr Length initial() { return Px{0}; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().radii.e = value[0];
+        c.borders.cow().radii.f = value[1];
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value[0] = try$(parseValue<PercentOr<Length>>(c));
+        if (c.ended()) {
+            value[1] = value[0];
+        } else {
+            value[1] = try$(parseValue<PercentOr<Length>>(c));
+        }
+
+        return Ok();
+    }
+};
+
+// https://drafts.csswg.org/css-backgrounds/#the-border-radius
+struct BorderRadiusBottomLeft {
+    Array<PercentOr<Length>, 2> value = {initial(), initial()};
+
+    static constexpr Str name() { return "border-bottom-left-radius"; }
+
+    static constexpr Length initial() { return Px{0}; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().radii.g = value[0];
+        c.borders.cow().radii.h = value[1];
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value[0] = try$(parseValue<PercentOr<Length>>(c));
+        if (c.ended()) {
+            value[1] = value[0];
+        } else {
+            value[1] = try$(parseValue<PercentOr<Length>>(c));
+        }
+
         return Ok();
     }
 };
@@ -1231,6 +1404,16 @@ using _StyleProp = Union<
     BorderRightWidthProp,
     BorderBottomWidthProp,
     BorderLeftWidthProp,
+
+    BorderTopStyleProp,
+    BorderRightStyleProp,
+    BorderBottomStyleProp,
+    BorderLeftStyleProp,
+
+    BorderRadiusTopRight,
+    BorderRadiusTopLeft,
+    BorderRadiusBottomRight,
+    BorderRadiusBottomLeft,
 
     // Flex
     FlexBasisProp,

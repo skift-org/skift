@@ -107,6 +107,35 @@ Res<bool> ValueParser<bool>::parse(Cursor<Css::Sst> &c) {
     return Ok(val > 0);
 }
 
+// MARK: Border-Style
+// https://www.w3.org/TR/CSS22/box.html#border-style-properties
+Res<BorderStyle> ValueParser<BorderStyle>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of property");
+
+    if (c.skip(Css::Token::ident("none"))) {
+        return Ok(BorderStyle::NONE);
+    } else if (c.skip(Css::Token::ident("solid"))) {
+        return Ok(BorderStyle::SOLID);
+    } else if (c.skip(Css::Token::ident("dashed"))) {
+        return Ok(BorderStyle::DASHED);
+    } else if (c.skip(Css::Token::ident("dotted"))) {
+        return Ok(BorderStyle::DOTTED);
+    } else if (c.skip(Css::Token::ident("hidden"))) {
+        return Ok(BorderStyle::HIDDEN);
+    } else if (c.skip(Css::Token::ident("double"))) {
+        return Ok(BorderStyle::DOUBLE);
+    } else if (c.skip(Css::Token::ident("groove"))) {
+        return Ok(BorderStyle::GROOVE);
+    } else if (c.skip(Css::Token::ident("ridge"))) {
+        return Ok(BorderStyle::RIDGE);
+    } else if (c.skip(Css::Token::ident("outset"))) {
+        return Ok(BorderStyle::OUTSET);
+    } else {
+        return Error::invalidData("unknown border-style");
+    }
+}
+
 // MARK: Color
 // https://drafts.csswg.org/css-color
 
@@ -526,6 +555,8 @@ Res<Length> ValueParser<Length>::parse(Cursor<Css::Sst> &c) {
         Io::SScan scan = c->token.data;
         auto value = tryOr(Io::atof(scan, {.allowExp = false}), 0.0);
         auto unit = try$(_parseLengthUnit(scan.remStr()));
+        c.next();
+
         return Ok(Length{value, unit});
     } else if (c.peek() == Css::Token::number("0")) {
         return Ok(Length{0.0, Length::Unit::PX});

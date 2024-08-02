@@ -219,6 +219,15 @@ Box computeBox(Context &ctx, RectPx borderBox) {
     if (ctx.style().borders->start.style != BorderStyle::NONE)
         res.borders.start = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->start.width);
 
+    res.radius.a = computeInset(ctx, Axis::VERTICAL, ctx.style().borders->radii.a);
+    res.radius.b = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->radii.b);
+    res.radius.c = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->radii.c);
+    res.radius.d = computeInset(ctx, Axis::VERTICAL, ctx.style().borders->radii.d);
+    res.radius.e = computeInset(ctx, Axis::VERTICAL, ctx.style().borders->radii.e);
+    res.radius.f = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->radii.f);
+    res.radius.g = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->radii.g);
+    res.radius.h = computeInset(ctx, Axis::VERTICAL, ctx.style().borders->radii.h);
+
     res.borderBox = borderBox;
 
     res.margins.top = computeInset(ctx, Axis::VERTICAL, ctx.style().margin->top);

@@ -141,12 +141,12 @@ union Curve {
     }
 
     constexpr Pair<Curve> split(T t = 0.5) const {
-        auto e = (a + b) * t;
-        auto f = (b + c) * t;
-        auto g = (c + d) * t;
-        auto h = (e + f) * t;
-        auto j = (f + g) * t;
-        auto k = (h + j) * t;
+        auto e = lerp(a, b, t);
+        auto f = lerp(b, c, t);
+        auto g = lerp(c, d, t);
+        auto h = lerp(e, f, t);
+        auto j = lerp(f, g, t);
+        auto k = lerp(h, j, t);
 
         return {
             {a, e, h, k},

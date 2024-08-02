@@ -72,23 +72,23 @@ void Context::transform(Math::Trans2f trans) {
 }
 
 void Context::translate(Math::Vec2f pos) {
-    transform(Math::Trans2f::translate(pos));
+    transform(Math::Trans2f::makeTranslate(pos));
 }
 
 void Context::scale(Math::Vec2f pos) {
-    transform(Math::Trans2f::scale(pos));
+    transform(Math::Trans2f::makeScale(pos));
 }
 
 void Context::rotate(f64 angle) {
-    transform(Math::Trans2f::rotate(angle));
+    transform(Math::Trans2f::makeRotate(angle));
 }
 
 void Context::skew(Math::Vec2f pos) {
-    transform(Math::Trans2f::skew(pos));
+    transform(Math::Trans2f::makeSkew(pos));
 }
 
 void Context::identity() {
-    current().trans = Math::Trans2f::identity();
+    current().trans = Math::Trans2f::IDENTITY;
 }
 
 // MARK: Fill & Stroke ---------------------------------------------------------

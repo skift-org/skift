@@ -131,13 +131,13 @@ struct Run {
         g._useSpaa = false;
     }
 
-    void paint(Gfx::Context &ctx) const {
+    void paint(Gfx::Context &g) const {
         auto m = _font.metrics();
 
-        ctx.save();
+        g.save();
 
-        ctx.strokeStyle({
-            .fill = ctx.current().fill,
+        g.strokeStyle({
+            .fill = g.current().fill,
             .width = 1,
             .align = Gfx::INSIDE_ALIGN,
         });
@@ -146,7 +146,7 @@ struct Run {
             auto glyph = cell.glyph;
 
             if (glyph == Glyph::TOFU) {
-                ctx.stroke(
+                g.stroke(
                     Math::Rectf::fromTwoPoint(
                         {cell.xpos, 0 - m.ascend},
                         {cell.xpos + cell.adv, 0 + m.descend}
@@ -154,11 +154,11 @@ struct Run {
                         .shrink(4)
                 );
             } else {
-                _fillGlyph(ctx, _font, {cell.xpos, 0}, cell.glyph);
+                _fillGlyph(g, _font, {cell.xpos, 0}, cell.glyph);
             }
         }
 
-        ctx.restore();
+        g.restore();
     }
 };
 

@@ -190,16 +190,16 @@ static void _fillGlyph(Gfx::Context &g, Font const &font, Math::Vec2f baseline, 
     g._useSpaa = false;
 }
 
-void Prose::paint(Gfx::Context &ctx) const {
+void Prose::paint(Gfx::Context &g) const {
     auto m = _style.font.metrics();
 
-    ctx.save();
+    g.save();
 
     if (_style.color)
-        ctx.fillStyle(*_style.color);
+        g.fillStyle(*_style.color);
 
-    ctx.strokeStyle({
-        .fill = ctx.current().fill,
+    g.strokeStyle({
+        .fill = g.current().fill,
         .width = 1,
         .align = Gfx::INSIDE_ALIGN,
     });
@@ -210,7 +210,7 @@ void Prose::paint(Gfx::Context &ctx) const {
                 auto glyph = cell.glyph;
 
                 if (glyph == Glyph::TOFU) {
-                    ctx.stroke(
+                    g.stroke(
                         Math::Rectf::fromTwoPoint(
                             {block.pos + cell.pos, line.baseline - m.ascend},
                             {block.pos + cell.pos + cell.adv, line.baseline + m.descend}
@@ -218,13 +218,13 @@ void Prose::paint(Gfx::Context &ctx) const {
                             .shrink(4)
                     );
                 } else {
-                    _fillGlyph(ctx, _style.font, {block.pos + cell.pos, line.baseline}, cell.glyph);
+                    _fillGlyph(g, _style.font, {block.pos + cell.pos, line.baseline}, cell.glyph);
                 }
             }
         }
     }
 
-    ctx.restore();
+    g.restore();
 }
 
 } // namespace Karm::Text

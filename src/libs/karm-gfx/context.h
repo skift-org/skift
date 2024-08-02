@@ -24,7 +24,7 @@ struct Context : public Canvas {
         Fill fill = Gfx::WHITE;
         Stroke stroke{};
         Math::Recti clip{};
-        Math::Trans2f trans = Math::Trans2f::identity();
+        Math::Trans2f trans = Math::Trans2f::IDENTITY;
     };
 
     Opt<MutPixels> _pixels{};

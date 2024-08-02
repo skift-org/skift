@@ -27,6 +27,42 @@ union Trans2 {
         Vec2<T> o;
     };
 
+    static Trans2 const IDENTITY;
+
+    static constexpr Trans2 makeRotate(T angle) {
+        T c = cos(angle);
+        T s = sin(angle);
+        return {
+            c, -s,
+            s, c,
+            0, 0
+        };
+    }
+
+    static constexpr Trans2 makeSkew(Vec2<T> v) {
+        return {
+            1, v.x,
+            v.y, 1,
+            0, 0
+        };
+    }
+
+    static constexpr Trans2 makeScale(Vec2<T> v) {
+        return {
+            v.x, 0,
+            0, v.y,
+            0, 0
+        };
+    }
+
+    static constexpr Trans2 makeTranslate(Vec2<T> v) {
+        return {
+            1, 0,
+            0, 1,
+            v.x, v.y
+        };
+    }
+
     Array<T, 6> _els{};
 
     bool rotated() const {
@@ -58,68 +94,6 @@ union Trans2 {
 
     constexpr Trans2(T xx, T xy, T yx, T yy, T ox, T oy)
         : _els{xx, xy, yx, yy, ox, oy} {}
-
-    static constexpr Trans2 identity() {
-        return {
-            1, 0,
-            0, 1,
-            0, 0
-        };
-    }
-
-    static constexpr Trans2 rotate(T angle) {
-        T c = cos(angle);
-        T s = sin(angle);
-        return {
-            c, -s,
-            s, c,
-            0, 0
-        };
-    }
-
-    static constexpr Trans2 skew(T x, T y) {
-        return {
-            1, x,
-            y, 1,
-            0, 0
-        };
-    }
-
-    static constexpr Trans2 skew(Vec2<T> v) {
-        return skew(v.x, v.y);
-    }
-
-    static constexpr Trans2 scale(T x, T y) {
-        return {
-            x, 0,
-            0, y,
-            0, 0
-        };
-    }
-
-    static constexpr Trans2 scale(T s) {
-        return scale(s, s);
-    }
-
-    static constexpr Trans2 scale(Vec2<T> v) {
-        return scale(v.x, v.y);
-    }
-
-    static constexpr Trans2 translate(T x, T y) {
-        return {
-            1, 0,
-            0, 1,
-            x, y
-        };
-    }
-
-    static constexpr Trans2 translate(Vec2<T> v) {
-        return {
-            1, 0,
-            0, 1,
-            v.x, v.y
-        };
-    }
 
     constexpr Vec2<T> applyVector(Vec2<T> v) const {
         return {
@@ -167,15 +141,15 @@ union Trans2 {
     }
 
     constexpr Trans2 rotated(T angle) {
-        return multiply(rotate(angle));
+        return multiply(makeRotate(angle));
     }
 
     constexpr Trans2 skewed(T x, T y) {
-        return multiply(skew(x, y));
+        return multiply(makeSkew(x, y));
     }
 
     constexpr Trans2 scaled(T x, T y) {
-        return multiply(scale(x, y));
+        return multiply(makeScale(x, y));
     }
 
     constexpr Trans2 scaled(T s) {
@@ -183,7 +157,7 @@ union Trans2 {
     }
 
     constexpr Trans2 translated(T x, T y) {
-        return multiply(translate(x, y));
+        return multiply(makeTranslate(x, y));
     }
 
     constexpr Trans2 inverse() const {
@@ -209,6 +183,13 @@ union Trans2 {
     constexpr Vec2<T> delta() const {
         return {xx, xy};
     }
+};
+
+template <typename T>
+Trans2<T> const Trans2<T>::IDENTITY = {
+    1, 0,
+    0, 1,
+    0, 0
 };
 
 using Trans2i = Trans2<isize>;

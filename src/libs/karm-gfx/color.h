@@ -127,6 +127,9 @@ struct Color {
     always_inline constexpr Color sample(Math::Vec2f) const {
         return *this;
     }
+
+    auto operator<=>(Color const &other) const = default;
+    bool operator==(Color const &other) const = default;
 };
 
 struct Hsv {

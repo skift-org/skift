@@ -25,6 +25,7 @@ struct Color {
     using enum Type;
 
     Type type;
+
     union {
         Gfx::Color srgb;
         SystemColor system;

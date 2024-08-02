@@ -53,6 +53,7 @@ struct Glyf : public Io::BChunk {
             Y_SAME_OR_POSITIVE_Y_SHORT_VECTOR = 0x20,
             OVERLAP_SIMPLE = 0x40,
         };
+
         u8 flags;
         i16 x;
         i16 y;

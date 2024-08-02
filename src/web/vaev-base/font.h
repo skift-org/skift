@@ -217,6 +217,7 @@ struct FontSize {
 };
 
 using FontTag = Array<char, 4>;
+
 static FontTag makeTag(Str tag) {
     if (tag.len() != 4)
         return {' ', ' ', ' ', ' '};

@@ -20,6 +20,7 @@ struct Defer : Meta::Static {
     F _f;
 
     always_inline Defer(F f) : _f(f) {}
+
     always_inline ~Defer() {
         _f();
     }

@@ -65,9 +65,11 @@ enum OpCode : u16 {
     RCODE(NOTZONE, 9)
 
 enum RCode : u16 {
+
 #define ITER(NAME, VAL) NAME = VAL << 12,
     FOREACH_RCODE(ITER)
 #undef ITER
+
 };
 
 Str toStr(RCode code) {

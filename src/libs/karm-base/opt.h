@@ -16,6 +16,7 @@ struct [[nodiscard]] Opt {
     struct _Empty {};
 
     bool _present;
+
     union {
         _Empty _empty;
         T _value;

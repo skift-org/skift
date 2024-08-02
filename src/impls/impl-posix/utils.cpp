@@ -190,7 +190,7 @@ Res<> consumeErrno() {
     if (errno == 0) {
         return Ok();
     }
-    
+
     auto err = fromLastErrno();
     errno = 0;
     return err;

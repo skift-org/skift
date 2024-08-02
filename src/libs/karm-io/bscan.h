@@ -184,43 +184,67 @@ struct BScan {
     }
 
     always_inline constexpr u8 nextU8be() { return nextBe<u8>(); }
+
     always_inline constexpr u16 nextU16be() { return nextBe<u16>(); }
+
     always_inline constexpr u32 nextU32be() { return nextBe<u32>(); }
+
     always_inline constexpr u64 nextU64be() { return nextBe<u64>(); }
 
     always_inline constexpr u8 nextU8le() { return nextLe<u8>(); }
+
     always_inline constexpr u16 nextU16le() { return nextLe<u16>(); }
+
     always_inline constexpr u32 nextU32le() { return nextLe<u32>(); }
+
     always_inline constexpr u64 nextU64le() { return nextLe<u64>(); }
 
     always_inline constexpr i8 nextI8be() { return nextBe<i8>(); }
+
     always_inline constexpr i16 nextI16be() { return nextBe<i16>(); }
+
     always_inline constexpr i32 nextI32be() { return nextBe<i32>(); }
+
     always_inline constexpr i64 nextI64be() { return nextBe<i64>(); }
 
     always_inline constexpr i8 nextI8le() { return nextLe<i8>(); }
+
     always_inline constexpr i16 nextI16le() { return nextLe<i16>(); }
+
     always_inline constexpr i32 nextI32le() { return nextLe<i32>(); }
+
     always_inline constexpr i64 nextI64le() { return nextLe<i64>(); }
 
     always_inline constexpr u8 peekU8be() { return peekBe<u8>(); }
+
     always_inline constexpr u16 peekU16be() { return peekBe<u16>(); }
+
     always_inline constexpr u32 peekU32be() { return peekBe<u32>(); }
+
     always_inline constexpr u64 peekU64be() { return peekBe<u64>(); }
 
     always_inline constexpr u8 peekU8le() { return peekLe<u8>(); }
+
     always_inline constexpr u16 peekU16le() { return peekLe<u16>(); }
+
     always_inline constexpr u32 peekU32le() { return peekLe<u32>(); }
+
     always_inline constexpr u64 peekU64le() { return peekLe<u64>(); }
 
     always_inline constexpr i8 peekI8be() { return peekBe<i8>(); }
+
     always_inline constexpr i16 peekI16be() { return peekBe<i16>(); }
+
     always_inline constexpr i32 peekI32be() { return peekBe<i32>(); }
+
     always_inline constexpr i64 peekI64be() { return peekBe<i64>(); }
 
     always_inline constexpr i8 peekI8le() { return peekLe<i8>(); }
+
     always_inline constexpr i16 peekI16le() { return peekLe<i16>(); }
+
     always_inline constexpr i32 peekI32le() { return peekLe<i32>(); }
+
     always_inline constexpr i64 peekI64le() { return peekLe<i64>(); }
 
     always_inline constexpr Str nextStr(usize n) {

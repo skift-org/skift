@@ -582,6 +582,7 @@ void Decoder::idct(Array<short, 64> &mcu) {
         mcu[i * 8 + 7] = b0 - b7;
     }
 }
+
 Res<> Decoder::decode(Gfx::MutPixels pixels) {
     for (usize i = 0; i < _mcus.len(); i += _componentCount) {
         usize x = (i / _componentCount) % mcuWidth();

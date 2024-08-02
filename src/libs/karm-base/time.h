@@ -277,6 +277,7 @@ struct Day {
 
 struct Month {
     enum _Name {
+
 #define ITER(NAME, ...) NAME,
         FOREACH_MONTH(ITER)
 #undef ITER
@@ -392,6 +393,7 @@ struct Year {
 
 struct DayOfWeek {
     enum _Raw : usize {
+
 #define ITER(NAME, ...) NAME,
         FOREACH_DAY_OF_WEEK(ITER)
 #undef ITER

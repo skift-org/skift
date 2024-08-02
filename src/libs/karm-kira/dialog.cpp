@@ -22,6 +22,7 @@ Ui::Child dialogContent(Ui::Children children) {
            Ui::align(Math::Align::CENTER | Math::Align::CLAMP) |
            Ui::insets(32);
 }
+
 Ui::Child dialogTitleBar(String title) {
     return Ui::vflow(
         Ui::hflow(

@@ -12,13 +12,16 @@ namespace Karm::Async {
 // MARK: Concepts --------------------------------------------------------------
 
 struct Inline {};
+
 static constexpr Inline INLINE;
 
 struct Later {};
+
 static constexpr Later LATER;
 
 struct InlineOrLater {
     constexpr InlineOrLater(Inline) {}
+
     constexpr InlineOrLater(Later) {}
 };
 
@@ -133,10 +136,13 @@ Awaiter<S> operator co_await(S s) {
 template <Sender S>
 static inline typename S::Inner run(S s, auto wait) {
     Opt<typename S::Inner> ret;
+
     struct Receiver {
         Opt<typename S::Inner> &_ret;
+
         void recv(InlineOrLater, typename S::Inner r) { _ret = r; }
     };
+
     auto op = s.connect(Receiver{ret});
     if (op.start())
         return ret.take();
@@ -148,10 +154,13 @@ static inline typename S::Inner run(S s, auto wait) {
 template <Sender S>
 static inline typename S::Inner run(S s) {
     Opt<typename S::Inner> ret;
+
     struct Receiver {
         Opt<typename S::Inner> &_ret;
+
         void recv(InlineOrLater, typename S::Inner r) { _ret = r; }
     };
+
     auto op = s.connect(Receiver{ret});
     if (not op.start()) [[unlikely]]
         panic("run() called on pending operation without a wait function");
@@ -209,6 +218,7 @@ struct Cancelation : public Meta::Static {
         Cancelation *_c = nullptr;
 
         Token() = default;
+
         Token(Cancelation &c) : _c{&c} {}
 
         bool canceled() const {

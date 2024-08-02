@@ -113,6 +113,7 @@ using _Filters = Union<
 
 struct Filter : public _Filters {
     using _Filters::_Filters;
+
     void apply(MutPixels s) const {
         visit([&](auto const &filter) {
             filter.apply(s);

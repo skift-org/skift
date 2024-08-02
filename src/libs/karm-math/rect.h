@@ -95,15 +95,21 @@ union Rect {
     }
 
     always_inline constexpr Vec2<T> topStart() const { return {x, y}; }
+
     always_inline constexpr Vec2<T> topEnd() const { return {x + width, y}; }
+
     always_inline constexpr Vec2<T> bottomStart() const { return {x, y + height}; }
+
     always_inline constexpr Vec2<T> bottomEnd() const { return {x + width, y + height}; }
 
     always_inline constexpr Vec2<T> center() const { return {x + width / 2, y + height / 2}; }
 
     always_inline constexpr Vec2<T> topCenter() const { return {x + width / 2, y}; }
+
     always_inline constexpr Vec2<T> bottomCenter() const { return {x + width / 2, y + height}; }
+
     always_inline constexpr Vec2<T> startCenter() const { return {x, y + height / 2}; }
+
     always_inline constexpr Vec2<T> endCenter() const { return {x + width, y + height / 2}; }
 
     always_inline constexpr Array<Vec2<T>, 4> vertices() const {

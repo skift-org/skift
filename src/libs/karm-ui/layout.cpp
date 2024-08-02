@@ -502,6 +502,7 @@ struct GridLayout : public GroupNode<GridLayout> {
     struct _Dim {
         isize start;
         isize size;
+
         isize end() const {
             return start + size;
         }

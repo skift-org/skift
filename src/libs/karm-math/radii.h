@@ -34,6 +34,7 @@ struct Radii {
         struct {
             T a, b, c, d, e, f, g, h;
         };
+
         Array<T, 8> radii;
     };
 

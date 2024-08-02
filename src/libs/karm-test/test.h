@@ -23,10 +23,12 @@ struct Test : Meta::Static {
 
     Str _name;
     Kind _kind;
+
     union {
         Func _func;
         FuncAsync _funcAsync;
     };
+
     Loc _loc;
 
     Test(Str name, Func func, Loc loc = Loc::current())

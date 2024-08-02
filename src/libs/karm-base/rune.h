@@ -33,11 +33,15 @@ struct _Multiple {
     }
 
     always_inline constexpr Unit &operator[](usize i) { return _buf[i]; }
+
     always_inline constexpr Unit const &operator[](usize i) const { return _buf[i]; }
 
     always_inline always_inline constexpr Unit *buf() { return _buf.buf(); }
+
     always_inline constexpr Unit const *buf() const { return _buf.buf(); }
+
     always_inline constexpr usize len() const { return _buf.len(); }
+
     always_inline constexpr usize rem() const { return N - len(); }
 };
 
@@ -62,10 +66,13 @@ struct _Single {
     }
 
     always_inline constexpr Unit &operator[](usize) { return _buf; }
+
     always_inline constexpr Unit const &operator[](usize) const { return _buf; }
 
     always_inline constexpr Unit *buf() { return &_buf; }
+
     always_inline constexpr Unit const *buf() const { return &_buf; }
+
     always_inline constexpr usize len() const { return 1; }
 };
 

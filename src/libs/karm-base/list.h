@@ -54,9 +54,11 @@ struct Ll {
     }
 
     T *head() { return _head; }
+
     T const *head() const { return _head; }
 
     T *tail() { return _tail; }
+
     T const *tail() const { return _tail; }
 
     usize len() const { return _len; }

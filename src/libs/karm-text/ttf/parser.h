@@ -147,6 +147,7 @@ struct Parser {
         auto scan = begin();
         /* auto version = */ scan.nextU32be();
         auto numTables = scan.nextU16be();
+
         /* auto searchRange = */ scan.nextU16be();
         /* auto entrySelector = */ scan.nextU16be();
         /* auto rangeShift = */ scan.nextU16be();

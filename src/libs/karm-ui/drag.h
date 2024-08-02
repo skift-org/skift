@@ -15,6 +15,7 @@ struct DragEvent {
         DRAG,
         END
     } type;
+
     Math::Vec2i delta{};
 };
 

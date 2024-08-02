@@ -79,6 +79,7 @@ struct Path {
     auto iterContours() const {
         struct _Contour : public Slice<Math::Vec2f> {
             bool close;
+
             _Contour(Slice<Math::Vec2f> slice, bool close)
                 : Slice<Math::Vec2f>(slice), close(close) {}
         };

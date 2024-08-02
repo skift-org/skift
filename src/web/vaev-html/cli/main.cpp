@@ -29,11 +29,14 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
         auto buf = co_try$(Io::readAllUtf8(file));
 
         Vec<Vaev::Html::Token> tokens;
+
         struct VecSink : public Vaev::Html::Sink {
             Vec<Vaev::Html::Token> &tokens;
+
             VecSink(Vec<Vaev::Html::Token> &tokens)
                 : tokens(tokens) {
             }
+
             void accept(Vaev::Html::Token const &token) override {
                 tokens.pushBack(token);
             }

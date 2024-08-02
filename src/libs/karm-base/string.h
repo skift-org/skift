@@ -253,12 +253,15 @@ using String = _String<Utf8>;
 template <auto N>
 struct StrLit {
     char _buf[N];
+
     constexpr StrLit(char const (&buf)[N]) {
         for (usize i = 0; i < N; i++) {
             _buf[i] = buf[i];
         }
     }
+
     constexpr operator Str() const { return _buf; }
+
     constexpr operator char const *() const { return _buf; }
 };
 

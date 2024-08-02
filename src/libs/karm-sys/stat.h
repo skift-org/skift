@@ -9,6 +9,7 @@ struct Stat {
         FILE,
         DIR,
     } type;
+
     usize size;
     TimeStamp accessTime;
     TimeStamp modifyTime;

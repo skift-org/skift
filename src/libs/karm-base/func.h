@@ -20,7 +20,9 @@ struct Func<Out(In...)> {
     template <typename F>
     struct Wrap : _Wrap {
         F _f;
+
         Wrap(F &&f) : _f(std::move(f)) {}
+
         Out operator()(In... in) const override { return _f(std::forward<In>(in)...); }
     };
 
@@ -88,7 +90,9 @@ struct SharedFunc<Out(In...)> {
     template <typename F>
     struct Wrap : _Wrap {
         F _f;
+
         Wrap(F &&f) : _f(std::move(f)) {}
+
         Out operator()(In... in) const override { return _f(std::forward<In>(in)...); }
     };
 

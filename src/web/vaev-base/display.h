@@ -79,12 +79,14 @@ struct Display {
     using enum Type;
 
     Type _type;
+
     union {
         struct {
             Inside _inside;
             Outside _outside;
             Item _item;
         };
+
         Box _box;
         Internal _internal;
     };

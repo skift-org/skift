@@ -68,6 +68,7 @@ void buildElement(Style::Computer &c, Dom::Element const &el, Flow &parent) {
 }
 
 static Opt<Strong<Text::Fontface>> _regularFontface = NONE;
+
 Strong<Text::Fontface> regularFontface() {
     if (not _regularFontface) {
         _regularFontface = Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Regular.ttf"_url).unwrap();

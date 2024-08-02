@@ -6,6 +6,7 @@
 
 struct HandoverHook : public Sys::Service {
     Handover::Payload *payload;
+
     HandoverHook(Handover::Payload *payload)
         : payload(payload) {}
 };

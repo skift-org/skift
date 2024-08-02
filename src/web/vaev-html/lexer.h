@@ -21,6 +21,7 @@ namespace Vaev::Html {
 
 struct Token {
     enum Type {
+
 #define ITER(NAME) NAME,
         FOREACH_TOKEN(ITER)
 #undef ITER

@@ -14,11 +14,13 @@ struct JSConsole : public Sys::Fd {
     } _proto;
 
     Io::BufferWriter _buf;
+
     JSConsole(Proto proto) : _proto(proto) {}
 
     Sys::Handle handle() const override {
         return Handle{(usize)_proto};
     }
+
     Res<usize> read(MutBytes) override {
         notImplemented();
     }

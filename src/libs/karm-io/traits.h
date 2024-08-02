@@ -123,8 +123,6 @@ struct TextEncoder :
     Res<usize> write(Bytes bytes) override {
         return _writer.write(bytes);
     }
-
-    
 };
 
 } // namespace Karm::Io

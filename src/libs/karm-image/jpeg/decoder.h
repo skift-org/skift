@@ -204,9 +204,11 @@ struct Decoder {
     isize _height = 8;
 
     isize width() const { return _width; }
+
     isize height() const { return _height; }
 
     isize mcuWidth() const { return (_width + 7) / 8; }
+
     isize mcuHeight() const { return (_height + 7) / 8; }
 
     struct Component {

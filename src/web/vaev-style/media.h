@@ -251,6 +251,7 @@ struct RangeFeature {
 template <StrLit NAME, typename T, auto Media::*F>
 struct DiscreteFeature {
     using Inner = T;
+
     enum Type : u8 {
         NONE,
         EQUAL,

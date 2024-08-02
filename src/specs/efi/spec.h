@@ -72,6 +72,7 @@ struct TimeCapabilities {
     ERR(HTTP_ERROR, EFI_ERROR | 0x23)
 
 enum : usize {
+
 #define ERR(ERR, CODE) ERR_##ERR = CODE,
     FOREACH_ERROR(ERR)
 #undef ERR

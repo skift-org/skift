@@ -17,6 +17,7 @@ ForEachMacros: ["__dummy_foreach"]
 SpaceBeforeParens: ControlStatementsExceptForEachMacros
 QualifierAlignment: Right
 AlignAfterOpenBracket: BlockIndent
+SeparateDefinitionBlocks: Always
 
 IncludeBlocks: Regroup
 IncludeCategories:

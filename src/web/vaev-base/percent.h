@@ -26,6 +26,7 @@ struct PercentOr {
     using enum Type;
 
     Type _type;
+
     union {
         Percent _percent;
         T _value;

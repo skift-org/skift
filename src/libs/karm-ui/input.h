@@ -49,11 +49,11 @@ struct MouseListener {
         return _pos;
     }
 
-    bool listen(Node &node, Sys::Event &event) {
+    bool listen(Node &node, App::Event &event) {
         bool result = false;
         MouseState state = _state;
 
-        if (auto *e = event.is<Events::MouseEvent>()) {
+        if (auto *e = event.is<App::MouseEvent>()) {
             if (not node.bound().contains(e->pos)) {
                 state = IDLE;
             } else {
@@ -64,19 +64,19 @@ struct MouseListener {
 
                 _pos = e->pos - node.bound().topStart();
 
-                if (e->type == Events::MouseEvent::PRESS and
-                    e->button == Events::Button::LEFT) {
+                if (e->type == App::MouseEvent::PRESS and
+                    e->button == App::MouseButton::LEFT) {
                     state = PRESS;
                     event.accept();
 
-                } else if (e->type == Events::MouseEvent::RELEASE and
-                           e->button == Events::Button::LEFT) {
+                } else if (e->type == App::MouseEvent::RELEASE and
+                           e->button == App::MouseButton::LEFT) {
                     state = HOVER;
                     result = true;
                     event.accept();
                 }
             }
-        } else if (auto *e = event.is<Events::MouseLeaveEvent>()) {
+        } else if (auto *e = event.is<App::MouseLeaveEvent>()) {
             state = IDLE;
         }
 
@@ -174,7 +174,7 @@ static inline auto slider(f64 value, OnChange<f64> onChange) {
 
 // MARK: Intent ----------------------------------------------------------------
 
-using Filter = Func<void(Node &, Sys::Event &e)>;
+using Filter = Func<void(Node &, App::Event &e)>;
 
 Child intent(Filter map, Child child);
 

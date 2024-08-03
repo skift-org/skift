@@ -32,7 +32,7 @@ struct RootHost :
         return Ok();
     }
 
-    void bubble(Sys::Event &e) override {
+    void bubble(App::Event &e) override {
         Ui::Host::bubble(e);
     }
 };

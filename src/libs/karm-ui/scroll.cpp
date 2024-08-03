@@ -88,7 +88,7 @@ struct Scroll : public ProxyNode<Scroll> {
         g.restore();
     }
 
-    void event(Sys::Event &e) override {
+    void event(App::Event &e) override {
         if (_scrollOpacity.needRepaint(*this, e)) {
             if (canHScroll())
                 shouldRepaint(*parent(), hTrack());
@@ -97,7 +97,7 @@ struct Scroll : public ProxyNode<Scroll> {
                 shouldRepaint(*parent(), vTrack());
         }
 
-        if (auto *me = e.is<Events::MouseEvent>()) {
+        if (auto *me = e.is<App::MouseEvent>()) {
             if (bound().contains(me->pos)) {
                 _mouseIn = true;
 
@@ -106,7 +106,7 @@ struct Scroll : public ProxyNode<Scroll> {
                 me->pos = me->pos + _scroll.cast<isize>();
 
                 if (not e.accepted()) {
-                    if (me->type == Events::MouseEvent::SCROLL) {
+                    if (me->type == App::MouseEvent::SCROLL) {
                         scroll((_scroll + me->scroll * 128).cast<isize>());
                         shouldAnimate(*this);
                         _scrollOpacity.delay(0).animate(*this, 1, 0.3);
@@ -136,7 +136,7 @@ struct Scroll : public ProxyNode<Scroll> {
         }
     }
 
-    void bubble(Sys::Event &e) override {
+    void bubble(App::Event &e) override {
         if (auto *pe = e.is<Node::PaintEvent>()) {
             pe->bound.xy = pe->bound.xy + _scroll.cast<isize>();
             pe->bound = pe->bound.clipTo(bound());

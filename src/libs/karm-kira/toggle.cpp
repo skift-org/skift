@@ -57,7 +57,7 @@ struct Toggle : public Ui::View<Toggle> {
         g.restore();
     }
 
-    void event(Sys::Event &e) override {
+    void event(App::Event &e) override {
         if (_anim.needRepaint(*this, e))
             Ui::shouldRepaint(*this);
 

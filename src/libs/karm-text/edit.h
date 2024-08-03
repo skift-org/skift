@@ -1,9 +1,9 @@
 #pragma once
 
+#include <karm-app/inputs.h>
 #include <karm-base/ctype.h>
 #include <karm-base/string.h>
 #include <karm-base/vec.h>
-#include <karm-events/events.h>
 #include <karm-sys/async.h>
 
 namespace Karm::Text {
@@ -56,7 +56,7 @@ struct Action {
 
     Action(_Op op, Rune rune = 0) : op(op), rune(rune) {}
 
-    static Opt<Action> fromEvent(Sys::Event &e);
+    static Opt<Action> fromEvent(App::Event &e);
 };
 
 struct Model {

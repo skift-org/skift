@@ -51,252 +51,252 @@ struct SdlHost :
         SDL_UpdateWindowSurface(_window);
     }
 
-    static Events::Key _fromSdlKeycode(SDL_Keycode sdl) {
+    static App::Key _fromSdlKeycode(SDL_Keycode sdl) {
         // clang-format off
         switch (sdl) {
-            case SDLK_a: return Events::Key::A;
-            case SDLK_b: return Events::Key::B;
-            case SDLK_c: return Events::Key::C;
-            case SDLK_d: return Events::Key::D;
-            case SDLK_e: return Events::Key::E;
-            case SDLK_f: return Events::Key::F;
-            case SDLK_g: return Events::Key::G;
-            case SDLK_h: return Events::Key::H;
-            case SDLK_i: return Events::Key::I;
-            case SDLK_j: return Events::Key::J;
-            case SDLK_k: return Events::Key::K;
-            case SDLK_l: return Events::Key::L;
-            case SDLK_m: return Events::Key::M;
-            case SDLK_n: return Events::Key::N;
-            case SDLK_o: return Events::Key::O;
-            case SDLK_p: return Events::Key::P;
-            case SDLK_q: return Events::Key::Q;
-            case SDLK_r: return Events::Key::R;
-            case SDLK_s: return Events::Key::S;
-            case SDLK_t: return Events::Key::T;
-            case SDLK_u: return Events::Key::U;
-            case SDLK_v: return Events::Key::V;
-            case SDLK_w: return Events::Key::W;
-            case SDLK_x: return Events::Key::X;
-            case SDLK_y: return Events::Key::Y;
-            case SDLK_z: return Events::Key::Z;
+            case SDLK_a: return App::Key::A;
+            case SDLK_b: return App::Key::B;
+            case SDLK_c: return App::Key::C;
+            case SDLK_d: return App::Key::D;
+            case SDLK_e: return App::Key::E;
+            case SDLK_f: return App::Key::F;
+            case SDLK_g: return App::Key::G;
+            case SDLK_h: return App::Key::H;
+            case SDLK_i: return App::Key::I;
+            case SDLK_j: return App::Key::J;
+            case SDLK_k: return App::Key::K;
+            case SDLK_l: return App::Key::L;
+            case SDLK_m: return App::Key::M;
+            case SDLK_n: return App::Key::N;
+            case SDLK_o: return App::Key::O;
+            case SDLK_p: return App::Key::P;
+            case SDLK_q: return App::Key::Q;
+            case SDLK_r: return App::Key::R;
+            case SDLK_s: return App::Key::S;
+            case SDLK_t: return App::Key::T;
+            case SDLK_u: return App::Key::U;
+            case SDLK_v: return App::Key::V;
+            case SDLK_w: return App::Key::W;
+            case SDLK_x: return App::Key::X;
+            case SDLK_y: return App::Key::Y;
+            case SDLK_z: return App::Key::Z;
 
-            case SDLK_1: return Events::Key::NUM1;
-            case SDLK_2: return Events::Key::NUM2;
-            case SDLK_3: return Events::Key::NUM3;
-            case SDLK_4: return Events::Key::NUM4;
-            case SDLK_5: return Events::Key::NUM5;
-            case SDLK_6: return Events::Key::NUM6;
-            case SDLK_7: return Events::Key::NUM7;
-            case SDLK_8: return Events::Key::NUM8;
-            case SDLK_9: return Events::Key::NUM9;
-            case SDLK_0: return Events::Key::NUM0;
+            case SDLK_1: return App::Key::NUM1;
+            case SDLK_2: return App::Key::NUM2;
+            case SDLK_3: return App::Key::NUM3;
+            case SDLK_4: return App::Key::NUM4;
+            case SDLK_5: return App::Key::NUM5;
+            case SDLK_6: return App::Key::NUM6;
+            case SDLK_7: return App::Key::NUM7;
+            case SDLK_8: return App::Key::NUM8;
+            case SDLK_9: return App::Key::NUM9;
+            case SDLK_0: return App::Key::NUM0;
 
-            case SDLK_RETURN: return Events::Key::ENTER;
-            case SDLK_ESCAPE: return Events::Key::ESC;
-            case SDLK_BACKSPACE: return Events::Key::BKSPC;
-            case SDLK_TAB: return Events::Key::TAB;
-            case SDLK_SPACE: return Events::Key::SPACE;
-            case SDLK_CAPSLOCK: return Events::Key::CAPSLOCK;
+            case SDLK_RETURN: return App::Key::ENTER;
+            case SDLK_ESCAPE: return App::Key::ESC;
+            case SDLK_BACKSPACE: return App::Key::BKSPC;
+            case SDLK_TAB: return App::Key::TAB;
+            case SDLK_SPACE: return App::Key::SPACE;
+            case SDLK_CAPSLOCK: return App::Key::CAPSLOCK;
 
-            case SDLK_F1: return Events::Key::F1;
-            case SDLK_F2: return Events::Key::F2;
-            case SDLK_F3: return Events::Key::F3;
-            case SDLK_F4: return Events::Key::F4;
-            case SDLK_F5: return Events::Key::F5;
-            case SDLK_F6: return Events::Key::F6;
-            case SDLK_F7: return Events::Key::F7;
-            case SDLK_F8: return Events::Key::F8;
-            case SDLK_F9: return Events::Key::F9;
-            case SDLK_F10: return Events::Key::F10;
-            case SDLK_F11: return Events::Key::F11;
-            case SDLK_F12: return Events::Key::F12;
+            case SDLK_F1: return App::Key::F1;
+            case SDLK_F2: return App::Key::F2;
+            case SDLK_F3: return App::Key::F3;
+            case SDLK_F4: return App::Key::F4;
+            case SDLK_F5: return App::Key::F5;
+            case SDLK_F6: return App::Key::F6;
+            case SDLK_F7: return App::Key::F7;
+            case SDLK_F8: return App::Key::F8;
+            case SDLK_F9: return App::Key::F9;
+            case SDLK_F10: return App::Key::F10;
+            case SDLK_F11: return App::Key::F11;
+            case SDLK_F12: return App::Key::F12;
 
-            case SDLK_INSERT: return Events::Key::INSERT;
-            case SDLK_HOME: return Events::Key::HOME;
-            case SDLK_PAGEUP: return Events::Key::PGUP;
-            case SDLK_DELETE: return Events::Key::DELETE;
-            case SDLK_END: return Events::Key::END;
-            case SDLK_PAGEDOWN: return Events::Key::PGDOWN;
-            case SDLK_RIGHT: return Events::Key::RIGHT;
-            case SDLK_LEFT: return Events::Key::LEFT;
-            case SDLK_DOWN: return Events::Key::DOWN;
-            case SDLK_UP: return Events::Key::UP;
+            case SDLK_INSERT: return App::Key::INSERT;
+            case SDLK_HOME: return App::Key::HOME;
+            case SDLK_PAGEUP: return App::Key::PGUP;
+            case SDLK_DELETE: return App::Key::DELETE;
+            case SDLK_END: return App::Key::END;
+            case SDLK_PAGEDOWN: return App::Key::PGDOWN;
+            case SDLK_RIGHT: return App::Key::RIGHT;
+            case SDLK_LEFT: return App::Key::LEFT;
+            case SDLK_DOWN: return App::Key::DOWN;
+            case SDLK_UP: return App::Key::UP;
 
-            case SDLK_KP_ENTER: return Events::Key::KPADENTER;
-            case SDLK_KP_1: return Events::Key::KPAD1;
-            case SDLK_KP_2: return Events::Key::KPAD2;
-            case SDLK_KP_3: return Events::Key::KPAD3;
-            case SDLK_KP_4: return Events::Key::KPAD4;
-            case SDLK_KP_5: return Events::Key::KPAD5;
-            case SDLK_KP_6: return Events::Key::KPAD6;
-            case SDLK_KP_7: return Events::Key::KPAD7;
-            case SDLK_KP_8: return Events::Key::KPAD8;
-            case SDLK_KP_9: return Events::Key::KPAD9;
-            case SDLK_KP_0: return Events::Key::KPAD0;
+            case SDLK_KP_ENTER: return App::Key::KPADENTER;
+            case SDLK_KP_1: return App::Key::KPAD1;
+            case SDLK_KP_2: return App::Key::KPAD2;
+            case SDLK_KP_3: return App::Key::KPAD3;
+            case SDLK_KP_4: return App::Key::KPAD4;
+            case SDLK_KP_5: return App::Key::KPAD5;
+            case SDLK_KP_6: return App::Key::KPAD6;
+            case SDLK_KP_7: return App::Key::KPAD7;
+            case SDLK_KP_8: return App::Key::KPAD8;
+            case SDLK_KP_9: return App::Key::KPAD9;
+            case SDLK_KP_0: return App::Key::KPAD0;
 
-            case SDLK_MENU: return Events::Key::MENU;
+            case SDLK_MENU: return App::Key::MENU;
 
-            case SDLK_LCTRL: return Events::Key::LCTRL;
-            case SDLK_LSHIFT: return Events::Key::LSHIFT;
-            case SDLK_LALT: return Events::Key::LALT;
-            case SDLK_LGUI: return Events::Key::LSUPER;
+            case SDLK_LCTRL: return App::Key::LCTRL;
+            case SDLK_LSHIFT: return App::Key::LSHIFT;
+            case SDLK_LALT: return App::Key::LALT;
+            case SDLK_LGUI: return App::Key::LSUPER;
 
-            case SDLK_RCTRL: return Events::Key::RCTRL;
-            case SDLK_RSHIFT: return Events::Key::RSHIFT;
-            case SDLK_RALT: return Events::Key::RALT;
-            case SDLK_RGUI: return Events::Key::RSUPER;
+            case SDLK_RCTRL: return App::Key::RCTRL;
+            case SDLK_RSHIFT: return App::Key::RSHIFT;
+            case SDLK_RALT: return App::Key::RALT;
+            case SDLK_RGUI: return App::Key::RSUPER;
 
-            default: return Events::Key::INVALID;
+            default: return App::Key::INVALID;
         }
         // clang-format on
     }
 
-    static Events::Key _fromSdlScancode(SDL_Scancode sdl) {
+    static App::Key _fromSdlScancode(SDL_Scancode sdl) {
         // clang-format off
         switch (sdl) {
-            case SDL_SCANCODE_A: return Events::Key::A;
-            case SDL_SCANCODE_B: return Events::Key::B;
-            case SDL_SCANCODE_C: return Events::Key::C;
-            case SDL_SCANCODE_D: return Events::Key::D;
-            case SDL_SCANCODE_E: return Events::Key::E;
-            case SDL_SCANCODE_F: return Events::Key::F;
-            case SDL_SCANCODE_G: return Events::Key::G;
-            case SDL_SCANCODE_H: return Events::Key::H;
-            case SDL_SCANCODE_I: return Events::Key::I;
-            case SDL_SCANCODE_J: return Events::Key::J;
-            case SDL_SCANCODE_K: return Events::Key::K;
-            case SDL_SCANCODE_L: return Events::Key::L;
-            case SDL_SCANCODE_M: return Events::Key::M;
-            case SDL_SCANCODE_N: return Events::Key::N;
-            case SDL_SCANCODE_O: return Events::Key::O;
-            case SDL_SCANCODE_P: return Events::Key::P;
-            case SDL_SCANCODE_Q: return Events::Key::Q;
-            case SDL_SCANCODE_R: return Events::Key::R;
-            case SDL_SCANCODE_S: return Events::Key::S;
-            case SDL_SCANCODE_T: return Events::Key::T;
-            case SDL_SCANCODE_U: return Events::Key::U;
-            case SDL_SCANCODE_V: return Events::Key::V;
-            case SDL_SCANCODE_W: return Events::Key::W;
-            case SDL_SCANCODE_X: return Events::Key::X;
-            case SDL_SCANCODE_Y: return Events::Key::Y;
-            case SDL_SCANCODE_Z: return Events::Key::Z;
+            case SDL_SCANCODE_A: return App::Key::A;
+            case SDL_SCANCODE_B: return App::Key::B;
+            case SDL_SCANCODE_C: return App::Key::C;
+            case SDL_SCANCODE_D: return App::Key::D;
+            case SDL_SCANCODE_E: return App::Key::E;
+            case SDL_SCANCODE_F: return App::Key::F;
+            case SDL_SCANCODE_G: return App::Key::G;
+            case SDL_SCANCODE_H: return App::Key::H;
+            case SDL_SCANCODE_I: return App::Key::I;
+            case SDL_SCANCODE_J: return App::Key::J;
+            case SDL_SCANCODE_K: return App::Key::K;
+            case SDL_SCANCODE_L: return App::Key::L;
+            case SDL_SCANCODE_M: return App::Key::M;
+            case SDL_SCANCODE_N: return App::Key::N;
+            case SDL_SCANCODE_O: return App::Key::O;
+            case SDL_SCANCODE_P: return App::Key::P;
+            case SDL_SCANCODE_Q: return App::Key::Q;
+            case SDL_SCANCODE_R: return App::Key::R;
+            case SDL_SCANCODE_S: return App::Key::S;
+            case SDL_SCANCODE_T: return App::Key::T;
+            case SDL_SCANCODE_U: return App::Key::U;
+            case SDL_SCANCODE_V: return App::Key::V;
+            case SDL_SCANCODE_W: return App::Key::W;
+            case SDL_SCANCODE_X: return App::Key::X;
+            case SDL_SCANCODE_Y: return App::Key::Y;
+            case SDL_SCANCODE_Z: return App::Key::Z;
 
-            case SDL_SCANCODE_1: return Events::Key::NUM1;
-            case SDL_SCANCODE_2: return Events::Key::NUM2;
-            case SDL_SCANCODE_3: return Events::Key::NUM3;
-            case SDL_SCANCODE_4: return Events::Key::NUM4;
-            case SDL_SCANCODE_5: return Events::Key::NUM5;
-            case SDL_SCANCODE_6: return Events::Key::NUM6;
-            case SDL_SCANCODE_7: return Events::Key::NUM7;
-            case SDL_SCANCODE_8: return Events::Key::NUM8;
-            case SDL_SCANCODE_9: return Events::Key::NUM9;
-            case SDL_SCANCODE_0: return Events::Key::NUM0;
+            case SDL_SCANCODE_1: return App::Key::NUM1;
+            case SDL_SCANCODE_2: return App::Key::NUM2;
+            case SDL_SCANCODE_3: return App::Key::NUM3;
+            case SDL_SCANCODE_4: return App::Key::NUM4;
+            case SDL_SCANCODE_5: return App::Key::NUM5;
+            case SDL_SCANCODE_6: return App::Key::NUM6;
+            case SDL_SCANCODE_7: return App::Key::NUM7;
+            case SDL_SCANCODE_8: return App::Key::NUM8;
+            case SDL_SCANCODE_9: return App::Key::NUM9;
+            case SDL_SCANCODE_0: return App::Key::NUM0;
 
-            case SDL_SCANCODE_RETURN: return Events::Key::ENTER;
-            case SDL_SCANCODE_ESCAPE: return Events::Key::ESC;
-            case SDL_SCANCODE_BACKSPACE: return Events::Key::BKSPC;
-            case SDL_SCANCODE_TAB: return Events::Key::TAB;
-            case SDL_SCANCODE_SPACE: return Events::Key::SPACE;
-            case SDL_SCANCODE_CAPSLOCK: return Events::Key::CAPSLOCK;
+            case SDL_SCANCODE_RETURN: return App::Key::ENTER;
+            case SDL_SCANCODE_ESCAPE: return App::Key::ESC;
+            case SDL_SCANCODE_BACKSPACE: return App::Key::BKSPC;
+            case SDL_SCANCODE_TAB: return App::Key::TAB;
+            case SDL_SCANCODE_SPACE: return App::Key::SPACE;
+            case SDL_SCANCODE_CAPSLOCK: return App::Key::CAPSLOCK;
 
-            case SDL_SCANCODE_F1: return Events::Key::F1;
-            case SDL_SCANCODE_F2: return Events::Key::F2;
-            case SDL_SCANCODE_F3: return Events::Key::F3;
-            case SDL_SCANCODE_F4: return Events::Key::F4;
-            case SDL_SCANCODE_F5: return Events::Key::F5;
-            case SDL_SCANCODE_F6: return Events::Key::F6;
-            case SDL_SCANCODE_F7: return Events::Key::F7;
-            case SDL_SCANCODE_F8: return Events::Key::F8;
-            case SDL_SCANCODE_F9: return Events::Key::F9;
-            case SDL_SCANCODE_F10: return Events::Key::F10;
-            case SDL_SCANCODE_F11: return Events::Key::F11;
-            case SDL_SCANCODE_F12: return Events::Key::F12;
+            case SDL_SCANCODE_F1: return App::Key::F1;
+            case SDL_SCANCODE_F2: return App::Key::F2;
+            case SDL_SCANCODE_F3: return App::Key::F3;
+            case SDL_SCANCODE_F4: return App::Key::F4;
+            case SDL_SCANCODE_F5: return App::Key::F5;
+            case SDL_SCANCODE_F6: return App::Key::F6;
+            case SDL_SCANCODE_F7: return App::Key::F7;
+            case SDL_SCANCODE_F8: return App::Key::F8;
+            case SDL_SCANCODE_F9: return App::Key::F9;
+            case SDL_SCANCODE_F10: return App::Key::F10;
+            case SDL_SCANCODE_F11: return App::Key::F11;
+            case SDL_SCANCODE_F12: return App::Key::F12;
 
-            case SDL_SCANCODE_INSERT: return Events::Key::INSERT;
-            case SDL_SCANCODE_HOME: return Events::Key::HOME;
-            case SDL_SCANCODE_PAGEUP: return Events::Key::PGUP;
-            case SDL_SCANCODE_DELETE: return Events::Key::DELETE;
-            case SDL_SCANCODE_END: return Events::Key::END;
-            case SDL_SCANCODE_PAGEDOWN: return Events::Key::PGDOWN;
-            case SDL_SCANCODE_RIGHT: return Events::Key::RIGHT;
-            case SDL_SCANCODE_LEFT: return Events::Key::LEFT;
-            case SDL_SCANCODE_DOWN: return Events::Key::DOWN;
-            case SDL_SCANCODE_UP: return Events::Key::UP;
+            case SDL_SCANCODE_INSERT: return App::Key::INSERT;
+            case SDL_SCANCODE_HOME: return App::Key::HOME;
+            case SDL_SCANCODE_PAGEUP: return App::Key::PGUP;
+            case SDL_SCANCODE_DELETE: return App::Key::DELETE;
+            case SDL_SCANCODE_END: return App::Key::END;
+            case SDL_SCANCODE_PAGEDOWN: return App::Key::PGDOWN;
+            case SDL_SCANCODE_RIGHT: return App::Key::RIGHT;
+            case SDL_SCANCODE_LEFT: return App::Key::LEFT;
+            case SDL_SCANCODE_DOWN: return App::Key::DOWN;
+            case SDL_SCANCODE_UP: return App::Key::UP;
 
-            case SDL_SCANCODE_KP_ENTER: return Events::Key::KPADENTER;
-            case SDL_SCANCODE_KP_1: return Events::Key::KPAD1;
-            case SDL_SCANCODE_KP_2: return Events::Key::KPAD2;
-            case SDL_SCANCODE_KP_3: return Events::Key::KPAD3;
-            case SDL_SCANCODE_KP_4: return Events::Key::KPAD4;
-            case SDL_SCANCODE_KP_5: return Events::Key::KPAD5;
-            case SDL_SCANCODE_KP_6: return Events::Key::KPAD6;
-            case SDL_SCANCODE_KP_7: return Events::Key::KPAD7;
-            case SDL_SCANCODE_KP_8: return Events::Key::KPAD8;
-            case SDL_SCANCODE_KP_9: return Events::Key::KPAD9;
-            case SDL_SCANCODE_KP_0: return Events::Key::KPAD0;
+            case SDL_SCANCODE_KP_ENTER: return App::Key::KPADENTER;
+            case SDL_SCANCODE_KP_1: return App::Key::KPAD1;
+            case SDL_SCANCODE_KP_2: return App::Key::KPAD2;
+            case SDL_SCANCODE_KP_3: return App::Key::KPAD3;
+            case SDL_SCANCODE_KP_4: return App::Key::KPAD4;
+            case SDL_SCANCODE_KP_5: return App::Key::KPAD5;
+            case SDL_SCANCODE_KP_6: return App::Key::KPAD6;
+            case SDL_SCANCODE_KP_7: return App::Key::KPAD7;
+            case SDL_SCANCODE_KP_8: return App::Key::KPAD8;
+            case SDL_SCANCODE_KP_9: return App::Key::KPAD9;
+            case SDL_SCANCODE_KP_0: return App::Key::KPAD0;
 
-            case SDL_SCANCODE_MENU: return Events::Key::MENU;
+            case SDL_SCANCODE_MENU: return App::Key::MENU;
 
-            case SDL_SCANCODE_LCTRL: return Events::Key::LCTRL;
-            case SDL_SCANCODE_LSHIFT: return Events::Key::LSHIFT;
-            case SDL_SCANCODE_LALT: return Events::Key::LALT;
-            case SDL_SCANCODE_LGUI: return Events::Key::LSUPER;
+            case SDL_SCANCODE_LCTRL: return App::Key::LCTRL;
+            case SDL_SCANCODE_LSHIFT: return App::Key::LSHIFT;
+            case SDL_SCANCODE_LALT: return App::Key::LALT;
+            case SDL_SCANCODE_LGUI: return App::Key::LSUPER;
 
-            case SDL_SCANCODE_RCTRL: return Events::Key::RCTRL;
-            case SDL_SCANCODE_RSHIFT: return Events::Key::RSHIFT;
-            case SDL_SCANCODE_RALT: return Events::Key::RALT;
-            case SDL_SCANCODE_RGUI: return Events::Key::RSUPER;
+            case SDL_SCANCODE_RCTRL: return App::Key::RCTRL;
+            case SDL_SCANCODE_RSHIFT: return App::Key::RSHIFT;
+            case SDL_SCANCODE_RALT: return App::Key::RALT;
+            case SDL_SCANCODE_RGUI: return App::Key::RSUPER;
 
-            default: return Events::Key::INVALID;
+            default: return App::Key::INVALID;
         }
         // clang-format on
     }
 
-    static Events::Mod _fromSdlMod(u16 sdl) {
-        Events::Mod mod = Events::Mod::NONE;
+    static App::KeyMod _fromSdlMod(u16 sdl) {
+        App::KeyMod mod = App::KeyMod::NONE;
 
         if (sdl & KMOD_LSHIFT)
-            mod |= Events::Mod::LSHIFT;
+            mod |= App::KeyMod::LSHIFT;
 
         if (sdl & KMOD_RSHIFT)
-            mod |= Events::Mod::RSHIFT;
+            mod |= App::KeyMod::RSHIFT;
 
         if (sdl & KMOD_LCTRL)
-            mod |= Events::Mod::LCTRL;
+            mod |= App::KeyMod::LCTRL;
 
         if (sdl & KMOD_RCTRL)
-            mod |= Events::Mod::RCTRL;
+            mod |= App::KeyMod::RCTRL;
 
         if (sdl & KMOD_LALT)
-            mod |= Events::Mod::LALT;
+            mod |= App::KeyMod::LALT;
 
         if (sdl & KMOD_RALT)
-            mod |= Events::Mod::RALT;
+            mod |= App::KeyMod::RALT;
 
         if (sdl & KMOD_LGUI)
-            mod |= Events::Mod::LSUPER;
+            mod |= App::KeyMod::LSUPER;
 
         if (sdl & KMOD_RGUI)
-            mod |= Events::Mod::RSUPER;
+            mod |= App::KeyMod::RSUPER;
 
         if (sdl & KMOD_NUM)
-            mod |= Events::Mod::NUM;
+            mod |= App::KeyMod::NUM;
 
         if (sdl & KMOD_CAPS)
-            mod |= Events::Mod::CAPS;
+            mod |= App::KeyMod::CAPS;
 
         if (sdl & KMOD_MODE)
-            mod |= Events::Mod::MODE;
+            mod |= App::KeyMod::MODE;
 
         if (sdl & KMOD_SCROLL)
-            mod |= Events::Mod::SCROLL;
+            mod |= App::KeyMod::SCROLL;
 
         return mod;
     }
 
-    static Events::KeyboardEvent _fromSdlKeyboardEvent(SDL_KeyboardEvent const &sdl) {
-        Events::KeyboardEvent ev{};
+    static App::KeyboardEvent _fromSdlKeyboardEvent(SDL_KeyboardEvent const &sdl) {
+        App::KeyboardEvent ev{};
         ev.key = _fromSdlKeycode(sdl.keysym.sym);
         ev.code = _fromSdlScancode(sdl.keysym.scancode);
         ev.mods = _fromSdlMod(sdl.keysym.mod);
@@ -323,22 +323,22 @@ struct SdlHost :
 
         case SDL_KEYDOWN: {
             auto ev = _fromSdlKeyboardEvent(sdlEvent.key);
-            ev.type = Events::KeyboardEvent::PRESS;
-            event<Events::KeyboardEvent>(*this, ev);
+            ev.type = App::KeyboardEvent::PRESS;
+            event<App::KeyboardEvent>(*this, ev);
             break;
         }
 
         case SDL_KEYUP: {
             auto ev = _fromSdlKeyboardEvent(sdlEvent.key);
-            ev.type = Events::KeyboardEvent::RELEASE;
-            event<Events::KeyboardEvent>(*this, ev);
+            ev.type = App::KeyboardEvent::RELEASE;
+            event<App::KeyboardEvent>(*this, ev);
             break;
         }
 
         case SDL_TEXTINPUT: {
             Str text = sdlEvent.text.text;
             for (Rune r : iterRunes(text)) {
-                event<Events::TypedEvent>(*this, r);
+                event<App::TypeEvent>(*this, r);
             }
             break;
         }
@@ -350,10 +350,10 @@ struct SdlHost :
             Math::Vec2<i32> screenPos = {};
             SDL_GetGlobalMouseState(&screenPos.x, &screenPos.y);
 
-            auto buttons = Events::Button::NONE;
-            buttons |= (sdlEvent.motion.state & SDL_BUTTON_LMASK) ? Events::Button::LEFT : Events::Button::NONE;
-            buttons |= (sdlEvent.motion.state & SDL_BUTTON_MMASK) ? Events::Button::MIDDLE : Events::Button::NONE;
-            buttons |= (sdlEvent.motion.state & SDL_BUTTON_RMASK) ? Events::Button::RIGHT : Events::Button::NONE;
+            auto buttons = App::MouseButton::NONE;
+            buttons |= (sdlEvent.motion.state & SDL_BUTTON_LMASK) ? App::MouseButton::LEFT : App::MouseButton::NONE;
+            buttons |= (sdlEvent.motion.state & SDL_BUTTON_MMASK) ? App::MouseButton::MIDDLE : App::MouseButton::NONE;
+            buttons |= (sdlEvent.motion.state & SDL_BUTTON_RMASK) ? App::MouseButton::RIGHT : App::MouseButton::NONE;
 
             // do the hit test and update the cursor
 
@@ -397,10 +397,10 @@ struct SdlHost :
                 sdlEvent.motion.y,
             };
 
-            event<Events::MouseEvent>(
+            event<App::MouseEvent>(
                 *this,
-                Events::MouseEvent{
-                    .type = Events::MouseEvent::MOVE,
+                App::MouseEvent{
+                    .type = App::MouseEvent::MOVE,
                     .pos = _lastMousePos,
                     .delta = screenPos - _lastScreenMousePos,
                     .buttons = buttons,
@@ -416,24 +416,24 @@ struct SdlHost :
                 return;
             }
 
-            Events::Button buttons = Events::Button::NONE;
-            buttons |= (sdlEvent.motion.state & SDL_BUTTON_LMASK) ? Events::Button::LEFT : Events::Button::NONE;
-            buttons |= (sdlEvent.motion.state & SDL_BUTTON_MMASK) ? Events::Button::MIDDLE : Events::Button::NONE;
-            buttons |= (sdlEvent.motion.state & SDL_BUTTON_RMASK) ? Events::Button::RIGHT : Events::Button::NONE;
+            App::MouseButton buttons = App::MouseButton::NONE;
+            buttons |= (sdlEvent.motion.state & SDL_BUTTON_LMASK) ? App::MouseButton::LEFT : App::MouseButton::NONE;
+            buttons |= (sdlEvent.motion.state & SDL_BUTTON_MMASK) ? App::MouseButton::MIDDLE : App::MouseButton::NONE;
+            buttons |= (sdlEvent.motion.state & SDL_BUTTON_RMASK) ? App::MouseButton::RIGHT : App::MouseButton::NONE;
 
-            Events::Button button = Events::Button::NONE;
+            App::MouseButton button = App::MouseButton::NONE;
             if (sdlEvent.button.button == SDL_BUTTON_LEFT) {
-                button = Events::Button::LEFT;
+                button = App::MouseButton::LEFT;
             } else if (sdlEvent.button.button == SDL_BUTTON_RIGHT) {
-                button = Events::Button::RIGHT;
+                button = App::MouseButton::RIGHT;
             } else if (sdlEvent.button.button == SDL_BUTTON_MIDDLE) {
-                button = Events::Button::MIDDLE;
+                button = App::MouseButton::MIDDLE;
             }
 
-            event<Events::MouseEvent>(
+            event<App::MouseEvent>(
                 *this,
-                Events::MouseEvent{
-                    .type = Events::MouseEvent::RELEASE,
+                App::MouseEvent{
+                    .type = App::MouseEvent::RELEASE,
                     .pos = _lastMousePos,
                     .buttons = buttons,
                     .button = button,
@@ -447,24 +447,24 @@ struct SdlHost :
                 return;
             }
 
-            Events::Button buttons = Events::Button::NONE;
-            buttons |= (sdlEvent.motion.state & SDL_BUTTON_LMASK) ? Events::Button::LEFT : Events::Button::NONE;
-            buttons |= (sdlEvent.motion.state & SDL_BUTTON_MMASK) ? Events::Button::MIDDLE : Events::Button::NONE;
-            buttons |= (sdlEvent.motion.state & SDL_BUTTON_RMASK) ? Events::Button::RIGHT : Events::Button::NONE;
+            App::MouseButton buttons = App::MouseButton::NONE;
+            buttons |= (sdlEvent.motion.state & SDL_BUTTON_LMASK) ? App::MouseButton::LEFT : App::MouseButton::NONE;
+            buttons |= (sdlEvent.motion.state & SDL_BUTTON_MMASK) ? App::MouseButton::MIDDLE : App::MouseButton::NONE;
+            buttons |= (sdlEvent.motion.state & SDL_BUTTON_RMASK) ? App::MouseButton::RIGHT : App::MouseButton::NONE;
 
-            Events::Button button = Events::Button::NONE;
+            App::MouseButton button = App::MouseButton::NONE;
             if (sdlEvent.button.button == SDL_BUTTON_LEFT) {
-                button = Events::Button::LEFT;
+                button = App::MouseButton::LEFT;
             } else if (sdlEvent.button.button == SDL_BUTTON_RIGHT) {
-                button = Events::Button::RIGHT;
+                button = App::MouseButton::RIGHT;
             } else if (sdlEvent.button.button == SDL_BUTTON_MIDDLE) {
-                button = Events::Button::MIDDLE;
+                button = App::MouseButton::MIDDLE;
             }
 
-            event<Events::MouseEvent>(
+            event<App::MouseEvent>(
                 *this,
-                Events::MouseEvent{
-                    .type = Events::MouseEvent::PRESS,
+                App::MouseEvent{
+                    .type = App::MouseEvent::PRESS,
                     .pos = _lastMousePos,
                     .buttons = buttons,
                     .button = button,
@@ -477,10 +477,10 @@ struct SdlHost :
             if (sdlEvent.wheel.which == SDL_TOUCH_MOUSEID)
                 return;
 
-            event<Events::MouseEvent>(
+            event<App::MouseEvent>(
                 *this,
-                Events::MouseEvent{
-                    .type = Events::MouseEvent::SCROLL,
+                App::MouseEvent{
+                    .type = App::MouseEvent::SCROLL,
                     .pos = _lastMousePos,
                     .scroll = {
 #if SDL_VERSION_ATLEAST(2, 0, 18)
@@ -498,7 +498,7 @@ struct SdlHost :
         }
 
         case SDL_QUIT: {
-            bubble<Events::RequestExitEvent>(*this);
+            bubble<App::RequestExitEvent>(*this);
             break;
         }
 
@@ -533,7 +533,7 @@ struct SdlHost :
         return Ok();
     }
 
-    void bubble(Sys::Event &event) override {
+    void bubble(App::Event &event) override {
         if (auto *e = event.is<DragEvent>()) {
             if (e->type == DragEvent::START) {
                 SDL_CaptureMouse(SDL_TRUE);
@@ -546,10 +546,10 @@ struct SdlHost :
                 SDL_SetWindowPosition(_window, pos.x, pos.y);
             }
             event.accept();
-        } else if (event.is<Events::RequestMinimizeEvent>()) {
+        } else if (event.is<App::RequestMinimizeEvent>()) {
             SDL_MinimizeWindow(_window);
             event.accept();
-        } else if (event.is<Events::RequestMaximizeEvent>()) {
+        } else if (event.is<App::RequestMaximizeEvent>()) {
             if (SDL_GetWindowFlags(_window) & SDL_WINDOW_MAXIMIZED)
                 SDL_RestoreWindow(_window);
             else

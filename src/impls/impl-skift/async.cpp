@@ -1,4 +1,5 @@
 #include <hjert-api/api.h>
+#include <karm-base/map.h>
 
 #include <karm-sys/_embed.h>
 

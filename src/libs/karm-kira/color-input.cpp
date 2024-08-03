@@ -72,10 +72,10 @@ struct HsvSquare : public Ui::View<HsvSquare> {
         g.restore();
     }
 
-    void event(Sys::Event &e) override {
+    void event(App::Event &e) override {
         _mouseListener.listen(*this, e);
 
-        if (_mouseListener.isPress() and e.is<Events::MouseEvent>()) {
+        if (_mouseListener.isPress() and e.is<App::MouseEvent>()) {
             _value = sampleHsv(_mouseListener.pos());
             if (_onChange)
                 _onChange(*this, _value);

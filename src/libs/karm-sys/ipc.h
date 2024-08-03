@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/cons.h>
+#include <karm-base/map.h>
 #include <karm-io/pack.h>
 #include <karm-logger/logger.h>
 #include <karm-sys/async.h>

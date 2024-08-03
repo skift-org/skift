@@ -335,7 +335,7 @@ Child aspectRatio(f64 ratio, Child child) {
 struct StackLayout : public GroupNode<StackLayout> {
     using GroupNode::GroupNode;
 
-    void event(Sys::Event &e) override {
+    void event(App::Event &e) override {
         if (e.accepted())
             return;
 

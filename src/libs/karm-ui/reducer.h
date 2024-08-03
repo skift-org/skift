@@ -103,7 +103,7 @@ struct Reducer :
         (*_child)->paint(g, r);
     }
 
-    void event(Sys::Event &e) override {
+    void event(App::Event &e) override {
         if (auto *a = e.is<Action>()) {
             Model::reduce(_state, *a);
             e.accept();
@@ -115,7 +115,7 @@ struct Reducer :
         }
     }
 
-    void bubble(Sys::Event &e) override {
+    void bubble(App::Event &e) override {
         if (auto *a = e.is<Action>()) {
             Model::reduce(_state, *a);
             e.accept();

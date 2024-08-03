@@ -52,8 +52,8 @@ struct Table : public Ui::View<Table> {
 
     // MARK: Events ------------------------------------------------------------
 
-    void event(Sys::Event &event) override {
-        auto *e = event.is<Events::MouseEvent>();
+    void event(App::Event &event) override {
+        auto *e = event.is<App::MouseEvent>();
         if (not e)
             return;
 
@@ -61,12 +61,12 @@ struct Table : public Ui::View<Table> {
         if (not bound().contains(e->pos))
             return;
 
-        if (e->type == Events::MouseEvent::PRESS) {
+        if (e->type == App::MouseEvent::PRESS) {
             auto cell = sheet().cellAt(pos - Math::Vec2i{CELL_WIDTH, CELL_HEIGHT});
             if (cell) {
                 Model::bubble(*this, UpdateSelection{Range{*cell}});
             }
-        } else if (e->type == Events::MouseEvent::MOVE and (e->buttons & Events::Button::LEFT) == Events::Button::LEFT) {
+        } else if (e->type == App::MouseEvent::MOVE and (e->buttons & App::MouseButton::LEFT) == App::MouseButton::LEFT) {
             auto cell = sheet().cellAt(pos - Math::Vec2i{CELL_WIDTH, CELL_HEIGHT});
             if (cell) {
                 auto sel = *_state->selection;

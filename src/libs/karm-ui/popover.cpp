@@ -64,7 +64,7 @@ struct PopoverLayer : public ProxyNode<PopoverLayer> {
             (*_popover)->paint(g, r);
     }
 
-    void event(Sys::Event &event) override {
+    void event(App::Event &event) override {
         ProxyNode::event(event);
 
         if (event.accepted())
@@ -78,15 +78,15 @@ struct PopoverLayer : public ProxyNode<PopoverLayer> {
         if (event.accepted())
             return;
 
-        auto *e = event.is<Events::MouseEvent>();
+        auto *e = event.is<App::MouseEvent>();
 
-        if (e and e->type == Events::MouseEvent::PRESS) {
+        if (e and e->type == App::MouseEvent::PRESS) {
             _closePopover();
             event.accept();
         }
     }
 
-    void bubble(Sys::Event &event) override {
+    void bubble(App::Event &event) override {
         if (auto *e = event.is<ShowPopoverEvent>()) {
             _showPopover(e->child, e->at);
             event.accept();

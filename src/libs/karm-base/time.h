@@ -124,6 +124,7 @@ struct TimeSpan {
     }
 
     auto operator<=>(TimeSpan const &other) const = default;
+    bool operator==(TimeSpan const &other) const = default;
 };
 
 inline TimeSpan operator""_us(unsigned long long value) {
@@ -221,6 +222,7 @@ struct TimeStamp {
     }
 
     auto operator<=>(TimeStamp const &) const = default;
+    bool operator==(TimeStamp const &) const = default;
 };
 
 // MARK: Time ------------------------------------------------------------------

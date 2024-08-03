@@ -213,7 +213,7 @@ struct Button : public _Box<Button> {
         }
     }
 
-    void event(Sys::Event &e) override {
+    void event(App::Event &e) override {
         if (_onPress and _mouseListener.listen(*this, e)) {
             _onPress(*this);
         }
@@ -309,7 +309,7 @@ struct Input : public View<Input> {
             g.plot(bound(), Gfx::CYAN);
     }
 
-    void event(Sys::Event &e) override {
+    void event(App::Event &e) override {
         auto a = Text::Action::fromEvent(e);
         if (a) {
             e.accept();
@@ -365,7 +365,7 @@ struct Slider : public ProxyNode<Slider> {
         return _bound;
     }
 
-    void bubble(Sys::Event &e) override {
+    void bubble(App::Event &e) override {
         if (auto *dv = e.is<DragEvent>()) {
             if (dv->type == DragEvent::DRAG) {
                 auto max = bound().width - bound().height;
@@ -393,9 +393,9 @@ Child slider(f64 value, OnChange<f64> onChange, Child child) {
 // MARK: Intent ----------------------------------------------------------------
 
 struct Intent : public ProxyNode<Intent> {
-    Func<void(Node &, Sys::Event &e)> _map;
+    Func<void(Node &, App::Event &e)> _map;
 
-    Intent(Func<void(Node &, Sys::Event &e)> map, Child child)
+    Intent(Func<void(Node &, App::Event &e)> map, Child child)
         : ProxyNode<Intent>(std::move(child)), _map(std::move(map)) {}
 
     void reconcile(Intent &o) override {
@@ -403,14 +403,14 @@ struct Intent : public ProxyNode<Intent> {
         ProxyNode<Intent>::reconcile(o);
     }
 
-    void event(Sys::Event &e) override {
+    void event(App::Event &e) override {
         if (e.accepted())
             return;
         _map(*this, e);
         ProxyNode<Intent>::event(e);
     }
 
-    void bubble(Sys::Event &e) override {
+    void bubble(App::Event &e) override {
         if (e.accepted())
             return;
         _map(*this, e);
@@ -418,7 +418,7 @@ struct Intent : public ProxyNode<Intent> {
     }
 };
 
-Child intent(Func<void(Node &, Sys::Event &e)> map, Child child) {
+Child intent(Func<void(Node &, App::Event &e)> map, Child child) {
     return makeStrong<Intent>(std::move(map), std::move(child));
 }
 

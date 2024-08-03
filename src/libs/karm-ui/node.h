@@ -1,9 +1,9 @@
 #pragma once
 
+#include <karm-app/event.h>
 #include <karm-base/checked.h>
 #include <karm-base/func.h>
 #include <karm-base/hash.h>
-#include <karm-events/events.h>
 #include <karm-gfx/context.h>
 #include <karm-logger/logger.h>
 #include <karm-sys/async.h>
@@ -35,9 +35,7 @@ using Visitor = Func<void(Node &)>;
 
 using Key = Opt<Hash>;
 
-struct Node :
-    Meta::Static {
-
+struct Node : public App::Dispatch {
     Key _key = NONE;
     bool _consumed = false;
 
@@ -67,10 +65,6 @@ struct Node :
     virtual Opt<Child> reconcile(Child other) { return other; }
 
     virtual void paint(Gfx::Context &, Math::Recti) {}
-
-    virtual void event(Sys::Event &) {}
-
-    virtual void bubble(Sys::Event &) {}
 
     virtual void layout(Math::Recti) {}
 
@@ -138,9 +132,12 @@ struct LeafNode : public Node {
         return NONE;
     }
 
-    void bubble(Sys::Event &e) override {
+    void bubble(App::Event &e) override {
         if (_parent and not e.accepted())
             _parent->bubble(e);
+    }
+
+    void event(App::Event &) override {
     }
 
     Node *parent() override {
@@ -211,7 +208,7 @@ struct GroupNode : public LeafNode<Crtp> {
         }
     }
 
-    void event(Sys::Event &e) override {
+    void event(App::Event &e) override {
         if (e.accepted())
             return;
 
@@ -267,7 +264,7 @@ struct ProxyNode : public LeafNode<Crtp> {
         child().paint(g, r);
     }
 
-    void event(Sys::Event &e) override {
+    void event(App::Event &e) override {
         if (e.accepted())
             return;
 

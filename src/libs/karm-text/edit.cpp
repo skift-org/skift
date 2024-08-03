@@ -1,3 +1,4 @@
+#include <karm-app/inputs.h>
 #include <karm-logger/logger.h>
 
 #include "edit.h"
@@ -10,84 +11,84 @@ static bool _isWord(Rune r) {
 
 // MARK: Actions ---------------------------------------------------------------
 
-Opt<Action> Action::fromEvent(Sys::Event &e) {
-    if (auto *te = e.is<Events::TypedEvent>()) {
-        return Action{TYPE, te->codepoint};
+Opt<Action> Action::fromEvent(App::Event &e) {
+    if (auto *te = e.is<App::TypeEvent>()) {
+        return Action{TYPE, te->rune};
     } else if (
-        auto *ke = e.is<Events::KeyboardEvent>();
-        ke and ke->type == Events::KeyboardEvent::PRESS
+        auto *ke = e.is<App::KeyboardEvent>();
+        ke and ke->type == App::KeyboardEvent::PRESS
     ) {
-        bool shift = !!(ke->mods & Events::Mod::SHIFT);
-        bool ctrl = !!(ke->mods & Events::Mod::CTRL);
-        bool alt = !!(ke->mods & Events::Mod::ALT);
+        bool shift = !!(ke->mods & App::KeyMod::SHIFT);
+        bool ctrl = !!(ke->mods & App::KeyMod::CTRL);
+        bool alt = !!(ke->mods & App::KeyMod::ALT);
         bool nomod = not(shift or ctrl or alt);
         bool optionalyShift = (nomod or shift);
 
-        if (ke->key == Events::Key::HOME and ctrl and shift)
+        if (ke->key == App::Key::HOME and ctrl and shift)
             return SELECT_START;
-        else if (ke->key == Events::Key::END and ctrl and shift)
+        else if (ke->key == App::Key::END and ctrl and shift)
             return SELECT_END;
-        else if (ke->key == Events::Key::LEFT and ctrl and shift)
+        else if (ke->key == App::Key::LEFT and ctrl and shift)
             return SELECT_PREV_WORD;
-        else if (ke->key == Events::Key::RIGHT and ctrl and shift)
+        else if (ke->key == App::Key::RIGHT and ctrl and shift)
             return SELECT_NEXT_WORD;
-        else if (ke->key == Events::Key::Z and ctrl and shift)
+        else if (ke->key == App::Key::Z and ctrl and shift)
             return REDO;
 
-        else if (ke->key == Events::Key::LEFT and shift)
+        else if (ke->key == App::Key::LEFT and shift)
             return SELECT_PREV;
-        else if (ke->key == Events::Key::RIGHT and shift)
+        else if (ke->key == App::Key::RIGHT and shift)
             return SELECT_NEXT;
-        else if (ke->key == Events::Key::UP and shift)
+        else if (ke->key == App::Key::UP and shift)
             return SELECT_UP;
-        else if (ke->key == Events::Key::DOWN and shift)
+        else if (ke->key == App::Key::DOWN and shift)
             return SELECT_DOWN;
-        else if (ke->key == Events::Key::HOME and shift)
+        else if (ke->key == App::Key::HOME and shift)
             return SELECT_LINE_START;
-        else if (ke->key == Events::Key::END and shift)
+        else if (ke->key == App::Key::END and shift)
             return SELECT_LINE_END;
 
-        else if (ke->key == Events::Key::BKSPC and ctrl)
+        else if (ke->key == App::Key::BKSPC and ctrl)
             return DELETE_PREV_WORD;
-        else if (ke->key == Events::Key::DELETE and ctrl)
+        else if (ke->key == App::Key::DELETE and ctrl)
             return DELETE_NEXT_WORD;
-        else if (ke->key == Events::Key::LEFT and ctrl)
+        else if (ke->key == App::Key::LEFT and ctrl)
             return MOVE_PREV_WORD;
-        else if (ke->key == Events::Key::RIGHT and ctrl)
+        else if (ke->key == App::Key::RIGHT and ctrl)
             return MOVE_NEXT_WORD;
-        else if (ke->key == Events::Key::HOME and ctrl)
+        else if (ke->key == App::Key::HOME and ctrl)
             return MOVE_START;
-        else if (ke->key == Events::Key::END and ctrl)
+        else if (ke->key == App::Key::END and ctrl)
             return MOVE_END;
-        else if (ke->key == Events::Key::A and ctrl)
+        else if (ke->key == App::Key::A and ctrl)
             return SELECT_ALL;
-        else if (ke->key == Events::Key::C and ctrl)
+        else if (ke->key == App::Key::C and ctrl)
             return COPY;
-        else if (ke->key == Events::Key::X and ctrl)
+        else if (ke->key == App::Key::X and ctrl)
             return CUT;
-        else if (ke->key == Events::Key::V and ctrl)
+        else if (ke->key == App::Key::V and ctrl)
             return PASTE;
-        else if (ke->key == Events::Key::Z and ctrl)
+        else if (ke->key == App::Key::Z and ctrl)
             return UNDO;
 
-        else if (ke->key == Events::Key::LEFT and nomod)
+        else if (ke->key == App::Key::LEFT and nomod)
             return MOVE_PREV;
-        else if (ke->key == Events::Key::RIGHT and nomod)
+        else if (ke->key == App::Key::RIGHT and nomod)
             return MOVE_NEXT;
-        else if (ke->key == Events::Key::UP and nomod)
+        else if (ke->key == App::Key::UP and nomod)
             return MOVE_UP;
-        else if (ke->key == Events::Key::DOWN and nomod)
+        else if (ke->key == App::Key::DOWN and nomod)
             return MOVE_DOWN;
-        else if (ke->key == Events::Key::HOME and nomod)
+        else if (ke->key == App::Key::HOME and nomod)
             return MOVE_LINE_START;
-        else if (ke->key == Events::Key::END and nomod)
+        else if (ke->key == App::Key::END and nomod)
             return MOVE_LINE_END;
-        else if (ke->key == Events::Key::ENTER and nomod)
+        else if (ke->key == App::Key::ENTER and nomod)
             return NEWLINE;
 
-        else if (ke->key == Events::Key::BKSPC and optionalyShift)
+        else if (ke->key == App::Key::BKSPC and optionalyShift)
             return BACKSPACE;
-        else if (ke->key == Events::Key::DELETE and optionalyShift)
+        else if (ke->key == App::Key::DELETE and optionalyShift)
             return DELETE;
     }
 

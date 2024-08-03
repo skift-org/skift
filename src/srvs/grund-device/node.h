@@ -1,8 +1,8 @@
 #pragma once
 
+#include <karm-app/event.h>
 #include <karm-base/rc.h>
 #include <karm-base/vec.h>
-#include <karm-sys/async.h>
 
 namespace Grund::Device {
 
@@ -23,9 +23,9 @@ struct Node :
 
     virtual Res<> init();
 
-    virtual Res<> event(Sys::Event &e);
+    virtual Res<> event(App::Event &e);
 
-    virtual Res<> bubble(Sys::Event &e);
+    virtual Res<> bubble(App::Event &e);
 
     Res<> attach(Strong<Node> child);
 

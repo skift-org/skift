@@ -1,7 +1,7 @@
 #pragma once
 
+#include <karm-app/inputs.h>
 #include <karm-base/res.h>
-#include <karm-events/events.h>
 
 #include "guid.h"
 
@@ -418,33 +418,33 @@ struct Key {
     ScanCode scanCode;
     u16 unicodeChar;
 
-    Events::KeyboardEvent toKeyEvent() const {
-        Events::Key key;
+    App::KeyboardEvent toKeyEvent() const {
+        App::Key key;
 
         switch (scanCode) {
         case NONE:
             switch (unicodeChar) {
             case u'\r':
-                key = Events::Key::ENTER;
+                key = App::Key::ENTER;
                 break;
             default:
-                key = Events::Key::INVALID;
+                key = App::Key::INVALID;
                 break;
             }
             break;
         case UP:
-            key = Events::Key::UP;
+            key = App::Key::UP;
             break;
         case DOWN:
-            key = Events::Key::DOWN;
+            key = App::Key::DOWN;
             break;
 
         case RIGHT:
-            key = Events::Key::RIGHT;
+            key = App::Key::RIGHT;
             break;
 
         case LEFT:
-            key = Events::Key::LEFT;
+            key = App::Key::LEFT;
             break;
 
         case HOME:
@@ -489,12 +489,12 @@ struct Key {
         case RECOVERY:
         case EJECT:
         default:
-            key = Events::Key::INVALID;
+            key = App::Key::INVALID;
             break;
         }
 
         return {
-            .type = Events::KeyboardEvent::PRESS,
+            .type = App::KeyboardEvent::PRESS,
             .key = key,
             .code = key
         };

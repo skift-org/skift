@@ -1,5 +1,5 @@
+#include <karm-app/host.h>
 #include <karm-kira/about-dialog.h>
-#include <karm-sys/context.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
 #include <karm-ui/input.h>
@@ -28,19 +28,19 @@ Ui::Child controls(TitlebarStyle style) {
     return Ui::hflow(
         12,
         Ui::button(
-            Ui::bindBubble<Events::RequestMinimizeEvent>(),
+            Ui::bindBubble<App::RequestMinimizeEvent>(),
             Ui::ButtonStyle::subtle(),
             Mdi::MINUS
         ) | Ui::cond(style == TitlebarStyle::DEFAULT),
 
         Ui::button(
-            Ui::bindBubble<Events::RequestMaximizeEvent>(),
+            Ui::bindBubble<App::RequestMaximizeEvent>(),
             Ui::ButtonStyle::subtle(),
             Mdi::CROP_SQUARE
         ) | Ui::cond(style == TitlebarStyle::DEFAULT),
 
         Ui::button(
-            Ui::bindBubble<Events::RequestExitEvent>(),
+            Ui::bindBubble<App::RequestExitEvent>(),
             Ui::ButtonStyle::subtle(),
             Mdi::CLOSE
         )

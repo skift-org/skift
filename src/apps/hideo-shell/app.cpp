@@ -1,5 +1,6 @@
 #include <hideo-base/scafold.h>
 #include <hideo-keyboard/views.h>
+#include <karm-app/host.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
 #include <karm-ui/input.h>
@@ -183,11 +184,11 @@ Ui::Child appStack(State const &state) {
                 .shadowStyle = Gfx::BoxShadow::elevated(index ? 4 : 16),
             }) |
             Ui::placed(s->bound) |
-            Ui::intent([=](Ui::Node &n, Sys::Event &e) {
+            Ui::intent([=](Ui::Node &n, App::Event &e) {
                 if (auto *m = e.is<Ui::DragEvent>()) {
                     e.accept();
                     Model::bubble<MoveInstance>(n, {index, m->delta});
-                } else if (auto *c = e.is<Events::RequestExitEvent>()) {
+                } else if (auto *c = e.is<App::RequestExitEvent>()) {
                     e.accept();
                     Model::bubble<CloseInstance>(n, {index});
                 }

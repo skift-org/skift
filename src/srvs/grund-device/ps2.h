@@ -110,7 +110,7 @@ struct Keyboard : public Device {
 
     Res<> init() override;
 
-    Res<> event(Sys::Event &e) override;
+    Res<> event(App::Event &e) override;
 
     Res<> sendCmd(_Cmd cmd) {
         try$(ctrl().writeData(cmd));
@@ -140,7 +140,7 @@ struct Mouse : public Device {
 
     Res<> init() override;
 
-    Res<> event(Sys::Event &e) override;
+    Res<> event(App::Event &e) override;
 
     Res<> decode();
 

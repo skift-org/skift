@@ -41,7 +41,7 @@ struct Radio : public Ui::View<Radio> {
         g.restore();
     }
 
-    void event(Sys::Event &e) override {
+    void event(App::Event &e) override {
         if (_mouseListener.listen(*this, e)) {
             _value = not _value;
             _onChange(*this, _value);

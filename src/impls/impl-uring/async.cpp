@@ -4,6 +4,7 @@
 //
 #include <impl-posix/fd.h>
 #include <impl-posix/utils.h>
+#include <karm-base/map.h>
 #include <karm-logger/logger.h>
 #include <karm-sys/async.h>
 #include <karm-sys/time.h>

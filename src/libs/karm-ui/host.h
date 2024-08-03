@@ -1,112 +1,13 @@
 #pragma once
 
+#include <karm-app/host.h>
 #include <karm-base/ring.h>
-#include <karm-sys/time.h>
 #include <karm-text/loader.h>
-#include <karm-text/prose.h>
 
 #include "node.h"
+#include "perf.h"
 
 namespace Karm::Ui {
-
-static constexpr auto FRAME_RATE = 60;
-static constexpr auto FRAME_TIME = 1.0 / FRAME_RATE;
-
-enum struct PerfEvent {
-    NONE,
-    PAINT,
-    LAYOUT,
-    INPUT,
-};
-
-struct PerfRecord {
-    PerfEvent event;
-    TimeStamp start;
-    TimeStamp end;
-
-    Gfx::Color color() const {
-        switch (event) {
-        case PerfEvent::PAINT:
-            return duration().toMSecs() > 16 ? Gfx::RED : Gfx::GREEN;
-
-        case PerfEvent::LAYOUT:
-            return Gfx::PINK;
-
-        case PerfEvent::INPUT:
-            return Gfx::BLUE;
-
-        default:
-            return Gfx::BLACK;
-        }
-    }
-
-    TimeSpan duration() const {
-        return end - start;
-    }
-};
-
-struct PerfGraph {
-    usize _index{};
-    Array<PerfRecord, 256> _records{};
-    f64 _frameTime = 1;
-
-    void record(PerfEvent e) {
-        auto now = Sys::now();
-        _records[_index % 256] = PerfRecord{e, now, now};
-    }
-
-    auto end() {
-        auto n = Sys::now();
-        auto rec = _records[_index % 256];
-        auto elapsed = n - rec.start;
-        _records[_index++ % 256].end = n;
-
-        if (rec.event == PerfEvent::PAINT) {
-            _frameTime = (_frameTime * 0.9) + (elapsed.toMSecs() * 0.1);
-        }
-        return elapsed;
-    }
-
-    f64 fps() {
-        return 1000.0 / _frameTime;
-    }
-
-    Math::Recti bound() {
-        return {0, 0, 256, 64};
-    }
-
-    void paint(Gfx::Context &g) {
-        g.save();
-        g.clip(bound());
-        g.fillStyle(Gfx::GREEN900.withOpacity(0.5));
-        g.fill(bound());
-
-        g.strokeStyle(Gfx::stroke(Gfx::GREEN.withOpacity(0.5)).withAlign(Gfx::INSIDE_ALIGN));
-        g.stroke();
-        g.strokeStyle(Gfx::stroke(Gfx::WHITE.withOpacity(0.5)).withAlign(Gfx::INSIDE_ALIGN));
-        g.stroke(Math::Edgef{0, (isize)(FRAME_TIME * 1000 * 2), (f64)bound().width, FRAME_TIME * 1000 * 2});
-
-        for (isize i = 0; i < 256; ++i) {
-            auto e = _records[(_index + i) % 256];
-
-            g.plot(
-                Math::Recti{i, 0, 1, (isize)e.duration().toMSecs() * 2},
-                e.color()
-            );
-        }
-
-        auto text = Io::format("FPS: {}", (isize)fps()).take();
-        Text::Prose gText{Text::ProseStyle{.font = Text::Font::fallback()}};
-        gText.append(text.str());
-        gText.layout(256);
-
-        g.fillStyle(Gfx::WHITE);
-        g.origin({8, 4});
-        gText.paint(g);
-
-        g.restore();
-    }
-};
 
 struct Host : public Node {
     Child _root;
@@ -179,10 +80,10 @@ struct Host : public Node {
         }
         auto elapsed = _perf.end();
 
-        static usize maxStutter = 31;
-        if (elapsed.toMSecs() > maxStutter) {
+        static auto maxStutter = TimeSpan::fromMSecs(15);
+        if (elapsed > maxStutter) {
             logWarn("Stutter detected, paint took {} for {} nodes", elapsed, debugNodeCount);
-            maxStutter = elapsed.toMSecs();
+            maxStutter = elapsed;
         }
 
         _g.end();
@@ -195,25 +96,25 @@ struct Host : public Node {
         _perf.record(PerfEvent::LAYOUT);
         _root->layout(r);
         auto elapsed = _perf.end();
-        static usize maxStutter = 1;
-        if (elapsed.toMSecs() > maxStutter) {
+        static auto maxStutter = TimeSpan::fromMSecs(1);
+        if (elapsed > maxStutter) {
             logWarn("Stutter detected, layout took {} for {} nodes", elapsed, debugNodeCount);
-            maxStutter = elapsed.toMSecs();
+            maxStutter = elapsed;
         }
     }
 
-    void event(Sys::Event &event) override {
+    void event(App::Event &event) override {
         _perf.record(PerfEvent::INPUT);
         _root->event(event);
         auto elapsed = _perf.end();
-        static usize maxStutter = 1;
-        if (elapsed.toMSecs() > maxStutter) {
+        static auto maxStutter = TimeSpan::fromMSecs(1);
+        if (elapsed > maxStutter) {
             logWarn("Stutter detected, event took {} for {} nodes", elapsed, debugNodeCount);
-            maxStutter = elapsed.toMSecs();
+            maxStutter = elapsed;
         }
     }
 
-    void bubble(Sys::Event &event) override {
+    void bubble(App::Event &event) override {
         if (auto *e = event.is<Node::PaintEvent>()) {
             _dirty.pushBack(e->bound);
             event.accept();
@@ -223,7 +124,7 @@ struct Host : public Node {
         } else if (auto *e = event.is<Node::AnimateEvent>()) {
             _shouldAnimate = true;
             event.accept();
-        } else if (auto *e = event.is<Events::RequestExitEvent>()) {
+        } else if (auto *e = event.is<App::RequestExitEvent>()) {
             _res = e->res;
             event.accept();
         }
@@ -232,18 +133,6 @@ struct Host : public Node {
             logWarn("unhandled event, bouncing down");
             _root->event(event);
         }
-    }
-
-    void doLayout() {
-        layout(bound());
-        _shouldLayout = false;
-        _shouldAnimate = true;
-        _dirty.pushBack(bound());
-    }
-
-    void doPaint() {
-        paint();
-        _dirty.clear();
     }
 
     Res<> run() {
@@ -270,15 +159,21 @@ struct Host : public Node {
         while (not _res) {
             if (_shouldAnimate and scheduleFrame()) {
                 _shouldAnimate = false;
-                auto e = Sys::makeEvent<Node::AnimateEvent>(FRAME_TIME);
+                auto e = App::makeEvent<Node::AnimateEvent>(FRAME_TIME);
                 event(*e);
             }
 
-            if (_shouldLayout)
-                doLayout();
+            if (_shouldLayout) {
+                layout(bound());
+                _shouldLayout = false;
+                _shouldAnimate = true;
+                _dirty.pushBack(bound());
+            }
 
-            if (_dirty.len() > 0)
-                doPaint();
+            if (_dirty.len() > 0) {
+                paint();
+                _dirty.clear();
+            }
 
             try$(wait(nextFrameScheduled ? nextFrame : TimeStamp::endOfTime()));
             nextFrameScheduled = false;

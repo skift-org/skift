@@ -1,5 +1,7 @@
 #pragma once
 
+#include <karm-app/inputs.h>
+
 #include "node.h"
 
 namespace Karm::Ui {
@@ -8,13 +10,13 @@ namespace Karm::Ui {
 
 template <typename E, typename... Args>
 inline void event(Node &n, Args &&...args) {
-    auto e = Sys::makeEvent<E>(std::forward<Args>(args)...);
+    auto e = App::makeEvent<E>(std::forward<Args>(args)...);
     n.event(*e);
 }
 
 template <typename E, typename... Args>
 inline void bubble(Node &n, Args &&...args) {
-    auto e = Sys::makeEvent<E>(std::forward<Args>(args)...);
+    auto e = App::makeEvent<E>(std::forward<Args>(args)...);
     n.bubble(*e);
 }
 
@@ -65,7 +67,7 @@ inline void shouldAnimate(Node &n) {
 }
 
 inline void mouseLeave(Node &n) {
-    event<Events::MouseLeaveEvent>(n);
+    event<App::MouseLeaveEvent>(n);
 }
 
 inline void mouseLeave(Children &children) {

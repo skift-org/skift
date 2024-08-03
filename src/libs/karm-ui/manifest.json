@@ -9,6 +9,6 @@
         "karm-media",
         "karm-text",
         "karm-gfx",
-        "karm-events"
+        "karm-app"
     ]
 }

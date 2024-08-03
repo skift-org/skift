@@ -104,15 +104,15 @@ Ui::Child alert(String title, String subtitle) {
            Ui::insets(64);
 }
 
-void intent(Ui::Node &n, Sys::Event &e) {
-    if (auto *k = e.is<Events::KeyboardEvent>()) {
-        if (k->key == Events::Key::LEFT) {
+void intent(Ui::Node &n, App::Event &e) {
+    if (auto *k = e.is<App::KeyboardEvent>()) {
+        if (k->key == App::Key::LEFT) {
             Ui::bubble<Action>(n, MoveSelectionAction{-1});
             e.accept();
-        } else if (k->key == Events::Key::RIGHT) {
+        } else if (k->key == App::Key::RIGHT) {
             Ui::bubble<Action>(n, MoveSelectionAction{1});
             e.accept();
-        } else if (k->key == Events::Key::ENTER) {
+        } else if (k->key == App::Key::ENTER) {
             Ui::bubble<Action>(n, SelectAction{});
             e.accept();
         }

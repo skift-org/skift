@@ -39,11 +39,11 @@ struct EfiHost :
         Efi::Key key = {};
         _stip->readKeyStroke(_stip, &key).unwrap();
         auto e = key.toKeyEvent();
-        event<Events::KeyboardEvent>(*this, e);
+        event<App::KeyboardEvent>(*this, e);
         return Ok();
     }
 
-    void bubble(Sys::Event &e) override {
+    void bubble(App::Event &e) override {
         Host::bubble(e);
     }
 };

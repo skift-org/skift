@@ -44,8 +44,8 @@ struct Dismisable :
         g.restore();
     }
 
-    void event(Sys::Event &e) override {
-        if (auto *me = e.is<Events::MouseEvent>()) {
+    void event(App::Event &e) override {
+        if (auto *me = e.is<App::MouseEvent>()) {
             me->pos = me->pos - drag();
             child().event(e);
             me->pos = me->pos + drag();
@@ -68,7 +68,7 @@ struct Dismisable :
         }
     }
 
-    void bubble(Sys::Event &e) override {
+    void bubble(App::Event &e) override {
         if (auto *de = e.is<DragEvent>()) {
             if (de->type == DragEvent::DRAG) {
                 auto d = _drag.target() + de->delta;
@@ -121,28 +121,28 @@ struct DragRegion : public ProxyNode<DragRegion> {
 
     using ProxyNode::ProxyNode;
 
-    void event(Sys::Event &event) override {
+    void event(App::Event &event) override {
         ProxyNode::event(event);
 
         if (event.accepted())
             return;
 
-        auto *e = event.is<Events::MouseEvent>();
+        auto *e = event.is<App::MouseEvent>();
         if (not e)
             return;
 
         if (not bound().contains(e->pos) and not _grabbed)
             return;
 
-        if (e->type == Events::MouseEvent::PRESS) {
+        if (e->type == App::MouseEvent::PRESS) {
             _grabbed = true;
             bubble<DragEvent>(*this, DragEvent::START);
             event.accept();
-        } else if (e->type == Events::MouseEvent::RELEASE) {
+        } else if (e->type == App::MouseEvent::RELEASE) {
             _grabbed = false;
             bubble<DragEvent>(*this, DragEvent::END);
             event.accept();
-        } else if (e->type == Events::MouseEvent::MOVE and _grabbed) {
+        } else if (e->type == App::MouseEvent::MOVE and _grabbed) {
             bubble<DragEvent>(*this, DragEvent::DRAG, e->delta);
             event.accept();
         }

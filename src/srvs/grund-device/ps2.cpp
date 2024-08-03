@@ -1,4 +1,4 @@
-#include <karm-events/events.h>
+#include <karm-app/inputs.h>
 #include <karm-logger/logger.h>
 
 #include "ps2.h"
@@ -99,7 +99,7 @@ Res<> Keyboard::init() {
     return Ok();
 }
 
-Res<> Keyboard::event(Sys::Event &e) {
+Res<> Keyboard::event(App::Event &e) {
     if (auto const *irq = e.is<IrqEvent>()) {
         if (irq->irq == 1) {
             auto status = try$(ctrl().readStatus());
@@ -108,13 +108,13 @@ Res<> Keyboard::event(Sys::Event &e) {
                 auto data = try$(ctrl().readData());
                 logInfo("ps2: keyboard data {:02x}", data);
                 if (_esc) {
-                    Events::Key key = {Events::Key::Code((data & 0x7F) + 0x80)};
+                    App::Key key = {App::Key::Code((data & 0x7F) + 0x80)};
                     logInfo("ps2: keyboard key {} {}", key.name(), data & 0x80 ? "pressed" : "released");
                     _esc = false;
                 } else if (data == 0xE0) {
                     _esc = true;
                 } else {
-                    Events::Key key = {Events::Key::Code(data & 0x7F)};
+                    App::Key key = {App::Key::Code(data & 0x7F)};
                     logInfo("ps2: keyboard key {} {}", key.name(), data & 0x80 ? "pressed" : "released");
                 }
                 status = try$(ctrl().readStatus());
@@ -178,7 +178,7 @@ Res<> Mouse::decode() {
     return Ok();
 }
 
-Res<> Mouse::event(Sys::Event &e) {
+Res<> Mouse::event(App::Event &e) {
     if (auto const *irq = e.is<IrqEvent>()) {
         if (irq->irq == 12) {
             auto status = try$(ctrl().readStatus());

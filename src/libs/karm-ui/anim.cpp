@@ -45,7 +45,7 @@ struct SlideIn : public ProxyNode<SlideIn> {
         g.restore();
     }
 
-    void event(Sys::Event &e) override {
+    void event(App::Event &e) override {
         if (_slide.needRepaint(*this, e)) {
             auto repaintBound =
                 bound().clipTo(
@@ -91,7 +91,7 @@ struct ScaleIn : public ProxyNode<ScaleIn> {
         g.restore();
     }
 
-    void event(Sys::Event &e) override {
+    void event(App::Event &e) override {
         if (_scale.needRepaint(*this, e)) {
             Ui::shouldRepaint(*this, bound());
         }
@@ -147,7 +147,7 @@ struct Carousel : public GroupNode<Carousel> {
         g.restore();
     }
 
-    void event(Sys::Event &e) override {
+    void event(App::Event &e) override {
         if (_slide.needRepaint(*this, e)) {
             Ui::shouldRepaint(*this, bound());
         }

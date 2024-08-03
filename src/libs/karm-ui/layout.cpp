@@ -345,6 +345,19 @@ struct StackLayout : public GroupNode<StackLayout> {
                 return;
         }
     }
+
+    Math::Vec2i size(Math::Vec2i s, Hint hint) override {
+        isize w{};
+        isize h{};
+
+        for (auto &child : children()) {
+            auto childSize = child->size(s, hint);
+            w = max(w, childSize.x);
+            h = max(h, childSize.y);
+        }
+
+        return {w, h};
+    }
 };
 
 Child stack(Children children) {

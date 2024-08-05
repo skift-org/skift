@@ -1,5 +1,6 @@
 #pragma once
 
+#include "edge.h"
 #include "vec.h"
 
 namespace Karm::Math {
@@ -34,7 +35,29 @@ union Tri2 {
     constexpr Tri2(Vec2<T> a, Vec2<T> b, Vec2<T> c)
         : a{a}, b{b}, c{c} {}
 
-    T turn() const {
+    constexpr Tri2 reversed() const {
+        return {c, b, a};
+    }
+
+    constexpr Vec2<T> min() const {
+        return a.min(b).min(c);
+    }
+
+    constexpr Vec2<T> max() const {
+        return a.max(b).max(c);
+    }
+
+    constexpr Rect<T> bound() const {
+        return Rect<T>::fromTwoPoint(min(), max());
+    }
+
+    constexpr bool degenerated(T epsilon = Limits<T>::EPSILON) const {
+        return epsilonEq(a, b, epsilon) or
+               epsilonEq(b, c, epsilon) or
+               epsilonEq(c, a, epsilon);
+    }
+
+    constexpr T turn() const {
         return (b - a).cross(c - a);
     }
 

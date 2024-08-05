@@ -46,6 +46,10 @@ union Curve {
         return quadratic(a, (a + b) / 2, b);
     }
 
+    constexpr Curve reversed() const {
+        return {d, c, b, a};
+    }
+
     constexpr bool degenerated(T epsilon = Limits<T>::EPSILON) const {
         return epsilonEq(a, b, epsilon) and
                epsilonEq(b, c, epsilon) and

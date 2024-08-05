@@ -26,6 +26,14 @@ union Edge {
     constexpr Edge(T x1, T y1, T x2, T y2)
         : start(x1, y1), end(x2, y2) {}
 
+    constexpr Edge reversed() const {
+        return {end, start};
+    }
+
+    constexpr bool degenerated(T epsilon = Limits<T>::EPSILON) const {
+        return epsilonEq(start, end, epsilon);
+    }
+
     constexpr Vec<T> delta() const {
         return {end.x - start.x, end.y - start.y};
     }
@@ -85,10 +93,6 @@ union Edge {
 
     constexpr bool hasNan() const {
         return start.hasNan() or end.hasNan();
-    }
-
-    constexpr bool degenerated() const {
-        return start == end;
     }
 
     void repr(Io::Emit &e) const {

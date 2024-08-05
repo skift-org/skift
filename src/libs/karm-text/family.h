@@ -13,14 +13,7 @@ struct FontAdjust {
     f64 linegap = 1;
     f64 sizeAdjust = 1;
 
-    FontAdjust combine(FontAdjust other) const {
-        return {
-            .ascent = ascent * other.ascent,
-            .descent = descent * other.descent,
-            .linegap = linegap * other.linegap,
-            .sizeAdjust = sizeAdjust * other.sizeAdjust,
-        };
-    }
+    FontAdjust combine(FontAdjust other) const;
 };
 
 struct FontFamily : public Fontface {
@@ -42,124 +35,30 @@ struct FontFamily : public Fontface {
 
         Builder(FontBook const &book) : book(book) {}
 
-        Builder &add(FontQuery query) {
-            auto face = book.queryClosest(query);
+        Builder &add(FontQuery query);
 
-            if (not face) {
-                logWarn("failed to find font for query: {}", query);
-                return *this;
-            }
+        Builder &withAdjust(FontAdjust adjust);
 
-            members.pushBack({
-                .adjust = {},
-                .face = *face,
-                .ranges = NONE,
-            });
+        Builder &adjustAll(FontAdjust adjust);
 
-            return *this;
-        }
+        Builder &withRange(Range<Rune> range);
 
-        Builder &withAdjust(FontAdjust adjust) {
-            last(members).adjust = adjust;
-            return *this;
-        }
-
-        Builder &adjustAll(FontAdjust adjust) {
-            this->adjust.combine(adjust);
-            return *this;
-        }
-
-        Builder &withRange(Range<Rune> range) {
-            auto &member = last(members);
-            if (not member.ranges)
-                member.ranges = Ranges<Range<Rune>>{};
-            last(members).ranges->add(range);
-            return *this;
-        }
-
-        Strong<FontFamily> bake() {
-            return makeStrong<FontFamily>(std::move(members));
-        }
+        Strong<FontFamily> bake();
     };
 
-    static Builder make(FontBook const &book) {
-        return {book};
-    }
+    static Builder make(FontBook const &book);
 
-    FontMetrics metrics() const override {
-        FontMetrics metrics = {};
+    FontMetrics metrics() const override;
 
-        for (auto &member : _members) {
-            auto m = metrics.combine(member.face->metrics());
-            auto &a = member.adjust;
+    FontAttrs attrs() const override;
 
-            m.ascend *= a.ascent * _adjust.ascent;
-            m.descend *= a.descent * _adjust.descent;
-            m.linegap *= a.linegap * _adjust.linegap;
+    Glyph glyph(Rune rune) override;
 
-            metrics = metrics.combine(m);
-        }
+    f64 advance(Glyph glyph) override;
 
-        return metrics;
-    }
+    f64 kern(Glyph prev, Glyph curr) override;
 
-    FontAttrs attrs() const override {
-        FontAttrs attrs;
-
-        StringBuilder familyName;
-        for (auto &member : _members) {
-            if (familyName.len())
-                familyName.append(" | "s);
-            familyName.append(member.face->attrs().family);
-        }
-
-        attrs.family = familyName.take();
-
-        return attrs;
-    }
-
-    Glyph glyph(Rune rune) override {
-        Glyph res = Glyph::TOFU;
-
-        for (usize i = 0; i < _members.len(); i++) {
-            auto &member = _members[i];
-            if (member.ranges and not member.ranges->contains(rune)) {
-                continue;
-            }
-
-            res = member.face->glyph(rune);
-            if (res != Glyph::TOFU) {
-                res.font = i;
-                break;
-            }
-        }
-
-        if (res == Glyph::TOFU)
-            logWarn("failed to find glyph for rune: {:x}", rune);
-
-        return res;
-    }
-
-    f64 advance(Glyph glyph) override {
-        auto &member = _members[glyph.font];
-        auto a = member.face->advance(glyph);
-        return a * member.adjust.sizeAdjust * _adjust.sizeAdjust;
-    }
-
-    f64 kern(Glyph prev, Glyph curr) override {
-        if (prev.font != curr.font)
-            return 0;
-
-        auto &member = _members[prev.font];
-        auto k = member.face->kern(prev, curr);
-        return k * member.adjust.sizeAdjust * _adjust.sizeAdjust;
-    }
-
-    void contour(Gfx::Context &g, Glyph glyph) const override {
-        auto &member = _members[glyph.font];
-        g.scale(_adjust.sizeAdjust * member.adjust.sizeAdjust);
-        member.face->contour(g, glyph);
-    }
+    void contour(Gfx::Context &g, Glyph glyph) const override;
 };
 
 } // namespace Karm::Text

@@ -74,11 +74,9 @@ struct FontWeight : public Distinct<u16, struct _FontWeightTag> {
     }
 
     u16 delta(FontWeight other) {
-        if (other > *this) {
+        if (other > *this)
             return (other - *this).value();
-        } else {
-            return (*this - other).value();
-        }
+        return (*this - other).value();
     }
 };
 
@@ -210,6 +208,8 @@ struct FontAttrs {
     }
 
     auto operator<=>(FontAttrs const &other) const {
+        // NOTE: Comparaison order is important
+
         auto ordr = family <=> other.family;
         if (ordr != 0)
             return ordr;

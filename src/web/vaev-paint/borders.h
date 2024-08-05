@@ -1,9 +1,9 @@
 #pragma once
 
 #include <karm-gfx/context.h>
-#include <karm-gfx/paint.h>
+#include <karm-gfx/fill.h>
 #include <karm-math/curve.h>
-#include <karm-math/radius.h>
+#include <karm-math/radii.h>
 #include <vaev-base/borders.h>
 
 #include "karm-logger/logger.h"
@@ -19,7 +19,7 @@ struct BorderPaint {
 // https://drafts.csswg.org/css-backgrounds/#borders
 struct Borders {
     BorderCollapse collapse;
-    Math::Radiusf radii;
+    Math::Radiif radii;
 
     BorderPaint top = BorderPaint{
         0,
@@ -73,7 +73,7 @@ struct Borders {
         }
     }
 
-    Math::Radiusf paint(Gfx::Canvas &ctx, Math::Rectf rect) {
+    Math::Radiif paint(Gfx::Canvas &ctx, Math::Rectf rect) {
         ctx.begin();
 
         Math::Vec2f const cornerTopStart = {rect.x - start.width, rect.y - top.width};
@@ -182,7 +182,7 @@ struct Borders {
         return curves;
     }
 
-    Array<Math::Curvef, 8> computeInnerCurves(Math::Vec2f topStart, Math::Rectf content, Math::Radiusf const &radii) {
+    Array<Math::Curvef, 8> computeInnerCurves(Math::Vec2f topStart, Math::Rectf content, Math::Radiif const &radii) {
         Array<Math::Curvef, 8> curves = {};
 
         // corner top-end
@@ -388,7 +388,7 @@ struct Borders {
         }
     }
 
-    Math::Radiusf computeInternalRadii(Math::Radiusf radii) {
+    Math::Radiif computeInternalRadii(Math::Radiif radii) {
 
         if (radii.a >= top.width) {
             radii.a = radii.a - top.width;

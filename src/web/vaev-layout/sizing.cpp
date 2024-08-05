@@ -219,14 +219,14 @@ Box computeBox(Context &ctx, RectPx borderBox) {
     if (ctx.style().borders->start.style != BorderStyle::NONE)
         res.borders.start = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->start.width);
 
-    res.radius.a = computeInset(ctx, Axis::VERTICAL, ctx.style().borders->radii.a);
-    res.radius.b = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->radii.b);
-    res.radius.c = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->radii.c);
-    res.radius.d = computeInset(ctx, Axis::VERTICAL, ctx.style().borders->radii.d);
-    res.radius.e = computeInset(ctx, Axis::VERTICAL, ctx.style().borders->radii.e);
-    res.radius.f = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->radii.f);
-    res.radius.g = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->radii.g);
-    res.radius.h = computeInset(ctx, Axis::VERTICAL, ctx.style().borders->radii.h);
+    res.radii.a = computeInset(ctx, Axis::VERTICAL, ctx.style().borders->radii.a);
+    res.radii.b = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->radii.b);
+    res.radii.c = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->radii.c);
+    res.radii.d = computeInset(ctx, Axis::VERTICAL, ctx.style().borders->radii.d);
+    res.radii.e = computeInset(ctx, Axis::VERTICAL, ctx.style().borders->radii.e);
+    res.radii.f = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->radii.f);
+    res.radii.g = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->radii.g);
+    res.radii.h = computeInset(ctx, Axis::VERTICAL, ctx.style().borders->radii.h);
 
     res.borderBox = borderBox;
 

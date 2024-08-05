@@ -66,21 +66,21 @@ struct Frag {
             // FIXME colorContext should be context dependant
 
             box.borders = Paint::Borders();
-            box.borders.radii = _box.radius.cast<f64>();
+            box.borders.radii = _box.radii.cast<f64>();
 
-            box.borders.top.width = _box.borders.top.toFloat<f64>();
+            box.borders.top.width = _box.borders.top.cast<f64>();
             box.borders.top.style = style().borders->top.style;
             box.borders.top.fill = colorContext.resolve(style().borders->top.color);
 
-            box.borders.bottom.width = _box.borders.bottom.toFloat<f64>();
+            box.borders.bottom.width = _box.borders.bottom.cast<f64>();
             box.borders.bottom.style = style().borders->bottom.style;
             box.borders.bottom.fill = colorContext.resolve(style().borders->bottom.color);
 
-            box.borders.start.width = _box.borders.start.toFloat<f64>();
+            box.borders.start.width = _box.borders.start.cast<f64>();
             box.borders.start.style = style().borders->start.style;
             box.borders.start.fill = colorContext.resolve(style().borders->start.color);
 
-            box.borders.end.width = _box.borders.end.toFloat<f64>();
+            box.borders.end.width = _box.borders.end.cast<f64>();
             box.borders.end.style = style().borders->end.style;
             box.borders.end.fill = colorContext.resolve(style().borders->end.color);
 

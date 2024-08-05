@@ -191,6 +191,7 @@ bool Selector::match(Dom::Element const &el) const {
 
 // enum order is the operator priority (the lesser the most important)
 enum struct OpCode {
+    NOP,
     OR,         // ,
     DESCENDANT, // ' '
     CHILD,      // >
@@ -200,7 +201,6 @@ enum struct OpCode {
     WHERE,      // :where()
     AND,        // a.b
     COLUMN,     // ||
-    NOP
 };
 
 static Selector _parseAttributeSelector(Slice<Css::Sst> content) {
@@ -264,78 +264,15 @@ static Selector _parseAttributeSelector(Slice<Css::Sst> content) {
     return AttributeSelector{name, caze, match, value};
 }
 
-static Selector _parseSelectorElement(Cursor<Css::Sst> &cur) {
-    Selector val;
-
-    if (*cur == Css::Sst::TOKEN) {
-        switch (cur->token.type) {
-        case Css::Token::WHITESPACE:
-            if (cur.ended()) {
-                // logError("ERROR : unterminated selector");
-                return EmptySelector{};
-            }
-            cur.next();
-            return _parseSelectorElement(cur);
-        case Css::Token::HASH:
-            if (cur.ended()) {
-                // logError("ERROR : unterminated selector");
-                return EmptySelector{};
-            }
-            val = IdSelector{next(cur->token.data, 1)};
-            break;
-        case Css::Token::IDENT:
-            val = TypeSelector{TagName::make(cur->token.data, Vaev::HTML)};
-            break;
-        case Css::Token::DELIM:
-            if (cur->token.data == ".") {
-                cur.next();
-                if (cur.ended()) {
-                    logError("ERROR : unterminated selector");
-                    return EmptySelector{};
-                }
-                val = ClassSelector{cur->token.data};
-            } else if (cur->token.data == "*") {
-                val = UniversalSelector{};
-            }
-            break;
-        case Css::Token::COLON:
-            cur.next();
-            if (cur.ended()) {
-                logError("ERROR : unterminated selector");
-                return EmptySelector{};
-            }
-            if (cur->token.type == Css::Token::COLON) {
-                cur.next();
-                if (cur.ended()) {
-                    logError("ERROR : unterminated selector");
-                    return EmptySelector{};
-                }
-            }
-            val = Pseudo{Pseudo::make(cur->token.data)};
-            break;
-        default:
-            val = ClassSelector{cur->token.data};
-            break;
-        }
-    } else if (cur->type == Css::Sst::BLOCK) {
-        val = _parseAttributeSelector(cur->content);
-    } else {
-        return EmptySelector{};
-    }
-
-    cur.next();
-    return val;
-}
-
 static OpCode _peekOpCode(Cursor<Css::Sst> &cur) {
+    if (cur.ended()) {
+        return OpCode::NOP;
+    }
     if (*cur != Css::Sst::TOKEN)
         return OpCode::AND;
 
     switch (cur->token.type) {
     case Css::Token::COMMA:
-        if (cur.ended()) {
-            return OpCode::NOP;
-        }
         cur.next();
         return OpCode::OR;
 
@@ -395,9 +332,6 @@ static OpCode _peekOpCode(Cursor<Css::Sst> &cur) {
         }
 
     case Css::Token::COLON:
-        if (cur.ended())
-            return OpCode::NOP;
-
     default:
         return OpCode::AND;
     }
@@ -405,8 +339,68 @@ static OpCode _peekOpCode(Cursor<Css::Sst> &cur) {
 
 static Selector _parseInfixExpr(Selector lhs, Cursor<Css::Sst> &cur, OpCode opCode = OpCode::NOP);
 
+static Selector _parseSelectorElement(Cursor<Css::Sst> &cur, OpCode currentOp) {
+    if (cur.ended()) {
+        // logError("ERROR : unterminated selector");
+        return EmptySelector{};
+    }
+    Selector val;
+
+    if (*cur == Css::Sst::TOKEN) {
+        switch (cur->token.type) {
+        case Css::Token::WHITESPACE:
+            cur.next();
+            return _parseSelectorElement(cur, currentOp);
+        case Css::Token::HASH:
+            val = IdSelector{next(cur->token.data, 1)};
+            break;
+        case Css::Token::IDENT:
+            val = TypeSelector{TagName::make(cur->token.data, Vaev::HTML)};
+            break;
+        case Css::Token::DELIM:
+            if (cur->token.data == ".") {
+                cur.next();
+                val = ClassSelector{cur->token.data};
+            } else if (cur->token.data == "*") {
+                val = UniversalSelector{};
+            }
+            break;
+        case Css::Token::COLON:
+            cur.next();
+            if (cur->token.type == Css::Token::COLON) {
+                cur.next();
+                if (cur.ended()) {
+                    // logError("ERROR : unterminated selector");
+                    return EmptySelector{};
+                }
+            }
+            val = Pseudo{Pseudo::make(cur->token.data)};
+            break;
+        default:
+            val = ClassSelector{cur->token.data};
+            break;
+        }
+    } else if (cur->type == Css::Sst::BLOCK) {
+        val = _parseAttributeSelector(cur->content);
+    } else {
+        return EmptySelector{};
+    }
+
+    cur.next();
+    if (not cur.ended()) {
+        Cursor rb = cur;
+        OpCode nextOpCode = _peekOpCode(cur);
+        if (nextOpCode > currentOp) {
+            val = _parseInfixExpr(val, cur, nextOpCode);
+        } else {
+            cur = rb;
+        }
+    }
+    return val;
+}
+
 static Selector _parseNfixExpr(Selector lhs, OpCode op, Cursor<Css::Sst> &cur) {
-    Vec<Selector> selectors = {lhs, _parseSelectorElement(cur)};
+    Vec<Selector> selectors = {lhs, _parseSelectorElement(cur, op)};
 
     while (not cur.ended()) {
         Cursor<Css::Sst> rollBack = cur;
@@ -415,14 +409,11 @@ static Selector _parseNfixExpr(Selector lhs, OpCode op, Cursor<Css::Sst> &cur) {
 
         if (nextOpCode == OpCode::NOP) {
             break;
-        }
-
-        if (nextOpCode == op) {
+        } else if (nextOpCode == op) {
             // adding the selector to the nfix
-            selectors.pushBack(_parseSelectorElement(cur));
+            selectors.pushBack(_parseSelectorElement(cur, op));
         } else if (nextOpCode == OpCode::COLUMN or nextOpCode == OpCode::OR or nextOpCode == OpCode::AND) {
             // parse new nfix
-
             if (nextOpCode < op) {
                 cur = rollBack;
                 break;
@@ -431,12 +422,13 @@ static Selector _parseNfixExpr(Selector lhs, OpCode op, Cursor<Css::Sst> &cur) {
             last(selectors) = _parseNfixExpr(last(selectors), nextOpCode, cur);
         } else {
             // parse new infix
+
             if (nextOpCode < op) {
                 cur = rollBack;
                 break;
             }
 
-            selectors.pushBack(_parseInfixExpr(_parseSelectorElement(cur), cur, nextOpCode));
+            selectors.pushBack(_parseInfixExpr(_parseSelectorElement(cur, op), cur, nextOpCode));
         }
     }
 
@@ -461,22 +453,22 @@ static Selector _parseInfixExpr(Selector lhs, Cursor<Css::Sst> &cur, OpCode opCo
         return lhs;
 
     case OpCode::DESCENDANT:
-        return Selector::descendant(lhs, _parseSelectorElement(cur));
+        return Selector::descendant(lhs, _parseSelectorElement(cur, opCode));
 
     case OpCode::CHILD:
-        return Selector::child(lhs, _parseSelectorElement(cur));
+        return Selector::child(lhs, _parseSelectorElement(cur, opCode));
 
     case OpCode::ADJACENT:
-        return Selector::adjacent(lhs, _parseSelectorElement(cur));
+        return Selector::adjacent(lhs, _parseSelectorElement(cur, opCode));
 
     case OpCode::SUBSEQUENT:
-        return Selector::subsequent(lhs, _parseSelectorElement(cur));
+        return Selector::subsequent(lhs, _parseSelectorElement(cur, opCode));
 
     case OpCode::NOT:
-        return Selector::not_(_parseSelectorElement(cur));
+        return Selector::not_(_parseSelectorElement(cur, opCode));
 
     case OpCode::WHERE:
-        return Selector::where(_parseSelectorElement(cur));
+        return Selector::where(_parseSelectorElement(cur, opCode));
 
     case OpCode::COLUMN:
     case OpCode::OR:
@@ -491,7 +483,7 @@ Selector Selector::parse(Cursor<Css::Sst> &c) {
         return EmptySelector{};
     }
 
-    Selector currentSelector = _parseSelectorElement(c);
+    Selector currentSelector = _parseSelectorElement(c, OpCode::NOP);
 
     while (not c.ended()) {
         currentSelector = _parseInfixExpr(currentSelector, c);

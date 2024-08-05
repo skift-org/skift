@@ -145,27 +145,27 @@ test$("vaev-style-parse-subsequent-selectors") {
 }
 
 test$("vaev-style-parse-mixed-selectors") {
-    // expectEq$(
-    //     Selector::parse("html > .className#idName"),
-    //     Selector::child(
-    //         TypeSelector{Html::HTML},
-    //         Selector::and_({
-    //             ClassSelector{"className"s},
-    //             IdSelector{"idName"s},
-    //         })
-    //     )
-    // );
-    //
-    // expectEq$(
-    //     Selector::parse("html#idName .className"),
-    //     Selector::descendant(
-    //         Selector::child(
-    //             TypeSelector{Html::HTML},
-    //             IdSelector{"idName"s}
-    //         ),
-    //         ClassSelector{"className"s}
-    //     )
-    // );
+    expectEq$(
+        Selector::parse("html > .className#idName"),
+        Selector::child(
+            TypeSelector{Html::HTML},
+            Selector::and_({
+                ClassSelector{"className"s},
+                IdSelector{"idName"s},
+            })
+        )
+    );
+
+    expectEq$(
+        Selector::parse("html#idName .className"),
+        Selector::descendant(
+            Selector::and_({
+                TypeSelector{Html::HTML},
+                IdSelector{"idName"s},
+            }),
+            ClassSelector{"className"s}
+        )
+    );
 
     return Ok();
 }

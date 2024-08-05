@@ -75,8 +75,8 @@ enum struct MyEnum {
 };
 
 test$("fmt-enum") {
-    try$(testCase("0", MyEnum::BAR));
-    try$(testCase("1", MyEnum::BAZ));
+    try$(testCase("(Karm::Io::Tests::MyEnum 0)", MyEnum::BAR));
+    try$(testCase("(Karm::Io::Tests::MyEnum 1)", MyEnum::BAZ));
 
     return Ok();
 }
@@ -88,7 +88,7 @@ enum struct MyEnumReflectable {
     _LEN,
 };
 
-test$("fmt-enum-reflectable") {
+test$("fmt-enum-bounded") {
     try$(testCase("BAR", MyEnumReflectable::BAR));
     try$(testCase("BAZ", MyEnumReflectable::BAZ));
 

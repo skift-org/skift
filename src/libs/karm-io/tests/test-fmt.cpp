@@ -3,19 +3,6 @@
 #include <karm-logger/logger.h>
 #include <karm-test/macros.h>
 
-struct Foo {
-    int bar;
-    int baz;
-};
-
-struct Baz {
-    Foo foo;
-    int qux;
-};
-
-Reflectable$(Baz, foo, qux);
-Reflectable$(Foo, bar, baz);
-
 namespace Karm::Io::Tests {
 
 template <typename T>
@@ -176,18 +163,6 @@ test$("fmt-references") {
 
     str = NONE;
     try$(testCase("None", weakStr));
-
-    return Ok();
-}
-
-// MARK: Format Reflectable ----------------------------------------------------
-
-test$("fmt-reflectable") {
-    auto fooStr = try$(Io::format("{#}", Foo{1, 2}));
-    expectEq$(fooStr, "Foo{bar=1, baz=2}");
-
-    auto bazStr = try$(Io::format("{#}", Baz{{1, 2}, 3}));
-    expectEq$(bazStr, "Baz{foo={bar=1, baz=2}, qux=3}");
 
     return Ok();
 }

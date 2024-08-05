@@ -1,6 +1,5 @@
 #pragma once
 
-#include <karm-base/reflect.h>
 #include <karm-base/string.h>
 
 namespace Grund::Echo {
@@ -11,5 +10,3 @@ struct Request {
 };
 
 } // namespace Grund::Echo
-
-Reflectable$(Grund::Echo::Request, msg);

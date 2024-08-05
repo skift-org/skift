@@ -18,7 +18,7 @@
         },
         "cute-engineering/ce-stdcpp": {
             "git": "https://github.com/cute-engineering/ce-stdcpp.git",
-            "tag": "v1.2.0"
+            "tag": "v1.3.0"
         },
         "sdl2": {
             "description": "A cross-platform development library designed to provide low level access to hardware",

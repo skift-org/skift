@@ -64,12 +64,13 @@ struct Insets {
     constexpr Math::Vec2<T> all() const {
         return {start + end, top + bottom};
     }
+
+    void repr(Io::Emit &e) const {
+        e("(insets {} {} {} {})", start, top, end, bottom);
+    }
 };
 
 using Insetsi = Insets<isize>;
 using Insetsf = Insets<f64>;
 
 } // namespace Karm::Math
-
-template <typename T>
-ReflectableTemplate$(Karm::Math::Insets<T>, start, top, end, bottom);

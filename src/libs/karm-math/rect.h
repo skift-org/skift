@@ -278,6 +278,10 @@ union Rect {
     always_inline T aspect() const {
         return width / height;
     }
+
+    void repr(Io::Emit &e) const {
+        e("(rect {} {} {} {})", x, y, width, height);
+    }
 };
 
 template <typename T>
@@ -296,6 +300,3 @@ using Rectu = Rect<usize>;
 using Rectf = Rect<f64>;
 
 } // namespace Karm::Math
-
-template <typename T>
-ReflectableTemplate$(Karm::Math::Rect<T>, x, y, width, height);

@@ -4,7 +4,6 @@
 #include <karm-base/endian.h>
 #include <karm-base/enum.h>
 #include <karm-base/rc.h>
-#include <karm-base/reflect.h>
 #include <karm-base/time.h>
 #include <karm-base/tuple.h>
 #include <karm-base/vec.h>
@@ -458,8 +457,8 @@ struct Formatter<T> : public UnsignedFormatter<T> {};
 template <Meta::SignedIntegral T>
 struct Formatter<T> : public SignedFormatter<T> {};
 
-template <>
-struct Formatter<f64> {
+template <Meta::Float T>
+struct Formatter<T> {
     Res<usize> format(Io::TextWriter &writer, f64 const &val) {
         NumberFormatter formatter;
         usize written = 0;
@@ -496,10 +495,11 @@ struct Formatter<Le<T>> : public Formatter<T> {
 template <Meta::Enum T>
 struct Formatter<T> {
     Res<usize> format(Io::TextWriter &writer, T val) {
-        if constexpr (ReflectableEnum<T>) {
+        if constexpr (BoundedEnum<T>) {
             return writer.writeStr(nameOf<T>(val));
-        } else
-            return Formatter<Meta::UnderlyingType<T>>().format(writer, toUnderlyingType(val));
+        } else {
+            return Io::format(writer, "({} {})", nameOf<T>(), toUnderlyingType(val));
+        }
     }
 };
 
@@ -768,36 +768,6 @@ concept Reprable =
         Repr<T>::repr(emit, t);
     };
 
-template <Reflectable T>
-    requires(not Reprable<T>)
-struct Formatter<T> {
-    bool prefix = false;
-
-    void parse(Io::SScan &scan) {
-        if (scan.skip('#'))
-            prefix = true;
-    }
-
-    Res<usize> format(Io::TextWriter &writer, T const &val) {
-        usize written = 0;
-        if (prefix)
-            written += try$(writer.writeStr(nameOf<T>()));
-        written += try$(writer.writeRune('{'));
-
-        bool first = true;
-        try$(iterFields(val, [&](Str name, auto const &v) -> Res<usize> {
-            if (not first)
-                written += try$(writer.writeStr(", "s));
-            first = false;
-            written += try$(Io::format(writer, "{}={}", name, v));
-            return Ok(written);
-        }));
-        written += try$(writer.writeRune('}'));
-
-        return Ok(written);
-    }
-};
-
 // MARK: Format Sliceable ------------------------------------------------------
 
 template <Sliceable T>
@@ -820,6 +790,31 @@ struct Formatter<T> {
             written += try$(inner.format(writer, val[i]));
         }
         return Ok(written + try$(writer.writeStr("]"s)));
+    }
+};
+
+// MARK: Format Range ----------------------------------------------------------
+
+template <typename T, typename Tag>
+struct Formatter<Range<T, Tag>> {
+    Formatter<T> inner;
+
+    void parse(Io::SScan &scan) {
+        if constexpr (requires() {
+                          inner.parse(scan);
+                      }) {
+            inner.parse(scan);
+        }
+    }
+
+    Res<usize> format(Io::TextWriter &writer, Range<T, Tag> const &val) {
+        usize written = 0;
+        written += try$(writer.writeStr("["s));
+        written += try$(inner.format(writer, val.start));
+        written += try$(writer.writeStr("-"s));
+        written += try$(inner.format(writer, val.end()));
+        written += try$(writer.writeStr("]"s));
+        return Ok(written);
     }
 };
 

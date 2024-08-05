@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-base/clamp.h>
-#include <karm-io/fmt.h>
+#include <karm-io/emit.h>
 
 #include "funcs.h"
 
@@ -171,6 +171,10 @@ union Vec2 {
 
     auto operator==(Vec2 const &other) const {
         return _els == other._els;
+    }
+
+    void repr(Io::Emit &e) const {
+        e("(vec {} {})", x, y);
     }
 };
 
@@ -373,6 +377,10 @@ union Vec3 {
     auto operator==(Vec3 const &other) const {
         return _els == other._els;
     }
+
+    void repr(Io::Emit &e) const {
+        e("(vec {} {} {})", x, y, z);
+    }
 };
 
 template <typename T>
@@ -561,6 +569,10 @@ union Vec4 {
     auto operator==(Vec4 const &other) const {
         return _els == other._els;
     }
+
+    void repr(Io::Emit &e) const {
+        e("(vec {} {} {} {})", x, y, z, w);
+    }
 };
 
 template <typename T>
@@ -598,12 +610,3 @@ bool epsilonEq(Vec4<T> const &lhs, Vec4<T> const &rhs, T epsilon) {
 }
 
 } // namespace Karm::Math
-
-template <typename T>
-ReflectableTemplate$(Math::Vec2<T>, x, y);
-
-template <typename T>
-ReflectableTemplate$(Math::Vec3<T>, x, y, z);
-
-template <typename T>
-ReflectableTemplate$(Math::Vec4<T>, x, y, z, w);

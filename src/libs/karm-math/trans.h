@@ -183,6 +183,10 @@ union Trans2 {
     constexpr Vec2<T> delta() const {
         return {xx, xy};
     }
+
+    void repr(Io::Emit &e) const {
+        e("(trans {} {} {} {} {} {})", xx, xy, yx, yy, ox, oy);
+    }
 };
 
 template <typename T>
@@ -197,6 +201,3 @@ using Trans2i = Trans2<isize>;
 using Trans2f = Trans2<f64>;
 
 } // namespace Karm::Math
-
-template <typename T>
-ReflectableTemplate$(Math::Trans2<T>, xx, xy, yx, yy, ox, oy);

@@ -1,13 +1,14 @@
 #pragma once
 
-#include <karm-base/reflect.h>
+#include <karm-base/enum.h>
+#include <karm-base/tuple.h>
 #include <karm-base/vec.h>
 #include <karm-meta/nocopy.h>
+#include <karm-meta/visit.h>
 
 #include <karm-sys/_handle.h>
 
 #include "bscan.h"
-#include "impls.h"
 
 namespace Karm::Io {
 
@@ -159,23 +160,45 @@ struct Packer<Res<T, E>> {
     }
 };
 
-// MARK: Reflectable ----------------------------------------------------------
-
-template <Reflectable T>
+template <Meta::Agregate T>
+    requires(not Meta::TrivialyCopyable<T>)
 struct Packer<T> {
     static Res<> pack(PackEmit &e, T const &val) {
-        return iterFields(val, [&](auto, auto const &v) {
-            return Io::pack(e, v);
-        });
+        return Meta::visit(
+            [&](auto &&...fields) {
+                Res<> res = Ok();
+                ([&] {
+                    res ? res = Io::pack(e, fields) : res;
+                }(),
+                 ...);
+                return res;
+            },
+            val
+        );
     }
 
     static Res<T> unpack(PackScan &s) {
-        T res;
-        try$(iterFields(res, [&]<typename U>(auto, U &v) -> Res<> {
-            v = try$(Io::unpack<U>(s));
-            return Ok();
-        }));
-        return Ok(res);
+        T object;
+        Opt<Error> err = NONE;
+        Meta::visit(
+            [&](auto &&...fields) {
+                ([&] {
+                    auto res = Io::unpack<Meta::RemoveConstVolatileRef<decltype(fields)>>(s);
+                    if (not res) {
+                        err = res.none();
+                        return;
+                    }
+                    fields = res.take();
+                }(),
+                 ...);
+            },
+            object
+        );
+
+        if (err)
+            return err.take();
+
+        return Ok(object);
     }
 };
 

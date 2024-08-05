@@ -105,6 +105,10 @@ struct Radii {
             static_cast<U>(h),
         };
     }
+
+    void repr(Io::Emit &_e) const {
+        _e("(radii {} {} {} {} {} {} {} {})", a, b, c, d, e, f, g, h);
+    }
 };
 
 using Radiii = Radii<isize>;
@@ -112,6 +116,3 @@ using Radiii = Radii<isize>;
 using Radiif = Radii<f64>;
 
 } // namespace Karm::Math
-
-template <typename T>
-ReflectableTemplate$(Karm::Math::Radii<T>, a, b, c, d, e, f, g, h);

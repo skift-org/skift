@@ -40,6 +40,10 @@ union Ellipse {
     bool hasNan() {
         return center.hasNan() or radii.hasNan();
     }
+
+    void repr(Io::Emit &e) const {
+        e("(ellipse {} {} {} {})", cx, cy, rx, ry);
+    }
 };
 
 using Ellipsei = Ellipse<isize>;
@@ -47,6 +51,3 @@ using Ellipsei = Ellipse<isize>;
 using Ellipsef = Ellipse<f64>;
 
 } // namespace Karm::Math
-
-template <typename T>
-ReflectableTemplate$(Math::Ellipse<T>, cx, cy, rx, ry);

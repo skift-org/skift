@@ -67,6 +67,9 @@ template <typename T>
 concept TrivialyCopyable = __is_trivially_copyable(T);
 
 template <typename T>
+concept Agregate = __is_aggregate(T);
+
+template <typename T>
 concept Signed = __is_signed(T);
 
 template <typename T>

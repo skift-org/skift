@@ -90,6 +90,10 @@ union Edge {
     constexpr bool degenerated() const {
         return start == end;
     }
+
+    void repr(Io::Emit &e) const {
+        e("(edge {} {} {} {})", sx, sy, ex, ey);
+    }
 };
 
 using Edgei = Edge<isize>;
@@ -97,6 +101,3 @@ using Edgei = Edge<isize>;
 using Edgef = Edge<f64>;
 
 } // namespace Karm::Math
-
-template <typename T>
-ReflectableTemplate$(Math::Edge<T>, sx, sy, ex, ey);

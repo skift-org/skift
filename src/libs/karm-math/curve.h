@@ -160,6 +160,10 @@ union Curve {
             res._pts[i] = _pts[i] + normal(i / 3.0).unit() * offset;
         return res;
     }
+
+    void repr(Io::Emit &e) const {
+        e("(curve {} {} {} {})", a, b, c, d);
+    }
 };
 
 using Curvei = Curve<isize>;
@@ -169,6 +173,3 @@ using Curveu = Curve<usize>;
 using Curvef = Curve<f64>;
 
 } // namespace Karm::Math
-
-template <typename T>
-ReflectableTemplate$(Math::Curve<T>, a, b, c, d);

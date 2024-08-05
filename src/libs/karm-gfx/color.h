@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-io/fmt.h>
+#include <karm-io/emit.h>
 #include <karm-math/vec.h>
 
 namespace Karm::Gfx {
@@ -128,6 +128,10 @@ struct Color {
         return *this;
     }
 
+    void repr(Io::Emit &e) const {
+        e("(color {} {} {} {})", red, green, blue, alpha);
+    }
+
     auto operator<=>(Color const &other) const = default;
     bool operator==(Color const &other) const = default;
 };
@@ -148,6 +152,12 @@ struct Hsv {
     }
 
     auto operator<=>(Hsv const &other) const = default;
+
+    bool operator==(Hsv const &other) const = default;
+
+    void repr(Io::Emit &e) const {
+        e("(hsv {} {} {})", hue, saturation, value);
+    }
 };
 
 Hsv rgbToHsv(Color color);
@@ -158,6 +168,10 @@ struct YCbCr {
     f32 y, cb, cr;
 
     auto operator<=>(YCbCr const &other) const = default;
+
+    void repr(Io::Emit &e) const {
+        e("(ycbcr {} {} {})", y, cb, cr);
+    }
 };
 
 static inline YCbCr rgbToYCbCr(Color color) {
@@ -180,5 +194,3 @@ static inline Color yCbCrToRgb(YCbCr yCbCr) {
 }
 
 } // namespace Karm::Gfx
-
-Reflectable$(Gfx::Color, red, green, blue, alpha);

@@ -17,7 +17,7 @@ static inline Demo SVG_DEMO{
     [] {
         return Ui::canvas(
             [](Gfx::Context &g, ...) {
-                g.begin();
+                g.beginPath();
                 g.evalSvg(CAT);
 
                 g.fillStyle(Ui::GRAY700);

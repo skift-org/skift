@@ -179,14 +179,14 @@ void Context::blit(Math::Vec2i dest, Pixels pixels) {
 // MARK: Shapes ----------------------------------------------------------------
 
 void Context::stroke(Math::Edgef edge) {
-    begin();
+    beginPath();
     moveTo(edge.start);
     lineTo(edge.end);
     stroke();
 }
 
 void Context::fill(Math::Edgef edge, f64 thickness) {
-    begin();
+    beginPath();
     moveTo(edge.start);
     lineTo(edge.end);
     auto copy = strokeStyle();
@@ -194,7 +194,7 @@ void Context::fill(Math::Edgef edge, f64 thickness) {
 }
 
 void Context::stroke(Math::Rectf r, Math::Radiif radii) {
-    begin();
+    beginPath();
     rect(r, radii);
     stroke();
 }
@@ -220,7 +220,7 @@ void Context::stroke(Math::Rectf r, Math::Radiif radii) {
 }
 
 void Context::fill(Math::Recti r, Math::Radiif radii) {
-    begin();
+    beginPath();
     rect(r.cast<f64>(), radii);
 
     bool isSuitableForFastFill =
@@ -236,19 +236,19 @@ void Context::fill(Math::Recti r, Math::Radiif radii) {
 }
 
 void Context::fill(Math::Rectf r, Math::Radiif radii) {
-    begin();
+    beginPath();
     rect(r, radii);
     fill();
 }
 
 void Context::stroke(Math::Ellipsef e) {
-    begin();
+    beginPath();
     ellipse(e);
     stroke();
 }
 
 void Context::fill(Math::Ellipsef e) {
-    begin();
+    beginPath();
     ellipse(e);
     fill();
 }
@@ -361,11 +361,11 @@ void Context::_fill(Fill fill, FillRule fillRule) {
     });
 }
 
-void Context::begin() {
+void Context::beginPath() {
     _path.clear();
 }
 
-void Context::close() {
+void Context::closePath() {
     _path.close();
 }
 

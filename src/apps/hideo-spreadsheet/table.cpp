@@ -123,7 +123,7 @@ struct Table : public Ui::View<Table> {
         auto all = start.mergeWith(end);
 
         g.fillStyle(Ui::ACCENT600.withOpacity(0.2));
-        g.begin();
+        g.beginPath();
         g.rect(all.cast<f64>().grow(3), 4);
         g.rect(start.cast<f64>().grow(3), 4);
         g.fill(Gfx::FillRule::EVENODD);

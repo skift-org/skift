@@ -214,10 +214,10 @@ struct Context : public Canvas {
     void _fill(Fill fill, FillRule rule = FillRule::NONZERO);
 
     // Begin a new path.
-    void begin() override;
+    void beginPath() override;
 
     // Close the current path. This will connect the last point to the first
-    void close() override;
+    void closePath() override;
 
     void moveTo(Math::Vec2f p, Math::Path::Flags flags = Math::Path::DEFAULT) override;
 

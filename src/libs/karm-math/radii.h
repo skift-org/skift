@@ -78,6 +78,9 @@ struct Radii {
                 radii *= factor;
         };
 
+        for (auto &r : res.radii)
+            r = max(r, T{});
+
         auto sumTop = res.b + res.c;
         scaleAll(sumTop > T{} ? size.width / sumTop : 1);
 

@@ -19,7 +19,7 @@ Ui::Child histogram(Hist const &hist) {
         };
 
         auto plotComponent = [&](usize c, Gfx::Color stroke, Gfx::Color fill) {
-            g.begin();
+            g.beginPath();
             g.moveTo(point(0, c));
             for (usize i = 0; i < hist.len() - 1; i++) {
                 auto p0 = point(i, c);
@@ -34,7 +34,7 @@ Ui::Child histogram(Hist const &hist) {
             g.stroke(Gfx::stroke(stroke));
 
             g.lineTo({0, (f64)size.y});
-            g.close();
+            g.closePath();
 
             g.fill(fill.withOpacity(0.25));
         };

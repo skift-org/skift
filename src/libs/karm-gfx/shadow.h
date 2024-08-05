@@ -159,18 +159,6 @@ struct BoxShadow {
 
         g.fillStyle(fill);
         g.fill(bound);
-
-        // Debug overlay
-        return;
-        g.plot(topStart, Gfx::GREEN);
-        g.plot(topEnd, Gfx::RED);
-        g.plot(bottomStart, Gfx::BLUE);
-        g.plot(bottomEnd, Gfx::YELLOW);
-
-        g.plot(top, Gfx::AMBER);
-        g.plot(bottom, Gfx::INDIGO);
-        g.plot(start, Gfx::PINK);
-        g.plot(end, Gfx::CYAN);
     }
 };
 

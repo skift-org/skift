@@ -15,7 +15,7 @@ Strong<Text::Fontface> Icon::fontface() {
 void Icon::fill(Gfx::Context &g, Math::Vec2i pos) const {
     auto face = fontface();
     g.save();
-    g.begin();
+    g.beginPath();
     g.origin(pos + Math::Vec2i{0, (isize)(face->metrics().ascend * _size)});
     g.scale(_size);
     face->contour(g, face->glyph((Rune)_code));
@@ -27,7 +27,7 @@ void Icon::stroke(Gfx::Context &g, Math::Vec2i pos) const {
     auto face = fontface();
 
     g.save();
-    g.begin();
+    g.beginPath();
     g.origin(pos + Math::Vec2i{0, (isize)(face->metrics().ascend * _size)});
     g.scale(_size);
     face->contour(g, face->glyph((Rune)_code));

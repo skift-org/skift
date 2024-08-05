@@ -22,7 +22,7 @@ Async::Task<> entryPointAsync(Sys::Context &) {
                 f64 s = rand.nextInt(4, 10);
                 s *= s;
 
-                g.begin();
+                g.beginPath();
                 g.ellipse({
                     rand.nextVec2(Math::Recti{100, 100}).cast<f64>(),
                     s,

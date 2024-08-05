@@ -20,10 +20,10 @@ struct Canvas : public Meta::NoCopy {
     virtual ~Canvas() = default;
 
     // Begin a new path.
-    virtual void begin() = 0;
+    virtual void beginPath() = 0;
 
     // Close the current path. This will connect the last point to the first
-    virtual void close() = 0;
+    virtual void closePath() = 0;
 
     // Begin a new subpath at the given point.
     virtual void moveTo(Math::Vec2f p, Math::Path::Flags flags = Math::Path::DEFAULT) = 0;

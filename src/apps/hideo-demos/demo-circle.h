@@ -19,7 +19,7 @@ static inline Demo CIRCLE_DEMO{
                     f64 s = rand.nextInt(4, 10);
                     s *= s;
 
-                    g.begin();
+                    g.beginPath();
                     g.ellipse({
                         rand.nextVec2(size).cast<f64>(),
                         s,

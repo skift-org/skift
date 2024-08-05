@@ -13,7 +13,7 @@ static inline Demo STROKE_DEMO{
     [] {
         return Ui::canvas(
             [](Gfx::Context &g, ...) {
-                g.begin();
+                g.beginPath();
                 g.translate({100, 100});
                 g.moveTo({0, 0});
                 g.lineTo({100, 100});

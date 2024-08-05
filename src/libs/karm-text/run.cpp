@@ -69,7 +69,7 @@ Math::Vec2f Run::layout() {
 void Run::_fillGlyph(Gfx::Context &g, Font const &font, Math::Vec2f baseline, Glyph glyph) {
     g._useSpaa = true;
     g.save();
-    g.begin();
+    g.beginPath();
     g.translate(baseline);
     g.scale(font.fontsize);
     font.fontface->contour(g, glyph);

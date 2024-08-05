@@ -76,11 +76,11 @@ static inline Demo MESH_DEMO{
                     g.strokeStyle(Gfx::stroke(Gfx::WHITE).withWidth(1).withAlign(Gfx::OUTSIDE_ALIGN));
 
                     for (usize i = 0; i + 2 < s.index.len(); i += 3) {
-                        g.begin();
+                        g.beginPath();
                         g.moveTo(s.verts[s.index[i]].xy);
                         g.lineTo(s.verts[s.index[i + 1]].xy);
                         g.lineTo(s.verts[s.index[i + 2]].xy);
-                        g.close();
+                        g.closePath();
                         g.stroke();
                     }
                 }

@@ -21,32 +21,28 @@ struct Borders {
     BorderCollapse collapse;
     Math::Radiif radii;
 
-    BorderPaint top = BorderPaint{
-        0,
-        BorderStyle::SOLID,
-        BLACK,
-    };
-    BorderPaint start = BorderPaint{
-        0,
-        BorderStyle::SOLID,
-        BLACK,
-    };
-    BorderPaint bottom = BorderPaint{
-        0,
-        BorderStyle::SOLID,
-        BLACK,
-    };
-    BorderPaint end = BorderPaint{
+    BorderPaint top = {
         0,
         BorderStyle::SOLID,
         BLACK,
     };
 
-    enum BorderName {
-        TOP,
-        START,
-        BOTTOM,
-        END
+    BorderPaint start = {
+        0,
+        BorderStyle::SOLID,
+        BLACK,
+    };
+
+    BorderPaint bottom = {
+        0,
+        BorderStyle::SOLID,
+        BLACK,
+    };
+
+    BorderPaint end = {
+        0,
+        BorderStyle::SOLID,
+        BLACK,
     };
 
     constexpr void all(BorderPaint b) {
@@ -74,12 +70,17 @@ struct Borders {
     }
 
     Math::Radiif paint(Gfx::Canvas &ctx, Math::Rectf rect) {
-        ctx.begin();
+        ctx.beginPath();
 
         Math::Vec2f const cornerTopStart = {rect.x - start.width, rect.y - top.width};
         auto const radiiIn = computeInternalRadii(radii);
 
-        if (top.fill == start.fill and start.fill == bottom.fill and bottom.fill == end.fill and top.style == bottom.style and bottom.style == start.style and start.style == end.style) {
+        if (top.fill == start.fill and
+            start.fill == bottom.fill and
+            bottom.fill == end.fill and
+            top.style == bottom.style and
+            bottom.style == start.style and
+            start.style == end.style) {
             // fast path, this allow us to paint the border easily if all the borders are the same color/style
 
             Math::Rectf const outer = Math::Rectf{
@@ -89,7 +90,7 @@ struct Borders {
 
             ctx.rect(outer, radii);
             ctx.rect(rect, 0);
-            ctx.fill(top.fill, Gfx::FillRule{Karm::Gfx::FillRule::EVENODD});
+            ctx.fill(top.fill, Gfx::FillRule::EVENODD);
             return radiiIn;
         }
 
@@ -97,10 +98,11 @@ struct Borders {
         auto outerCurves = computeOuterCurves(cornerTopStart, rect);
         auto innerCurves = computeInnerCurves(cornerTopStart, rect, radiiIn);
 
-        paintEdge(ctx, BorderName::TOP, outerCurves, innerCurves);
-        paintEdge(ctx, BorderName::BOTTOM, outerCurves, innerCurves);
-        paintEdge(ctx, BorderName::START, outerCurves, innerCurves);
-        paintEdge(ctx, BorderName::END, outerCurves, innerCurves);
+        paintEdge(ctx, BorderEdge::TOP, outerCurves, innerCurves);
+        paintEdge(ctx, BorderEdge::BOTTOM, outerCurves, innerCurves);
+        paintEdge(ctx, BorderEdge::START, outerCurves, innerCurves);
+        paintEdge(ctx, BorderEdge::END, outerCurves, innerCurves);
+
         return computeInternalRadii(radiiIn);
     }
 
@@ -260,10 +262,10 @@ struct Borders {
         return curves;
     }
 
-    void paintEdge(Gfx::Canvas &ctx, BorderName border, Array<Math::Curvef, 8> curvesOUT, Array<Math::Curvef, 8> curvesIN) {
-        ctx.begin();
+    void paintEdge(Gfx::Canvas &ctx, BorderEdge border, Array<Math::Curvef, 8> curvesOUT, Array<Math::Curvef, 8> curvesIN) {
+        ctx.beginPath();
 
-        if (border == BorderName::TOP) {
+        if (border == BorderEdge::TOP) {
             ctx.moveTo(curvesOUT[7].a);
             ctx.cubicTo(
                 curvesOUT[7].b,
@@ -291,9 +293,9 @@ struct Borders {
                 curvesIN[7].b,
                 curvesIN[7].a
             );
-            ctx.close();
+            ctx.closePath();
             ctx.fill(top.fill);
-        } else if (border == BorderName::END) {
+        } else if (border == BorderEdge::END) {
             ctx.moveTo(curvesOUT[1].a);
             ctx.cubicTo(
                 curvesOUT[1].b,
@@ -321,9 +323,9 @@ struct Borders {
                 curvesIN[1].b,
                 curvesIN[1].a
             );
-            ctx.close();
+            ctx.closePath();
             ctx.fill(end.fill);
-        } else if (border == BorderName::BOTTOM) {
+        } else if (border == BorderEdge::BOTTOM) {
             ctx.moveTo(curvesOUT[3].a);
             ctx.cubicTo(
                 curvesOUT[3].b,
@@ -352,9 +354,9 @@ struct Borders {
                 curvesIN[3].a
             );
 
-            ctx.close();
+            ctx.closePath();
             ctx.fill(bottom.fill);
-        } else if (border == BorderName::START) {
+        } else if (border == BorderEdge::START) {
             ctx.moveTo(curvesOUT[5].a);
             ctx.cubicTo(
                 curvesOUT[5].b,
@@ -383,13 +385,12 @@ struct Borders {
                 curvesIN[5].a
             );
 
-            ctx.close();
+            ctx.closePath();
             ctx.fill(start.fill);
         }
     }
 
     Math::Radiif computeInternalRadii(Math::Radiif radii) {
-
         if (radii.a >= top.width) {
             radii.a = radii.a - top.width;
         }

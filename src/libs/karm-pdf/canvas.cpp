@@ -2,11 +2,11 @@
 
 namespace Karm::Pdf {
 
-void Canvas::begin() {
+void Canvas::beginPath() {
     emit().ln("q");
 }
 
-void Canvas::close() {
+void Canvas::closePath() {
     emit().ln("Q");
 }
 
@@ -66,7 +66,7 @@ void Canvas::rect(Math::Rectf rect, Math::Radiif) {
     lineTo(rect.topEnd(), Math::Path::DEFAULT);
     lineTo(rect.bottomEnd(), Math::Path::DEFAULT);
     lineTo(rect.bottomStart(), Math::Path::DEFAULT);
-    close();
+    closePath();
 }
 
 void Canvas::fill(Gfx::Fill fill, Gfx::FillRule rule) {

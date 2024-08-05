@@ -24,7 +24,7 @@ static inline Demo BEZIER_DEMO{
         return Ui::reducer<Model>(Math::Curvef::linear(100, 300), [](Math::Curvef const &s) {
             auto canvas = Ui::canvas(
                 [=](Gfx::Context &g, Math::Vec2i) {
-                    g.begin();
+                    g.beginPath();
                     g.moveTo(s.a);
                     g.cubicTo(s.b, s.c, s.d);
 
@@ -39,13 +39,13 @@ static inline Demo BEZIER_DEMO{
                     auto minusOffset = s.offset2(-50);
                     auto plusOffset = s.offset(-50);
 
-                    g.begin();
+                    g.beginPath();
                     g.moveTo(minusOffset.a);
                     g.cubicTo(minusOffset.b, minusOffset.c, minusOffset.d);
                     g.strokeStyle(Gfx::stroke(Gfx::RED).withWidth(1).withAlign(Gfx::CENTER_ALIGN));
                     g.stroke();
 
-                    g.begin();
+                    g.beginPath();
                     g.moveTo(minusOffset.a);
                     g.lineTo(minusOffset.b);
                     g.lineTo(minusOffset.c);
@@ -53,13 +53,13 @@ static inline Demo BEZIER_DEMO{
                     g.strokeStyle(Gfx::stroke(Gfx::RED).withWidth(0.5).withAlign(Gfx::CENTER_ALIGN));
                     g.stroke();
 
-                    g.begin();
+                    g.beginPath();
                     g.moveTo(plusOffset.a);
                     g.cubicTo(plusOffset.b, plusOffset.c, plusOffset.d);
                     g.strokeStyle(Gfx::stroke(Gfx::GREEN).withWidth(1).withAlign(Gfx::CENTER_ALIGN));
                     g.stroke();
 
-                    g.begin();
+                    g.beginPath();
                     g.moveTo(plusOffset.a);
                     g.lineTo(plusOffset.b);
                     g.lineTo(plusOffset.c);
@@ -67,13 +67,13 @@ static inline Demo BEZIER_DEMO{
                     g.strokeStyle(Gfx::stroke(Gfx::GREEN).withWidth(0.5).withAlign(Gfx::CENTER_ALIGN));
                     g.stroke();
 
-                    g.begin();
+                    g.beginPath();
                     g.moveTo(s.a);
                     g.lineTo(s.b);
                     g.strokeStyle(Gfx::stroke(Gfx::WHITE).withWidth(0.5).withAlign(Gfx::CENTER_ALIGN));
                     g.stroke();
 
-                    g.begin();
+                    g.beginPath();
                     g.moveTo(s.d);
                     g.lineTo(s.c);
                     g.strokeStyle(Gfx::stroke(Gfx::WHITE).withWidth(0.5).withAlign(Gfx::CENTER_ALIGN));

@@ -148,7 +148,7 @@ struct Glyf : public Io::BChunk {
                 g.quadTo(cp, startP);
             }
 
-            g.close();
+            g.closePath();
             start = end + 1;
         }
     }

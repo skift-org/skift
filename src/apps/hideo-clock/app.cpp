@@ -19,7 +19,7 @@ struct Clock : public Ui::View<Clock> {
 
     void _drawHand(Gfx::Context &g, f64 angle, f64 length, Gfx::Color color, f64 width) {
         g.save();
-        g.begin();
+        g.beginPath();
         g.translate(bound().center().cast<f64>());
         g.rotate(angle);
         g.line({0, {0, -length}});

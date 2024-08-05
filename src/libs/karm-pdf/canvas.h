@@ -17,17 +17,16 @@ struct Canvas : public Gfx::Canvas {
     Math::Vec2f _mapPoint(Math::Vec2f p, Math::Path::Flags flags) {
         if (flags & Math::Path::RELATIVE)
             return p;
-        else
-            return _p + p;
+        return _p + p;
     }
 
     Math::Vec2f _mapPointAndUpdate(Math::Vec2f p, Math::Path::Flags flags) {
         return _p = _mapPoint(p, flags);
     }
 
-    void begin() override;
+    void beginPath() override;
 
-    void close() override;
+    void closePath() override;
 
     void moveTo(Math::Vec2f p, Math::Path::Flags flags) override;
 

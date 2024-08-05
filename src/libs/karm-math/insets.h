@@ -1,7 +1,6 @@
 #pragma once
 
-#include "flow.h"
-#include "rect.h"
+#include "vec.h"
 
 namespace Karm::Math {
 
@@ -26,24 +25,6 @@ struct Insets {
 
     constexpr Insets(T start, T top, T end, T bottom)
         : start(start), top(top), end(end), bottom(bottom) {}
-
-    constexpr Math::Rect<T> shrink(Flow flow, Math::Rect<T> rect) const {
-        rect = flow.setStart(rect, flow.getStart(rect) + start);
-        rect = flow.setTop(rect, flow.getTop(rect) + top);
-        rect = flow.setEnd(rect, flow.getEnd(rect) - end);
-        rect = flow.setBottom(rect, flow.getBottom(rect) - bottom);
-
-        return rect;
-    }
-
-    constexpr Math::Rect<T> grow(Flow flow, Math::Rect<T> rect) const {
-        rect = flow.setStart(rect, flow.getStart(rect) - start);
-        rect = flow.setTop(rect, flow.getTop(rect) - top);
-        rect = flow.setEnd(rect, flow.getEnd(rect) + end);
-        rect = flow.setBottom(rect, flow.getBottom(rect) + bottom);
-
-        return rect;
-    }
 
     constexpr Math::Vec2<T> topStart() const {
         return {start, top};

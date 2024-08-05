@@ -3,6 +3,7 @@
 #include <karm-base/array.h>
 #include <karm-base/iter.h>
 
+#include "insets.h"
 #include "vec.h"
 
 namespace Karm::Math {
@@ -92,6 +93,38 @@ struct Radii {
 
         auto sumStart = res.h + res.a;
         scaleAll(sumStart > T{} ? size.height / sumStart : 1);
+        return res;
+    }
+
+    Radii shrink(Insets<T> insets) const {
+        auto res = *this;
+
+        res.a = max(res.a - insets.top, T{});
+        res.b = max(res.b - insets.start, T{});
+        res.c = max(res.c - insets.end, T{});
+        res.d = max(res.d - insets.top, T{});
+
+        res.e = max(res.e - insets.bottom, T{});
+        res.f = max(res.f - insets.end, T{});
+        res.g = max(res.g - insets.start, T{});
+        res.h = max(res.h - insets.bottom, T{});
+
+        return res;
+    }
+
+    Radii grow(Insets<T> insets) const {
+        auto res = *this;
+
+        res.a += insets.top;
+        res.b += insets.start;
+        res.c += insets.end;
+        res.d += insets.top;
+
+        res.e += insets.bottom;
+        res.f += insets.end;
+        res.g += insets.start;
+        res.h += insets.bottom;
+
         return res;
     }
 

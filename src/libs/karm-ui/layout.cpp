@@ -279,7 +279,7 @@ struct Insets : public ProxyNode<Insets> {
     }
 
     void layout(Math::Recti rect) override {
-        child().layout(_insets.shrink(Math::Flow::LEFT_TO_RIGHT, rect));
+        child().layout(rect.shrink(_insets));
     }
 
     Math::Vec2i size(Math::Vec2i s, Hint hint) override {
@@ -287,7 +287,7 @@ struct Insets : public ProxyNode<Insets> {
     }
 
     Math::Recti bound() override {
-        return _insets.grow(Math::Flow::LEFT_TO_RIGHT, child().bound());
+        return child().bound().grow(_insets);
     }
 };
 

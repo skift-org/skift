@@ -17,15 +17,15 @@ struct Box {
     }
 
     RectPx paddingBox() const {
-        return borders.shrink(Math::Flow::LEFT_TO_RIGHT, borderBox);
+        return borderBox.shrink(borders);
     }
 
     RectPx contentBox() const {
-        return paddings.shrink(Math::Flow::LEFT_TO_RIGHT, paddingBox());
+        return paddingBox().shrink(paddings);
     }
 
     RectPx marginBox() const {
-        return margins.grow(Math::Flow::LEFT_TO_RIGHT, borderBox);
+        return borderBox.grow(margins);
     }
 };
 

@@ -68,7 +68,7 @@ struct BoxStyle {
     }
 
     void paint(Gfx::Context &g, Math::Recti bound, auto inner) {
-        bound = padding.grow(Math::Flow::LEFT_TO_RIGHT, bound);
+        bound = bound.grow(padding);
 
         g.save();
         if (shadowStyle)
@@ -112,8 +112,8 @@ struct _Box : public ProxyNode<Crtp> {
     }
 
     void layout(Math::Recti rect) override {
-        rect = boxStyle().margin.shrink(Math::Flow::LEFT_TO_RIGHT, rect);
-        rect = boxStyle().padding.shrink(Math::Flow::LEFT_TO_RIGHT, rect);
+        rect = rect.shrink(boxStyle().margin);
+        rect = rect.shrink(boxStyle().padding);
 
         ProxyNode<Crtp>::child().layout(rect);
     }
@@ -131,7 +131,12 @@ struct _Box : public ProxyNode<Crtp> {
     }
 
     Math::Recti bound() override {
-        return boxStyle().padding.grow(Math::Flow::LEFT_TO_RIGHT, ProxyNode<Crtp>::child().bound());
+        auto bound = ProxyNode<Crtp>::child().bound();
+
+        bound = bound.grow(boxStyle().padding);
+        bound = bound.grow(boxStyle().margin);
+
+        return bound;
     }
 };
 

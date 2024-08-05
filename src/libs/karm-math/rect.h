@@ -3,6 +3,7 @@
 #include <karm-base/clamp.h>
 #include <karm-base/cons.h>
 
+#include "insets.h"
 #include "vec.h"
 
 namespace Karm::Math {
@@ -247,35 +248,49 @@ union Rect {
         );
     }
 
-    always_inline bool hasNan() const {
+    always_inline constexpr bool hasNan() const {
         return xy.hasNan() or wh.hasNan();
     }
 
-    always_inline Cons<Rect, Rect> hsplit(T v) const {
+    always_inline constexpr Cons<Rect, Rect> hsplit(T v) const {
         return {Rect{x, y, v, height}, Rect{x + v, y, width - v, height}};
     }
 
-    always_inline Cons<Rect, Rect> vsplit(T v) const {
+    always_inline constexpr Cons<Rect, Rect> vsplit(T v) const {
         return {Rect{x, y, width, v}, Rect{x, y + v, width, height - v}};
     }
 
-    always_inline Rect shrink(Vec2<T> v) const {
-        return {x + v.x, y + v.y, width - v.x * 2, height - v.y * 2};
+    always_inline constexpr Rect shrink(Insets<T> insets) const {
+        Rect res = *this;
+
+        res.x += insets.start;
+        res.y += insets.top;
+        res.width -= insets.start + insets.end;
+        res.height -= insets.top + insets.bottom;
+
+        return res;
     }
 
-    always_inline Rect grow(Vec2<T> v) const {
-        return {x - v.x, y - v.y, width + v.x * 2, height + v.y * 2};
+    always_inline constexpr Math::Rect<T> grow(Insets<T> insets) const {
+        Rect res = *this;
+
+        res.x -= insets.start;
+        res.y -= insets.top;
+        res.width += insets.start + insets.end;
+        res.height += insets.top + insets.bottom;
+
+        return res;
     }
 
-    always_inline Rect offset(Vec2<T> v) const {
+    always_inline constexpr Rect offset(Vec2<T> v) const {
         return {x + v.x, y + v.y, width, height};
     }
 
-    always_inline T area() const {
+    always_inline constexpr T area() const {
         return width * height;
     }
 
-    always_inline T aspect() const {
+    always_inline constexpr T aspect() const {
         return width / height;
     }
 

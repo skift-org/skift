@@ -28,7 +28,7 @@ struct FontFamily : public Fontface {
 
     FontFamily(Vec<Member> members) : _members(std::move(members)) {}
 
-    struct Builder : public Meta::NoCopy {
+    struct Builder : Meta::NoCopy {
         FontBook const &book;
         Vec<Member> members = {};
         FontAdjust adjust = {};

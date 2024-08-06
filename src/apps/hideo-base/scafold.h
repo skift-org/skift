@@ -34,7 +34,7 @@ inline Ui::Child bottombar(Meta::Same<Ui::Child> auto... children) {
     return bottombar({children...});
 }
 
-struct Scafold : public Meta::NoCopy {
+struct Scafold : Meta::NoCopy {
     Mdi::Icon icon;
     String title;
     TitlebarStyle titlebar = TitlebarStyle::DEFAULT;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-io/fmt.h>
+#include <karm-io/emit.h>
 
 namespace Karm::Cli {
 
@@ -110,6 +110,43 @@ struct Style {
         _reset = true;
         return *this;
     }
+
+    void repr([[maybe_unused]] Io::Emit &e) const {
+
+#ifdef __ck_karm_cli_backend_ansi__
+        if (_reset) {
+            e("\x1b[0m"s);
+        }
+
+        if (_fg != Karm::Cli::_COLOR_UNDEF) {
+            e("\x1b[{}m", _fg + 30);
+        }
+
+        if (_bg != Karm::Cli::_COLOR_UNDEF) {
+            e("\x1b[{}m", _bg + 40);
+        }
+
+        if (_bold) {
+            e("\x1b[1m"s);
+        }
+
+        if (_underline) {
+            e("\x1b[4m"s);
+        }
+
+        if (_blink) {
+            e("\x1b[5m"s);
+        }
+
+        if (_reverse) {
+            e("\x1b[7m"s);
+        }
+
+        if (_invisible) {
+            e("\x1b[8m"s);
+        }
+#endif
+    }
 };
 
 inline constexpr Style reset() {
@@ -133,53 +170,6 @@ inline auto styled(auto inner, Style style) {
 }
 
 } // namespace Karm::Cli
-
-template <>
-struct Karm::Io::Formatter<Karm::Cli::Style> {
-    Res<usize> format(Io::TextWriter &writer, Karm::Cli::Style style) {
-#ifdef __ck_karm_cli_backend_ansi__
-        usize written = 0;
-
-        if (style._reset) {
-            written += try$(writer.writeStr("\x1b[0m"s));
-        }
-
-        if (style._fg != Karm::Cli::_COLOR_UNDEF) {
-            written += try$(Io::format(writer, "\x1b[{}m", style._fg + 30));
-        }
-
-        if (style._bg != Karm::Cli::_COLOR_UNDEF) {
-            written += try$(Io::format(writer, "\x1b[{}m", style._bg + 40));
-        }
-
-        if (style._bold) {
-            written += try$(writer.writeStr("\x1b[1m"s));
-        }
-
-        if (style._underline) {
-            written += try$(writer.writeStr("\x1b[4m"s));
-        }
-
-        if (style._blink) {
-            written += try$(writer.writeStr("\x1b[5m"s));
-        }
-
-        if (style._reverse) {
-            written += try$(writer.writeStr("\x1b[7m"s));
-        }
-
-        if (style._invisible) {
-            written += try$(writer.writeStr("\x1b[8m"s));
-        }
-
-        return Ok(written);
-#else
-        (void)writer;
-        (void)style;
-        return Ok(0uz);
-#endif
-    }
-};
 
 template <typename T>
 struct Karm::Io::Formatter<Karm::Cli::Styled<T>> {

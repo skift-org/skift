@@ -9,7 +9,7 @@
 
 namespace Karm::Gfx {
 
-struct Canvas : public Meta::NoCopy {
+struct Canvas : Meta::NoCopy {
     // NOTE: Canvas is marked as NoCopy because it doesn't make sense to copy
     // a context. And it's also a good way to prevent accidental copies.
 

@@ -1,7 +1,7 @@
 #pragma once
 
+#include <karm-io/emit.h>
 #include <karm-io/expr.h>
-#include <karm-io/fmt.h>
 #include <karm-io/sscan.h>
 #include <mdi/spec.h>
 
@@ -39,6 +39,10 @@ struct Mime {
     Str str() const {
         return _buf;
     }
+
+    void repr(Io::Emit &e) const {
+        e("{}", str());
+    }
 };
 
 /// Try to sniff the mime type from a file extension.
@@ -52,10 +56,3 @@ Mdi::Icon iconFor(Mime const &mime);
 inline auto operator""_mime(char const *buf, usize len) {
     return Karm::Mime::Mime(Str(buf, len));
 }
-
-template <>
-struct Karm::Io::Formatter<Karm::Mime::Mime> {
-    Res<usize> format(Io::TextWriter &writer, Karm::Mime::Mime const &mime) {
-        return writer.writeStr(mime.str());
-    }
-};

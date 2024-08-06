@@ -3,7 +3,7 @@
 #include <karm-base/array.h>
 #include <karm-base/endian.h>
 #include <karm-io/aton.h>
-#include <karm-io/fmt.h>
+#include <karm-io/emit.h>
 
 namespace Karm::Sys {
 

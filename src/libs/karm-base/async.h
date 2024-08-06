@@ -213,7 +213,7 @@ static inline void detach(S s) {
 
 // MARK: Cancelation -----------------------------------------------------------
 
-struct Cancelation : public Meta::Static {
+struct Cancelation : Meta::Static {
     struct Token {
         Cancelation *_c = nullptr;
 
@@ -333,7 +333,7 @@ template <typename V = None, typename E = Error>
 using Future = _Future<Res<V, E>>;
 
 template <typename T>
-struct _Promise : public Meta::NoCopy {
+struct _Promise : Meta::NoCopy {
     Opt<Strong<State<T>>> _state;
 
     _Promise() : _state{makeStrong<State<T>>()} {}

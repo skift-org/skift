@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-io/fmt.h>
+#include <karm-io/emit.h>
 
 namespace Karm::Cli {
 
@@ -104,78 +104,86 @@ struct Cmd {
         return {CLEAR_LINE_BEFORE};
     }
 
-    Res<usize> write(Io::TextWriter &writer) const {
+    void repr([[maybe_unused]] Io::Emit &e) const {
 #ifdef __ck_karm_cli_backend_ansi__
         switch (_type) {
         case Cli::Cmd::SAVE:
-            return Io::format(writer, "\x1b[s");
+            e("\x1b[s");
+            break;
 
         case Cli::Cmd::RESTORE:
-            return Io::format(writer, "\x1b[u");
+            e("\x1b[u");
+            break;
 
         case Cli::Cmd::UP:
-            return Io::format(writer, "\x1b[{}A", _row);
+            e("\x1b[{}A", _row);
+            break;
 
         case Cli::Cmd::DOWN:
-            return Io::format(writer, "\x1b[{}B", _row);
+            e("\x1b[{}B", _row);
+            break;
 
         case Cli::Cmd::FORWARD:
-            return Io::format(writer, "\x1b[{}C", _col);
+            e("\x1b[{}C", _col);
+            break;
 
         case Cli::Cmd::BACKWARD:
-            return Io::format(writer, "\x1b[{}D", _col);
+            e("\x1b[{}D", _col);
+            break;
 
         case Cli::Cmd::NEXTLINE:
-            return Io::format(writer, "\x1b[{}E", _row);
+            e("\x1b[{}E", _row);
+            break;
 
         case Cli::Cmd::PREVLINE:
-            return Io::format(writer, "\x1b[{}F", _row);
+            e("\x1b[{}F", _row);
+            break;
 
         case Cli::Cmd::HORIZONTAL:
-            return Io::format(writer, "\x1b[{}G", _col);
+            e("\x1b[{}G", _col);
+            break;
 
         case Cli::Cmd::POSITION:
-            return Io::format(writer, "\x1b[{};{}H", _row, _col);
+            e("\x1b[{};{}H", _row, _col);
+            break;
 
         case Cli::Cmd::HIDE:
-            return Io::format(writer, "\x1b[?25l");
+            e("\x1b[?25l");
+            break;
 
         case Cli::Cmd::SHOW:
-            return Io::format(writer, "\x1b[?25h");
+            e("\x1b[?25h");
+            break;
 
         case Cli::Cmd::CLEAR_DISPLAY:
-            return Io::format(writer, "\x1b[2J");
+            e("\x1b[2J");
+            break;
 
         case Cli::Cmd::CLEAR_DISPLAY_AFTER:
-            return Io::format(writer, "\x1b[J");
+            e("\x1b[J");
+            break;
 
         case Cli::Cmd::CLEAR_DISPLAY_BEFORE:
-            return Io::format(writer, "\x1b[1J");
+            e("\x1b[1J");
+            break;
 
         case Cli::Cmd::CLEAR_LINE:
-            return Io::format(writer, "\x1b[2K");
+            e("\x1b[2K");
+            break;
 
         case Cli::Cmd::CLEAR_LINE_AFTER:
-            return Io::format(writer, "\x1b[K");
+            e("\x1b[K");
+            break;
 
         case Cli::Cmd::CLEAR_LINE_BEFORE:
-            return Io::format(writer, "\x1b[1K");
+            e("\x1b[1K");
+            break;
 
         default:
             panic("Invalid cursor move type");
         }
 #endif
-
-        (void)writer;
-        return Ok(0uz);
     }
 };
 
 } // namespace Karm::Cli
-
-template <>
-struct Karm::Io::Formatter<Cli::Cmd> {
-    Res<usize> format(Io::TextWriter &writer, Cli::Cmd const &move) {
-        return move.write(writer);
-    }
-};

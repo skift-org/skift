@@ -1473,7 +1473,6 @@ using _StyleProp = Union<
 enum struct Important {
     NO,
     YES,
-    VERY,
 };
 
 struct StyleProp : public _StyleProp {

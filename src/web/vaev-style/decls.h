@@ -9,6 +9,7 @@ Res<T> parseDeclarationValue(Cursor<Css::Sst> &c) {
     if constexpr (requires { T{}.parse(c); }) {
         T t;
         try$(t.parse(c));
+
         return Ok(std::move(t));
     } else {
         logError("missing parser for declaration: {}", T::name());
@@ -31,6 +32,7 @@ Res<P> parseDeclaration(Css::Sst const &sst) {
             return false;
 
         Cursor<Css::Sst> cursor = sst.content;
+
         auto res = parseDeclarationValue<T>(cursor);
         if (not res) {
             resDecl = res.none();
@@ -38,6 +40,12 @@ Res<P> parseDeclaration(Css::Sst const &sst) {
         }
 
         resDecl = Ok(res.take());
+
+        if constexpr (requires { P::important; }) {
+            if (cursor.skip(Css::Token::delim("!")) and cursor.skip(Css::Token::ident("important")))
+                resDecl.unwrap().important = Important::YES;
+        }
+
         return true;
     });
 

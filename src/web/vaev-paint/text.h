@@ -18,12 +18,12 @@ struct Text : public Node {
         auto baseline = _run->baseline();
         g.push();
         g.fillStyle(Gfx::BLACK);
-        g.fill(_run->_font, *_run, baseline);
+        g.fill(_run->_font, *_run, _topLeft + baseline);
         g.pop();
     }
 
     virtual void repr(Io::Emit &e) const {
-        e("(text)");
+        e("(text {})", _topLeft);
     }
 };
 

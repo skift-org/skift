@@ -9,7 +9,7 @@ void BlockFlow::placeChildren(Context &ctx, Box box) {
 
     Axis mainAxis = Axis::VERTICAL;
 
-    Px res = box.contentBox().start();
+    Px res = box.contentBox().top();
 
     for (auto &c : _frags) {
         auto childcontext = ctx.subContext(

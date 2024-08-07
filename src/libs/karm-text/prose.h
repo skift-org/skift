@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-gfx/context.h>
+#include <karm-gfx/canvas.h>
 #include <karm-logger/logger.h>
 
 #include "font.h"
@@ -178,9 +178,9 @@ struct Prose {
 
     // MARK: Paint -------------------------------------------------------------
 
-    void paint(Gfx::Context &g) const;
+    void paint(Gfx::Canvas &g);
 
-    void paintCaret(Gfx::Context &g, usize runeIndex, Gfx::Color color) const {
+    void paintCaret(Gfx::Canvas &g, usize runeIndex, Gfx::Color color) const {
         auto m = _style.font.metrics();
         auto baseline = queryPosition(runeIndex);
         auto cs = baseline - Math::Vec2f{0, m.ascend};

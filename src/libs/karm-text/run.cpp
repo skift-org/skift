@@ -66,45 +66,4 @@ Math::Vec2f Run::layout() {
     };
 }
 
-void Run::_fillGlyph(Gfx::Context &g, Font const &font, Math::Vec2f baseline, Glyph glyph) {
-    g._useSpaa = true;
-    g.save();
-    g.beginPath();
-    g.translate(baseline);
-    g.scale(font.fontsize);
-    font.fontface->contour(g, glyph);
-    g.fill();
-    g.restore();
-    g._useSpaa = false;
-}
-
-void Run::paint(Gfx::Context &g) const {
-    auto m = _font.metrics();
-
-    g.save();
-
-    g.strokeStyle({
-        .fill = g.current().fill,
-        .width = 1,
-        .align = Gfx::INSIDE_ALIGN,
-    });
-
-    for (auto &cell : _cells) {
-        auto glyph = cell.glyph;
-
-        if (glyph == Glyph::TOFU) {
-            g.stroke(
-                Math::Rectf::fromTwoPoint(
-                    {cell.xpos, 0 - m.ascend},
-                    {cell.xpos + cell.adv, 0 + m.descend}
-                )
-                    .shrink(4)
-            );
-        } else {
-            _fillGlyph(g, _font, {cell.xpos, 0}, cell.glyph);
-        }
-    }
-
-    g.restore();
-}
 } // namespace Karm::Text

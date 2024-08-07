@@ -61,18 +61,18 @@ struct DialogLayer : public LeafNode<DialogLayer> {
         _child->attach(this);
     }
 
-    void paint(Gfx::Context &g, Math::Recti r) override {
+    void paint(Gfx::Canvas &g, Math::Recti r) override {
         _child->paint(g, r);
 
         if (_visibility.value() > 0.001) {
-            g.save();
+            g.push();
             g.fillStyle(Ui::GRAY950.withOpacity(0.8 * _visibility.value()));
             g.fill(bound());
-            g.restore();
+            g.pop();
         }
 
         if (_dialog) {
-            g.save();
+            g.push();
             // change the orgin to the center of the screen
             g.translate(bound().center().cast<f64>());
             g.scale(Math::lerp(0.9, 1, _visibility.value()));
@@ -80,7 +80,7 @@ struct DialogLayer : public LeafNode<DialogLayer> {
 
             (*_dialog)->paint(g, r);
 
-            g.restore();
+            g.pop();
         }
     }
 

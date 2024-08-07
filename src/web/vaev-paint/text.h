@@ -15,11 +15,11 @@ struct Text : public Node {
     }
 
     virtual void paint(Gfx::Canvas &) {
-        // g.save();
+        // g.push();
         // g.translate(_topLeft + Math::Vec2f{0, _run->baseline()});
         // g.fillStyle(Gfx::BLACK);
         // _run->paint(g);
-        // g.restore();
+        // g.pop();
     }
 
     virtual void repr(Io::Emit &e) const {

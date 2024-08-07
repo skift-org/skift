@@ -7,6 +7,8 @@
 
 namespace Karm::Gfx {
 
+// MARK: Buffers ---------------------------------------------------------------
+
 void Context::begin(MutPixels p) {
     _pixels = p;
     _stack.pushBack({
@@ -39,285 +41,36 @@ Context::Scope const &Context::current() const {
     return last(_stack);
 }
 
-void Context::save() {
+// MARK: Context Operations ----------------------------------------------------
+
+void Context::push() {
     if (_stack.len() > 100) [[unlikely]]
-        panic("save/restore stack overflow");
+        panic("context stack overflow");
 
     _stack.pushBack(current());
 }
 
-void Context::restore() {
+void Context::pop() {
     if (_stack.len() == 1) [[unlikely]]
-        panic("restore without save");
+        panic("context without save");
 
     _stack.popBack();
 }
 
-// MARK: Origin & Clipping -----------------------------------------------------
-
-void Context::clip(Math::Recti rect) {
-    rect = current().trans.apply(rect.cast<f64>()).cast<isize>();
-    current().clip = rect.clipTo(current().clip);
+void Context::fillStyle(Fill fill) {
+    current().fill = fill;
 }
 
-void Context::origin(Math::Vec2i pos) {
-    translate(pos.cast<f64>());
+void Context::strokeStyle(Stroke style) {
+    current().stroke = style;
 }
-
-// MARK: Transform -------------------------------------------------------------
 
 void Context::transform(Math::Trans2f trans) {
     auto &t = current().trans;
     t = trans.multiply(t);
 }
 
-void Context::translate(Math::Vec2f pos) {
-    transform(Math::Trans2f::makeTranslate(pos));
-}
-
-void Context::scale(Math::Vec2f pos) {
-    transform(Math::Trans2f::makeScale(pos));
-}
-
-void Context::rotate(f64 angle) {
-    transform(Math::Trans2f::makeRotate(angle));
-}
-
-void Context::skew(Math::Vec2f pos) {
-    transform(Math::Trans2f::makeSkew(pos));
-}
-
-void Context::identity() {
-    current().trans = Math::Trans2f::IDENTITY;
-}
-
-// MARK: Fill & Stroke ---------------------------------------------------------
-
-Fill const &Context::fillStyle() {
-    return current().fill;
-}
-
-Stroke const &Context::strokeStyle() {
-    return current().stroke;
-}
-
-Context &Context::fillStyle(Fill fill) {
-    current().fill = fill;
-    return *this;
-}
-
-Context &Context::strokeStyle(Stroke style) {
-    current().stroke = style;
-    return *this;
-}
-
-// MARK: Drawing ---------------------------------------------------------------
-
-void Context::clear(Color color) {
-    clear(current().clip, color);
-}
-
-void Context::clear(Math::Recti rect, Color color) {
-    rect = current().trans.apply(rect.cast<f64>()).cast<isize>();
-    rect = current().clip.clipTo(rect);
-    mutPixels()
-        .clip(rect)
-        .clear(color);
-}
-
-// MARK: Blitting --------------------------------------------------------------
-
-[[gnu::flatten]] void Context::_blit(
-    Pixels src, Math::Recti srcRect, auto srcFmt,
-    MutPixels dest, Math::Recti destRect, auto destFmt
-) {
-
-    destRect = current().trans.apply(destRect.cast<f64>()).cast<isize>();
-    auto clipDest = current().clip.clipTo(destRect);
-
-    auto hratio = srcRect.height / (f64)destRect.height;
-    auto wratio = srcRect.width / (f64)destRect.width;
-
-    for (isize y = 0; y < clipDest.height; ++y) {
-        isize yy = clipDest.y - destRect.y + y;
-
-        auto srcY = srcRect.y + yy * hratio;
-        auto destY = clipDest.y + y;
-
-        for (isize x = 0; x < clipDest.width; ++x) {
-            isize xx = clipDest.x - destRect.x + x;
-
-            auto srcX = srcRect.x + xx * wratio;
-            auto destX = clipDest.x + x;
-
-            u8 const *srcPx = static_cast<u8 const *>(src.pixelUnsafe({(isize)srcX, (isize)srcY}));
-            u8 *destPx = static_cast<u8 *>(dest.pixelUnsafe({destX, destY}));
-            auto srcC = srcFmt.load(srcPx);
-            auto destC = destFmt.load(destPx);
-            destFmt.store(destPx, srcC.blendOver(destC));
-        }
-    }
-}
-
-void Context::blit(Math::Recti src, Math::Recti dest, Pixels p) {
-    auto d = mutPixels();
-    d.fmt().visit([&](auto dfmt) {
-        p.fmt().visit([&](auto pfmt) {
-            _blit(p, src, pfmt, d, dest, dfmt);
-        });
-    });
-}
-
-void Context::blit(Math::Recti dest, Pixels pixels) {
-    blit(pixels.bound(), dest, pixels);
-}
-
-void Context::blit(Math::Vec2i dest, Pixels pixels) {
-    blit(pixels.bound(), {dest, pixels.bound().wh}, pixels);
-}
-
-// MARK: Shapes ----------------------------------------------------------------
-
-void Context::stroke(Math::Edgef edge) {
-    beginPath();
-    moveTo(edge.start);
-    lineTo(edge.end);
-    stroke();
-}
-
-void Context::fill(Math::Edgef edge, f64 thickness) {
-    beginPath();
-    moveTo(edge.start);
-    lineTo(edge.end);
-    auto copy = strokeStyle();
-    stroke(copy.withWidth(thickness));
-}
-
-void Context::stroke(Math::Rectf r, Math::Radiif radii) {
-    beginPath();
-    rect(r, radii);
-    stroke();
-}
-
-[[gnu::flatten]] void Context::_fillRect(Math::Recti r, Gfx::Color color) {
-    r = current().trans.apply(r.cast<f64>()).cast<isize>();
-    r = current().clip.clipTo(r);
-
-    if (color.alpha == 255) {
-        mutPixels()
-            .clip(r)
-            .clear(color);
-    } else {
-        pixels().fmt().visit([&](auto f) {
-            for (isize y = r.y; y < r.y + r.height; ++y) {
-                for (isize x = r.x; x < r.x + r.width; ++x) {
-                    auto blended = color.blendOver(f.load(mutPixels().pixelUnsafe({x, y})));
-                    f.store(mutPixels().pixelUnsafe({x, y}), blended);
-                }
-            }
-        });
-    }
-}
-
-void Context::fill(Math::Recti r, Math::Radiif radii) {
-    beginPath();
-    rect(r.cast<f64>(), radii);
-
-    bool isSuitableForFastFill =
-        radii.zero() and
-        current().fill.is<Color>() and
-        current().trans.isIdentity();
-
-    if (isSuitableForFastFill) {
-        _fillRect(r, current().fill.unwrap<Color>());
-    } else {
-        fill();
-    }
-}
-
-void Context::fill(Math::Rectf r, Math::Radiif radii) {
-    beginPath();
-    rect(r, radii);
-    fill();
-}
-
-void Context::stroke(Math::Ellipsef e) {
-    beginPath();
-    ellipse(e);
-    stroke();
-}
-
-void Context::fill(Math::Ellipsef e) {
-    beginPath();
-    ellipse(e);
-    fill();
-}
-
-// stroke a path
-void Context::stroke(Math::Path const &path) {
-    _poly.clear();
-    createStroke(_poly, path, current().stroke);
-    _poly.transform(current().trans);
-    _fill(current().stroke.fill);
-}
-
-// fill a path
-void Context::fill(Math::Path const &path, FillRule rule) {
-    _poly.clear();
-    createSolid(_poly, path);
-    _poly.transform(current().trans);
-    _fill(current().fill, rule);
-}
-
-// MARK: Debug -----------------------------------------------------------------
-
-void Context::plot(Math::Vec2i point, Color color) {
-    point = current().trans.apply(point.cast<f64>()).cast<isize>();
-    if (current().clip.contains(point)) {
-        mutPixels().blend(point, color);
-    }
-}
-
-void Context::plot(Math::Edgei edge, Color color) {
-    isize dx = Math::abs(edge.ex - edge.sx);
-    isize sx = edge.sx < edge.ex ? 1 : -1;
-
-    isize dy = -Math::abs(edge.ey - edge.sy);
-    isize sy = edge.sy < edge.ey ? 1 : -1;
-
-    isize err = dx + dy, e2;
-
-    for (;;) {
-        plot(edge.start, color);
-        if (edge.sx == edge.ex and edge.sy == edge.ey)
-            break;
-        e2 = 2 * err;
-        if (e2 >= dy) {
-            err += dy;
-            edge.sx += sx;
-        }
-        if (e2 <= dx) {
-            err += dx;
-            edge.sy += sy;
-        }
-    }
-}
-
-void Context::plot(Math::Recti rect, Color color) {
-    rect = {rect.xy, rect.wh - 1};
-    plot(Math::Edgei{rect.topStart(), rect.topEnd()}, color);
-    plot(Math::Edgei{rect.topEnd(), rect.bottomEnd()}, color);
-    plot(Math::Edgei{rect.bottomEnd(), rect.bottomStart()}, color);
-    plot(Math::Edgei{rect.bottomStart(), rect.topStart()}, color);
-}
-
-void Context::plot(Gfx::Color color) {
-    for (auto edge : _poly) {
-        plot(edge.cast<isize>(), color);
-    }
-}
-
-// MARK: Paths -----------------------------------------------------------------
+// MARK: Path Operations -------------------------------------------------------
 
 void Context::_fillImpl(auto fill, auto format, FillRule fillRule) {
     _rast.fill(_poly, current().clip, fillRule, [&](Rast::Frag frag) {
@@ -397,10 +150,6 @@ void Context::arcTo(Math::Vec2f radii, f64 angle, Math::Vec2f p, Math::Path::Fla
     _path.arcTo(radii, angle, p, flags);
 }
 
-bool Context::evalSvg(Str path) {
-    return _path.evalSvg(path);
-}
-
 void Context::line(Math::Edgef line) {
     _path.line(line);
 }
@@ -413,33 +162,188 @@ void Context::rect(Math::Rectf rect, Math::Radiif radii) {
     _path.rect(rect, radii);
 }
 
+void Context::path(Math::Path const &path) {
+    _path.path(path);
+}
+
 void Context::ellipse(Math::Ellipsef ellipse) {
     _path.ellipse(ellipse);
 }
 
 void Context::fill(FillRule rule) {
-    fill(fillStyle(), rule);
-}
-
-void Context::fill(Fill fill, FillRule rule) {
     _poly.clear();
     createSolid(_poly, _path);
     _poly.transform(current().trans);
-    _fill(fill, rule);
+    _fill(current().fill, rule);
 }
 
 void Context::stroke() {
-    stroke(strokeStyle());
-}
-
-void Context::stroke(Stroke style) {
     _poly.clear();
-    createStroke(_poly, _path, style);
+    createStroke(_poly, _path, current().stroke);
     _poly.transform(current().trans);
-    _fill(style.fill);
+    _fill(current().stroke.fill);
 }
 
-// MARK: Effects ---------------------------------------------------------------
+void Context::clip(FillRule) {
+    notImplemented();
+}
+
+// MARK: Shape Operations ------------------------------------------------------
+
+[[gnu::flatten]] void Context::_fillRect(Math::Recti r, Gfx::Color color) {
+    r = current().trans.apply(r.cast<f64>()).cast<isize>();
+    r = current().clip.clipTo(r);
+
+    if (color.alpha == 255) {
+        mutPixels()
+            .clip(r)
+            .clear(color);
+    } else {
+        pixels().fmt().visit([&](auto f) {
+            for (isize y = r.y; y < r.y + r.height; ++y) {
+                for (isize x = r.x; x < r.x + r.width; ++x) {
+                    auto blended = color.blendOver(f.load(mutPixels().pixelUnsafe({x, y})));
+                    f.store(mutPixels().pixelUnsafe({x, y}), blended);
+                }
+            }
+        });
+    }
+}
+
+void Context::fill(Math::Recti r, Math::Radiif radii) {
+    beginPath();
+    rect(r.cast<f64>(), radii);
+
+    bool isSuitableForFastFill =
+        radii.zero() and
+        current().fill.is<Color>() and
+        current().trans.isIdentity();
+
+    if (isSuitableForFastFill) {
+        _fillRect(r, current().fill.unwrap<Color>());
+    } else {
+        fill(FillRule::NONZERO);
+    }
+}
+
+void Context::clip(Math::Rectf rect) {
+    rect = current().trans.apply(rect.cast<f64>());
+    current().clip = rect.cast<isize>().clipTo(current().clip);
+}
+
+void Context::stroke(Math::Path const &path) {
+    _poly.clear();
+    createStroke(_poly, path, current().stroke);
+    _poly.transform(current().trans);
+    _fill(current().stroke.fill);
+}
+
+void Context::fill(Math::Path const &path, FillRule rule) {
+    _poly.clear();
+    createSolid(_poly, path);
+    _poly.transform(current().trans);
+    _fill(current().fill, rule);
+}
+
+// MARK: Clear Operations ------------------------------------------------------
+
+void Context::clear(Color color) {
+    clear(current().clip, color);
+}
+
+void Context::clear(Math::Recti rect, Color color) {
+    rect = current().trans.apply(rect.cast<f64>()).cast<isize>();
+    rect = current().clip.clipTo(rect);
+    mutPixels()
+        .clip(rect)
+        .clear(color);
+}
+
+// MARK: Plot Operations ---------------------------------------------------
+
+void Context::plot(Math::Vec2i point, Color color) {
+    point = current().trans.apply(point.cast<f64>()).cast<isize>();
+    if (current().clip.contains(point)) {
+        mutPixels().blend(point, color);
+    }
+}
+
+void Context::plot(Math::Edgei edge, Color color) {
+    isize dx = Math::abs(edge.ex - edge.sx);
+    isize sx = edge.sx < edge.ex ? 1 : -1;
+
+    isize dy = -Math::abs(edge.ey - edge.sy);
+    isize sy = edge.sy < edge.ey ? 1 : -1;
+
+    isize err = dx + dy, e2;
+
+    for (;;) {
+        plot(edge.start, color);
+        if (edge.sx == edge.ex and edge.sy == edge.ey)
+            break;
+        e2 = 2 * err;
+        if (e2 >= dy) {
+            err += dy;
+            edge.sx += sx;
+        }
+        if (e2 <= dx) {
+            err += dx;
+            edge.sy += sy;
+        }
+    }
+}
+
+void Context::plot(Math::Recti rect, Color color) {
+    rect = {rect.xy, rect.wh - 1};
+    plot(Math::Edgei{rect.topStart(), rect.topEnd()}, color);
+    plot(Math::Edgei{rect.topEnd(), rect.bottomEnd()}, color);
+    plot(Math::Edgei{rect.bottomEnd(), rect.bottomStart()}, color);
+    plot(Math::Edgei{rect.bottomStart(), rect.topStart()}, color);
+}
+
+// MARK: Blit Operations -------------------------------------------------------
+
+[[gnu::flatten]] void Context::_blit(
+    Pixels src, Math::Recti srcRect, auto srcFmt,
+    MutPixels dest, Math::Recti destRect, auto destFmt
+) {
+    destRect = current().trans.apply(destRect.cast<f64>()).cast<isize>();
+    auto clipDest = current().clip.clipTo(destRect);
+
+    auto hratio = srcRect.height / (f64)destRect.height;
+    auto wratio = srcRect.width / (f64)destRect.width;
+
+    for (isize y = 0; y < clipDest.height; ++y) {
+        isize yy = clipDest.y - destRect.y + y;
+
+        auto srcY = srcRect.y + yy * hratio;
+        auto destY = clipDest.y + y;
+
+        for (isize x = 0; x < clipDest.width; ++x) {
+            isize xx = clipDest.x - destRect.x + x;
+
+            auto srcX = srcRect.x + xx * wratio;
+            auto destX = clipDest.x + x;
+
+            u8 const *srcPx = static_cast<u8 const *>(src.pixelUnsafe({(isize)srcX, (isize)srcY}));
+            u8 *destPx = static_cast<u8 *>(dest.pixelUnsafe({destX, destY}));
+            auto srcC = srcFmt.load(srcPx);
+            auto destC = destFmt.load(destPx);
+            destFmt.store(destPx, srcC.blendOver(destC));
+        }
+    }
+}
+
+void Context::blit(Math::Recti src, Math::Recti dest, Pixels p) {
+    auto d = mutPixels();
+    d.fmt().visit([&](auto dfmt) {
+        p.fmt().visit([&](auto pfmt) {
+            _blit(p, src, pfmt, d, dest, dfmt);
+        });
+    });
+}
+
+// MARK: Filter Operations -----------------------------------------------------
 
 void Context::apply(Filter filter) {
     apply(filter, pixels().bound());

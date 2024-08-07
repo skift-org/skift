@@ -1,4 +1,4 @@
-#include <karm-gfx/context.h>
+#include <karm-gfx/canvas.h>
 
 #include "icon.h"
 
@@ -12,27 +12,27 @@ Strong<Text::Fontface> Icon::fontface() {
     return *_fontface;
 }
 
-void Icon::fill(Gfx::Context &g, Math::Vec2i pos) const {
+void Icon::fill(Gfx::Canvas &g, Math::Vec2i pos) const {
     auto face = fontface();
-    g.save();
+    g.push();
     g.beginPath();
-    g.origin(pos + Math::Vec2i{0, (isize)(face->metrics().ascend * _size)});
+    g.origin(pos + Math::Vec2f{0, face->metrics().ascend * _size});
     g.scale(_size);
     face->contour(g, face->glyph((Rune)_code));
     g.fill();
-    g.restore();
+    g.pop();
 }
 
-void Icon::stroke(Gfx::Context &g, Math::Vec2i pos) const {
+void Icon::stroke(Gfx::Canvas &g, Math::Vec2i pos) const {
     auto face = fontface();
 
-    g.save();
+    g.push();
     g.beginPath();
-    g.origin(pos + Math::Vec2i{0, (isize)(face->metrics().ascend * _size)});
+    g.origin(pos + Math::Vec2f{0, face->metrics().ascend * _size});
     g.scale(_size);
     face->contour(g, face->glyph((Rune)_code));
     g.stroke();
-    g.restore();
+    g.pop();
 }
 
 } // namespace Karm::Media

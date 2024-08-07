@@ -10,10 +10,6 @@ struct Canvas : public Gfx::Canvas {
     Io::StringWriter _buf;
     Math::Vec2f _p;
 
-    Io::Emit emit() {
-        return _buf;
-    }
-
     Math::Vec2f _mapPoint(Math::Vec2f p, Math::Path::Flags flags) {
         if (flags & Math::Path::RELATIVE)
             return p;
@@ -23,6 +19,28 @@ struct Canvas : public Gfx::Canvas {
     Math::Vec2f _mapPointAndUpdate(Math::Vec2f p, Math::Path::Flags flags) {
         return _p = _mapPoint(p, flags);
     }
+
+    Io::Emit emit() {
+        return _buf;
+    }
+
+    Bytes bytes() const {
+        return _buf.bytes();
+    }
+
+    // MARK: Context Operations ------------------------------------------------
+
+    void push() override;
+
+    void pop() override;
+
+    void fillStyle(Gfx::Fill) override;
+
+    void strokeStyle(Gfx::Stroke) override;
+
+    void transform(Math::Trans2f trans) override;
+
+    // MARK: Path Operations ---------------------------------------------------
 
     void beginPath() override;
 
@@ -50,13 +68,41 @@ struct Canvas : public Gfx::Canvas {
 
     void rect(Math::Rectf rect, Math::Radiif radii = 0) override;
 
+    void path(Math::Path const &path) override;
+
+    void fill(Gfx::FillRule rule) override;
+
     void fill(Gfx::Fill fill, Gfx::FillRule rule) override;
+
+    void stroke() override;
 
     void stroke(Gfx::Stroke style) override;
 
-    Bytes bytes() const {
-        return _buf.bytes();
-    }
+    void clip(Gfx::FillRule rule) override;
+
+    void apply(Gfx::Filter filter) override;
+
+    // MARK: Shape Operations --------------------------------------------------
+
+    // MARK: Clear Operations --------------------------------------------------
+
+    void clear(Gfx::Color color) override;
+
+    void clear(Math::Recti rect, Gfx::Color color) override;
+
+    // MARK: Plot Operations ---------------------------------------------------
+
+    void plot(Math::Vec2i point, Gfx::Color color) override;
+
+    void plot(Math::Edgei edge, Gfx::Color color) override;
+
+    void plot(Math::Recti rect, Gfx::Color color) override;
+
+    // MARK: Blit Operations ---------------------------------------------------
+
+    void blit(Math::Recti src, Math::Recti dest, Gfx::Pixels pixels) override;
+
+    // MARK: Filter Operations -------------------------------------------------
 };
 
 } // namespace Karm::Pdf

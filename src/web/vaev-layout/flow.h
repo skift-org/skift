@@ -29,7 +29,7 @@ struct Flow : public Frag {
 
     void makePaintables(Paint::Stack &stack) override;
 
-    void paintWireframe(Gfx::Context &g) override;
+    void paintWireframe(Gfx::Canvas &g) override;
 
     void repr(Io::Emit &e) const override;
 };

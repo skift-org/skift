@@ -33,16 +33,16 @@ struct SlideIn : public ProxyNode<SlideIn> {
         return lerp(outside(), Math::Vec2f{}, _slide.value()).cast<isize>();
     }
 
-    void paint(Gfx::Context &g, Math::Recti r) override {
-        g.save();
+    void paint(Gfx::Canvas &g, Math::Recti r) override {
+        g.push();
 
         g.clip(bound());
         auto anim = translation();
-        g.origin(anim);
+        g.origin(anim.cast<f64>());
         r.xy = r.xy - anim;
         child().paint(g, r);
 
-        g.restore();
+        g.pop();
     }
 
     void event(App::Event &e) override {
@@ -81,14 +81,14 @@ struct ScaleIn : public ProxyNode<ScaleIn> {
         return {_scale.value(), _scale.value()};
     }
 
-    void paint(Gfx::Context &g, Math::Recti r) override {
-        g.save();
+    void paint(Gfx::Canvas &g, Math::Recti r) override {
+        g.push();
         g.clip(bound());
-        g.origin(bound().center());
+        g.origin(bound().center().cast<f64>());
         g.scale(scale());
-        g.origin(-bound().center());
+        g.origin(-bound().center().cast<f64>());
         child().paint(g, r);
-        g.restore();
+        g.pop();
     }
 
     void event(App::Event &e) override {
@@ -136,15 +136,15 @@ struct Carousel : public GroupNode<Carousel> {
         };
     }
 
-    void paint(Gfx::Context &g, Math::Recti r) override {
-        g.save();
+    void paint(Gfx::Canvas &g, Math::Recti r) override {
+        g.push();
         g.clip(bound());
         auto anim = translation();
-        g.origin(anim);
+        g.origin(anim.cast<f64>());
         for (auto &child : children()) {
             child->paint(g, r);
         }
-        g.restore();
+        g.pop();
     }
 
     void event(App::Event &e) override {

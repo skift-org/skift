@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-gfx/context.h>
+#include <karm-gfx/canvas.h>
 
 #include "base.h"
 #include "font.h"
@@ -71,9 +71,9 @@ struct Run {
 
     Math::Vec2f layout();
 
-    static void _fillGlyph(Gfx::Context &g, Font const &font, Math::Vec2f baseline, Glyph glyph);
+    static void _fillGlyph(Gfx::Canvas &g, Font const &font, Math::Vec2f baseline, Glyph glyph);
 
-    void paint(Gfx::Context &g) const;
+    void paint(Gfx::Canvas &g) const;
 };
 
 } // namespace Karm::Text

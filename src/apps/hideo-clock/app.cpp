@@ -17,20 +17,20 @@ struct Clock : public Ui::View<Clock> {
         _time = o._time;
     }
 
-    void _drawHand(Gfx::Context &g, f64 angle, f64 length, Gfx::Color color, f64 width) {
-        g.save();
+    void _drawHand(Gfx::Canvas &g, f64 angle, f64 length, Gfx::Color color, f64 width) {
+        g.push();
         g.beginPath();
         g.translate(bound().center().cast<f64>());
         g.rotate(angle);
         g.line({0, {0, -length}});
         g.stroke(Gfx::stroke(color).withWidth(width).withCap(Gfx::ROUND_CAP).withAlign(Gfx::CENTER_ALIGN));
-        g.restore();
+        g.pop();
     }
 
-    void paint(Gfx::Context &g, Math::Recti) override {
+    void paint(Gfx::Canvas &g, Math::Recti) override {
         auto size = bound().size().min();
 
-        g.save();
+        g.push();
 
         g.fillStyle(Ui::GRAY800);
         g.fill(Math::Ellipsef{bound().center().cast<f64>(), size / 2.});
@@ -42,7 +42,7 @@ struct Clock : public Ui::View<Clock> {
         g.fillStyle(Ui::GRAY600);
         g.fill(Math::Ellipsef{bound().center().cast<f64>(), size / 32.});
 
-        g.restore();
+        g.pop();
     }
 };
 

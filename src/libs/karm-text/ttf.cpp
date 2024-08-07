@@ -76,7 +76,7 @@ f64 TtfFontface::kern(Glyph prev, Glyph curr) {
     return k;
 }
 
-void TtfFontface::contour(Gfx::Context &g, Glyph glyph) const {
+void TtfFontface::contour(Gfx::Canvas &g, Glyph glyph) const {
     g.scale(1.0 / _unitPerEm);
     _parser.glyphContour(g, glyph);
 }

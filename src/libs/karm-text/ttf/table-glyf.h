@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-gfx/context.h>
+#include <karm-gfx/canvas.h>
 #include <karm-io/bscan.h>
 #include <karm-logger/logger.h>
 
@@ -59,7 +59,7 @@ struct Glyf : public Io::BChunk {
         i16 y;
     };
 
-    void contourSimple(Gfx::Context &g, Metrics m, Io::BScan &s) const {
+    void contourSimple(Gfx::Canvas &g, Metrics m, Io::BScan &s) const {
         auto endPtsOfContours = s;
         auto nPoints = s.peek(2 * (m.numContours - 1)).nextU16be() + 1u;
         u16 instructionLength = s.skip(m.numContours * 2).nextU16be();
@@ -153,11 +153,11 @@ struct Glyf : public Io::BChunk {
         }
     }
 
-    void contourComposite(Gfx::Context &, Metrics, Io::BScan &) const {
+    void contourComposite(Gfx::Canvas &, Metrics, Io::BScan &) const {
         logDebug("composite glyph not implemented");
     }
 
-    void contour(Gfx::Context &g, usize glyfOffset) const {
+    void contour(Gfx::Canvas &g, usize glyfOffset) const {
         auto s = begin();
         auto m = metrics(s, glyfOffset);
 

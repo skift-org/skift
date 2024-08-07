@@ -35,7 +35,7 @@ struct Context : public Canvas {
     LcdLayout _lcdLayout = RGB;
     bool _useSpaa = false;
 
-    // MARK: Scope -------------------------------------------------------------
+    // MARK: Buffers -----------------------------------------------------------
 
     // Begin drawing operations on the given pixels.
     void begin(MutPixels p);
@@ -46,7 +46,7 @@ struct Context : public Canvas {
     // Get the pixels being drawn on.
     MutPixels mutPixels();
 
-    // Get the pxeils being drawn on.
+    // Get the pixels being drawn on.
     Pixels pixels() const;
 
     // Get the current scope.
@@ -55,86 +55,87 @@ struct Context : public Canvas {
     // Get the current scope.
     Scope const &current() const;
 
-    // Push a new scope.
-    void save();
+    // MARK: Context Operations ------------------------------------------------
 
-    // Pop the current scope.
-    void restore();
+    void push() override;
 
-    // A closure that receives a new Context as input.This context represents a
-    // new transparency layer that you can draw into.When the closure returns,
-    // karm-ui draws the new layer into the current context.
-    void layer(auto inner) {
-        layer({}, inner);
-    }
+    void pop() override;
 
-    // A closure that receives a new Context as input.This context represents a
-    // new transparency layer that you can draw into.When the closure returns,
-    // karm-ui draws the new layer into the current context.
-    void layer(Math::Vec2i offset, auto inner) {
-        auto old = mutPixels();
-        auto layer = Surface::alloc(
-            pixels().size(),
-            pixels().fmt()
-        );
+    void fillStyle(Fill style) override;
 
-        _pixels = layer->mutPixels();
-        inner(*this);
-        _pixels = old;
-        blit(offset, layer->pixels());
-    }
+    void strokeStyle(Stroke style) override;
 
-    // MARK: Origin & Clipping -------------------------------------------------
+    void transform(Math::Trans2f trans) override;
 
-    // Set the current clipping rectangle.
-    void clip(Math::Recti rect);
+    // MARK: Path Operations ---------------------------------------------------
 
-    // Set the current origin.
-    void origin(Math::Vec2i pos);
+    // (internal) Fill the current shape with the given fill.
+    // NOTE: The shape must be flattened before calling this function.
+    void _fillImpl(auto fill, auto format, FillRule fillRule);
+    void _FillSmoothImpl(auto fill, auto format, FillRule fillRule);
+    void _fill(Fill fill, FillRule rule = FillRule::NONZERO);
 
-    // MARK: Transform ---------------------------------------------------------
+    void beginPath() override;
 
-    // Transform subsequent drawing operations using the given matrix.
-    void transform(Math::Trans2f trans);
+    void closePath() override;
 
-    // Translate subsequent drawing operations.
-    void translate(Math::Vec2f pos);
+    void moveTo(Math::Vec2f p, Math::Path::Flags flags) override;
 
-    // Scale subsequent drawing operations.
-    void scale(Math::Vec2f pos);
+    void lineTo(Math::Vec2f p, Math::Path::Flags flags) override;
 
-    // Rotate subsequent drawing operations.
-    void rotate(f64 angle);
+    void hlineTo(f64 x, Math::Path::Flags flags) override;
 
-    // Skew subsequent drawing operations.
-    void skew(Math::Vec2f pos);
+    void vlineTo(f64 y, Math::Path::Flags flags) override;
 
-    // Reset the transformation matrix to the identity matrix.
-    void identity();
+    void cubicTo(Math::Vec2f cp1, Math::Vec2f cp2, Math::Vec2f p, Math::Path::Flags flags) override;
 
-    // MARK: Fill & Stroke -----------------------------------------------------
+    void quadTo(Math::Vec2f cp, Math::Vec2f p, Math::Path::Flags flags) override;
 
-    // Get the current fill style.
-    Fill const &fillStyle();
+    void arcTo(Math::Vec2f radii, f64 angle, Math::Vec2f p, Math::Path::Flags flags) override;
 
-    // Get the current stroke style.
-    Stroke const &strokeStyle();
+    void line(Math::Edgef line) override;
 
-    // Set the current fill style.
-    Context &fillStyle(Fill style);
+    void curve(Math::Curvef curve) override;
 
-    // Set the current stroke style.
-    Context &strokeStyle(Stroke style);
+    void rect(Math::Rectf rect, Math::Radiif radii) override;
 
-    // MARK: Drawing -----------------------------------------------------------
+    void path(Math::Path const &path) override;
 
-    // Clear all pixels with respect to the current origin and clip.
-    void clear(Color color = BLACK);
+    void ellipse(Math::Ellipsef ellipse) override;
 
-    // Clear the given rectangle with respect to the current origin and clip.
-    void clear(Math::Recti rect, Color color = BLACK);
+    void fill(FillRule rule) override;
 
-    // MARK: Blitting ----------------------------------------------------------
+    void stroke() override;
+
+    void clip(FillRule rule) override;
+
+    // MARK: Shape Operations --------------------------------------------------
+
+    void _fillRect(Math::Recti r, Gfx::Color color);
+
+    void fill(Math::Recti rect, Math::Radiif radii) override;
+
+    void clip(Math::Rectf rect) override;
+
+    void stroke(Math::Path const &path) override;
+
+    void fill(Math::Path const &path, FillRule rule = FillRule::NONZERO) override;
+
+    // MARK: Clear Operations --------------------------------------------------
+
+    void clear(Color color = BLACK) override;
+
+    void clear(Math::Recti rect, Color color = BLACK) override;
+
+    // MARK: Plot Operations ---------------------------------------------------
+
+    void plot(Math::Vec2i point, Color color) override;
+
+    void plot(Math::Edgei edge, Color color) override;
+
+    void plot(Math::Recti rect, Color color) override;
+
+    // MARK: Blit Operations ---------------------------------------------------
 
     void _blit(
         Pixels src,
@@ -146,120 +147,12 @@ struct Context : public Canvas {
         auto destFmt
     );
 
-    // Blit the given pixels to the current pixels
-    // using the given source and destination rectangles.
-    void blit(Math::Recti src, Math::Recti dest, Pixels pixels);
+    void blit(Math::Recti src, Math::Recti dest, Pixels pixels) override;
 
-    // Blit the given pixels to the current pixels.
-    // The source rectangle is the entire piels.
-    void blit(Math::Recti dest, Pixels pixels);
+    // MARK: Filter Operations -------------------------------------------------
 
-    // Blit the given pixels to the current pixels at the given position.
-    void blit(Math::Vec2i dest, Pixels pixels);
+    void apply(Filter filter) override;
 
-    // MARK: Shapes ------------------------------------------------------------
-
-    // Stroke a line
-    void stroke(Math::Edgef edge);
-
-    // Fill a line with the given thickness.
-    void fill(Math::Edgef edge, f64 thickness = 1.0f);
-
-    // Stroke a rectangle.
-    void stroke(Math::Rectf rect, Math::Radiif radii = 0);
-
-    // Fast path for filling simple rectangles without a border radii.
-    void _fillRect(Math::Recti r, Gfx::Color color);
-
-    // Fill a rectangle.
-    void fill(Math::Recti rect, Math::Radiif radii = 0);
-
-    // Fill a rectangle.
-    void fill(Math::Rectf rect, Math::Radiif radii = 0);
-
-    // Stroke an ellipse.
-    void stroke(Math::Ellipsef e);
-
-    // Fill an ellipse.
-    void fill(Math::Ellipsef e);
-
-    // stroke a path
-    void stroke(Math::Path const &path);
-
-    // fill a path
-    void fill(Math::Path const &path, FillRule rule = FillRule::NONZERO);
-
-    // MARK: Debug -------------------------------------------------------------
-    // These functions are mostly for debugging purposes. They let you draw
-    // non-antialiased shapes and lines.
-
-    // Plot a point.
-    void plot(Math::Vec2i point, Color color);
-
-    // Draw a line.
-    void plot(Math::Edgei edge, Color color);
-
-    // Draw a rectangle.
-    void plot(Math::Recti rect, Color color);
-
-    // Draw the current path as a polygon.
-    void plot(Gfx::Color color);
-
-    // MARK: Paths -------------------------------------------------------------
-
-    // (internal) Fill the current shape with the given fill.
-    // NOTE: The shape must be flattened before calling this function.
-    void _fillImpl(auto fill, auto format, FillRule fillRule);
-    void _FillSmoothImpl(auto fill, auto format, FillRule fillRule);
-    void _fill(Fill fill, FillRule rule = FillRule::NONZERO);
-
-    // Begin a new path.
-    void beginPath() override;
-
-    // Close the current path. This will connect the last point to the first
-    void closePath() override;
-
-    void moveTo(Math::Vec2f p, Math::Path::Flags flags = Math::Path::DEFAULT) override;
-
-    void lineTo(Math::Vec2f p, Math::Path::Flags flags = Math::Path::DEFAULT) override;
-
-    void hlineTo(f64 x, Math::Path::Flags flags = Math::Path::DEFAULT) override;
-
-    void vlineTo(f64 y, Math::Path::Flags flags = Math::Path::DEFAULT) override;
-
-    void cubicTo(Math::Vec2f cp1, Math::Vec2f cp2, Math::Vec2f p, Math::Path::Flags flags = Math::Path::DEFAULT) override;
-
-    void quadTo(Math::Vec2f cp, Math::Vec2f p, Math::Path::Flags flags = Math::Path::DEFAULT) override;
-
-    void arcTo(Math::Vec2f radii, f64 angle, Math::Vec2f p, Math::Path::Flags flags = Math::Path::DEFAULT) override;
-
-    // Evaluate the given SVG path and add it to the current path.
-    bool evalSvg(Str path);
-
-    void line(Math::Edgef line) override;
-
-    void curve(Math::Curvef curve) override;
-
-    void rect(Math::Rectf rect, Math::Radiif radii = 0) override;
-
-    void ellipse(Math::Ellipsef ellipse) override;
-
-    // Fill the current path.
-    void fill(FillRule rule = FillRule::NONZERO);
-
-    void fill(Fill fill, FillRule rule = FillRule::NONZERO) override;
-
-    // Stroke the current path.
-    void stroke();
-
-    void stroke(Stroke style) override;
-
-    // MARK: Filters -----------------------------------------------------------
-
-    // Apply the given filter to the current pixels.
-    void apply(Filter filter);
-
-    // Apply the given filter to the given region of the current pixels.
     void apply(Filter filter, Math::Recti region);
 };
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-base/string.h>
-#include <karm-gfx/context.h>
+#include <karm-gfx/canvas.h>
 #include <karm-io/bscan.h>
 #include <karm-logger/logger.h>
 

@@ -18,7 +18,7 @@ void Flow::makePaintables(Paint::Stack &stack) {
     }
 }
 
-void Flow::paintWireframe(Gfx::Context &g) {
+void Flow::paintWireframe(Gfx::Canvas &g) {
     for (auto &c : _frags) {
         c->paintWireframe(g);
     }

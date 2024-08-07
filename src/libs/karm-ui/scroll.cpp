@@ -48,23 +48,23 @@ struct Scroll : public ProxyNode<Scroll> {
         return Math::Recti{bound().end() - SCROLL_BAR_WIDTH, bound().top(), SCROLL_BAR_WIDTH, bound().height};
     }
 
-    void paint(Gfx::Context &g, Math::Recti r) override {
-        g.save();
+    void paint(Gfx::Canvas &g, Math::Recti r) override {
+        g.push();
         g.clip(_bound);
-        g.origin(_scroll.cast<isize>());
+        g.origin(_scroll);
         r.xy = r.xy - _scroll.cast<isize>();
         child().paint(g, r);
 
         if (debugShowScrollBounds)
             g.plot(child().bound(), Gfx::PINK);
 
-        g.restore();
+        g.pop();
 
         if (debugShowScrollBounds)
             g.plot(_bound, Gfx::CYAN);
 
         // draw scroll bar
-        g.save();
+        g.push();
         g.clip(_bound);
 
         auto childBound = child().bound();
@@ -85,7 +85,7 @@ struct Scroll : public ProxyNode<Scroll> {
             g.fill(Math::Recti{bound().end() - SCROLL_BAR_WIDTH, (isize)scrollBarY, SCROLL_BAR_WIDTH, scrollBarHeight});
         }
 
-        g.restore();
+        g.pop();
     }
 
     void event(App::Event &e) override {
@@ -202,11 +202,11 @@ struct Clip : public ProxyNode<Clip> {
     Clip(Child child, Math::Orien orient)
         : ProxyNode(child), _orient(orient) {}
 
-    void paint(Gfx::Context &g, Math::Recti r) override {
-        g.save();
+    void paint(Gfx::Canvas &g, Math::Recti r) override {
+        g.push();
         g.clip(_bound);
         child().paint(g, r);
-        g.restore();
+        g.pop();
     }
 
     void layout(Math::Recti r) override {

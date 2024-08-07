@@ -294,17 +294,17 @@ struct Input : public View<Input> {
         return *_text;
     }
 
-    void paint(Gfx::Context &g, Math::Recti) override {
-        g.save();
+    void paint(Gfx::Canvas &g, Math::Recti) override {
+        g.push();
         g.clip(bound());
-        g.origin(bound().xy);
+        g.origin(bound().xy.cast<f64>());
 
         auto &text = _ensureText();
 
         text.paintCaret(g, _model->_cur.head, Ui::ACCENT500);
         text.paint(g);
 
-        g.restore();
+        g.pop();
         if (debugShowLayoutBounds)
             g.plot(bound(), Gfx::CYAN);
     }

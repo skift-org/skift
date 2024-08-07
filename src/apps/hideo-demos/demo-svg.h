@@ -16,10 +16,13 @@ static inline Demo SVG_DEMO{
     "SVG rendering",
     [] {
         return Ui::canvas(
-            [](Gfx::Context &g, ...) {
+            [](Gfx::Canvas &g, ...) {
                 g.beginPath();
-                g.evalSvg(CAT);
 
+                Math::Path p;
+                p.evalSvg(CAT);
+
+                g.path(p);
                 g.fillStyle(Ui::GRAY700);
                 g.fill();
 

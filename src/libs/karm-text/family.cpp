@@ -123,7 +123,7 @@ f64 FontFamily::kern(Glyph prev, Glyph curr) {
     return k * member.adjust.sizeAdjust * _adjust.sizeAdjust;
 }
 
-void FontFamily::contour(Gfx::Context &g, Glyph glyph) const {
+void FontFamily::contour(Gfx::Canvas &g, Glyph glyph) const {
     auto &member = _members[glyph.font];
     g.scale(_adjust.sizeAdjust * member.adjust.sizeAdjust);
     member.face->contour(g, glyph);

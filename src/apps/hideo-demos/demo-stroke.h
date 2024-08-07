@@ -12,7 +12,7 @@ static inline Demo STROKE_DEMO{
     "Strokes styling and rendering",
     [] {
         return Ui::canvas(
-            [](Gfx::Context &g, ...) {
+            [](Gfx::Canvas &g, ...) {
                 g.beginPath();
                 g.translate({100, 100});
                 g.moveTo({0, 0});

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-gfx/context.h>
+#include <karm-gfx/canvas.h>
 #include <karm-gfx/fill.h>
 #include <karm-math/curve.h>
 #include <karm-math/radii.h>

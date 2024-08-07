@@ -144,6 +144,8 @@ struct Path {
 
     void ellipse(Math::Ellipsef ellipse);
 
+    void path(Math::Path const &path);
+
     // MARK: Svg ---------------------------------------------------------------
 
     Opt<Math::Vec2f> _nextVec2f(Io::SScan &scan);

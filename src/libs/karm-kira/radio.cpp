@@ -16,8 +16,8 @@ struct Radio : public Ui::View<Radio> {
         _onChange = std::move(o._onChange);
     }
 
-    void paint(Gfx::Context &g, Math::Recti) override {
-        g.save();
+    void paint(Gfx::Canvas &g, Math::Recti) override {
+        g.push();
         if (_value) {
             g.fillStyle(_mouseListener.isHover() ? Ui::ACCENT600 : Ui::ACCENT700);
             g.fill(bound(), 999);
@@ -38,7 +38,7 @@ struct Radio : public Ui::View<Radio> {
                 g.stroke(bound().cast<f64>(), 999);
             }
         }
-        g.restore();
+        g.pop();
     }
 
     void event(App::Event &e) override {

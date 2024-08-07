@@ -58,7 +58,7 @@ struct FontFamily : public Fontface {
 
     f64 kern(Glyph prev, Glyph curr) override;
 
-    void contour(Gfx::Context &g, Glyph glyph) const override;
+    void contour(Gfx::Canvas &g, Glyph glyph) const override;
 };
 
 } // namespace Karm::Text

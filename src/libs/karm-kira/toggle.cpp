@@ -22,8 +22,8 @@ struct Toggle : public Ui::View<Toggle> {
         _onChange = std::move(o._onChange);
     }
 
-    void paint(Gfx::Context &g, Math::Recti) override {
-        g.save();
+    void paint(Gfx::Canvas &g, Math::Recti) override {
+        g.push();
 
         Math::Recti thumb = {
             bound().x + (isize)(6 + 26 * _anim.value()),
@@ -54,7 +54,7 @@ struct Toggle : public Ui::View<Toggle> {
             g.stroke(bound().cast<f64>(), 999);
         }
 
-        g.restore();
+        g.pop();
     }
 
     void event(App::Event &e) override {

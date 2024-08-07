@@ -116,7 +116,7 @@ Child image(Image::Picture image, Math::Radiif radii);
 
 // MARK: Canvas ----------------------------------------------------------------
 
-using OnPaint = Func<void(Gfx::Context &g, Math::Vec2i size)>;
+using OnPaint = Func<void(Gfx::Canvas &g, Math::Vec2i size)>;
 
 Child canvas(OnPaint onPaint);
 

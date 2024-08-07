@@ -23,7 +23,7 @@ static inline Demo BEZIER_DEMO{
         using Model = Ui::Model<Math::Curvef, Edit, reduce>;
         return Ui::reducer<Model>(Math::Curvef::linear(100, 300), [](Math::Curvef const &s) {
             auto canvas = Ui::canvas(
-                [=](Gfx::Context &g, Math::Vec2i) {
+                [=](Gfx::Canvas &g, Math::Vec2i) {
                     g.beginPath();
                     g.moveTo(s.a);
                     g.cubicTo(s.b, s.c, s.d);

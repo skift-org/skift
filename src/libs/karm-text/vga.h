@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-base/array.h>
-#include <karm-gfx/context.h>
+#include <karm-gfx/canvas.h>
 
 #include "font.h"
 
@@ -47,7 +47,7 @@ struct VgaFontface : public Fontface {
         return 0;
     }
 
-    void contour(Gfx::Context &g, Glyph glyph) const override {
+    void contour(Gfx::Canvas &g, Glyph glyph) const override {
         g.scale(1 / UNIT_PER_EM);
         for (isize y = 0; y < HEIGHT; y++) {
             for (isize x = 0; x < WIDTH; x++) {

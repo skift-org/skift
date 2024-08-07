@@ -24,6 +24,25 @@ struct HsvSquare : public Ui::View<HsvSquare> {
         _onChange = std::move(o._onChange);
     }
 
+    auto makeHsvSquare() {
+        auto surf = Gfx::Surface::alloc({256, 256});
+
+        for (isize y = 0; y < surf->height(); y++) {
+            for (isize x = 0; x < surf->width(); x++) {
+                surf->mutPixels().store(
+                    {x, y},
+                    Gfx::hsvToRgb({
+                        360 * (x / (f64)surf->width()),
+                        1 - (y / (f64)surf->height()),
+                        1,
+                    })
+                );
+            }
+        }
+
+        return surf;
+    }
+
     Gfx::Hsv sampleHsv(Math::Vec2i pos) {
         return {
             _value.hue,
@@ -36,24 +55,16 @@ struct HsvSquare : public Ui::View<HsvSquare> {
         return Gfx::hsvToRgb(sampleHsv(pos));
     }
 
-    Math::Vec2i coordinates(Gfx::Hsv hsv) {
-        return Math::Vec2i(
-            bound().x + (hsv.saturation * bound().width),
-            bound().y + ((1 - hsv.value) * bound().height)
-        );
-    }
-
-    void paint(Gfx::Context &g, Math::Recti) override {
-        g.save();
+    void paint(Gfx::Canvas &g, Math::Recti) override {
+        g.push();
         g.clip(bound());
 
-        for (isize y = 0; y < bound().height; y++) {
-            for (isize x = 0; x < bound().width; x++) {
-                g._fillRect(Math::Recti{bound().x + x, bound().y + y, 1, 1}, sampleColor({x, y}));
-            }
-        }
+        auto hsv = makeHsvSquare();
 
-        auto pos = coordinates(_value);
+        Math::Vec2i pos = {
+            (isize)(_value.saturation * bound().width),
+            (isize)((1 - _value.value) * bound().height),
+        };
 
         g.fillStyle(Gfx::WHITE);
         g.fill(Math::Ellipsef{pos.cast<f64>(), 8.});
@@ -69,7 +80,7 @@ struct HsvSquare : public Ui::View<HsvSquare> {
         g.fillStyle(Gfx::hsvToRgb(_value));
         g.fill(Math::Ellipsef{pos.cast<f64>(), 6});
 
-        g.restore();
+        g.pop();
     }
 
     void event(App::Event &e) override {

@@ -2,7 +2,7 @@
 
 #include <karm-base/ranges.h>
 #include <karm-base/rc.h>
-#include <karm-gfx/context.h>
+#include <karm-gfx/canvas.h>
 #include <karm-math/rect.h>
 
 #include "base.h"
@@ -65,7 +65,7 @@ struct Fontface {
 
     virtual f64 kern(Glyph prev, Glyph curr) = 0;
 
-    virtual void contour(Gfx::Context &g, Glyph glyph) const = 0;
+    virtual void contour(Gfx::Canvas &g, Glyph glyph) const = 0;
 };
 
 struct Font {
@@ -85,7 +85,7 @@ struct Font {
 
     FontMeasure measure(Glyph glyph);
 
-    void contour(Gfx::Context &g, Glyph glyph) {
+    void contour(Gfx::Canvas &g, Glyph glyph) {
         g.scale(fontsize);
         fontface->contour(g, glyph);
     }

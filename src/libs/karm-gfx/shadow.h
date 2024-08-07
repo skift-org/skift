@@ -1,48 +1,8 @@
 #pragma once
 
-#include "context.h"
+#include "canvas.h"
 
 namespace Karm::Gfx {
-
-struct DropShadow {
-    Fill fill = Gfx::BLACK;
-    f64 radius{8};
-    Math::Vec2i offset{};
-
-    static DropShadow elevated(f64 v) {
-        return {
-            Gfx::BLACK.withOpacity(0.7),
-            v * 2,
-            {0, (int)v},
-        };
-    }
-
-    auto &withFill(Fill p) {
-        fill = p;
-        return *this;
-    }
-
-    auto &withRadii(f64 r) {
-        radius = r;
-        return *this;
-    }
-
-    auto &withOffset(Math::Vec2i o) {
-        offset = o;
-        return *this;
-    }
-
-    void paint(Gfx::Context &g) {
-        g.layer(offset, [&](Context &ctx) {
-            ctx.fill(fill);
-            ctx.apply(BlurFilter{radius});
-        });
-    }
-};
-
-inline DropShadow dropShadow(auto... args) {
-    return DropShadow(args...);
-}
 
 struct BoxShadow {
     Gfx::Color fill;
@@ -79,7 +39,7 @@ struct BoxShadow {
         return *this;
     }
 
-    void paint(Gfx::Context &g, Math::Recti bound) const {
+    void paint(Gfx::Canvas &g, Math::Recti bound) const {
         /// 1 / sqrt(2)
         static constexpr f64 IS2 = 0.7071067811865475;
 

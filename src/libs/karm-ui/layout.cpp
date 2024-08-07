@@ -22,7 +22,7 @@ struct Empty : public View<Empty> {
         return _size;
     }
 
-    void paint(Gfx::Context &g, Math::Recti) override {
+    void paint(Gfx::Canvas &g, Math::Recti) override {
         if (debugShowEmptyBounds) {
             auto b = bound();
             g.plot(b, Gfx::WHITE.withOpacity(0.2));
@@ -107,11 +107,11 @@ struct Separator : public View<Separator> {
         return {1};
     }
 
-    void paint(Gfx::Context &g, Math::Recti) override {
-        g.save();
+    void paint(Gfx::Canvas &g, Math::Recti) override {
+        g.push();
         g.fillStyle(GRAY800);
         g.fill(bound());
-        g.restore();
+        g.pop();
     }
 };
 
@@ -271,7 +271,7 @@ struct Insets : public ProxyNode<Insets> {
         ProxyNode<Insets>::reconcile(o);
     }
 
-    void paint(Gfx::Context &g, Math::Recti r) override {
+    void paint(Gfx::Canvas &g, Math::Recti r) override {
         child().paint(g, r);
         if (debugShowLayoutBounds) {
             g.plot(child().bound(), Gfx::LIME);
@@ -308,7 +308,7 @@ struct AspectRatio : public ProxyNode<AspectRatio> {
         ProxyNode<AspectRatio>::reconcile(o);
     }
 
-    void paint(Gfx::Context &g, Math::Recti r) override {
+    void paint(Gfx::Canvas &g, Math::Recti r) override {
         child().paint(g, r);
         if (debugShowLayoutBounds)
             g.plot(child().bound(), Gfx::INDIGO);

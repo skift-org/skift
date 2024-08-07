@@ -507,11 +507,11 @@ struct SdlHost :
         }
     }
 
-    void paint(Gfx::Context &g, Math::Recti r) override {
-        g.save();
+    void paint(Gfx::Canvas &g, Math::Recti r) override {
+        g.push();
         g.scale(dpi());
         Host::paint(g, r);
-        g.restore();
+        g.pop();
     }
 
     Res<> wait(TimeStamp ts) override {

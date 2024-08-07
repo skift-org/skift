@@ -90,7 +90,7 @@ struct Frag {
         }
     }
 
-    virtual void paintWireframe(Gfx::Context &g) {
+    virtual void paintWireframe(Gfx::Canvas &g) {
         g.strokeStyle({
             .fill = Gfx::GREEN,
             .width = 1,

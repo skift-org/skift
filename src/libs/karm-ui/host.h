@@ -2,6 +2,7 @@
 
 #include <karm-app/host.h>
 #include <karm-base/ring.h>
+#include <karm-gfx/context.h>
 #include <karm-text/loader.h>
 
 #include "node.h"
@@ -45,8 +46,8 @@ struct Host : public Node {
         return pixels().bound();
     }
 
-    void paint(Gfx::Context &g, Math::Recti r) override {
-        g.save();
+    void paint(Gfx::Canvas &g, Math::Recti r) override {
+        g.push();
         g.clip(r);
         g.clear(r, GRAY950);
         g.fillStyle(GRAY50);
@@ -65,7 +66,7 @@ struct Host : public Node {
         if (debugShowPerfGraph)
             _perf.paint(_g);
 
-        g.restore();
+        g.pop();
     }
 
     void paint() {

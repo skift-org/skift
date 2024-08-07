@@ -4,7 +4,7 @@
 #include <karm-base/checked.h>
 #include <karm-base/func.h>
 #include <karm-base/hash.h>
-#include <karm-gfx/context.h>
+#include <karm-gfx/canvas.h>
 #include <karm-logger/logger.h>
 #include <karm-sys/async.h>
 
@@ -64,7 +64,7 @@ struct Node : public App::Dispatch {
 
     virtual Opt<Child> reconcile(Child other) { return other; }
 
-    virtual void paint(Gfx::Context &, Math::Recti) {}
+    virtual void paint(Gfx::Canvas &, Math::Recti) {}
 
     virtual void layout(Math::Recti) {}
 
@@ -199,7 +199,7 @@ struct GroupNode : public LeafNode<Crtp> {
         us.trunc(them.len());
     }
 
-    void paint(Gfx::Context &g, Math::Recti r) override {
+    void paint(Gfx::Canvas &g, Math::Recti r) override {
         for (auto &child : children()) {
             if (not child->bound().colide(r))
                 continue;
@@ -260,7 +260,7 @@ struct ProxyNode : public LeafNode<Crtp> {
         LeafNode<Crtp>::reconcile(o);
     }
 
-    void paint(Gfx::Context &g, Math::Recti r) override {
+    void paint(Gfx::Canvas &g, Math::Recti r) override {
         child().paint(g, r);
     }
 

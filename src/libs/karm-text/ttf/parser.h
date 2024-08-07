@@ -230,7 +230,7 @@ struct Parser {
         return positioning.unwrap().car.xAdvance;
     }
 
-    void glyphContour(Gfx::Context &g, Text::Glyph glyph) const {
+    void glyphContour(Gfx::Canvas &g, Text::Glyph glyph) const {
         auto glyfOffset = _loca.glyfOffset(glyph.index, _head);
 
         if (glyfOffset == _loca.glyfOffset(glyph.index + 1, _head))

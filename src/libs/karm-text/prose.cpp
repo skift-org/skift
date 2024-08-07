@@ -178,53 +178,21 @@ Math::Vec2f Prose::layout(f64 width) {
 
 // MARK: Paint -------------------------------------------------------------
 
-static void _fillGlyph(Gfx::Context &g, Font const &font, Math::Vec2f baseline, Glyph glyph) {
-    g._useSpaa = true;
-    g.save();
-    g.beginPath();
-    g.translate(baseline);
-    g.scale(font.fontsize);
-    font.fontface->contour(g, glyph);
-    g.fill();
-    g.restore();
-    g._useSpaa = false;
-}
-
-void Prose::paint(Gfx::Context &g) const {
-    auto m = _style.font.metrics();
-
-    g.save();
+void Prose::paint(Gfx::Canvas &g) {
+    g.push();
 
     if (_style.color)
         g.fillStyle(*_style.color);
 
-    g.strokeStyle({
-        .fill = g.current().fill,
-        .width = 1,
-        .align = Gfx::INSIDE_ALIGN,
-    });
-
     for (auto const &line : _lines) {
         for (auto &block : line.blocks(*this)) {
             for (auto &cell : block.cells(*this)) {
-                auto glyph = cell.glyph;
-
-                if (glyph == Glyph::TOFU) {
-                    g.stroke(
-                        Math::Rectf::fromTwoPoint(
-                            {block.pos + cell.pos, line.baseline - m.ascend},
-                            {block.pos + cell.pos + cell.adv, line.baseline + m.descend}
-                        )
-                            .shrink(4)
-                    );
-                } else {
-                    _fillGlyph(g, _style.font, {block.pos + cell.pos, line.baseline}, cell.glyph);
-                }
+                g.fill(_style.font, cell.glyph, {block.pos + cell.pos, line.baseline});
             }
         }
     }
 
-    g.restore();
+    g.pop();
 }
 
 } // namespace Karm::Text

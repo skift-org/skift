@@ -18,8 +18,8 @@ struct Checkbox : public Ui::View<Checkbox> {
         _onChange = std::move(o._onChange);
     }
 
-    void paint(Gfx::Context &g, Math::Recti) override {
-        g.save();
+    void paint(Gfx::Canvas &g, Math::Recti) override {
+        g.push();
 
         if (_value) {
             g.fillStyle(_mouseListener.isHover() ? Ui::ACCENT600 : Ui::ACCENT700);
@@ -42,7 +42,7 @@ struct Checkbox : public Ui::View<Checkbox> {
             }
         }
 
-        g.restore();
+        g.pop();
     }
 
     void event(App::Event &e) override {

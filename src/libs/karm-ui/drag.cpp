@@ -33,15 +33,15 @@ struct Dismisable :
         return _drag.value().cast<isize>();
     }
 
-    void paint(Gfx::Context &g, Math::Recti r) override {
-        g.save();
+    void paint(Gfx::Canvas &g, Math::Recti r) override {
+        g.push();
 
         g.clip(bound());
-        g.origin(drag());
+        g.origin(drag().cast<f64>());
         r.xy = r.xy - drag();
         child().paint(g, r);
 
-        g.restore();
+        g.pop();
     }
 
     void event(App::Event &e) override {

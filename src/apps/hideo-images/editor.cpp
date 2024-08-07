@@ -11,7 +11,7 @@
 namespace Hideo::Images {
 
 Ui::Child histogram(Hist const &hist) {
-    return Ui::canvas([hist](Gfx::Context &g, Math::Vec2i size) {
+    return Ui::canvas([hist](Gfx::Canvas &g, Math::Vec2i size) {
         f64 xunit = size.x / ((f64)hist.len() - 1);
 
         auto point = [&](usize i, usize c) {

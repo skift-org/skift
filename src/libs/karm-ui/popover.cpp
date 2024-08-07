@@ -57,7 +57,7 @@ struct PopoverLayer : public ProxyNode<PopoverLayer> {
         return {pos, size};
     }
 
-    void paint(Gfx::Context &g, Math::Recti r) override {
+    void paint(Gfx::Canvas &g, Math::Recti r) override {
         ProxyNode::paint(g, r);
 
         if (_popover)

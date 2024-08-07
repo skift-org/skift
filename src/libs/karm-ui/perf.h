@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-gfx/context.h>
+#include <karm-gfx/canvas.h>
 #include <karm-sys/time.h>
 #include <karm-text/prose.h>
 
@@ -72,8 +72,8 @@ struct PerfGraph {
         return {0, 0, 256, 64};
     }
 
-    void paint(Gfx::Context &g) {
-        g.save();
+    void paint(Gfx::Canvas &g) {
+        g.push();
         g.clip(bound());
         g.fillStyle(Gfx::GREEN900.withOpacity(0.5));
         g.fill(bound());
@@ -101,7 +101,7 @@ struct PerfGraph {
         g.origin({8, 4});
         gText.paint(g);
 
-        g.restore();
+        g.pop();
     }
 };
 

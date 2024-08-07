@@ -51,16 +51,16 @@ struct View : public Ui::View<View> {
         _renderResult = NONE;
     }
 
-    void paint(Gfx::Context &g, Math::Recti) override {
+    void paint(Gfx::Canvas &g, Math::Recti) override {
         auto viewport = bound().size();
         if (not _renderResult) {
             auto media = _constructMedia(viewport);
             _renderResult = Driver::render(*_dom, media, viewport.cast<Px>());
         }
 
-        g.save();
+        g.push();
 
-        g.origin(bound().xy);
+        g.origin(bound().xy.cast<f64>());
         g.clip(viewport);
         g.clear(viewport, WHITE);
 
@@ -73,7 +73,7 @@ struct View : public Ui::View<View> {
             layout->paintWireframe(g);
         }
 
-        g.restore();
+        g.pop();
     }
 
     void layout(Math::Recti bound) override {

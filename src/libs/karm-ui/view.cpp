@@ -229,11 +229,11 @@ struct Text : public View<Text> {
         _text = o._text;
     }
 
-    void paint(Gfx::Context &g, Math::Recti) override {
-        g.save();
-        g.origin(bound().xy);
+    void paint(Gfx::Canvas &g, Math::Recti) override {
+        g.push();
+        g.origin(bound().xy.cast<f64>());
         _text.paint(g);
-        g.restore();
+        g.pop();
         if (debugShowLayoutBounds)
             g.plot(bound(), Gfx::CYAN);
     }
@@ -271,14 +271,14 @@ struct Icon : public View<Icon> {
         _color = o._color;
     }
 
-    void paint(Gfx::Context &g, Math::Recti) override {
-        g.save();
+    void paint(Gfx::Canvas &g, Math::Recti) override {
+        g.push();
         if (_color)
             g.fillStyle(_color.unwrap());
         _icon.fill(g, bound().topStart());
         if (debugShowLayoutBounds)
             g.plot(bound(), Gfx::CYAN);
-        g.restore();
+        g.pop();
     }
 
     Math::Vec2i size(Math::Vec2i, Hint) override {
@@ -300,14 +300,11 @@ struct Image : public View<Image> {
     Karm::Image::Picture _image;
     Opt<Math::Radiif> _radii;
 
-    Image(Karm::Image::Picture image)
-        : _image(image) {}
-
-    Image(Karm::Image::Picture image, Math::Radiif radii)
+    Image(Karm::Image::Picture image, Opt<Math::Radiif> radii = NONE)
         : _image(image), _radii(radii) {}
 
-    void paint(Gfx::Context &g, Math::Recti) override {
-        g.save();
+    void paint(Gfx::Canvas &g, Math::Recti) override {
+        g.push();
 
         if (_radii) {
             g.fillStyle(_image.pixels());
@@ -318,7 +315,8 @@ struct Image : public View<Image> {
 
         if (debugShowLayoutBounds)
             g.plot(bound(), Gfx::CYAN);
-        g.restore();
+
+        g.pop();
     }
 
     Math::Vec2i size(Math::Vec2i, Hint) override {
@@ -347,12 +345,12 @@ struct Canvas : public View<Canvas> {
         View<Canvas>::reconcile(o);
     }
 
-    void paint(Gfx::Context &g, Math::Recti) override {
-        g.save();
+    void paint(Gfx::Canvas &g, Math::Recti) override {
+        g.push();
         g.clip(_bound);
-        g.origin(_bound.xy);
+        g.origin(_bound.xy.cast<f64>());
         _onPaint(g, _bound.wh);
-        g.restore();
+        g.pop();
     }
 
     Math::Vec2i size(Math::Vec2i, Hint hint) override {
@@ -382,8 +380,8 @@ struct BackgroundFilter : public ProxyNode<BackgroundFilter> {
         ProxyNode<BackgroundFilter>::reconcile(o);
     }
 
-    void paint(Gfx::Context &g, Math::Recti r) override {
-        g.apply(_filter, bound());
+    void paint(Gfx::Canvas &g, Math::Recti r) override {
+        g.apply(_filter, bound().cast<f64>());
         ProxyNode<BackgroundFilter>::paint(g, r);
     }
 };
@@ -404,9 +402,9 @@ struct ForegroundFilter : public ProxyNode<ForegroundFilter> {
         ProxyNode<ForegroundFilter>::reconcile(o);
     }
 
-    void paint(Gfx::Context &g, Math::Recti r) override {
+    void paint(Gfx::Canvas &g, Math::Recti r) override {
         ProxyNode<ForegroundFilter>::paint(g, r);
-        g.apply(_filter, bound());
+        g.apply(_filter, bound().cast<f64>());
     }
 };
 

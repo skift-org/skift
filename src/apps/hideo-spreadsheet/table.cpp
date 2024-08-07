@@ -83,11 +83,11 @@ struct Table : public Ui::View<Table> {
 
     // MARK: Painting ----------------------------------------------------------
 
-    void paintCell(Gfx::Context &g, Cell const &, Math::Recti bound) {
+    void paintCell(Gfx::Canvas &g, Cell const &, Math::Recti bound) {
         g.rect(bound.cast<f64>());
     }
 
-    void paintColHeader(Gfx::Context &g, usize idx) {
+    void paintColHeader(Gfx::Canvas &g, usize idx) {
         auto col = sheet().cols[idx];
         auto bound = colHeaderBound(idx);
         auto sep = Math::Edgei{
@@ -102,7 +102,7 @@ struct Table : public Ui::View<Table> {
         g.plot(sep, Gfx::WHITE.withOpacity(0.05));
     }
 
-    void paintRowHeader(Gfx::Context &g, usize idx) {
+    void paintRowHeader(Gfx::Canvas &g, usize idx) {
         auto row = sheet().rows[idx];
         Math::Recti bound = {0, row.y, CELL_WIDTH, row.height};
         Math::Edgei sep = {
@@ -117,7 +117,7 @@ struct Table : public Ui::View<Table> {
         g.plot(sep, Gfx::WHITE.withOpacity(0.05));
     }
 
-    void paintSelection(Gfx::Context &g, Range r) {
+    void paintSelection(Gfx::Canvas &g, Range r) {
         auto start = cellBound(r.start.row, r.start.col);
         auto end = cellBound(r.end.row, r.end.col);
         auto all = start.mergeWith(end);
@@ -139,10 +139,10 @@ struct Table : public Ui::View<Table> {
         g.stroke();
     }
 
-    void paint(Gfx::Context &g, Math::Recti) override {
-        g.save();
+    void paint(Gfx::Canvas &g, Math::Recti) override {
+        g.push();
         g.clip(bound());
-        g.origin(bound().xy);
+        g.origin(bound().xy.cast<f64>());
 
         // Draw columns.
         isize headerX = CELL_WIDTH;
@@ -183,7 +183,7 @@ struct Table : public Ui::View<Table> {
         if (_state->selection)
             paintSelection(g, *_state->selection);
 
-        g.restore();
+        g.pop();
     }
 
     Math::Vec2i size(Math::Vec2i, Ui::Hint) override {

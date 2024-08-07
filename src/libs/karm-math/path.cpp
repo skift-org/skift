@@ -352,6 +352,18 @@ void Path::ellipse(Math::Ellipsef ellipse) {
     close();
 }
 
+void Path::path(Math::Path const &path) {
+    for (auto contour : path.iterContours()) {
+        moveTo(first(contour));
+        for (auto v : next(contour, 1)) {
+            lineTo(v);
+        }
+
+        if (contour.close)
+            close();
+    }
+}
+
 // MARK: Svg -------------------------------------------------------------------
 
 Opt<Math::Vec2f> _nextVec2f(Io::SScan &s) {

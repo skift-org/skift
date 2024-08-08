@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-pdf/canvas.h>
 #include <karm-pdf/values.h>
 
 #include "base.h"
@@ -8,11 +9,13 @@ namespace Karm::Print {
 
 struct PdfPrinter : public Printer {
     PaperStock _stock;
-    Vec<Pdf::Canvas> _pages;
+    Vec<Io::StringWriter> _pages;
+    Opt<Pdf::Canvas> _canvas;
 
     Gfx::Canvas &beginPage() override {
         _pages.emplaceBack();
-        return last(_pages);
+        _canvas = Pdf::Canvas{last(_pages)};
+        return *_canvas;
     }
 
     Pdf::File pdf() {

@@ -54,14 +54,14 @@ void Value::write(Io::Emit &e) const {
             e("stream\n");
             (void)e.flush();
             (void)e.write(s.data);
-            e("endstream\n");
+            e("\nendstream\n");
         }
     });
 }
 
 void File::write(Io::Emit &e) const {
     e("%{}\n", header);
-    e("% Powered By Karm PDF 🐢🏳️‍⚧️🦔\n", header);
+    e("%Powered By Karm PDF 🐢🏳️‍⚧️🦔\n", header);
 
     XRef xref;
 
@@ -72,8 +72,8 @@ void File::write(Io::Emit &e) const {
         e("\nendobj\n");
     }
 
+    (void)e.flush();
     auto startxref = e.total();
-
     e("xref\n");
     xref.write(e);
 

@@ -7,25 +7,21 @@
 namespace Karm::Pdf {
 
 struct Canvas : public Gfx::Canvas {
-    Io::StringWriter _buf;
-    Math::Vec2f _p;
+    Io::Emit _e;
+    Math::Vec2f _p{};
+
+    Canvas(Io::Emit e) : _e{e} {}
 
     Math::Vec2f _mapPoint(Math::Vec2f p, Math::Path::Flags flags) {
         if (flags & Math::Path::RELATIVE)
             return p;
-        return _p + p;
+        return p - _p;
     }
 
     Math::Vec2f _mapPointAndUpdate(Math::Vec2f p, Math::Path::Flags flags) {
-        return _p = _mapPoint(p, flags);
-    }
-
-    Io::Emit emit() {
-        return _buf;
-    }
-
-    Bytes bytes() const {
-        return _buf.bytes();
+        p = _mapPoint(p, flags);
+        _p = _p + p;
+        return p;
     }
 
     // MARK: Context Operations ------------------------------------------------

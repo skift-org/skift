@@ -88,7 +88,9 @@ ET)"s
     file.trailer.put("Root"s, catalogRef);
     file.trailer.put("Size"s, (isize)file.body.len() + 1);
 
-    Io::Emit out{Sys::out()};
+    auto outFile = co_try$(Sys::File::create("file:test.pdf"_url));
+    Io::TextEncoder<> outEncoder{outFile};
+    Io::Emit out{outEncoder};
     file.write(out);
     co_try$(Sys::out().flush());
 

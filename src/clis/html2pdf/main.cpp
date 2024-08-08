@@ -61,7 +61,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto start = Sys::now();
     auto [layout, paint] = Vaev::Driver::render(*dom, media, paper);
     auto elapsed = Sys::now() - start;
-    logDebug("render time: {}", elapsed);
+    logInfo("render time: {}", elapsed);
 
     logDebug("layout tree: {}", layout);
     logDebug("paint tree: {}", paint);

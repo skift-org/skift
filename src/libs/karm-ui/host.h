@@ -81,10 +81,10 @@ struct Host : public Node {
         }
         auto elapsed = _perf.end();
 
-        static auto maxStutter = TimeSpan::fromMSecs(15);
-        if (elapsed > maxStutter) {
-            logWarn("Stutter detected, paint took {} for {} nodes", elapsed, debugNodeCount);
-            maxStutter = elapsed;
+        static auto threshold = TimeSpan::fromMSecs(15);
+        if (elapsed > threshold) {
+            logWarn("Stutter detected, paint took {} for {} nodes, threshold raised", elapsed, debugNodeCount);
+            threshold = elapsed;
         }
 
         _g.end();
@@ -97,10 +97,10 @@ struct Host : public Node {
         _perf.record(PerfEvent::LAYOUT);
         _root->layout(r);
         auto elapsed = _perf.end();
-        static auto maxStutter = TimeSpan::fromMSecs(1);
-        if (elapsed > maxStutter) {
-            logWarn("Stutter detected, layout took {} for {} nodes", elapsed, debugNodeCount);
-            maxStutter = elapsed;
+        static auto threshold = TimeSpan::fromMSecs(1);
+        if (elapsed > threshold) {
+            logWarn("Stutter detected, layout took {} for {} nodes, threshold raised", elapsed, debugNodeCount);
+            threshold = elapsed;
         }
     }
 
@@ -108,10 +108,10 @@ struct Host : public Node {
         _perf.record(PerfEvent::INPUT);
         _root->event(event);
         auto elapsed = _perf.end();
-        static auto maxStutter = TimeSpan::fromMSecs(1);
-        if (elapsed > maxStutter) {
-            logWarn("Stutter detected, event took {} for {} nodes", elapsed, debugNodeCount);
-            maxStutter = elapsed;
+        static auto threshold = TimeSpan::fromMSecs(1);
+        if (elapsed > threshold) {
+            logWarn("Stutter detected, event took {} for {} nodes, threshold raised", elapsed, debugNodeCount);
+            threshold = elapsed;
         }
     }
 

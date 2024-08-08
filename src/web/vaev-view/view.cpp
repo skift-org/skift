@@ -51,7 +51,7 @@ struct View : public Ui::View<View> {
         _renderResult = NONE;
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti) override {
+    void paint(Gfx::Canvas &g, Math::Recti rect) override {
         auto viewport = bound().size();
         if (not _renderResult) {
             auto media = _constructMedia(viewport);
@@ -62,9 +62,9 @@ struct View : public Ui::View<View> {
 
         g.origin(bound().xy.cast<f64>());
         g.clip(viewport);
-        g.clear(viewport, WHITE);
 
         auto [layout, paint] = *_renderResult;
+        g.clear(rect, Gfx::WHITE);
 
         paint->paint(g);
         if (Ui::debugShowLayoutBounds) {
@@ -85,6 +85,8 @@ struct View : public Ui::View<View> {
         // FIXME: This is wasteful, we should cache the result
         auto media = _constructMedia(size);
         auto [layout, _] = Driver::render(*_dom, media, size.cast<Px>());
+
+        logDebug("Size: {}", layout->_box.borderBox);
 
         return {
             layout->_box.borderBox.width.cast<isize>(),

@@ -32,7 +32,7 @@ Res<> doLog(Task &self, UserSlice<Str> msg) {
 
         try$(Hjert::Arch::globalOut().writeStr(str));
         if (str.len() == 0 or last(str) != '\n')
-            try$(Hjert::Arch::globalOut().writeStr("\n"));
+            try$(Hjert::Arch::globalOut().writeStr(Str{"\n"}));
 
         return Ok();
     });

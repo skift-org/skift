@@ -118,7 +118,7 @@ Res<usize> Path::write(Io::TextWriter &writer) const {
     for (auto part : iter()) {
         if (not first)
             try$(writer.writeRune(SEP));
-        written += try$(writer.writeStr(part));
+        written += try$(writer.writeStr(part.str()));
         first = false;
     }
 

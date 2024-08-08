@@ -19,11 +19,8 @@ struct Emit : public Io::TextWriterBase<> {
     }
 
     void _tryWrapper(Res<usize> result) {
-        if (result) {
-            _total += result.unwrap();
-        } else {
+        if (not result)
             _error = result.none();
-        }
     }
 
     void indent() {
@@ -63,11 +60,14 @@ struct Emit : public Io::TextWriterBase<> {
         _newline = false;
         for (usize i = 0; i < _ident; i++)
             written += try$(_writer.writeStr("    "s));
+        _total += written;
         return Ok(written);
     }
 
     virtual Res<usize> write(Bytes bytes) override {
-        return _writer.write(bytes);
+        auto written = try$(_writer.write(bytes));
+        _total += written;
+        return Ok(written);
     }
 
     Res<usize> writeRune(Rune r) override {
@@ -80,6 +80,7 @@ struct Emit : public Io::TextWriterBase<> {
         if (_newline)
             written += try$(_insertNewline());
         written += try$(_writer.writeRune(r));
+        _total += written;
         return Ok(written);
     }
 

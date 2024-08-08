@@ -221,7 +221,7 @@ struct _StringWriter :
 
     Res<usize> writeRune(Rune rune) override {
         _StringBuilder<E>::append(rune);
-        return Ok(1uz);
+        return Ok(E::runeLen(rune));
     }
 
     Res<usize> writeUnit(Slice<typename E::Unit> unit) {

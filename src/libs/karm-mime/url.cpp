@@ -95,7 +95,7 @@ Res<usize> Url::write(Io::TextWriter &writer) const {
         written += try$(Io::format(writer, "{}@", authority));
 
     if (host.len() > 0)
-        written += try$(writer.writeStr(host));
+        written += try$(writer.writeStr(host.str()));
 
     if (port)
         written += try$(Io::format(writer, ":{}", port.unwrap()));

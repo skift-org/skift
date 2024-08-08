@@ -79,16 +79,12 @@ struct TextWriter :
     using Writer::write;
 
     template <StaticEncoding E>
-    Res<usize> _writeStr(_Str<E> str) {
+    Res<usize> writeStr(_Str<E> str) {
         usize written = 0;
         for (auto rune : iterRunes(str)) {
             written += try$(writeRune(rune));
         }
         return Ok(written);
-    }
-
-    Res<usize> writeStr(Str str) {
-        return _writeStr(str);
     }
 
     virtual Res<usize> writeRune(Rune rune) = 0;

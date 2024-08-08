@@ -831,7 +831,7 @@ struct StringFormatter {
 
     Res<usize> format(Io::TextWriter &writer, _Str<E> text) {
         if (not prefix)
-            return writer._writeStr(text);
+            return writer.writeStr(text);
 
         usize written = 0;
         written += try$(writer.writeRune('"'));

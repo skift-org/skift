@@ -147,6 +147,12 @@ void Canvas::apply(Gfx::Filter) {
     logDebug("pdf: apply() operation not implemented");
 };
 
+// MARK: Shape Operations --------------------------------------------------
+
+void Canvas::fill(Text::Font &, Text::Glyph, Math::Vec2f) {
+    logDebug("pdf: fill() operation not implemented");
+}
+
 // MARK: Clear Operations --------------------------------------------------
 
 void Canvas::clear(Gfx::Color) {

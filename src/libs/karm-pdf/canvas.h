@@ -84,6 +84,8 @@ struct Canvas : public Gfx::Canvas {
 
     // MARK: Shape Operations --------------------------------------------------
 
+    void fill(Text::Font &font, Text::Glyph glyph, Math::Vec2f baseline) override;
+
     // MARK: Clear Operations --------------------------------------------------
 
     void clear(Gfx::Color color) override;

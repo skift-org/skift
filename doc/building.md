@@ -5,7 +5,7 @@ This guide provides instructions for building skiftOS from source.
 ## Prerequisites
 
 * Linux or macOS
-* Clang (16 or later)
+* Clang (18 or later)
 * Python (3.11.5 or later)
 * Tools: `llvm`, `clang`, `ninja`, `nasm`, `qemu`
 * **Installation:** Use your system's package manager (e.g., `apt` on Ubuntu) to install these dependencies.

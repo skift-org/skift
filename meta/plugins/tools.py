@@ -155,7 +155,7 @@ def _():
     everythingIsOk = everythingIsOk & moduleIsAvailable("cutekit")
     everythingIsOk = everythingIsOk & moduleIsAvailable("chatty")
     everythingIsOk = everythingIsOk & commandIsAvailable("qemu-system-x86_64")
-    everythingIsOk = everythingIsOk & commandIsAvailable("clang", versionExpected=(15,))
+    everythingIsOk = everythingIsOk & commandIsAvailable("clang", versionExpected=(18,))
     everythingIsOk = everythingIsOk & commandIsAvailable(
         "clang++", versionExpected=(16,)
     )

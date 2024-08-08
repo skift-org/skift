@@ -30,7 +30,7 @@ struct Run : public Frag {
     }
 
     void makePaintables(Paint::Stack &s) override {
-        s.add(makeStrong<Paint::Text>(_box.borderBox.topStart().cast<f64>(), _run));
+        s.add(makeStrong<Paint::Text>(_box.contentBox().topStart().cast<f64>(), _run));
     }
 };
 

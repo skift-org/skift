@@ -26,6 +26,9 @@ enum struct IntrinsicSize {
     ITER(IMAGE)            \
     ITER(INLINE)           \
     ITER(TABLE)            \
+    ITER(TABLE_ROW)        \
+    ITER(TABLE_CELL)       \
+    ITER(TABLE_GROUP)      \
     ITER(RUN)
 
 struct Frag {

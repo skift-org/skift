@@ -21,8 +21,23 @@ void buildChildren(Style::Computer &c, Vec<Strong<Dom::Node>> const &children, F
 }
 
 Strong<Flow> buildForDisplay(Display const &display, Strong<Style::Computed> style) {
-    if (display.type() == Display::INTERNAL)
-        return makeStrong<InlineFlow>(style);
+    if (display.type() == Display::INTERNAL) {
+        switch (display.internal()) {
+        case Display::Internal::TABLE_CELL:
+            return makeStrong<TableCell>(style);
+
+        case Display::Internal::TABLE_ROW_GROUP:
+        case Display::Internal::TABLE_HEADER_GROUP:
+        case Display::Internal::TABLE_FOOTER_GROUP:
+            return makeStrong<TableGroup>(style);
+
+        case Display::Internal::TABLE_ROW:
+            return makeStrong<TableRow>(style);
+
+        default:
+            return makeStrong<InlineFlow>(style);
+        }
+    }
 
     switch (display.inside()) {
     case Display::Inside::FLOW:

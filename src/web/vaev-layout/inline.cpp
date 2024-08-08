@@ -7,7 +7,8 @@ void InlineFlow::placeChildren(Context &ctx, Box box) {
 
     Axis mainAxis = Axis::INLINE;
 
-    Px res = box.borderBox.start();
+    Px res = box.contentBox().start();
+
     auto blockSize = computePreferredBorderSize(
         ctx,
         mainAxis.cross(),
@@ -15,15 +16,15 @@ void InlineFlow::placeChildren(Context &ctx, Box box) {
     );
 
     for (auto &c : _frags) {
-        auto childCtx = ctx.subContext(
+        auto childContext = ctx.subContext(
             *c,
             mainAxis,
             box.contentBox()
         );
 
         auto inlineSize = computePreferredOuterSize(
-            childCtx, mainAxis,
-            box.contentBox().width - res
+            childContext, mainAxis,
+            max(Px{0}, box.contentBox().width - res)
         );
 
         RectPx borderBox = RectPx{
@@ -33,8 +34,8 @@ void InlineFlow::placeChildren(Context &ctx, Box box) {
             blockSize,
         };
 
-        auto box = computeBox(childCtx, borderBox);
-        c->placeChildren(childCtx, box);
+        auto box = computeBox(childContext, borderBox);
+        c->placeChildren(childContext, box);
 
         res += inlineSize;
     }

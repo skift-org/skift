@@ -24,11 +24,15 @@ void BlockFlow::placeChildren(Context &ctx, Box box) {
             max(Px{0}, box.contentBox().height - res)
         );
 
-        auto inlineSize = computePreferredBorderSize(
-            childcontext,
-            mainAxis.cross(),
-            box.contentBox().width
-        );
+        Px inlineSize = box.contentBox().width;
+
+        if (c->style().sizing->width != Size::AUTO) {
+            inlineSize = computePreferredBorderSize(
+                childcontext,
+                mainAxis.cross(),
+                box.contentBox().width
+            );
+        }
 
         RectPx borderBox = RectPx{
             box.contentBox().start(),

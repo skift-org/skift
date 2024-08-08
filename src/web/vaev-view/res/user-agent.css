@@ -47,3 +47,7 @@ tr {
 td {
     display: table-cell;
 }
+
+th {
+    display: table-cell;
+}

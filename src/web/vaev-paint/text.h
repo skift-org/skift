@@ -18,7 +18,7 @@ struct Text : public Node {
         auto baseline = _run->baseline();
         g.push();
         g.fillStyle(Gfx::BLACK);
-        g.fill(_run->_font, *_run, _topLeft + baseline);
+        g.fill(_run->_font, *_run, _topLeft + Math::Vec2f{0, baseline});
         g.pop();
     }
 

@@ -10,7 +10,7 @@ style {
 }
 
 /* 15.3.8 MARK: Tables ------------------------------------------------------ */
-/* https: //html.spec.whatwg.org/multipage/rendering.html#tables-2 */
+/* https://html.spec.whatwg.org/multipage/rendering.html#tables-2 */
 
 table {
     display: table;
@@ -44,10 +44,7 @@ tr {
     display: table-row;
 }
 
-td {
-    display: table-cell;
-}
-
+td,
 th {
     display: table-cell;
 }

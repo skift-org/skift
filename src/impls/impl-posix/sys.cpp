@@ -95,7 +95,7 @@ Res<Strong<Fd>> openFile(Mime::Url const &url) {
 Res<Strong<Fd>> createFile(Mime::Url const &url) {
     String str = try$(resolve(url)).str();
 
-    auto raw = ::open(str.buf(), O_RDWR | O_CREAT, 0644);
+    auto raw = ::open(str.buf(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (raw < 0)
         return Posix::fromLastErrno();
     return Ok(makeStrong<Posix::Fd>(raw));

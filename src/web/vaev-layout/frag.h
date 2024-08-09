@@ -53,8 +53,16 @@ struct Frag {
 
     virtual Type type() const = 0;
 
-    virtual void placeChildren(Context &, Box box) {
+    virtual MutSlice<Strong<Frag>> children() {
+        return {};
+    }
+
+    virtual void placeSelf(Context &, Box box) {
         _box = box;
+    }
+
+    virtual void placeChildren(Context &ctx, Box box) {
+        placeSelf(ctx, box);
     }
 
     virtual Px computeIntrinsicSize(Context &, Axis, IntrinsicSize, Px availableSpace) {
@@ -108,16 +116,6 @@ struct Frag {
 
     Style::Computed const &style() const {
         return *_style;
-    }
-
-    template <typename T>
-    T *is() {
-        return type() == T::TYPE ? static_cast<T *>(this) : nullptr;
-    }
-
-    template <typename T>
-    T const *is() const {
-        return type() == T::TYPE ? static_cast<T const *>(this) : nullptr;
     }
 };
 

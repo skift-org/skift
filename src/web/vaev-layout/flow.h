@@ -9,6 +9,10 @@ struct Flow : public Frag {
 
     Vec<Strong<Frag>> _frags;
 
+    MutSlice<Strong<Frag>> children() override {
+        return _frags;
+    }
+
     Frag &fragAt(usize frag) {
         return *_frags[frag];
     }

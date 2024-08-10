@@ -8,7 +8,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto args = Sys::useArgs(ctx);
 
     if (args.len() != 2) {
-        Sys::errln("usage: vaev-css.cli <verb> <url>\n");
+        Sys::errln("usage: vaev-js.cli <verb> <url>\n");
         co_return Error::invalidInput();
     }
 

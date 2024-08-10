@@ -56,7 +56,7 @@ struct Radii {
 
     bool zero() const {
         return iter(radii).all([](T radii) {
-            return radii == 0;
+            return epsilonEq(radii, T{});
         });
     }
 

@@ -32,9 +32,9 @@ struct HsvSquare : public Ui::View<HsvSquare> {
                 surf->mutPixels().store(
                     {x, y},
                     Gfx::hsvToRgb({
-                        360 * (x / (f64)surf->width()),
+                        _value.hue,
+                        (x / (f64)surf->width()),
                         1 - (y / (f64)surf->height()),
-                        1,
                     })
                 );
             }
@@ -61,9 +61,11 @@ struct HsvSquare : public Ui::View<HsvSquare> {
 
         auto hsv = makeHsvSquare();
 
+        g.blit(bound(), *hsv);
+
         Math::Vec2i pos = {
-            (isize)(_value.saturation * bound().width),
-            (isize)((1 - _value.value) * bound().height),
+            bound().x + (isize)(_value.saturation * bound().width),
+            bound().y + (isize)((1 - _value.value) * bound().height),
         };
 
         g.fillStyle(Gfx::WHITE);

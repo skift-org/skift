@@ -297,14 +297,17 @@ void Path::rect(Math::Rectf rect, Math::Radiif radii) {
     } else {
         radii = radii.reduceOverlap(rect.size());
 
-        f64 cpa = radii.a * 0.5522847498;
-        f64 cpb = radii.b * 0.5522847498;
-        f64 cpc = radii.c * 0.5522847498;
-        f64 cpd = radii.d * 0.5522847498;
-        f64 cpe = radii.e * 0.5522847498;
-        f64 cpf = radii.f * 0.5522847498;
-        f64 cpg = radii.g * 0.5522847498;
-        f64 cph = radii.h * 0.5522847498;
+        // NOTE: 0.5522847498 is the cubic bezier approximation of the circle
+        //       Since we take the value relative to the end of the edge,
+        //       we need to subtract it from the radii to get the control point
+        f64 cpa = radii.a * (1 - 0.5522847498);
+        f64 cpb = radii.b * (1 - 0.5522847498);
+        f64 cpc = radii.c * (1 - 0.5522847498);
+        f64 cpd = radii.d * (1 - 0.5522847498);
+        f64 cpe = radii.e * (1 - 0.5522847498);
+        f64 cpf = radii.f * (1 - 0.5522847498);
+        f64 cpg = radii.g * (1 - 0.5522847498);
+        f64 cph = radii.h * (1 - 0.5522847498);
 
         moveTo({rect.x + radii.b, rect.y});
 

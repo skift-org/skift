@@ -81,7 +81,7 @@ static constexpr Array _threeCharTokens = {
     Str2Token{">>=", Token::SHIFT_RIGHT_EQUALS},
     Str2Token{"&&=", Token::DOUBLE_AMPERSAND_EQUALS},
     Str2Token{"||=", Token::DOUBLE_PIPE_EQUALS},
-    Str2Token{"?\?=", Token::DOUBLE_QUESTION_MARK_EQUALS},
+    Str2Token{"??=", Token::DOUBLE_QUESTION_MARK_EQUALS},
     Str2Token{">>>", Token::UNSIGNED_SHIFT_RIGHT},
     Str2Token{"...", Token::TRIPLE_DOT},
 };

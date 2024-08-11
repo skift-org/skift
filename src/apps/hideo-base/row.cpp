@@ -11,20 +11,6 @@
 
 namespace Hideo {
 
-Ui::Child card(Ui::Child child) {
-    return Ui::box(
-        {
-            .borderRadii = 4,
-            .backgroundFill = Ui::GRAY900,
-        },
-        child
-    );
-}
-
-Ui::Child card(Ui::Children children) {
-    return card(Ui::vflow(children));
-}
-
 Ui::Child row(Ui::Child child) {
     return child |
            Ui::vcenter() |

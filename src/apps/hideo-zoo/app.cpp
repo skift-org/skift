@@ -7,6 +7,7 @@
 #include "page-alert.h"
 #include "page-avatar.h"
 #include "page-badge.h"
+#include "page-card.h"
 #include "page-checkbox.h"
 #include "page-color-input.h"
 #include "page-context-menu.h"
@@ -25,6 +26,7 @@ static Array PAGES = {
     &PAGE_ALERT,
     &PAGE_AVATAR,
     &PAGE_BADGE,
+    &PAGE_CARD,
     &PAGE_CHECKBOX,
     &PAGE_COLOR_INPUT,
     &PAGE_CONTEXT_MENU,

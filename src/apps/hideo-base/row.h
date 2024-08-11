@@ -4,20 +4,6 @@
 
 namespace Hideo {
 
-Ui::Child card(Ui::Child child);
-
-inline auto card() {
-    return [](Ui::Child child) {
-        return card(child);
-    };
-}
-
-Ui::Child card(Ui::Children children);
-
-static inline Ui::Child card(Ui::Child child, Meta::Same<Ui::Child> auto... children) {
-    return card({child, children...});
-}
-
 Ui::Child row(Ui::Child child);
 
 Ui::Child row(Opt<Ui::Child> leading, String title, Opt<String> subtitle, Opt<Ui::Child> trailing);

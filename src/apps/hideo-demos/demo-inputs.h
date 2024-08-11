@@ -2,6 +2,7 @@
 
 #include <hideo-base/row.h>
 #include <hideo-base/scafold.h>
+#include <karm-kira/card.h>
 #include <karm-kira/dialog.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/layout.h>
@@ -29,7 +30,7 @@ static inline Demo INPUTS_DEMO{
 
         auto title = Hideo::titleRow("Some Settings"s);
 
-        auto list = Hideo::card(
+        auto list = Kr::card(
             button,
             Ui::separator(),
             Hideo::treeRow(

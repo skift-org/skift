@@ -1,5 +1,6 @@
 #include <hideo-base/row.h>
 #include <hideo-base/scafold.h>
+#include <karm-kira/card.h>
 #include <karm-sys/info.h>
 #include <karm-ui/error.h>
 
@@ -83,10 +84,10 @@ Ui::Child pageAbout(State const &) {
     return Ui::vflow(
                8,
                Hideo::titleRow("About"s),
-               userInfos() | Hideo::card(),
-               sysInfos() | Hideo::card(),
-               memInfos() | Hideo::card(),
-               cpuInfos() | Hideo::card()
+               userInfos() | Kr::card(),
+               sysInfos() | Kr::card(),
+               memInfos() | Kr::card(),
+               cpuInfos() | Kr::card()
            ) |
            pageScafold;
 }

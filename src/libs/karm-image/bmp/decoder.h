@@ -59,13 +59,13 @@ struct Decoder {
 
     Vec<Gfx::Color> _palette;
 
-    Res<> readPalette(Io::BScan &s);
+    Res<> _readPalette(Io::BScan &s);
 
     // MARK: Pixels ------------------------------------------------------------
 
     Bytes _pixels;
 
-    Res<> readPixels(Io::BScan &s);
+    Res<> _readPixels(Io::BScan &s);
 
     // MARK: Decoding ----------------------------------------------------------
 

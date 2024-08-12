@@ -5,7 +5,7 @@
 namespace Karm {
 
 template <typename T>
-struct Be {
+struct [[gnu::packed]] Be {
     T _value;
 
     always_inline constexpr Be() = default;
@@ -24,22 +24,10 @@ struct Be {
     always_inline constexpr T value() const {
         return toBe(_value);
     }
-
-    always_inline constexpr auto operator<=>(Be const &other) const = default;
-
-    always_inline constexpr bool operator==(Be const &other) const = default;
-
-    always_inline constexpr auto operator<=>(Meta::Integral auto const &other) const {
-        return value() <=> other;
-    }
-
-    always_inline constexpr bool operator==(Meta::Integral auto const &other) const {
-        return value() == other;
-    }
 };
 
 template <typename T>
-struct Le {
+struct [[gnu::packed]] Le {
     T _value;
 
     always_inline constexpr Le() = default;
@@ -59,22 +47,12 @@ struct Le {
     always_inline constexpr T value() const {
         return toLe(_value);
     }
-
-    always_inline constexpr auto operator<=>(Le const &other) const = default;
-
-    always_inline constexpr bool operator==(Le const &other) const = default;
-
-    always_inline constexpr auto operator<=>(T const &other) const {
-        return value() <=> other;
-    }
-
-    always_inline constexpr bool operator==(T const &other) const {
-        return value() == other;
-    }
 };
 
 static_assert(sizeof(Be<u32>) == sizeof(u32));
 static_assert(sizeof(Le<u32>) == sizeof(u32));
+static_assert(Meta::Pod<Le<u32>>);
+static_assert(Meta::Pod<Be<u32>>);
 
 using u8be = Be<u8>;
 using u16be = Be<u16>;

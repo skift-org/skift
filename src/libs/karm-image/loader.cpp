@@ -4,6 +4,7 @@
 #include "jpeg/decoder.h"
 #include "png/decoder.h"
 #include "qoi/decoder.h"
+#include "tga/decoder.h"
 
 //
 #include "loader.h"
@@ -38,6 +39,13 @@ static Res<Picture> loadJpeg(Bytes bytes) {
     return Ok(img);
 }
 
+static Res<Picture> load(Bytes bytes) {
+    auto tga = try$(Tga::Decoder::init(bytes));
+    auto img = Gfx::Surface::alloc({tga.width(), tga.height()});
+    try$(tga.decode(*img));
+    return Ok(img);
+}
+
 Res<Picture> load(Sys::Mmap &&map) {
     if (Bmp::Decoder::sniff(map.bytes())) {
         return loadBmp(map.bytes());
@@ -47,6 +55,8 @@ Res<Picture> load(Sys::Mmap &&map) {
         return loadPng(map.bytes());
     } else if (Jpeg::Decoder::sniff(map.bytes())) {
         return loadJpeg(map.bytes());
+    } else if (Tga::Decoder::sniff(map.bytes())) {
+        return load(map.bytes());
     } else {
         return Error::invalidData("unknown image format");
     }

@@ -11,8 +11,8 @@ Res<Decoder> Decoder::init(Bytes slice) {
     Io::BScan s{slice};
     try$(dec.readHeader(s));
     try$(dec.readInfoHeader(s));
-    try$(dec.readPalette(s));
-    try$(dec.readPixels(s));
+    try$(dec._readPalette(s));
+    try$(dec._readPixels(s));
 
     return Ok(dec);
 }
@@ -67,7 +67,7 @@ Res<> Decoder::readInfoHeader(Io::BScan &s) {
     return Ok();
 }
 
-Res<> Decoder::readPalette(Io::BScan &s) {
+Res<> Decoder::_readPalette(Io::BScan &s) {
     for (usize i = 0; i < _numsColors; ++i) {
         auto b = s.nextU8le();
         auto g = s.nextU8le();
@@ -81,7 +81,7 @@ Res<> Decoder::readPalette(Io::BScan &s) {
     return Ok();
 }
 
-Res<> Decoder::readPixels(Io::BScan &s) {
+Res<> Decoder::_readPixels(Io::BScan &s) {
     s.seek(_dataOffset);
     _pixels = s.remBytes();
     return Ok();

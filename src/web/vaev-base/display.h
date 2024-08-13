@@ -35,6 +35,13 @@ struct Display {
         _LEN1,
     };
 
+    bool isTableGroup() const {
+        return _type == Type::INTERNAL and
+               (_internal == Internal::TABLE_ROW_GROUP or
+                _internal == Internal::TABLE_HEADER_GROUP or
+                _internal == Internal::TABLE_FOOTER_GROUP);
+    }
+
     using enum Internal;
 
     enum struct Inside : u8 {

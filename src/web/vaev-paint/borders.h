@@ -6,7 +6,7 @@
 #include <karm-math/radii.h>
 #include <vaev-base/borders.h>
 
-#include "karm-logger/logger.h"
+#include "base.h"
 
 namespace Vaev::Paint {
 
@@ -17,7 +17,8 @@ struct BorderPaint {
 };
 
 // https://drafts.csswg.org/css-backgrounds/#borders
-struct Borders {
+struct Borders : public Node {
+    Math::Rectf bound;
     BorderCollapse collapse;
     Math::Radiif radii;
 
@@ -69,10 +70,10 @@ struct Borders {
         }
     }
 
-    Math::Radiif paint(Gfx::Canvas &ctx, Math::Rectf rect) {
+    void paint(Gfx::Canvas &ctx) override {
         ctx.beginPath();
 
-        Math::Vec2f const cornerTopStart = {rect.x - start.width, rect.y - top.width};
+        Math::Vec2f const cornerTopStart = {bound.x - start.width, bound.y - top.width};
         auto const radiiIn = computeInternalRadii(radii);
 
         if (top.fill == start.fill and
@@ -85,25 +86,26 @@ struct Borders {
 
             Math::Rectf const outer = Math::Rectf{
                 cornerTopStart,
-                {rect.width + end.width + start.width, rect.height + top.width + bottom.width}
+                {
+                    bound.width + end.width + start.width,
+                    bound.height + top.width + bottom.width,
+                }
             };
 
             ctx.rect(outer, radii);
-            ctx.rect(rect, 0);
+            ctx.rect(bound, 0);
             ctx.fill(top.fill, Gfx::FillRule::EVENODD);
-            return radiiIn;
+            return;
         }
 
         // precise path, allow us to draw each border independantly
-        auto outerCurves = computeOuterCurves(cornerTopStart, rect);
-        auto innerCurves = computeInnerCurves(cornerTopStart, rect, radiiIn);
+        auto outerCurves = computeOuterCurves(cornerTopStart, bound);
+        auto innerCurves = computeInnerCurves(cornerTopStart, bound, radiiIn);
 
         paintEdge(ctx, BorderEdge::TOP, outerCurves, innerCurves);
         paintEdge(ctx, BorderEdge::BOTTOM, outerCurves, innerCurves);
         paintEdge(ctx, BorderEdge::START, outerCurves, innerCurves);
         paintEdge(ctx, BorderEdge::END, outerCurves, innerCurves);
-
-        return computeInternalRadii(radiiIn);
     }
 
     Array<Math::Curvef, 8> computeOuterCurves(Math::Vec2f topStart, Math::Rectf content) {

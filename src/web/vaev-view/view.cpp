@@ -70,7 +70,7 @@ struct View : public Ui::View<View> {
         if (Ui::debugShowLayoutBounds) {
             logDebug("layout tree: {}", layout);
             logDebug("paint tree: {}", paint);
-            layout->paintWireframe(g);
+            Layout::wireframe(*layout, g);
         }
 
         g.pop();
@@ -86,11 +86,11 @@ struct View : public Ui::View<View> {
         auto media = _constructMedia(size);
         auto [layout, _] = Driver::render(*_dom, media, size.cast<Px>());
 
-        logDebug("Size: {}", layout->_box.borderBox);
+        logDebug("Size: {}", layout->box.borderBox);
 
         return {
-            layout->_box.borderBox.width.cast<isize>(),
-            layout->_box.borderBox.height.cast<isize>(),
+            layout->box.borderBox.width.cast<isize>(),
+            layout->box.borderBox.height.cast<isize>(),
         };
     }
 };

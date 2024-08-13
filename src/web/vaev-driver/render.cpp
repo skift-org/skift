@@ -1,6 +1,6 @@
 #include <karm-sys/time.h>
 #include <vaev-dom/element.h>
-#include <vaev-layout/builder.h>
+#include <vaev-layout/frag.h>
 #include <vaev-layout/sizing.h>
 #include <vaev-paint/page.h>
 #include <vaev-paint/stack.h>
@@ -60,7 +60,7 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
     logDebug("style collection time: {}", elapsed);
 
     Style::Computer computer{media, stylebook};
-    auto layoutRoot = Layout::build(computer, dom);
+    auto layoutRoot = makeStrong<Layout::Frag>(Layout::build(computer, dom));
 
     Layout::Viewport vp{.small = viewport};
     Layout::Context ctx{
@@ -77,10 +77,11 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
         .borderBox = {vp.small.width, height},
     };
 
-    layoutRoot->placeChildren(ctx, containingBox);
+    Layout::layout(ctx, containingBox);
 
     auto paintRoot = makeStrong<Paint::Stack>();
-    layoutRoot->makePaintables(*paintRoot);
+
+    Layout::paint(*layoutRoot, *paintRoot);
     paintRoot->prepare();
 
     return {layoutRoot, paintRoot};
@@ -99,7 +100,7 @@ RenderResult render(Dom::Document &dom, Style::Media const &media, Print::PaperS
     logDebug("style collection time: {}", elapsed);
 
     Style::Computer computer{media, stylebook};
-    auto layoutRoot = Layout::build(computer, dom);
+    auto layoutRoot = makeStrong<Layout::Frag>(Layout::build(computer, dom));
 
     Layout::Viewport vp{
         .small = {
@@ -122,10 +123,10 @@ RenderResult render(Dom::Document &dom, Style::Media const &media, Print::PaperS
         .borderBox = {vp.small.width, height},
     };
 
-    layoutRoot->placeChildren(ctx, containingBox);
+    Layout::layout(ctx, containingBox);
 
     auto paintRoot = makeStrong<Paint::Page>();
-    layoutRoot->makePaintables(*paintRoot);
+    Layout::paint(*layoutRoot, *paintRoot);
     paintRoot->prepare();
 
     return {layoutRoot, paintRoot};

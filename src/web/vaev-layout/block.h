@@ -1,21 +1,12 @@
 #pragma once
 
-#include "flow.h"
+#include "box.h"
+#include "context.h"
 
 namespace Vaev::Layout {
 
-struct BlockFlow : public Flow {
-    static constexpr auto TYPE = BLOCK;
+void blockLayout(Context &ctx, Box box);
 
-    using Flow::Flow;
-
-    Type type() const override {
-        return TYPE;
-    }
-
-    void placeChildren(Context &ctx, Box box) override;
-
-    Px computeIntrinsicSize(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px) override;
-};
+Px blockMeasure(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px availableSpace);
 
 } // namespace Vaev::Layout

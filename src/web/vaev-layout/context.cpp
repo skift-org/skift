@@ -26,7 +26,11 @@ Context Context::subContext(Frag &frag, Axis axis, RectPx containingBlock) const
 // MARK: Fragment ----------------------------------------------------------
 
 Style::Computed const &Context::style() {
-    return frag.style();
+    return *frag.style;
+}
+
+MutSlice<Frag> Context::children() {
+    return frag.children();
 }
 
 // MARK: Font --------------------------------------------------------------

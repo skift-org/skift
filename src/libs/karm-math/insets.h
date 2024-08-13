@@ -27,7 +27,7 @@ struct Insets {
         : start(start), top(top), end(end), bottom(bottom) {}
 
     constexpr bool zero() const {
-        return start == 0 and top == 0 and end == 0 and bottom == 0;
+        return start == T{} and top == T{} and end == T{} and bottom == T{};
     }
 
     constexpr Math::Vec2<T> topStart() const {

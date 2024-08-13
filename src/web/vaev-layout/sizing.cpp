@@ -59,28 +59,28 @@ Px computeSpecifiedSize(Context &ctx, Axis axis, Size size, Px availableSpace) {
     availableSpace = max(Px{0}, availableSpace - allInsets(ctx, axis));
 
     if (size == Size::MIN_CONTENT) {
-        res = ctx.frag.computeIntrinsicSize(
+        res = measure(
             ctx,
             axis,
             IntrinsicSize::MIN_CONTENT,
             availableSpace
         );
     } else if (size == Size::MAX_CONTENT) {
-        res = ctx.frag.computeIntrinsicSize(
+        res = measure(
             ctx,
             axis,
             IntrinsicSize::MAX_CONTENT,
             Px{0}
         );
     } else if (size == Size::AUTO) {
-        res = ctx.frag.computeIntrinsicSize(
+        res = measure(
             ctx,
             axis,
             IntrinsicSize::MAX_CONTENT,
             availableSpace
         );
     } else if (size == Size::FIT_CONTENT) {
-        res = ctx.frag.computeIntrinsicSize(
+        res = measure(
             ctx,
             axis,
             IntrinsicSize::MAX_CONTENT,
@@ -151,7 +151,7 @@ Px computePreferredContentSize(Context &ctx, Axis axis, Px availableSpace) {
 
 // https://www.w3.org/TR/css-box-4/#border-box
 Px computePreferredBorderSize(Context &ctx, Axis axis, Px availableSpace) {
-    auto &style = ctx.frag.style();
+    auto &style = ctx.style();
 
     auto res = computePreferredSize(ctx, axis, availableSpace);
 

@@ -4,28 +4,8 @@
 
 namespace Vaev::Layout {
 
-void FlexFlow::_clear() {
-    _items.clear();
-    _lines.clear();
-}
-
-void FlexFlow::_createItems() {
-    for (usize i = 0; i < _frags.len(); i++)
-        _items.pushBack({i});
-}
-
-void FlexFlow::_sortByOrder() {
-    stableSort(_items, [&](auto a, auto b) {
-        return styleAt(a.frag).order < styleAt(b.frag).order;
-    });
-}
-
-void FlexFlow::placeChildren(Context &ctx, Box box) {
-    Frag::placeChildren(ctx, box);
-
-    _clear();
-    _createItems();
-    _sortByOrder();
+void flexLayout(Context &ctx, Box box) {
+    ctx.frag.box = box;
 
     Axis mainAxis = Axis::HORIZONTAL;
 
@@ -36,15 +16,15 @@ void FlexFlow::placeChildren(Context &ctx, Box box) {
         box.contentBox().height
     );
 
-    for (auto &c : _frags) {
-        auto childcontext = ctx.subContext(
-            *c,
+    for (auto &c : ctx.children()) {
+        auto childContext = ctx.subContext(
+            c,
             mainAxis,
             box.contentBox()
         );
 
         auto inlineSize = computePreferredOuterSize(
-            childcontext, mainAxis,
+            childContext, mainAxis,
             max(Px{0}, box.contentBox().width - res)
         );
 
@@ -55,19 +35,19 @@ void FlexFlow::placeChildren(Context &ctx, Box box) {
             blockSize,
         };
 
-        auto box = computeBox(childcontext, borderBox);
-        c->placeChildren(childcontext, box);
+        auto box = computeBox(childContext, borderBox);
+        layout(childContext, box);
 
         res += inlineSize;
     }
 }
 
-Px FlexFlow::computeIntrinsicSize(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px) {
+Px flexMeasure(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px) {
     Px res = Px{};
 
-    for (auto &c : _frags) {
+    for (auto &c : ctx.children()) {
         auto childCtx = ctx.subContext(
-            *c,
+            c,
             axis,
             Vec2Px::ZERO
         );

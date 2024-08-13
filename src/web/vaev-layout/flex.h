@@ -1,38 +1,12 @@
 #pragma once
 
-#include "flow.h"
+#include "box.h"
+#include "context.h"
 
 namespace Vaev::Layout {
 
-struct FlexFlow : public Flow {
-    static constexpr auto TYPE = FLEX;
+void flexLayout(Context &ctx, Box box);
 
-    struct Item {
-        usize frag;
-    };
-
-    struct Line {
-        urange items;
-    };
-
-    Vec<Item> _items;
-    Vec<Line> _lines;
-
-    using Flow::Flow;
-
-    Type type() const override {
-        return TYPE;
-    }
-
-    void _clear();
-
-    void _createItems();
-
-    void _sortByOrder();
-
-    void placeChildren(Context &ctx, Box box) override;
-
-    Px computeIntrinsicSize(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px) override;
-};
+Px flexMeasure(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px availableSpace);
 
 } // namespace Vaev::Layout

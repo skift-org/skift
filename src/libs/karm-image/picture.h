@@ -37,6 +37,10 @@ struct Picture {
     always_inline Gfx::Color sample(Math::Vec2f pos) const {
         return pixels().sample(pos);
     }
+
+    void repr(Io::Emit &e) const {
+        e("(picture {}x{})", width(), height());
+    }
 };
 
 } // namespace Karm::Image

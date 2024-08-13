@@ -4,6 +4,11 @@
 
 namespace Vaev::Layout {
 
+enum struct IntrinsicSize {
+    MIN_CONTENT,
+    MAX_CONTENT,
+};
+
 struct Viewport {
     Px dpi = Px{96};
     // https://drafts.csswg.org/css-values/#small-viewport-size

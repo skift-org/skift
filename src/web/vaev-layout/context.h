@@ -5,7 +5,7 @@
 #include <vaev-base/writing.h>
 #include <vaev-style/computed.h>
 
-#include "viewport.h"
+#include "base.h"
 
 namespace Vaev::Layout {
 
@@ -29,6 +29,8 @@ struct Context {
     // MARK: Fragment ----------------------------------------------------------
 
     Style::Computed const &style();
+
+    MutSlice<Frag> children();
 
     // MARK: Axis --------------------------------------------------------------
 

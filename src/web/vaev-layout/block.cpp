@@ -1,19 +1,18 @@
 #include "block.h"
 
+#include "frag.h"
 #include "sizing.h"
 
 namespace Vaev::Layout {
 
-void BlockFlow::placeChildren(Context &ctx, Box box) {
-    Frag::placeChildren(ctx, box);
+void blockLayout(Context &ctx, Box box) {
+    ctx.frag.box = box;
 
     Axis mainAxis = Axis::VERTICAL;
-
     Px res = box.contentBox().top();
-
-    for (auto &c : _frags) {
+    for (auto &c : ctx.children()) {
         auto childcontext = ctx.subContext(
-            *c,
+            c,
             mainAxis,
             box.contentBox()
         );
@@ -26,7 +25,7 @@ void BlockFlow::placeChildren(Context &ctx, Box box) {
 
         Px inlineSize = box.contentBox().width;
 
-        if (c->style().sizing->width != Size::AUTO) {
+        if (c->sizing->width != Size::AUTO) {
             inlineSize = computePreferredBorderSize(
                 childcontext,
                 mainAxis.cross(),
@@ -42,18 +41,18 @@ void BlockFlow::placeChildren(Context &ctx, Box box) {
         };
 
         auto box = computeBox(childcontext, borderBox);
-        c->placeChildren(childcontext, box);
+        layout(childcontext, box);
 
         res += blockSize;
     }
 }
 
-Px BlockFlow::computeIntrinsicSize(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px) {
+Px blockMeasure(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px) {
     Px res = Px{};
 
-    for (auto &c : _frags) {
+    for (auto &c : ctx.children()) {
         auto childCtx = ctx.subContext(
-            *c,
+            c,
             axis,
             Vec2Px::ZERO
         );

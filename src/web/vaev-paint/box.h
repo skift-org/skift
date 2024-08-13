@@ -3,21 +3,19 @@
 #include <vaev-base/background.h>
 
 #include "base.h"
-#include "borders.h"
 
 namespace Vaev::Paint {
 
 struct Box : public Node {
     RectPx bound;
-    Borders borders;
+    Math::Radiif radii;
     Vec<Background> backgrounds;
 
     void paint(Gfx::Canvas &ctx) override {
-        auto insetRadii = borders.paint(ctx, bound.cast<f64>());
         ColorContext colorContext; // FIXME: Resolving color should happen in the layout phase
         for (auto &background : backgrounds) {
             ctx.beginPath();
-            ctx.rect(bound.cast<f64>(), insetRadii);
+            ctx.rect(bound.cast<f64>(), radii);
             ctx.fill(colorContext.resolve(background.fill));
         }
     }

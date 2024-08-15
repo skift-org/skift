@@ -14,7 +14,7 @@ def generateSystem(img: image.Image) -> None:
     img.install("hjert", "kernel-x86_64")
     img.installAll("skift-x86_64")
 
-    img.cpTree("meta/image/boot", "boot")
+    img.cpTree("meta/image/opstart-uefi/boot", "boot")
 
 
 @cli.command("i", "image", "Generate the boot image")

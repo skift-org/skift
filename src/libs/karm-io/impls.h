@@ -148,13 +148,8 @@ struct BufferWriter : public Writer, public Flusher {
     BufferWriter(usize cap = 16) : _buf(cap) {}
 
     Res<usize> write(Bytes bytes) override {
-        usize written = 0;
-        _buf.ensure(_buf.len() + sizeOf(bytes));
-        for (auto byte : iter(bytes)) {
-            _buf.insert(_buf.len(), std::move(byte));
-            written += 1;
-        }
-        return Ok(written);
+        _buf.insert(COPY, _buf.len(), bytes.buf(), bytes.len());
+        return Ok(bytes.len());
     }
 
     Bytes bytes() const {

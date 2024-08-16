@@ -55,4 +55,24 @@ FontMeasure Font::measure(Glyph r) {
     };
 }
 
+f64 Font::fontSize() {
+    return fontsize;
+}
+
+f64 Font::xHeight() {
+    return measure(glyph('x')).capbound.height;
+}
+
+f64 Font::capHeight() {
+    return measure(glyph('H')).capbound.height;
+}
+
+f64 Font::zeroAdvance() {
+    return advance(glyph('0'));
+}
+
+f64 Font::lineHeight() {
+    return metrics().lineheight();
+}
+
 } // namespace Karm::Text

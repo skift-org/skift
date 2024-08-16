@@ -53,7 +53,7 @@ Frag build(Style::Computer &c, Dom::Document const &doc);
 
 // MARK: Layout ----------------------------------------------------------------
 
-void layout(Context &ctx, Box box);
+Output layout(Context &ctx, Box box, Input input);
 
 Px measure(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px availableSpace);
 

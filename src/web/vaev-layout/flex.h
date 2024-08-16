@@ -5,8 +5,6 @@
 
 namespace Vaev::Layout {
 
-void flexLayout(Context &ctx, Box box);
-
-Px flexMeasure(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px availableSpace);
+Output flexLayout(Context &ctx, Box box, Input input);
 
 } // namespace Vaev::Layout

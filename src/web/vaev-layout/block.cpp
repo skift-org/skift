@@ -5,11 +5,14 @@
 
 namespace Vaev::Layout {
 
-void blockLayout(Context &ctx, Box box) {
-    ctx.frag.box = box;
+Output blockLayout(Context &ctx, Box box, Input input) {
+    if (input.commit == Commit::YES)
+        ctx.frag.box = box;
 
     Axis mainAxis = Axis::VERTICAL;
-    Px res = box.contentBox().top();
+
+    Px pos = box.contentBox().top();
+    Px width = box.contentBox().width;
     for (auto &c : ctx.children()) {
         auto childcontext = ctx.subContext(
             c,
@@ -20,57 +23,37 @@ void blockLayout(Context &ctx, Box box) {
         auto blockSize = computePreferredOuterSize(
             childcontext,
             mainAxis,
-            max(Px{0}, box.contentBox().height - res)
+            max(Px{0}, box.contentBox().height - pos)
         );
 
-        Px inlineSize = box.contentBox().width;
+        Px inlineSize = computePreferredBorderSize(
+            childcontext,
+            mainAxis.cross(),
+            box.contentBox().width
+        );
 
-        if (c->sizing->width != Size::AUTO) {
-            inlineSize = computePreferredBorderSize(
-                childcontext,
-                mainAxis.cross(),
-                box.contentBox().width
-            );
+        if (c->sizing->width == Size::AUTO) {
+            inlineSize = max(inlineSize, box.contentBox().width);
         }
 
         RectPx borderBox = RectPx{
             box.contentBox().start(),
-            res,
+            pos,
             inlineSize,
             blockSize,
         };
 
         auto box = computeBox(childcontext, borderBox);
-        layout(childcontext, box);
+        layout(childcontext, box, input.withAvailableSpace(borderBox.wh));
 
-        res += blockSize;
-    }
-}
-
-Px blockMeasure(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px) {
-    Px res = Px{};
-
-    for (auto &c : ctx.children()) {
-        auto childCtx = ctx.subContext(
-            c,
-            axis,
-            Vec2Px::ZERO
-        );
-
-        if (axis == Axis::VERTICAL) {
-            auto size = computePreferredOuterSize(childCtx, axis);
-            if (intrinsic == IntrinsicSize::MAX_CONTENT) {
-                res += size;
-            } else {
-                res = max(res, size);
-            }
-        } else {
-            auto size = computePreferredOuterSize(childCtx, axis);
-            res = max(res, size);
-        }
+        pos += blockSize;
+        width = max(width, box.contentBox().width);
     }
 
-    return res;
+    return Output::fromSize({
+        width,
+        pos - box.contentBox().top(),
+    });
 }
 
 } // namespace Vaev::Layout

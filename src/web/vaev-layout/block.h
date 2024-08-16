@@ -5,7 +5,7 @@
 
 namespace Vaev::Layout {
 
-void blockLayout(Context &ctx, Box box);
+Output blockLayout(Context &ctx, Box box, Input input);
 
 Px blockMeasure(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px availableSpace);
 

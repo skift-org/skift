@@ -5,8 +5,6 @@
 
 namespace Vaev::Layout {
 
-void tableLayout(Context &ctx, Box box);
-
-Px tableMeasure(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px availableSpace);
+Output tableLayout(Context &ctx, Box box, Input input);
 
 } // namespace Vaev::Layout

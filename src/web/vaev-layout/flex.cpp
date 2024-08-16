@@ -4,8 +4,9 @@
 
 namespace Vaev::Layout {
 
-void flexLayout(Context &ctx, Box box) {
-    ctx.frag.box = box;
+Output flexLayout(Context &ctx, Box box, Input input) {
+    if (input.commit == Commit::YES)
+        ctx.frag.box = box;
 
     Axis mainAxis = Axis::HORIZONTAL;
 
@@ -23,9 +24,11 @@ void flexLayout(Context &ctx, Box box) {
             box.contentBox()
         );
 
+        auto availableSpace = max(Px{0}, box.contentBox().width - res);
+
         auto inlineSize = computePreferredOuterSize(
             childContext, mainAxis,
-            max(Px{0}, box.contentBox().width - res)
+            availableSpace
         );
 
         RectPx borderBox = RectPx{
@@ -36,36 +39,15 @@ void flexLayout(Context &ctx, Box box) {
         };
 
         auto box = computeBox(childContext, borderBox);
-        layout(childContext, box);
+        layout(childContext, box, input.withAvailableSpace(borderBox.wh));
 
         res += inlineSize;
     }
-}
 
-Px flexMeasure(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px) {
-    Px res = Px{};
-
-    for (auto &c : ctx.children()) {
-        auto childCtx = ctx.subContext(
-            c,
-            axis,
-            Vec2Px::ZERO
-        );
-
-        if (axis == Axis::HORIZONTAL) {
-            auto size = computePreferredOuterSize(childCtx, axis);
-            if (intrinsic == IntrinsicSize::MAX_CONTENT) {
-                res += size;
-            } else {
-                res = max(res, size);
-            }
-        } else {
-            auto size = computePreferredOuterSize(childCtx, axis);
-            res = max(res, size);
-        }
-    }
-
-    return res;
+    return Output::fromSize({
+        res - box.contentBox().start(),
+        blockSize,
+    });
 }
 
 } // namespace Vaev::Layout

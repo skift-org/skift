@@ -1,7 +1,5 @@
 #pragma once
 
-#include <karm-base/ranges.h>
-#include <karm-base/rc.h>
 #include <karm-gfx/canvas.h>
 #include <karm-math/rect.h>
 
@@ -89,6 +87,16 @@ struct Font {
         g.scale(fontsize);
         fontface->contour(g, glyph);
     }
+
+    f64 fontSize();
+
+    f64 xHeight();
+
+    f64 capHeight();
+
+    f64 zeroAdvance();
+
+    f64 lineHeight();
 };
 
 } // namespace Karm::Text

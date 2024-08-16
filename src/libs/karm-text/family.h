@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/ranges.h>
 #include <karm-logger/logger.h>
 
 #include "book.h"

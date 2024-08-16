@@ -95,9 +95,8 @@ Px computeSpecifiedSize(Context &ctx, Axis axis, Size size, Px availableSpace) {
 
     auto &style = ctx.style();
 
-    if (style.boxSizing == BoxSizing::CONTENT_BOX) {
+    if (style.boxSizing == BoxSizing::CONTENT_BOX)
         return res;
-    }
 
     if (axis == Axis::HORIZONTAL) {
         res += max(Px{0}, computeInset(ctx, axis, style.padding->start));
@@ -227,6 +226,16 @@ Box computeBox(Context &ctx, RectPx borderBox) {
     res.radii.f = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->radii.f);
     res.radii.g = computeInset(ctx, Axis::HORIZONTAL, ctx.style().borders->radii.g);
     res.radii.h = computeInset(ctx, Axis::VERTICAL, ctx.style().borders->radii.h);
+
+    borderBox.height = max(
+        borderBox.height,
+        res.paddings.all().height + res.borders.all().height
+    );
+
+    borderBox.width = max(
+        borderBox.width,
+        res.paddings.all().width + res.borders.all().width
+    );
 
     res.borderBox = borderBox;
 

@@ -8,6 +8,7 @@
 #include "flex.h"
 #include "frag.h"
 #include "grid.h"
+#include "sizing.h"
 #include "table.h"
 
 namespace Vaev::Layout {
@@ -136,43 +137,46 @@ Frag build(Style::Computer &c, Dom::Document const &doc) {
 
 // MARK: Layout ----------------------------------------------------------------
 
-void layout(Context &ctx, Box box) {
+Output layout(Context &ctx, Box box, Input input) {
     auto display = ctx.style().display;
 
     if (auto *run = ctx.frag.content.is<Strong<Text::Run>>()) {
-        ctx.frag.box = box;
-        (*run)->layout();
+        if (input.commit == Commit::YES)
+            ctx.frag.box = box;
+        return Output::fromSize((*run)->layout().cast<Px>());
     } else if (display == Display::FLOW or display == Display::FLOW_ROOT) {
-        blockLayout(ctx, box);
+        return blockLayout(ctx, box, input);
     } else if (display == Display::FLEX) {
-        flexLayout(ctx, box);
+        return flexLayout(ctx, box, input);
     } else if (display == Display::GRID) {
-        gridLayout(ctx, box);
+        return gridLayout(ctx, box, input);
     } else if (display == Display::TABLE) {
-        tableLayout(ctx, box);
+        return tableLayout(ctx, box, input);
     } else {
-        logWarn("layout: unsupported display: {}", display);
-        blockLayout(ctx, box);
+        return blockLayout(ctx, box, input);
     }
 }
 
 Px measure(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px availableSpace) {
-    auto display = ctx.style().display;
+    Box box = computeBox(
+        ctx,
+        {
+            axis == Axis::HORIZONTAL ? availableSpace : Px{0},
+            axis == Axis::VERTICAL ? availableSpace : Px{0},
+        }
+    );
 
-    if (auto *run = ctx.frag.content.is<Strong<Text::Run>>()) {
-        return Px{(*run)->layout()[axis.index()]};
-    } else if (display == Display::FLOW or display == Display::FLOW_ROOT) {
-        return blockMeasure(ctx, axis, intrinsic, availableSpace);
-    } else if (display == Display::FLEX) {
-        return flexMeasure(ctx, axis, intrinsic, availableSpace);
-    } else if (display == Display::GRID) {
-        return gridMeasure(ctx, axis, intrinsic, availableSpace);
-    } else if (display == Display::TABLE) {
-        return tableMeasure(ctx, axis, intrinsic, availableSpace);
-    } else {
-        logWarn("measure: unsupported display: {}", display);
-        return blockMeasure(ctx, axis, intrinsic, availableSpace);
-    }
+    auto ouput = layout(
+        ctx,
+        box,
+        {.commit = Commit::NO,
+         .axis = axis,
+         .intrinsic = intrinsic,
+         .availableSpace = box.borderBox.wh
+        }
+    );
+
+    return ouput.size[axis.index()];
 }
 
 // MARK: Paint -----------------------------------------------------------------

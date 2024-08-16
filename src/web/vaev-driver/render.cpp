@@ -77,7 +77,7 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
         .borderBox = {vp.small.width, height},
     };
 
-    Layout::layout(ctx, containingBox);
+    Layout::layout(ctx, containingBox, {Layout::Commit::YES});
 
     auto paintRoot = makeStrong<Paint::Stack>();
 
@@ -123,7 +123,7 @@ RenderResult render(Dom::Document &dom, Style::Media const &media, Print::PaperS
         .borderBox = {vp.small.width, height},
     };
 
-    Layout::layout(ctx, containingBox);
+    Layout::layout(ctx, containingBox, {Layout::Commit::YES});
 
     auto paintRoot = makeStrong<Paint::Page>();
     Layout::paint(*layoutRoot, *paintRoot);

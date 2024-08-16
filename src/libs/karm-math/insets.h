@@ -50,6 +50,14 @@ struct Insets {
         return {start + end, top + bottom};
     }
 
+    constexpr Math::Vec2<T> horizontal() const {
+        return {start, end};
+    }
+
+    constexpr Math::Vec2<T> vertical() const {
+        return {top, bottom};
+    }
+
     void repr(Io::Emit &e) const {
         e("(insets {} {} {} {})", start, top, end, bottom);
     }

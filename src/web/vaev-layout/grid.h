@@ -5,8 +5,6 @@
 
 namespace Vaev::Layout {
 
-void gridLayout(Context &ctx, Box box);
-
-Px gridMeasure(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px availableSpace);
+Output gridLayout(Context &ctx, Box box, Input input);
 
 } // namespace Vaev::Layout

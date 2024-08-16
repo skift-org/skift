@@ -4,14 +4,9 @@
 
 namespace Vaev::Layout {
 
-void gridLayout(Context &ctx, Box box) {
+Output gridLayout(Context &ctx, Box box, Input input) {
     // FIXME: Implement grid layout
-    blockLayout(ctx, box);
-}
-
-Px gridMeasure(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px availableSpace) {
-    // FIXME: Implement grid measure
-    return blockMeasure(ctx, axis, intrinsic, availableSpace);
+    return blockLayout(ctx, box, input);
 }
 
 } // namespace Vaev::Layout

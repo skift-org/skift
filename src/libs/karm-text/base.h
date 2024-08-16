@@ -5,9 +5,11 @@
 #include <karm-base/string.h>
 #include <karm-io/emit.h>
 
-#include "_fwd.h"
-
 namespace Karm::Text {
+
+struct Run;
+
+struct Font;
 
 struct Glyph {
     u16 index;

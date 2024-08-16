@@ -19,7 +19,13 @@ static void _collectColumnSize(Context &ctx, Vec<ColumnSizing> &cols, usize inde
             cols.pushBack({
                 .width = computePreferredOuterSize(ctx, Axis::HORIZONTAL),
             });
+        } else {
+            cols[index].width = max(
+                cols[index].width,
+                computePreferredOuterSize(ctx, Axis::HORIZONTAL)
+            );
         }
+        return;
     }
 
     for (auto &c : ctx.children()) {
@@ -41,10 +47,32 @@ static void _collectColumnSize(Context &ctx, Vec<ColumnSizing> &cols, usize inde
     }
 }
 
-static void _placeColumns(Context &ctx, Box box, Vec<ColumnSizing> &cols) {
-    ctx.frag.box = box;
+static Px _collectRowHeight(Context &ctx) {
+    auto display = ctx.style().display;
+    if (display == Display::TABLE_CELL) {
+        return computePreferredOuterSize(ctx, Axis::VERTICAL);
+    }
+
+    Px res = Px{0};
+    for (auto &c : ctx.children()) {
+        auto childCtx = ctx.subContext(
+            c,
+            Axis::HORIZONTAL,
+            {}
+        );
+
+        res = max(res, _collectRowHeight(childCtx));
+    }
+
+    return res;
+}
+
+static Output _placeColumns(Context &ctx, Box box, Input input, Vec<ColumnSizing> &cols) {
+    if (input.commit == Commit::YES)
+        ctx.frag.box = box;
 
     Px res = box.contentBox().start();
+    Px height = _collectRowHeight(ctx);
 
     for (usize i = 0; i < ctx.children().len(); i++) {
         auto &c = ctx.children()[i];
@@ -59,18 +87,24 @@ static void _placeColumns(Context &ctx, Box box, Vec<ColumnSizing> &cols) {
             res,
             box.contentBox().top(),
             cols[i].width,
-            box.contentBox().height,
+            height,
         };
 
         auto box = computeBox(childCtx, borderBox);
-        layout(childCtx, box);
+        layout(childCtx, box, input.withAvailableSpace(borderBox.wh));
 
         res += cols[i].width;
     }
+
+    return Output::fromSize({
+        res - box.contentBox().start(),
+        height,
+    });
 }
 
-void _placeRows(Context &ctx, Box box, Vec<ColumnSizing> &cols) {
-    ctx.frag.box = box;
+static Output _placeRows(Context &ctx, Box box, Input input, Vec<ColumnSizing> &cols) {
+    if (input.commit == Commit::YES)
+        ctx.frag.box = box;
 
     Axis mainAxis = Axis::VERTICAL;
 
@@ -83,11 +117,16 @@ void _placeRows(Context &ctx, Box box, Vec<ColumnSizing> &cols) {
             box.contentBox()
         );
 
-        auto blockSize = computePreferredOuterSize(
-            childContext,
-            mainAxis,
-            max(Px{0}, box.contentBox().height - res)
-        );
+        Px blockSize = {};
+
+        if (c->display == Display::TABLE_ROW)
+            blockSize = _collectRowHeight(childContext);
+        else
+            blockSize = computePreferredOuterSize(
+                childContext,
+                mainAxis,
+                max(Px{0}, box.contentBox().height - res)
+            );
 
         RectPx borderBox = RectPx{
             box.contentBox().start(),
@@ -95,53 +134,34 @@ void _placeRows(Context &ctx, Box box, Vec<ColumnSizing> &cols) {
             box.contentBox().width,
             blockSize,
         };
-
-        auto box = computeBox(childContext, borderBox);
+        auto childBox = computeBox(childContext, borderBox);
 
         if (c->display == Display::TABLE_ROW) {
-            _placeColumns(childContext, box, cols);
+            _placeColumns(childContext, childBox, input, cols);
+        } else if (c->display == Display::TABLE_CAPTION) {
+            layout(childContext, childBox, input.withAvailableSpace(borderBox.wh));
         } else if (c->display.isTableGroup()) {
-            _placeRows(childContext, box, cols);
+            _placeRows(childContext, childBox, input, cols);
         } else {
-            layout(childContext, box);
+            layout(childContext, childBox, input.withAvailableSpace(borderBox.wh));
         }
 
         res += blockSize;
     }
+
+    return Output::fromSize({
+        box.contentBox().width,
+        res - box.contentBox().top(),
+    });
 }
 
-void tableLayout(Context &ctx, Box box) {
-    ctx.frag.box = box;
+Output tableLayout(Context &ctx, Box box, Input input) {
+    if (input.commit == Commit::YES)
+        ctx.frag.box = box;
 
     Vec<ColumnSizing> cols;
     _collectColumnSize(ctx, cols);
-    _placeRows(ctx, box, cols);
-}
-
-Px tableMeasure(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px) {
-    Px res = Px{};
-
-    for (auto &c : ctx.children()) {
-        auto childCtx = ctx.subContext(
-            c,
-            axis,
-            Vec2Px::ZERO
-        );
-
-        if (axis == Axis::VERTICAL) {
-            auto size = computePreferredOuterSize(childCtx, axis);
-            if (intrinsic == IntrinsicSize::MAX_CONTENT) {
-                res += size;
-            } else {
-                res = max(res, size);
-            }
-        } else {
-            auto size = computePreferredOuterSize(childCtx, axis);
-            res = max(res, size);
-        }
-    }
-
-    return res;
+    return _placeRows(ctx, box, input, cols);
 }
 
 } // namespace Vaev::Layout

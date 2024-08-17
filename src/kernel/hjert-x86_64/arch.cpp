@@ -26,7 +26,7 @@ static x86_64::Com _com1 = x86_64::Com::com1();
 static x86_64::DualPic _pic = x86_64::DualPic::dualPic();
 static x86_64::Pit _pit = x86_64::Pit::pit();
 
-static Array<Byte, Hal::PAGE_SIZE * 16> _kstackRsp{};
+static Array<Byte, Hal::PAGE_SIZE * 16> _kstack{};
 static x86_64::Tss _tss{};
 
 static x86_64::Gdt _gdt{_tss};
@@ -40,7 +40,7 @@ Res<> init(Handover::Payload &) {
 
     _gdtDesc.load();
     _tss = {};
-    _tss._rsp[0] = (u64)_kstackRsp.bytes().end();
+    _tss.rsp[0] = (u64)_kstack.bytes().end();
     x86_64::_tssUpdate();
 
     for (usize i = 0; i < x86_64::Idt::LEN; i++) {

@@ -6,60 +6,60 @@ namespace x86_64 {
 
 struct [[gnu::packed]] Tss {
     u32 _reserved;
-    Array<u64, 3> _rsp;
-    u64 _reserved0;
-    Array<u64, 7> _ist;
-    u32 _reserved1;
+    Array<u64, 3> rsp;
+    u64 _reserved1;
+    Array<u64, 7> ist;
     u32 _reserved2;
-    u16 _reserved3;
-    u16 _iopbOffset;
+    u32 _reserved3;
+    u16 _reserved4;
+    u16 iopbOffset;
 };
 
 struct [[gnu::packed]] GdtEntry {
-    u16 _limitLow{};
-    u16 _baseLow{};
-    u8 _baseMid{};
-    u8 _flags{};
-    u8 _limitHigh : 4 {};
-    u8 _granularity : 4 {};
-    u8 _baseHigh{};
+    u16 limitLow{};
+    u16 baseLow{};
+    u8 baseMid{};
+    u8 flags{};
+    u8 limitHigh : 4 {};
+    u8 granularity : 4 {};
+    u8 baseHigh{};
 
     constexpr GdtEntry() = default;
 
     constexpr GdtEntry(u8 flags, u8 granularity)
-        : _flags(flags),
-          _granularity(granularity) {};
+        : flags(flags),
+          granularity(granularity){};
 
     constexpr GdtEntry(u32 base, u32 limit, u8 flags, u8 granularity)
-        : _limitLow(limit & 0xffff),
-          _baseLow(base & 0xffff),
-          _baseMid((base >> 16) & 0xff),
-          _flags(flags),
-          _limitHigh((limit >> 16) & 0x0f),
-          _granularity(granularity),
-          _baseHigh((base >> 24) & 0xff) {}
+        : limitLow(limit & 0xffff),
+          baseLow(base & 0xffff),
+          baseMid((base >> 16) & 0xff),
+          flags(flags),
+          limitHigh((limit >> 16) & 0x0f),
+          granularity(granularity),
+          baseHigh((base >> 24) & 0xff) {}
 };
 
 struct [[gnu::packed]] GdtTssEntry {
-    u16 _len;
-    u16 _baseLow16;
-    u8 _baseMid8;
-    u8 _flags1;
-    u8 _flags2;
-    u8 _baseHigh8;
-    u32 _baseUpper32;
+    u16 len;
+    u16 baseLow16;
+    u8 baseMid8;
+    u8 flags1;
+    u8 flags2;
+    u8 baseHigh8;
+    u32 baseUpper32;
     u32 _reserved;
 
     constexpr GdtTssEntry() = default;
 
     GdtTssEntry(Tss const &tss)
-        : _len(sizeof(Tss)),
-          _baseLow16((usize)&tss & 0xffff),
-          _baseMid8(((usize)&tss >> 16) & 0xff),
-          _flags1(0b10001001),
-          _flags2(0),
-          _baseHigh8(((usize)&tss >> 24) & 0xff),
-          _baseUpper32((usize)&tss >> 32),
+        : len(sizeof(Tss)),
+          baseLow16((usize)&tss & 0xffff),
+          baseMid8(((usize)&tss >> 16) & 0xff),
+          flags1(0b10001001),
+          flags2(0),
+          baseHigh8(((usize)&tss >> 24) & 0xff),
+          baseUpper32((usize)&tss >> 32),
           _reserved() {}
 };
 
@@ -106,12 +106,12 @@ extern "C" void _gdtLoad(void const *ptr);
 extern "C" void _tssUpdate();
 
 struct [[gnu::packed]] GdtDesc {
-    u16 _limit;
-    u64 _base;
+    u16 limit;
+    u64 base;
 
     GdtDesc(Gdt const &base)
-        : _limit(sizeof(Gdt) - 1),
-          _base(reinterpret_cast<usize>(&base)) {}
+        : limit(sizeof(Gdt) - 1),
+          base(reinterpret_cast<usize>(&base)) {}
 
     void load() const { _gdtLoad(this); }
 };

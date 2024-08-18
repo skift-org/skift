@@ -26,6 +26,10 @@ struct Port : public Distinct<u64, struct _PortTag> {
     static Port const BUS;
 
     using Distinct::Distinct;
+
+    void repr(Io::Emit &e) const {
+        e("{}", value());
+    }
 };
 
 constexpr Port Port::INVALID{0};
@@ -35,6 +39,10 @@ struct Header {
     u64 seq;
     Port port;
     Meta::Id mid;
+
+    void repr(Io::Emit &e) const {
+        e("(header seq: {}, port: {}, mid: {:016x})", seq, port, mid);
+    }
 };
 
 struct Message {

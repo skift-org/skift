@@ -137,7 +137,7 @@ Frag build(Style::Computer &c, Dom::Document const &doc) {
 
 // MARK: Layout ----------------------------------------------------------------
 
-Output layout(Context &ctx, Box box, Input input) {
+Output innerLayout(Context &ctx, Box box, Input input) {
     auto display = ctx.style().display;
 
     if (auto *run = ctx.frag.content.is<Strong<Text::Run>>()) {
@@ -155,6 +155,10 @@ Output layout(Context &ctx, Box box, Input input) {
     } else {
         return blockLayout(ctx, box, input);
     }
+}
+
+Output layout(Context &ctx, Box box, Input input) {
+    return innerLayout(ctx, box, input);
 }
 
 Px measure(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px availableSpace) {

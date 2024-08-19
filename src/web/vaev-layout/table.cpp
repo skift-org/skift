@@ -67,6 +67,21 @@ static Px _collectRowHeight(Context &ctx) {
     return res;
 }
 
+static Px _collectRowsHeight(Context &ctx) {
+    Px res = Px{0};
+    for (auto &c : ctx.children()) {
+        auto childCtx = ctx.subContext(
+            c,
+            Axis::HORIZONTAL,
+            {}
+        );
+
+        res += _collectRowHeight(childCtx);
+    }
+
+    return res;
+}
+
 static Output _placeColumns(Context &ctx, Box box, Input input, Vec<ColumnSizing> &cols) {
     if (input.commit == Commit::YES)
         ctx.frag.box = box;
@@ -122,11 +137,7 @@ static Output _placeRows(Context &ctx, Box box, Input input, Vec<ColumnSizing> &
         if (c->display == Display::TABLE_ROW)
             blockSize = _collectRowHeight(childContext);
         else
-            blockSize = computePreferredOuterSize(
-                childContext,
-                mainAxis,
-                max(Px{0}, box.contentBox().height - res)
-            );
+            blockSize = _collectRowsHeight(childContext);
 
         RectPx borderBox = RectPx{
             box.contentBox().start(),

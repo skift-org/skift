@@ -10,6 +10,8 @@ namespace Karm::Math {
 
 template <typename T>
 union Rect {
+    using Scalar = T;
+
     struct {
         T x, y, width, height;
     };
@@ -296,6 +298,11 @@ union Rect {
 
     void repr(Io::Emit &e) const {
         e("(rect {} {} {} {})", x, y, width, height);
+    }
+
+    constexpr auto map(auto f) const {
+        using U = decltype(f(x));
+        return Rect<U>{f(x), f(y), f(width), f(height)};
     }
 };
 

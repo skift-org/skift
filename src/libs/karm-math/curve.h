@@ -168,6 +168,11 @@ union Curve {
     void repr(Io::Emit &e) const {
         e("(curve {} {} {} {})", a, b, c, d);
     }
+
+    constexpr auto map(auto f) const {
+        using U = decltype(f(a));
+        return Curve<U>{f(a), f(b), f(c), f(d)};
+    }
 };
 
 using Curvei = Curve<isize>;

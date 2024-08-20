@@ -176,6 +176,11 @@ union Vec2 {
     void repr(Io::Emit &e) const {
         e("(vec {} {})", x, y);
     }
+
+    constexpr auto map(auto f) const {
+        using U = decltype(f(x));
+        return Vec2<U>{f(x), f(y)};
+    }
 };
 
 template <typename T>
@@ -381,6 +386,11 @@ union Vec3 {
     void repr(Io::Emit &e) const {
         e("(vec {} {} {})", x, y, z);
     }
+
+    constexpr auto map(auto f) const {
+        using U = decltype(f(x));
+        return Vec3<U>{f(x), f(y), f(z)};
+    }
 };
 
 template <typename T>
@@ -572,6 +582,11 @@ union Vec4 {
 
     void repr(Io::Emit &e) const {
         e("(vec {} {} {} {})", x, y, z, w);
+    }
+
+    constexpr auto map(auto f) const {
+        using U = decltype(f(x));
+        return Vec4<U>{f(x), f(y), f(z), f(w)};
     }
 };
 

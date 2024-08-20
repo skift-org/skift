@@ -44,6 +44,11 @@ union Ellipse {
     void repr(Io::Emit &e) const {
         e("(ellipse {} {} {} {})", cx, cy, rx, ry);
     }
+
+    constexpr auto map(auto f) const {
+        using U = decltype(f(cx));
+        return Ellipse<U>{f(cx), f(cy), f(rx), f(ry)};
+    }
 };
 
 using Ellipsei = Ellipse<isize>;

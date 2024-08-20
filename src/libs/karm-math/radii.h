@@ -145,6 +145,20 @@ struct Radii {
     void repr(Io::Emit &_e) const {
         _e("(radii {} {} {} {} {} {} {} {})", a, b, c, d, e, f, g, h);
     }
+
+    constexpr auto map(auto f) const {
+        using U = decltype(f(a));
+        return Radii<U>{
+            f(a),
+            f(b),
+            f(c),
+            f(d),
+            f(e),
+            f(f),
+            f(g),
+            f(h),
+        };
+    }
 };
 
 using Radiii = Radii<isize>;

@@ -98,6 +98,11 @@ union Edge {
     void repr(Io::Emit &e) const {
         e("(edge {} {} {} {})", sx, sy, ex, ey);
     }
+
+    constexpr auto map(auto f) const {
+        using U = decltype(f(sx));
+        return Edge<U>{f(sx), f(sy), f(ex), f(ey)};
+    }
 };
 
 using Edgei = Edge<isize>;

@@ -6,6 +6,8 @@ namespace Karm::Math {
 
 template <typename V, typename T = typename V::Scalar>
 struct Ray {
+    using Scalar = T;
+
     V o;
     V dir;
 
@@ -17,6 +19,11 @@ struct Ray {
 
     constexpr V at(T t) const {
         return o + dir * t;
+    }
+
+    constexpr auto map(auto f) const {
+        using U = decltype(o.map(f));
+        return Ray<U>{o.map(f), dir.map(f)};
     }
 };
 

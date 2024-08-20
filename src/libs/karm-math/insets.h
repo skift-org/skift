@@ -61,6 +61,11 @@ struct Insets {
     void repr(Io::Emit &e) const {
         e("(insets {} {} {} {})", start, top, end, bottom);
     }
+
+    constexpr auto map(auto f) const {
+        using U = decltype(f(start));
+        return Insets<U>{f(start), f(top), f(end), f(bottom)};
+    }
 };
 
 using Insetsi = Insets<isize>;

@@ -73,6 +73,11 @@ union Tri2 {
     void repr(Io::Emit &e) const {
         e("(tri {} {} {})", a, b, c);
     }
+
+    constexpr auto map(auto f) const {
+        using U = decltype(f(ax));
+        return Tri2<U>{f(ax), f(ay), f(bx), f(by), f(cx), f(cy)};
+    }
 };
 
 using Tri2i = Tri2<isize>;

@@ -279,9 +279,8 @@ static OpCode _peekOpCode(Cursor<Css::Sst> &cur) {
     case Css::Token::WHITESPACE:
         cur.next();
         // a white space could be an operator or be ignored if followed by another op
-        if (cur.ended()) {
+        if (cur.ended())
             return OpCode::NOP;
-        }
 
         if (
             cur.peek() == Css::Token::IDENT or
@@ -293,12 +292,12 @@ static OpCode _peekOpCode(Cursor<Css::Sst> &cur) {
         } else {
             auto op = _peekOpCode(cur);
 
-            if (cur.peek(1).token.type == Css::Token::WHITESPACE) {
-                if (cur.ended()) {
+            if (cur.rem() > 1 and cur.peek(1).token == Css::Token::WHITESPACE) {
+                if (cur.ended())
                     return OpCode::NOP;
-                }
                 cur.next();
             }
+
             return op;
         }
 

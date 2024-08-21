@@ -14,9 +14,6 @@ namespace Vaev::Layout {
 
 // MARK: Frag ------------------------------------------------------------------
 
-struct Frag;
-struct Context;
-
 using Content = Union<
     None,
     Vec<Frag>,
@@ -25,12 +22,13 @@ using Content = Union<
 
 struct Frag : public Meta::NoCopy {
     Strong<Style::Computed> style;
+    Text::Font font;
     Content content = NONE;
     Box box{};
 
-    Frag(Strong<Style::Computed> style);
+    Frag(Strong<Style::Computed> style, Text::Font font);
 
-    Frag(Strong<Style::Computed> style, Content content);
+    Frag(Strong<Style::Computed> style, Text::Font font, Content content);
 
     Slice<Frag> children() const;
 
@@ -45,6 +43,11 @@ struct Frag : public Meta::NoCopy {
     void repr(Io::Emit &e) const;
 };
 
+struct Tree {
+    Frag root;
+    Viewport viewport;
+};
+
 // MARK: Build -----------------------------------------------------------------
 
 void build(Style::Computer &c, Dom::Node const &n, Frag &parent);
@@ -53,9 +56,9 @@ Frag build(Style::Computer &c, Dom::Document const &doc);
 
 // MARK: Layout ----------------------------------------------------------------
 
-Output layout(Context &ctx, Box box, Input input);
+Output layout(Tree &t, Frag &f, Box box, Input input);
 
-Px measure(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px availableSpace);
+Px measure(Tree &t, Frag &f, Axis axis, IntrinsicSize intrinsic, Px availableSpace);
 
 // MARK: Paint -----------------------------------------------------------------
 

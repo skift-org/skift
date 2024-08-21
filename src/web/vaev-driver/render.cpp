@@ -60,31 +60,48 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
     logDebug("style collection time: {}", elapsed);
 
     Style::Computer computer{media, stylebook};
-    auto layoutRoot = makeStrong<Layout::Frag>(Layout::build(computer, dom));
-
-    Layout::Viewport vp{.small = viewport};
-    Layout::Context ctx{
-        .viewport = vp,
-        .frag = *layoutRoot,
-        .axis = Axis::VERTICAL,
-        .containingBlock = vp.small,
-        .font = Text::Font::fallback(),
+    Layout::Tree tree = {
+        Layout::build(computer, dom),
+        {
+            .small = viewport,
+        }
     };
 
-    auto height = Layout::computePreferredOuterSize(ctx, Axis::VERTICAL);
+    Layout::Viewport vp{.small = viewport};
+
+    auto height = Layout::computePreferredOuterSize(
+        tree,
+        tree.root,
+        {
+            .commit = Layout::Commit::NO,
+            .axis = Axis::VERTICAL,
+        },
+        Axis::VERTICAL
+    );
 
     Layout::Box containingBox = {
         .borderBox = {vp.small.width, height},
     };
 
-    Layout::layout(ctx, containingBox, {Layout::Commit::YES});
+    Layout::layout(
+        tree,
+        tree.root,
+        containingBox,
+        {
+            .commit = Layout::Commit::YES,
+            .containingBlock = containingBox.borderBox,
+        }
+    );
 
     auto paintRoot = makeStrong<Paint::Stack>();
 
-    Layout::paint(*layoutRoot, *paintRoot);
+    Layout::paint(tree.root, *paintRoot);
     paintRoot->prepare();
 
-    return {layoutRoot, paintRoot};
+    return {
+        makeStrong<Layout::Frag>(std::move(tree.root)),
+        paintRoot,
+    };
 }
 
 RenderResult render(Dom::Document &dom, Style::Media const &media, Print::PaperStock paper) {
@@ -100,7 +117,6 @@ RenderResult render(Dom::Document &dom, Style::Media const &media, Print::PaperS
     logDebug("style collection time: {}", elapsed);
 
     Style::Computer computer{media, stylebook};
-    auto layoutRoot = makeStrong<Layout::Frag>(Layout::build(computer, dom));
 
     Layout::Viewport vp{
         .small = {
@@ -109,27 +125,43 @@ RenderResult render(Dom::Document &dom, Style::Media const &media, Print::PaperS
         },
     };
 
-    Layout::Context ctx{
-        .viewport = vp,
-        .frag = *layoutRoot,
-        .axis = Axis::VERTICAL,
-        .containingBlock = vp.small,
-        .font = Text::Font::fallback(),
+    Layout::Tree tree = {
+        Layout::build(computer, dom),
+        vp,
     };
 
-    auto height = Layout::computePreferredOuterSize(ctx, Axis::VERTICAL);
+    auto height = Layout::computePreferredOuterSize(
+        tree,
+        tree.root,
+        {
+            .commit = Layout::Commit::NO,
+            .axis = Axis::VERTICAL,
+        },
+        Axis::VERTICAL
+    );
 
     Layout::Box containingBox = {
         .borderBox = {vp.small.width, height},
     };
 
-    Layout::layout(ctx, containingBox, {Layout::Commit::YES});
+    Layout::layout(
+        tree,
+        tree.root,
+        containingBox,
+        {
+            .commit = Layout::Commit::YES,
+            .containingBlock = containingBox.borderBox,
+        }
+    );
 
     auto paintRoot = makeStrong<Paint::Page>();
-    Layout::paint(*layoutRoot, *paintRoot);
+    Layout::paint(tree.root, *paintRoot);
     paintRoot->prepare();
 
-    return {layoutRoot, paintRoot};
+    return {
+        makeStrong<Layout::Frag>(std::move(tree.root)),
+        paintRoot,
+    };
 }
 
 } // namespace Vaev::Driver

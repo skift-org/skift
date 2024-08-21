@@ -4,30 +4,27 @@
 
 namespace Vaev::Layout {
 
-Output flexLayout(Context &ctx, Box box, Input input) {
+Output flexLayout(Tree &t, Frag &f, Box box, Input input) {
     if (input.commit == Commit::YES)
-        ctx.frag.box = box;
+        f.box = box;
 
     Axis mainAxis = Axis::HORIZONTAL;
 
     Px res = box.contentBox().start();
     auto blockSize = computePreferredBorderSize(
-        ctx,
+        t, f,
+        input,
         mainAxis.cross(),
         box.contentBox().height
     );
 
-    for (auto &c : ctx.children()) {
-        auto childContext = ctx.subContext(
-            c,
-            mainAxis,
-            box.contentBox()
-        );
-
+    for (auto &c : f.children()) {
         auto availableSpace = max(Px{0}, box.contentBox().width - res);
 
         auto inlineSize = computePreferredOuterSize(
-            childContext, mainAxis,
+            t, f,
+            input,
+            mainAxis,
             availableSpace
         );
 
@@ -38,8 +35,18 @@ Output flexLayout(Context &ctx, Box box, Input input) {
             blockSize,
         };
 
-        auto box = computeBox(childContext, borderBox);
-        layout(childContext, box, input.withAvailableSpace(borderBox.wh));
+        auto childBox = computeBox(t, f, input, borderBox);
+
+        layout(
+            t, c,
+            childBox,
+            {
+                .commit = input.commit,
+                .axis = input.axis,
+                .availableSpace = borderBox.wh,
+                .containingBlock = box.contentBox(),
+            }
+        );
 
         res += inlineSize;
     }

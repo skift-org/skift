@@ -1,10 +1,11 @@
 #pragma once
 
 #include "base.h"
-#include "box.h"
 
 namespace Vaev::Layout {
 
-Output tableLayout(Tree &t, Frag &f, Box box, Input input);
+Axis mainAxis(Frag &f);
+
+Axis crossAxis(Frag &f);
 
 } // namespace Vaev::Layout

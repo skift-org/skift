@@ -4,7 +4,6 @@
 #include <vaev-paint/text.h>
 
 #include "block.h"
-#include "context.h"
 #include "flex.h"
 #include "frag.h"
 #include "grid.h"
@@ -15,11 +14,11 @@ namespace Vaev::Layout {
 
 // MARK: Frag ------------------------------------------------------------------
 
-Frag::Frag(Strong<Style::Computed> style)
-    : style{std::move(style)} {}
+Frag::Frag(Strong<Style::Computed> style, Text::Font font)
+    : style{std::move(style)}, font{font} {}
 
-Frag::Frag(Strong<Style::Computed> style, Content content)
-    : style{std::move(style)}, content{std::move(content)} {}
+Frag::Frag(Strong<Style::Computed> style, Text::Font font, Content content)
+    : style{std::move(style)}, font{font}, content{std::move(content)} {}
 
 Karm::Slice<Frag> Frag::children() const {
     if (auto *frags = content.is<Vec<Frag>>())
@@ -60,6 +59,14 @@ void Frag::repr(Io::Emit &e) const {
 
 // MARK: Build -----------------------------------------------------------------
 
+static Opt<Strong<Text::Fontface>> _regularFontface = NONE;
+
+static Strong<Text::Fontface> regularFontface() {
+    if (not _regularFontface)
+        _regularFontface = Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Regular.ttf"_url).unwrap();
+    return *_regularFontface;
+}
+
 static void buildChildren(Style::Computer &c, Vec<Strong<Dom::Node>> const &children, Frag &parent) {
     for (auto &child : children) {
         build(c, *child, parent);
@@ -68,10 +75,11 @@ static void buildChildren(Style::Computer &c, Vec<Strong<Dom::Node>> const &chil
 
 static void buildElement(Style::Computer &c, Dom::Element const &el, Frag &parent) {
     auto style = c.computeFor(*parent.style, el);
+    auto font = Text::Font{regularFontface(), 16};
 
     if (el.tagName == Html::IMG) {
         Image::Picture img = Gfx::Surface::fallback();
-        parent.add({style, img});
+        parent.add({style, font, img});
         return;
     }
 
@@ -85,18 +93,9 @@ static void buildElement(Style::Computer &c, Dom::Element const &el, Frag &paren
         return;
     }
 
-    Frag frag = {style};
+    Frag frag = {style, font};
     buildChildren(c, el.children(), frag);
     parent.add(std::move(frag));
-}
-
-static Opt<Strong<Text::Fontface>> _regularFontface = NONE;
-
-static Strong<Text::Fontface> regularFontface() {
-    if (not _regularFontface) {
-        _regularFontface = Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Regular.ttf"_url).unwrap();
-    }
-    return *_regularFontface;
 }
 
 static void buildRun(Style::Computer &, Dom::Text const &node, Frag &parent) {
@@ -116,7 +115,7 @@ static void buildRun(Style::Computer &, Dom::Text const &node, Frag &parent) {
         }
     }
 
-    parent.add({style, run});
+    parent.add({style, font, run});
 }
 
 void build(Style::Computer &c, Dom::Node const &node, Frag &parent) {
@@ -130,40 +129,49 @@ void build(Style::Computer &c, Dom::Node const &node, Frag &parent) {
 }
 
 Frag build(Style::Computer &c, Dom::Document const &doc) {
-    Frag root = makeStrong<Style::Computed>();
+    auto font = Text::Font{regularFontface(), 16};
+    Frag root = {makeStrong<Style::Computed>(), font};
     build(c, doc, root);
     return root;
 }
 
 // MARK: Layout ----------------------------------------------------------------
 
-Output innerLayout(Context &ctx, Box box, Input input) {
-    auto display = ctx.style().display;
+Output innerLayout(Tree &t, Frag &f, Box box, Input input) {
+    auto display = f->display;
 
-    if (auto *run = ctx.frag.content.is<Strong<Text::Run>>()) {
+    if (auto *run = f.content.is<Strong<Text::Run>>()) {
         if (input.commit == Commit::YES)
-            ctx.frag.box = box;
+            f.box = box;
         return Output::fromSize((*run)->layout().cast<Px>());
     } else if (display == Display::FLOW or display == Display::FLOW_ROOT) {
-        return blockLayout(ctx, box, input);
+        return blockLayout(t, f, box, input);
     } else if (display == Display::FLEX) {
-        return flexLayout(ctx, box, input);
+        return flexLayout(t, f, box, input);
     } else if (display == Display::GRID) {
-        return gridLayout(ctx, box, input);
+        return gridLayout(t, f, box, input);
     } else if (display == Display::TABLE) {
-        return tableLayout(ctx, box, input);
+        return tableLayout(t, f, box, input);
     } else {
-        return blockLayout(ctx, box, input);
+        return blockLayout(t, f, box, input);
     }
 }
 
-Output layout(Context &ctx, Box box, Input input) {
-    return innerLayout(ctx, box, input);
+Output layout(Tree &t, Frag &f, Box box, Input input) {
+    return innerLayout(t, f, box, input);
 }
 
-Px measure(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px availableSpace) {
+Px measure(Tree &t, Frag &f, Axis axis, IntrinsicSize intrinsic, Px availableSpace) {
+    Input input = {
+        .commit = Commit::NO,
+        .axis = axis,
+        .intrinsic = intrinsic,
+        .availableSpace = availableSpace,
+    };
+
     Box box = computeBox(
-        ctx,
+        t, f,
+        input,
         {
             axis == Axis::HORIZONTAL ? availableSpace : Px{0},
             axis == Axis::VERTICAL ? availableSpace : Px{0},
@@ -171,13 +179,9 @@ Px measure(Context &ctx, Axis axis, IntrinsicSize intrinsic, Px availableSpace) 
     );
 
     auto ouput = layout(
-        ctx,
+        t, f,
         box,
-        {.commit = Commit::NO,
-         .axis = axis,
-         .intrinsic = intrinsic,
-         .availableSpace = box.borderBox.wh
-        }
+        input
     );
 
     return ouput.size[axis.index()];

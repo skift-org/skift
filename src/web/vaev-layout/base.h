@@ -31,12 +31,7 @@ struct Input {
     Axis axis = Axis::HORIZONTAL;
     IntrinsicSize intrinsic = IntrinsicSize::AUTO;
     Vec2Px availableSpace = {};
-
-    Input withAvailableSpace(Vec2Px availableSpace) const {
-        auto copy = *this;
-        copy.availableSpace = availableSpace;
-        return copy;
-    }
+    RectPx containingBlock{};
 };
 
 struct Output {
@@ -46,5 +41,9 @@ struct Output {
         return Output{size};
     }
 };
+
+struct Frag;
+
+struct Tree;
 
 } // namespace Vaev::Layout

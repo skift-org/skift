@@ -108,12 +108,12 @@ struct _String {
 
     static constexpr Array<Unit, 1> _EMPTY = {0};
 
-    Unit *_buf = nullptr;
+    Unit const *_buf = nullptr;
     usize _len = 0;
 
     constexpr _String() = default;
 
-    always_inline _String(Move, Unit *buf, usize len)
+    always_inline _String(Move, Unit const *buf, usize len)
         : _buf(buf),
           _len(len) {
     }
@@ -123,9 +123,11 @@ struct _String {
         if (len == 0)
             // Allow initializing the string using "" and not allocating memory.
             return;
-        _buf = new Unit[len + 1];
-        _buf[len] = 0;
-        memcpy(_buf, buf, len * sizeof(Unit));
+
+        auto store = new Unit[len + 1];
+        store[len] = 0;
+        memcpy(store, buf, len * sizeof(Unit));
+        _buf = store;
     }
 
     always_inline _String(_Str<E> str)

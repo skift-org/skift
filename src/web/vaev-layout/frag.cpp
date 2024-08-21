@@ -214,6 +214,7 @@ void paint(Frag &frag, Paint::Stack &stack) {
 
         borders = Paint::Borders();
         borders.radii = frag.box.radii.cast<f64>();
+        borders.bound = frag.box.contentBox().cast<f64>();
 
         borders.top.width = frag.box.borders.top.cast<f64>();
         borders.top.style = frag->borders->top.style;

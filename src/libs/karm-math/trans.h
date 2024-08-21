@@ -9,6 +9,8 @@ namespace Karm::Math {
 
 template <typename T>
 union Trans2 {
+    using Scalar = T;
+
     struct
     {
         T xx;
@@ -94,6 +96,26 @@ union Trans2 {
 
     constexpr Trans2(T xx, T xy, T yx, T yy, T ox, T oy)
         : _els{xx, xy, yx, yy, ox, oy} {}
+
+    constexpr Trans2(Trans2 const &other)
+        : _els{other._els} {}
+
+    constexpr Trans2(Trans2 &&other)
+        : _els{std::move(other._els)} {}
+
+    constexpr Trans2 &operator=(Trans2 const &other) {
+        _els = other._els;
+        return *this;
+    }
+
+    constexpr Trans2 &operator=(Trans2 &&other) {
+        _els = std::move(other._els);
+        return *this;
+    }
+
+    constexpr ~Trans2() {
+        _els.~Array();
+    }
 
     constexpr Vec2<T> applyVector(Vec2<T> v) const {
         return {

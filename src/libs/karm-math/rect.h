@@ -49,6 +49,26 @@ union Rect {
         : xy(), wh(wh) {
     }
 
+    constexpr Rect(Rect const &other)
+        : _els{other._els} {}
+
+    constexpr Rect(Rect &&other)
+        : _els{std::move(other._els)} {}
+
+    constexpr Rect &operator=(Rect const &other) {
+        _els = other._els;
+        return *this;
+    }
+
+    constexpr Rect &operator=(Rect &&other) {
+        _els = std::move(other._els);
+        return *this;
+    }
+
+    constexpr ~Rect() {
+        _els.~Array();
+    }
+
     always_inline static constexpr Rect<T> fromTwoPoint(Vec2<T> a, Vec2<T> b) {
         return {
             min(a.x, b.x),

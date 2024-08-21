@@ -13,9 +13,11 @@
 
 namespace Karm::Math {
 
+// Cubic Bezier curve
 template <typename T>
 union Curve {
-    // Cubic Bezier curve
+    using Scalar = T;
+
     struct {
         Vec2<T> a, b, c, d;
     };
@@ -33,6 +35,26 @@ union Curve {
 
     constexpr Curve(Vec2<T> a, Vec2<T> b, Vec2<T> c, Vec2<T> d)
         : a(a), b(b), c(c), d(d) {}
+
+    constexpr Curve(Curve const &other)
+        : _els{other._els} {}
+
+    constexpr Curve(Curve &&other)
+        : _els{std::move(other._els)} {}
+
+    constexpr Curve &operator=(Curve const &other) {
+        _els = other._els;
+        return *this;
+    }
+
+    constexpr Curve &operator=(Curve &&other) {
+        _els = std::move(other._els);
+        return *this;
+    }
+
+    constexpr ~Curve() {
+        _els.~Array();
+    }
 
     static constexpr Curve cubic(Vec2<T> a, Vec2<T> b, Vec2<T> c, Vec2<T> d) {
         return {a, b, c, d};

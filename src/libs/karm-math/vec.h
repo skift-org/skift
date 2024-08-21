@@ -36,6 +36,26 @@ union Vec2 {
     constexpr Vec2(T value)
         : _els{value, value} {}
 
+    constexpr Vec2(Vec2 const &other)
+        : _els{other._els} {}
+
+    constexpr Vec2(Vec2 &&other)
+        : _els{std::move(other._els)} {}
+
+    constexpr Vec2 &operator=(Vec2 const &other) {
+        _els = other._els;
+        return *this;
+    }
+
+    constexpr Vec2 &operator=(Vec2 &&other) {
+        _els = std::move(other._els);
+        return *this;
+    }
+
+    constexpr ~Vec2() {
+        _els.~Array();
+    }
+
     constexpr T min() const {
         return ::min(x, y);
     }
@@ -233,6 +253,11 @@ union Vec3 {
     };
 
     struct {
+        T r, g, b;
+    };
+
+    struct {
+
         Vec2<T> xy;
         T _z;
     };
@@ -252,6 +277,26 @@ union Vec3 {
 
     constexpr Vec3(T value)
         : _els{value, value, value} {}
+
+    constexpr Vec3(Vec3 const &other)
+        : _els{other._els} {}
+
+    constexpr Vec3(Vec3 &&other)
+        : _els{std::move(other._els)} {}
+
+    constexpr Vec3 &operator=(Vec3 const &other) {
+        _els = other._els;
+        return *this;
+    }
+
+    constexpr Vec3 &operator=(Vec3 &&other) {
+        _els = std::move(other._els);
+        return *this;
+    }
+
+    constexpr ~Vec3() {
+        _els.~Array();
+    }
 
     constexpr Vec2<T> xz() const {
         return {x, y};
@@ -435,9 +480,12 @@ union Vec4 {
     };
 
     struct {
-        Vec3<T> xyz;
-        T _w;
+        T r, g, b, a;
     };
+
+    Vec3<T> rgb;
+
+    Vec3<T> xyz;
 
     struct {
         Vec2<T> xy;
@@ -454,6 +502,26 @@ union Vec4 {
 
     constexpr Vec4(T value)
         : _els{value, value, value, value} {}
+
+    constexpr Vec4(Vec4 const &other)
+        : _els{other._els} {}
+
+    constexpr Vec4(Vec4 &&other)
+        : _els{std::move(other._els)} {}
+
+    constexpr Vec4 &operator=(Vec4 const &other) {
+        _els = other._els;
+        return *this;
+    }
+
+    constexpr Vec4 &operator=(Vec4 &&other) {
+        _els = std::move(other._els);
+        return *this;
+    }
+
+    constexpr ~Vec4() {
+        _els.~Array();
+    }
 
     constexpr T min() const {
         return min(x, y, z, w);

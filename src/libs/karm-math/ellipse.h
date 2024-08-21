@@ -7,6 +7,8 @@ namespace Karm::Math {
 
 template <typename T>
 union Ellipse {
+    using Scalar = T;
+
     struct {
         Vec2<T> center{};
         Vec2<T> radii{};
@@ -27,6 +29,26 @@ union Ellipse {
     constexpr Ellipse(Vec2<T> center, T radii) : center(center), radii(radii) {}
 
     constexpr Ellipse(Vec2<T> center, Vec2<T> radii) : center(center), radii(radii) {}
+
+    constexpr Ellipse(Ellipse const &other)
+        : _els{other._els} {}
+
+    constexpr Ellipse(Ellipse &&other)
+        : _els{std::move(other._els)} {}
+
+    constexpr Ellipse &operator=(Ellipse const &other) {
+        _els = other._els;
+        return *this;
+    }
+
+    constexpr Ellipse &operator=(Ellipse &&other) {
+        _els = std::move(other._els);
+        return *this;
+    }
+
+    constexpr ~Ellipse() {
+        _els.~Array();
+    }
 
     constexpr Rect<T> bound() const {
         return {center.x - radii.x, center.y - radii.y, radii.x * 2, radii.y * 2};

@@ -7,6 +7,8 @@ namespace Karm::Math {
 
 template <typename T>
 union Edge {
+    using Scalar = T;
+
     struct {
         Vec2<T> start{}, end{};
     };
@@ -25,6 +27,26 @@ union Edge {
 
     constexpr Edge(T x1, T y1, T x2, T y2)
         : start(x1, y1), end(x2, y2) {}
+
+    constexpr Edge(Edge const &other)
+        : _els{other._els} {}
+
+    constexpr Edge(Edge &&other)
+        : _els{std::move(other._els)} {}
+
+    constexpr Edge &operator=(Edge const &other) {
+        _els = other._els;
+        return *this;
+    }
+
+    constexpr Edge &operator=(Edge &&other) {
+        _els = std::move(other._els);
+        return *this;
+    }
+
+    constexpr ~Edge() {
+        _els.~Array();
+    }
 
     constexpr Edge reversed() const {
         return {end, start};

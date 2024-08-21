@@ -39,7 +39,7 @@ Output blockLayout(Tree &t, Frag &f, Box box, Input input) {
             blockSize,
         };
 
-        auto childBox = computeBox(t, f, input, borderBox);
+        auto childBox = computeBox(t, c, input, borderBox);
         layout(
             t, c,
             childBox,

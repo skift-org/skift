@@ -196,6 +196,7 @@ void paint(Frag &frag, Paint::Stack &stack) {
         background.radii = frag.box.radii.cast<f64>();
         background.backgrounds = frag->backgrounds;
         background.bound = frag.box.borderBox;
+
         stack.add(makeStrong<Paint::Box>(std::move(background)));
     }
 
@@ -208,7 +209,7 @@ void paint(Frag &frag, Paint::Stack &stack) {
     }
 
     if (not frag.box.borders.zero()) {
-        // FIXME colorContext should be context dependant
+        // FIXME: colorContext should be context dependant
         ColorContext colorContext;
 
         Paint::Borders borders;

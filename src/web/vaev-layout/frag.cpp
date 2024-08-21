@@ -193,6 +193,7 @@ void paint(Frag &frag, Paint::Stack &stack) {
     if (frag->backgrounds.len()) {
         Paint::Box background;
 
+        background.radii = frag.box.radii.cast<f64>();
         background.backgrounds = frag->backgrounds;
         background.bound = frag.box.borderBox;
         stack.add(makeStrong<Paint::Box>(std::move(background)));

@@ -59,6 +59,8 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
     auto elapsed = Sys::now() - start;
     logDebug("style collection time: {}", elapsed);
 
+    start = Sys::now();
+
     Style::Computer computer{media, stylebook};
     Layout::Tree tree = {
         Layout::build(computer, dom),
@@ -67,9 +69,15 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
         }
     };
 
+    elapsed = Sys::now() - start;
+
+    logDebug("layout tree build time: {}", elapsed);
+
+    start = Sys::now();
+
     Layout::Viewport vp{.small = viewport};
 
-    auto height = Layout::computePreferredOuterSize(
+    auto height = Layout::computePreferredBorderSize(
         tree,
         tree.root,
         {
@@ -78,6 +86,12 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
         },
         Axis::VERTICAL
     );
+
+    elapsed = Sys::now() - start;
+
+    logDebug("layout tree measure time: {}", elapsed);
+
+    start = Sys::now();
 
     Layout::Box containingBox = {
         .borderBox = {vp.small.width, height},
@@ -95,8 +109,16 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
 
     auto paintRoot = makeStrong<Paint::Stack>();
 
+    elapsed = Sys::now() - start;
+    logDebug("layout tree layout time: {}", elapsed);
+
+    auto paintStart = Sys::now();
+
     Layout::paint(tree.root, *paintRoot);
     paintRoot->prepare();
+
+    elapsed = Sys::now() - paintStart;
+    logDebug("layout tree paint time: {}", elapsed);
 
     return {
         makeStrong<Layout::Frag>(std::move(tree.root)),
@@ -130,7 +152,7 @@ RenderResult render(Dom::Document &dom, Style::Media const &media, Print::PaperS
         vp,
     };
 
-    auto height = Layout::computePreferredOuterSize(
+    auto height = Layout::computePreferredBorderSize(
         tree,
         tree.root,
         {

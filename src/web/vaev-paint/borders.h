@@ -126,7 +126,14 @@ struct Borders : public Node {
             {endpoint.x, endpoint.y - cp2},
             endpoint
         );
-        auto [part1, part2] = curve.split(top.width / (end.width + top.width));
+
+        f64 ratio;
+        if (top.width == 0 and end.width == 0) {
+            ratio = 0.5;
+        } else {
+            ratio = top.width / (end.width + top.width);
+        }
+        auto [part1, part2] = curve.split(ratio);
         curves[0] = part1;
         curves[1] = part2;
 
@@ -145,7 +152,13 @@ struct Borders : public Node {
             {endpoint.x + cp2, endpoint.y},
             endpoint
         );
-        auto [part3, part4] = curve.split(end.width / (end.width + bottom.width));
+
+        if (end.width == 0 and bottom.width == 0) {
+            ratio = 0.5;
+        } else {
+            ratio = end.width / (end.width + bottom.width);
+        }
+        auto [part3, part4] = curve.split(ratio);
         curves[2] = part3;
         curves[3] = part4;
 
@@ -164,7 +177,13 @@ struct Borders : public Node {
             {endpoint.x, endpoint.y + cp2},
             endpoint
         );
-        auto [part5, part6] = curve.split(bottom.width / (start.width + bottom.width));
+
+        if (bottom.width == 0 and start.width == 0) {
+            ratio = 0.5;
+        } else {
+            ratio = bottom.width / (start.width + bottom.width);
+        }
+        auto [part5, part6] = curve.split(ratio);
         curves[4] = part5;
         curves[5] = part6;
 
@@ -180,7 +199,13 @@ struct Borders : public Node {
             {endpoint.x - cp2, endpoint.y},
             endpoint
         );
-        auto [part7, part8] = curve.split(start.width / (top.width + start.width));
+
+        if (top.width == 0 and start.width == 0) {
+            ratio = 0.5;
+        } else {
+            ratio = start.width / (top.width + start.width);
+        }
+        auto [part7, part8] = curve.split(ratio);
         curves[6] = part7;
         curves[7] = part8;
         return curves;
@@ -204,7 +229,14 @@ struct Borders : public Node {
             {endpoint.x, endpoint.y - cp2},
             endpoint
         );
-        auto [part1, part2] = curve.split(end.width / (end.width + bottom.width));
+
+        f64 ratio;
+        if (end.width == 0 and top.width == 0) {
+            ratio = 0.5;
+        } else {
+            ratio = top.width / (end.width + top.width);
+        }
+        auto [part1, part2] = curve.split(ratio);
         curves[0] = part1;
         curves[1] = part2;
 
@@ -223,7 +255,13 @@ struct Borders : public Node {
             {endpoint.x + cp2, endpoint.y},
             endpoint
         );
-        auto [part3, part4] = curve.split(end.width / (end.width + bottom.width));
+
+        if (end.width == 0 and bottom.width == 0) {
+            ratio = 0.5;
+        } else {
+            ratio = end.width / (end.width + bottom.width);
+        }
+        auto [part3, part4] = curve.split(ratio);
         curves[2] = part3;
         curves[3] = part4;
 
@@ -242,7 +280,13 @@ struct Borders : public Node {
             {endpoint.x, endpoint.y + cp2},
             endpoint
         );
-        auto [part5, part6] = curve.split(bottom.width / (start.width + bottom.width));
+
+        if (bottom.width == 0 and start.width == 0) {
+            ratio = 0.5;
+        } else {
+            ratio = bottom.width / (start.width + bottom.width);
+        }
+        auto [part5, part6] = curve.split(ratio);
         curves[4] = part5;
         curves[5] = part6;
 
@@ -258,7 +302,13 @@ struct Borders : public Node {
             {endpoint.x - cp2, endpoint.y},
             endpoint
         );
-        auto [part7, part8] = curve.split(start.width / (top.width + start.width));
+
+        if (top.width == 0 and start.width == 0) {
+            ratio = 0.5;
+        } else {
+            ratio = start.width / (top.width + start.width);
+        }
+        auto [part7, part8] = curve.split(ratio);
         curves[6] = part7;
         curves[7] = part8;
         return curves;

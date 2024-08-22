@@ -228,6 +228,57 @@ struct ValueParser<Update> {
     static Res<Update> parse(Cursor<Css::Sst> &c);
 };
 
+template <typename T>
+struct ValueParser<Math::Radii<T>> {
+
+    static Res<Math::Radii<T>> parse(Cursor<Css::Sst> &c) {
+        if (c.ended())
+            return Error::invalidData("unexpected end of input");
+
+        auto value1 = parseValue<PercentOr<Length>>(c);
+        if (not value1)
+            return Ok(Math::Radii<T>{});
+
+        auto value2 = parseValue<PercentOr<Length>>(c);
+        if (not value2)
+            return Ok(Math::Radii<T>{value1.take()});
+
+        auto value3 = parseValue<PercentOr<Length>>(c);
+        if (not value3)
+            return Ok(Math::Radii<T>{value1.take(), value2.take()});
+
+        auto value4 = parseValue<PercentOr<Length>>(c);
+        if (not value4)
+            return Ok(Math::Radii<T>{value1.take(), value2.take(), value3.take(), value2.take()});
+
+        if (not c.ended() and c.peek().token.data == "/"s) {
+            auto value1 = parseValue<PercentOr<Length>>(c);
+            if (not value1)
+                return Ok(Math::Radii<T>{});
+
+            auto value2 = parseValue<PercentOr<Length>>(c);
+            if (not value2)
+                return Ok(Math::Radii<T>{value1.take()});
+
+            auto value3 = parseValue<PercentOr<Length>>(c);
+            if (not value3)
+                return Ok(Math::Radii<T>{value1.take(), value2.take()});
+
+            auto value4 = parseValue<PercentOr<Length>>(c);
+            if (not value4)
+                return Ok(Math::Radii<T>{value1.take(), value2.take(), value3.take(), value2.take()});
+
+            // if parse a /
+            // 1 value-- > border all(a, d, e, h)
+            // 2 values-- > 1 = top - start + bottom - end 2 = the others
+            // 3 values-- > 1 = top - start, 2 = top - end + bottom - start, 3 = bottom - end
+            // 4 values-- > 1 = top - start, 2 = top - end 3 = bottom - ens, 4 = bottom - start
+        }
+
+        return Ok(Math::Radii<T>{value1.take(), value2.take(), value3.take(), value4.take()});
+    }
+};
+
 template <>
 struct ValueParser<ReducedMotion> {
     static Res<ReducedMotion> parse(Cursor<Css::Sst> &c);

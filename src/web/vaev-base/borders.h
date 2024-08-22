@@ -41,6 +41,10 @@ struct Border {
     Length width;
     BorderStyle style;
     Color color = Color::CURRENT;
+
+    void repr(Io::Emit &e) const {
+        e("{}-{}-{}", width, style, color);
+    }
 };
 
 struct Borders {

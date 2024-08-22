@@ -188,21 +188,28 @@ Res<Color> ValueParser<Color>::parse(Cursor<Css::Sst> &c) {
         return Ok(try$(_parseHexColor(scan)));
     } else if (c.peek() == Css::Token::IDENT) {
         Str data = c->token.data;
-        c.next();
 
         auto maybeColor = parseNamedColor(data);
-        if (maybeColor)
+        if (maybeColor) {
+            c.next();
             return Ok(maybeColor.unwrap());
+        }
 
         auto maybeSystemColor = parseSystemColor(data);
-        if (maybeSystemColor)
+        if (maybeSystemColor) {
+            c.next();
             return Ok(maybeSystemColor.unwrap());
+        }
 
-        if (data == "currentColor")
+        if (data == "currentColor") {
+            c.next();
             return Ok(Color::CURRENT);
+        }
 
-        if (data == "transparent")
+        if (data == "transparent") {
+            c.next();
             return Ok(TRANSPARENT);
+        }
     }
 
     return Error::invalidData("expected color");

@@ -259,6 +259,31 @@ struct BackgroundRepeatProp {
     }
 };
 
+// https://www.w3.org/TR/CSS22/colors.html#x10
+struct BackgroundProp {
+    // FIXME this should cover everything else
+    Vec<Color> value = initial();
+
+    static constexpr Str name() { return "background"; }
+
+    static constexpr Array<Color, 1> initial() { return {TRANSPARENT}; }
+
+    void apply(Computed &c) const {
+        c.backgrounds.resize(max(c.backgrounds.len(), value.len()));
+        for (usize i = 0; i < value.len(); ++i)
+            c.backgrounds[i].fill = value[i];
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        eatWhitespace(c);
+        while (not c.ended()) {
+            value.pushBack(try$(parseValue<Color>(c)));
+            eatWhitespace(c);
+        }
+        return Ok();
+    }
+};
+
 // https://www.w3.org/TR/CSS22/colors.html#propdef-color
 struct ColorProp {
     Color value = initial();
@@ -539,8 +564,8 @@ struct BorderRadiusTopRight {
     static constexpr Length initial() { return Px{0}; }
 
     void apply(Computed &c) const {
-        c.borders.cow().radii.a = value[0];
-        c.borders.cow().radii.b = value[1];
+        c.borders.cow().radii.c = value[0];
+        c.borders.cow().radii.d = value[1];
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -564,8 +589,8 @@ struct BorderRadiusTopLeft {
     static constexpr Length initial() { return Px{0}; }
 
     void apply(Computed &c) const {
-        c.borders.cow().radii.c = value[0];
-        c.borders.cow().radii.d = value[1];
+        c.borders.cow().radii.a = value[0];
+        c.borders.cow().radii.b = value[1];
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -625,6 +650,93 @@ struct BorderRadiusBottomLeft {
             value[1] = value[0];
         } else {
             value[1] = try$(parseValue<PercentOr<Length>>(c));
+        }
+
+        return Ok();
+    }
+};
+
+// https://drafts.csswg.org/css-backgrounds/#the-border-radius
+struct BorderRadius {
+    Math::Radii<PercentOr<Length>> value = {};
+
+    static constexpr Str name() { return "border-radius"; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().radii = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Math::Radii<PercentOr<Length>>>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-backgrounds-3/#border-shorthands
+struct BorderProp {
+    Array<Border, 4> value = {Border{}, Border{}, Border{}, Border{}};
+
+    static constexpr Str name() { return "border"; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().top = value[0];
+        c.borders.cow().bottom = value[1];
+        c.borders.cow().start = value[2];
+        c.borders.cow().end = value[3];
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        eatWhitespace(c);
+
+        while (not c.ended()) {
+            auto width = parseValue<Length>(c);
+            if (width) {
+                value[0].width = width.unwrap();
+                value[1].width = width.unwrap();
+                value[2].width = width.unwrap();
+                value[3].width = width.unwrap();
+            } else {
+                auto color = parseValue<Color>(c);
+                if (color) {
+                    value[0].color = color.unwrap();
+                    value[1].color = color.unwrap();
+                    value[2].color = color.unwrap();
+                    value[3].color = color.unwrap();
+                } else {
+                    auto style = parseValue<BorderStyle>(c);
+                    if (style) {
+                        value[0].style = style.unwrap();
+                        value[1].style = style.unwrap();
+                        value[2].style = style.unwrap();
+                        value[3].style = style.unwrap();
+                    }
+                }
+            }
+        }
+
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-backgrounds-3/#border-width
+struct BorderWidthProp {
+    Array<Length, 4> value = {Borders::MEDIUM, Borders::MEDIUM, Borders::MEDIUM, Borders::MEDIUM};
+
+    static constexpr Str name() { return "border-width"; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().start.width = value[0];
+        c.borders.cow().end.width = value[1];
+        c.borders.cow().top.width = value[2];
+        c.borders.cow().bottom.width = value[3];
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value[0] = try$(parseValue<Length>(c));
+        if (c.ended()) {
+            value[1] = value[0];
+        } else {
+            value[1] = try$(parseValue<Length>(c));
         }
 
         return Ok();
@@ -1391,6 +1503,7 @@ using _StyleProp = Union<
     BackgroundImageProp,
     BackgroundPositionProp,
     BackgroundRepeatProp,
+    BackgroundProp,
     ColorProp,
     DisplayProp,
 
@@ -1414,6 +1527,9 @@ using _StyleProp = Union<
     BorderRadiusTopLeft,
     BorderRadiusBottomRight,
     BorderRadiusBottomLeft,
+    BorderRadius,
+    BorderProp,
+    BorderWidthProp,
 
     // Flex
     FlexBasisProp,

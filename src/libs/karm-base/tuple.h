@@ -43,6 +43,11 @@ struct Tuple<> {
     constexpr auto apply(auto) const {
         return true;
     }
+
+    template <typename U>
+    constexpr U into() const {
+        return U{};
+    }
 };
 
 template <typename _T0>
@@ -73,6 +78,11 @@ struct Tuple<_T0> {
 
     constexpr auto apply(auto f) const {
         return f(v0);
+    }
+
+    template <typename U>
+    constexpr U into() const {
+        return U{v0};
     }
 };
 
@@ -118,6 +128,11 @@ struct Tuple<_T0, _T1> {
 
     constexpr auto apply(auto f) const {
         return f(v0, v1);
+    }
+
+    template <typename U>
+    constexpr U into() const {
+        return U{v0, v1};
     }
 };
 
@@ -174,6 +189,11 @@ struct Tuple<_T0, _T1, _T2> {
 
     constexpr auto apply(auto f) const {
         return f(v0, v1, v2);
+    }
+
+    template <typename U>
+    constexpr U into() const {
+        return U{v0, v1, v2};
     }
 };
 
@@ -241,6 +261,11 @@ struct Tuple<_T0, _T1, _T2, _T3> {
 
     constexpr auto apply(auto f) const {
         return f(v0, v1, v2, v3);
+    }
+
+    template <typename U>
+    constexpr U into() const {
+        return U{v0, v1, v2, v3};
     }
 };
 
@@ -319,6 +344,11 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4> {
 
     constexpr auto apply(auto f) const {
         return f(v0, v1, v2, v3, v4);
+    }
+
+    template <typename U>
+    constexpr U into() const {
+        return U{v0, v1, v2, v3, v4};
     }
 };
 
@@ -408,6 +438,11 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5> {
 
     constexpr auto apply(auto f) const {
         return f(v0, v1, v2, v3, v4, v5);
+    }
+
+    template <typename U>
+    constexpr U into() const {
+        return U{v0, v1, v2, v3, v4, v5};
     }
 };
 
@@ -508,6 +543,11 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6> {
 
     constexpr auto apply(auto f) const {
         return f(v0, v1, v2, v3, v4, v5, v6);
+    }
+
+    template <typename U>
+    constexpr U into() const {
+        return U{v0, v1, v2, v3, v4, v5, v6};
     }
 };
 
@@ -619,6 +659,11 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7> {
 
     constexpr auto apply(auto f) const {
         return f(v0, v1, v2, v3, v4, v5, v6, v7);
+    }
+
+    template <typename U>
+    constexpr U into() const {
+        return U{v0, v1, v2, v3, v4, v5, v6, v7};
     }
 };
 

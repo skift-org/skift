@@ -169,6 +169,11 @@ union Vec2 {
         return {static_cast<U>(x), static_cast<U>(y)};
     }
 
+    template <typename U>
+    constexpr U into() const {
+        return U{x, y};
+    }
+
     Vec2 floor() {
         return {Math::floor(x), Math::floor(y)};
     }
@@ -404,6 +409,11 @@ union Vec3 {
         };
     }
 
+    template <typename U>
+    constexpr U into() const {
+        return U{x, y, z};
+    }
+
     Vec3 floor() {
         return {Math::floor(x), Math::floor(y), Math::floor(z)};
     }
@@ -622,6 +632,11 @@ union Vec4 {
             static_cast<U>(z),
             static_cast<U>(w),
         };
+    }
+
+    template <typename U>
+    constexpr U into() const {
+        return U{x, y, z, w};
     }
 
     Vec4 floor() {

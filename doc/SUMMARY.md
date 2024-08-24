@@ -23,7 +23,7 @@
 # Others
 
 - [Propaganda](propaganda.md)
-- [Roadmap](roadmap.md)
+- [Ideas](ideas.md)
 - [Articles](articles.md)
 - [History](history.md)
 - [Usefull links](usefull.md)

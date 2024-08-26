@@ -61,7 +61,10 @@ union Curve {
     }
 
     static constexpr Curve quadratic(Vec2<T> a, Vec2<T> b, Vec2<T> c) {
-        return {a, a * 2 / 3 + b / 3, c * 2 / 3 + b / 3, c};
+        auto cp1 = a + ((b - a) * (2.0f / 3.0f));
+        auto cp2 = c + ((b - c) * (2.0f / 3.0f));
+
+        return {a, cp1, cp2, c};
     }
 
     static constexpr Curve linear(Vec2<T> a, Vec2<T> b) {

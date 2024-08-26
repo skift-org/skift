@@ -84,6 +84,24 @@ struct [[nodiscard]] Res {
         return _inner.template unwrap<Ok<V>>().inner;
     }
 
+    always_inline constexpr V const &unwrapOr(V const &other) const {
+        if (_inner.template is<Ok<V>>())
+            return _inner.template unwrap<Ok<V>>().inner;
+        return other;
+    }
+
+    always_inline constexpr V unwrapOrDefault(V other) const {
+        if (_inner.template is<Ok<V>>())
+            return _inner.template unwrap<Ok<V>>().inner;
+        return other;
+    }
+
+    always_inline constexpr V unwrapOrElse(auto f) const {
+        if (_inner.template is<Ok<V>>())
+            return _inner.template unwrap<Ok<V>>().inner;
+        return f();
+    }
+
     always_inline constexpr V take(char const *msg = "take() called on an error") {
         if (not _inner.template is<Ok<V>>()) [[unlikely]]
             panic(msg);
@@ -106,14 +124,14 @@ struct [[nodiscard]] Res {
     }
 
     template <typename U>
-    always_inline constexpr Res<U, E> mapValue(auto f) {
+    always_inline constexpr Res<U, E> map(auto f) {
         if (_inner.template is<Ok<V>>())
             return Ok(f(_inner.template unwrap<Ok<V>>().inner));
         return _inner.template unwrap<E>();
     }
 
     template <typename U>
-    always_inline constexpr Res<U, E> mapValue() {
+    always_inline constexpr Res<U, E> map() {
         if (_inner.template is<Ok<V>>())
             return Ok(_inner.template unwrap<Ok<V>>().inner);
         return _inner.template unwrap<E>();

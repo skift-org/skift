@@ -381,23 +381,19 @@ struct Grow : public ProxyNode<Grow> {
 };
 
 Child grow(Opt<Child> child) {
-    return makeStrong<Grow>(tryOrElse(
-        child,
-        [] {
+    return makeStrong<Grow>(
+        child.unwrapOrElse([] {
             return empty();
-        }
-    ));
+        })
+    );
 }
 
 Child grow(isize grow, Opt<Child> child) {
     return makeStrong<Grow>(
         grow,
-        tryOrElse(
-            child,
-            [] {
-                return empty();
-            }
-        )
+        child.unwrapOrElse([] {
+            return empty();
+        })
     );
 }
 

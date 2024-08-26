@@ -57,7 +57,7 @@ struct DialogLayer : public LeafNode<DialogLayer> {
     }
 
     void reconcile(DialogLayer &o) override {
-        _child = tryOr(_child->reconcile(o._child), _child);
+        _child = _child->reconcile(o._child).unwrapOr(_child);
         _child->attach(this);
     }
 

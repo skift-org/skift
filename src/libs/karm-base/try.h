@@ -26,20 +26,6 @@ concept Tryable = requires(T t) {
     { t.none() };
 } and Unwrapable<T> and Takeable<T>;
 
-auto tryOr(Tryable auto opt, Meta::RemoveRef<decltype(opt.unwrap())> defaultValue) -> Meta::RemoveRef<decltype(opt.unwrap())> {
-    if (not opt) {
-        return defaultValue;
-    }
-
-    return opt.unwrap();
-}
-
-auto tryOrElse(Tryable auto opt, auto defaultValue) -> Meta::RemoveRef<decltype(opt.unwrap())> {
-    if (not opt)
-        return defaultValue();
-    return opt.unwrap();
-}
-
 } // namespace Karm
 
 // Give us a symbole to break one when debbuging error handling.

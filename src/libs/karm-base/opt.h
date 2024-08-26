@@ -46,6 +46,23 @@ struct [[nodiscard]] Opt {
     }
 
     always_inline constexpr Opt(Opt &&other)
+        requires(Meta::MoveConstructible<T>)
+        : _present(other._present) {
+        if (_present)
+            std::construct_at(&_value, other.take());
+    }
+
+    template <typename U>
+    always_inline constexpr Opt(Opt<U> const &other)
+        requires(Meta::CopyConstructible<T, U>)
+        : _present(other._present) {
+        if (_present)
+            std::construct_at(&_value, other.unwrap());
+    }
+
+    template <typename U>
+        requires(Meta::MoveConstructible<T, U>)
+    always_inline constexpr Opt(Opt<U> &&other)
         : _present(other._present) {
         if (_present)
             std::construct_at(&_value, other.take());
@@ -70,7 +87,7 @@ struct [[nodiscard]] Opt {
     }
 
     template <typename U = T>
-        requires(not Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> and Meta::MoveConstructible<U, T>)
+        requires(not Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> and Meta::MoveConstructible<T, U>)
     always_inline constexpr Opt &operator=(U &&value) {
         clear();
         _present = true;
@@ -78,16 +95,40 @@ struct [[nodiscard]] Opt {
         return *this;
     }
 
-    always_inline constexpr Opt &operator=(Opt const &other) {
+    always_inline constexpr Opt &operator=(Opt const &other)
+        requires(Meta::CopyConstructible<T>)
+    {
         *this = Opt(other);
         return *this;
     }
 
-    always_inline constexpr Opt &operator=(Opt &&other) {
+    always_inline constexpr Opt &operator=(Opt &&other)
+        requires(Meta::MoveConstructible<T>)
+    {
         clear();
         if (other._present) {
             _present = true;
             std::construct_at(&_value, other.take());
+        }
+        return *this;
+    }
+
+    template <typename U = T>
+    always_inline constexpr Opt &operator=(Opt<U> const &other)
+        requires(Meta::CopyConstructible<T, U>)
+    {
+        *this = Opt(other);
+        return *this;
+    }
+
+    template <typename U>
+    always_inline constexpr Opt &operator=(Opt<U> &&other)
+        requires(Meta::MoveConstructible<T, U>)
+    {
+        clear();
+        if (other._present) {
+            _present = true;
+            std::construct_at<T>(&_value, other.take());
         }
         return *this;
     }
@@ -157,6 +198,24 @@ struct [[nodiscard]] Opt {
         if (not _present) [[unlikely]]
             panic(msg);
         return _value;
+    }
+
+    always_inline constexpr T const &unwrapOr(T const &other) const {
+        if (_present)
+            return _value;
+        return other;
+    }
+
+    always_inline constexpr T unwrapOrDefault(T other) const {
+        if (_present)
+            return _value;
+        return other;
+    }
+
+    always_inline constexpr T unwrapOrElse(auto f) const {
+        if (_present)
+            return _value;
+        return f();
     }
 
     always_inline constexpr T take(char const *msg = "unwraping none") {

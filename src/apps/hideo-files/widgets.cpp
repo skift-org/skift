@@ -68,7 +68,9 @@ Ui::Child directorEntry(Sys::DirEntry const &entry, bool odd) {
     return Ui::button(
                Model::bind<Navigate>(entry.name),
                itemStyle(odd),
-               entry.isDir ? Mdi::FOLDER : Mime::iconFor(tryOr(Mime::sniffSuffix(Mime::suffixOf(entry.name)), "file"s)),
+               entry.isDir
+                   ? Mdi::FOLDER
+                   : Mime::iconFor(Mime::sniffSuffix(Mime::suffixOf(entry.name)).unwrapOr("file"s)),
                entry.name
            ) |
            Kr::contextMenu(slot$(directoryContextMenu()));

@@ -313,7 +313,7 @@ struct NumberFormatter {
         if (scan.skip('0'))
             fillChar = '0';
 
-        width = tryOr(atoi(scan), 0);
+        width = atoi(scan).unwrapOr(0);
 
         if (scan.ended())
             return;

@@ -10,7 +10,8 @@
 namespace Serv {
 
 Async::Task<> respondFile(Sys::_Connection &conn, Mime::Url const &url, Net::Http::Code code = Net::Http::Code::OK) {
-    auto ct = tryOr(Mime::sniffSuffix(url.path.suffix()), "application/octet-stream"_mime);
+    auto contentType = Mime::sniffSuffix(url.path.suffix())
+                           .unwrapOr("application/octet-stream"_mime);
     auto file = co_try$(Sys::File::open(url));
     auto stat = co_try$(file.stat());
 
@@ -25,7 +26,7 @@ Async::Task<> respondFile(Sys::_Connection &conn, Mime::Url const &url, Net::Htt
         "\r\n",
         (usize)code,
         Net::Http::toStr(code),
-        ct,
+        contentType,
         stat.size
     ));
 

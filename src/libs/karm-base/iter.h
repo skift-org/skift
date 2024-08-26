@@ -9,6 +9,7 @@ template <typename Next>
 struct Iter {
     Next next;
     using Item = decltype(next());
+    using Value = Meta::RemoveConstVolatileRef<decltype(*next())>;
 
     constexpr Iter(Next next) : next(next) {}
 
@@ -94,7 +95,7 @@ struct Iter {
     }
 
     constexpr auto sum() {
-        return reduce(0, [](auto &a, auto &b) {
+        return reduce(Value{}, [](auto &a, auto &b) {
             return a + b;
         });
     }

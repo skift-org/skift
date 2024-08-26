@@ -189,7 +189,7 @@ struct GroupNode : public LeafNode<Crtp> {
 
         for (usize i = 0; i < them.len(); i++) {
             if (i < us.len()) {
-                us.replace(i, tryOr(us[i]->reconcile(them[i]), us[i]));
+                us.replace(i, us[i]->reconcile(them[i]).unwrapOr(us[i]));
             } else {
                 us.insert(i, them[i]);
             }
@@ -255,7 +255,7 @@ struct ProxyNode : public LeafNode<Crtp> {
     }
 
     void reconcile(Crtp &o) override {
-        _child = tryOr(_child->reconcile(o._child), _child);
+        _child = _child->reconcile(o._child).unwrapOr(_child);
         _child->attach(this);
         LeafNode<Crtp>::reconcile(o);
     }

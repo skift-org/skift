@@ -61,7 +61,11 @@ Karm::Gfx::Color Decoder::readColor(Io::BScan &s, usize bpp) {
         u8 r = s.nextU8le();
         return {r, g, b, 255};
     } else if (bpp == 32) {
-        return Gfx::Color::fromHex(s.nextU32le());
+        u8 b = s.nextU8le();
+        u8 g = s.nextU8le();
+        u8 r = s.nextU8le();
+        u8 a = s.nextU8le();
+        return {r, g, b, a};
     } else {
         return {255, 0, 255, 255};
     }
@@ -95,7 +99,7 @@ void Decoder::storePixel(Gfx::MutPixels pixels, Math::Vec2i pos, Gfx::Color colo
     if (_header.desc & ORDER_R2L)
         pos.x = width() - pos.x - 1;
 
-    if (_header.desc & ORDER_T2B)
+    if (not(_header.desc & ORDER_T2B))
         pos.y = height() - pos.y - 1;
 
     pixels.store(pos, color);

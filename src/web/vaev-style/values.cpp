@@ -92,7 +92,7 @@ Res<Angle> ValueParser<Angle>::parse(Cursor<Css::Sst> &c) {
 
     if (c.peek() == Css::Token::DIMENSION) {
         Io::SScan scan = c->token.data;
-        auto value = tryOr(Io::atof(scan), 0.0);
+        auto value = Io::atof(scan).unwrapOr(0.0);
         auto unit = try$(_parseAngleUnit(scan.remStr()));
         return Ok(Angle{value, unit});
     }
@@ -144,7 +144,7 @@ static Res<Gfx::Color> _parseHexColor(Io::SScan &s) {
         panic("expected '#'");
 
     auto nextHex = [&](usize len) {
-        return tryOr(Io::atou(s.slice(len), {.base = 16}), 0);
+        return Io::atou(s.slice(len), {.base = 16}).unwrapOr(0);
     };
 
     if (s.rem() == 3) {
@@ -358,8 +358,8 @@ Res<Display> ValueParser<Display>::parse(Cursor<Css::Sst> &c) {
         return Error::invalidData("expected display value");
 
     return Ok(Display{
-        tryOr(inside, Display::FLOW),
-        tryOr(outside, Display::BLOCK),
+        inside.unwrapOr(Display::FLOW),
+        outside.unwrapOr(Display::BLOCK),
         item,
     });
 }
@@ -560,7 +560,7 @@ Res<Length> ValueParser<Length>::parse(Cursor<Css::Sst> &c) {
 
     if (c.peek() == Css::Token::DIMENSION) {
         Io::SScan scan = c->token.data;
-        auto value = tryOr(Io::atof(scan, {.allowExp = false}), 0.0);
+        auto value = Io::atof(scan, {.allowExp = false}).unwrapOr(0.0);
         auto unit = try$(_parseLengthUnit(scan.remStr()));
         c.next();
 
@@ -712,7 +712,7 @@ Res<Percent> ValueParser<Percent>::parse(Cursor<Css::Sst> &c) {
 
     if (c.peek() == Css::Token::PERCENTAGE) {
         Io::SScan scan = c->token.data;
-        auto value = tryOr(Io::atof(scan), 0.0);
+        auto value = Io::atof(scan).unwrapOr(0.0);
         if (scan.remStr() != "%")
             return Error::invalidData("invalid percentage");
 
@@ -778,7 +778,7 @@ Res<Resolution> ValueParser<Resolution>::parse(Cursor<Css::Sst> &c) {
 
     if (c.peek() == Css::Token::DIMENSION) {
         Io::SScan scan = c->token.data;
-        auto value = tryOr(Io::atof(scan), 0.0);
+        auto value = Io::atof(scan).unwrapOr(0.0);
         auto unit = try$(_parseResolutionUnit(scan.remStr()));
         return Ok(Resolution{value, unit});
     }

@@ -1,72 +1,70 @@
 #pragma once
 
-#include <hideo-base/row.h>
-#include <hideo-base/scafold.h>
 #include <karm-kira/card.h>
 #include <karm-kira/dialog.h>
+#include <karm-kira/row.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
-#include <karm-ui/view.h>
 
-#include "base.h"
+#include "model.h"
 
-namespace Hideo::Demos {
+namespace Hideo::Zoo {
 
 static void willShowMessage(Ui::Node &n) {
     Ui::showDialog(n, Kr::alert("Message"s, "This is a message"s));
 }
 
-static inline Demo INPUTS_DEMO{
-    Mdi::LIST_BOX_OUTLINE,
-    "Inputs",
-    "Form inputs widgets",
+static inline Page PAGE_ROWS{
+    Mdi::FORMAT_LIST_BULLETED_TYPE,
+    "Settings Rows",
+    "A collection of rows that can be used to display settings.",
     [] {
-        auto button = Hideo::buttonRow(
+        auto button = Kr::buttonRow(
             willShowMessage,
             "Cool duck app"s,
             "Install"s
         );
 
-        auto title = Hideo::titleRow("Some Settings"s);
+        auto title = Kr::titleRow("Some Settings"s);
 
         auto list = Kr::card(
             button,
             Ui::separator(),
-            Hideo::treeRow(
+            Kr::treeRow(
                 slot$(Ui::icon(Mdi::TOGGLE_SWITCH)), "Switches"s, NONE,
                 slots$(
-                    Hideo::toggleRow(true, NONE, "Some property"s),
-                    Hideo::toggleRow(true, NONE, "Some property"s),
-                    Hideo::toggleRow(true, NONE, "Some property"s)
+                    Kr::toggleRow(true, NONE, "Some property"s),
+                    Kr::toggleRow(true, NONE, "Some property"s),
+                    Kr::toggleRow(true, NONE, "Some property"s)
                 )
             ),
 
             Ui::separator(),
-            Hideo::treeRow(
+            Kr::treeRow(
                 slot$(Ui::icon(Mdi::CHECKBOX_MARKED)),
                 "Checkboxs"s,
                 NONE,
                 slots$(
-                    Hideo::checkboxRow(true, NONE, "Some property"s),
-                    Hideo::checkboxRow(false, NONE, "Some property"s),
-                    Hideo::checkboxRow(false, NONE, "Some property"s)
+                    Kr::checkboxRow(true, NONE, "Some property"s),
+                    Kr::checkboxRow(false, NONE, "Some property"s),
+                    Kr::checkboxRow(false, NONE, "Some property"s)
                 )
             ),
 
             Ui::separator(),
-            Hideo::treeRow(
+            Kr::treeRow(
                 slot$(Ui::icon(Mdi::RADIOBOX_MARKED)),
                 "Radios"s,
                 NONE,
                 slots$(
-                    Hideo::radioRow(true, NONE, "Some property"s),
-                    Hideo::radioRow(false, NONE, "Some property"s),
-                    Hideo::radioRow(false, NONE, "Some property"s)
+                    Kr::radioRow(true, NONE, "Some property"s),
+                    Kr::radioRow(false, NONE, "Some property"s),
+                    Kr::radioRow(false, NONE, "Some property"s)
                 )
             ),
             Ui::separator(),
-            Hideo::sliderRow(
+            Kr::sliderRow(
                 0.5,
                 NONE,
                 "Some property"s
@@ -81,4 +79,4 @@ static inline Demo INPUTS_DEMO{
     },
 };
 
-} // namespace Hideo::Demos
+} // namespace Hideo::Zoo

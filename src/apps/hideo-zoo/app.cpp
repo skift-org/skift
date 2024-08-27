@@ -15,6 +15,7 @@
 #include "page-hsv-square.h"
 #include "page-navbar.h"
 #include "page-radio.h"
+#include "page-rows.h"
 #include "page-side-nav.h"
 #include "page-side-panel.h"
 #include "page-slider.h"
@@ -34,6 +35,7 @@ static Array PAGES = {
     &PAGE_HSV_SQUARE,
     &PAGE_NAVBAR,
     &PAGE_RADIO,
+    &PAGE_ROWS,
     &PAGE_SIDE_PANEL,
     &PAGE_SIDENAV,
     &PAGE_SLIDER,

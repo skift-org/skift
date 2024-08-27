@@ -12,7 +12,6 @@
 #include "demo-gradient.h"
 #include "demo-hello.h"
 #include "demo-icons.h"
-#include "demo-inputs.h"
 #include "demo-mixbox.h"
 #include "demo-stroke.h"
 #include "demo-svg.h"
@@ -27,7 +26,6 @@ static Array DEMOS = {
     &GRADIENT_DEMO,
     &HELLO_DEMO,
     &ICONS_DEMO,
-    &INPUTS_DEMO,
     &MIXBOX_DEMO,
     &STROKE_DEMO,
     &SVG_DEMO,

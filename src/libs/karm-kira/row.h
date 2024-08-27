@@ -2,11 +2,13 @@
 
 #include <karm-ui/input.h>
 
-namespace Hideo {
+#include "_prelude.h"
 
-Ui::Child row(Ui::Child child);
+namespace Karm::Kira {
 
-Ui::Child row(Opt<Ui::Child> leading, String title, Opt<String> subtitle, Opt<Ui::Child> trailing);
+Ui::Child rowContent(Ui::Child child);
+
+Ui::Child rowContent(Opt<Ui::Child> leading, String title, Opt<String> subtitle, Opt<Ui::Child> trailing);
 
 Ui::Child titleRow(String t);
 
@@ -30,4 +32,4 @@ Ui::Child treeRow(Opt<Ui::Slot> leading, String title, Opt<String> subtitle, Ui:
 
 Ui::Child treeRow(Opt<Ui::Slot> leading, String title, Opt<String> subtitle, Ui::Slots children);
 
-} // namespace Hideo
+} // namespace Karm::Kira

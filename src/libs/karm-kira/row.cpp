@@ -1,24 +1,24 @@
-#include <karm-kira/checkbox.h>
-#include <karm-kira/color-input.h>
-#include <karm-kira/radio.h>
-#include <karm-kira/slider.h>
-#include <karm-kira/toggle.h>
 #include <karm-ui/anim.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/reducer.h>
 
+#include "checkbox.h"
+#include "color-input.h"
+#include "radio.h"
 #include "row.h"
+#include "slider.h"
+#include "toggle.h"
 
-namespace Hideo {
+namespace Karm::Kira {
 
-Ui::Child row(Ui::Child child) {
+Ui::Child rowContent(Ui::Child child) {
     return child |
            Ui::vcenter() |
            Ui::insets(16) |
            Ui::minSize({Ui::UNCONSTRAINED, 64});
 }
 
-Ui::Child row(Opt<Ui::Child> leading, String title, Opt<String> subtitle, Opt<Ui::Child> trailing) {
+Ui::Child rowContent(Opt<Ui::Child> leading, String title, Opt<String> subtitle, Opt<Ui::Child> trailing) {
     auto lead = leading
                     ? *leading |
                           Ui::center() |
@@ -65,7 +65,7 @@ Ui::Child pressableRow(Ui::OnPress onPress, Opt<Ui::Child> leading, String title
     return button(
         std::move(onPress),
         Ui::ButtonStyle::subtle(),
-        row(
+        rowContent(
             leading,
             title,
             subtitle,
@@ -78,7 +78,7 @@ Ui::Child buttonRow(Ui::OnPress onPress, Mdi::Icon i, String title, String subti
     return button(
         std::move(onPress),
         Ui::ButtonStyle::subtle(),
-        row(
+        rowContent(
             Ui::icon(i, 24),
             title,
             subtitle,
@@ -88,7 +88,7 @@ Ui::Child buttonRow(Ui::OnPress onPress, Mdi::Icon i, String title, String subti
 }
 
 Ui::Child buttonRow(Ui::OnPress onPress, String title, String text) {
-    return row(
+    return rowContent(
         NONE,
         title,
         NONE,
@@ -97,7 +97,7 @@ Ui::Child buttonRow(Ui::OnPress onPress, String title, String text) {
 }
 
 Ui::Child toggleRow(bool value, Ui::OnChange<bool> onChange, String title) {
-    return row(
+    return rowContent(
         NONE,
         title,
         NONE,
@@ -106,7 +106,7 @@ Ui::Child toggleRow(bool value, Ui::OnChange<bool> onChange, String title) {
 }
 
 Ui::Child checkboxRow(bool value, Ui::OnChange<bool> onChange, String title) {
-    return row(
+    return rowContent(
         NONE,
         title,
         NONE,
@@ -115,7 +115,7 @@ Ui::Child checkboxRow(bool value, Ui::OnChange<bool> onChange, String title) {
 }
 
 Ui::Child radioRow(bool value, Ui::OnChange<bool> onChange, String title) {
-    return row(
+    return rowContent(
         Kr::radio(value, std::move(onChange)),
         title,
         NONE,
@@ -124,16 +124,21 @@ Ui::Child radioRow(bool value, Ui::OnChange<bool> onChange, String title) {
 }
 
 Ui::Child sliderRow(f64 value, Ui::OnChange<f64> onChange, String title) {
-    return row(
+    return rowContent(
         NONE,
         title,
         NONE,
-        Kr::slider(value, std::move(onChange), Mdi::DRAG_VERTICAL_VARIANT, "") | Ui::minSize({128, Ui::UNCONSTRAINED})
+        Kr::slider(
+            value,
+            std::move(onChange),
+            Mdi::DRAG_VERTICAL_VARIANT,
+            ""
+        ) | Ui::minSize({128, Ui::UNCONSTRAINED})
     );
 }
 
 Ui::Child colorRow(Gfx::Color c, Ui::OnChange<Gfx::Color> onChange, String title) {
-    return row(
+    return rowContent(
         NONE,
         title,
         NONE,
@@ -150,7 +155,11 @@ Ui::Child treeRow(Opt<Ui::Slot> leading, String title, Opt<String> subtitle, Ui:
                 leading(),
                 title,
                 subtitle,
-                Ui::icon(state ? Mdi::CHEVRON_UP : Mdi::CHEVRON_DOWN, 24)
+                Ui::icon(
+                    state ? Mdi::CHEVRON_UP
+                          : Mdi::CHEVRON_DOWN,
+                    24
+                )
             ),
             state ? insets(
                         {38, 0, 0, 0},
@@ -168,4 +177,4 @@ Ui::Child treeRow(Opt<Ui::Slot> leading, String title, Opt<String> subtitle, Ui:
     return treeRow(std::move(leading), title, subtitle, std::move(slot));
 }
 
-} // namespace Hideo
+} // namespace Karm::Kira

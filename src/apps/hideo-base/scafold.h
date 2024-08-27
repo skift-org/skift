@@ -57,11 +57,9 @@ struct Scafold : Meta::NoCopy {
     using Action = Union<ToggleSidebar>;
 
     static void reduce(State &s, Action a) {
-        a.visit(::Visitor{
-            [&](ToggleSidebar) {
-                s.sidebarOpen = !s.sidebarOpen;
-            },
-        });
+        if (a.is<ToggleSidebar>()) {
+            s.sidebarOpen = !s.sidebarOpen;
+        }
     }
 
     using Model = Ui::Model<State, Action, reduce>;

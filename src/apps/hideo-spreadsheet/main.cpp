@@ -1,5 +1,5 @@
-#include <hideo-base/row.h>
 #include <hideo-base/scafold.h>
+#include <karm-kira/row.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
@@ -50,11 +50,11 @@ Ui::Child toolbar(State const &state) {
 Ui::Child properties() {
     return Ui::vscroll(
         Ui::vflow(
-            Hideo::titleRow("Text Properties"s),
+            Kr::titleRow("Text Properties"s),
 
-            Hideo::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Color"s),
+            Kr::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Color"s),
 
-            Hideo::row(
+            Kr::rowContent(
                 NONE,
                 "Format"s,
                 NONE,
@@ -67,7 +67,7 @@ Ui::Child properties() {
                 )
             ),
 
-            Hideo::row(
+            Kr::rowContent(
                 NONE,
                 "Wrapping"s,
                 NONE,
@@ -78,7 +78,7 @@ Ui::Child properties() {
                 )
             ),
 
-            Hideo::row(
+            Kr::rowContent(
                 NONE,
                 "Horizontal Align"s,
                 NONE,
@@ -90,7 +90,7 @@ Ui::Child properties() {
                 )
             ),
 
-            Hideo::row(
+            Kr::rowContent(
                 NONE,
                 "Vertical Align"s,
                 NONE,
@@ -104,11 +104,11 @@ Ui::Child properties() {
 
             Ui::separator(),
 
-            Hideo::titleRow("Cell Properties"s),
-            Hideo::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Background Color"s),
-            Hideo::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Border Color"s),
+            Kr::titleRow("Cell Properties"s),
+            Kr::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Background Color"s),
+            Kr::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Border Color"s),
 
-            Hideo::row(
+            Kr::rowContent(
                 NONE,
                 "Borders"s,
                 NONE,
@@ -121,7 +121,7 @@ Ui::Child properties() {
                 )
             ),
 
-            Hideo::row(
+            Kr::rowContent(
                 NONE,
                 ""s,
                 NONE,
@@ -138,7 +138,7 @@ Ui::Child properties() {
 
             Ui::separator(),
 
-            Hideo::titleRow("Sheet Properties"s)
+            Kr::titleRow("Sheet Properties"s)
         )
     );
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <hideo-base/row.h>
+#include <karm-kira/row.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
@@ -15,7 +15,7 @@ static inline Demo TEXT_DEMO{
     "Typography",
     [] {
         return Ui::vflow(
-                   Hideo::treeRow(
+                   Kr::treeRow(
                        slot$(Ui::icon(Mdi::TEXT)), "Display"s, NONE,
                        slots$(
                            Ui::displayLarge("Display Large"),
@@ -24,7 +24,7 @@ static inline Demo TEXT_DEMO{
                        )
                    ),
 
-                   Hideo::treeRow(
+                   Kr::treeRow(
                        slot$(Ui::icon(Mdi::TEXT)), "Headlines"s, NONE,
                        slots$(
                            Ui::headlineLarge("Headline Large"),
@@ -33,7 +33,7 @@ static inline Demo TEXT_DEMO{
                        )
                    ),
 
-                   Hideo::treeRow(
+                   Kr::treeRow(
                        slot$(Ui::icon(Mdi::TEXT)), "Titles"s, NONE,
                        slots$(
                            Ui::titleLarge("Title Large"),
@@ -42,7 +42,7 @@ static inline Demo TEXT_DEMO{
                        )
                    ),
 
-                   Hideo::treeRow(
+                   Kr::treeRow(
                        slot$(Ui::icon(Mdi::TEXT)), "Body"s, NONE,
                        slots$(
                            Ui::bodyLarge("Body Large"),

@@ -317,8 +317,8 @@ static void _paintInner(Frag &frag, Paint::Stack &stack, Math::Vec2f pos) {
         auto bordersStyle = frag.style->borders;
 
         paint = Paint::Borders();
-        paint.radii = frag.layout.radii.cast<f64>();
         paint.bound = frag.layout.paddingBox().cast<f64>().offset(pos);
+        paint.radii = frag.layout.radii.cast<f64>().reduceOverlap(paint.bound.size());
 
         paint.top.width = bordersLayout.top.cast<f64>();
         paint.top.style = bordersStyle->top.style;

@@ -7,8 +7,8 @@
 #include "flex.h"
 #include "frag.h"
 #include "grid.h"
-#include "sizing.h"
 #include "table.h"
+#include "values.h"
 
 namespace Vaev::Layout {
 
@@ -44,7 +44,7 @@ void Frag::add(Frag &&frag) {
 
 void Frag::repr(Io::Emit &e) const {
     if (children()) {
-        e("(flow {} {}", style->display, box.borderBox);
+        e("(flow {} {}", style->display, layout.borderBox());
         e.indentNewline();
         for (auto &c : children()) {
             c.repr(e);
@@ -53,7 +53,7 @@ void Frag::repr(Io::Emit &e) const {
         e.deindent();
         e(")");
     } else {
-        e("(frag {} {})", style->display, box.borderBox);
+        e("(frag {} {})", style->display, layout.borderBox());
     }
 }
 
@@ -130,111 +130,224 @@ void build(Style::Computer &c, Dom::Node const &node, Frag &parent) {
 
 Frag build(Style::Computer &c, Dom::Document const &doc) {
     auto font = Text::Font{regularFontface(), 16};
-    Frag root = {makeStrong<Style::Computed>(), font};
+    Frag root = {makeStrong<Style::Computed>(Style::Computed::initial()), font};
     build(c, doc, root);
     return root;
 }
 
 // MARK: Layout ----------------------------------------------------------------
 
-Output innerLayout(Tree &t, Frag &f, Box box, Input input) {
-    auto display = f->display;
+Output _contentLayout(Tree &t, Frag &f, Input input) {
+    auto display = f.style->display;
 
     if (auto *run = f.content.is<Strong<Text::Run>>()) {
-        if (input.commit == Commit::YES)
-            f.box = box;
         return Output::fromSize((*run)->layout().cast<Px>());
     } else if (display == Display::FLOW or display == Display::FLOW_ROOT) {
-        return blockLayout(t, f, box, input);
+        return blockLayout(t, f, input);
     } else if (display == Display::FLEX) {
-        return flexLayout(t, f, box, input);
+        return flexLayout(t, f, input);
     } else if (display == Display::GRID) {
-        return gridLayout(t, f, box, input);
+        return gridLayout(t, f, input);
     } else if (display == Display::TABLE) {
-        return tableLayout(t, f, box, input);
+        return tableLayout(t, f, input);
     } else {
-        return blockLayout(t, f, box, input);
+        return blockLayout(t, f, input);
     }
 }
 
-Output layout(Tree &t, Frag &f, Box box, Input input) {
-    return innerLayout(t, f, box, input);
+static InsetsPx _computeMargins(Tree &t, Frag &f, Input input) {
+    InsetsPx res;
+    auto margin = f.style->margin;
+
+    res.top = resolve(t, f, margin->top, input.containingBlock.height);
+    res.end = resolve(t, f, margin->end, input.containingBlock.width);
+    res.bottom = resolve(t, f, margin->bottom, input.containingBlock.height);
+    res.start = resolve(t, f, margin->start, input.containingBlock.width);
+
+    return res;
 }
 
-Px measure(Tree &t, Frag &f, Axis axis, IntrinsicSize intrinsic, Px availableSpace) {
-    Input input = {
-        .commit = Commit::NO,
-        .axis = axis,
-        .intrinsic = intrinsic,
-        .availableSpace = availableSpace,
-    };
+static InsetsPx _computeBorders(Tree &t, Frag &f) {
+    InsetsPx res;
+    auto borders = f.style->borders;
 
-    Box box = computeBox(
-        t, f,
-        input,
-        {
-            axis == Axis::HORIZONTAL ? availableSpace : Px{0},
-            axis == Axis::VERTICAL ? availableSpace : Px{0},
-        }
-    );
+    if (borders->top.style != BorderStyle::NONE)
+        res.top = resolve(t, f, borders->top.width);
 
-    auto ouput = layout(
-        t, f,
-        box,
-        input
-    );
+    if (borders->end.style != BorderStyle::NONE)
+        res.end = resolve(t, f, borders->end.width);
 
-    return ouput.size[axis.index()];
+    if (borders->bottom.style != BorderStyle::NONE)
+        res.bottom = resolve(t, f, borders->bottom.width);
+
+    if (borders->start.style != BorderStyle::NONE)
+        res.start = resolve(t, f, borders->start.width);
+
+    return res;
+}
+
+static InsetsPx _computePaddings(Tree &t, Frag &f, Input input) {
+    InsetsPx res;
+    auto padding = f.style->padding;
+
+    res.top = resolve(t, f, padding->top, input.containingBlock.height);
+    res.end = resolve(t, f, padding->end, input.containingBlock.width);
+    res.bottom = resolve(t, f, padding->bottom, input.containingBlock.height);
+    res.start = resolve(t, f, padding->start, input.containingBlock.width);
+
+    return res;
+}
+
+static Math::Radii<Px> _computeRadii(Tree &t, Frag &f, Vec2Px size) {
+    auto radii = f.style->borders->radii;
+    Math::Radii<Px> res;
+
+    res.a = resolve(t, f, radii.a, size.height);
+    res.b = resolve(t, f, radii.b, size.width);
+    res.c = resolve(t, f, radii.c, size.width);
+    res.d = resolve(t, f, radii.d, size.height);
+    res.e = resolve(t, f, radii.e, size.height);
+    res.f = resolve(t, f, radii.f, size.width);
+    res.g = resolve(t, f, radii.g, size.width);
+    res.h = resolve(t, f, radii.h, size.height);
+
+    return res;
+}
+
+static Cons<Opt<Px>, IntrinsicSize> _computeSpecifiedSize(Tree &t, Frag &f, Input input, Size size) {
+    if (size == Size::MIN_CONTENT) {
+        return {NONE, IntrinsicSize::MIN_CONTENT};
+    } else if (size == Size::MAX_CONTENT) {
+        return {NONE, IntrinsicSize::MAX_CONTENT};
+    } else if (size == Size::AUTO) {
+        return {NONE, IntrinsicSize::AUTO};
+    } else if (size == Size::FIT_CONTENT) {
+        return {NONE, IntrinsicSize::STRETCH_TO_FIT};
+    } else if (size == Size::LENGTH) {
+        return {resolve(t, f, size.value, input.containingBlock.width), IntrinsicSize::AUTO};
+    } else {
+        logWarn("unknown specified size: {}", size);
+        return {Px{0}, IntrinsicSize::AUTO};
+    }
+}
+
+Output layout(Tree &t, Frag &f, Input input) {
+    auto margin = _computeMargins(t, f, input);
+    auto borders = _computeBorders(t, f);
+    auto padding = _computePaddings(t, f, input);
+    auto sizing = f.style->sizing;
+
+    auto [specifiedWidth, widthIntrinsicSize] = _computeSpecifiedSize(t, f, input, sizing->width);
+    if (input.knownSize.width == NONE) {
+        input.knownSize.width = specifiedWidth;
+    }
+    input.knownSize.width = input.knownSize.width.map([&](auto s) {
+        // FIXME: Take box-sizing into account
+        return s - padding.horizontal() - borders.horizontal();
+    });
+    input.intrinsic = widthIntrinsicSize;
+
+    auto [specifiedHeight, heightIntrinsicSize] = _computeSpecifiedSize(t, f, input, sizing->height);
+    if (input.knownSize.height == NONE) {
+        input.knownSize.height = specifiedHeight;
+    }
+
+    input.knownSize.height = input.knownSize.height.map([&](auto s) {
+        // FIXME: Take box-sizing into account
+        return s - padding.vertical() - borders.vertical();
+    });
+    input.intrinsic = heightIntrinsicSize;
+
+    auto [size, _] = _contentLayout(t, f, input);
+
+    size.width = input.knownSize.width.unwrapOr(size.width);
+    size.height = input.knownSize.height.unwrapOr(size.height);
+
+    size = size + padding.all() + borders.all();
+
+    if (input.commit == Commit::YES) {
+        f.layout.size = size;
+        f.layout.padding = padding;
+        f.layout.borders = borders;
+        f.layout.margin = margin;
+        f.layout.radii = _computeRadii(t, f, size);
+    }
+
+    return Output::fromSizeAndMargin(size, margin);
 }
 
 // MARK: Paint -----------------------------------------------------------------
 
-void paint(Frag &frag, Paint::Stack &stack) {
-    if (frag->backgrounds.len()) {
-        Paint::Box background;
+static void _paintInner(Frag &frag, Paint::Stack &stack, Math::Vec2f pos) {
+    auto const &backgrounds = frag.style->backgrounds;
 
-        background.radii = frag.box.radii.cast<f64>();
-        background.backgrounds = frag->backgrounds;
-        background.bound = frag.box.borderBox;
+    Gfx::Color currentColor = Gfx::BLACK;
+    currentColor = resolve(frag.style->color, currentColor);
 
-        stack.add(makeStrong<Paint::Box>(std::move(background)));
+    if (backgrounds.len()) {
+        Paint::Box paint;
+
+        paint.backgrounds.ensure(backgrounds.len());
+        for (auto &bg : backgrounds) {
+            paint.backgrounds.pushBack(resolve(bg.fill, currentColor));
+        }
+
+        paint.radii = frag.layout.radii.cast<f64>();
+        paint.bound = frag.layout.borderBox().cast<f64>().offset(pos);
+
+        stack.add(makeStrong<Paint::Box>(std::move(paint)));
     }
 
     for (auto &c : frag.children()) {
-        paint(c, stack);
+        paint(c, stack, pos + frag.layout.contentBox().topStart().cast<f64>());
     }
 
     if (auto *run = frag.content.is<Strong<Text::Run>>()) {
-        stack.add(makeStrong<Paint::Text>(frag.box.borderBox.topStart().cast<f64>(), *run));
+        Math::Vec2f baseline = {0, frag.font.metrics().ascend};
+        stack.add(makeStrong<Paint::Text>(
+            pos + frag.layout.borderBox().topStart().cast<f64>() + baseline,
+            *run,
+            currentColor
+        ));
     }
 
-    if (not frag.box.borders.zero()) {
-        // FIXME: colorContext should be context dependant
-        ColorContext colorContext;
+    if (not frag.layout.borders.zero()) {
+        Paint::Borders paint;
+        auto bordersLayout = frag.layout.borders;
+        auto bordersStyle = frag.style->borders;
 
-        Paint::Borders borders;
+        paint = Paint::Borders();
+        paint.radii = frag.layout.radii.cast<f64>();
+        paint.bound = frag.layout.paddingBox().cast<f64>().offset(pos);
 
-        borders = Paint::Borders();
-        borders.radii = frag.box.radii.cast<f64>();
-        borders.bound = frag.box.paddingBox().cast<f64>();
+        paint.top.width = bordersLayout.top.cast<f64>();
+        paint.top.style = bordersStyle->top.style;
+        paint.top.fill = resolve(bordersStyle->top.color, currentColor);
 
-        borders.top.width = frag.box.borders.top.cast<f64>();
-        borders.top.style = frag->borders->top.style;
-        borders.top.fill = colorContext.resolve(frag->borders->top.color);
+        paint.bottom.width = bordersLayout.bottom.cast<f64>();
+        paint.bottom.style = bordersStyle->bottom.style;
+        paint.bottom.fill = resolve(bordersStyle->bottom.color, currentColor);
 
-        borders.bottom.width = frag.box.borders.bottom.cast<f64>();
-        borders.bottom.style = frag->borders->bottom.style;
-        borders.bottom.fill = colorContext.resolve(frag->borders->bottom.color);
+        paint.start.width = bordersLayout.start.cast<f64>();
+        paint.start.style = bordersStyle->start.style;
+        paint.start.fill = resolve(bordersStyle->start.color, currentColor);
 
-        borders.start.width = frag.box.borders.start.cast<f64>();
-        borders.start.style = frag->borders->start.style;
-        borders.start.fill = colorContext.resolve(frag->borders->start.color);
+        paint.end.width = bordersLayout.end.cast<f64>();
+        paint.end.style = bordersStyle->end.style;
+        paint.end.fill = resolve(bordersStyle->end.color, currentColor);
 
-        borders.end.width = frag.box.borders.end.cast<f64>();
-        borders.end.style = frag->borders->end.style;
-        borders.end.fill = colorContext.resolve(frag->borders->end.color);
+        stack.add(makeStrong<Paint::Borders>(std::move(paint)));
+    }
+}
 
-        stack.add(makeStrong<Paint::Borders>(std::move(borders)));
+void paint(Frag &frag, Paint::Stack &stack, Math::Vec2f pos) {
+    if (frag.style->zIndex == ZIndex::AUTO) {
+        _paintInner(frag, stack, pos);
+    } else {
+        auto innerStack = makeStrong<Paint::Stack>();
+        innerStack->zIndex = frag.style->zIndex.value;
+        _paintInner(frag, *innerStack, pos);
+        stack.add(std::move(innerStack));
     }
 }
 
@@ -248,7 +361,7 @@ void wireframe(Frag &frag, Gfx::Canvas &g) {
         .align = Gfx::INSIDE_ALIGN,
     });
 
-    g.stroke(frag.box.borderBox.cast<f64>());
+    g.stroke(frag.layout.borderBox().cast<f64>());
 }
 
 } // namespace Vaev::Layout

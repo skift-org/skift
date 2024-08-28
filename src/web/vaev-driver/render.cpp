@@ -1,7 +1,6 @@
 #include <karm-sys/time.h>
 #include <vaev-dom/element.h>
 #include <vaev-layout/frag.h>
-#include <vaev-layout/sizing.h>
 #include <vaev-paint/page.h>
 #include <vaev-paint/stack.h>
 #include <vaev-style/computer.h>
@@ -77,33 +76,20 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
 
     Layout::Viewport vp{.small = viewport};
 
-    auto height = Layout::computePreferredBorderSize(
-        tree,
-        tree.root,
-        {
-            .commit = Layout::Commit::NO,
-            .axis = Axis::VERTICAL,
-        },
-        Axis::VERTICAL
-    );
-
     elapsed = Sys::now() - start;
 
     logDebug("layout tree measure time: {}", elapsed);
 
     start = Sys::now();
 
-    Layout::Box containingBox = {
-        .borderBox = {vp.small.width, height},
-    };
-
     Layout::layout(
         tree,
         tree.root,
-        containingBox,
         {
             .commit = Layout::Commit::YES,
-            .containingBlock = containingBox.borderBox,
+            .knownSize = {vp.small.width, NONE},
+            .availableSpace = {vp.small.width, Px{0}},
+            .containingBlock = {vp.small.width, vp.small.height},
         }
     );
 
@@ -152,27 +138,14 @@ RenderResult render(Dom::Document &dom, Style::Media const &media, Print::PaperS
         vp,
     };
 
-    auto height = Layout::computePreferredBorderSize(
-        tree,
-        tree.root,
-        {
-            .commit = Layout::Commit::NO,
-            .axis = Axis::VERTICAL,
-        },
-        Axis::VERTICAL
-    );
-
-    Layout::Box containingBox = {
-        .borderBox = {vp.small.width, height},
-    };
-
     Layout::layout(
         tree,
         tree.root,
-        containingBox,
         {
             .commit = Layout::Commit::YES,
-            .containingBlock = containingBox.borderBox,
+            .knownSize = {vp.small.width, NONE},
+            .availableSpace = {vp.small.width, Px{0}},
+            .containingBlock = {vp.small.width, vp.small.height},
         }
     );
 

@@ -60,28 +60,6 @@ struct Color {
     }
 };
 
-struct ColorContext {
-    Gfx::Color currentColor = Gfx::BLACK;
-    Array<Gfx::Color, static_cast<usize>(SystemColor::_LEN)> systemColors = {
-#define COLOR(NAME, _, VALUE) Gfx::Color::fromHex(VALUE),
-#include "defs/system-colors.inc"
-#undef COLOR
-    };
-
-    constexpr Gfx::Color resolve(Color const &c) const {
-        switch (c.type) {
-        case Color::Type::SRGB:
-            return c.srgb;
-
-        case Color::Type::SYSTEM:
-            return systemColors[static_cast<usize>(c.system)];
-
-        case Color::Type::CURRENT:
-            return currentColor;
-        }
-    }
-};
-
 inline constexpr Gfx::Color TRANSPARENT = Gfx::Color::fromRgba(0, 0, 0, 0);
 
 #define COLOR(NAME, _, VALUE) \
@@ -92,5 +70,7 @@ inline constexpr Gfx::Color TRANSPARENT = Gfx::Color::fromRgba(0, 0, 0, 0);
 Opt<Color> parseNamedColor(Str name);
 
 Opt<SystemColor> parseSystemColor(Str name);
+
+Gfx::Color resolve(Color c, Gfx::Color currentColor);
 
 } // namespace Vaev

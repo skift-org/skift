@@ -674,7 +674,7 @@ struct BorderRadius {
 
 // https://www.w3.org/TR/css-backgrounds-3/#border-shorthands
 struct BorderProp {
-    Array<Border, 4> value = {Border{}, Border{}, Border{}, Border{}};
+    Array<Border, 4> value = {};
 
     static constexpr Str name() { return "border"; }
 
@@ -1483,6 +1483,25 @@ struct MaxHeightProp {
     }
 };
 
+// https://drafts.csswg.org/css2/#z-index
+
+struct ZIndexProp {
+    ZIndex value = initial();
+
+    static constexpr Str name() { return "z-index"; }
+
+    static constexpr ZIndex initial() { return ZIndex::AUTO; }
+
+    void apply(Computed &c) const {
+        c.zIndex = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<ZIndex>(c));
+        return Ok();
+    }
+};
+
 // MARK: Style Property  -------------------------------------------------------
 
 using _StyleProp = Union<
@@ -1581,7 +1600,10 @@ using _StyleProp = Union<
     MinWidthProp,
     MinHeightProp,
     MaxWidthProp,
-    MaxHeightProp
+    MaxHeightProp,
+
+    // ZIndex
+    ZIndexProp
 
     /**/
     >;

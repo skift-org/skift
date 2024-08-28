@@ -13,6 +13,7 @@
 #include <vaev-base/overflow.h>
 #include <vaev-base/resolution.h>
 #include <vaev-base/sizing.h>
+#include <vaev-base/z-index.h>
 #include <vaev-css/parser.h>
 
 namespace Vaev::Style {
@@ -307,6 +308,11 @@ struct ValueParser<ColorScheme> {
 template <>
 struct ValueParser<ReducedData> {
     static Res<ReducedData> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
+struct ValueParser<ZIndex> {
+    static Res<ZIndex> parse(Cursor<Css::Sst> &c);
 };
 
 } // namespace Vaev::Style

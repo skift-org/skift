@@ -8,7 +8,6 @@
 #include <vaev-style/computer.h>
 
 #include "base.h"
-#include "box.h"
 
 namespace Vaev::Layout {
 
@@ -24,7 +23,7 @@ struct Frag : public Meta::NoCopy {
     Strong<Style::Computed> style;
     Text::Font font;
     Content content = NONE;
-    Box box{};
+    Layout layout;
 
     Frag(Strong<Style::Computed> style, Text::Font font);
 
@@ -33,10 +32,6 @@ struct Frag : public Meta::NoCopy {
     Slice<Frag> children() const;
 
     MutSlice<Frag> children();
-
-    Style::Computed const *operator->() const {
-        return &*style;
-    }
 
     void add(Frag &&frag);
 
@@ -56,13 +51,13 @@ Frag build(Style::Computer &c, Dom::Document const &doc);
 
 // MARK: Layout ----------------------------------------------------------------
 
-Output layout(Tree &t, Frag &f, Box box, Input input);
+Output layout(Tree &t, Frag &f, Input input);
 
 Px measure(Tree &t, Frag &f, Axis axis, IntrinsicSize intrinsic, Px availableSpace);
 
 // MARK: Paint -----------------------------------------------------------------
 
-void paint(Frag &frag, Paint::Stack &stack);
+void paint(Frag &frag, Paint::Stack &stack, Math::Vec2f pos = {});
 
 void wireframe(Frag &frag, Gfx::Canvas &g);
 

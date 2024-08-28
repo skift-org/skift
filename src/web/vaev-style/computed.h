@@ -14,6 +14,7 @@
 #include <vaev-base/overflow.h>
 #include <vaev-base/sizing.h>
 #include <vaev-base/visibility.h>
+#include <vaev-base/z-index.h>
 
 namespace Vaev::Style {
 
@@ -58,6 +59,9 @@ struct Computed {
 
     Float float_ = Float::NONE;
     Clear clear = Clear::NONE;
+
+    // https://drafts.csswg.org/css2/#z-index
+    ZIndex zIndex = ZIndex::AUTO;
 
     void inherit(Computed const &parent) {
         color = parent.color;

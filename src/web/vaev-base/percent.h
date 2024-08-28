@@ -8,15 +8,6 @@ namespace Vaev {
 using Percent = Distinct<f64, struct _PercentTag>;
 
 template <typename T>
-struct PercentOf {
-    f64 _val;
-
-    void repr(Io::Emit &e) const {
-        e("{}%", _val);
-    }
-};
-
-template <typename T>
 struct PercentOr {
     enum struct Type {
         PERCENT,

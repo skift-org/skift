@@ -9,6 +9,7 @@ enum struct IntrinsicSize {
     AUTO,
     MIN_CONTENT,
     MAX_CONTENT,
+    STRETCH_TO_FIT,
 };
 
 struct Viewport {
@@ -26,19 +27,66 @@ enum struct Commit {
     YES, // Yes, commit computed values to the tree
 };
 
+/// Input to the layout algorithm.
+
 struct Input {
-    Commit commit = Commit::NO; //< Should the computed values be committed to the DOM?
-    Axis axis = Axis::HORIZONTAL;
+    Commit commit = Commit::NO; //< Should the computed values be committed to the layout?
     IntrinsicSize intrinsic = IntrinsicSize::AUTO;
+    Math::Vec2<Opt<Px>> knownSize = {};
     Vec2Px availableSpace = {};
-    RectPx containingBlock{};
+    Vec2Px containingBlock = {};
 };
+
+/// Output of the layout algorithm.
 
 struct Output {
     Vec2Px size;
+    InsetsPx margins = {};
 
     static Output fromSize(Vec2Px size) {
         return Output{size};
+    }
+
+    static Output fromSizeAndMargin(Vec2Px size, InsetsPx margins) {
+        return Output{size, margins};
+    }
+};
+
+/// Computed layout values.
+
+struct Layout {
+    InsetsPx padding{};
+    InsetsPx borders{};
+    Vec2Px position; //< Position relative to the content box of the containing block
+    Vec2Px size;
+    InsetsPx margin{};
+    RadiiPx radii{};
+
+    void repr(Io::Emit &e) const {
+        e("(layout paddings: {} borders: {} position: {} size: {} margins: {} radii: {})",
+          padding, borders, position, size, margin, radii);
+    }
+
+    Layout offseted(Vec2Px offset) const {
+        auto copy = *this;
+        copy.position = position + offset;
+        return copy;
+    }
+
+    RectPx borderBox() const {
+        return RectPx{position, size}.grow(borders);
+    }
+
+    RectPx paddingBox() const {
+        return borderBox().shrink(borders);
+    }
+
+    RectPx contentBox() const {
+        return paddingBox().shrink(padding);
+    }
+
+    RectPx marginBox() const {
+        return borderBox().grow(margin);
     }
 };
 

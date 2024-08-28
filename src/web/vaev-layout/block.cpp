@@ -1,63 +1,63 @@
 #include "block.h"
 
 #include "frag.h"
-#include "sizing.h"
 
 namespace Vaev::Layout {
 
-Output blockLayout(Tree &t, Frag &f, Box box, Input input) {
-    if (input.commit == Commit::YES)
-        f.box = box;
-
-    Axis mainAxis = Axis::VERTICAL;
-
-    Px pos = box.contentBox().top();
-    Px width = box.contentBox().width;
+static Px _blockLayoutDetermineWidth(Tree &t, Frag &f, Input input) {
+    Px width = Px{0};
     for (auto &c : f.children()) {
-        auto blockSize = computePreferredOuterSize(
-            t, c,
-            input,
-            mainAxis,
-            max(Px{0}, box.contentBox().height - pos)
-        );
 
-        Px inlineSize = computePreferredBorderSize(
-            t, c,
-            input,
-            mainAxis.cross(),
-            box.contentBox().width
-        );
+        if (c.style->sizing->width == Size::AUTO)
+            width = max(width, input.knownSize.width.unwrapOr(Px{0}));
+        else {
+            auto ouput = layout(
+                t,
+                c,
+                {
+                    .commit = Commit::NO,
+                    .intrinsic = input.intrinsic,
+                }
+            );
 
-        if (c->sizing->width == Size::AUTO) {
-            inlineSize = max(inlineSize, box.contentBox().width);
+            width = max(width, ouput.size.x);
         }
+    }
 
-        RectPx borderBox = RectPx{
-            box.contentBox().start(),
-            pos,
-            inlineSize,
-            blockSize,
-        };
+    return width;
+}
 
-        auto childBox = computeBox(t, c, input, borderBox);
-        layout(
-            t, c,
-            childBox,
+Output blockLayout(Tree &t, Frag &f, Input input) {
+    Px blockSize = Px{0};
+    Px inlineSize = input.knownSize.x.unwrapOrElse([&]() {
+        return _blockLayoutDetermineWidth(t, f, input);
+    });
+
+    for (auto &c : f.children()) {
+        Opt<Px> childInlineSize = NONE;
+        if (c.style->sizing->width == Size::AUTO)
+            childInlineSize = inlineSize;
+
+        auto ouput = layout(
+            t,
+            c,
             {
                 .commit = input.commit,
-                .axis = input.axis,
-                .availableSpace = borderBox.wh,
-                .containingBlock = box.contentBox(),
+                .knownSize = {childInlineSize, NONE},
+                .availableSpace = {inlineSize, Px{0}},
+                .containingBlock = {inlineSize, Px{0}},
             }
         );
 
-        pos += blockSize;
-        width = max(width, childBox.borderBox.width);
+        if (input.commit == Commit::YES)
+            c.layout.position = {Px{0}, blockSize};
+
+        blockSize += ouput.size.y;
     }
 
     return Output::fromSize({
-        width,
-        pos - box.contentBox().top(),
+        inlineSize,
+        blockSize,
     });
 }
 

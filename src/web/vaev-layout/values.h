@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vaev-base/color.h>
 #include <vaev-base/width.h>
 
 #include "base.h"

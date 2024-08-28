@@ -1,9 +1,10 @@
+#include "table.h"
+
 #include "frag.h"
-#include "sizing.h"
 
 namespace Vaev::Layout {
 
-struct ColumnSizing {
+struct TableColumn {
     Px width;
 
     void repr(Io::Emit &e) const {
@@ -11,17 +12,22 @@ struct ColumnSizing {
     }
 };
 
-static void _collectColumnSize(Tree &t, Frag &f, Input input, Vec<ColumnSizing> &cols, usize index = 0) {
-    auto display = f->display;
+static void _collectColumnSize(Tree &t, Frag &f, Input input, Vec<TableColumn> &cols, usize col = 0) {
+    auto display = f.style->display;
     if (display == Display::TABLE_CELL) {
-        if (cols.len() <= index) {
+        Input childInput = {
+            .commit = Commit::NO,
+            .containingBlock = input.containingBlock
+        };
+
+        if (cols.len() <= col) {
             cols.pushBack({
-                .width = computePreferredOuterSize(t, f, input, Axis::HORIZONTAL),
+                .width = layout(t, f, childInput).size.width,
             });
         } else {
-            cols[index].width = max(
-                cols[index].width,
-                computePreferredOuterSize(t, f, input, Axis::HORIZONTAL)
+            cols[col].width = max(
+                cols[col].width,
+                layout(t, f, childInput).size.width
             );
         }
         return;
@@ -30,8 +36,6 @@ static void _collectColumnSize(Tree &t, Frag &f, Input input, Vec<ColumnSizing> 
     for (auto &c : f.children()) {
         Input childInput = {
             .commit = Commit::NO,
-            .axis = input.axis,
-            .availableSpace = Px{0},
             .containingBlock = input.containingBlock,
         };
 
@@ -41,23 +45,27 @@ static void _collectColumnSize(Tree &t, Frag &f, Input input, Vec<ColumnSizing> 
         }
 
         if (display == Display::TABLE_ROW) {
-            _collectColumnSize(t, c, childInput, cols, index++);
+            _collectColumnSize(t, c, childInput, cols, col++);
             continue;
         }
     }
 }
 
 static Px _collectRowHeight(Tree &t, Frag &f, Input input) {
-    auto display = f->display;
+    auto display = f.style->display;
+
     if (display == Display::TABLE_CELL) {
-        return computePreferredOuterSize(t, f, input, Axis::VERTICAL);
+        Input childInput = {
+            .commit = Commit::NO,
+            .containingBlock = input.containingBlock,
+        };
+        return layout(t, f, childInput).size.height;
     }
 
     Px res = Px{0};
     for (auto &c : f.children()) {
         Input childInput = {
             .commit = Commit::NO,
-            .axis = input.axis,
             .availableSpace = Px{0},
             .containingBlock = input.containingBlock,
         };
@@ -73,7 +81,6 @@ static Px _collectRowsHeight(Tree &t, Frag &f, Input input) {
     for (auto &c : f.children()) {
         Input childInput = {
             .commit = Commit::NO,
-            .axis = input.axis,
             .availableSpace = Px{0},
             .containingBlock = input.containingBlock,
         };
@@ -83,102 +90,103 @@ static Px _collectRowsHeight(Tree &t, Frag &f, Input input) {
     return res;
 }
 
-static Output _placeColumns(Tree &t, Frag &f, Box box, Input input, Vec<ColumnSizing> &cols) {
-    if (input.commit == Commit::YES)
-        f.box = box;
-
-    Px res = box.contentBox().start();
-    Px height = _collectRowHeight(t, f, input);
+static Output _placeColumns(Tree &t, Frag &f, Input input, Vec<TableColumn> &cols) {
+    Px inlineSize = {};
+    Px rowBlockSize = _collectRowHeight(t, f, input);
 
     for (usize i = 0; i < f.children().len(); i++) {
         auto &c = f.children()[i];
 
-        RectPx borderBox = RectPx{
-            res,
-            box.contentBox().top(),
-            cols[i].width,
-            height,
-        };
-
         Input childInput = {
             .commit = input.commit,
-            .axis = input.axis,
-            .availableSpace = borderBox.wh,
-            .containingBlock = box.contentBox(),
+            .knownSize = {
+                cols[i].width,
+                rowBlockSize,
+            },
+            .availableSpace = {},
+            .containingBlock = input.containingBlock,
         };
 
-        auto childBox = computeBox(t, c, childInput, borderBox);
-        layout(
+        auto output = layout(
             t, c,
-            childBox,
             childInput
         );
 
-        res += cols[i].width;
+        c.layout.position = {
+            inlineSize,
+            Px{0},
+        };
+
+        inlineSize += cols[i].width;
     }
 
     return Output::fromSize({
-        res - box.contentBox().start(),
-        height,
+        inlineSize,
+        rowBlockSize,
     });
 }
 
-static Output _placeRows(Tree &t, Frag &f, Box box, Input input, Vec<ColumnSizing> &cols) {
-    if (input.commit == Commit::YES)
-        f.box = box;
-
-    Px res = box.contentBox().top();
+static Output _placeRows(Tree &t, Frag &f, Input input, Vec<TableColumn> &cols) {
+    Px blockSize = {};
+    Px knownInlineSize = input.knownSize.x.unwrapOr(Px{0});
 
     for (auto &c : f.children()) {
-        Px blockSize = {};
+        auto display = c.style->display;
+
+        Px childBlockSize = {};
 
         Input childInput = {
             .commit = input.commit,
-            .axis = input.axis,
+            .knownSize = {knownInlineSize, NONE},
             .availableSpace = {},
-            .containingBlock = box.contentBox(),
+            .containingBlock = {
+                knownInlineSize,
+                Px{0},
+            }
         };
 
-        if (c->display == Display::TABLE_ROW)
-            blockSize = _collectRowHeight(t, c, childInput);
+        if (display == Display::TABLE_ROW)
+            childBlockSize = _collectRowHeight(t, c, childInput);
         else
-            blockSize = _collectRowsHeight(t, c, childInput);
+            childBlockSize = _collectRowsHeight(t, c, childInput);
 
-        RectPx borderBox = RectPx{
-            box.contentBox().start(),
-            res,
-            box.contentBox().width,
+        input.availableSpace.height = childBlockSize;
+
+        if (display == Display::TABLE_ROW) {
+            _placeColumns(t, c, input, cols);
+        } else if (display == Display::TABLE_CAPTION) {
+            layout(t, c, childInput);
+        } else if (display.isTableGroup()) {
+            _placeRows(t, c, input, cols);
+        } else {
+            layout(t, c, childInput);
+        }
+
+        c.layout.position = {
+            Px{0},
             blockSize,
         };
 
-        auto childBox = computeBox(t, c, childInput, borderBox);
-
-        if (c->display == Display::TABLE_ROW) {
-            _placeColumns(t, c, childBox, input, cols);
-        } else if (c->display == Display::TABLE_CAPTION) {
-            layout(t, c, childBox, childInput);
-        } else if (c->display.isTableGroup()) {
-            _placeRows(t, c, childBox, input, cols);
-        } else {
-            layout(t, c, childBox, childInput);
-        }
-
-        res += blockSize;
+        blockSize += childBlockSize;
     }
 
+    auto inlineSize =
+        iter(cols)
+            .map([](auto &col) {
+                return col.width;
+            })
+            .sum();
+
     return Output::fromSize({
-        box.contentBox().width,
-        res - box.contentBox().top(),
+        inlineSize,
+        blockSize,
     });
 }
 
-Output tableLayout(Tree &t, Frag &f, Box box, Input input) {
-    if (input.commit == Commit::YES)
-        f.box = box;
-
-    Vec<ColumnSizing> cols;
+Output tableLayout(Tree &t, Frag &f, Input input) {
+    Vec<TableColumn> cols;
     _collectColumnSize(t, f, input, cols);
-    return _placeRows(t, f, box, input, cols);
+    return _placeRows(t, f, input, cols);
 }
 
 } // namespace Vaev::Layout

@@ -960,4 +960,19 @@ Res<ReducedData> ValueParser<ReducedData>::parse(Cursor<Css::Sst> &c) {
         return Error::invalidData("expected reduced data value");
 }
 
+// MARK: ZIndex
+// https://drafts.csswg.org/css2/#z-index
+
+Res<ZIndex> ValueParser<ZIndex>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c->token == Css::Token::ident("auto")) {
+        c.next();
+        return Ok(ZIndex::AUTO);
+    }
+
+    return Ok(try$(parseValue<Integer>(c)));
+}
+
 } // namespace Vaev::Style

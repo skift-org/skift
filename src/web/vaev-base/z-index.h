@@ -11,12 +11,14 @@ struct ZIndex {
 
     using enum _Auto;
 
-    bool auto_;
-    isize value;
+    bool auto_ = true;
+    isize value = 0;
 
     constexpr ZIndex(_Auto) : auto_(true) {}
 
     constexpr ZIndex(isize value) : auto_(false), value(value) {}
+
+    bool operator==(_Auto) const { return auto_; }
 
     void repr(Io::Emit &e) const {
         if (auto_) {

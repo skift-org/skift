@@ -83,7 +83,6 @@ struct Borders : public Node {
             bottom.style == start.style and
             start.style == end.style) {
             // fast path, this allow us to paint the border easily if all the borders are the same color/style
-
             Math::Rectf const outer = Math::Rectf{
                 cornerTopStart,
                 {
@@ -93,7 +92,7 @@ struct Borders : public Node {
             };
 
             ctx.rect(outer, radii);
-            ctx.rect(bound, 0);
+            ctx.rect(bound, radiiIn);
             ctx.fill(top.fill, Gfx::FillRule::EVENODD);
             return;
         }

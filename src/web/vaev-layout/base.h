@@ -58,13 +58,13 @@ struct Layout {
     InsetsPx padding{};
     InsetsPx borders{};
     Vec2Px position; //< Position relative to the content box of the containing block
-    Vec2Px size;
+    Vec2Px borderSize;
     InsetsPx margin{};
     RadiiPx radii{};
 
     void repr(Io::Emit &e) const {
-        e("(layout paddings: {} borders: {} position: {} size: {} margins: {} radii: {})",
-          padding, borders, position, size, margin, radii);
+        e("(layout paddings: {} borders: {} position: {} borderSize: {} margin: {} radii: {})",
+          padding, borders, position, borderSize, margin, radii);
     }
 
     Layout offseted(Vec2Px offset) const {
@@ -74,7 +74,7 @@ struct Layout {
     }
 
     RectPx borderBox() const {
-        return RectPx{position, size}.grow(borders);
+        return RectPx{position, borderSize};
     }
 
     RectPx paddingBox() const {

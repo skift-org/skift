@@ -135,19 +135,23 @@ always_inline constexpr usize popcount(T value) {
     return count;
 }
 
-always_inline constexpr auto rol(auto x, auto n) {
+template <typename T>
+always_inline constexpr T rol(T x, usize n) {
     return (x << n) | (x >> (sizeof(x) * 8 - n));
 }
 
-always_inline constexpr auto ror(auto x, auto n) {
+template <typename T>
+always_inline constexpr T ror(T x, usize n) {
     return (x >> n) | (x << (sizeof(x) * 8 - n));
 }
 
-always_inline constexpr auto rotl(auto x, auto n) {
+template <typename T>
+always_inline constexpr T rotl(T x, usize n) {
     return (x << n) | (x >> (sizeof(x) * 8 - n));
 }
 
-always_inline constexpr auto rotr(auto x, auto n) {
+template <typename T>
+always_inline constexpr T rotr(T x, usize n) {
     return (x >> n) | (x << (sizeof(x) * 8 - n));
 }
 

@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-recorder",
+    "type": "lib",
+    "description": "Record and edit audio",
+    "requires": [
+        "hideo-base"
+    ]
+}

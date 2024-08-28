@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-climber",
+    "type": "lib",
+    "description": "Climb the mountain",
+    "requires": [
+        "hideo-base"
+    ]
+}

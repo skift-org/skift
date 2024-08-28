@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "cc",
+    "type": "exe",
+    "description": "Compiler collection",
+    "requires": [
+        "karm-jit",
+        "karm-sys"
+    ]
+}

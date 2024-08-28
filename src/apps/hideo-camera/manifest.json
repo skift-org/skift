@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-camera",
+    "type": "lib",
+    "description": "Take photos and videos",
+    "requires": [
+        "hideo-base"
+    ]
+}

@@ -103,7 +103,6 @@ struct Slice {
 
     template <typename U>
     constexpr Slice<U> cast() const {
-        static_assert(sizeof(T) == sizeof(U));
         return Slice<U>{(U const *)_buf, _len};
     }
 
@@ -167,8 +166,7 @@ struct MutSlice {
 
     template <typename U>
     constexpr MutSlice<U> cast() const {
-        static_assert(sizeof(T) == sizeof(U) and alignof(T) == alignof(U));
-        return MutSlice<U>{(U *)_buf, _len};
+        return MutSlice<U>{(U *)_buf, _len * sizeof(T) / sizeof(U)};
     }
 
     constexpr explicit operator bool() const {

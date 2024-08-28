@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-canvas",
+    "type": "lib",
+    "description": "A digital whiteboard",
+    "requires": [
+        "hideo-base"
+    ]
+}

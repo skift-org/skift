@@ -12,6 +12,13 @@ struct Array {
 
     T _buf[N];
 
+    always_inline static constexpr Array from(Sliceable<T> auto slice) {
+        Array res{};
+        for (usize i = 0; i < N; i++)
+            res[i] = slice[i];
+        return res;
+    }
+
     always_inline constexpr T &operator[](usize i) {
         if (i >= N) [[unlikely]]
             panic("index out of range");

@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-code",
+    "type": "lib",
+    "description": "Write and run code",
+    "requires": [
+        "hideo-base"
+    ]
+}

@@ -11,6 +11,8 @@
 
 namespace Hideo {
 
+#undef __ck_sys_darwin__
+
 static Ui::BoxStyle TOOLBAR = {
     .backgroundFill = Ui::GRAY900,
 };

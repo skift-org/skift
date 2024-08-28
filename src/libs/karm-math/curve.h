@@ -103,7 +103,7 @@ union Curve {
             epsilonEq(Tri2(a, c, d).turn(), 0.0, epsilon);
     }
 
-    constexpr bool straightish(T tolerance) {
+    constexpr bool straightish(T tolerance) const {
         auto d1 = d - a;
         auto d2 = Math::abs((b.x - d.x) * d1.y - (b.y - d.y) * d1.x);
         auto d3 = Math::abs((c.x - d.x) * d1.y - (c.y - d.y) * d1.x);
@@ -169,7 +169,7 @@ union Curve {
         return {p0, p1, p2, p3};
     }
 
-    constexpr Pair<Curve> split(T t = 0.5) const {
+    constexpr Pair<Curve> split(T t) const {
         auto e = lerp(a, b, t);
         auto f = lerp(b, c, t);
         auto g = lerp(c, d, t);
@@ -180,6 +180,20 @@ union Curve {
         return {
             {a, e, h, k},
             {k, j, g, d},
+        };
+    }
+
+    constexpr Pair<Curve> split() const {
+        auto ab = (a + b) / 2;
+        auto bc = (b + c) / 2;
+        auto cd = (c + d) / 2;
+        auto abc = (ab + bc) / 2;
+        auto bcd = (bc + cd) / 2;
+        auto abcd = (abc + bcd) / 2;
+
+        return {
+            {a, ab, abc, abcd},
+            {abcd, bcd, cd, d},
         };
     }
 

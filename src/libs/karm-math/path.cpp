@@ -19,14 +19,14 @@ void Path::_flattenClose() {
     last(_contours).close = true;
 }
 
-[[gnu::flatten]] void Path::_flattenLineTo(Math::Vec2f p) {
+void Path::_flattenLineTo(Math::Vec2f p) {
     if (not _contours.len()) {
         logError("path: moveTo must be called before lineTo");
         return;
     }
 
     if (last(_contours).start != last(_contours).end and
-        Math::epsilonEq(last(_verts), p, 0.001)) {
+        Math::epsilonEq(last(_verts), p)) {
         return;
     }
 
@@ -38,17 +38,20 @@ void Path::_flattenCurveTo(Math::Curvef curve, isize depth) {
     if (depth > 16)
         return;
 
+    if (curve.degenerated())
+        return;
+
     if (curve.straightish(0.25)) {
         _flattenLineTo(curve.d);
         return;
     }
 
-    auto [left, right] = curve.split(0.5);
+    auto [left, right] = curve.split();
     _flattenCurveTo(left, depth + 1);
     _flattenCurveTo(right, depth + 1);
 }
 
-[[gnu::flatten]] void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radii, f64 angle, Flags flags, Math::Vec2f point) {
+void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radii, f64 angle, Flags flags, Math::Vec2f point) {
     // Ported from canvg (https://github.com/canvg/canvg)
     f64 x1 = start.x;
     f64 y1 = start.y;
@@ -85,8 +88,12 @@ void Path::_flattenCurveTo(Math::Curvef curve, isize depth) {
     }
 
     // 2) Compute cx', cy'
-    f64 sa = Math::pow2(radii.x) * Math::pow2(radii.y) - Math::pow2(radii.x) * Math::pow2(y1p) - Math::pow2(radii.y) * Math::pow2(x1p);
-    f64 sb = Math::pow2(radii.x) * Math::pow2(y1p) + Math::pow2(radii.y) * Math::pow2(x1p);
+    f64 sa = Math::pow2(radii.x) * Math::pow2(radii.y) -
+             Math::pow2(radii.x) * Math::pow2(y1p) -
+             Math::pow2(radii.y) * Math::pow2(x1p);
+
+    f64 sb = Math::pow2(radii.x) * Math::pow2(y1p) +
+             Math::pow2(radii.y) * Math::pow2(x1p);
 
     if (sa < 0.0f)
         sa = 0.0f;

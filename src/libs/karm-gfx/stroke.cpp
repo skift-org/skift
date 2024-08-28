@@ -140,7 +140,7 @@ static void _createCap(Math::Polyf &poly, Stroke stroke, Cap cap) {
 
 // MARK: Public Api ------------------------------------------------------------
 
-[[gnu::flatten]] void createStroke(Math::Polyf &poly, Math::Path const &path, Stroke stroke) {
+void createStroke(Math::Polyf &poly, Math::Path const &path, Stroke stroke) {
     f64 outerDist = 0;
 
     if (stroke.align == CENTER_ALIGN) {

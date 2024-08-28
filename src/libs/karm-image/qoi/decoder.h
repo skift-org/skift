@@ -56,7 +56,7 @@ struct Decoder : public Io::BChunk {
         return c.red * 3 + c.green * 5 + c.blue * 7 + c.alpha * 11;
     }
 
-    [[gnu::flatten]] Res<> decode(Gfx::MutPixels dest);
+    Res<> decode(Gfx::MutPixels dest);
 };
 
 } // namespace Qoi

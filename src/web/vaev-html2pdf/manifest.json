@@ -10,5 +10,8 @@
         "vaev-layout",
         "vaev-view",
         "karm-sys"
+    ],
+    "provides": [
+        "o-html2pdf"
     ]
 }

@@ -13,10 +13,10 @@ Res<Strong<Dom::Document>> fetchDocument(Mime::Url url) {
 
     if (url.scheme == "about") {
         if (url.path.str() == "blank")
-            return fetchDocument("bundle://hideo-browser/blank.xhtml"_url);
+            return fetchDocument("bundle://vaev-driver/blank.xhtml"_url);
 
         if (url.path.str() == "start")
-            return fetchDocument("bundle://hideo-browser/start-page.xhtml"_url);
+            return fetchDocument("bundle://vaev-driver/start-page.xhtml"_url);
 
         return Error::invalidInput("unsupported about page");
     }

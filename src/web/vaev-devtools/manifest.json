@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "vaev-devtools",
+    "description": "Vaev's devtools",
+    "type": "exe",
+    "requires": [
+        "hideo-base",
+        "vaev-html",
+        "vaev-xml",
+        "vaev-view"
+    ],
+    "provides": [
+        "o-devtools"
+    ]
+}

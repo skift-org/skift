@@ -245,6 +245,12 @@ void Context::fill(Math::Path const &path, FillRule rule) {
     _fill(current().fill, rule);
 }
 
+void Context::fill(Text::Font &font, Text::Glyph glyph, Math::Vec2f baseline) {
+    _useSpaa = true;
+    Canvas::fill(font, glyph, baseline);
+    _useSpaa = false;
+}
+
 // MARK: Clear Operations ------------------------------------------------------
 
 void Context::clear(Color color) {

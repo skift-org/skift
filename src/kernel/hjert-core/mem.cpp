@@ -69,7 +69,7 @@ struct Pmm : public Hal::Pmm {
         range.start /= Hal::PAGE_SIZE;
         range.size /= Hal::PAGE_SIZE;
 
-        return range.as<BitsRange>();
+        return range.into<BitsRange>();
     }
 
     Hal::PmmRange bits2Pmm(BitsRange range) {
@@ -77,7 +77,7 @@ struct Pmm : public Hal::Pmm {
         range.start *= Hal::PAGE_SIZE;
         range.start += _usable.start;
 
-        return range.as<Hal::PmmRange>();
+        return range.into<Hal::PmmRange>();
     }
 };
 

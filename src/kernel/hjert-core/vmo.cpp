@@ -30,7 +30,7 @@ Hal::PmmRange Vmo::range() {
                 return mem.range();
             },
             [](Hal::DmaRange const &range) {
-                return range.as<Hal::PmmRange>();
+                return range.into<Hal::PmmRange>();
             },
         }
     );

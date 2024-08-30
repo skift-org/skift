@@ -4,7 +4,6 @@
     "type": "lib",
     "description": "System-dependent system abstraction",
     "requires": [
-        "hal",
         "karm-sys-impl",
         "karm-sys-async-impl",
         "karm-io",

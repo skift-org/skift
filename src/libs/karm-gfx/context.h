@@ -121,6 +121,8 @@ struct Context : public Canvas {
 
     void fill(Math::Path const &path, FillRule rule = FillRule::NONZERO) override;
 
+    void fill(Text::Font &font, Text::Glyph glyph, Math::Vec2f baseline) override;
+
     // MARK: Clear Operations --------------------------------------------------
 
     void clear(Color color = BLACK) override;

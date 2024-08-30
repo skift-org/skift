@@ -53,12 +53,4 @@ Res<UserInfo> userinfo();
 
 Res<Vec<UserInfo>> usersinfo();
 
-inline bool isSkift() {
-#ifdef __ck_sys_skift__
-    return true;
-#else
-    return false;
-#endif
-}
-
 } // namespace Karm::Sys

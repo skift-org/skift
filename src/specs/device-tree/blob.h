@@ -22,8 +22,8 @@ struct Blob {
     };
 
     struct Reserved {
-        usize address;
-        usize size;
+        u64 address;
+        u64 size;
     };
 
     static constexpr u32 MAGIC = 0xd00dfeed;
@@ -64,7 +64,7 @@ struct Blob {
         auto s = begin();
         s.skip(header().offMemRsvmap);
         return Iter{
-            [s] mutable -> Opt<Reserved> {
+            [s] mutable -> Opt<Range<u64>> {
                 if (s.ended()) {
                     return NONE;
                 }
@@ -76,7 +76,7 @@ struct Blob {
                     return NONE;
                 }
 
-                return Reserved{addr, size};
+                return Range<u64>{addr, size};
             },
         };
     }

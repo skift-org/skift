@@ -7,6 +7,7 @@
 #include "externs.h"
 
 namespace Karm::Sys::_Embed {
+
 struct JSConsole : public Sys::Fd {
     enum Proto {
         LOG,
@@ -92,6 +93,52 @@ Res<Strong<Sys::Fd>> unpackFd(Io::PackScan &) {
     notImplemented();
 }
 
+Res<Vec<DirEntry>> readDir(Mime::Url const &) {
+    return Error::notImplemented("directory listing not supported");
+}
+
+// MARK: File I/O --------------------------------------------------------------
+
+Res<Strong<Fd>> openFile(Mime::Url const &) {
+    return Error::notImplemented();
+}
+
+Res<Strong<Fd>> createFile(Mime::Url const &) {
+    return Error::notImplemented();
+}
+
+Res<Strong<Fd>> openOrCreateFile(Mime::Url const &) {
+    return Error::notImplemented();
+}
+
+// MARK: Sockets ---------------------------------------------------------------
+
+Res<Strong<Fd>> listenUdp(SocketAddr) {
+    return Error::notImplemented("raw sockets not supported");
+}
+
+Res<Strong<Fd>> connectTcp(SocketAddr) {
+    return Error::notImplemented("raw sockets not supported");
+}
+
+Res<Strong<Fd>> listenTcp(SocketAddr) {
+    return Error::notImplemented("raw sockets not supported");
+}
+
+Res<Strong<Fd>> listenIpc(Mime::Url) {
+    return Error::notImplemented("ipc sockets not supported");
+}
+
+// MARK: Memory Managment ------------------------------------------------------
+
+Res<MmapResult> memMap(MmapOptions const &, Strong<Fd>) {
+    return Error::notImplemented("file mapping not supported");
+}
+
+Res<> memUnmap(void const *, usize) {
+    return Error::notImplemented();
+}
+
 // MARK: System Informations ---------------------------------------------------
 
 Res<> populate(Sys::SysInfo &) {
@@ -119,4 +166,5 @@ Res<> populate(Sys::UserInfo &) {
 Res<> populate(Vec<Sys::UserInfo> &) {
     return Ok();
 }
+
 } // namespace Karm::Sys::_Embed

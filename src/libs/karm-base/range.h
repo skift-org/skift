@@ -104,7 +104,12 @@ struct Range {
     }
 
     template <typename U>
-    constexpr auto as() const {
+    constexpr auto cast() const {
+        return Range<U, TAG>{static_cast<U>(start), static_cast<U>(size)};
+    }
+
+    template <typename U>
+    constexpr auto into() const {
         return U{start, size};
     }
 

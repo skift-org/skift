@@ -22,7 +22,7 @@ enum struct VmmFlags : u64 {
 
 FlagsEnum$(VmmFlags);
 
-using VmmRange = Range<usize, struct VmmRangeTag>;
+using VmmRange = Range<usize, struct _VmmRangeTag>;
 
 inline VmmRange identityMapped(PmmRange range) {
     return {range.start, range.size};

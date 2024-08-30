@@ -1,6 +1,5 @@
 #pragma once
 
-#include <hal/vmm.h>
 #include <karm-io/traits.h>
 
 #include <karm-sys/_embed.h>
@@ -55,9 +54,9 @@ struct Mmap :
 
     usize paddr() const { return _paddr; }
 
-    Hal::VmmRange vrange() const { return {vaddr(), _size}; }
+    urange vrange() const { return {vaddr(), _size}; }
 
-    Hal::PmmRange prange() const { return {_paddr, _size}; }
+    urange prange() const { return {_paddr, _size}; }
 
     template <typename T>
     T const *as() const {

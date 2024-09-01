@@ -1,5 +1,5 @@
 #include <karm-cli/cursor.h>
-#include <karm-gfx/context.h>
+#include <karm-gfx/cpu/canvas.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/time.h>
 
@@ -12,7 +12,7 @@ Async::Task<> entryPointAsync(Sys::Context &) {
         for (isize size = 100; size < 1000; size += 10) {
             f64 scale = size / 100.0;
 
-            Gfx::Context g;
+            Gfx::CpuCanvas g;
             g.begin(surface->mutPixels());
             g.scale(scale);
 

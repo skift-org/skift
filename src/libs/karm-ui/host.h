@@ -2,7 +2,7 @@
 
 #include <karm-app/host.h>
 #include <karm-base/ring.h>
-#include <karm-gfx/context.h>
+#include <karm-gfx/cpu/canvas.h>
 #include <karm-text/loader.h>
 
 #include "node.h"
@@ -13,7 +13,7 @@ namespace Karm::Ui {
 struct Host : public Node {
     Child _root;
     Opt<Res<>> _res;
-    Gfx::Context _g;
+    Gfx::CpuCanvas _g;
     Vec<Math::Recti> _dirty;
     PerfGraph _perf;
 

@@ -3,11 +3,11 @@
 #include <karm-base/range.h>
 #include <karm-math/poly.h>
 
-#include "types.h"
+#include "../types.h"
 
 namespace Karm::Gfx {
 
-struct Rast {
+struct CpuRast {
     static constexpr auto AA = 3;
     static constexpr auto UNIT = 1.0f / AA;
     static constexpr auto HALF_UNIT = 1.0f / AA / 2.0;

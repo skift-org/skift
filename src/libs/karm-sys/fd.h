@@ -48,7 +48,9 @@ struct Fd : Meta::NoCopy {
 };
 
 struct NullFd : public Fd {
-    Handle handle() const override { return INVALID; }
+    Handle handle() const override {
+        return INVALID;
+    }
 
     Res<usize> read(MutBytes) override;
 

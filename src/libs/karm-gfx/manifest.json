@@ -8,6 +8,7 @@
         "karm-io"
     ],
     "subdirs": [
-        "mixbox"
+        "mixbox",
+        "cpu"
     ]
 }

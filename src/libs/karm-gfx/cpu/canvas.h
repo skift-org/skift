@@ -1,11 +1,11 @@
 #pragma once
 
-#include "buffer.h"
-#include "canvas.h"
-#include "fill.h"
-#include "filters.h"
+#include "../buffer.h"
+#include "../canvas.h"
+#include "../fill.h"
+#include "../filters.h"
+#include "../stroke.h"
 #include "rast.h"
-#include "stroke.h"
 
 namespace Karm::Gfx {
 
@@ -19,7 +19,7 @@ static LcdLayout RGB = {{+0.33, 0.0}, {0.0, 0.0}, {-0.33, 0.0}};
 static LcdLayout BGR = {{-0.33, 0.0}, {0.0, 0.0}, {+0.33, 0.0}};
 static LcdLayout VRGB = {{0.0, +0.33}, {0.0, 0.0}, {0.0, -0.33}};
 
-struct Context : public Canvas {
+struct CpuCanvas : public Canvas {
     struct Scope {
         Fill fill = Gfx::WHITE;
         Stroke stroke{};
@@ -31,7 +31,7 @@ struct Context : public Canvas {
     Vec<Scope> _stack{};
     Math::Path _path{};
     Math::Polyf _poly;
-    Rast _rast{};
+    CpuRast _rast{};
     LcdLayout _lcdLayout = RGB;
     bool _useSpaa = false;
 

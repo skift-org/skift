@@ -5,8 +5,7 @@
     "description": "Drive Vaev web content",
     "requires": [
         "vaev-layout",
-        "vaev-html",
-        "vaev-xml",
+        "vaev-markup",
         "karm-mime",
         "karm-sys"
     ]

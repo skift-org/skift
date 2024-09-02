@@ -2,7 +2,7 @@
 
 #include <karm-image/picture.h>
 #include <karm-text/run.h>
-#include <vaev-dom/document.h>
+#include <vaev-markup/dom.h>
 #include <vaev-paint/stack.h>
 #include <vaev-style/computed.h>
 #include <vaev-style/computer.h>
@@ -45,9 +45,9 @@ struct Tree {
 
 // MARK: Build -----------------------------------------------------------------
 
-void build(Style::Computer &c, Dom::Node const &n, Frag &parent);
+void build(Style::Computer &c, Markup::Node const &n, Frag &parent);
 
-Frag build(Style::Computer &c, Dom::Document const &doc);
+Frag build(Style::Computer &c, Markup::Document const &doc);
 
 // MARK: Layout ----------------------------------------------------------------
 

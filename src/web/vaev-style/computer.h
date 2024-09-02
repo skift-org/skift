@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vaev-dom/node.h>
+#include <vaev-markup/dom.h>
 
 #include "computed.h"
 #include "stylesheet.h"
@@ -13,9 +13,9 @@ struct Computer {
 
     using MatchingRules = Vec<StyleRule const *>;
 
-    void _evalRule(Rule const &rule, Dom::Element const &el, MatchingRules &matches);
+    void _evalRule(Rule const &rule, Markup::Element const &el, MatchingRules &matches);
 
-    Strong<Computed> computeFor(Computed const &parent, Dom::Element const &el);
+    Strong<Computed> computeFor(Computed const &parent, Markup::Element const &el);
 };
 
 } // namespace Vaev::Style

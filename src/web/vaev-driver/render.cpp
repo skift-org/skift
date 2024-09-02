@@ -1,6 +1,6 @@
 #include <karm-sys/time.h>
-#include <vaev-dom/element.h>
 #include <vaev-layout/frag.h>
+#include <vaev-markup/dom.h>
 #include <vaev-paint/page.h>
 #include <vaev-paint/stack.h>
 #include <vaev-style/computer.h>
@@ -10,8 +10,10 @@
 
 namespace Vaev::Driver {
 
-static void _collectStyle(Dom::Node const &node, Style::StyleBook &sb) {
-    auto *el = node.is<Dom::Element>();
+static constexpr bool DEBUG_RENDER = false;
+
+static void _collectStyle(Markup::Node const &node, Style::StyleBook &sb) {
+    auto *el = node.is<Markup::Element>();
     if (el and el->tagName == Html::STYLE) {
         auto text = el->textContent();
         Io::SScan textScan{text};
@@ -46,7 +48,7 @@ static void _collectStyle(Dom::Node const &node, Style::StyleBook &sb) {
     }
 }
 
-RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px viewport) {
+RenderResult render(Markup::Document const &dom, Style::Media const &media, Vec2Px viewport) {
     Style::StyleBook stylebook;
     stylebook.add(
         fetchStylesheet("bundle://vaev-view/user-agent.css"_url)
@@ -56,7 +58,7 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
     auto start = Sys::now();
     _collectStyle(dom, stylebook);
     auto elapsed = Sys::now() - start;
-    logDebug("style collection time: {}", elapsed);
+    logDebugIf(DEBUG_RENDER, "style collection time: {}", elapsed);
 
     start = Sys::now();
 
@@ -70,7 +72,7 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
 
     elapsed = Sys::now() - start;
 
-    logDebug("layout tree build time: {}", elapsed);
+    logDebugIf(DEBUG_RENDER, "layout tree build time: {}", elapsed);
 
     start = Sys::now();
 
@@ -78,7 +80,7 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
 
     elapsed = Sys::now() - start;
 
-    logDebug("layout tree measure time: {}", elapsed);
+    logDebugIf(DEBUG_RENDER, "layout tree measure time: {}", elapsed);
 
     start = Sys::now();
 
@@ -96,7 +98,7 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
     auto paintRoot = makeStrong<Paint::Stack>();
 
     elapsed = Sys::now() - start;
-    logDebug("layout tree layout time: {}", elapsed);
+    logDebugIf(DEBUG_RENDER, "layout tree layout time: {}", elapsed);
 
     auto paintStart = Sys::now();
 
@@ -104,7 +106,7 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
     paintRoot->prepare();
 
     elapsed = Sys::now() - paintStart;
-    logDebug("layout tree paint time: {}", elapsed);
+    logDebugIf(DEBUG_RENDER, "layout tree paint time: {}", elapsed);
 
     return {
         makeStrong<Layout::Frag>(std::move(tree.root)),
@@ -112,7 +114,7 @@ RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px 
     };
 }
 
-RenderResult render(Dom::Document &dom, Style::Media const &media, Print::PaperStock paper) {
+RenderResult render(Markup::Document &dom, Style::Media const &media, Print::PaperStock paper) {
     Style::StyleBook stylebook;
     stylebook.add(
         fetchStylesheet("bundle://vaev-view/user-agent.css"_url)
@@ -122,7 +124,7 @@ RenderResult render(Dom::Document &dom, Style::Media const &media, Print::PaperS
     auto start = Sys::now();
     _collectStyle(dom, stylebook);
     auto elapsed = Sys::now() - start;
-    logDebug("style collection time: {}", elapsed);
+    logDebugIf(DEBUG_RENDER, "style collection time: {}", elapsed);
 
     Style::Computer computer{media, stylebook};
 

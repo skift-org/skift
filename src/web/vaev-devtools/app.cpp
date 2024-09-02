@@ -23,7 +23,7 @@ enum struct SidePanel {
 
 struct State {
     Mime::Url url;
-    Res<Strong<Vaev::Dom::Document>> dom;
+    Res<Strong<Vaev::Markup::Document>> dom;
     SidePanel sidePanel = SidePanel::CLOSE;
 
     bool canGoBack() const {
@@ -88,7 +88,8 @@ Ui::Child addressBar(Mime::Url const &url) {
                0,
                Math::Align::CENTER,
                Ui::text("{}", url),
-               Ui::grow(NONE)
+               Ui::grow(NONE),
+               Kr::contextMenuIcon(Model::bind<Reload>(), Mdi::REFRESH)
            ) |
            Ui::box({
                .padding = {12, 0, 0, 0},
@@ -170,7 +171,7 @@ Ui::Child appContent(State const &s) {
     );
 }
 
-Ui::Child app(Mime::Url url, Res<Strong<Vaev::Dom::Document>> dom) {
+Ui::Child app(Mime::Url url, Res<Strong<Vaev::Markup::Document>> dom) {
     return Ui::reducer<Model>(
         {
             url,
@@ -186,10 +187,13 @@ Ui::Child app(Mime::Url url, Res<Strong<Vaev::Dom::Document>> dom) {
                                Ui::ButtonStyle::subtle(),
                                Mdi::SURFING
                            ),
-                           addressBar(s.url) | Ui::grow(), Ui::button(Model::bind<Reload>(), Ui::ButtonStyle::subtle(), Mdi::REFRESH), Ui::button([&](Ui::Node &n) {
-                               Ui::showPopover(n, n.bound().bottomEnd(), mainMenu(s));
-                           },
-                                                                                                                                                  Ui::ButtonStyle::subtle(), Mdi::DOTS_HORIZONTAL),
+                           addressBar(s.url) | Ui::grow(),
+                           Ui::button(
+                               [&](Ui::Node &n) {
+                                   Ui::showPopover(n, n.bound().bottomEnd(), mainMenu(s));
+                               },
+                               Ui::ButtonStyle::subtle(), Mdi::DOTS_HORIZONTAL
+                           ),
                            Hideo::controls()
                        ) | Ui::dragRegion(),
                        appContent(s) | Ui::grow()

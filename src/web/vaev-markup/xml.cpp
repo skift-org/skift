@@ -1,17 +1,17 @@
 #include <karm-io/expr.h>
 #include <karm-logger/logger.h>
 
-#include "parser.h"
+#include "xml.h"
 
-namespace Vaev::Xml {
+namespace Vaev::Markup {
 
 // 2 MARK: Documents
 // https://www.w3.org/TR/xml/#sec-documents
 
-Res<Strong<Dom::Document>> Parser::parse(Io::SScan &s, Ns ns) {
+Res<Strong<Document>> XmlParser::parse(Io::SScan &s, Ns ns) {
     // document :: = prolog element Misc *
 
-    auto doc = makeStrong<Dom::Document>();
+    auto doc = makeStrong<Document>();
     try$(_parseProlog(s, *doc));
     doc->appendChild(try$(_parseElement(s, ns)));
     while (_parseMisc(s, *doc))
@@ -83,7 +83,7 @@ static constexpr auto RE_NAME_CHAR = RE_NAME_START_CHAR & Re::zeroOrMore(Re::cty
 
 static constexpr auto RE_NAME = RE_NAME_START_CHAR & Re::zeroOrMore(RE_NAME_CHAR);
 
-Res<> Parser::_parseS(Io::SScan &s) {
+Res<> XmlParser::_parseS(Io::SScan &s) {
     // S ::= (#x20 | #x9 | #xD | #xA)+
 
     s.eat(Re::oneOrMore(RE_S));
@@ -91,7 +91,7 @@ Res<> Parser::_parseS(Io::SScan &s) {
     return Ok();
 }
 
-Res<Str> Parser::_parseName(Io::SScan &s) {
+Res<Str> XmlParser::_parseName(Io::SScan &s) {
     // Name ::= NameStartChar (NameChar)*
 
     auto name = s.token(RE_NAME);
@@ -105,7 +105,7 @@ Res<Str> Parser::_parseName(Io::SScan &s) {
 
 static constexpr auto RE_CHARDATA = Re::negate(Re::single('<', '&'));
 
-Res<> Parser::_parseCharData(Io::SScan &s, StringBuilder &sb) {
+Res<> XmlParser::_parseCharData(Io::SScan &s, StringBuilder &sb) {
     // CharData ::= [^<&]* - ([^<&]* ']]>' [^<&]*)
 
     bool any = false;
@@ -131,7 +131,7 @@ Res<> Parser::_parseCharData(Io::SScan &s, StringBuilder &sb) {
 static constexpr auto RE_COMMENT_START = "<!--"_re;
 static constexpr auto RE_COMMENT_END = "-->"_re;
 
-Res<Strong<Dom::Comment>> Parser::_parseComment(Io::SScan &s) {
+Res<Strong<Comment>> XmlParser::_parseComment(Io::SScan &s) {
     // 	Comment ::= '<!--' ((Char - '-') | ('-' (Char - '-')))* '-->'
 
     auto rollback = s.rollbackPoint();
@@ -151,7 +151,7 @@ Res<Strong<Dom::Comment>> Parser::_parseComment(Io::SScan &s) {
         return Error::invalidData("expected '-->'");
 
     rollback.disarm();
-    return Ok(makeStrong<Dom::Comment>(sb.take()));
+    return Ok(makeStrong<Comment>(sb.take()));
 }
 
 // 2.6 MARK: Processing Instructions
@@ -160,7 +160,7 @@ Res<Strong<Dom::Comment>> Parser::_parseComment(Io::SScan &s) {
 static constexpr auto RE_PI_START = "<?"_re;
 static constexpr auto RE_PI_END = "?>"_re;
 
-Res<> Parser::_parsePi(Io::SScan &s) {
+Res<> XmlParser::_parsePi(Io::SScan &s) {
     // PI ::= '<?' PITarget (S (Char* - (Char* '?>' Char*)))? '?>
 
     auto rollback = s.rollbackPoint();
@@ -182,7 +182,7 @@ Res<> Parser::_parsePi(Io::SScan &s) {
     return Ok();
 }
 
-Res<> Parser::_parsePiTarget(Io::SScan &s) {
+Res<> XmlParser::_parsePiTarget(Io::SScan &s) {
     // PITarget ::= Name - (('X' | 'x') ('M' | 'm') ('L' | 'l'))
 
     auto name = try$(_parseName(s));
@@ -194,7 +194,7 @@ Res<> Parser::_parsePiTarget(Io::SScan &s) {
 // 2.7 MARK: CDATA Sections
 // https://www.w3.org/TR/xml/#sec-cdata-sect
 
-Res<> Parser::_parseCDSect(Io::SScan &s, StringBuilder &sb) {
+Res<> XmlParser::_parseCDSect(Io::SScan &s, StringBuilder &sb) {
     // CDStart ::= '<![CDATA['
     // CData ::= (Char* - (Char* ']]>' Char*))
     // CDEnd ::= ']]>'
@@ -219,7 +219,7 @@ Res<> Parser::_parseCDSect(Io::SScan &s, StringBuilder &sb) {
 
 static constexpr auto RE_XML_DECL_START = "<?xml"_re;
 
-Res<> Parser::_parseVersionInfo(Io::SScan &s) {
+Res<> XmlParser::_parseVersionInfo(Io::SScan &s) {
     // versionInfo ::= S 'version' Eq ("'" VersionNum "'" | '"' VersionNum '"')
 
     try$(_parseS(s));
@@ -230,7 +230,7 @@ Res<> Parser::_parseVersionInfo(Io::SScan &s) {
     return Ok();
 }
 
-Res<> Parser::_parseXmlDecl(Io::SScan &s) {
+Res<> XmlParser::_parseXmlDecl(Io::SScan &s) {
     // XMLDecl ::= '<?xml' VersionInfo EncodingDecl? SDDecl? S? '?>'
 
     if (not s.skip(RE_XML_DECL_START))
@@ -241,7 +241,7 @@ Res<> Parser::_parseXmlDecl(Io::SScan &s) {
     return Ok();
 }
 
-Res<> Parser::_parseMisc(Io::SScan &s, Dom::Node &parent) {
+Res<> XmlParser::_parseMisc(Io::SScan &s, Node &parent) {
     // Misc ::= Comment | PI | S
 
     auto rollback = s.rollbackPoint();
@@ -260,12 +260,12 @@ Res<> Parser::_parseMisc(Io::SScan &s, Dom::Node &parent) {
     return Ok();
 }
 
-Res<> Parser::_parseProlog(Io::SScan &s, Dom::Node &parent) {
+Res<> XmlParser::_parseProlog(Io::SScan &s, Node &parent) {
     // prolog ::= XMLDecl? Misc* (doctypedecl Misc*)?
     auto rollback = s.rollbackPoint();
 
     if (s.match(RE_XML_DECL_START) != Match::NO)
-        try$(Parser::_parseXmlDecl(s));
+        try$(_parseXmlDecl(s));
 
     while (_parseMisc(s, parent) and not s.ended())
         ;
@@ -282,14 +282,14 @@ Res<> Parser::_parseProlog(Io::SScan &s, Dom::Node &parent) {
 
 static constexpr auto RE_DOCTYPE_START = "<!DOCTYPE"_re;
 
-Res<Strong<Dom::DocumentType>> Parser::_parseDoctype(Io::SScan &s) {
+Res<Strong<DocumentType>> XmlParser::_parseDoctype(Io::SScan &s) {
     // doctypedecl ::= '<!DOCTYPE' S Name (S ExternalID)? S? ('[' intSubset ']' S?)? '>'
     auto rollback = s.rollbackPoint();
 
     if (not s.skip(RE_DOCTYPE_START))
         return Error::invalidData("expected '<!DOCTYPE'");
 
-    auto docType = makeStrong<Dom::DocumentType>();
+    auto docType = makeStrong<DocumentType>();
 
     try$(_parseS(s));
 
@@ -312,7 +312,7 @@ Res<Strong<Dom::DocumentType>> Parser::_parseDoctype(Io::SScan &s) {
 // 3 MARK: Logical Structures
 // https://www.w3.org/TR/xml/#sec-logical-struct
 
-Res<Strong<Dom::Element>> Parser::_parseElement(Io::SScan &s, Ns ns) {
+Res<Strong<Element>> XmlParser::_parseElement(Io::SScan &s, Ns ns) {
     // element ::= EmptyElemTag | STag content ETag
 
     auto rollback = s.rollbackPoint();
@@ -337,7 +337,7 @@ Res<Strong<Dom::Element>> Parser::_parseElement(Io::SScan &s, Ns ns) {
 // 3.1 MARK: Start-Tags, End-Tags, and Empty-Element Tags
 // https://www.w3.org/TR/xml/#sec-starttags
 
-Res<Strong<Dom::Element>> Parser::_parseStartTag(Io::SScan &s, Ns ns) {
+Res<Strong<Element>> XmlParser::_parseStartTag(Io::SScan &s, Ns ns) {
     // STag ::= '<' Name (S Attribute)* S? '>'
 
     auto rollback = s.rollbackPoint();
@@ -346,7 +346,7 @@ Res<Strong<Dom::Element>> Parser::_parseStartTag(Io::SScan &s, Ns ns) {
 
     auto name = try$(_parseName(s));
 
-    auto el = makeStrong<Dom::Element>(TagName::make(name, ns));
+    auto el = makeStrong<Element>(TagName::make(name, ns));
 
     try$(_parseS(s));
 
@@ -359,7 +359,7 @@ Res<Strong<Dom::Element>> Parser::_parseStartTag(Io::SScan &s, Ns ns) {
     return Ok(el);
 }
 
-Res<> Parser::_parseAttribute(Io::SScan &s, Ns ns, Dom::Element &el) {
+Res<> XmlParser::_parseAttribute(Io::SScan &s, Ns ns, Element &el) {
     // Attribute ::= Name Eq AttValue
 
     auto rollback = s.rollbackPoint();
@@ -377,7 +377,7 @@ Res<> Parser::_parseAttribute(Io::SScan &s, Ns ns, Dom::Element &el) {
     return Ok();
 }
 
-Res<String> Parser::_parseAttValue(Io::SScan &s) {
+Res<String> XmlParser::_parseAttValue(Io::SScan &s) {
     // AttValue ::= '"' ([^<&"] | Reference)* '"'
     //              |  "'" ([^<&'] | Reference)* "'"
 
@@ -406,7 +406,7 @@ Res<String> Parser::_parseAttValue(Io::SScan &s) {
     return Ok(sb.take());
 }
 
-Res<> Parser::_parseEndTag(Io::SScan &s, Dom::Element &el) {
+Res<> XmlParser::_parseEndTag(Io::SScan &s, Element &el) {
     // '</' Name S? '>'
 
     auto rollback = s.rollbackPoint();
@@ -427,7 +427,7 @@ Res<> Parser::_parseEndTag(Io::SScan &s, Dom::Element &el) {
     return Ok();
 }
 
-Res<> Parser::_parseContentItem(Io::SScan &s, Ns ns, Dom::Element &el) {
+Res<> XmlParser::_parseContentItem(Io::SScan &s, Ns ns, Element &el) {
     // (element | Reference | CDSect | PI | Comment)
 
     if (auto r = _parseElement(s, ns)) {
@@ -444,7 +444,7 @@ Res<> Parser::_parseContentItem(Io::SScan &s, Ns ns, Dom::Element &el) {
     }
 }
 
-Res<> Parser::_parseContent(Io::SScan &s, Ns ns, Dom::Element &el) {
+Res<> XmlParser::_parseContent(Io::SScan &s, Ns ns, Element &el) {
     // content ::= CharData? ((element | Reference | CDSect | PI | Comment) CharData?)*
 
     try$(_parseText(s, el));
@@ -454,7 +454,7 @@ Res<> Parser::_parseContent(Io::SScan &s, Ns ns, Dom::Element &el) {
     return Ok();
 }
 
-Res<> Parser::_parseTextItem(Io::SScan &s, StringBuilder &sb) {
+Res<> XmlParser::_parseTextItem(Io::SScan &s, StringBuilder &sb) {
     if (_parseCharData(s, sb)) {
         return Ok();
     } else if (_parseCDSect(s, sb)) {
@@ -467,19 +467,19 @@ Res<> Parser::_parseTextItem(Io::SScan &s, StringBuilder &sb) {
     }
 }
 
-Res<> Parser::_parseText(Io::SScan &s, Dom::Element &el) {
+Res<> XmlParser::_parseText(Io::SScan &s, Element &el) {
     StringBuilder sb;
     while (_parseTextItem(s, sb))
         ;
 
     auto te = sb.take();
     if (te)
-        el.appendChild(makeStrong<Dom::Text>(te));
+        el.appendChild(makeStrong<Text>(te));
 
     return Ok();
 }
 
-Res<Strong<Dom::Element>> Parser::_parseEmptyElementTag(Io::SScan &s, Ns ns) {
+Res<Strong<Element>> XmlParser::_parseEmptyElementTag(Io::SScan &s, Ns ns) {
     // EmptyElemTag ::= '<' Name (S Attribute)* S? '/>'
 
     auto rollback = s.rollbackPoint();
@@ -488,7 +488,7 @@ Res<Strong<Dom::Element>> Parser::_parseEmptyElementTag(Io::SScan &s, Ns ns) {
 
     auto name = try$(_parseName(s));
 
-    auto el = makeStrong<Dom::Element>(TagName::make(name, ns));
+    auto el = makeStrong<Element>(TagName::make(name, ns));
     try$(_parseS(s));
     while (not s.skip("/>"_re) and not s.ended()) {
         try$(_parseAttribute(s, ns, *el));
@@ -502,7 +502,7 @@ Res<Strong<Dom::Element>> Parser::_parseEmptyElementTag(Io::SScan &s, Ns ns) {
 // 4.1 MARK: Character and Entity References
 // https://www.w3.org/TR/xml/#NT-CharRef
 
-Res<Rune> Parser::_parseCharRef(Io::SScan &s) {
+Res<Rune> XmlParser::_parseCharRef(Io::SScan &s) {
     // CharRef ::= '&#' [0-9]+ ';' | '&#x' [0-9a-fA-F]+ ';'
 
     auto rollback = s.rollbackPoint();
@@ -531,7 +531,7 @@ Res<Rune> Parser::_parseCharRef(Io::SScan &s) {
     return Ok(r);
 }
 
-Res<Rune> Parser::_parseEntityRef(Io::SScan &s) {
+Res<Rune> XmlParser::_parseEntityRef(Io::SScan &s) {
     // EntityRef ::= '&' Name ';'
 
     auto rollback = s.rollbackPoint();
@@ -560,7 +560,7 @@ Res<Rune> Parser::_parseEntityRef(Io::SScan &s) {
     return Error::invalidData("unknown entity reference");
 }
 
-Res<Rune> Parser::_parseReference(Io::SScan &s) {
+Res<Rune> XmlParser::_parseReference(Io::SScan &s) {
     // Reference ::= EntityRef | CharRef
 
     if (auto r = _parseCharRef(s))
@@ -574,7 +574,7 @@ Res<Rune> Parser::_parseReference(Io::SScan &s) {
 // 4.2 MARK: Entity Declarations
 // https://www.w3.org/TR/xml/#sec-entity-decl
 
-Res<> Parser::_parseExternalId(Io::SScan &s, Dom::DocumentType &docType) {
+Res<> XmlParser::_parseExternalId(Io::SScan &s, DocumentType &docType) {
     // ExternalID ::= 'SYSTEM' S SystemLiteral | 'PUBLIC' S PubidLiteral S SystemLiteral
 
     auto rollback = s.rollbackPoint();
@@ -598,4 +598,4 @@ Res<> Parser::_parseExternalId(Io::SScan &s, Dom::DocumentType &docType) {
     }
 }
 
-} // namespace Vaev::Xml
+} // namespace Vaev::Markup

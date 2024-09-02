@@ -6,10 +6,10 @@
 namespace Vaev::View {
 
 struct View : public Ui::View<View> {
-    Strong<Dom::Document> _dom;
+    Strong<Markup::Document> _dom;
     Opt<Driver::RenderResult> _renderResult;
 
-    View(Strong<Dom::Document> dom) : _dom(dom) {}
+    View(Strong<Markup::Document> dom) : _dom(dom) {}
 
     Style::Media _constructMedia(Math::Vec2i viewport) {
         return {
@@ -85,8 +85,6 @@ struct View : public Ui::View<View> {
         auto media = _constructMedia(size);
         auto [layout, _] = Driver::render(*_dom, media, size.cast<Px>());
 
-        logDebug("Size: {}", layout->layout.borderBox());
-
         return {
             layout->layout.borderBox().width.cast<isize>(),
             layout->layout.borderBox().height.cast<isize>(),
@@ -94,7 +92,7 @@ struct View : public Ui::View<View> {
     }
 };
 
-Ui::Child view(Strong<Dom::Document> dom) {
+Ui::Child view(Strong<Markup::Document> dom) {
     return makeStrong<View>(dom);
 }
 

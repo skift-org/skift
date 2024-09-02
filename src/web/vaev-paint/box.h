@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vaev-base/background.h>
-
 #include "base.h"
 
 namespace Vaev::Paint {

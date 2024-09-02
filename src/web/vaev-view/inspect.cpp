@@ -3,10 +3,7 @@
 #include <karm-ui/reducer.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
-#include <vaev-dom/comment.h>
-#include <vaev-dom/document-type.h>
-#include <vaev-dom/element.h>
-#include <vaev-dom/text.h>
+#include <vaev-markup/dom.h>
 
 #include "inspect.h"
 
@@ -32,44 +29,44 @@ auto idented(isize ident) {
     };
 }
 
-Ui::Child elementStartTag(Dom::Element const &el) {
+Ui::Child elementStartTag(Markup::Element const &el) {
     return Ui::text(
         Ui::TextStyles::codeSmall().withColor(Ui::ACCENT500),
         "<{}>", el.tagName
     );
 }
 
-Ui::Child elementEndTag(Dom::Element const &el) {
+Ui::Child elementEndTag(Markup::Element const &el) {
     return Ui::text(
         Ui::TextStyles::codeSmall().withColor(Ui::ACCENT500),
         "</{}>", el.tagName
     );
 }
 
-Ui::Child itemHeader(Dom::Node const &n) {
-    if (n.is<Dom::Document>()) {
+Ui::Child itemHeader(Markup::Node const &n) {
+    if (n.is<Markup::Document>()) {
         return Ui::codeMedium("#document");
-    } else if (n.is<Dom::DocumentType>()) {
+    } else if (n.is<Markup::DocumentType>()) {
         return Ui::codeMedium("#document-type");
-    } else if (auto *tx = n.is<Dom::Text>()) {
+    } else if (auto *tx = n.is<Markup::Text>()) {
         return Ui::codeMedium("#text {#}", tx->data);
-    } else if (auto *el = n.is<Dom::Element>()) {
+    } else if (auto *el = n.is<Markup::Element>()) {
         return Ui::hflow(n.children().len() ? Ui::icon(Mdi::CHEVRON_DOWN) : Ui::empty(), elementStartTag(*el));
-    } else if (auto *c = n.is<Dom::Comment>()) {
+    } else if (auto *c = n.is<Markup::Comment>()) {
         return Ui::codeMedium(Gfx::GREEN, "<!-- {} -->", c->data);
     } else {
         unreachable();
     }
 }
 
-Ui::Child itemFooter(Dom::Node const &n, isize ident) {
-    if (auto *el = n.is<Dom::Element>()) {
+Ui::Child itemFooter(Markup::Node const &n, isize ident) {
+    if (auto *el = n.is<Markup::Element>()) {
         return Ui::hflow(n.children().len() ? guide() : Ui::empty(), elementEndTag(*el)) | idented(ident);
     }
     return Ui::empty();
 }
 
-Ui::Child item(Dom::Node const &n, isize ident) {
+Ui::Child item(Markup::Node const &n, isize ident) {
     return Ui::button(
         Ui::NOP,
         Ui::ButtonStyle::subtle(),
@@ -77,7 +74,7 @@ Ui::Child item(Dom::Node const &n, isize ident) {
     );
 }
 
-Ui::Child node(Dom::Node const &n, isize ident = 0) {
+Ui::Child node(Markup::Node const &n, isize ident = 0) {
     Ui::Children children{item(n, ident)};
     for (auto &c : n.children()) {
         children.pushBack(node(*c, ident + 1));
@@ -86,7 +83,7 @@ Ui::Child node(Dom::Node const &n, isize ident = 0) {
     return Ui::vflow(children);
 }
 
-Ui::Child inspect(Strong<Vaev::Dom::Document> dom) {
+Ui::Child inspect(Strong<Vaev::Markup::Document> dom) {
     return node(*dom);
 }
 

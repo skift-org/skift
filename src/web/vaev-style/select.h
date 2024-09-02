@@ -3,8 +3,8 @@
 #include <karm-base/box.h>
 #include <karm-base/vec.h>
 #include <vaev-css/parser.h>
-#include <vaev-dom/element.h>
-#include <vaev-html/tags.h>
+#include <vaev-markup/dom.h>
+#include <vaev-markup/tags.h>
 
 namespace Vaev::Style {
 
@@ -349,7 +349,7 @@ struct Selector : public _Selector {
         });
     }
 
-    bool match(Dom::Element const &el) const;
+    bool match(Markup::Element const &el) const;
 
     bool operator==(Selector const &) const = default;
 

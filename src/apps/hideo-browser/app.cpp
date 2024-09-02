@@ -23,7 +23,7 @@ enum struct SidePanel {
 
 struct State {
     Mime::Url url;
-    Res<Strong<Vaev::Dom::Document>> dom;
+    Res<Strong<Vaev::Markup::Document>> dom;
     SidePanel sidePanel = SidePanel::CLOSE;
 
     bool canGoBack() const {
@@ -187,7 +187,7 @@ Ui::Child appContent(State const &s) {
     );
 }
 
-Ui::Child app(Mime::Url url, Res<Strong<Vaev::Dom::Document>> dom) {
+Ui::Child app(Mime::Url url, Res<Strong<Vaev::Markup::Document>> dom) {
     return Ui::reducer<Model>(
         {
             url,

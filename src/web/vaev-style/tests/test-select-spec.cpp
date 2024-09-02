@@ -5,7 +5,7 @@ namespace Vaev::Style::Tests {
 
 test$("select-class-spec") {
     Selector sel = ClassSelector{"foo"s};
-    auto el = makeStrong<Dom::Element>(Html::DIV);
+    auto el = makeStrong<Markup::Element>(Html::DIV);
     el->classList.add("foo");
     expect$(sel.match(*el));
     return Ok();

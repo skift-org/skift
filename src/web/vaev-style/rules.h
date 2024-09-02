@@ -16,7 +16,7 @@ struct StyleRule {
 
     void repr(Io::Emit &e) const;
 
-    bool match(Dom::Element const &el) const {
+    bool match(Markup::Element const &el) const {
         return selector.match(el);
     }
 

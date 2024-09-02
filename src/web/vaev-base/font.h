@@ -1,9 +1,10 @@
 #pragma once
 
 #include <karm-mime/url.h>
-#include <vaev-base/angle.h>
-#include <vaev-base/length.h>
-#include <vaev-base/percent.h>
+
+#include "angle.h"
+#include "length.h"
+#include "percent.h"
 
 namespace Vaev {
 

@@ -5,8 +5,6 @@
     "type": "exe",
     "requires": [
         "hideo-base",
-        "vaev-html",
-        "vaev-xml",
         "vaev-view"
     ],
     "provides": [

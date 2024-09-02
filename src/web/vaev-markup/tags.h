@@ -1,15 +1,23 @@
 #pragma once
 
 #include <karm-base/string.h>
-#include <karm-io/fmt.h>
+#include <karm-io/emit.h>
 
 namespace Vaev {
 
 namespace Html {
 
-enum struct TagId : u16;
+enum struct TagId : u16 {
+#define TAG(IDENT, _) IDENT,
+#include "defs/ns-html-tag-names.inc"
+#undef TAG
+};
 
-enum struct AttrId : u16;
+enum struct AttrId : u16 {
+#define ATTR(IDENT, _) IDENT,
+#include "defs/ns-html-attr-names.inc"
+#undef ATTR
+};
 
 Str _tagName(TagId id);
 
@@ -23,9 +31,17 @@ Opt<AttrId> _attrId(Str name);
 
 namespace Svg {
 
-enum struct TagId : u16;
+enum struct TagId : u16 {
+#define TAG(IDENT, _) IDENT,
+#include "defs/ns-svg-tag-names.inc"
+#undef TAG
+};
 
-enum struct AttrId : u16;
+enum struct AttrId : u16 {
+#define ATTR(IDENT, _) IDENT,
+#include "defs/ns-svg-attr-names.inc"
+#undef ATTR
+};
 
 Str _tagName(TagId id);
 
@@ -39,9 +55,17 @@ Opt<AttrId> _attrId(Str name);
 
 namespace MathMl {
 
-enum struct TagId : u16;
+enum struct TagId : u16 {
+#define TAG(IDENT, _) IDENT,
+#include "defs/ns-mathml-tag-names.inc"
+#undef TAG
+};
 
-enum struct AttrId : u16;
+enum struct AttrId : u16 {
+#define ATTR(IDENT, _) IDENT,
+#include "defs/ns-mathml-attr-names.inc"
+#undef ATTR
+};
 
 Str _tagName(TagId id);
 
@@ -97,6 +121,10 @@ struct Ns {
 
     constexpr bool operator==(Ns const &other) const {
         return _id == other._id;
+    }
+
+    void repr(Io::Emit &e) const {
+        e("{}", name());
     }
 };
 
@@ -163,6 +191,10 @@ struct TagName {
     }
 
     constexpr bool operator==(TagName const &other) const = default;
+
+    void repr(Io::Emit &e) const {
+        e("{}", name());
+    }
 };
 
 struct AttrName {
@@ -223,27 +255,42 @@ struct AttrName {
     }
 
     constexpr bool operator==(AttrName const &other) const = default;
+
+    void repr(Io::Emit &e) const {
+        e("{}", name());
+    }
 };
+
+namespace Html {
+
+#define TAG(IDENT, _) \
+    inline constexpr TagName IDENT = TagId::IDENT;
+#include "defs/ns-html-tag-names.inc"
+#undef TAG
+
+#define ATTR(IDENT, _) \
+    inline constexpr AttrName IDENT##_ATTR = AttrId::IDENT;
+#include "defs/ns-html-attr-names.inc"
+#undef ATTR
+
+} // namespace Html
+
+namespace MathMl {
+
+#define TAG(IDENT, _) \
+    inline constexpr TagName IDENT = TagId::IDENT;
+#include "defs/ns-mathml-tag-names.inc"
+#undef TAG
+
+} // namespace MathMl
+
+namespace Svg {
+
+#define TAG(IDENT, _) \
+    inline constexpr TagName IDENT = TagId::IDENT;
+#include "defs/ns-svg-tag-names.inc"
+#undef TAG
+
+} // namespace Svg
 
 } // namespace Vaev
-
-template <>
-struct Karm::Io::Formatter<Vaev::Ns> {
-    Res<usize> format(Io::TextWriter &writer, Vaev::Ns const &val) {
-        return writer.writeStr(val.name());
-    }
-};
-
-template <>
-struct Karm::Io::Formatter<Vaev::TagName> {
-    Res<usize> format(Io::TextWriter &writer, Vaev::TagName const &val) {
-        return Io::format(writer, "{}:{}", val.ns, val.name());
-    }
-};
-
-template <>
-struct Karm::Io::Formatter<Vaev::AttrName> {
-    Res<usize> format(Io::TextWriter &writer, Vaev::AttrName const &val) {
-        return Io::format(writer, "{}:{}", val.ns, val.name());
-    }
-};

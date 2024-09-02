@@ -44,9 +44,8 @@ struct Bus {
     }
 
     Res<> run() {
-        for (auto &service : _services) {
+        for (auto &service : _services)
             try$(service->activate(_context));
-        }
 
         logDebug("running system event loop");
         while (true) {

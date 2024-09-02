@@ -7,7 +7,7 @@
         "karm-math",
         "karm-gfx",
         "karm-text",
-        "vaev-dom",
+        "vaev-markup",
         "vaev-style",
         "vaev-paint"
     ]

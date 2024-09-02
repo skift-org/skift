@@ -1,8 +1,8 @@
 #pragma once
 
 #include <vaev-base/length.h>
-#include <vaev-dom/document.h>
 #include <vaev-layout/frag.h>
+#include <vaev-markup/dom.h>
 #include <vaev-paint/base.h>
 #include <vaev-style/media.h>
 
@@ -13,8 +13,8 @@ struct RenderResult {
     Strong<Paint::Node> paint;
 };
 
-RenderResult render(Dom::Document const &dom, Style::Media const &media, Vec2Px viewport);
+RenderResult render(Markup::Document const &dom, Style::Media const &media, Vec2Px viewport);
 
-RenderResult render(Dom::Document &dom, Style::Media const &media, Print::PaperStock paper);
+RenderResult render(Markup::Document &dom, Style::Media const &media, Print::PaperStock paper);
 
 } // namespace Vaev::Driver

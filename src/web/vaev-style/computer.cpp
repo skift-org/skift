@@ -13,7 +13,7 @@ Computed const &Computed::initial() {
     return computed;
 }
 
-void Computer::_evalRule(Rule const &rule, Dom::Element const &el, MatchingRules &matches) {
+void Computer::_evalRule(Rule const &rule, Markup::Element const &el, MatchingRules &matches) {
     rule.visit(Visitor{
         [&](StyleRule const &r) {
             if (r.match(el))
@@ -30,7 +30,7 @@ void Computer::_evalRule(Rule const &rule, Dom::Element const &el, MatchingRules
     });
 }
 
-Strong<Computed> Computer::computeFor(Computed const &parent, Dom::Element const &el) {
+Strong<Computed> Computer::computeFor(Computed const &parent, Markup::Element const &el) {
     MatchingRules matchingRules;
 
     // Collect matching styles rules

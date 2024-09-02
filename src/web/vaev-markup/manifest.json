@@ -1,10 +1,10 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "hideo-browser",
+    "id": "vaev-markup",
     "type": "lib",
-    "description": "Browse the web",
+    "description": "Vaev's markup engine",
     "requires": [
-        "hideo-base",
-        "vaev-view"
+        "karm-io",
+        "karm-logger"
     ]
 }

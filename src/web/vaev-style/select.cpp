@@ -52,11 +52,11 @@ Spec spec(Selector const &s) {
 // MARK: Selector Matching -----------------------------------------------------
 
 // https://www.w3.org/TR/selectors-4/#descendant-combinators
-static bool _matchDescendant(Selector const &s, Dom::Element const &e) {
-    Dom::Node const *curr = &e;
+static bool _matchDescendant(Selector const &s, Markup::Element const &e) {
+    Markup::Node const *curr = &e;
     while (curr->hasParent()) {
         auto &parent = curr->parentNode();
-        if (auto *el = parent.is<Dom::Element>())
+        if (auto *el = parent.is<Markup::Element>())
             if (s.match(*el))
                 return true;
         curr = &parent;
@@ -65,33 +65,33 @@ static bool _matchDescendant(Selector const &s, Dom::Element const &e) {
 }
 
 // https://www.w3.org/TR/selectors-4/#child-combinators
-static bool _matchChild(Selector const &s, Dom::Element const &e) {
+static bool _matchChild(Selector const &s, Markup::Element const &e) {
     if (not e.hasParent())
         return false;
 
     auto &parent = e.parentNode();
-    if (auto *el = parent.is<Dom::Element>())
+    if (auto *el = parent.is<Markup::Element>())
         return s.match(*el);
     return false;
 }
 
 // https://www.w3.org/TR/selectors-4/#adjacent-sibling-combinators
-static bool _matchAdjacent(Selector const &s, Dom::Element const &e) {
+static bool _matchAdjacent(Selector const &s, Markup::Element const &e) {
     if (not e.hasPreviousSibling())
         return false;
 
     auto prev = e.previousSibling();
-    if (auto *el = prev.is<Dom::Element>())
+    if (auto *el = prev.is<Markup::Element>())
         return s.match(*el);
     return false;
 }
 
 // https://www.w3.org/TR/selectors-4/#general-sibling-combinators
-static bool _matchSubsequent(Selector const &s, Dom::Element const &e) {
-    Dom::Node const *curr = &e;
+static bool _matchSubsequent(Selector const &s, Markup::Element const &e) {
+    Markup::Node const *curr = &e;
     while (curr->hasPreviousSibling()) {
         auto prev = curr->previousSibling();
-        if (auto *el = prev.is<Dom::Element>())
+        if (auto *el = prev.is<Markup::Element>())
             if (s.match(*el))
                 return true;
         curr = &prev.unwrap();
@@ -99,7 +99,7 @@ static bool _matchSubsequent(Selector const &s, Dom::Element const &e) {
     return false;
 }
 
-static bool _match(Infix const &s, Dom::Element const &e) {
+static bool _match(Infix const &s, Markup::Element const &e) {
     if (not s.lhs->match(e))
         return false;
 
@@ -122,7 +122,7 @@ static bool _match(Infix const &s, Dom::Element const &e) {
     }
 }
 
-static bool _match(Nfix const &s, Dom::Element const &el) {
+static bool _match(Nfix const &s, Markup::Element const &el) {
     switch (s.type) {
     case Nfix::AND:
         for (auto &inner : s.inners)
@@ -155,27 +155,27 @@ static bool _match(Nfix const &s, Dom::Element const &el) {
 
 // 5.1. Type (tag name) selector
 // https://www.w3.org/TR/selectors-4/#type
-static bool _match(TypeSelector const &s, Dom::Element const &el) {
+static bool _match(TypeSelector const &s, Markup::Element const &el) {
     return el.tagName == s.type;
 }
 
-static bool _match(IdSelector const &s, Dom::Element const &el) {
+static bool _match(IdSelector const &s, Markup::Element const &el) {
     return el.id() == s.id;
 }
 
-static bool _match(ClassSelector const &s, Dom::Element const &el) {
+static bool _match(ClassSelector const &s, Markup::Element const &el) {
     return el.classList.contains(s.class_);
 }
 
 // 5.2. Universal selector
 // https://www.w3.org/TR/selectors-4/#the-universal-selector
-static bool _match(UniversalSelector const &, Dom::Element const &) {
+static bool _match(UniversalSelector const &, Markup::Element const &) {
     return true;
 }
 
 // MARK: Selector --------------------------------------------------------------
 
-bool Selector::match(Dom::Element const &el) const {
+bool Selector::match(Markup::Element const &el) const {
     return visit(
         [&](auto const &s) {
             if constexpr (requires { _match(s, el); })

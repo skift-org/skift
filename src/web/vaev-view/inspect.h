@@ -1,10 +1,10 @@
 #pragma once
 
 #include <karm-ui/node.h>
-#include <vaev-dom/document.h>
+#include <vaev-markup/dom.h>
 
 namespace Vaev::View {
 
-Ui::Child inspect(Strong<Dom::Document> dom);
+Ui::Child inspect(Strong<Markup::Document> dom);
 
 } // namespace Vaev::View

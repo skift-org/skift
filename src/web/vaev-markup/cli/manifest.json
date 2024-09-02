@@ -1,11 +1,10 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "vaev-xml.cli",
+    "id": "vaev-markup.cli",
     "type": "exe",
-    "description": "XML CLI",
+    "description": "Markup CLI",
     "requires": [
         "karm-sys",
-        "vaev-xml",
-        "vaev-html"
+        "vaev-markup"
     ]
 }

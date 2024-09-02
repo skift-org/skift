@@ -67,13 +67,13 @@ static Strong<Text::Fontface> regularFontface() {
     return *_regularFontface;
 }
 
-static void buildChildren(Style::Computer &c, Vec<Strong<Dom::Node>> const &children, Frag &parent) {
+static void buildChildren(Style::Computer &c, Vec<Strong<Markup::Node>> const &children, Frag &parent) {
     for (auto &child : children) {
         build(c, *child, parent);
     }
 }
 
-static void buildElement(Style::Computer &c, Dom::Element const &el, Frag &parent) {
+static void buildElement(Style::Computer &c, Markup::Element const &el, Frag &parent) {
     auto style = c.computeFor(*parent.style, el);
     auto font = Text::Font{regularFontface(), 16};
 
@@ -98,7 +98,7 @@ static void buildElement(Style::Computer &c, Dom::Element const &el, Frag &paren
     parent.add(std::move(frag));
 }
 
-static void buildRun(Style::Computer &, Dom::Text const &node, Frag &parent) {
+static void buildRun(Style::Computer &, Markup::Text const &node, Frag &parent) {
     auto style = makeStrong<Style::Computed>(Style::Computed::initial());
     style->inherit(*parent.style);
 
@@ -118,17 +118,17 @@ static void buildRun(Style::Computer &, Dom::Text const &node, Frag &parent) {
     parent.add({style, font, run});
 }
 
-void build(Style::Computer &c, Dom::Node const &node, Frag &parent) {
-    if (auto *el = node.is<Dom::Element>()) {
+void build(Style::Computer &c, Markup::Node const &node, Frag &parent) {
+    if (auto *el = node.is<Markup::Element>()) {
         buildElement(c, *el, parent);
-    } else if (auto *text = node.is<Dom::Text>()) {
+    } else if (auto *text = node.is<Markup::Text>()) {
         buildRun(c, *text, parent);
-    } else if (auto *doc = node.is<Dom::Document>()) {
+    } else if (auto *doc = node.is<Markup::Document>()) {
         buildChildren(c, doc->children(), parent);
     }
 }
 
-Frag build(Style::Computer &c, Dom::Document const &doc) {
+Frag build(Style::Computer &c, Markup::Document const &doc) {
     auto font = Text::Font{regularFontface(), 16};
     Frag root = {makeStrong<Style::Computed>(Style::Computed::initial()), font};
     build(c, doc, root);

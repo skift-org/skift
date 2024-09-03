@@ -54,7 +54,7 @@ I, Sleepy-monax, would like to express my gratitude to the following individuals
 ## License
 
 <a href="https://www.gnu.org/licenses/lgpl-3.0.en.html">
-  <img align="right" height="96" alt="LGPL3 License" src="https://branding.cute.engineering/licenses/lgpl.svg" />
+  <img align="right" height="72" alt="LGPL3 License" src="https://branding.cute.engineering/licenses/lgpl.svg" />
 </a>
 
 The skift operating system and its core components are licensed under the **GNU Lesser General Public License v3.0 or later**.

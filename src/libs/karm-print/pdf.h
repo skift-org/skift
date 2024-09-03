@@ -12,6 +12,9 @@ struct PdfPrinter : public Printer {
     Vec<Io::StringWriter> _pages;
     Opt<Pdf::Canvas> _canvas;
 
+    PdfPrinter(PaperStock stock)
+        : _stock{stock} {}
+
     Gfx::Canvas &beginPage() override {
         _pages.emplaceBack();
         _canvas = Pdf::Canvas{last(_pages)};
@@ -29,22 +32,32 @@ struct PdfPrinter : public Printer {
 
         // Page
         for (auto &p : _pages) {
-            pagesKids.pushBack(file.add(
-                alloc.alloc(),
+            Pdf::Ref pageRef = alloc.alloc();
+            Pdf::Ref contentsRef = alloc.alloc();
+
+            file.add(
+                pageRef,
                 Pdf::Dict{
                     {"Type"s, Pdf::Name{"Page"s}},
                     {"Parent"s, pagesRef},
                     {
                         "Contents"s,
-                        Pdf::Stream{
-                            .dict = Pdf::Dict{
-                                {"Length"s, p.bytes().len()},
-                            },
-                            .data = p.bytes(),
-                        },
+                        contentsRef,
                     },
                 }
-            ));
+            );
+
+            file.add(
+                contentsRef,
+                Pdf::Stream{
+                    .dict = Pdf::Dict{
+                        {"Length"s, p.bytes().len()},
+                    },
+                    .data = p.bytes(),
+                }
+            );
+
+            pagesKids.pushBack(pageRef);
         }
 
         // Pages
@@ -78,6 +91,11 @@ struct PdfPrinter : public Printer {
 
     void write(Io::Emit &e) {
         pdf().write(e);
+    }
+
+    void write(Io::TextWriter &w) {
+        Io::Emit e{w};
+        write(e);
     }
 };
 

@@ -14,8 +14,9 @@ void Canvas::pop() {
     _e.ln("Q");
 }
 
-void Canvas::fillStyle(Gfx::Fill) {
-    logDebug("pdf: fillStyle() operation not implemented");
+void Canvas::fillStyle(Gfx::Fill fill) {
+    auto color = fill.unwrap<Gfx::Color>();
+    _e.ln("{} {} {} rg", color.red / 255.0, color.green / 255.0, color.blue / 255.0);
 }
 
 void Canvas::strokeStyle(Gfx::Stroke) {
@@ -98,17 +99,16 @@ void Canvas::path(Math::Path const &) {
     logDebug("pdf: path() operation not implemented");
 }
 
-void Canvas::fill(Gfx::FillRule) {
-    logDebug("pdf: fill() operation not implemented");
-}
-
-void Canvas::fill(Gfx::Fill fill, Gfx::FillRule rule) {
-    auto color = fill.unwrap<Gfx::Color>();
-    _e.ln("{} {} {} rg", color.red / 255.0, color.green / 255.0, color.blue / 255.0);
+void Canvas::fill(Gfx::FillRule rule) {
     if (rule == Gfx::FillRule::NONZERO)
         _e.ln("f");
     else
         _e.ln("f*");
+}
+
+void Canvas::fill(Gfx::Fill f, Gfx::FillRule rule) {
+    fillStyle(f);
+    fill(rule);
 }
 
 void Canvas::stroke() {

@@ -1,8 +1,36 @@
 #pragma once
 
+#include <karm-base/distinct.h>
 #include <karm-base/string.h>
 
 namespace Karm::Print {
+
+static constexpr f64 INCH_TO_MM = 25.4;
+
+// Print density in Dot Per Mm (DPMM)
+struct Density : public Distinct<f64, struct _DensityTag> {
+    using Distinct::Distinct;
+
+    static Density const DEFAULT;
+
+    static constexpr Density fromDpi(f64 dpi) {
+        return Density{dpi * INCH_TO_MM};
+    }
+
+    static constexpr Density fromDpcm(f64 dpcm) {
+        return Density{dpcm};
+    }
+
+    constexpr f64 toDpi() const {
+        return _value / INCH_TO_MM;
+    }
+
+    constexpr f64 toDpcm() const {
+        return _value;
+    }
+};
+
+inline constexpr Density Density::DEFAULT = Density::fromDpi(72.0);
 
 struct PaperStock {
     Str name;

@@ -18,7 +18,11 @@ struct Density : public Distinct<f64, struct _DensityTag> {
     }
 
     static constexpr Density fromDpcm(f64 dpcm) {
-        return Density{dpcm};
+        return Density{dpcm * 10.0};
+    }
+
+    static constexpr Density fromDpmm(f64 dpmm) {
+        return Density{dpmm};
     }
 
     constexpr f64 toDpi() const {

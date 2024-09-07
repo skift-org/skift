@@ -38,4 +38,4 @@ jobs:
         run: ./skift.sh builder test
 
       - name: Check for formatting errors
-        run: ./meta/scripts/style-check.sh || echo "Please run ./meta/scripts/style-fix.sh"
+        run: ./meta/scripts/style-check.sh || echo "Please run ./meta/scripts/style-format.sh"

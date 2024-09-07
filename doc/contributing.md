@@ -16,4 +16,4 @@ Binary files should be kept as small as possible. Here are some tips for reducin
 
 ## Coding Style
 
-Just configure you IDE to use the `.clang-format` file at the root of the source tree, or use `meta/scripts/style-fix.sh` to format the code.
+Just configure you IDE to use the `.clang-format` file at the root of the source tree, or use `meta/scripts/style-format.sh` to format the code.

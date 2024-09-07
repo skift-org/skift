@@ -2,7 +2,7 @@
 
 #include "array.h"
 #include "clamp.h"
-#include "inert.h"
+#include "manual.h"
 
 namespace Karm {
 
@@ -12,7 +12,7 @@ template <typename T>
 struct Buf {
     using Inner = T;
 
-    Inert<T> *_buf{};
+    Manual<T> *_buf{};
     usize _cap{};
     usize _len{};
 
@@ -99,14 +99,14 @@ struct Buf {
             return;
 
         if (not _buf) {
-            _buf = new Inert<T>[desired];
+            _buf = new Manual<T>[desired];
             _cap = desired;
             return;
         }
 
         usize newCap = max(_cap * 2, desired);
 
-        Inert<T> *tmp = new Inert<T>[newCap];
+        Manual<T> *tmp = new Manual<T>[newCap];
         for (usize i = 0; i < _len; i++) {
             tmp[i].ctor(_buf[i].take());
         }
@@ -120,10 +120,10 @@ struct Buf {
         if (_len == _cap)
             return;
 
-        Inert<T> *tmp = nullptr;
+        Manual<T> *tmp = nullptr;
 
         if (_len) {
-            tmp = new Inert<T>[_len];
+            tmp = new Manual<T>[_len];
             for (usize i = 0; i < _len; i++)
                 tmp[i].ctor(_buf[i].take());
         }
@@ -291,7 +291,7 @@ template <typename T, usize N>
 struct InlineBuf {
     using Inner = T;
 
-    Array<Inert<T>, N> _buf = {};
+    Array<Manual<T>, N> _buf = {};
     usize _len = {};
 
     constexpr InlineBuf() = default;
@@ -484,13 +484,13 @@ template <typename T>
 struct ViewBuf {
     using Inner = T;
 
-    Inert<T> *_buf{};
+    Manual<T> *_buf{};
     usize _cap{};
     usize _len{};
 
     ViewBuf() = default;
 
-    ViewBuf(Inert<T> *buf, usize cap)
+    ViewBuf(Manual<T> *buf, usize cap)
         : _buf(buf), _cap(cap) {
     }
 

@@ -1,13 +1,13 @@
 #pragma once
 
-#include "inert.h"
+#include "manual.h"
 #include "panic.h"
 
 namespace Karm {
 
 template <typename T>
 struct Ring {
-    Inert<T> *_buf{};
+    Manual<T> *_buf{};
     usize _cap{};
     usize _len{};
     usize _head{};
@@ -17,12 +17,12 @@ struct Ring {
 
     Ring(usize cap)
         : _cap(cap) {
-        _buf = new Inert<T>[cap];
+        _buf = new Manual<T>[cap];
     }
 
     Ring(Ring const &other) {
         _cap = other._cap;
-        _buf = new Inert<T>[_cap];
+        _buf = new Manual<T>[_cap];
         for (usize i = 0; i < other._len; i++)
             pushBack(other.peek(i));
     }

@@ -7,7 +7,7 @@
 namespace Karm {
 
 template <typename T>
-struct Inert {
+struct Manual {
     alignas(alignof(T)) char _inner[sizeof(T)];
 
     template <typename... Args>
@@ -34,6 +34,7 @@ struct Inert {
     }
 };
 
-static_assert(Meta::Trivial<Inert<isize>>);
+static_assert(Meta::Trivial<Manual<isize>>);
+static_assert(sizeof(Manual<isize>) == sizeof(isize));
 
 } // namespace Karm

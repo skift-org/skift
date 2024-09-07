@@ -45,7 +45,7 @@ struct Builder {
         : _buf(slice.buf()),
           _size(slice.len()),
           _string((char *)end(slice)),
-          _records(ViewBuf<Record>{(Inert<Record> *)payload().records, _size / sizeof(Record)}) {
+          _records(ViewBuf<Record>{(Manual<Record> *)payload().records, _size / sizeof(Record)}) {
         payload() = {};
         payload().magic = COOLBOOT;
         payload().size = slice.len();

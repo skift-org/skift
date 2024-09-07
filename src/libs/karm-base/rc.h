@@ -93,7 +93,7 @@ struct _Cell {
 
 template <typename T>
 struct Cell : public _Cell {
-    Inert<T> _buf{};
+    Manual<T> _buf{};
 
     template <typename... Args>
     Cell(Args &&...args) {

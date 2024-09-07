@@ -2,7 +2,7 @@
 
 #include "clamp.h"
 #include "hash.h"
-#include "inert.h"
+#include "manual.h"
 
 namespace Karm {
 
@@ -10,7 +10,7 @@ template <typename T>
 struct Set {
     enum State {};
 
-    struct Slot : public Inert<T> {
+    struct Slot : public Manual<T> {
         enum struct State : u8 {
             FREE,
             USED,

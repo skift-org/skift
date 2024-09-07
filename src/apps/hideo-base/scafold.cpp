@@ -18,44 +18,15 @@ static Ui::BoxStyle TOOLBAR = {
 };
 
 Ui::Child aboutButton([[maybe_unused]] Mdi::Icon icon, String title) {
-#ifdef __ck_sys_darwin__
-    return Ui::button(
-        [title](auto &n) {
-            Ui::showDialog(n, Kr::aboutDialog(title));
-        },
-        Ui::ButtonStyle::subtle(), title
-    );
-#else
     return Ui::button(
         [title](auto &n) {
             Ui::showDialog(n, Kr::aboutDialog(title));
         },
         Ui::ButtonStyle::subtle(), icon, title
     );
-#endif
 }
 
 Ui::Child controls(TitlebarStyle style) {
-#ifdef __ck_sys_darwin__
-    return Ui::hflow(
-        4,
-        Ui::button(
-            Ui::bindBubble<App::RequestExitEvent>(),
-            Ui::ButtonStyle::subtle(),
-            Mdi::CLOSE
-        ),
-        Ui::button(
-            Ui::bindBubble<App::RequestMinimizeEvent>(),
-            Ui::ButtonStyle::subtle(),
-            Mdi::MINUS
-        ) | Ui::cond(style == TitlebarStyle::DEFAULT),
-        Ui::button(
-            Ui::bindBubble<App::RequestMaximizeEvent>(),
-            Ui::ButtonStyle::subtle(),
-            Mdi::PLUS
-        ) | Ui::cond(style == TitlebarStyle::DEFAULT)
-    );
-#else
     return Ui::hflow(
         4,
         Ui::button(
@@ -74,21 +45,9 @@ Ui::Child controls(TitlebarStyle style) {
             Mdi::CLOSE
         )
     );
-#endif
 }
 
 Ui::Child titlebar(Mdi::Icon icon, String title, TitlebarStyle style) {
-#ifdef __ck_sys_darwin__
-    return Ui::stack(
-               aboutButton(icon, title) | Ui::center(),
-               Ui::hflow(
-                   controls(style),
-                   Ui::grow(NONE)
-               )
-           ) |
-           Ui::insets(8) |
-           Ui::dragRegion() | box(TOOLBAR);
-#else
     return Ui::hflow(
                4,
                aboutButton(icon, title),
@@ -97,7 +56,6 @@ Ui::Child titlebar(Mdi::Icon icon, String title, TitlebarStyle style) {
            ) |
            Ui::insets(8) |
            Ui::dragRegion() | box(TOOLBAR);
-#endif
 }
 
 Ui::Child titlebar(Mdi::Icon icon, String title, Ui::Child tabs, TitlebarStyle style) {

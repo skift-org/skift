@@ -3,6 +3,7 @@
 #include <karm-kira/dialog.h>
 #include <karm-kira/error-page.h>
 #include <karm-kira/side-panel.h>
+#include <karm-kira/toolbar.h>
 #include <karm-mime/mime.h>
 #include <karm-sys/file.h>
 #include <karm-sys/launch.h>
@@ -179,7 +180,7 @@ Ui::Child app(Mime::Url url, Res<Strong<Vaev::Markup::Document>> dom) {
         },
         [](State const &s) {
             return Ui::vflow(
-                       Hideo::toolbar(
+                       Kr::toolbar({
                            Ui::button(
                                [&](Ui::Node &n) {
                                    Ui::showDialog(n, Kr::alert("Vaev"s, "Copyright © 2024, Odoo S.A."s));
@@ -194,8 +195,8 @@ Ui::Child app(Mime::Url url, Res<Strong<Vaev::Markup::Document>> dom) {
                                },
                                Ui::ButtonStyle::subtle(), Mdi::DOTS_HORIZONTAL
                            ),
-                           Hideo::controls()
-                       ) | Ui::dragRegion(),
+                           Kr::titlebarControls(),
+                       }) | Ui::dragRegion(),
                        appContent(s) | Ui::grow()
                    ) |
                    Ui::pinSize({800, 600}) | Ui::dialogLayer() | Ui::popoverLayer();

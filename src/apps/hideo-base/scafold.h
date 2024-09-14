@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-kira/titlebar.h>
 #include <karm-media/icon.h>
 #include <karm-sys/context.h>
 #include <karm-ui/box.h>
@@ -10,34 +11,10 @@
 
 namespace Hideo {
 
-enum struct TitlebarStyle {
-    DEFAULT,
-    FIXED,
-    DIALOG,
-};
-
-Ui::Child controls(TitlebarStyle style = TitlebarStyle::DEFAULT);
-
-Ui::Child titlebar(Mdi::Icon icon, String title, TitlebarStyle style = TitlebarStyle::DEFAULT);
-
-Ui::Child titlebar(Mdi::Icon icon, String title, Ui::Child tabs, TitlebarStyle style = TitlebarStyle::DEFAULT);
-
-Ui::Child toolbar(Ui::Children children);
-
-inline Ui::Child toolbar(Meta::Same<Ui::Child> auto... children) {
-    return toolbar({children...});
-}
-
-Ui::Child bottombar(Ui::Children children);
-
-inline Ui::Child bottombar(Meta::Same<Ui::Child> auto... children) {
-    return bottombar({children...});
-}
-
 struct Scafold : Meta::NoCopy {
     Mdi::Icon icon;
     String title;
-    TitlebarStyle titlebar = TitlebarStyle::DEFAULT;
+    Kr::TitlebarStyle titlebar = Kr::TitlebarStyle::DEFAULT;
 
     Opt<Ui::Slots> startTools = NONE;
     Opt<Ui::Slots> midleTools = NONE;

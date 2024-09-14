@@ -2,6 +2,7 @@
 #include <karm-kira/context-menu.h>
 #include <karm-kira/dialog.h>
 #include <karm-kira/error-page.h>
+#include <karm-kira/toolbar.h>
 #include <karm-mime/mime.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/input.h>
@@ -214,13 +215,13 @@ Ui::Child refreshTool() {
 }
 
 Ui::Child toolbar(State const &state) {
-    return Hideo::toolbar(
+    return Kr::toolbar({
         Ui::button(Model::bindIf<GoBack>(state.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
         Ui::button(Model::bindIf<GoForward>(state.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
         Ui::button(Model::bindIf<GoParent>(state.canGoParent(), 1), Ui::ButtonStyle::subtle(), Mdi::ARROW_UP),
         Ui::grow(breadcrumb(state)),
-        Ui::button(Model::bind<Refresh>(), Ui::ButtonStyle::subtle(), Mdi::REFRESH)
-    );
+        Ui::button(Model::bind<Refresh>(), Ui::ButtonStyle::subtle(), Mdi::REFRESH),
+    });
 }
 
 // MARK:  Dialogs  -------------------------------------------------------------

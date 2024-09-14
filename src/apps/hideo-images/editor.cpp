@@ -1,6 +1,7 @@
 #include <hideo-base/scafold.h>
 #include <karm-kira/row.h>
 #include <karm-kira/slider.h>
+#include <karm-kira/toolbar.h>
 #include <karm-ui/anim.h>
 #include <karm-ui/input.h>
 #include <karm-ui/scroll.h>
@@ -66,7 +67,7 @@ Ui::Child editorPreview(State const &state) {
 }
 
 Ui::Child editorToolbar(State const &) {
-    return Hideo::toolbar(
+    return Kr::toolbar({
         Ui::grow(NONE),
 
         Ui::button(
@@ -81,8 +82,8 @@ Ui::Child editorToolbar(State const &) {
             Ui::ButtonStyle::primary(),
             Mdi::Icon::FLOPPY,
             "Save Changes"
-        )
-    );
+        ),
+    });
 }
 
 Ui::Child editorFilterTile(Ui::OnPress onPress, Ui::ButtonStyle style, Mdi::Icon icon, String text) {

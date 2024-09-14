@@ -1,5 +1,7 @@
 #include <hideo-base/scafold.h>
 #include <karm-kira/row.h>
+#include <karm-kira/titlebar.h>
+#include <karm-kira/toolbar.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
@@ -26,7 +28,7 @@ Ui::Child formula() {
 }
 
 Ui::Child toolbar(State const &state) {
-    return Hideo::toolbar(
+    return Kr::toolbar({
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FILE),
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FOLDER),
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE),
@@ -43,8 +45,8 @@ Ui::Child toolbar(State const &state) {
         Ui::empty(4),
         formula() | Ui::grow(),
         Ui::empty(4),
-        Ui::button(Model::bind<ToggleProperties>(), state.propertiesVisible ? Ui::ButtonStyle::regular() : Ui::ButtonStyle::subtle(), Mdi::BRUSH_VARIANT)
-    );
+        Ui::button(Model::bind<ToggleProperties>(), state.propertiesVisible ? Ui::ButtonStyle::regular() : Ui::ButtonStyle::subtle(), Mdi::BRUSH_VARIANT),
+    });
 }
 
 Ui::Child properties() {
@@ -174,7 +176,7 @@ Ui::Child tabs(State const &state) {
 
 Ui::Child app() {
     return Ui::reducer<Model>({}, [](auto const &s) {
-        auto tb = titlebar(Mdi::TABLE, "Spreadsheet"s, tabs(s));
+        auto tb = Kr::titlebar(Mdi::TABLE, "Spreadsheet"s, tabs(s));
         auto body = table(s) | Ui::grow();
         if (s.propertiesVisible) {
             body = hflow(body, Ui::separator(), properties());

@@ -1,5 +1,6 @@
 #include <hideo-base/scafold.h>
 #include <karm-kira/error-page.h>
+#include <karm-kira/toolbar.h>
 #include <karm-ui/input.h>
 
 #include "app.h"
@@ -28,7 +29,7 @@ Ui::Child viewerPreview(State const &state) {
 }
 
 Ui::Child viewerToolbar(State const &state) {
-    return toolbar(
+    return Kr::toolbar({
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::Icon::MAGNIFY_PLUS),
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::Icon::MAGNIFY_MINUS),
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::Icon::FULLSCREEN),
@@ -38,8 +39,8 @@ Ui::Child viewerToolbar(State const &state) {
             Ui::ButtonStyle::subtle(),
             Mdi::Icon::PENCIL,
             "Edit"
-        )
-    );
+        ),
+    });
 }
 
 Ui::Child viewerControls(State const &) {

@@ -124,7 +124,7 @@ Ui::Child app() {
             return scafold({
                 .icon = Mdi::CLOCK,
                 .title = "Clock"s,
-                .titlebar = TitlebarStyle::DIALOG,
+                .titlebar = Kr::TitlebarStyle::DIALOG,
                 .body = [&] {
                     auto navbar = Kr::navbarContent({
                         Kr::navbarItem(

@@ -89,7 +89,7 @@ Ui::Child app() {
         return scafold({
             .icon = Mdi::CALCULATOR,
             .title = "Calculator"s,
-            .titlebar = TitlebarStyle::DIALOG,
+            .titlebar = Kr::TitlebarStyle::DIALOG,
             .body = slot$(Ui::vflow(
                 screen(state) | Ui::dragRegion(),
                 keypad(state) | Ui::grow()

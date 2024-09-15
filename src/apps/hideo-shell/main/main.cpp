@@ -1,3 +1,4 @@
+#include <karm-app/form-factor.h>
 #include <karm-image/loader.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
@@ -6,7 +7,7 @@
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto args = useArgs(ctx);
-    bool isMobile = Sys::useFormFactor() == Sys::FormFactor::MOBILE;
+    bool isMobile = App::useFormFactor() == App::FormFactor::MOBILE;
 
     Hideo::Shell::State state = {
         .isMobile = isMobile,

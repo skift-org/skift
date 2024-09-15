@@ -1,3 +1,4 @@
+#include <karm-app/form-factor.h>
 #include <karm-app/host.h>
 #include <karm-kira/toolbar.h>
 #include <karm-ui/dialog.h>
@@ -124,7 +125,7 @@ Ui::Child desktopScafold(Scafold::State const &s, Scafold const &scafold) {
 }
 
 Ui::Child scafold(Scafold scafold) {
-    auto isMobile = Sys::useFormFactor() == Sys::FormFactor::MOBILE;
+    auto isMobile = App::useFormFactor() == App::FormFactor::MOBILE;
 
     Scafold::State state{
         .sidebarOpen = not isMobile,

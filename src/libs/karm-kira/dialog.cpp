@@ -1,4 +1,4 @@
-#include <karm-sys/context.h>
+#include <karm-app/form-factor.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
 #include <karm-ui/input.h>
@@ -50,7 +50,7 @@ Ui::Child dialogDescription(String text) {
 }
 
 Ui::Child dialogFooter(Ui::Children children) {
-    auto isMobile = Sys::useFormFactor() == Sys::FormFactor::MOBILE;
+    auto isMobile = App::useFormFactor() == App::FormFactor::MOBILE;
     if (not isMobile)
         children.pushFront(Ui::grow(NONE));
     return Ui::flow(

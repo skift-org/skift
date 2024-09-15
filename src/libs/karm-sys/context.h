@@ -51,9 +51,8 @@ struct ArgsHook :
     }
 
     Str operator[](usize i) const {
-        if (i >= len()) {
-            panic("out of range");
-        }
+        if (i >= len())
+            panic("index out of bounds");
         return _argv[i + 1];
     }
 
@@ -67,17 +66,6 @@ struct ArgsHook :
 
 inline auto &useArgs(Context &ctx = globalContext()) {
     return ctx.use<ArgsHook>();
-}
-
-enum struct FormFactor {
-    DESKTOP,
-    MOBILE,
-};
-
-inline FormFactor useFormFactor(Context &ctx = globalContext()) {
-    if (useArgs(ctx).has("--mobile"))
-        return FormFactor::MOBILE;
-    return FormFactor::DESKTOP;
 }
 
 } // namespace Karm::Sys

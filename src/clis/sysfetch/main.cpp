@@ -1,3 +1,4 @@
+#include <karm-app/form-factor.h>
 #include <karm-base/witty.h>
 #include <karm-cli/cursor.h>
 #include <karm-cli/style.h>
@@ -40,7 +41,7 @@ Res<> dumpSysInfo() {
     Sys::println("{}: {} {}", title("System"), sysinfo.sysName, sysinfo.sysVersion);
     Sys::println("{}: {} {}", title("Kernel"), sysinfo.kernelName, sysinfo.kernelVersion);
     Sys::println("{}: {}", title("Hostname"), sysinfo.hostname);
-    Sys::println("{}: {}", title("Form factor"), Sys::useFormFactor() == Sys::FormFactor::DESKTOP ? "🖥️" : "📱");
+    Sys::println("{}: {}", title("Form factor"), App::useFormFactor() == App::FormFactor::DESKTOP ? "🖥️" : "📱");
     return Ok();
 }
 

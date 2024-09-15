@@ -9,11 +9,12 @@ namespace Hideo::Zoo {
 
 static inline Page PAGE_SIDENAV{
     Mdi::DOCK_LEFT,
-    "Sidenav",
+    "Side Navigation"s,
     "A vertical list of links that can be toggled open and closed.",
     [] {
         return Ui::hflow(
             Kr::sidenav({
+                Kr::sidenavTitle("Navigation"s),
                 Kr::sidenavItem(true, Ui::NOP, Mdi::DUCK, "Item 1"s),
                 Kr::sidenavTree(Mdi::TREE, "Item 2"s, [] {
                     return Ui::vflow(

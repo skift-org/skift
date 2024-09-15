@@ -1,11 +1,11 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "hideo-tasks.main",
+    "id": "hideo-sysmon.main",
     "props": {
         "cpp-excluded": true
     },
     "type": "exe",
     "requires": [
-        "hideo-tasks"
+        "hideo-sysmon"
     ]
 }

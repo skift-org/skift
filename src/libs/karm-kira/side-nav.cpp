@@ -72,4 +72,8 @@ Ui::Child sidenavItem(bool selected, Ui::OnPress onPress, Mdi::Icon icon, String
     );
 }
 
+Ui::Child sidenavTitle(String title) {
+    return Ui::titleMedium(title) | Ui::insets({8, 8, 12, 8});
+}
+
 } // namespace Karm::Kira

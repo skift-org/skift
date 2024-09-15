@@ -9,7 +9,7 @@ namespace Hideo::Zoo {
 
 static inline Page PAGE_NAVBAR{
     Mdi::DOCK_BOTTOM,
-    "Navbar",
+    "Navigation Bar"s,
     "A horizontal navigation bar that displays a list of links.",
     [] {
         return Ui::state(0, [](auto state, auto bind) {

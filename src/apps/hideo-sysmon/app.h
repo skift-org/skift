@@ -2,8 +2,8 @@
 
 #include <karm-ui/node.h>
 
-namespace Hideo::Tasks {
+namespace Hideo::Sysmon {
 
 Ui::Child app();
 
-} // namespace Hideo::Tasks
+} // namespace Hideo::Sysmon

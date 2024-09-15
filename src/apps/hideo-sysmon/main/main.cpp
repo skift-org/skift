@@ -6,6 +6,6 @@
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
     co_return Ui::runApp(
         ctx,
-        Hideo::Tasks::app()
+        Hideo::Sysmon::app()
     );
 }

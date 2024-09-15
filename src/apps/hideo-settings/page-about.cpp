@@ -1,6 +1,6 @@
-#include <hideo-base/scafold.h>
 #include <karm-kira/card.h>
 #include <karm-kira/row.h>
+#include <karm-kira/scaffold.h>
 #include <karm-sys/info.h>
 #include <karm-ui/error.h>
 
@@ -89,7 +89,7 @@ Ui::Child pageAbout(State const &) {
                memInfos() | Kr::card(),
                cpuInfos() | Kr::card()
            ) |
-           pageScafold;
+           pagescaffold;
 }
 
 } // namespace Hideo::Settings

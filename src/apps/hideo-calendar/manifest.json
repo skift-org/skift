@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Plan your day",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

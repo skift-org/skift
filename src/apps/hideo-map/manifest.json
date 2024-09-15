@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Explore and navigate the world",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

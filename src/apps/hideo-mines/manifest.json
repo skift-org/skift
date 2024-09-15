@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Play minesweeper",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

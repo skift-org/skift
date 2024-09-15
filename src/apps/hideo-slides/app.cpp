@@ -1,11 +1,12 @@
-#include <hideo-base/scafold.h>
+#include <karm-kira/scaffold.h>
+#include <karm-ui/layout.h>
 
 #include "app.h"
 
 namespace Hideo::Slides {
 
 Ui::Child app() {
-    return Hideo::scafold({
+    return Kr::scaffold({
         .icon = Mdi::PRESENTATION,
         .title = "Slides"s,
         .body = slot$(Ui::empty()),

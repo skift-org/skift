@@ -1,4 +1,4 @@
-#include <hideo-base/scafold.h>
+#include <karm-kira/scaffold.h>
 
 #include "app.h"
 #include "model.h"
@@ -44,7 +44,7 @@ static Array PAGES = {
 
 Ui::Child app() {
     return Ui::reducer<Model>([](State const &s) {
-        return scafold({
+        return Kr::scaffold({
             .icon = Mdi::DUCK,
             .title = "Zoo"s,
             .sidebar = [&] {

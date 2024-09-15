@@ -1,6 +1,6 @@
-#include <hideo-base/scafold.h>
 #include <hideo-keyboard/views.h>
 #include <karm-app/host.h>
+#include <karm-kira/scaffold.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
 #include <karm-ui/input.h>
@@ -171,7 +171,7 @@ Ui::Child appStack(State const &state) {
     usize index = state.instances.len() - 1;
     for (auto &s : iterRev(state.instances)) {
         apps.pushBack(
-            scafold({
+            Kr::scaffold({
                 .icon = s->manifest->icon,
                 .title = s->manifest->name,
                 .body = slot$(Ui::empty()),

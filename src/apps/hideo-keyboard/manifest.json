@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Virtual keyboard",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

@@ -1,8 +1,9 @@
-#include <hideo-base/scafold.h>
 #include <karm-kira/navbar.h>
+#include <karm-kira/scaffold.h>
 #include <karm-kira/toggle.h>
 #include <karm-sys/time.h>
 #include <karm-ui/anim.h>
+#include <karm-ui/layout.h>
 
 #include "model.h"
 
@@ -121,7 +122,7 @@ Ui::Child appContent(State const &s) {
 Ui::Child app() {
     return Ui::reducer<Model>(
         [](State const &s) {
-            return scafold({
+            return Kr::scaffold({
                 .icon = Mdi::CLOCK,
                 .title = "Clock"s,
                 .titlebar = Kr::TitlebarStyle::DIALOG,

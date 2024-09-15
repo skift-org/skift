@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Install, update, and manage application",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

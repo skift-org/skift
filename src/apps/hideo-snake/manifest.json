@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Play snake",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

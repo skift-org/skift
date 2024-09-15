@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Record and edit audio",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

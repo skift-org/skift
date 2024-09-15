@@ -1,16 +1,18 @@
-#include <hideo-base/scafold.h>
 #include <karm-base/witty.h>
 #include <karm-image/loader.h>
 #include <karm-kira/about-dialog.h>
 #include <karm-kira/badge.h>
+#include <karm-kira/scaffold.h>
 #include <karm-sys/time.h>
+#include <karm-ui/dialog.h>
 #include <karm-ui/input.h>
+#include <karm-ui/layout.h>
 #include <karm-ui/view.h>
 
 namespace Hideo::About {
 
 Ui::Child app() {
-    return scafold({
+    return Kr::scaffold({
         .icon = Mdi::INFORMATION,
         .title = "About"s,
         .titlebar = Kr::TitlebarStyle::DIALOG,

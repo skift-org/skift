@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Climb the mountain",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

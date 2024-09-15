@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Write and run code",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

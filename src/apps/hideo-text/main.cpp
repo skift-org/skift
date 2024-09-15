@@ -1,11 +1,12 @@
-#include <hideo-base/scafold.h>
 #include <hideo-files/widgets.h>
 #include <karm-io/funcs.h>
 #include <karm-kira/error-page.h>
+#include <karm-kira/scaffold.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <karm-text/edit.h>
 #include <karm-ui/app.h>
+#include <karm-ui/dialog.h>
 #include <karm-ui/scroll.h>
 
 namespace Hideo::Text {
@@ -67,7 +68,7 @@ Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
             text,
         },
         [](State const &s) {
-            return scafold({
+            return Kr::scaffold({
                 .icon = Mdi::TEXT,
                 .title = "Text"s,
                 .startTools = slots$(

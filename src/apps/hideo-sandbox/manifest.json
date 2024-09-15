@@ -5,6 +5,6 @@
     "description": "A sample application",
     "requires": [
         "fonts-noto-misc",
-        "hideo-base"
+        "karm-kira"
     ]
 }

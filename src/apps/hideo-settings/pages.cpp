@@ -5,7 +5,7 @@
 
 namespace Hideo::Settings {
 
-Ui::Child pageScafold(Ui::Child inner) {
+Ui::Child pagescaffold(Ui::Child inner) {
     return inner |
            Ui::insets({0, 0, 0, 32}) |
            Ui::maxSize({460, Ui::UNCONSTRAINED}) |

@@ -1,5 +1,6 @@
-#include <hideo-base/scafold.h>
+#include <karm-kira/scaffold.h>
 #include <karm-ui/input.h>
+#include <karm-ui/layout.h>
 
 #include "model.h"
 
@@ -7,7 +8,7 @@ namespace Hideo::Counter {
 
 Ui::Child app() {
     return Ui::reducer<Model>([](State const &s) {
-        return scafold({
+        return Kr::scaffold({
             .icon = Mdi::COUNTER,
             .title = "Counter"s,
             .titlebar = Kr::TitlebarStyle::DIALOG,

@@ -1,5 +1,5 @@
-#include <hideo-base/scafold.h>
 #include <karm-kira/row.h>
+#include <karm-kira/scaffold.h>
 #include <karm-kira/titlebar.h>
 #include <karm-kira/toolbar.h>
 #include <karm-sys/entry.h>

@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "View and manage people",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

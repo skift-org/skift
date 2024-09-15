@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Evaluate mathematical expressions",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

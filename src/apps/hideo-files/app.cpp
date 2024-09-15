@@ -1,6 +1,7 @@
-#include <hideo-base/scafold.h>
+#include <karm-kira/scaffold.h>
 #include <karm-kira/side-nav.h>
 #include <karm-ui/dialog.h>
+#include <karm-ui/layout.h>
 
 #include "model.h"
 #include "widgets.h"
@@ -44,7 +45,7 @@ Ui::Child pageContent(State const &state) {
 
 Ui::Child app() {
     return Ui::reducer<Model>("location://home"_url, [](State const &s) {
-        return scafold({
+        return Kr::scaffold({
             .icon = Mdi::FOLDER,
             .title = "Files"s,
             .startTools = slots$(

@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Take notes",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

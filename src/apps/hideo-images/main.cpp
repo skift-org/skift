@@ -1,5 +1,5 @@
-#include <hideo-base/scafold.h>
 #include <karm-image/loader.h>
+#include <karm-kira/scaffold.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
@@ -12,7 +12,7 @@ Ui::Child app(State initial) {
     return Ui::reducer<Model>(
         initial,
         [](auto const &state) {
-            return scafold({
+            return Kr::scaffold({
                 .icon = Mdi::IMAGE,
                 .title = "Images"s,
                 .body = slot$(

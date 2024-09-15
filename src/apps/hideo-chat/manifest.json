@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Chat with other users",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

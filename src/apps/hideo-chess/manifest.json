@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Play chess",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

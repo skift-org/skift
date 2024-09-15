@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Keeps track of a counter",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

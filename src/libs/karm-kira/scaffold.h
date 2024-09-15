@@ -1,17 +1,13 @@
 #pragma once
 
 #include <karm-kira/titlebar.h>
-#include <karm-media/icon.h>
-#include <karm-sys/context.h>
-#include <karm-ui/box.h>
-#include <karm-ui/dialog.h>
-#include <karm-ui/layout.h>
-#include <karm-ui/node.h>
 #include <karm-ui/reducer.h>
 
-namespace Hideo {
+#include "_prelude.h"
 
-struct Scafold : Meta::NoCopy {
+namespace Karm::Kira {
+
+struct Scaffold : Meta::NoCopy {
     Mdi::Icon icon;
     String title;
     Kr::TitlebarStyle titlebar = Kr::TitlebarStyle::DEFAULT;
@@ -42,6 +38,6 @@ struct Scafold : Meta::NoCopy {
     using Model = Ui::Model<State, Action, reduce>;
 };
 
-Ui::Child scafold(Scafold scafold);
+Ui::Child scaffold(Scaffold scaffold);
 
-} // namespace Hideo
+} // namespace Karm::Kira

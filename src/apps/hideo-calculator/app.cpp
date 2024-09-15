@@ -1,4 +1,4 @@
-#include <hideo-base/scafold.h>
+#include <karm-kira/scaffold.h>
 #include <karm-ui/drag.h>
 #include <karm-ui/layout.h>
 
@@ -86,7 +86,7 @@ Ui::Child screen(State const &state) {
 
 Ui::Child app() {
     return Ui::reducer<Model>([](State const &state) {
-        return scafold({
+        return Kr::scaffold({
             .icon = Mdi::CALCULATOR,
             .title = "Calculator"s,
             .titlebar = Kr::TitlebarStyle::DIALOG,

@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Showcase of Karm Ui and Karm Gfx features",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

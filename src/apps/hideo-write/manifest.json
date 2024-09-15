@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Write documents",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

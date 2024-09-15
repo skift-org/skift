@@ -4,6 +4,6 @@
     "type": "exe",
     "description": "Get the latest weather information",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

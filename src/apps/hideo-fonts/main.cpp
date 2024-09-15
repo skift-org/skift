@@ -1,5 +1,5 @@
-#include <hideo-base/scafold.h>
 #include <karm-kira/badge.h>
+#include <karm-kira/scaffold.h>
 #include <karm-sys/entry.h>
 #include <karm-text/book.h>
 #include <karm-ui/app.h>
@@ -200,7 +200,7 @@ Ui::Child appContent(State const &s) {
 
 Ui::Child app(Text::FontBook book) {
     return Ui::reducer<Model>(book, [](State const &s) {
-        return scafold({
+        return Kr::scaffold({
             .icon = Mdi::FORMAT_FONT,
             .title = "Fonts"s,
             .startTools = slots$(Ui::button(Model::bindIf<GoBack>(s.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT)),

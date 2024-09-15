@@ -4,6 +4,6 @@
     "type": "exe",
     "description": "Edit and manage settings for your system",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

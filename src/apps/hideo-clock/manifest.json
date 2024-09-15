@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Time, clock, timer and stopwatch",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

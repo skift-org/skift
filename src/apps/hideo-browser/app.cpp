@@ -1,12 +1,14 @@
-#include <hideo-base/scafold.h>
 #include <karm-kira/context-menu.h>
 #include <karm-kira/dialog.h>
 #include <karm-kira/error-page.h>
+#include <karm-kira/scaffold.h>
 #include <karm-kira/side-panel.h>
 #include <karm-mime/mime.h>
 #include <karm-sys/file.h>
 #include <karm-sys/launch.h>
+#include <karm-ui/dialog.h>
 #include <karm-ui/input.h>
+#include <karm-ui/layout.h>
 #include <karm-ui/popover.h>
 #include <karm-ui/scroll.h>
 #include <vaev-driver/fetcher.h>
@@ -194,7 +196,7 @@ Ui::Child app(Mime::Url url, Res<Strong<Vaev::Markup::Document>> dom) {
             dom,
         },
         [](State const &s) {
-            return Hideo::scafold({
+            return Kr::scaffold({
                 .icon = Mdi::WEB,
                 .title = "Browser"s,
                 .startTools = slots$(

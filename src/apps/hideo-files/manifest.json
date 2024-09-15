@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Browse and manage files",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

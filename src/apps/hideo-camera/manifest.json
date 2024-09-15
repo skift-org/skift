@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Take photos and videos",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

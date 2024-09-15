@@ -5,6 +5,6 @@
     "description": "View and edit text files",
     "requires": [
         "hideo-files",
-        "hideo-base"
+        "karm-kira"
     ]
 }

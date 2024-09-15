@@ -1,11 +1,12 @@
-#include <hideo-base/scafold.h>
 #include <karm-kira/context-menu.h>
 #include <karm-kira/dialog.h>
 #include <karm-kira/error-page.h>
+#include <karm-kira/scaffold.h>
 #include <karm-kira/toolbar.h>
 #include <karm-mime/mime.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/input.h>
+#include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
 
 #include "model.h"

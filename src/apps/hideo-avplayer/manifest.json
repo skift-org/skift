@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Play audio and video",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

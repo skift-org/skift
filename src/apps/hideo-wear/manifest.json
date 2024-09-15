@@ -4,7 +4,7 @@
     "type": "exe",
     "description": "Graphical user interface for wearable devices",
     "requires": [
-        "hideo-base",
+        "karm-kira",
         "skift-wallpapers"
     ]
 }

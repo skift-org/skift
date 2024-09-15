@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Merge the numbers to get to the 2048 tile!",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

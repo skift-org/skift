@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "About the skift operating system",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

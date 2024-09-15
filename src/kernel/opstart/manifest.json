@@ -9,7 +9,7 @@
         ]
     },
     "requires": [
-        "hideo-base",
+        "karm-kira",
         "karm-sys",
         "opstart-impl",
         "karm-json"

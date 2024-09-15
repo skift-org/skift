@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Create and present slides",
     "requires": [
-        "hideo-base"
+        "karm-kira"
     ]
 }

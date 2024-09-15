@@ -51,7 +51,7 @@ using Model = Ui::Model<State, Action, reduce>;
 
 // MARK: Views -----------------------------------------------------------------
 
-Ui::Child pageScafold(Ui::Child inner);
+Ui::Child pagescaffold(Ui::Child inner);
 
 Ui::Child pageHome(State const &);
 

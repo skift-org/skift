@@ -1,11 +1,12 @@
-#include <hideo-base/scafold.h>
+#include <karm-kira/scaffold.h>
+#include <karm-ui/layout.h>
 
 #include "app.h"
 
 namespace Hideo::Calendar {
 
 Ui::Child app() {
-    return Hideo::scafold({
+    return Kr::scaffold({
         .icon = Mdi::CALENDAR,
         .title = "Calendar"s,
         .body = slot$(Ui::empty()),

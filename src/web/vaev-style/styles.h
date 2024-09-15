@@ -674,44 +674,38 @@ struct BorderRadius {
 
 // https://www.w3.org/TR/css-backgrounds-3/#border-shorthands
 struct BorderProp {
-    Array<Border, 4> value = {};
+    Border value;
 
     static constexpr Str name() { return "border"; }
 
     void apply(Computed &c) const {
-        c.borders.cow().top = value[0];
-        c.borders.cow().bottom = value[1];
-        c.borders.cow().start = value[2];
-        c.borders.cow().end = value[3];
+        c.borders.cow().top = value;
+        c.borders.cow().bottom = value;
+        c.borders.cow().start = value;
+        c.borders.cow().end = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
-        eatWhitespace(c);
-
         while (not c.ended()) {
             auto width = parseValue<Length>(c);
             if (width) {
-                value[0].width = width.unwrap();
-                value[1].width = width.unwrap();
-                value[2].width = width.unwrap();
-                value[3].width = width.unwrap();
-            } else {
-                auto color = parseValue<Color>(c);
-                if (color) {
-                    value[0].color = color.unwrap();
-                    value[1].color = color.unwrap();
-                    value[2].color = color.unwrap();
-                    value[3].color = color.unwrap();
-                } else {
-                    auto style = parseValue<BorderStyle>(c);
-                    if (style) {
-                        value[0].style = style.unwrap();
-                        value[1].style = style.unwrap();
-                        value[2].style = style.unwrap();
-                        value[3].style = style.unwrap();
-                    }
-                }
+                value.width = width.unwrap();
+                continue;
             }
+
+            auto color = parseValue<Color>(c);
+            if (color) {
+                value.color = color.unwrap();
+                continue;
+            }
+
+            auto style = parseValue<BorderStyle>(c);
+            if (style) {
+                value.style = style.unwrap();
+                continue;
+            }
+
+            break;
         }
 
         return Ok();
@@ -720,24 +714,19 @@ struct BorderProp {
 
 // https://www.w3.org/TR/css-backgrounds-3/#border-width
 struct BorderWidthProp {
-    Array<Length, 4> value = {Borders::MEDIUM, Borders::MEDIUM, Borders::MEDIUM, Borders::MEDIUM};
+    Math::Insets<Length> value = Borders::MEDIUM;
 
     static constexpr Str name() { return "border-width"; }
 
     void apply(Computed &c) const {
-        c.borders.cow().start.width = value[0];
-        c.borders.cow().end.width = value[1];
-        c.borders.cow().top.width = value[2];
-        c.borders.cow().bottom.width = value[3];
+        c.borders.cow().start.width = value.start;
+        c.borders.cow().end.width = value.end;
+        c.borders.cow().top.width = value.top;
+        c.borders.cow().bottom.width = value.bottom;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
-        value[0] = try$(parseValue<Length>(c));
-        if (c.ended()) {
-            value[1] = value[0];
-        } else {
-            value[1] = try$(parseValue<Length>(c));
-        }
+        value = try$(parseValue<Math::Insets<Length>>(c));
 
         return Ok();
     }
@@ -751,7 +740,7 @@ struct FlexBasisProp {
 
     static constexpr Str name() { return "flex-basis"; }
 
-    static constexpr FlexBasis initial() { return Width{Width::AUTO}; }
+    static FlexBasis initial() { return Width{Width::AUTO}; }
 
     void apply(Computed &c) const {
         c.flex.cow().basis = value;
@@ -831,6 +820,50 @@ struct FlexWrapProp {
 
     Res<> parse(Cursor<Css::Sst> &c) {
         value = try$(parseValue<FlexWrap>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-flexbox-1/#propdef-flex-flow
+struct FlexFlowProp {
+    Tuple<FlexDirection, FlexWrap> value = initial();
+
+    static Tuple<FlexDirection, FlexWrap> initial() {
+        return {
+            FlexDirection::ROW,
+            FlexWrap::NOWRAP,
+        };
+    }
+
+    static constexpr Str name() { return "flex-flow"; }
+
+    void apply(Computed &c) const {
+        c.flex.cow().direction = value.v0;
+        c.flex.cow().wrap = value.v1;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        if (c.ended())
+            return Error::invalidData("unexpected end of input");
+
+        auto direction = parseValue<FlexDirection>(c);
+        if (direction) {
+            value.v0 = direction.unwrap();
+
+            auto wrap = parseValue<FlexWrap>(c);
+            if (wrap)
+                value.v1 = wrap.unwrap();
+        } else {
+            auto wrap = parseValue<FlexWrap>(c);
+            if (not wrap)
+                return Error::invalidData("expected flex direction or wrap");
+            value.v1 = wrap.unwrap();
+
+            direction = parseValue<FlexDirection>(c);
+            if (direction)
+                value.v0 = direction.unwrap();
+        }
+
         return Ok();
     }
 };
@@ -965,7 +998,7 @@ struct MarginTopProp {
 
     static Str name() { return "margin-top"; }
 
-    static constexpr Width initial() { return Length{}; }
+    static Width initial() { return Length{}; }
 
     void apply(Computed &c) const {
         c.margin.cow().top = value;
@@ -982,7 +1015,7 @@ struct MarginRightProp {
 
     static Str name() { return "margin-right"; }
 
-    static constexpr Width initial() { return Length{}; }
+    static Width initial() { return Length{}; }
 
     void apply(Computed &c) const {
         c.margin.cow().end = value;
@@ -999,7 +1032,7 @@ struct MarginBottomProp {
 
     static constexpr Str name() { return "margin-bottom"; }
 
-    static constexpr Width initial() { return Length{}; }
+    static Width initial() { return Length{}; }
 
     void apply(Computed &c) const {
         c.margin.cow().bottom = value;
@@ -1376,7 +1409,7 @@ struct WidthProp {
 
     static constexpr Str name() { return "width"; }
 
-    static constexpr Size initial() { return Size::AUTO; }
+    static Size initial() { return Size::AUTO; }
 
     void apply(Computed &c) const {
         c.sizing.cow().width = value;
@@ -1395,7 +1428,7 @@ struct HeightProp {
 
     static constexpr Str name() { return "height"; }
 
-    static constexpr Size initial() { return Size::AUTO; }
+    static Size initial() { return Size::AUTO; }
 
     void apply(Computed &c) const {
         c.sizing.cow().height = value;
@@ -1414,7 +1447,7 @@ struct MinWidthProp {
 
     static constexpr Str name() { return "min-width"; }
 
-    static constexpr Size initial() { return Size::AUTO; }
+    static Size initial() { return Size::AUTO; }
 
     void apply(Computed &c) const {
         c.sizing.cow().minWidth = value;
@@ -1433,7 +1466,7 @@ struct MinHeightProp {
 
     static constexpr Str name() { return "min-height"; }
 
-    static constexpr Size initial() { return Size::AUTO; }
+    static Size initial() { return Size::AUTO; }
 
     void apply(Computed &c) const {
         c.sizing.cow().minHeight = value;
@@ -1452,7 +1485,7 @@ struct MaxWidthProp {
 
     static constexpr Str name() { return "max-width"; }
 
-    static constexpr Size initial() { return Size::NONE; }
+    static Size initial() { return Size::NONE; }
 
     void apply(Computed &c) const {
         c.sizing.cow().maxWidth = value;
@@ -1471,7 +1504,7 @@ struct MaxHeightProp {
 
     static constexpr Str name() { return "max-height"; }
 
-    static constexpr Size initial() { return Size::NONE; }
+    static Size initial() { return Size::NONE; }
 
     void apply(Computed &c) const {
         c.sizing.cow().maxHeight = value;
@@ -1556,6 +1589,7 @@ using _StyleProp = Union<
     FlexGrowProp,
     FlexShrinkProp,
     FlexWrapProp,
+    FlexFlowProp,
 
     // Font
     FontFamilyProp,

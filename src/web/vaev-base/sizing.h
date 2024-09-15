@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-io/emit.h>
+#include <vaev-base/calc.h>
 
 #include "length.h"
 #include "percent.h"
@@ -29,7 +30,7 @@ struct Size {
     using enum Type;
 
     Type type;
-    PercentOr<Length> value;
+    CalcValue<PercentOr<Length>> value;
 
     constexpr Size() : type(AUTO), value(Length{}) {
     }
@@ -37,7 +38,7 @@ struct Size {
     constexpr Size(Type type) : type(type), value(Length{}) {
     }
 
-    constexpr Size(Type type, PercentOr<Length> value) : type(type), value(value) {
+    Size(CalcValue<PercentOr<Length>> value) : type(LENGTH), value(value) {
     }
 
     constexpr Size(Percent value) : type(LENGTH), value(value) {

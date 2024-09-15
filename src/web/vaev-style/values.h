@@ -15,6 +15,7 @@
 #include <vaev-base/sizing.h>
 #include <vaev-base/z-index.h>
 #include <vaev-css/parser.h>
+#include <vaev-base/calc.h>
 
 namespace Vaev::Style {
 
@@ -27,6 +28,7 @@ struct ValueParser;
 
 template <typename T>
 always_inline static Res<T> parseValue(Cursor<Css::Sst> &c) {
+
     return ValueParser<T>::parse(c);
 }
 
@@ -48,6 +50,71 @@ struct ValueParser<bool> {
 template <>
 struct ValueParser<BorderStyle> {
     static Res<BorderStyle> parse(Cursor<Css::Sst> &c);
+};
+
+template <typename T>
+struct ValueParser<CalcValue<T>> {
+    static Res<CalcValue<T>> parse(Cursor<Css::Sst> &c) {
+        if (c.ended())
+            return Error::invalidData("unexpected end of input");
+
+        if (c.peek() == Css::Sst::FUNC) {
+            auto const &prefix = c.peek().prefix;
+            auto prefixToken = prefix->unwrap().token;
+            if (prefixToken.data == "calc(") {
+                Cursor<Css::Sst> content = c.peek().content;
+                auto lhs = try$(parseVal(content));
+
+                auto op = parseOp(content);
+                if (not op)
+                    return Ok(CalcValue<T>{lhs});
+
+                if (content.peek() == Css::Token::WHITESPACE) {
+                    content.next();
+                }
+                auto rhs = try$(parseVal(content));
+                return Ok(CalcValue<T>{lhs, op.unwrap(), rhs});
+            }
+        }
+
+        return Ok(try$(parseValue<T>(c)));
+    }
+
+    static Res<typename CalcValue<T>::OpCode> parseOp(Cursor<Css::Sst> &c) {
+        if (c.ended())
+            return Error::invalidData("unexpected end of input");
+
+        if (c.peek() == Css::Token::WHITESPACE) {
+            c.next();
+            return parseOp(c);
+        }
+
+        if (c.peek().token.data == "+") {
+            c.next();
+            return Ok(CalcValue<T>::OpCode::ADD);
+        } else if (c.peek().token.data == "-") {
+            c.next();
+            return Ok(CalcValue<T>::OpCode::SUBSTRACT);
+        } else if (c.peek().token.data == "*") {
+            c.next();
+            return Ok(CalcValue<T>::OpCode::MULTIPLY);
+        } else if (c.peek().token.data == "/") {
+            c.next();
+            return Ok(CalcValue<T>::OpCode::DIVIDE);
+        }
+        return Error::invalidData("unexpected operator");
+    }
+    
+    static Res<typename CalcValue<T>::Value> parseVal(Cursor<Css::Sst> &c) {
+        if (c.ended())
+            return Error::invalidData("unexpected end of input");
+
+        if(c.peek().token == Css::Token::NUMBER){
+            return Ok(try$(parseValue<Number>(c)));
+        }else{
+            return Ok(try$(parseValue<T>(c)));
+        }                
+    }
 };
 
 template <>

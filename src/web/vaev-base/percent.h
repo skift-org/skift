@@ -14,6 +14,8 @@ struct PercentOr {
         VALUE,
     };
 
+    using Resolved = typename T::Resolved;
+
     using enum Type;
 
     Type _type;

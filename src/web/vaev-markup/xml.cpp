@@ -79,7 +79,7 @@ static bool _isNameChar(Rune r) {
     return false;
 }
 
-static constexpr auto RE_NAME_CHAR = RE_NAME_START_CHAR & Re::zeroOrMore(Re::ctype(_isNameChar));
+static constexpr auto RE_NAME_CHAR = RE_NAME_START_CHAR | Re::ctype(_isNameChar);
 
 static constexpr auto RE_NAME = RE_NAME_START_CHAR & Re::zeroOrMore(RE_NAME_CHAR);
 

@@ -2,6 +2,8 @@
 
 #include <vaev-css/parser.h>
 
+#include "base.h"
+
 namespace Vaev::Style {
 
 template <typename T>
@@ -36,7 +38,7 @@ Res<P> parseDeclaration(Css::Sst const &sst) {
         auto res = parseDeclarationValue<T>(cursor);
         if (not res) {
             resDecl = res.none();
-            return false;
+            return true;
         }
 
         resDecl = Ok(res.take());
@@ -45,6 +47,10 @@ Res<P> parseDeclaration(Css::Sst const &sst) {
             if (cursor.skip(Css::Token::delim("!")) and cursor.skip(Css::Token::ident("important")))
                 resDecl.unwrap().important = Important::YES;
         }
+
+        eatWhitespace(cursor);
+        if (not cursor.ended())
+            resDecl = Error::invalidData("unknown tokens in content");
 
         return true;
     });

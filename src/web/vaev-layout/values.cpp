@@ -191,10 +191,68 @@ Px resolve(Tree &t, Frag &f, Length l) {
     }
 }
 
+template <typename T>
+concept Resolvable = requires {
+    typename T::Resolved;
+};
+
+template <typename T>
+using Resolved = Meta::Cond<Resolvable<T>, typename T::Resolved, T>;
+static_assert(Resolvable<PercentOr<Length>>);
+
 Px resolve(Tree &t, Frag &f, PercentOr<Length> p, Px relative) {
     if (p.resolved())
         return resolve(t, f, p.value());
     return Px{relative.cast<f64>() * (p.percent().value() / 100.)};
+}
+
+template <typename T>
+Resolved<T> resolveInfix(typename CalcValue<T>::OpCode op, Resolved<T> lhs, Resolved<T> rhs) {
+    switch (op) {
+    case CalcValue<T>::OpCode::ADD:
+        return lhs + rhs;
+    case CalcValue<T>::OpCode::SUBSTRACT:
+        return lhs - rhs;
+    case CalcValue<T>::OpCode::MULTIPLY:
+        return lhs * rhs;
+    case CalcValue<T>::OpCode::DIVIDE:
+        return lhs / rhs;
+    default:
+        return lhs;
+    }
+}
+
+template <typename T>
+auto resolve(Tree &t, Frag &f, CalcValue<T> const &p, Px relative) {
+    if (p.type == CalcValue<T>::OpType::FIXED) {
+        return resolve(t, f, p.lhs.template unwrap<T>(), relative);
+    } else if (p.type == CalcValue<T>::OpType::SINGLE) {
+        // TODO: compute result of funtion here with the resolved value
+        return resolve(t, f, p.lhs.template unwrap<T>(), relative);
+    } else if (p.type == CalcValue<T>::OpType::CALC) {
+        auto resolveUnion = Visitor{
+            [&](T const &v) {
+                return resolve<T>(t, f, v, relative);
+            },
+            [&](CalcValue<T>::Leaf const &v) {
+                return resolve<T>(t, f, *v, relative);
+            },
+            [&](Number const &v) {
+                return Math::i24f8{v};
+            },
+            [&](None const &) -> Resolved<T>{
+                panic("invalid value in calc expression");
+            }
+        };
+
+        return resolveInfix<T>(
+            p.op,
+            p.lhs.visit(resolveUnion),
+            p.rhs.visit(resolveUnion)
+        );
+    }
+
+    unreachable();
 }
 
 Px resolve(Tree &t, Frag &f, Width w, Px relative) {

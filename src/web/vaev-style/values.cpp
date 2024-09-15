@@ -382,7 +382,7 @@ Res<FlexDirection> ValueParser<FlexDirection>::parse(Cursor<Css::Sst> &c) {
         return Error::invalidData("expected flex direction");
 }
 
-// Mark: FlexWrap
+// MARK: FlexWrap
 // https://drafts.csswg.org/css-flexbox-1/#flex-wrap-property
 Res<FlexWrap> ValueParser<FlexWrap>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
@@ -632,6 +632,7 @@ Res<Number> ValueParser<Number>::parse(Cursor<Css::Sst> &c) {
 
     if (c.peek() == Css::Token::NUMBER) {
         Io::SScan scan = c->token.data;
+        c.next();
         return Ok(try$(Io::atof(scan)));
     }
 
@@ -758,7 +759,7 @@ Res<Position> ValueParser<Position>::parse(Cursor<Css::Sst> &c) {
         return Error::invalidData("expected position");
 }
 
-// Mark: Resolution
+// MARK: Resolution
 // https://drafts.csswg.org/css-values/#resolution
 
 static Res<Resolution::Unit> _parseResolutionUnit(Str unit) {
@@ -817,21 +818,13 @@ Res<Size> ValueParser<Size>::parse(Cursor<Css::Sst> &c) {
             return Ok(Size::MIN_CONTENT);
         } else if (data == "max-content") {
             return Ok(Size::MAX_CONTENT);
+        } else if (data == "fit-content") {
+            return Ok(Size::FIT_CONTENT);
         }
-    } else if (c.peek() == Css::Token::PERCENTAGE) {
-        return Ok(try$(parseValue<Percent>(c)));
-    } else if (c.peek() == Css::Token::DIMENSION) {
-        return Ok(try$(parseValue<Length>(c)));
-    } else if (c.peek() == Css::Sst::FUNC) {
-        auto const &prefix = c.next().prefix.unwrap();
-        auto prefixToken = prefix->token;
-        if (prefixToken.data == "fit-content") {
-            Cursor<Css::Sst> content = prefix->content;
-            return Ok(Size{Size::FIT_CONTENT, try$(parseValue<Length>(content))});
-        }
+    } else {
+        return Ok(try$(parseValue<CalcValue<PercentOr<Length>>>(c)));
     }
-
-    return Error::invalidData("expected size");
+    unreachable();
 }
 
 // MARK: String

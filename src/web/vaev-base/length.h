@@ -37,6 +37,8 @@ struct Length {
 
     using enum Unit;
 
+    using Resolved = Px;
+
     f64 _val = 0;
     Unit _unit = Unit::PX;
 

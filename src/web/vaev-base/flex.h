@@ -32,13 +32,13 @@ struct FlexBasis {
     using enum Type;
 
     Type type;
-    Width width;
+    Width width = Width::AUTO;
 
     constexpr FlexBasis(Type type)
         : type(type) {
     }
 
-    constexpr FlexBasis(Width width)
+    FlexBasis(Width width)
         : type(Type::WIDTH), width(width) {
     }
 

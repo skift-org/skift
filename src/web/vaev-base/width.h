@@ -2,6 +2,7 @@
 
 #include "length.h"
 #include "percent.h"
+#include "vaev-base/calc.h"
 
 namespace Vaev {
 
@@ -14,13 +15,13 @@ struct Width {
     using enum Type;
 
     Type type;
-    PercentOr<Length> value;
+    CalcValue<PercentOr<Length>> value;
 
     constexpr Width(Type type)
         : type(type) {
     }
 
-    constexpr Width(PercentOr<Length> percent = {})
+    Width(CalcValue<PercentOr<Length>> percent = {})
         : type(Type::VALUE), value(percent) {
     }
 

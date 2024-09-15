@@ -19,6 +19,7 @@
 #include "page-side-nav.h"
 #include "page-side-panel.h"
 #include "page-slider.h"
+#include "page-titlebar.h"
 #include "page-toggle.h"
 
 namespace Hideo::Zoo {
@@ -39,6 +40,7 @@ static Array PAGES = {
     &PAGE_SIDE_PANEL,
     &PAGE_SIDENAV,
     &PAGE_SLIDER,
+    &PAGE_TITLEBAR,
     &PAGE_TOGGLE,
 };
 

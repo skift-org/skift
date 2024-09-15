@@ -9,9 +9,9 @@ Async::Task<> serv(Sys::Context &ctx) {
     Sys::Ipc ipc = Sys::Ipc::create(ctx);
     while (true) {
         auto msg = co_trya$(ipc.recvAsync());
-        if (msg.is<Request>()) {
-            auto req = co_try$(msg.unpack<Request>());
-            co_try$(ipc.resp<Request>(msg, Ok(req.msg)));
+        if (msg.is<Echo::Request>()) {
+            auto req = co_try$(msg.unpack<Echo::Request>());
+            co_try$(ipc.resp<Echo::Request>(msg, Ok(req.msg)));
         }
     }
 

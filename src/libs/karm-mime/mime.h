@@ -1,9 +1,9 @@
 #pragma once
 
+#include <fonts-mdi/icons.h>
 #include <karm-io/emit.h>
 #include <karm-io/expr.h>
 #include <karm-io/sscan.h>
-#include <mdi/spec.h>
 
 namespace Karm::Mime {
 

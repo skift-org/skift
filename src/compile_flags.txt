@@ -8,6 +8,7 @@
 
 -I./
 -I./apps
+-I./assets
 -I./clis
 -I./embed
 -I./impls

@@ -1,7 +1,7 @@
 #pragma once
 
+#include <fonts-mdi/icons.h>
 #include <karm-text/loader.h>
-#include <mdi/spec.h>
 
 namespace Karm::Media {
 

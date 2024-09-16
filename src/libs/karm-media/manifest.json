@@ -5,6 +5,6 @@
     "description": "A media loader library",
     "requires": [
         "karm-text",
-        "mdi-spec"
+        "fonts-mdi"
     ]
 }

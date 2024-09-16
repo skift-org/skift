@@ -4,11 +4,13 @@
 #include <karm-base/vec.h>
 #include <karm-mime/url.h>
 
+#include "stat.h"
+
 namespace Karm::Sys {
 
 struct DirEntry {
     String name;
-    bool isDir;
+    Type type;
 };
 
 struct Dir {

@@ -214,9 +214,9 @@ Sys::SocketAddr fromSockAddr(struct sockaddr_in sockaddr) {
 
 Sys::Stat fromStat(struct stat const &buf) {
     Sys::Stat stat{};
-    Sys::Stat::Type type = Sys::Stat::FILE;
+    Sys::Type type = Sys::Type::FILE;
     if (S_ISDIR(buf.st_mode))
-        type = Sys::Stat::DIR;
+        type = Sys::Type::DIR;
     stat.type = type;
     stat.size = (usize)buf.st_size;
     stat.accessTime = TimeStamp::epoch() + TimeSpan::fromSecs(buf.st_atime);

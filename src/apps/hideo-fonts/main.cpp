@@ -3,6 +3,7 @@
 #include <karm-sys/entry.h>
 #include <karm-text/book.h>
 #include <karm-ui/app.h>
+#include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
 
 namespace Hideo::Fonts {

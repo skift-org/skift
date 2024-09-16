@@ -7,6 +7,7 @@
 #include <karm-text/edit.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
+#include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
 
 namespace Hideo::Text {

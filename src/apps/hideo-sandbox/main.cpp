@@ -2,6 +2,9 @@
 #include <karm-text/book.h>
 #include <karm-text/family.h>
 #include <karm-ui/app.h>
+#include <karm-ui/box.h>
+#include <karm-ui/layout.h>
+#include <karm-ui/view.h>
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
     Text::FontBook fontBook;

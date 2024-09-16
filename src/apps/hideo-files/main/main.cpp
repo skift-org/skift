@@ -4,9 +4,5 @@
 #include "../app.h"
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
-    co_return Ui::runApp(
-        ctx,
-        Hideo::Files::app() |
-            Ui::pinSize({320, 200})
-    );
+    co_return Ui::runApp(ctx, Hideo::Files::app());
 }

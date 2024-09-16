@@ -1,6 +1,7 @@
 #include <karm-app/form-factor.h>
 #include <karm-image/loader.h>
 #include <karm-sys/entry.h>
+#include <karm-sys/time.h>
 #include <karm-ui/app.h>
 
 #include "../app.h"

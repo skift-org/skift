@@ -130,16 +130,16 @@ static inline Opt<usize> atou(_Str<E> str, AtoxOptions const &options = {}) {
 
 template <StaticEncoding E>
 static inline Opt<isize> atoi(_Str<E> str, AtoxOptions const &options = {}) {
-    auto s = _SScan<E>(str, options);
-    return atoi(s);
+    auto s = _SScan<E>(str);
+    return atoi(s, options);
 }
 
 #ifndef __ck_freestanding__
 
 template <StaticEncoding E>
 static inline Opt<f64> atof(_Str<E> str, AtoxOptions const &options = {}) {
-    auto s = _SScan<E>(str, options);
-    return stof(s);
+    auto s = _SScan<E>(str);
+    return stof(s, options);
 }
 
 #endif

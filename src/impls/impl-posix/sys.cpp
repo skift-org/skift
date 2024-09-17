@@ -87,7 +87,7 @@ Res<Strong<Fd>> openFile(Mime::Url const &url) {
     if (raw < 0)
         return Posix::fromLastErrno();
     auto fd = makeStrong<Posix::Fd>(raw);
-    if (try$(fd->stat()).type == Stat::DIR)
+    if (try$(fd->stat()).type == Type::DIR)
         return Error::isADirectory();
     return Ok(fd);
 }
@@ -108,7 +108,7 @@ Res<Strong<Fd>> openOrCreateFile(Mime::Url const &url) {
     if (raw < 0)
         return Posix::fromLastErrno();
     auto fd = makeStrong<Posix::Fd>(raw);
-    if (try$(fd->stat()).type == Stat::DIR)
+    if (try$(fd->stat()).type == Type::DIR)
         return Error::isADirectory();
     return Ok(fd);
 }
@@ -157,14 +157,13 @@ Res<Vec<DirEntry>> readDir(Mime::Url const &url) {
         try$(Posix::consumeErrno());
 
         if (strcmp(entry->d_name, ".") == 0 or
-            strcmp(entry->d_name, "..") == 0 or
-            (cstrLen(entry->d_name) >= 1 and entry->d_name[0] == '.')) {
+            strcmp(entry->d_name, "..") == 0) {
             continue;
         }
 
         entries.pushBack(DirEntry{
             Str::fromNullterminated(entry->d_name),
-            entry->d_type == DT_DIR,
+            entry->d_type == DT_DIR ? Sys::Type::DIR : Sys::Type::FILE,
         });
     }
 

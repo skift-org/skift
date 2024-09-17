@@ -10,7 +10,7 @@ Res<Vec<String>> installedBundles() {
     auto dirs = try$(Sys::_Embed::readDir(repoRoot));
     Vec<String> ids;
     for (auto &dir : dirs) {
-        if (dir.isDir)
+        if (dir.type == Sys::Type::DIR)
             ids.pushBack(dir.name);
     }
     return Ok(ids);

@@ -5,6 +5,7 @@
 #include <karm-base/rc.h>
 #include <karm-base/string.h>
 #include <karm-base/vec.h>
+#include <karm-logger/logger.h>
 #include <karm-sys/chan.h>
 #include <karm-sys/context.h>
 
@@ -427,8 +428,7 @@ struct Command {
         co_return co_await execAsync(ctx, tokens);
     }
 
-    Async::Task<> execAsync(Sys::Context &ctx, Slice<Token> tokens) {
-        Cursor<Token> c = tokens;
+    Async::Task<> execAsync(Sys::Context &ctx, Cursor<Token> c) {
         co_try$(_evalParams(c));
 
         if (_help) {
@@ -447,9 +447,30 @@ struct Command {
         if (callbackAsync)
             co_trya$(callbackAsync.unwrap()(ctx));
 
-        for (auto &cmd : _commands)
-            co_trya$(cmd->execAsync(ctx));
+        if (not c.ended()) {
+            if (c->kind != Token::OPERAND)
+                co_return Error::invalidInput("expected subcommand");
 
+            if (not any(_commands))
+                co_return Error::invalidInput("unexpected subcommand");
+
+            auto value = c->value;
+            c.next();
+
+            for (auto &cmd : _commands) {
+
+                bool shortNameMatch = value.len() == 1 and iterRunes(value).first() == cmd->shortName;
+                bool longNameMatch = value == cmd->longName;
+
+                if (not(shortNameMatch or longNameMatch))
+                    continue;
+
+                co_return co_await cmd->execAsync(ctx, c);
+            }
+
+            logError("unknown subcommand '{}'", value);
+            co_return Error::invalidInput("unknown subcommand");
+        }
         co_return Ok();
     }
 

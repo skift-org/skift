@@ -70,7 +70,7 @@ Ui::Child directorEntry(Sys::DirEntry const &entry, bool odd) {
     return Ui::button(
                Model::bind<Navigate>(entry.name),
                itemStyle(odd),
-               entry.isDir
+               entry.type == Sys::Type::DIR
                    ? Mdi::FOLDER
                    : Mime::iconFor(Mime::sniffSuffix(Mime::suffixOf(entry.name)).unwrapOr("file"s)),
                entry.name

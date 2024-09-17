@@ -27,7 +27,7 @@ void reduce(State &s, Action a) {
             dest.append(navigate.item);
 
             auto stat = Sys::stat(dest).unwrap();
-            if (stat.type == Sys::Stat::FILE) {
+            if (stat.type == Sys::Type::FILE) {
                 (void)Sys::launch(Mime::Uti::PUBLIC_PREVIEW, dest);
             } else {
                 reduce(s, GoTo{dest});

@@ -22,7 +22,7 @@ Res<> FontBook::loadAll() {
         auto dir = maybeDir.take();
 
         for (auto &diren : dir.entries()) {
-            if (diren.isDir)
+            if (diren.type != Sys::Type::FILE)
                 continue;
 
             auto fontUrl = dir.path() / diren.name;

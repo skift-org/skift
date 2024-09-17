@@ -4,6 +4,7 @@
     "type": "lib",
     "description": "A graphical user interface library",
     "requires": [
+        "karm-cli",
         "karm-ui-impl",
         "karm-image",
         "karm-media",

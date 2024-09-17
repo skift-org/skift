@@ -71,4 +71,18 @@ Res<> runApp(Sys::Context &ctx, Child root) {
     return try$(_Embed::makeHost(root))->run();
 }
 
+void mountApp(Cli::Command &cmd, Slot rootSlot) {
+    Cli::Flag debugArg = Cli::flag(NONE, "debug"s, "Show debug inspector."s);
+    Cli::Flag mobileArg = Cli::flag(NONE, "mobile"s, "Show mobile layout."s);
+
+    cmd.option(debugArg);
+    cmd.option(mobileArg);
+    cmd.callbackAsync = [rootSlot = std::move(rootSlot), debugArg](Sys::Context &) -> Async::Task<> {
+        auto root = rootSlot();
+        if (debugArg)
+            root = root | inspector;
+        co_return co_try$(_Embed::makeHost(root))->run();
+    };
+}
+
 } // namespace Karm::Ui

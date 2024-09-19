@@ -6,4 +6,4 @@ namespace Hideo::Mines {
 
 Ui::Child game();
 
-} // namespace Hideo::Climber
+} // namespace Hideo::Mines

@@ -6,4 +6,4 @@ namespace Hideo::Code {
 
 Ui::Child app();
 
-} // namespace Hideo::Chat
+} // namespace Hideo::Code

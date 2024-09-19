@@ -132,7 +132,7 @@ struct Set {
     }
 
     auto iter() const {
-        return Iter{[&, i = 0uz]() mutable -> T const * {
+        return Iter{[&, i = 0uz] mutable -> T const * {
             if (i == _cap)
                 return nullptr;
 

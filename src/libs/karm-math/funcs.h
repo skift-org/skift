@@ -9,8 +9,9 @@ namespace Karm::Math {
 
 // MARK: Other -----------------------------------------------------------------
 
-constexpr auto abs(auto value) {
-    return value < 0 ? -value : value;
+template <typename T>
+constexpr auto abs(T value) {
+    return value < T{} ? -value : value;
 }
 
 constexpr auto lerp(auto a, auto b, auto p) {

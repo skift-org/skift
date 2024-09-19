@@ -29,7 +29,7 @@ static Px _blockLayoutDetermineWidth(Tree &t, Frag &f, Input input) {
 
 Output blockLayout(Tree &t, Frag &f, Input input) {
     Px blockSize = Px{0};
-    Px inlineSize = input.knownSize.x.unwrapOrElse([&]() {
+    Px inlineSize = input.knownSize.x.unwrapOrElse([&] {
         return _blockLayoutDetermineWidth(t, f, input);
     });
 

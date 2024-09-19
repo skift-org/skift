@@ -9,6 +9,7 @@
 namespace Vaev::Driver {
 
 struct RenderResult {
+    Style::StyleBook style;
     Strong<Layout::Frag> layout;
     Strong<Paint::Node> paint;
 };

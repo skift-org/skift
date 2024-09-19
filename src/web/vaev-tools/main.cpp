@@ -131,25 +131,40 @@ Vaev::Style::Media constructMedia(Print::PaperStock paper) {
     };
 }
 
-Res<> html2pdf(Mime::Url const &input, Mime::Url const &output) {
-    auto dom = try$(Vaev::Driver::fetchDocument(input));
+struct Html2PdfOption {
+    bool dumpStyle = false;
+    bool dumpDom = false;
+    bool dumpLayout = false;
+    bool dumpPaint = false;
+};
 
+Res<> html2pdf(Mime::Url const &input, Io::Writer &output, Html2PdfOption options = {}) {
+    auto start = Sys::now();
+
+    auto dom = try$(Vaev::Driver::fetchDocument(input));
     auto paper = Print::A4;
     auto media = constructMedia(paper);
-
-    auto start = Sys::now();
-    auto [layout, paint] = Vaev::Driver::render(*dom, media, paper);
+    auto [style, layout, paint] = Vaev::Driver::render(*dom, media, paper);
     auto elapsed = Sys::now() - start;
 
     logInfo("render time: {}", elapsed);
-    logDebug("layout tree: {}", layout);
-    logDebug("paint tree: {}", paint);
+
+    if (options.dumpDom)
+        Sys::println("--- START OF DOM ---\n{}\n--- END OF DOM ---\n", dom);
+
+    if (options.dumpStyle)
+        Sys::println("--- START OF STYLE ---\n{}\n--- END OF STYLE ---\n", style);
+
+    if (options.dumpLayout)
+        Sys::println("--- START OF LAYOUT ---\n{}\n--- END OF LAYOUT ---\n", layout);
+
+    if (options.dumpPaint)
+        Sys::println("--- START OF PAINT ---\n{}\n--- END OF PAINT ---\n", paint);
 
     Print::PdfPrinter printer{Print::A4, Print::Density::DEFAULT};
     paint->print(printer);
 
-    auto file = try$(Sys::File::create(output));
-    Io::TextEncoder<> encoder{file};
+    Io::TextEncoder<> encoder{output};
     Io::Emit e{encoder};
     printer.write(e);
     try$(e.flush());
@@ -256,27 +271,42 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
         }
     );
 
+    Cli::Flag dumpStyleArg = Cli::flag('s', "dump-style"s, "Dump the stylesheet"s);
+    Cli::Flag dumpDomArg = Cli::flag('d', "dump-dom"s, "Dump the DOM tree"s);
+    Cli::Flag dumpLayoutArg = Cli::flag('l', "dump-layout"s, "Dump the layout tree"s);
+    Cli::Flag dumpPaintArg = Cli::flag('p', "dump-paint"s, "Dump the paint tree"s);
+
     cmd.subCommand(
         "html2pdf"s,
         'r',
         "Convert HTML to PDF"s,
-        {inputArg, outputArg
-        },
-        [inputArg, outputArg](Sys::Context &) -> Async::Task<> {
+        {inputArg, outputArg, dumpStyleArg, dumpDomArg, dumpLayoutArg, dumpPaintArg},
+        [inputArg, outputArg, dumpStyleArg, dumpDomArg, dumpLayoutArg, dumpPaintArg](Sys::Context &) -> Async::Task<> {
+            Vaev::Tools::Html2PdfOption options{
+                .dumpStyle = dumpStyleArg,
+                .dumpDom = dumpDomArg,
+                .dumpLayout = dumpLayoutArg,
+                .dumpPaint = dumpPaintArg,
+            };
+
             auto input = co_try$(Mime::parseUrlOrPath(inputArg));
-            auto output = co_try$(Mime::parseUrlOrPath(outputArg));
-            co_return Vaev::Tools::html2pdf(input, output);
+            if (outputArg.unwrap() == "-"s)
+                co_return Vaev::Tools::html2pdf(input, Sys::out(), options);
+
+            auto outputUrl = co_try$(Mime::parseUrlOrPath(outputArg));
+            auto outputFile = co_try$(Sys::File::create(outputUrl));
+            co_return Vaev::Tools::html2pdf(input, outputFile, options);
         }
     );
 
     auto &inspectorCmd = cmd.subCommand(
         "inspector"s,
         'i',
-        "Inspect a document"s,
+        "View a document in the inspector for debugging"s,
         {inputArg}
     );
 
-    Ui::mountApp(inspectorCmd, [inputArg]() -> Ui::Child {
+    Ui::mountApp(inspectorCmd, [inputArg] -> Ui::Child {
         auto input = Mime::parseUrlOrPath(inputArg).unwrap();
         auto dom = Vaev::Driver::fetchDocument(input);
         return Vaev::Tools::inspector(input, dom);

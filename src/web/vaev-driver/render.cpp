@@ -109,6 +109,7 @@ RenderResult render(Markup::Document const &dom, Style::Media const &media, Vec2
     logDebugIf(DEBUG_RENDER, "layout tree paint time: {}", elapsed);
 
     return {
+        std::move(stylebook),
         makeStrong<Layout::Frag>(std::move(tree.root)),
         paintRoot,
     };
@@ -156,6 +157,7 @@ RenderResult render(Markup::Document &dom, Style::Media const &media, Print::Pap
     paintRoot->prepare();
 
     return {
+        std::move(stylebook),
         makeStrong<Layout::Frag>(std::move(tree.root)),
         paintRoot,
     };

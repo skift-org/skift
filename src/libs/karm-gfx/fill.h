@@ -172,6 +172,20 @@ struct Fill : public _Fills {
             }
         );
     }
+
+    void repr(Io::Emit &e) const {
+        visit(Visitor{
+            [&](Color const &c) {
+                c.repr(e);
+            },
+            [&](Gradient const &grad) {
+                e("(gradient {} {})", grad._start, grad._end);
+            },
+            [&](Pixels const &pixels) {
+                e("(pixels {} {})", pixels.width(), pixels.height());
+            }
+        });
+    }
 };
 
 } // namespace Karm::Gfx

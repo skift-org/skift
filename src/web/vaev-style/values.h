@@ -2,6 +2,7 @@
 
 #include <vaev-base/align.h>
 #include <vaev-base/borders.h>
+#include <vaev-base/calc.h>
 #include <vaev-base/color.h>
 #include <vaev-base/display.h>
 #include <vaev-base/flex.h>
@@ -15,7 +16,6 @@
 #include <vaev-base/sizing.h>
 #include <vaev-base/z-index.h>
 #include <vaev-css/parser.h>
-#include <vaev-base/calc.h>
 
 namespace Vaev::Style {
 
@@ -104,17 +104,26 @@ struct ValueParser<CalcValue<T>> {
         }
         return Error::invalidData("unexpected operator");
     }
-    
+
     static Res<typename CalcValue<T>::Value> parseVal(Cursor<Css::Sst> &c) {
         if (c.ended())
             return Error::invalidData("unexpected end of input");
 
-        if(c.peek().token == Css::Token::NUMBER){
+        if (c.peek().token == Css::Token::NUMBER)
             return Ok(try$(parseValue<Number>(c)));
-        }else{
-            return Ok(try$(parseValue<T>(c)));
-        }                
+
+        return Ok(try$(parseValue<T>(c)));
     }
+};
+
+template <>
+struct ValueParser<Colors> {
+    static Res<Colors> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
+struct ValueParser<ColorScheme> {
+    static Res<ColorScheme> parse(Cursor<Css::Sst> &c);
 };
 
 template <>
@@ -125,6 +134,11 @@ struct ValueParser<Color> {
 template <>
 struct ValueParser<ColorGamut> {
     static Res<ColorGamut> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
+struct ValueParser<Contrast> {
+    static Res<Contrast> parse(Cursor<Css::Sst> &c);
 };
 
 template <>
@@ -381,21 +395,6 @@ struct ValueParser<ReducedMotion> {
 template <>
 struct ValueParser<ReducedTransparency> {
     static Res<ReducedTransparency> parse(Cursor<Css::Sst> &c);
-};
-
-template <>
-struct ValueParser<Contrast> {
-    static Res<Contrast> parse(Cursor<Css::Sst> &c);
-};
-
-template <>
-struct ValueParser<Colors> {
-    static Res<Colors> parse(Cursor<Css::Sst> &c);
-};
-
-template <>
-struct ValueParser<ColorScheme> {
-    static Res<ColorScheme> parse(Cursor<Css::Sst> &c);
 };
 
 template <>

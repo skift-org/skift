@@ -18,7 +18,7 @@ struct Box : public Node {
     }
 
     void repr(Io::Emit &e) const override {
-        e("(box {})", bound);
+        e("(box {} {} {})", bound, radii, backgrounds);
     }
 };
 

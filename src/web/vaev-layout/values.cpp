@@ -240,7 +240,7 @@ auto resolve(Tree &t, Frag &f, CalcValue<T> const &p, Px relative) {
             [&](Number const &v) {
                 return Math::i24f8{v};
             },
-            [&](None const &) -> Resolved<T>{
+            [&](None const &) -> Resolved<T> {
                 panic("invalid value in calc expression");
             }
         };

@@ -49,6 +49,16 @@ struct PercentOr {
         return _type == type;
     }
 
+    constexpr bool operator==(PercentOr const &other) const {
+        if (_type != other._type)
+            return false;
+
+        if (_type == Type::PERCENT)
+            return _percent == other._percent;
+
+        return _value == other._value;
+    }
+
     constexpr bool resolved() const {
         return _type == Type::VALUE;
     }

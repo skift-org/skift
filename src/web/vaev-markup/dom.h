@@ -36,7 +36,7 @@ struct Node :
 
     Node *_parent = nullptr;
     Vec<Strong<Node>> _children;
- 
+
     virtual ~Node() = default;
 
     virtual NodeType nodeType() const = 0;
@@ -269,9 +269,7 @@ struct Attr : public Node {
     }
 
     void _repr(Io::Emit &e) const override {
-        e(" namespaceURI={#}", name.ns.url());
-        e(" prefix={#}", name.ns.name());
-        e(" localName={#} value={#}", name.name(), value);
+        e(" localName={}:{} value={#}", name.ns.name(), name.name(), value);
     }
 };
 

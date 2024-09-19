@@ -1,9 +1,0 @@
-{
-    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "karm-cli",
-    "type": "lib",
-    "description": "Command line arguments and formatting",
-    "requires": [
-        "karm-sys"
-    ]
-}

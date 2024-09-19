@@ -26,14 +26,14 @@ Res<usize> _changeCase(SScan &s, Io::TextWriter &w, CaseFn fn) {
             wi = 0;
             wasLower = false;
         } else {
-            if (wasLower and isAsciiUpper(s.curr())) {
+            if (wasLower and isAsciiUpper(s.peek())) {
                 auto sep = fn(' ', si, wi);
                 if (sep)
                     written += try$(w.writeRune(sep));
                 wi = 0;
             }
 
-            wasLower = isAsciiLower(s.curr()) and isAsciiAlpha(s.curr());
+            wasLower = isAsciiLower(s.peek()) and isAsciiAlpha(s.peek());
             written += try$(w.writeRune(fn(s.next(), si, wi)));
             si++;
             wi++;

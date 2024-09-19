@@ -226,23 +226,23 @@ Child button(OnPress onPress, ButtonStyle style, Child child) {
 
 Child button(OnPress onPress, ButtonStyle style, Str t) {
     return text(t) |
-           insets({16, 6}) |
+           insets({6, 16}) |
            center() |
            minSize({UNCONSTRAINED, 36}) |
            button(std::move(onPress), style);
 }
 
-Child button(OnPress onPress, ButtonStyle style, Media::Icon i) {
+Child button(OnPress onPress, ButtonStyle style, Gfx::Icon i) {
     return icon(i) |
-           insets({6, 6}) |
+           insets(6) |
            center() |
            minSize({36, 36}) |
            button(std::move(onPress), style);
 }
 
-Child button(OnPress onPress, ButtonStyle style, Media::Icon i, Str t) {
+Child button(OnPress onPress, ButtonStyle style, Gfx::Icon i, Str t) {
     return hflow(8, Math::Align::CENTER, icon(i), text(t)) |
-           insets({12, 6, 16, 6}) |
+           insets({6, 16, 6, 12}) |
            minSize({UNCONSTRAINED, 36}) |
            button(std::move(onPress), style);
 }
@@ -366,7 +366,7 @@ struct Slider : public ProxyNode<Slider> {
     }
 
     void bubble(App::Event &e) override {
-        if (auto *dv = e.is<DragEvent>()) {
+        if (auto dv = e.is<DragEvent>()) {
             if (dv->type == DragEvent::DRAG) {
                 auto max = bound().width - bound().height;
                 auto value = max * _value;

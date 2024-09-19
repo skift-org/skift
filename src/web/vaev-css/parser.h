@@ -72,7 +72,7 @@ Opt<Sst> consumeRule(Lexer &lex);
 
 Content consumeDeclarationValue(Lexer &lex);
 
-Content consumeDeclarationList(Lexer &lex);
+Content consumeDeclarationList(Lexer &lex, bool topLevel = false);
 
 Content consumeDeclarationBlock(Lexer &lex);
 

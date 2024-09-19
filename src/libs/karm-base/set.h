@@ -8,16 +8,13 @@ namespace Karm {
 
 template <typename T>
 struct Set {
-    enum State {};
-
     struct Slot : public Manual<T> {
-        enum struct State : u8 {
+        enum State : u8 {
             FREE,
             USED,
             DEAD,
         };
 
-        using enum State;
         State state = State::FREE;
     };
 
@@ -132,7 +129,7 @@ struct Set {
     }
 
     auto iter() const {
-        return Iter{[&, i = 0uz]() mutable -> T const * {
+        return Iter{[&, i = 0uz] mutable -> T const * {
             if (i == _cap)
                 return nullptr;
 

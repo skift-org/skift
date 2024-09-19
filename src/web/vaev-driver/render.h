@@ -1,16 +1,17 @@
 #pragma once
 
+#include <karm-scene/base.h>
 #include <vaev-base/length.h>
 #include <vaev-layout/frag.h>
 #include <vaev-markup/dom.h>
-#include <vaev-paint/base.h>
 #include <vaev-style/media.h>
 
 namespace Vaev::Driver {
 
 struct RenderResult {
+    Style::StyleBook style;
     Strong<Layout::Frag> layout;
-    Strong<Paint::Node> paint;
+    Strong<Scene::Node> scene;
 };
 
 RenderResult render(Markup::Document const &dom, Style::Media const &media, Vec2Px viewport);

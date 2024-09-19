@@ -88,11 +88,11 @@ struct Gpos : public Io::BChunk {
                 continue;
 
             for (auto lookupSubtable : lookupTable.iter()) {
-                if (auto *glyphPair = lookupSubtable.is<GlyphPairAdjustment>()) {
+                if (auto glyphPair = lookupSubtable.is<GlyphPairAdjustment>()) {
                     auto pair = glyphPair->adjustments(prev, curr);
                     if (pair)
                         return Ok(*pair);
-                } else if (auto *classPair = lookupSubtable.is<ClassPairAdjustment>()) {
+                } else if (auto classPair = lookupSubtable.is<ClassPairAdjustment>()) {
                     auto pair = classPair->adjustments(prev, curr);
                     if (pair)
                         return Ok(*pair);

@@ -4,6 +4,12 @@
 #include <karm-sys/time.h>
 #include <karm-ui/anim.h>
 #include <karm-ui/layout.h>
+#include <mdi/alarm.h>
+#include <mdi/clock-outline.h>
+#include <mdi/clock.h>
+#include <mdi/dots-horizontal.h>
+#include <mdi/timer-outline.h>
+#include <mdi/timer-sand.h>
 
 #include "model.h"
 
@@ -161,7 +167,7 @@ Ui::Child app() {
                             Ui::titleLarge(toStr(s.page)),
                             Ui::grow(NONE),
                             Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::DOTS_HORIZONTAL)
-                        ) | Ui::insets({18, 18, 18, 0}),
+                        ) | Ui::insets({18, 18, 0, 18}),
                         appContent(s) | Ui::grow(),
                         navbar
                     );

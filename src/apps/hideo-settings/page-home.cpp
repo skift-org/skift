@@ -2,6 +2,14 @@
 #include <karm-sys/context.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
+#include <mdi/account.h>
+#include <mdi/information-outline.h>
+#include <mdi/laptop.h>
+#include <mdi/palette.h>
+#include <mdi/security.h>
+#include <mdi/update.h>
+#include <mdi/widgets-outline.h>
+#include <mdi/wifi.h>
 
 #include "app.h"
 

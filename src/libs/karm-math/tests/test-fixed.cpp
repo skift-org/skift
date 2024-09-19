@@ -3,6 +3,7 @@
 // Copyright (c) 2019 Mike Lankamp
 
 #include <karm-math/fixed.h>
+#include <karm-math/funcs.h>
 #include <karm-test/macros.h>
 
 namespace Karm::Math::Tests {
@@ -57,6 +58,15 @@ test$("fixed-arithmethic-division-range") {
     // These calculation will overflow and produce
     // wrong results without the intermediate type.
     expectEq$(P(32), P(256) / P(8));
+
+    return Ok();
+}
+
+test$("fixed-abs") {
+    using P = i24f8;
+
+    expectEq$(P(13.125), abs(P(13.125)));
+    expectEq$(P(13.125), abs(P(-13.125)));
 
     return Ok();
 }

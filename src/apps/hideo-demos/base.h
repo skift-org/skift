@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-ui/node.h>
+#include <mdi>
 
 namespace Hideo::Demos {
 

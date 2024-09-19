@@ -2,6 +2,17 @@
 #include <karm-kira/side-nav.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/layout.h>
+#include <mdi/disc.h>
+#include <mdi/download.h>
+#include <mdi/file-document.h>
+#include <mdi/film.h>
+#include <mdi/folder.h>
+#include <mdi/home.h>
+#include <mdi/image.h>
+#include <mdi/laptop.h>
+#include <mdi/music.h>
+#include <mdi/sd.h>
+#include <mdi/usb.h>
 
 #include "model.h"
 #include "widgets.h"

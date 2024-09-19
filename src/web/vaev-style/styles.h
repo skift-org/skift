@@ -26,7 +26,7 @@ struct AlignContentProp {
 
     static constexpr Str name() { return "align-content"; }
 
-    static constexpr Align initial() { return {}; }
+    static constexpr Align initial() { return Align::Keywords::STRETCH; }
 
     void apply(Computed &c) const {
         c.aligns.alignContent = value;
@@ -44,7 +44,7 @@ struct JustifyContentProp {
 
     static constexpr Str name() { return "justify-content"; }
 
-    static constexpr Align initial() { return {}; }
+    static constexpr Align initial() { return Align::Keywords::FLEX_START; }
 
     void apply(Computed &c) const {
         c.aligns.justifyContent = value;
@@ -80,7 +80,7 @@ struct AlignSelfProp {
 
     static constexpr Str name() { return "align-self"; }
 
-    static constexpr Align initial() { return {}; }
+    static constexpr Align initial() { return Align::Keywords::AUTO; }
 
     void apply(Computed &c) const {
         c.aligns.alignSelf = value;
@@ -116,7 +116,7 @@ struct AlignItemsProp {
 
     static constexpr Str name() { return "align-items"; }
 
-    static constexpr Align initial() { return {}; }
+    static constexpr Align initial() { return Align::Keywords::FLEX_START; }
 
     void apply(Computed &c) const {
         c.aligns.alignItems = value;
@@ -176,15 +176,10 @@ struct BackgroundAttachmentProp {
         return {BackgroundAttachment::SCROLL};
     }
 
-    void apply(Computed &) const {
-        // TODO
-    }
-
-    Res<> parse(Computed &c) const {
+    void apply(Computed &c) const {
         c.backgrounds.resize(max(c.backgrounds.len(), value.len()));
         for (usize i = 0; i < value.len(); ++i)
             c.backgrounds[i].attachment = value[i];
-        return Ok();
     }
 };
 
@@ -204,6 +199,7 @@ struct BackgroundColorProp {
 
     Res<> parse(Cursor<Css::Sst> &c) {
         eatWhitespace(c);
+        value.clear();
         while (not c.ended()) {
             value.pushBack(try$(parseValue<Color>(c)));
             eatWhitespace(c);
@@ -261,7 +257,7 @@ struct BackgroundRepeatProp {
 
 // https://www.w3.org/TR/CSS22/colors.html#x10
 struct BackgroundProp {
-    // FIXME this should cover everything else
+    // FIXME: this should cover everything else
     Vec<Color> value = initial();
 
     static constexpr Str name() { return "background"; }
@@ -276,6 +272,7 @@ struct BackgroundProp {
 
     Res<> parse(Cursor<Css::Sst> &c) {
         eatWhitespace(c);
+        value.clear();
         while (not c.ended()) {
             value.pushBack(try$(parseValue<Color>(c)));
             eatWhitespace(c);
@@ -324,20 +321,43 @@ struct DisplayProp {
     }
 };
 
-// MARK: Borders ---------------------------------------------------------------
+// https://www.w3.org/TR/CSS21/tables.html#propdef-table-layout
+struct TableLayoutProp {
+    TableLayout value = initial();
 
-// https://www.w3.org/TR/CSS22/tables.html#propdef-border-collapse
-struct BorderCollapseProp {
-    BorderCollapse value = initial();
+    static constexpr Str name() { return "table-layout"; }
 
-    static constexpr Str name() { return "border-collapse"; }
+    static constexpr TableLayout initial() { return TableLayout::AUTO; }
 
-    static constexpr BorderCollapse initial() { return BorderCollapse::SEPARATE; }
+    void apply(Computed &s) const {
+        s.table.cow().tableLayout = value;
+    }
 
-    void apply(Computed &) const {
-        // TODO
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<TableLayout>(c));
+        return Ok();
     }
 };
+
+// https://www.w3.org/TR/CSS21/tables.html#caption-position
+struct CaptionSideProp {
+    CaptionSide value = initial();
+
+    static constexpr Str name() { return "caption-side"; }
+
+    static constexpr CaptionSide initial() { return CaptionSide::TOP; }
+
+    void apply(Computed &s) const {
+        s.table.cow().captionSide = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<CaptionSide>(c));
+        return Ok();
+    }
+};
+
+// MARK: Borders ---------------------------------------------------------------
 
 // https://www.w3.org/TR/CSS22/box.html#propdef-border-color
 struct BorderTopColorProp {
@@ -411,74 +431,119 @@ struct BorderLeftColorProp {
     }
 };
 
+struct BorderColorProp {
+    Color value = initial();
+
+    static constexpr Str name() { return "border-color"; }
+
+    static constexpr Color initial() { return BLACK; }
+
+    void apply(Computed &c) const {
+        auto &borders = c.borders.cow();
+        borders.start.color = value;
+        borders.end.color = value;
+        borders.top.color = value;
+        borders.bottom.color = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Color>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/CSS22/box.html#border-style-properties
+
+struct BorderStyle {
+    Math::Insets<Gfx::BorderStyle> value = initial();
+
+    static constexpr Str name() { return "border-style"; }
+
+    static constexpr Math::Insets<Gfx::BorderStyle> initial() {
+        return {Gfx::BorderStyle::NONE};
+    }
+
+    void apply(Computed &c) const {
+        c.borders.cow().start.style = value.start;
+        c.borders.cow().end.style = value.end;
+        c.borders.cow().top.style = value.top;
+        c.borders.cow().bottom.style = value.bottom;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Math::Insets<Gfx::BorderStyle>>(c));
+        return Ok();
+    }
+};
+
 // https://www.w3.org/TR/CSS22/box.html#border-style-properties
 struct BorderLeftStyleProp {
-    BorderStyle value = initial();
+    Gfx::BorderStyle value = initial();
 
     static constexpr Str name() { return "border-left-style"; }
 
-    static constexpr BorderStyle initial() { return BorderStyle::NONE; }
+    static constexpr Gfx::BorderStyle initial() { return Gfx::BorderStyle::NONE; }
 
     void apply(Computed &c) const {
         c.borders.cow().start.style = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
-        value = try$(parseValue<BorderStyle>(c));
+        value = try$(parseValue<Gfx::BorderStyle>(c));
         return Ok();
     }
 };
 
 // https://www.w3.org/TR/CSS22/box.html#border-style-properties
 struct BorderTopStyleProp {
-    BorderStyle value = initial();
+    Gfx::BorderStyle value = initial();
 
     static constexpr Str name() { return "border-top-style"; }
 
-    static constexpr BorderStyle initial() { return BorderStyle::NONE; }
+    static constexpr Gfx::BorderStyle initial() { return Gfx::BorderStyle::NONE; }
 
     void apply(Computed &c) const {
         c.borders.cow().top.style = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
-        value = try$(parseValue<BorderStyle>(c));
+        value = try$(parseValue<Gfx::BorderStyle>(c));
         return Ok();
     }
 };
 
 // https://www.w3.org/TR/CSS22/box.html#border-style-properties
 struct BorderRightStyleProp {
-    BorderStyle value = initial();
+    Gfx::BorderStyle value = initial();
 
     static constexpr Str name() { return "border-right-style"; }
 
-    static constexpr BorderStyle initial() { return BorderStyle::NONE; }
+    static constexpr Gfx::BorderStyle initial() { return Gfx::BorderStyle::NONE; }
 
     void apply(Computed &c) const {
         c.borders.cow().end.style = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
-        value = try$(parseValue<BorderStyle>(c));
+        value = try$(parseValue<Gfx::BorderStyle>(c));
         return Ok();
     }
 };
 
 // https://www.w3.org/TR/CSS22/box.html#border-style-properties
 struct BorderBottomStyleProp {
-    BorderStyle value = initial();
+    Gfx::BorderStyle value = initial();
 
     static constexpr Str name() { return "border-bottom-style"; }
 
-    static constexpr BorderStyle initial() { return BorderStyle::NONE; }
+    static constexpr Gfx::BorderStyle initial() { return Gfx::BorderStyle::NONE; }
 
     void apply(Computed &c) const {
         c.borders.cow().bottom.style = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
-        value = try$(parseValue<BorderStyle>(c));
+        value = try$(parseValue<Gfx::BorderStyle>(c));
         return Ok();
     }
 };
@@ -673,6 +738,154 @@ struct BorderRadius {
 };
 
 // https://www.w3.org/TR/css-backgrounds-3/#border-shorthands
+struct BorderTopProp {
+    Border value;
+
+    static constexpr Str name() { return "border-top"; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().top = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        while (not c.ended()) {
+            auto width = parseValue<Length>(c);
+            if (width) {
+                value.width = width.unwrap();
+                continue;
+            }
+
+            auto color = parseValue<Color>(c);
+            if (color) {
+                value.color = color.unwrap();
+                continue;
+            }
+
+            auto style = parseValue<Gfx::BorderStyle>(c);
+            if (style) {
+                value.style = style.unwrap();
+                continue;
+            }
+
+            break;
+        }
+
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-backgrounds-3/#border-shorthands
+struct BorderRightProp {
+    Border value;
+
+    static constexpr Str name() { return "border-right"; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().end = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        while (not c.ended()) {
+            auto width = parseValue<Length>(c);
+            if (width) {
+                value.width = width.unwrap();
+                continue;
+            }
+
+            auto color = parseValue<Color>(c);
+            if (color) {
+                value.color = color.unwrap();
+                continue;
+            }
+
+            auto style = parseValue<Gfx::BorderStyle>(c);
+            if (style) {
+                value.style = style.unwrap();
+                continue;
+            }
+
+            break;
+        }
+
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-backgrounds-3/#border-shorthands
+struct BorderBottomProp {
+    Border value;
+
+    static constexpr Str name() { return "border-bottom"; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().bottom = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        while (not c.ended()) {
+            auto width = parseValue<Length>(c);
+            if (width) {
+                value.width = width.unwrap();
+                continue;
+            }
+
+            auto color = parseValue<Color>(c);
+            if (color) {
+                value.color = color.unwrap();
+                continue;
+            }
+
+            auto style = parseValue<Gfx::BorderStyle>(c);
+            if (style) {
+                value.style = style.unwrap();
+                continue;
+            }
+
+            break;
+        }
+
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-backgrounds-3/#border-shorthands
+struct BorderLeftProp {
+    Border value;
+
+    static constexpr Str name() { return "border-left"; }
+
+    void apply(Computed &c) const {
+        c.borders.cow().start = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        while (not c.ended()) {
+            auto width = parseValue<Length>(c);
+            if (width) {
+                value.width = width.unwrap();
+                continue;
+            }
+
+            auto color = parseValue<Color>(c);
+            if (color) {
+                value.color = color.unwrap();
+                continue;
+            }
+
+            auto style = parseValue<Gfx::BorderStyle>(c);
+            if (style) {
+                value.style = style.unwrap();
+                continue;
+            }
+
+            break;
+        }
+
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-backgrounds-3/#border-shorthands
 struct BorderProp {
     Border value;
 
@@ -699,7 +912,7 @@ struct BorderProp {
                 continue;
             }
 
-            auto style = parseValue<BorderStyle>(c);
+            auto style = parseValue<Gfx::BorderStyle>(c);
             if (style) {
                 value.style = style.unwrap();
                 continue;
@@ -728,6 +941,44 @@ struct BorderWidthProp {
     Res<> parse(Cursor<Css::Sst> &c) {
         value = try$(parseValue<Math::Insets<Length>>(c));
 
+        return Ok();
+    }
+};
+
+// MARK: Borders - Table ---------------------------------------------------------------
+
+// https://www.w3.org/TR/CSS22/tables.html#propdef-border-collapse
+struct BorderCollapseProp {
+    BorderCollapse value = initial();
+
+    static constexpr Str name() { return "border-collapse"; }
+
+    static constexpr BorderCollapse initial() { return BorderCollapse::SEPARATE; }
+
+    void apply(Computed &c) const {
+        c.table.cow().collapse = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<BorderCollapse>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/CSS22/tables.html#propdef-border-spacing
+struct BorderSpacingProp {
+    BorderSpacing value = initial();
+
+    static constexpr Str name() { return "border-spacing"; }
+
+    static constexpr BorderSpacing initial() { return {Px{0}, Px{0}}; }
+
+    void apply(Computed &c) const {
+        c.table.cow().spacing = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<BorderSpacing>(c));
         return Ok();
     }
 };
@@ -772,7 +1023,7 @@ struct FlexDirectionProp {
 
 // https://www.w3.org/TR/css-flexbox-1/#flex-grow-property
 struct FlexGrowProp {
-    f64 value = initial();
+    Number value = initial();
 
     static constexpr Str name() { return "flex-grow"; }
 
@@ -783,25 +1034,25 @@ struct FlexGrowProp {
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
-        value = try$(parseValue<f64>(c));
+        value = try$(parseValue<Number>(c));
         return Ok();
     }
 };
 
 // https://www.w3.org/TR/css-flexbox-1/#propdef-flex-shrink
 struct FlexShrinkProp {
-    f64 value = initial();
+    Number value = initial();
 
     static constexpr Str name() { return "flex-shrink"; }
 
-    static constexpr f64 initial() { return 1; }
+    static constexpr Number initial() { return 1; }
 
     void apply(Computed &c) const {
         c.flex.cow().shrink = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
-        value = try$(parseValue<f64>(c));
+        value = try$(parseValue<Number>(c));
         return Ok();
     }
 };
@@ -864,6 +1115,126 @@ struct FlexFlowProp {
                 value.v0 = direction.unwrap();
         }
 
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-flexbox-1/#propdef-flex
+struct FlexProp {
+    struct Flex {
+        FlexBasis flexBasis;
+        Number flexGrow, flexShrink;
+
+        void repr(Io::Emit &e) const {
+            e("({} {} {})", flexBasis, flexGrow, flexShrink);
+        }
+    } value = initial();
+
+    static Flex initial() {
+        return {
+            Width{Width::AUTO},
+            0,
+            1,
+        };
+    }
+
+    static constexpr Str name() { return "flex"; }
+
+    void apply(Computed &c) const {
+        auto &flex = c.flex.cow();
+        flex.basis = value.flexBasis;
+        flex.grow = value.flexGrow;
+        flex.shrink = value.flexShrink;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        if (c.ended())
+            return Error::invalidData("unexpected end of input");
+
+        if (c.skip(Css::Token::ident("none"))) {
+            value = {
+                Width{Width::AUTO},
+                0,
+                0,
+            };
+            return Ok();
+        } else if (c.skip(Css::Token::ident("initial"))) {
+            value = {
+                Width{Width::AUTO},
+                0,
+                1,
+            };
+            return Ok();
+        }
+
+        // deafult values if these parameters are omitted
+        value.flexGrow = value.flexShrink = 1;
+        value.flexBasis = FlexBasis(Width(Length(0, Length::Unit::PX)));
+
+        auto parseGrowShrink = [](Cursor<Css::Sst> &c, Flex &value) -> Res<> {
+            auto grow = parseValue<Number>(c);
+            if (not grow)
+                return Error::invalidData("expected flex item grow");
+
+            value.flexGrow = grow.unwrap();
+
+            auto shrink = parseValue<Number>(c);
+            if (shrink)
+                value.flexShrink = shrink.unwrap();
+
+            return Ok();
+        };
+
+        auto parsedGrowAndMaybeShrink = parseGrowShrink(c, value);
+        if (parsedGrowAndMaybeShrink) {
+            auto basis = parseValue<FlexBasis>(c);
+            if (basis)
+                value.flexBasis = basis.unwrap();
+        } else {
+            auto basis = parseValue<FlexBasis>(c);
+            if (basis)
+                value.flexBasis = basis.unwrap();
+            else
+                return Error::invalidData("expected flex item grow or basis");
+
+            auto parsedGrowAndMaybeShrink = parseGrowShrink(c, value);
+        }
+        return Ok();
+    }
+};
+
+// MARK: Float & Clear ---------------------------------------------------------
+
+struct FloatProp {
+    Float value = initial();
+
+    static constexpr Str name() { return "float"; }
+
+    static Float initial() { return Float::NONE; }
+
+    void apply(Computed &c) const {
+        c.float_ = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Float>(c));
+        return Ok();
+    }
+};
+
+struct ClearProp {
+    Clear value = initial();
+
+    static constexpr Str name() { return "clear"; }
+
+    static Clear initial() { return Clear::NONE; }
+
+    void apply(Computed &c) const {
+        c.clear = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Clear>(c));
         return Ok();
     }
 };
@@ -989,6 +1360,41 @@ struct FontSizeProp {
     }
 };
 
+// MARK: Line ------------------------------------------------------------------
+
+struct LineHeightProp {
+    LineHeight value = initial();
+
+    static constexpr Str name() { return "line-height"; }
+
+    static LineHeight initial() { return LineHeight::NORMAL; }
+
+    void apply(Computed &) const {
+        // TODO
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        if (c.skip(Css::Token::ident("normal"))) {
+            value = LineHeight::NORMAL;
+            return Ok();
+        }
+
+        auto maybeNumber = parseValue<Number>(c);
+        if (maybeNumber) {
+            value = maybeNumber.unwrap();
+            return Ok();
+        }
+
+        auto maybeLength = parseValue<PercentOr<Length>>(c);
+        if (maybeLength) {
+            value = maybeLength.unwrap();
+            return Ok();
+        }
+
+        return Error::invalidData("expected line height");
+    }
+};
+
 // MARK: Margin ----------------------------------------------------------------
 
 // https://www.w3.org/TR/css-box-3/#propdef-margin
@@ -1070,6 +1476,118 @@ struct MarginProp {
 
     void apply(Computed &c) const {
         c.margin.cow() = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Math::Insets<Width>>(c));
+        return Ok();
+    }
+};
+
+// https://drafts.csswg.org/css-logical/#margin-properties
+
+struct MarginInlineStartProp {
+    Width value = initial();
+
+    static Str name() { return "margin-inline-start"; }
+
+    static Width initial() { return Length{}; }
+
+    void apply(Computed &c) const {
+        // FIXME: Take writing mode into account
+        c.margin.cow().start = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Width>(c));
+        return Ok();
+    }
+};
+
+struct MarginInlineEndProp {
+    Width value = initial();
+
+    static Str name() { return "margin-inline-end"; }
+
+    static Width initial() { return Length{}; }
+
+    void apply(Computed &c) const {
+        // FIXME: Take writing mode into account
+        c.margin.cow().end = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Width>(c));
+        return Ok();
+    }
+};
+
+struct MarginInlineProp {
+    Math::Insets<Width> value = initial();
+
+    static Str name() { return "margin-inline"; }
+
+    static Math::Insets<Width> initial() { return {}; }
+
+    void apply(Computed &c) const {
+        // FIXME: Take writing mode into account
+        c.margin.cow().start = value.start;
+        c.margin.cow().end = value.end;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Math::Insets<Width>>(c));
+        return Ok();
+    }
+};
+
+struct MarginBlockStartProp {
+    Width value = initial();
+
+    static Str name() { return "margin-block-start"; }
+
+    static Width initial() { return Length{}; }
+
+    void apply(Computed &c) const {
+        // FIXME: Take writing mode into account
+        c.margin.cow().top = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Width>(c));
+        return Ok();
+    }
+};
+
+struct MarginBlockEndProp {
+    Width value = initial();
+
+    static Str name() { return "margin-block-end"; }
+
+    static Width initial() { return Length{}; }
+
+    void apply(Computed &c) const {
+        // FIXME: Take writing mode into account
+        c.margin.cow().bottom = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<Width>(c));
+        return Ok();
+    }
+};
+
+struct MarginBlockProp {
+    Math::Insets<Width> value = initial();
+
+    static Str name() { return "margin-block"; }
+
+    static Math::Insets<Width> initial() { return {}; }
+
+    void apply(Computed &c) const {
+        // FIXME: Take writing mode into account
+        c.margin.cow().top = value.top;
+        c.margin.cow().bottom = value.bottom;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -1516,6 +2034,40 @@ struct MaxHeightProp {
     }
 };
 
+// MARK: Text
+// https://drafts.csswg.org/css-text-4
+
+// https://drafts.csswg.org/css-text-4/#text-transform-property
+
+struct TextTransformProp {
+    TextTransform value = initial();
+
+    static constexpr Str name() { return "text-transform"; }
+
+    static TextTransform initial() { return TextTransform::NONE; }
+
+    void apply(Computed &c) const {
+        c.text.cow().transform = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        if (c.ended())
+            return Error::invalidData("unexpected end of input");
+
+        if (c.skip(Css::Token::ident("none"))) {
+            value = TextTransform::NONE;
+        } else if (c.skip(Css::Token::ident("uppercase"))) {
+            value = TextTransform::UPPERCASE;
+        } else if (c.skip(Css::Token::ident("lowsercase"))) {
+            value = TextTransform::LOWERCASE;
+        } else {
+            return Error::invalidData("expected text-transform");
+        }
+
+        return Ok();
+    }
+};
+
 // https://drafts.csswg.org/css2/#z-index
 
 struct ZIndexProp {
@@ -1558,18 +2110,22 @@ using _StyleProp = Union<
     BackgroundProp,
     ColorProp,
     DisplayProp,
+    TableLayoutProp,
+    CaptionSideProp,
 
     // Borders
     BorderTopColorProp,
     BorderRightColorProp,
     BorderBottomColorProp,
     BorderLeftColorProp,
+    BorderColorProp,
 
     BorderTopWidthProp,
     BorderRightWidthProp,
     BorderBottomWidthProp,
     BorderLeftWidthProp,
 
+    BorderStyle,
     BorderTopStyleProp,
     BorderRightStyleProp,
     BorderBottomStyleProp,
@@ -1580,8 +2136,18 @@ using _StyleProp = Union<
     BorderRadiusBottomRight,
     BorderRadiusBottomLeft,
     BorderRadius,
+
+    BorderTopProp,
+    BorderRightProp,
+    BorderBottomProp,
+    BorderLeftProp,
     BorderProp,
+
     BorderWidthProp,
+
+    // Borders - Table
+    BorderCollapseProp,
+    BorderSpacingProp,
 
     // Flex
     FlexBasisProp,
@@ -1590,6 +2156,11 @@ using _StyleProp = Union<
     FlexShrinkProp,
     FlexWrapProp,
     FlexFlowProp,
+    FlexProp,
+
+    // Float & Clear
+    FloatProp,
+    ClearProp,
 
     // Font
     FontFamilyProp,
@@ -1598,12 +2169,23 @@ using _StyleProp = Union<
     FontStyleProp,
     FontSizeProp,
 
+    // Line
+    LineHeightProp,
+
     // Margin
     MarginTopProp,
     MarginRightProp,
     MarginBottomProp,
     MarginLeftProp,
     MarginProp,
+
+    MarginInlineStartProp,
+    MarginInlineEndProp,
+    MarginInlineProp,
+
+    MarginBlockStartProp,
+    MarginBlockEndProp,
+    MarginBlockProp,
 
     // Overflow
     OverflowXProp,
@@ -1635,6 +2217,9 @@ using _StyleProp = Union<
     MinHeightProp,
     MaxWidthProp,
     MaxHeightProp,
+
+    // Text
+    TextTransformProp,
 
     // ZIndex
     ZIndexProp

@@ -53,10 +53,10 @@ Spec spec(Selector const &s) {
 
 // https://www.w3.org/TR/selectors-4/#descendant-combinators
 static bool _matchDescendant(Selector const &s, Markup::Element const &e) {
-    Markup::Node const *curr = &e;
+    Cursor<Markup::Node> curr = &e;
     while (curr->hasParent()) {
         auto &parent = curr->parentNode();
-        if (auto *el = parent.is<Markup::Element>())
+        if (auto el = parent.is<Markup::Element>())
             if (s.match(*el))
                 return true;
         curr = &parent;
@@ -70,7 +70,7 @@ static bool _matchChild(Selector const &s, Markup::Element const &e) {
         return false;
 
     auto &parent = e.parentNode();
-    if (auto *el = parent.is<Markup::Element>())
+    if (auto el = parent.is<Markup::Element>())
         return s.match(*el);
     return false;
 }
@@ -81,17 +81,17 @@ static bool _matchAdjacent(Selector const &s, Markup::Element const &e) {
         return false;
 
     auto prev = e.previousSibling();
-    if (auto *el = prev.is<Markup::Element>())
+    if (auto el = prev.is<Markup::Element>())
         return s.match(*el);
     return false;
 }
 
 // https://www.w3.org/TR/selectors-4/#general-sibling-combinators
 static bool _matchSubsequent(Selector const &s, Markup::Element const &e) {
-    Markup::Node const *curr = &e;
+    Cursor<Markup::Node> curr = &e;
     while (curr->hasPreviousSibling()) {
         auto prev = curr->previousSibling();
-        if (auto *el = prev.is<Markup::Element>())
+        if (auto el = prev.is<Markup::Element>())
             if (s.match(*el))
                 return true;
         curr = &prev.unwrap();
@@ -100,21 +100,21 @@ static bool _matchSubsequent(Selector const &s, Markup::Element const &e) {
 }
 
 static bool _match(Infix const &s, Markup::Element const &e) {
-    if (not s.lhs->match(e))
+    if (not s.rhs->match(e))
         return false;
 
     switch (s.type) {
-    case Infix::Type::DESCENDANT:
-        return _matchDescendant(*s.rhs, e);
+    case Infix::DESCENDANT: // ' '
+        return _matchDescendant(*s.lhs, e);
 
-    case Infix::Type::CHILD:
-        return _matchChild(*s.rhs, e);
+    case Infix::CHILD: // >
+        return _matchChild(*s.lhs, e);
 
-    case Infix::Type::ADJACENT:
-        return _matchAdjacent(*s.rhs, e);
+    case Infix::ADJACENT: // +
+        return _matchAdjacent(*s.lhs, e);
 
-    case Infix::Type::SUBSEQUENT:
-        return _matchSubsequent(*s.rhs, e);
+    case Infix::SUBSEQUENT: // ~
+        return _matchSubsequent(*s.lhs, e);
 
     default:
         logWarn("unimplemented selector: {}", s);
@@ -167,6 +167,65 @@ static bool _match(ClassSelector const &s, Markup::Element const &el) {
     return el.classList.contains(s.class_);
 }
 
+// 8.2. The Link History Pseudo-classes: :link and :visited
+// https://www.w3.org/TR/selectors-4/#link
+
+static bool _matchLink(Markup::Element const &el) {
+    return el.tagName == Html::A and el.hasAttribute(Html::HREF_ATTR);
+}
+
+// 14.4.3. :first-of-type pseudo-class
+// https://www.w3.org/TR/selectors-4/#the-first-of-type-pseudo
+
+static bool _matchFirstOfType(Markup::Element const &e) {
+    Cursor<Markup::Node> curr = &e;
+    auto tag = e.tagName;
+
+    while (curr->hasPreviousSibling()) {
+        auto prev = curr->previousSibling();
+        if (auto el = prev.is<Markup::Element>())
+            if (e.tagName == tag)
+                return false;
+        curr = &prev.unwrap();
+    }
+    return true;
+}
+
+// 14.4.4. :last-of-type pseudo-class
+// https://www.w3.org/TR/selectors-4/#the-last-of-type-pseudo
+
+static bool _matchLastOfType(Markup::Element const &e) {
+    Cursor<Markup::Node> curr = &e;
+    auto tag = e.tagName;
+
+    while (curr->hasNextSibling()) {
+        auto prev = curr->nextSibling();
+        if (auto el = prev.is<Markup::Element>())
+            if (e.tagName == tag)
+                return false;
+        curr = &prev.unwrap();
+    }
+    return true;
+}
+
+static bool _match(Pseudo const &s, Markup::Element const &el) {
+    switch (s.type) {
+
+    case Pseudo::LINK:
+        return _matchLink(el);
+
+    case Pseudo::FIRST_OF_TYPE:
+        return _matchFirstOfType(el);
+
+    case Pseudo::LAST_OF_TYPE:
+        return _matchLastOfType(el);
+
+    default:
+        logDebug("unimplemented pseudo class: {}", s);
+        return false;
+    }
+}
+
 // 5.2. Universal selector
 // https://www.w3.org/TR/selectors-4/#the-universal-selector
 static bool _match(UniversalSelector const &, Markup::Element const &) {
@@ -207,7 +266,7 @@ static Selector _parseAttributeSelector(Slice<Css::Sst> content) {
     auto caze = AttributeSelector::INSENSITIVE;
     Str name = "";
     String value = ""s;
-    auto match = AttributeSelector::Match{AttributeSelector::PRESENT};
+    auto match = AttributeSelector::PRESENT;
 
     usize step = 0;
     Cursor<Css::Sst> cur = content;
@@ -228,21 +287,21 @@ static Selector _parseAttributeSelector(Slice<Css::Sst> content) {
                 }
 
                 if (cur->token.data == "~") {
-                    match = AttributeSelector::Match{AttributeSelector::CONTAINS};
+                    match = AttributeSelector::CONTAINS;
                 } else if (cur->token.data == "|") {
-                    match = AttributeSelector::Match{AttributeSelector::HYPHENATED};
+                    match = AttributeSelector::HYPHENATED;
                 } else if (cur->token.data == "^") {
-                    match = AttributeSelector::Match{AttributeSelector::STR_START_WITH};
+                    match = AttributeSelector::STR_START_WITH;
                 } else if (cur->token.data == "$") {
-                    match = AttributeSelector::Match{AttributeSelector::STR_END_WITH};
+                    match = AttributeSelector::STR_END_WITH;
                 } else if (cur->token.data == "*") {
-                    match = AttributeSelector::Match{AttributeSelector::STR_CONTAIN};
+                    match = AttributeSelector::STR_CONTAIN;
                 } else {
                     break;
                 }
                 cur.next();
             } else {
-                match = AttributeSelector::Match{AttributeSelector::EXACT};
+                match = AttributeSelector::EXACT;
             }
             step++;
             break;
@@ -261,7 +320,12 @@ static Selector _parseAttributeSelector(Slice<Css::Sst> content) {
             cur.next();
     }
 
-    return AttributeSelector{name, caze, match, value};
+    return AttributeSelector{
+        name,
+        caze,
+        match,
+        value,
+    };
 }
 
 static OpCode _peekOpCode(Cursor<Css::Sst> &cur) {
@@ -373,7 +437,7 @@ static Selector _parseSelectorElement(Cursor<Css::Sst> &cur, OpCode currentOp) {
                     return EmptySelector{};
                 }
             }
-            val = Pseudo{Pseudo::make(cur->token.data)};
+            val = Pseudo::make(cur->token.data);
             break;
         default:
             val = ClassSelector{cur->token.data};

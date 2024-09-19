@@ -1,6 +1,7 @@
 #include <karm-kira/scaffold.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
+#include <mdi/console-line.h>
 
 namespace Hideo::Console {
 

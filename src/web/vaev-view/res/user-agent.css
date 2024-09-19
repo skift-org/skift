@@ -1,13 +1,146 @@
 /* Vaev's User Agent Stylesheet */
 
-html {
-    display: contents;
-}
+/* 15.3.1 MARK: Hidden elements  -------------------------------------------- */
+/* https://html.spec.whatwg.org/multipage/rendering.html#hidden-elements */
 
+area,
+base,
+basefont,
+datalist,
 head,
-style {
+link,
+meta,
+noembed,
+noframes,
+param,
+rp,
+script,
+style,
+template,
+title {
     display: none;
 }
+
+/* 15.3.2 MARK: The page ---------------------------------------------------- */
+/* https://html.spec.whatwg.org/multipage/rendering.html#the-page */
+
+html {
+    display: block;
+}
+
+body {
+    display: block;
+    margin: 8px;
+}
+
+/* 15.3.3 MARK: Flow content ------------------------------------------------ */
+/* https://html.spec.whatwg.org/multipage/rendering.html#flow-content-3 */
+
+address,
+blockquote,
+center,
+dialog,
+div,
+figure,
+figcaption,
+footer,
+form,
+header,
+hr,
+legend,
+listing,
+main,
+p,
+plaintext,
+pre,
+search,
+xmp {
+    display: block;
+}
+
+
+/* 15.3.4 MARK: Phrasing content -------------------------------------------- */
+/* https://html.spec.whatwg.org/multipage/rendering.html#phrasing-content-3   */
+
+:link {
+    color: #0000EE;
+}
+
+mark {
+    background: yellow;
+    color: black;
+}
+
+/* 15.3.6 MARK: Sections and headings --------------------------------------- */
+/* https://html.spec.whatwg.org/multipage/rendering.html#sections-and-headings */
+
+article,
+aside,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hgroup,
+nav,
+section {
+    display: block;
+}
+
+h1 {
+    margin-block: 0.67em;
+    font-size: 2.00em;
+    font-weight: bold;
+}
+
+h2 {
+    margin-block: 0.83em;
+    font-size: 1.50em;
+    font-weight: bold;
+}
+
+h3 {
+    margin-block: 1.00em;
+    font-size: 1.17em;
+    font-weight: bold;
+}
+
+h4 {
+    margin-block: 1.33em;
+    font-size: 1.00em;
+    font-weight: bold;
+}
+
+h5 {
+    margin-block: 1.67em;
+    font-size: 0.83em;
+    font-weight: bold;
+}
+
+h6 {
+    margin-block: 2.33em;
+    font-size: 0.67em;
+    font-weight: bold;
+}
+
+/* 15.3.7 MARK: Lists ------------------------------------------------------- */
+/* https://html.spec.whatwg.org/multipage/rendering.html#lists */
+
+dir,
+dd,
+dl,
+dt,
+menu,
+ol,
+ul {
+    display: block;
+}
+
+dd {
+    margin-inline-start: 40px;
+}
+
 
 /* 15.3.8 MARK: Tables ------------------------------------------------------ */
 /* https://html.spec.whatwg.org/multipage/rendering.html#tables-2 */

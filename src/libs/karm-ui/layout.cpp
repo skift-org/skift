@@ -4,7 +4,38 @@
 
 namespace Karm::Ui {
 
-struct Grow;
+// MARK: Grow ------------------------------------------------------------------
+
+struct Grow : public ProxyNode<Grow> {
+    isize _grow;
+
+    Grow(Child child)
+        : ProxyNode(child), _grow(1) {}
+
+    Grow(isize grow, Child child)
+        : ProxyNode(child), _grow(grow) {}
+
+    isize grow() const {
+        return _grow;
+    }
+};
+
+Child grow(Opt<Child> child) {
+    return makeStrong<Grow>(
+        child.unwrapOrElse([] {
+            return empty();
+        })
+    );
+}
+
+Child grow(isize grow, Opt<Child> child) {
+    return makeStrong<Grow>(
+        grow,
+        child.unwrapOrElse([] {
+            return empty();
+        })
+    );
+}
 
 // MARK: Empty -----------------------------------------------------------------
 
@@ -365,37 +396,6 @@ Child stack(Children children) {
 }
 
 // MARK: Flow ------------------------------------------------------------------
-
-struct Grow : public ProxyNode<Grow> {
-    isize _grow;
-
-    Grow(Child child)
-        : ProxyNode(child), _grow(1) {}
-
-    Grow(isize grow, Child child)
-        : ProxyNode(child), _grow(grow) {}
-
-    isize grow() const {
-        return _grow;
-    }
-};
-
-Child grow(Opt<Child> child) {
-    return makeStrong<Grow>(
-        child.unwrapOrElse([] {
-            return empty();
-        })
-    );
-}
-
-Child grow(isize grow, Opt<Child> child) {
-    return makeStrong<Grow>(
-        grow,
-        child.unwrapOrElse([] {
-            return empty();
-        })
-    );
-}
 
 struct FlowLayout : public GroupNode<FlowLayout> {
     using GroupNode::GroupNode;

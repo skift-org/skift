@@ -1,7 +1,7 @@
 #pragma once
 
+#include <karm-gfx/icon.h>
 #include <karm-image/picture.h>
-#include <karm-media/icon.h>
 #include <karm-text/prose.h>
 
 #include "node.h"
@@ -104,7 +104,7 @@ DEF_STYLE(codeSmall)
 
 // MARK: Icon ------------------------------------------------------------------
 
-Child icon(Media::Icon icon, Opt<Gfx::Color> color = NONE);
+Child icon(Gfx::Icon icon, Opt<Gfx::Color> color = NONE);
 
 Child icon(Mdi::Icon icon, f64 size, Opt<Gfx::Color> color = NONE);
 

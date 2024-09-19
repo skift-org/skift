@@ -9,14 +9,12 @@ using Percent = Distinct<f64, struct _PercentTag>;
 
 template <typename T>
 struct PercentOr {
-    enum struct Type {
+    enum Type {
         PERCENT,
         VALUE,
     };
 
     using Resolved = typename T::Resolved;
-
-    using enum Type;
 
     Type _type;
 
@@ -26,7 +24,7 @@ struct PercentOr {
     };
 
     constexpr PercentOr()
-        : PercentOr(Percent{}) {
+        : PercentOr(T{}) {
     }
 
     constexpr PercentOr(Percent percent)
@@ -47,6 +45,16 @@ struct PercentOr {
 
     constexpr bool operator==(Type type) const {
         return _type == type;
+    }
+
+    constexpr bool operator==(PercentOr const &other) const {
+        if (_type != other._type)
+            return false;
+
+        if (_type == Type::PERCENT)
+            return _percent == other._percent;
+
+        return _value == other._value;
     }
 
     constexpr bool resolved() const {

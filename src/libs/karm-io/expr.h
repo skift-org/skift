@@ -215,7 +215,7 @@ inline constexpr Expr auto word(Str word) {
 /// Multiple characters can be passed to match any of them.
 inline constexpr Expr auto single(auto... c) {
     return [=](auto &scan) {
-        if (((scan.curr() == (Rune)c) or ...)) {
+        if (((scan.peek() == (Rune)c) or ...)) {
             scan.next();
             return true;
         }
@@ -226,7 +226,7 @@ inline constexpr Expr auto single(auto... c) {
 /// Match a single character against a ctype function and consume it.
 inline constexpr Expr auto ctype(CType auto ctype) {
     return [=](auto &scan) {
-        if (ctype(scan.curr())) {
+        if (ctype(scan.peek())) {
             scan.next();
             return true;
         }
@@ -237,7 +237,7 @@ inline constexpr Expr auto ctype(CType auto ctype) {
 /// Match a character range and consume it if it lies within the range.
 inline constexpr Expr auto range(Rune start, Rune end) {
     return [=](auto &scan) {
-        if (scan.curr() >= start and scan.curr() <= end) {
+        if (scan.peek() >= start and scan.peek() <= end) {
             scan.next();
             return true;
         }

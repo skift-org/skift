@@ -1,7 +1,5 @@
 #pragma once
 
-#include <karm-gfx/canvas.h>
-
 #include "base.h"
 #include "font.h"
 
@@ -37,21 +35,41 @@ struct Run {
         }
     };
 
-    Font _font;
     Vec<Rune> _runes{};
     Vec<Cell> _cells{};
-    f64 _width = 0;
+    Math::Vec2f _size{};
+    bool _shaped = false;
 
-    static Run from(Font font);
+    // MARK: Access ------------------------------------------------------------
+
+    Slice<Rune> runes() const {
+        return _runes;
+    }
+
+    Slice<Cell> cells() const {
+        assume$(_shaped, "run not shaped");
+        return _cells;
+    }
+
+    Math::Vec2f size() const {
+        assume$(_shaped, "run not shaped");
+        return _size;
+    }
+
+    bool shaped() const {
+        return _shaped;
+    }
+
+    // MARK: Builder -----------------------------------------------------------
 
     template <typename E>
-    static Run from(Font font, _Str<E> str) {
-        auto run = from(font);
+    static Run from(_Str<E> str) {
+        Run run;
         run.append(str);
         return run;
     }
 
-    static Run from(Font font, Slice<Rune> runes);
+    static Run from(Slice<Rune> runes);
 
     void clear();
 
@@ -65,15 +83,11 @@ struct Run {
 
     void append(Slice<Rune> runes);
 
-    f64 baseline();
+    // MARK: Layout ------------------------------------------------------------
 
-    f64 lineheight();
+    void _layout(Font &font);
 
-    Math::Vec2f layout();
-
-    static void _fillGlyph(Gfx::Canvas &g, Font const &font, Math::Vec2f baseline, Glyph glyph);
-
-    void paint(Gfx::Canvas &g) const;
+    void shape(Font &font);
 };
 
 } // namespace Karm::Text

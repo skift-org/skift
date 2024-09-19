@@ -3,8 +3,6 @@
 #include <karm-image/picture.h>
 #include <karm-text/run.h>
 #include <vaev-markup/dom.h>
-#include <vaev-paint/stack.h>
-#include <vaev-style/computed.h>
 #include <vaev-style/computer.h>
 
 #include "base.h"
@@ -16,18 +14,29 @@ namespace Vaev::Layout {
 using Content = Union<
     None,
     Vec<Frag>,
-    Strong<Text::Run>,
+    Karm::Text::Run,
     Image::Picture>;
+
+struct Attrs {
+    usize span = 1;
+    usize rowSpan = 1;
+    usize colSpan = 1;
+
+    void repr(Io::Emit &e) const {
+        e("(attrs span: {} rowSpan: {} colSpan: {})", span, rowSpan, colSpan);
+    }
+};
 
 struct Frag : public Meta::NoCopy {
     Strong<Style::Computed> style;
-    Text::Font font;
+    Strong<Karm::Text::Fontface> fontFace;
     Content content = NONE;
     Layout layout;
+    Attrs attrs;
 
-    Frag(Strong<Style::Computed> style, Text::Font font);
+    Frag(Strong<Style::Computed> style, Strong<Karm::Text::Fontface> fontFace);
 
-    Frag(Strong<Style::Computed> style, Text::Font font, Content content);
+    Frag(Strong<Style::Computed> style, Strong<Karm::Text::Fontface> fontFace, Content content);
 
     Slice<Frag> children() const;
 
@@ -45,20 +54,8 @@ struct Tree {
 
 // MARK: Build -----------------------------------------------------------------
 
-void build(Style::Computer &c, Markup::Node const &n, Frag &parent);
+void _buildNode(Style::Computer &c, Markup::Node const &n, Frag &parent);
 
 Frag build(Style::Computer &c, Markup::Document const &doc);
-
-// MARK: Layout ----------------------------------------------------------------
-
-Output layout(Tree &t, Frag &f, Input input);
-
-Px measure(Tree &t, Frag &f, Axis axis, IntrinsicSize intrinsic, Px availableSpace);
-
-// MARK: Paint -----------------------------------------------------------------
-
-void paint(Frag &frag, Paint::Stack &stack, Math::Vec2f pos = {});
-
-void wireframe(Frag &frag, Gfx::Canvas &g);
 
 } // namespace Vaev::Layout

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "res.h"
+#include "opt.h"
 
 namespace Karm {
 
@@ -24,10 +24,10 @@ always_inline constexpr bool isAlign(usize addr, usize align) {
     return alignDown(addr, align) == addr;
 }
 
-always_inline inline Res<> ensureAlign(usize addr, usize align) {
+always_inline inline Opt<bool> ensureAlign(usize addr, usize align) {
     if (not isAlign(addr, align))
-        return Error::invalidInput("not aligned");
-    return Ok();
+        return NONE;
+    return true;
 }
 
 } // namespace Karm

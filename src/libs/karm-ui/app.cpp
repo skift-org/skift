@@ -1,7 +1,13 @@
-#include "app.h"
+#include <mdi/arrow-up-down.h>
+#include <mdi/border-none-variant.h>
+#include <mdi/brush.h>
+#include <mdi/chart-histogram.h>
+#include <mdi/flask.h>
+#include <mdi/ruler-square.h>
 
 #include "_embed.h"
 
+#include "app.h"
 #include "host.h"
 #include "input.h"
 #include "layout.h"

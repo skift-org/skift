@@ -184,7 +184,7 @@ struct DarwinSched :
 };
 
 Sched &globalSched() {
-    static DarwinSched sched = []() {
+    static DarwinSched sched = [] {
         int kqueue = ::kqueue();
         if (kqueue < 0)
             panic("kqueue");

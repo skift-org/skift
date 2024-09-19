@@ -1,16 +1,15 @@
 #include "block.h"
 
 #include "frag.h"
+#include "layout.h"
 
 namespace Vaev::Layout {
 
-static Px _blockLayoutDetermineWidth(Tree &t, Frag &f, Input input) {
-    Px width = Px{0};
-    for (auto &c : f.children()) {
-
-        if (c.style->sizing->width == Size::AUTO)
-            width = max(width, input.knownSize.width.unwrapOr(Px{0}));
-        else {
+// https://www.w3.org/TR/CSS22/visuren.html#normal-flow
+struct BlockFormatingContext {
+    static Px _determineWidth(Tree &t, Frag &f, Input input) {
+        Px width = Px{0};
+        for (auto &c : f.children()) {
             auto ouput = layout(
                 t,
                 c,
@@ -22,43 +21,64 @@ static Px _blockLayoutDetermineWidth(Tree &t, Frag &f, Input input) {
 
             width = max(width, ouput.size.x);
         }
+
+        return width;
     }
 
-    return width;
-}
+    Output run(Tree &t, Frag &f, Input input) {
+        Px blockSize = Px{0};
+        Px inlineSize = input.knownSize.width.unwrapOrElse([&] {
+            return _determineWidth(t, f, input);
+        });
 
-Output blockLayout(Tree &t, Frag &f, Input input) {
-    Px blockSize = Px{0};
-    Px inlineSize = input.knownSize.x.unwrapOrElse([&]() {
-        return _blockLayoutDetermineWidth(t, f, input);
-    });
+        for (auto &c : f.children()) {
+            if (c.style->float_ != Float::NONE)
+                continue;
 
-    for (auto &c : f.children()) {
-        Opt<Px> childInlineSize = NONE;
-        if (c.style->sizing->width == Size::AUTO)
-            childInlineSize = inlineSize;
+            Opt<Px> childInlineSize = NONE;
+            if (c.style->sizing->width == Size::AUTO and
+                c.style->display != Display::TABLE) {
+                childInlineSize = inlineSize;
+            }
 
-        auto ouput = layout(
-            t,
-            c,
-            {
+            Input childInput = {
                 .commit = input.commit,
-                .knownSize = {childInlineSize, NONE},
                 .availableSpace = {inlineSize, Px{0}},
                 .containingBlock = {inlineSize, Px{0}},
+            };
+
+            auto margin = computeMargins(t, c, childInput);
+
+            if (c.style->position != Position::ABSOLUTE) {
+                blockSize += margin.top;
+                childInput.knownSize.width = childInlineSize;
             }
-        );
 
-        if (input.commit == Commit::YES)
-            c.layout.position = {Px{0}, blockSize};
+            childInput.position = input.position + Vec2Px{margin.start, blockSize};
 
-        blockSize += ouput.size.y;
+            auto ouput = layout(
+                t,
+                c,
+                childInput
+            );
+
+            if (c.style->position != Position::ABSOLUTE) {
+                blockSize += ouput.size.y + margin.bottom;
+            }
+        }
+
+        // layoutFloat(t, f, input.containingBlock);
+
+        return Output::fromSize({
+            inlineSize,
+            blockSize,
+        });
     }
+};
 
-    return Output::fromSize({
-        inlineSize,
-        blockSize,
-    });
+Output blockLayout(Tree &t, Frag &f, Input input) {
+    BlockFormatingContext fc;
+    return fc.run(t, f, input);
 }
 
 } // namespace Vaev::Layout

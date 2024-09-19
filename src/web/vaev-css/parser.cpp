@@ -141,7 +141,7 @@ Opt<Sst> consumeRule(Lexer &lex) {
 // NOSPEC: We unified the two functions into one for simplicity
 //         and added a check for the right curly bracket
 //         to avoid aving to parsing the input multiple times
-Content consumeDeclarationList(Lexer &lex) {
+Content consumeDeclarationList(Lexer &lex, bool topLevel) {
     Content block;
 
     while (true) {
@@ -153,7 +153,8 @@ Content consumeDeclarationList(Lexer &lex) {
             break;
 
         case Token::END_OF_FILE:
-            logError("unexpected end of file");
+            if (not topLevel)
+                logError("unexpected end of file");
             lex.next();
             return block;
 

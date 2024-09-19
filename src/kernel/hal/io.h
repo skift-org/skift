@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/range.h>
+#include <karm-base/res.h>
 #include <karm-base/slice.h>
 
 namespace Hal {

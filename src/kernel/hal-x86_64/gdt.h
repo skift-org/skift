@@ -28,7 +28,7 @@ struct [[gnu::packed]] GdtEntry {
 
     constexpr GdtEntry(u8 flags, u8 granularity)
         : flags(flags),
-          granularity(granularity){};
+          granularity(granularity) {};
 
     constexpr GdtEntry(u32 base, u32 limit, u8 flags, u8 granularity)
         : limitLow(limit & 0xffff),

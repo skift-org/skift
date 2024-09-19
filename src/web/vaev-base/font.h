@@ -191,28 +191,34 @@ struct FontSize {
         // length/percent
         LENGTH,
 
-        // math
-        MATH,
-
         _LEN,
     };
 
-    _Named val;
-    PercentOr<Length> size;
+    _Named _named;
+    PercentOr<Length> _value;
 
     constexpr FontSize(_Named named = MEDIUM)
-        : val(named), size(Length{}) {
+        : _named(named), _value(Length{}) {
     }
 
     constexpr FontSize(PercentOr<Length> size)
-        : val(LENGTH), size(size) {
+        : _named(LENGTH), _value(size) {
+    }
+
+    _Named named() const {
+        return _named;
+    }
+
+    PercentOr<Length> value() const {
+        assume$(_named == LENGTH, "not a length");
+        return _value;
     }
 
     void repr(Io::Emit &e) const {
-        if (val == LENGTH) {
-            e("{}", size);
+        if (_named == LENGTH) {
+            e("{}", _value);
         } else {
-            e("{}", val);
+            e("{}", _named);
         }
     }
 };

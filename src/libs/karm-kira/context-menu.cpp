@@ -25,7 +25,7 @@ struct ContextMenu : public Ui::ProxyNode<ContextMenu> {
         if (event.accepted())
             return;
 
-        if (auto *e = event.is<App::MouseEvent>()) {
+        if (auto e = event.is<App::MouseEvent>()) {
             if (e->type == App::MouseEvent::PRESS and
                 e->button == App::MouseButton::RIGHT and
                 bound().contains(e->pos)) {
@@ -63,7 +63,7 @@ Ui::Child contextMenuItem(Ui::OnPress onPress, Opt<Mdi::Icon> i, Str t) {
                i ? Ui::icon(*i) : Ui::empty(18),
                Ui::text(t)
            ) |
-           Ui::insets({10, 6, 6, 6}) |
+           Ui::insets({6, 6, 6, 10}) |
            Ui::minSize({Ui::UNCONSTRAINED, 36}) |
            Ui::button(
                [onPress = std::move(onPress)](auto &n) {

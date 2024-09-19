@@ -14,8 +14,19 @@ struct Cursor {
 
     constexpr Cursor() = default;
 
+    always_inline constexpr Cursor(T const *ptr)
+        : Cursor(ptr, ptr ? 1 : 0) {
+    }
+
+    always_inline constexpr Cursor(T const *ptr, usize len)
+        : _begin(ptr), _end(ptr + len) {
+        if (_begin == nullptr and _begin != _end) [[unlikely]]
+            panic("null pointer with non-zero length");
+    }
+
     always_inline constexpr Cursor(T const *begin, T const *end)
-        : _begin(begin), _end(end) {}
+        : _begin(begin), _end(end) {
+    }
 
     always_inline constexpr Cursor(Sliceable<T> auto const &slice)
         : Cursor{begin(slice), end(slice)} {}
@@ -116,6 +127,16 @@ struct MutCursor {
 
     constexpr MutCursor() = default;
 
+    always_inline constexpr MutCursor(T *ptr)
+        : MutCursor(ptr, ptr ? 1 : 0) {
+    }
+
+    always_inline constexpr MutCursor(T *ptr, usize len)
+        : _begin(ptr), _end(ptr + len) {
+        if (_begin == nullptr and _begin != _end) [[unlikely]]
+            panic("null pointer with non-zero length");
+    }
+
     always_inline constexpr MutCursor(T *begin, T *end)
         : _begin(begin), _end(end) {}
 
@@ -134,9 +155,13 @@ struct MutCursor {
         return _begin[i];
     }
 
-    always_inline constexpr operator T *() { return _begin; }
+    always_inline constexpr operator T *() {
+        return _begin;
+    }
 
-    always_inline constexpr operator T const *() const { return _begin; }
+    always_inline constexpr operator T const *() const {
+        return _begin;
+    }
 
     always_inline bool ended() const {
         return _begin == _end;
@@ -146,33 +171,41 @@ struct MutCursor {
         return _end - _begin;
     }
 
-    always_inline constexpr T curr() const {
-        if (ended()) [[unlikely]]
-            panic("curr() called on ended cursor");
-        return *_begin;
+    always_inline constexpr T &peek(usize i = 0) {
+        if (i >= len()) [[unlikely]]
+            panic("index out of bounds");
+        return _begin[i];
+    }
+
+    always_inline constexpr T const &peek(usize i = 0) const {
+        if (i >= len()) [[unlikely]]
+            panic("index out of bounds");
+        return _begin[i];
     }
 
     always_inline constexpr T &operator*() {
-        return curr();
+        return peek();
     }
 
     always_inline constexpr T *operator->() {
-        return &curr();
+        return &peek();
     }
 
     always_inline constexpr T const &operator*() const {
-        return curr();
+        return peek();
     }
 
     always_inline constexpr T const *operator->() const {
-        return &curr();
+        return &peek();
     }
 
-    always_inline constexpr T next() {
+    always_inline constexpr T &next() {
         if (ended()) [[unlikely]]
             panic("next() called on ended cursor");
 
-        return *_begin++;
+        T &r = *_begin;
+        _begin++;
+        return r;
     }
 
     always_inline constexpr MutSlice<T> next(usize n) {

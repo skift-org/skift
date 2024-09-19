@@ -97,7 +97,7 @@ struct Scroll : public ProxyNode<Scroll> {
                 shouldRepaint(*parent(), vTrack());
         }
 
-        if (auto *me = e.is<App::MouseEvent>()) {
+        if (auto me = e.is<App::MouseEvent>()) {
             if (bound().contains(me->pos)) {
                 _mouseIn = true;
 
@@ -137,7 +137,7 @@ struct Scroll : public ProxyNode<Scroll> {
     }
 
     void bubble(App::Event &e) override {
-        if (auto *pe = e.is<Node::PaintEvent>()) {
+        if (auto pe = e.is<Node::PaintEvent>()) {
             pe->bound.xy = pe->bound.xy + _scroll.cast<isize>();
             pe->bound = pe->bound.clipTo(bound());
         }

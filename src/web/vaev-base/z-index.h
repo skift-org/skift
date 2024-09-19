@@ -20,6 +20,10 @@ struct ZIndex {
 
     bool operator==(_Auto) const { return auto_; }
 
+    bool operator==(isize value) const {
+        return not auto_ and this->value == value;
+    }
+
     void repr(Io::Emit &e) const {
         if (auto_) {
             e("auto");

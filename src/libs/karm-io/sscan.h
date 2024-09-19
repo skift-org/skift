@@ -58,7 +58,7 @@ struct _SScan {
     }
 
     /// Returns the current rune.
-    Rune curr() {
+    Rune peek() {
         if (ended())
             return '\0';
         Rune r;
@@ -67,10 +67,10 @@ struct _SScan {
     }
 
     /// Peek the next rune without advancing the cursor.
-    Rune peek(usize count = 0) {
+    Rune peek(usize count) {
         auto save = _cursor;
         next(count);
-        auto r = curr();
+        auto r = peek();
         _cursor = save;
         return r;
     }
@@ -108,7 +108,7 @@ struct _SScan {
 
     /// If the current rune is `c`, advance the cursor.
     bool skip(Rune c) {
-        if (curr() == c) {
+        if (peek() == c) {
             next();
             return true;
         }

@@ -1,4 +1,5 @@
 #include <karm-ui/layout.h>
+#include <mdi/close.h>
 
 #include "side-panel.h"
 

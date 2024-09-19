@@ -4,6 +4,17 @@
 
 namespace Vaev {
 
+enum struct Float {
+    NONE,
+
+    INLINE_START,
+    INLINE_END,
+    LEFT,
+    RIGHT,
+
+    _LEN
+};
+
 enum struct Clear {
     NONE,
 
@@ -12,15 +23,8 @@ enum struct Clear {
     BOTH,
     INLINE_START,
     INLINE_END,
-};
 
-enum struct Float {
-    NONE,
-
-    INLINE_START,
-    INLINE_END,
-    LEFT,
-    RIGHT,
+    _LEN,
 };
 
 } // namespace Vaev

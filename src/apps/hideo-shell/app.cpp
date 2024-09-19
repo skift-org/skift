@@ -6,6 +6,13 @@
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
+#include <mdi/apps.h>
+#include <mdi/battery.h>
+#include <mdi/calendar.h>
+#include <mdi/keyboard.h>
+#include <mdi/network-strength-4.h>
+#include <mdi/volume-high.h>
+#include <mdi/wifi-strength-4.h>
 
 #include "app.h"
 
@@ -13,7 +20,7 @@ namespace Hideo::Shell {
 
 // MARK: Status Bar ------------------------------------------------------------
 
-Ui::Child indicator(Media::Icon icon) {
+Ui::Child indicator(Gfx::Icon icon) {
     return Ui::icon(icon) |
            Ui::center() |
            Ui::insets(4);
@@ -34,7 +41,7 @@ Ui::Child statusbar(State const &state) {
                36,
            }) |
            Ui::box({
-               .padding = {12, 0},
+               .padding = {0, 12},
                .backgroundFill = Ui::GRAY900,
            });
 }
@@ -94,7 +101,7 @@ Ui::Child taskbar(State const &state) {
         ) |
 
             Ui::center() |
-            Ui::insets({12, 6}) |
+            Ui::insets({6, 12}) |
             Ui::bound()
     );
 
@@ -185,10 +192,10 @@ Ui::Child appStack(State const &state) {
             }) |
             Ui::placed(s->bound) |
             Ui::intent([=](Ui::Node &n, App::Event &e) {
-                if (auto *m = e.is<Ui::DragEvent>()) {
+                if (auto m = e.is<Ui::DragEvent>()) {
                     e.accept();
                     Model::bubble<MoveInstance>(n, {index, m->delta});
-                } else if (auto *c = e.is<App::RequestExitEvent>()) {
+                } else if (auto c = e.is<App::RequestExitEvent>()) {
                     e.accept();
                     Model::bubble<CloseInstance>(n, {index});
                 }
@@ -218,7 +225,7 @@ Ui::Child desktopPanels(State const &state) {
                          Ui::slideIn(Ui::SlideFrom::TOP)
                    : Ui::empty()
            ) |
-           Ui::insets({8, 38});
+           Ui::insets({38, 8});
 }
 
 Ui::Child desktop(State const &state) {

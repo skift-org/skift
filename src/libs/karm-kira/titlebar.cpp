@@ -2,6 +2,9 @@
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
 #include <karm-ui/layout.h>
+#include <mdi/close.h>
+#include <mdi/crop-square.h>
+#include <mdi/minus.h>
 
 #include "about-dialog.h"
 #include "titlebar.h"

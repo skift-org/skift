@@ -7,6 +7,19 @@
 #include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
+#include <mdi/auto-fix.h>
+#include <mdi/blur.h>
+#include <mdi/cancel.h>
+#include <mdi/contrast-circle.h>
+#include <mdi/drag-vertical-variant.h>
+#include <mdi/eyedropper-plus.h>
+#include <mdi/eyedropper.h>
+#include <mdi/floppy.h>
+#include <mdi/grain.h>
+#include <mdi/image-filter-vintage.h>
+#include <mdi/image.h>
+#include <mdi/invert-colors.h>
+#include <mdi/lightbulb.h>
 
 #include "app.h"
 
@@ -74,14 +87,14 @@ Ui::Child editorToolbar(State const &) {
         Ui::button(
             Model::bind<ToggleEditor>(),
             Ui::ButtonStyle::subtle(),
-            Mdi::Icon::CANCEL,
+            Mdi::CANCEL,
             "Cancel"
         ),
 
         Ui::button(
             Model::bind<SaveImage>(),
             Ui::ButtonStyle::primary(),
-            Mdi::Icon::FLOPPY,
+            Mdi::FLOPPY,
             "Save Changes"
         ),
     });
@@ -192,7 +205,7 @@ Ui::Child editorControls(State const &state) {
                4,
                editorFilterControls(state.filter),
                editorFilters(state) |
-                   Ui::insets({8, 0, 8, 8}) |
+                   Ui::insets({0, 8, 8, 8}) |
                    Ui::hscroll()
            ) |
            Ui::slideIn(Ui::SlideFrom::BOTTOM);

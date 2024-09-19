@@ -6,6 +6,30 @@
 #include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
+#include <mdi/bluetooth.h>
+#include <mdi/brightness-2.h>
+#include <mdi/brightness-4.h>
+#include <mdi/brightness-5.h>
+#include <mdi/brightness-6.h>
+#include <mdi/brightness-7.h>
+#include <mdi/cellphone.h>
+#include <mdi/chevron-down.h>
+#include <mdi/chevron-right.h>
+#include <mdi/chevron-up.h>
+#include <mdi/circle-half-full.h>
+#include <mdi/cog.h>
+#include <mdi/flashlight.h>
+#include <mdi/information.h>
+#include <mdi/laptop.h>
+#include <mdi/lock.h>
+#include <mdi/map-marker-outline.h>
+#include <mdi/power.h>
+#include <mdi/swap-vertical.h>
+#include <mdi/volume-high.h>
+#include <mdi/volume-low.h>
+#include <mdi/volume-medium.h>
+#include <mdi/volume-mute.h>
+#include <mdi/wifi-strength-4.h>
 
 #include "app.h"
 
@@ -297,7 +321,7 @@ Ui::Child notiPanel(State const &state) {
     return Ui::vflow(
                8,
                Ui::labelMedium("Notifications") |
-                   Ui::insets({12, 6, 0, 0}),
+                   Ui::insets({6, 0, 0, 12}),
                notifications(state) | Ui::grow()
            ) |
            panel({500, 400});
@@ -305,8 +329,8 @@ Ui::Child notiPanel(State const &state) {
 
 Ui::Child sysFlyout(State const &state) {
     auto box = Ui::box({
-        .margin = {8, 8, 8, 32},
-        .padding = {12, 12, 12, 0},
+        .margin = {8, 8, 32, 8},
+        .padding = {12, 12, 0, 12},
         .borderRadii = 8,
         .borderWidth = 1,
         .borderFill = Ui::GRAY800,
@@ -317,7 +341,7 @@ Ui::Child sysFlyout(State const &state) {
     body.pushBack(quickheader(state));
     if (state.isSysPanelColapsed) {
         body.pushBack(colapsedQuickSettings(state));
-        body.pushBack(Ui::labelMedium("Notifications") | Ui::insets({12, 6, 0, 0}));
+        body.pushBack(Ui::labelMedium("Notifications") | Ui::insets({6, 0, 0, 12}));
         body.pushBack(notifications(state) | Ui::grow());
     } else {
         body.pushBack(expendedQuickSettings(state) | Ui::grow());

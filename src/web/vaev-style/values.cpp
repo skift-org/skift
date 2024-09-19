@@ -1,5 +1,7 @@
 #include "values.h"
 
+#include "base.h"
+
 namespace Vaev::Style {
 
 // MARK: Parser ----------------------------------------------------------------
@@ -109,31 +111,68 @@ Res<bool> ValueParser<bool>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: Border-Style
 // https://www.w3.org/TR/CSS22/box.html#border-style-properties
-Res<BorderStyle> ValueParser<BorderStyle>::parse(Cursor<Css::Sst> &c) {
+Res<Gfx::BorderStyle> ValueParser<Gfx::BorderStyle>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of property");
 
     if (c.skip(Css::Token::ident("none"))) {
-        return Ok(BorderStyle::NONE);
+        return Ok(Gfx::BorderStyle::NONE);
     } else if (c.skip(Css::Token::ident("solid"))) {
-        return Ok(BorderStyle::SOLID);
+        return Ok(Gfx::BorderStyle::SOLID);
     } else if (c.skip(Css::Token::ident("dashed"))) {
-        return Ok(BorderStyle::DASHED);
+        return Ok(Gfx::BorderStyle::DASHED);
     } else if (c.skip(Css::Token::ident("dotted"))) {
-        return Ok(BorderStyle::DOTTED);
+        return Ok(Gfx::BorderStyle::DOTTED);
     } else if (c.skip(Css::Token::ident("hidden"))) {
-        return Ok(BorderStyle::HIDDEN);
+        return Ok(Gfx::BorderStyle::HIDDEN);
     } else if (c.skip(Css::Token::ident("double"))) {
-        return Ok(BorderStyle::DOUBLE);
+        return Ok(Gfx::BorderStyle::DOUBLE);
     } else if (c.skip(Css::Token::ident("groove"))) {
-        return Ok(BorderStyle::GROOVE);
+        return Ok(Gfx::BorderStyle::GROOVE);
     } else if (c.skip(Css::Token::ident("ridge"))) {
-        return Ok(BorderStyle::RIDGE);
+        return Ok(Gfx::BorderStyle::RIDGE);
     } else if (c.skip(Css::Token::ident("outset"))) {
-        return Ok(BorderStyle::OUTSET);
+        return Ok(Gfx::BorderStyle::OUTSET);
     } else {
         return Error::invalidData("unknown border-style");
     }
+}
+
+// MARK: BorderCollapse
+// https://www.w3.org/TR/CSS22/tables.html#propdef-border-collapse
+Res<BorderCollapse> ValueParser<BorderCollapse>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Css::Token::ident("collapse"))) {
+        return Ok(BorderCollapse::COLLAPSE);
+    } else if (c.skip(Css::Token::ident("separate"))) {
+        return Ok(BorderCollapse::SEPARATE);
+    }
+
+    return Error::invalidData("expected border collapse value");
+}
+
+// MARK: BorderSpacing
+// https://www.w3.org/TR/CSS22/tables.html#propdef-border-spacing
+Res<BorderSpacing> ValueParser<BorderSpacing>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    auto firstLength = parseValue<Length>(c);
+
+    if (not firstLength)
+        return Error::invalidData("expected length parameter for border-spacing");
+
+    auto secondLength = parseValue<Length>(c);
+
+    if (secondLength) {
+        return Ok(BorderSpacing{firstLength.unwrap(), secondLength.unwrap()});
+    } else {
+        return Ok(BorderSpacing{firstLength.unwrap(), firstLength.unwrap()});
+    }
+
+    return Error::invalidData("expected border spacing value");
 }
 
 // MARK: Color
@@ -178,6 +217,57 @@ static Res<Gfx::Color> _parseHexColor(Io::SScan &s) {
     }
 }
 
+static Res<Gfx::Color> _parseFuncColor(Css::Sst const &s) {
+    if (s.prefix == Css::Token::function("rgb(")) {
+        Cursor<Css::Sst> scan = s.content;
+
+        eatWhitespace(scan);
+        auto r = try$(parseValue<Integer>(scan));
+        eatWhitespace(scan);
+
+        scan.skip(Css::Token::COMMA);
+
+        eatWhitespace(scan);
+        auto g = try$(parseValue<Integer>(scan));
+        eatWhitespace(scan);
+
+        scan.skip(Css::Token::COMMA);
+
+        eatWhitespace(scan);
+        auto b = try$(parseValue<Integer>(scan));
+        eatWhitespace(scan);
+
+        return Ok(Gfx::Color::fromRgb(r, g, b));
+    } else if (s.prefix == Css::Token::function("rgba(")) {
+        Cursor<Css::Sst> scan = s.content;
+
+        eatWhitespace(scan);
+        auto r = try$(parseValue<Integer>(scan));
+
+        eatWhitespace(scan);
+        scan.skip(Css::Token::COMMA);
+        eatWhitespace(scan);
+
+        auto g = try$(parseValue<Integer>(scan));
+
+        eatWhitespace(scan);
+        scan.skip(Css::Token::COMMA);
+        eatWhitespace(scan);
+
+        auto b = try$(parseValue<Integer>(scan));
+
+        eatWhitespace(scan);
+        scan.skip(Css::Token::COMMA);
+        eatWhitespace(scan);
+
+        auto a = try$(parseValue<Number>(scan));
+
+        return Ok(Gfx::Color::fromRgba(r, g, b, 255 * a));
+    } else {
+        return Error::invalidData("unknown color function");
+    }
+}
+
 Res<Color> ValueParser<Color>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
@@ -210,6 +300,8 @@ Res<Color> ValueParser<Color>::parse(Cursor<Css::Sst> &c) {
             c.next();
             return Ok(TRANSPARENT);
         }
+    } else if (c.peek() == Css::Sst::FUNC) {
+        return Ok(try$(_parseFuncColor(c.next())));
     }
 
     return Error::invalidData("expected color");
@@ -249,6 +341,36 @@ static Res<Display> _parseLegacyDisplay(Cursor<Css::Sst> &c) {
     }
 
     return Error::invalidData("expected legacy display value");
+}
+
+// MARK: TableLayout
+// https://www.w3.org/TR/CSS21/tables.html#propdef-table-layout
+Res<TableLayout> ValueParser<TableLayout>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Css::Token::ident("auto"))) {
+        return Ok(TableLayout::AUTO);
+    } else if (c.skip(Css::Token::ident("fixed"))) {
+        return Ok(TableLayout::FIXED);
+    }
+
+    return Error::invalidData("expected table layout value");
+}
+
+// MARK: CaptionSide
+// https://www.w3.org/TR/CSS21/tables.html#caption-position
+Res<CaptionSide> ValueParser<CaptionSide>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Css::Token::ident("top"))) {
+        return Ok(CaptionSide::TOP);
+    } else if (c.skip(Css::Token::ident("bottom"))) {
+        return Ok(CaptionSide::BOTTOM);
+    }
+
+    return Error::invalidData("expected caption side value");
 }
 
 static Res<Display::Outside> _parseOutsideDisplay(Cursor<Css::Sst> &c) {
@@ -435,8 +557,6 @@ Res<FontSize> ValueParser<FontSize>::parse(Cursor<Css::Sst> &c) {
         return Ok(FontSize::SMALLER);
     else if (c.skip(Css::Token::ident("larger")))
         return Ok(FontSize::LARGER);
-    else if (c.skip(Css::Token::ident("math")))
-        return Ok(FontSize::MATH);
     else
         return Ok(try$(parseValue<PercentOr<Length>>(c)));
 }
@@ -512,6 +632,49 @@ Res<FontWidth> ValueParser<FontWidth>::parse(Cursor<Css::Sst> &c) {
     return Ok(try$(parseValue<Percent>(c)));
 }
 
+// MARK: Clear & Float
+//
+
+Res<Float> ValueParser<Float>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Css::Token::ident("none"))) {
+        return Ok(Float::NONE);
+    } else if (c.skip(Css::Token::ident("inline-start"))) {
+        return Ok(Float::INLINE_START);
+    } else if (c.skip(Css::Token::ident("inline-end"))) {
+        return Ok(Float::INLINE_END);
+    } else if (c.skip(Css::Token::ident("left"))) {
+        return Ok(Float::LEFT);
+    } else if (c.skip(Css::Token::ident("right"))) {
+        return Ok(Float::RIGHT);
+    }
+
+    return Error::invalidData("expected float");
+}
+
+Res<Clear> ValueParser<Clear>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Css::Token::ident("none"))) {
+        return Ok(Clear::NONE);
+    } else if (c.skip(Css::Token::ident("left"))) {
+        return Ok(Clear::LEFT);
+    } else if (c.skip(Css::Token::ident("right"))) {
+        return Ok(Clear::RIGHT);
+    } else if (c.skip(Css::Token::ident("both"))) {
+        return Ok(Clear::BOTH);
+    } else if (c.skip(Css::Token::ident("inline-start"))) {
+        return Ok(Clear::INLINE_START);
+    } else if (c.skip(Css::Token::ident("inline-end"))) {
+        return Ok(Clear::INLINE_END);
+    }
+
+    return Error::invalidData("expected clear");
+}
+
 // MARK: Hover
 // https://drafts.csswg.org/mediaqueries/#hover
 Res<Hover> ValueParser<Hover>::parse(Cursor<Css::Sst> &c) {
@@ -534,6 +697,7 @@ Res<Integer> ValueParser<Integer>::parse(Cursor<Css::Sst> &c) {
 
     if (c.peek() == Css::Token::NUMBER) {
         Io::SScan scan = c->token.data;
+        c.next();
         return Ok(try$(Io::atoi(scan)));
     }
 
@@ -565,7 +729,7 @@ Res<Length> ValueParser<Length>::parse(Cursor<Css::Sst> &c) {
         c.next();
 
         return Ok(Length{value, unit});
-    } else if (c.peek() == Css::Token::number("0")) {
+    } else if (c.skip(Css::Token::number("0"))) {
         return Ok(Length{0.0, Length::Unit::PX});
     }
 
@@ -713,11 +877,8 @@ Res<Percent> ValueParser<Percent>::parse(Cursor<Css::Sst> &c) {
 
     if (c.peek() == Css::Token::PERCENTAGE) {
         Io::SScan scan = c->token.data;
-        auto value = Io::atof(scan).unwrapOr(0.0);
-        if (scan.remStr() != "%")
-            return Error::invalidData("invalid percentage");
-
-        return Ok(Percent{value});
+        c.next();
+        return Ok(Percent{Io::atof(scan).unwrapOr(0.0)});
     }
 
     return Error::invalidData("expected percentage");
@@ -820,11 +981,12 @@ Res<Size> ValueParser<Size>::parse(Cursor<Css::Sst> &c) {
             return Ok(Size::MAX_CONTENT);
         } else if (data == "fit-content") {
             return Ok(Size::FIT_CONTENT);
+        } else {
+            return Error::invalidData("unknown size value");
         }
     } else {
         return Ok(try$(parseValue<CalcValue<PercentOr<Length>>>(c)));
     }
-    unreachable();
 }
 
 // MARK: String

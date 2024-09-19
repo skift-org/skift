@@ -2,6 +2,10 @@
 #include <karm-ui/dialog.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
+#include <mdi/logout.h>
+#include <mdi/power-standby.h>
+#include <mdi/restart.h>
+#include <mdi/sleep.h>
 
 namespace Hideo::Shell {
 

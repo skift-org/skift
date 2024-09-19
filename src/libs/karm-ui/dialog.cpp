@@ -88,12 +88,12 @@ struct DialogLayer : public LeafNode<DialogLayer> {
         if (_visibility.needRepaint(*this, e))
             Ui::shouldRepaint(*this);
 
-        auto *ke = e.is<App::KeyboardEvent>();
+        auto ke = e.is<App::KeyboardEvent>();
 
         if (ke and ke->type == App::KeyboardEvent::PRESS and ke->key == App::Key::ESC) {
             _closeDialog();
             e.accept();
-        } else if (auto *se = e.is<ShowDialogEvent>()) {
+        } else if (auto se = e.is<ShowDialogEvent>()) {
             _showDialog(se->child);
             e.accept();
         } else if (e.is<CloseDialogEvent>()) {
@@ -107,7 +107,7 @@ struct DialogLayer : public LeafNode<DialogLayer> {
     }
 
     void bubble(App::Event &e) override {
-        if (auto *se = e.is<ShowDialogEvent>()) {
+        if (auto se = e.is<ShowDialogEvent>()) {
             _showDialog(se->child);
             e.accept();
         } else if (e.is<CloseDialogEvent>()) {

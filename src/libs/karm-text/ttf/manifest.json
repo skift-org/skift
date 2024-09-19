@@ -3,6 +3,9 @@
     "id": "karm-text.ttf",
     "type": "lib",
     "description": "TrueType font specification",
+    "props": {
+        "cpp-excluded": true
+    },
     "requires": [
         "karm-base"
     ]

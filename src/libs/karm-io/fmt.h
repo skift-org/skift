@@ -67,7 +67,7 @@ inline Res<usize> _format(Io::TextWriter &writer, Str format, _Args &args) {
         if (c == '{') {
             scan.skip(':');
             scan.begin();
-            while (scan.curr() != '}') {
+            while (scan.peek() != '}') {
                 scan.next();
             }
             scan.next();

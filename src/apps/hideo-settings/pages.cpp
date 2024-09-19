@@ -7,7 +7,7 @@ namespace Hideo::Settings {
 
 Ui::Child pagescaffold(Ui::Child inner) {
     return inner |
-           Ui::insets({0, 0, 0, 32}) |
+           Ui::insets({0, 0, 32, 0}) |
            Ui::maxSize({460, Ui::UNCONSTRAINED}) |
            Ui::grow() |
            Ui::hcenter() |

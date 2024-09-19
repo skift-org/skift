@@ -97,6 +97,10 @@ Res<Vec<DirEntry>> readDir(Mime::Url const &) {
     return Error::notImplemented("directory listing not supported");
 }
 
+Res<Stat> stat(Mime::Url const &) {
+    return Error::notImplemented("directory listing not supported");
+}
+
 // MARK: File I/O --------------------------------------------------------------
 
 Res<Strong<Fd>> openFile(Mime::Url const &) {

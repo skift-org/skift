@@ -14,7 +14,7 @@ Res<String> parseStr(Io::SScan &s) {
     s.begin();
 
     while (not s.ended()) {
-        if (s.curr() == '"') {
+        if (s.peek() == '"') {
             auto str = s.end();
             s.next();
             return Ok(String{str});

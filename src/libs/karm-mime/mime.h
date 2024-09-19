@@ -1,9 +1,9 @@
 #pragma once
 
-#include <fonts-mdi/icons.h>
 #include <karm-io/emit.h>
 #include <karm-io/expr.h>
 #include <karm-io/sscan.h>
+#include <mdi>
 
 namespace Karm::Mime {
 
@@ -33,7 +33,8 @@ struct Mime {
     }
 
     bool is(Mime const &other) const {
-        return type() == other.type() and subtype() == other.subtype();
+        return type() == other.type() and
+               subtype() == other.subtype();
     }
 
     Str str() const {

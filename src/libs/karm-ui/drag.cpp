@@ -45,7 +45,7 @@ struct Dismisable :
     }
 
     void event(App::Event &e) override {
-        if (auto *me = e.is<App::MouseEvent>()) {
+        if (auto me = e.is<App::MouseEvent>()) {
             me->pos = me->pos - drag();
             child().event(e);
             me->pos = me->pos + drag();
@@ -69,7 +69,7 @@ struct Dismisable :
     }
 
     void bubble(App::Event &e) override {
-        if (auto *de = e.is<DragEvent>()) {
+        if (auto de = e.is<DragEvent>()) {
             if (de->type == DragEvent::DRAG) {
                 auto d = _drag.target() + de->delta;
 
@@ -127,7 +127,7 @@ struct DragRegion : public ProxyNode<DragRegion> {
         if (event.accepted())
             return;
 
-        auto *e = event.is<App::MouseEvent>();
+        auto e = event.is<App::MouseEvent>();
         if (not e)
             return;
 

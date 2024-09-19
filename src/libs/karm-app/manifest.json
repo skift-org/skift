@@ -4,6 +4,7 @@
     "type": "lib",
     "description": "Application host",
     "requires": [
-        "karm-base"
+        "karm-base",
+        "karm-math"
     ]
 }

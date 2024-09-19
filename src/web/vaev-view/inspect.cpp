@@ -3,6 +3,7 @@
 #include <karm-ui/reducer.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
+#include <mdi/chevron-down.h>
 #include <vaev-markup/dom.h>
 
 #include "inspect.h"
@@ -48,11 +49,11 @@ Ui::Child itemHeader(Markup::Node const &n) {
         return Ui::codeMedium("#document");
     } else if (n.is<Markup::DocumentType>()) {
         return Ui::codeMedium("#document-type");
-    } else if (auto *tx = n.is<Markup::Text>()) {
+    } else if (auto tx = n.is<Markup::Text>()) {
         return Ui::codeMedium("#text {#}", tx->data);
-    } else if (auto *el = n.is<Markup::Element>()) {
+    } else if (auto el = n.is<Markup::Element>()) {
         return Ui::hflow(n.children().len() ? Ui::icon(Mdi::CHEVRON_DOWN) : Ui::empty(), elementStartTag(*el));
-    } else if (auto *c = n.is<Markup::Comment>()) {
+    } else if (auto c = n.is<Markup::Comment>()) {
         return Ui::codeMedium(Gfx::GREEN, "<!-- {} -->", c->data);
     } else {
         unreachable();
@@ -60,7 +61,7 @@ Ui::Child itemHeader(Markup::Node const &n) {
 }
 
 Ui::Child itemFooter(Markup::Node const &n, isize ident) {
-    if (auto *el = n.is<Markup::Element>()) {
+    if (auto el = n.is<Markup::Element>()) {
         return Ui::hflow(n.children().len() ? guide() : Ui::empty(), elementEndTag(*el)) | idented(ident);
     }
     return Ui::empty();

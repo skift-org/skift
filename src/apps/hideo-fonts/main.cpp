@@ -5,6 +5,8 @@
 #include <karm-ui/app.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
+#include <mdi/arrow-left.h>
+#include <mdi/format-font.h>
 
 namespace Hideo::Fonts {
 
@@ -71,7 +73,7 @@ Ui::Child allFamiliesItem(State const &s, Str family) {
                Ui::labelMedium(Ui::GRAY500, "{} · {} {}", family, nStyle, nStyle == 1 ? "Style" : "Styles"),
                Ui::text(Text::ProseStyle{font}, PANGRAM)
            ) |
-           Ui::insets({12, 8, 0, 8}) |
+           Ui::insets({8, 0, 8, 12}) |
            Ui::hclip() |
            Ui::button(Model::bind<SelectFamily>(family), Ui::ButtonStyle::outline());
 }
@@ -130,7 +132,7 @@ Ui::Child familyItem(State const &, Strong<Text::Fontface> fontface) {
                Ui::text(Text::ProseStyle{font}, PANGRAM),
                fontfaceTags(attrs)
            ) |
-           Ui::insets({12, 8, 0, 8}) |
+           Ui::insets({8, 0, 8, 12}) |
            Ui::hclip() |
            Ui::button(Model::bind<SelectFace>(fontface), Ui::ButtonStyle::outline());
 }
@@ -140,7 +142,7 @@ Ui::Child familyContent(State const &s) {
     auto &fontBook = s.fontBook;
     auto fontfaces = fontBook.queryFamily(s.fontFamily.unwrap());
 
-    auto header = Ui::labelSmall(s.fontFamily.unwrap()) | Ui::insets({16, 6});
+    auto header = Ui::labelSmall(s.fontFamily.unwrap()) | Ui::insets({6, 16});
 
     for (auto const &fontface : fontfaces) {
         children.pushBack(familyItem(s, fontface));
@@ -183,7 +185,7 @@ Ui::Child fontfaceContent(State const &s) {
             Math::Align::CENTER,
             Ui::labelSmall(attrs.normal() ? "{}" : "{}  · ", attrs.family),
             fontfaceTags(attrs)
-        ) | Ui::insets({16, 6}),
+        ) | Ui::insets({6, 16}),
         Ui::separator(),
         pangrams(fontface)
     );

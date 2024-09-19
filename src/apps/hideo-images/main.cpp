@@ -3,6 +3,7 @@
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
+#include <mdi/image.h>
 
 #include "app.h"
 

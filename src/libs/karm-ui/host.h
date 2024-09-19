@@ -116,16 +116,16 @@ struct Host : public Node {
     }
 
     void bubble(App::Event &event) override {
-        if (auto *e = event.is<Node::PaintEvent>()) {
+        if (auto e = event.is<Node::PaintEvent>()) {
             _dirty.pushBack(e->bound);
             event.accept();
-        } else if (auto *e = event.is<Node::LayoutEvent>()) {
+        } else if (auto e = event.is<Node::LayoutEvent>()) {
             _shouldLayout = true;
             event.accept();
-        } else if (auto *e = event.is<Node::AnimateEvent>()) {
+        } else if (auto e = event.is<Node::AnimateEvent>()) {
             _shouldAnimate = true;
             event.accept();
-        } else if (auto *e = event.is<App::RequestExitEvent>()) {
+        } else if (auto e = event.is<App::RequestExitEvent>()) {
             _res = e->res;
             event.accept();
         }

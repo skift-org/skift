@@ -15,13 +15,13 @@ Path Path::parse(Io::SScan &s, bool inUrl, bool stopAtWhitespace) {
 
     s.begin();
     while (not s.ended()) {
-        if (inUrl and (s.curr() == '?' or s.curr() == '#'))
+        if (inUrl and (s.peek() == '?' or s.peek() == '#'))
             break;
 
-        if (stopAtWhitespace and isAsciiSpace(s.curr()))
+        if (stopAtWhitespace and isAsciiSpace(s.peek()))
             break;
 
-        if (s.curr() == SEP) {
+        if (s.peek() == SEP) {
             path._parts.pushBack(s.end());
             s.next();
             s.begin();

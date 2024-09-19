@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-ui/view.h>
+#include <mdi/circle.h>
 
 #include "base.h"
 

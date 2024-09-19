@@ -27,11 +27,9 @@ Ui::Child app() {
         Ui::titleMedium(dateTime.unwrap())
     );
 
-    return Ui::stack(
-               Ui::image(Image::loadOrFallback("bundle://skift-wallpapers/images/abstract.qoi"_url).unwrap()) | Ui::cover(),
-               clock | Ui::center()
-           ) |
-           Ui::maxSize(192);
+    return clock |
+           Ui::center() |
+           Ui::pinSize(192);
 }
 
 } // namespace Hideo::Wear

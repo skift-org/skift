@@ -194,7 +194,7 @@ struct Pseudo {
         return NONE;
     }
 
-    static Type make(Str name) {
+    static Pseudo make(Str name) {
         auto id = _Type(name);
         // logDebug("make type {} {}", name, id);
         if (id) {
@@ -209,6 +209,11 @@ struct Pseudo {
 
     Type type;
     Extra extra = NONE;
+
+    Pseudo() = default;
+
+    Pseudo(Type type, Extra extra = NONE)
+        : type(type), extra(extra) {}
 
     bool operator==(Pseudo const &) const = default;
 

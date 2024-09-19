@@ -1,5 +1,6 @@
 #include <karm-kira/scaffold.h>
 #include <karm-ui/layout.h>
+#include <mdi/message.h>
 
 #include "app.h"
 

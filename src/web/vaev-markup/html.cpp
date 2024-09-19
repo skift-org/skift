@@ -5,6 +5,8 @@
 
 namespace Vaev::Markup {
 
+static constexpr bool DEBUG_HTML_PARSER = false;
+
 // MARK: Lexer -----------------------------------------------------------------
 
 struct Entity {
@@ -28,7 +30,7 @@ void HtmlLexer::_raise(Str msg) {
 }
 
 void HtmlLexer::consume(Rune rune, bool isEof) {
-    // logDebug("Lexing '{#c}' {#x} in {}", rune, rune, _state);
+    logDebugIf(DEBUG_HTML_PARSER, "Lexing '{#c}' {#x} in {}", rune, rune, _state);
 
     switch (_state) {
 
@@ -437,6 +439,7 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // treat it as per the "anything else" entry below.
         if ((rune == '\t' or rune == '\n' or rune == '\f' or rune == ' ') and
             _isAppropriateEndTagToken()) {
+            _ensure().name = _builder.take();
             _switchTo(State::BEFORE_ATTRIBUTE_NAME);
         }
 
@@ -445,6 +448,7 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // then switch to the self-closing start tag state. Otherwise,
         // treat it as per the "anything else" entry below.
         else if (rune == '/' and _isAppropriateEndTagToken()) {
+            _ensure().name = _builder.take();
             _switchTo(State::SELF_CLOSING_START_TAG);
         }
 
@@ -453,6 +457,7 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // then switch to the data state and emit the current tag token.
         // Otherwise, treat it as per the "anything else" entry below.
         else if (rune == '>' and _isAppropriateEndTagToken()) {
+            _ensure().name = _builder.take();
             _switchTo(State::DATA);
             _emit();
         }
@@ -3580,7 +3585,7 @@ void reconstructActiveFormattingElements(HtmlParser &) {
 
 // https://html.spec.whatwg.org/multipage/parsing.html#acknowledge-self-closing-flag
 void acknowledgeSelfClosingFlag(HtmlToken const &) {
-    logDebug("acknowledgeSelfClosingFlag not implemented");
+    logDebugIf(DEBUG_HTML_PARSER, "acknowledgeSelfClosingFlag not implemented");
 }
 
 // 13.2.6 MARK: Tree construction
@@ -3703,7 +3708,9 @@ Strong<Element> createElementFor(HtmlToken const &t, Ns ns) {
     //    localName, given namespace, null, and is. If will execute script
     //    is true, set the synchronous custom elements flag; otherwise,
     //    leave it unset.
-    auto el = makeStrong<Element>(TagName::make(t.name, ns));
+    auto tag = TagName::make(t.name, ns);
+    logDebugIf(DEBUG_HTML_PARSER, "Creating element: {} {}", t.name, tag);
+    auto el = makeStrong<Element>(tag);
 
     // 10. Append each attribute in the given token to element.
     for (auto &[name, value] : t.attrs) {
@@ -3895,7 +3902,6 @@ void HtmlParser::_handleInitialMode(HtmlToken const &t) {
 
     // Anything else
     else {
-        _raise();
         _switchTo(Mode::BEFORE_HTML);
         accept(t);
     }
@@ -4346,6 +4352,23 @@ void HtmlParser::_handleInBody(HtmlToken const &t) {
     // TODO: An end-of-file token
 
     // TODO: An end tag whose tag name is "body"
+    else if (t.type == HtmlToken::END_TAG and t.name == "body") {
+        // If the stack of open elements does not have a body element in
+        // scope, this is a parse error; ignore the token.
+        if (not _hasElementInScope(Html::BODY)) {
+            _raise();
+            return;
+        }
+
+        // Otherwise, if there is a node in the stack of open elements that
+        // is not a implid end tag, then this is a parse error.
+        if (not contains(IMPLIED_END_TAGS, last(_openElements)->tagName)) {
+            _raise();
+        }
+
+        // Switch the insertion mode to "after body".
+        _switchTo(Mode::AFTER_BODY);
+    }
 
     // TODO: An end tag whose tag name is "html"
 
@@ -4443,9 +4466,10 @@ void HtmlParser::_handleInBody(HtmlToken const &t) {
     // TODO: Any other end tag
     else if (t.type == HtmlToken::END_TAG) {
         // loop:
-        while (true) {
+        usize curr = _openElements.len();
+        while (curr > 0) {
             // 1. Initialize node to be the current node (the bottommost node of the stack).
-            auto node = last(_openElements);
+            auto node = _openElements[curr - 1];
 
             // 2. Loop: If node is an HTML element with the same tag name as the token, then:
             if (node->tagName.name() == t.name) {
@@ -4453,9 +4477,8 @@ void HtmlParser::_handleInBody(HtmlToken const &t) {
                 generateImpliedEndTags(*this, t.name);
 
                 // 2. If node is not the current node, then this is a parse error.
-                if (node != last(_openElements)) {
+                if (node != last(_openElements))
                     _raise();
-                }
 
                 // 3. Pop all the nodes from the current node up to node, including node, then stop these steps
                 while (last(_openElements) != node) {
@@ -4468,7 +4491,10 @@ void HtmlParser::_handleInBody(HtmlToken const &t) {
             // 3. Otherwise, if node is in the special category,
             //    then this is a parse error; ignore the token, and return.
 
+            // TODO: Implement the special category
+
             // 4. Set node to the previous entry in the stack of open elements.
+            curr--;
 
             // 5. Return to the step labeled loop.
         }
@@ -4511,12 +4537,43 @@ void HtmlParser::_handleText(HtmlToken const &t) {
     // FIXME: Implement the rest of the rules
 }
 
+// 3.2.6.4.22 MARK: The "after after body" insertion mode
+// https://html.spec.whatwg.org/multipage/parsing.html#the-after-after-body-insertion-mode
+void HtmlParser::_handleAfterBody(HtmlToken const &t) {
+    // A comment token
+    if (t.type == HtmlToken::COMMENT) {
+        // Insert a comment.
+        insertAComment(*this, t);
+    }
+
+    // A DOCTYPE token
+    // A character token that is one of U+0009 CHARACTER TABULATION, U+000A LINE FEED (LF), U+000C FORM FEED (FF), U+000D CARRIAGE RETURN (CR), or U+0020 SPACE
+    // A start tag whose tag name is "html"
+    else if (t.type == HtmlToken::DOCTYPE or
+             (t.type == HtmlToken::CHARACTER and (t.rune == '\t' or t.rune == '\n' or t.rune == '\f' or t.rune == '\r' or t.rune == ' ')) or
+             (t.type == HtmlToken::START_TAG and t.name == "html")) {
+        // Process the token using the rules for the "in body" insertion mode.
+        _acceptIn(Mode::IN_BODY, t);
+    }
+
+    else if (t.type == HtmlToken::END_OF_FILE) {
+        // Stop parsing.
+    }
+
+    else {
+        // Parse error. Switch the insertion mode to "in body" and reprocess the token.
+        _raise();
+        _switchTo(Mode::IN_BODY);
+        accept(t);
+    }
+}
+
 void HtmlParser::_switchTo(Mode mode) {
     _insertionMode = mode;
 }
 
 void HtmlParser::_acceptIn(Mode mode, HtmlToken const &t) {
-    logDebug("Parsing {} in {}", t, mode);
+    logDebugIf(DEBUG_HTML_PARSER, "Parsing {} in {}", t, mode);
 
     switch (mode) {
 
@@ -4553,79 +4610,64 @@ void HtmlParser::_acceptIn(Mode mode, HtmlToken const &t) {
         break;
 
     // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intable
-    case Mode::IN_TABLE: {
+    case Mode::IN_TABLE:
         break;
-    }
 
     // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intabletext
-    case Mode::IN_TABLE_TEXT: {
+    case Mode::IN_TABLE_TEXT:
         break;
-    }
 
     // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-incaption
-    case Mode::IN_CAPTION: {
+    case Mode::IN_CAPTION:
         break;
-    }
 
     // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-incolumngroup
-    case Mode::IN_COLUMN_GROUP: {
+    case Mode::IN_COLUMN_GROUP:
         break;
-    }
 
     // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intablebody
-    case Mode::IN_TABLE_BODY: {
+    case Mode::IN_TABLE_BODY:
         break;
-    }
 
     // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inrow
-    case Mode::IN_ROW: {
+    case Mode::IN_ROW:
         break;
-    }
 
     // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-incell
-    case Mode::IN_CELL: {
+    case Mode::IN_CELL:
         break;
-    }
 
     // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inselect
-    case Mode::IN_SELECT: {
+    case Mode::IN_SELECT:
         break;
-    }
 
     // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inselectintable
-    case Mode::IN_SELECT_IN_TABLE: {
+    case Mode::IN_SELECT_IN_TABLE:
         break;
-    }
 
     // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intemplate
-    case Mode::IN_TEMPLATE: {
+    case Mode::IN_TEMPLATE:
         break;
-    }
 
     // TODO: https://html.spec.whatwg.org/multipage/parsing.html#the-after-body-insertion-mode
-    case Mode::AFTER_BODY: {
+    case Mode::AFTER_BODY:
         break;
-    }
 
     // TODO: https://html.spec.whatwg.org/multipage/parsing.html#the-in-frameset-insertion-mode
-    case Mode::IN_FRAMESET: {
+    case Mode::IN_FRAMESET:
         break;
-    }
 
     // TODO: https://html.spec.whatwg.org/multipage/parsing.html#the-after-frameset-insertion-mode
-    case Mode::AFTER_FRAMESET: {
+    case Mode::AFTER_FRAMESET:
         break;
-    }
 
-    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#the-after-after-body-insertion-mode
-    case Mode::AFTER_AFTER_BODY: {
+    case Mode::AFTER_AFTER_BODY:
+        _handleAfterBody(t);
         break;
-    }
 
     // TODO: https://html.spec.whatwg.org/multipage/parsing.html#the-after-after-frameset-insertion-mode
-    case Mode::AFTER_AFTER_FRAMESET: {
+    case Mode::AFTER_AFTER_FRAMESET:
         break;
-    }
 
     default:
         break;

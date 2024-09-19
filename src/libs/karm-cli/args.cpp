@@ -40,11 +40,11 @@ Res<bool> ValueParser<bool>::parse(Cursor<Token> &) {
     return Ok(true);
 }
 
-void ValueParser<i32>::usage(Io::Emit &e) {
+void ValueParser<isize>::usage(Io::Emit &e) {
     e("integer");
 }
 
-Res<i32> ValueParser<i32>::parse(Cursor<Token> &c) {
+Res<isize> ValueParser<isize>::parse(Cursor<Token> &c) {
     if (c.ended() or c->kind != Token::OPERAND)
         return Error::other("missing value");
 

@@ -5,6 +5,9 @@
 #include <karm-ui/layout.h>
 #include <karm-ui/reducer.h>
 #include <karm-ui/view.h>
+#include <mdi/arrow-left.h>
+#include <mdi/arrow-right.h>
+#include <mdi/view-carousel.h>
 
 #include "base.h"
 

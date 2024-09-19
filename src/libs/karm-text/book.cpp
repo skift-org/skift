@@ -209,7 +209,7 @@ FontStyle _pickFontStyle(FontStyle curr, FontStyle best, FontStyle desired) {
 }
 
 Str FontBook::_resolveFamily(Family family) const {
-    if (auto *gf = family.is<GenericFamily>())
+    if (auto gf = family.is<GenericFamily>())
         return _genericFamily[toUnderlyingType(*gf)];
     return family.unwrap<Str>();
 }

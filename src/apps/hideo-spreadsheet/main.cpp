@@ -9,6 +9,41 @@
 #include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
+#include <mdi/align-horizontal-center.h>
+#include <mdi/align-horizontal-left.h>
+#include <mdi/align-horizontal-right.h>
+#include <mdi/align-vertical-bottom.h>
+#include <mdi/align-vertical-center.h>
+#include <mdi/align-vertical-top.h>
+#include <mdi/border-all.h>
+#include <mdi/border-bottom.h>
+#include <mdi/border-horizontal.h>
+#include <mdi/border-left.h>
+#include <mdi/border-none.h>
+#include <mdi/border-right.h>
+#include <mdi/border-top.h>
+#include <mdi/border-vertical.h>
+#include <mdi/brush-variant.h>
+#include <mdi/content-save-plus.h>
+#include <mdi/content-save.h>
+#include <mdi/file.h>
+#include <mdi/filter.h>
+#include <mdi/folder.h>
+#include <mdi/format-bold.h>
+#include <mdi/format-clear.h>
+#include <mdi/format-italic.h>
+#include <mdi/format-paint.h>
+#include <mdi/format-strikethrough.h>
+#include <mdi/format-underline.h>
+#include <mdi/function.h>
+#include <mdi/plus.h>
+#include <mdi/redo.h>
+#include <mdi/sigma.h>
+#include <mdi/table-merge-cells.h>
+#include <mdi/table.h>
+#include <mdi/undo.h>
+#include <mdi/wrap-disabled.h>
+#include <mdi/wrap.h>
 
 #include "app.h"
 
@@ -46,7 +81,13 @@ Ui::Child toolbar(State const &state) {
         Ui::empty(4),
         formula() | Ui::grow(),
         Ui::empty(4),
-        Ui::button(Model::bind<ToggleProperties>(), state.propertiesVisible ? Ui::ButtonStyle::regular() : Ui::ButtonStyle::subtle(), Mdi::BRUSH_VARIANT),
+        Ui::button(
+            Model::bind<ToggleProperties>(),
+            state.propertiesVisible
+                ? Ui::ButtonStyle::regular()
+                : Ui::ButtonStyle::subtle(),
+            Mdi::BRUSH_VARIANT
+        ),
     });
 }
 

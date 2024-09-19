@@ -45,15 +45,15 @@ test$("sscan-rem-str") {
 
 test$("sscan-curr") {
     SScan s{"abc"};
-    expect$(s.curr() == 'a');
+    expect$(s.peek() == 'a');
 
     s = SScan{"abc"};
     s.next();
-    expect$(s.curr() == 'b');
+    expect$(s.peek() == 'b');
 
     s = SScan{"abc"};
     s.next(3);
-    expect$(s.curr() == '\0');
+    expect$(s.peek() == '\0');
 
     return Ok();
 }

@@ -2,9 +2,11 @@
 
 #include <vaev-base/align.h>
 #include <vaev-base/borders.h>
+#include <vaev-base/calc.h>
 #include <vaev-base/color.h>
 #include <vaev-base/display.h>
 #include <vaev-base/flex.h>
+#include <vaev-base/float.h>
 #include <vaev-base/font.h>
 #include <vaev-base/insets.h>
 #include <vaev-base/length.h>
@@ -13,9 +15,9 @@
 #include <vaev-base/overflow.h>
 #include <vaev-base/resolution.h>
 #include <vaev-base/sizing.h>
+#include <vaev-base/table.h>
 #include <vaev-base/z-index.h>
 #include <vaev-css/parser.h>
-#include <vaev-base/calc.h>
 
 namespace Vaev::Style {
 
@@ -28,7 +30,6 @@ struct ValueParser;
 
 template <typename T>
 always_inline static Res<T> parseValue(Cursor<Css::Sst> &c) {
-
     return ValueParser<T>::parse(c);
 }
 
@@ -48,8 +49,19 @@ struct ValueParser<bool> {
 };
 
 template <>
-struct ValueParser<BorderStyle> {
-    static Res<BorderStyle> parse(Cursor<Css::Sst> &c);
+struct ValueParser<Gfx::BorderStyle> {
+    static Res<Gfx::BorderStyle> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
+struct ValueParser<BorderCollapse> {
+
+    static Res<BorderCollapse> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
+struct ValueParser<BorderSpacing> {
+    static Res<BorderSpacing> parse(Cursor<Css::Sst> &c);
 };
 
 template <typename T>
@@ -104,17 +116,26 @@ struct ValueParser<CalcValue<T>> {
         }
         return Error::invalidData("unexpected operator");
     }
-    
+
     static Res<typename CalcValue<T>::Value> parseVal(Cursor<Css::Sst> &c) {
         if (c.ended())
             return Error::invalidData("unexpected end of input");
 
-        if(c.peek().token == Css::Token::NUMBER){
+        if (c.peek().token == Css::Token::NUMBER)
             return Ok(try$(parseValue<Number>(c)));
-        }else{
-            return Ok(try$(parseValue<T>(c)));
-        }                
+
+        return Ok(try$(parseValue<T>(c)));
     }
+};
+
+template <>
+struct ValueParser<Colors> {
+    static Res<Colors> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
+struct ValueParser<ColorScheme> {
+    static Res<ColorScheme> parse(Cursor<Css::Sst> &c);
 };
 
 template <>
@@ -128,8 +149,18 @@ struct ValueParser<ColorGamut> {
 };
 
 template <>
+struct ValueParser<Contrast> {
+    static Res<Contrast> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
 struct ValueParser<Display> {
     static Res<Display> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
+struct ValueParser<CaptionSide> {
+    static Res<CaptionSide> parse(Cursor<Css::Sst> &c);
 };
 
 template <>
@@ -168,6 +199,16 @@ struct ValueParser<FontWidth> {
 };
 
 template <>
+struct ValueParser<Float> {
+    static Res<Float> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
+struct ValueParser<Clear> {
+    static Res<Clear> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
 struct ValueParser<Hover> {
     static Res<Hover> parse(Cursor<Css::Sst> &c);
 };
@@ -189,17 +230,25 @@ struct ValueParser<Math::Insets<T>> {
 
         auto right = parseValue<T>(c);
         if (not right)
-            return Ok(Math::Insets<T>{top.take()});
+            return Ok(Math::Insets<T>{
+                top.take()
+            });
 
         auto bottom = parseValue<T>(c);
         if (not bottom)
-            return Ok(Math::Insets<T>{top.take(), right.take()});
+            return Ok(Math::Insets<T>{
+                top.take(), right.take()
+            });
 
         auto left = parseValue<T>(c);
         if (not left)
-            return Ok(Math::Insets<T>{top.take(), right.take(), bottom.take()});
+            return Ok(Math::Insets<T>{
+                top.take(), right.take(), bottom.take()
+            });
 
-        return Ok(Math::Insets<T>{top.take(), right.take(), bottom.take(), left.take()});
+        return Ok(Math::Insets<T>{
+            top.take(), right.take(), bottom.take(), left.take()
+        });
     }
 };
 
@@ -322,7 +371,7 @@ struct ValueParser<Math::Radii<T>> {
         return Ok(parsePostSlash(c, Math::Radii<T>{value1.take(), value2.take(), value3.take(), value4.take()}));
     }
 
-    static Math::Radii<T> parsePostSlash(Cursor<Css::Sst> &c, Math::Radii<T> firstPart) {
+    static Math::Radii<T> parsePostSlash(Cursor<Css::Sst> &c, Math::Radii<T> radii) {
         // if parse a /
         // 1 value-- > border all(a, d, e, h)
         // 2 values-- > 1 = top - start + bottom - end 2 = the others
@@ -332,44 +381,45 @@ struct ValueParser<Math::Radii<T>> {
             c.next();
             auto value1 = parseValue<PercentOr<Length>>(c);
             if (not value1) {
-                return firstPart;
+                return radii;
             }
 
             auto value2 = parseValue<PercentOr<Length>>(c);
             if (not value2) {
-                firstPart.a = value1.take();
-                firstPart.d = value1.take();
-                firstPart.e = value1.take();
-                firstPart.h = value1.take();
-                return firstPart;
+                radii.a = value1.take();
+                radii.d = value1.take();
+                radii.e = value1.take();
+                radii.h = value1.take();
+                return radii;
             }
 
             auto value3 = parseValue<PercentOr<Length>>(c);
             if (not value3) {
-                firstPart.a = value1.take();
-                firstPart.d = value2.take();
-                firstPart.e = value1.take();
-                firstPart.h = value2.take();
-                return firstPart;
+                radii.a = value1.take();
+                radii.d = value2.take();
+                radii.e = value1.take();
+                radii.h = value2.take();
+                return radii;
             }
 
             auto value4 = parseValue<PercentOr<Length>>(c);
             if (not value4) {
-                firstPart.a = value1.take();
-                firstPart.d = value2.take();
-                firstPart.e = value3.take();
-                firstPart.h = value2.take();
-                return firstPart;
+                radii.a = value1.take();
+                radii.d = value2.take();
+                radii.e = value3.take();
+                radii.h = value2.take();
+
+                return radii;
             }
 
-            firstPart.a = value1.take();
-            firstPart.d = value2.take();
-            firstPart.e = value3.take();
-            firstPart.h = value4.take();
-            return firstPart;
-        } else {
-            return firstPart;
+            radii.a = value1.take();
+            radii.d = value2.take();
+            radii.e = value3.take();
+            radii.h = value4.take();
+            return radii;
         }
+
+        return radii;
     }
 };
 
@@ -384,23 +434,13 @@ struct ValueParser<ReducedTransparency> {
 };
 
 template <>
-struct ValueParser<Contrast> {
-    static Res<Contrast> parse(Cursor<Css::Sst> &c);
-};
-
-template <>
-struct ValueParser<Colors> {
-    static Res<Colors> parse(Cursor<Css::Sst> &c);
-};
-
-template <>
-struct ValueParser<ColorScheme> {
-    static Res<ColorScheme> parse(Cursor<Css::Sst> &c);
-};
-
-template <>
 struct ValueParser<ReducedData> {
     static Res<ReducedData> parse(Cursor<Css::Sst> &c);
+};
+
+template <>
+struct ValueParser<TableLayout> {
+    static Res<TableLayout> parse(Cursor<Css::Sst> &c);
 };
 
 template <>

@@ -3,6 +3,7 @@
 #include <karm-ui/box.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/view.h>
+#include <mdi/alert-octagon-outline.h>
 
 namespace Karm::Ui {
 
@@ -24,7 +25,7 @@ static inline Child errorScope(Str what, auto callback) {
         },
         hflow(
             6,
-            icon(Mdi::ALERT_DECAGRAM_OUTLINE, 26) | center(),
+            icon(Mdi::ALERT_OCTAGON_OUTLINE, 26) | center(),
             vflow(
                 4,
                 text(TextStyles::titleMedium().withColor(Gfx::WHITE), "Can't display {}", what),

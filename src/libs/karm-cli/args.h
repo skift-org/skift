@@ -70,10 +70,10 @@ struct ValueParser<bool> {
 };
 
 template <>
-struct ValueParser<i32> {
+struct ValueParser<isize> {
     static void usage(Io::Emit &e);
 
-    static Res<i32> parse(Cursor<Token> &c);
+    static Res<isize> parse(Cursor<Token> &c);
 };
 
 template <>

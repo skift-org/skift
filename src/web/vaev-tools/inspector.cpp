@@ -15,6 +15,14 @@
 #include <karm-ui/popover.h>
 #include <karm-ui/reducer.h>
 #include <karm-ui/scroll.h>
+#include <mdi/alert-decagram.h>
+#include <mdi/button-cursor.h>
+#include <mdi/code-tags.h>
+#include <mdi/dots-horizontal.h>
+#include <mdi/printer.h>
+#include <mdi/refresh.h>
+#include <mdi/surfing.h>
+#include <mdi/web.h>
 #include <vaev-driver/fetcher.h>
 #include <vaev-view/inspect.h>
 #include <vaev-view/view.h>
@@ -93,13 +101,16 @@ Ui::Child mainMenu([[maybe_unused]] State const &s) {
 Ui::Child addressBar(Mime::Url const &url) {
     return Ui::hflow(
                0,
-               Math::Align::CENTER,
-               Ui::text("{}", url),
-               Ui::grow(NONE),
+
+               Ui::text("{}", url) |
+                   Ui::center() |
+                   Ui::hscroll() |
+                   Ui::grow(),
+
                Kr::contextMenuIcon(Model::bind<Reload>(), Mdi::REFRESH)
            ) |
            Ui::box({
-               .padding = {12, 0, 0, 0},
+               .padding = {0, 0, 0, 12},
                .borderRadii = 4,
                .borderWidth = 1,
                .backgroundFill = Ui::GRAY800,

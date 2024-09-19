@@ -1,3 +1,18 @@
+#include <mdi/code-json.h>
+#include <mdi/cog-box.h>
+#include <mdi/file-document.h>
+#include <mdi/file-jpg-box.h>
+#include <mdi/file-pdf-box.h>
+#include <mdi/file-png-box.h>
+#include <mdi/file.h>
+#include <mdi/filmstrip.h>
+#include <mdi/format-font.h>
+#include <mdi/image.h>
+#include <mdi/language-css3.h>
+#include <mdi/language-html5.h>
+#include <mdi/language-javascript.h>
+#include <mdi/zip-box.h>
+
 #include "mime.h"
 
 namespace Karm::Mime {

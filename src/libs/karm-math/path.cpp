@@ -470,7 +470,7 @@ bool Path::evalSvg(Str svg) {
 
             opcode = opcode == 'M' ? 'L' : opcode;
             opcode = opcode == 'm' ? 'l' : opcode;
-        } while (not s.ended() and not isAsciiAlpha(s.curr()));
+        } while (not s.ended() and not isAsciiAlpha(s.peek()));
     }
 
     return true;

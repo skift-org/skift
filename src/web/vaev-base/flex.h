@@ -55,8 +55,13 @@ struct Flex {
     FlexDirection direction = FlexDirection::ROW;
     FlexWrap wrap = FlexWrap::NOWRAP;
     FlexBasis basis = Width{Width::AUTO};
-    f64 grow = 0;
-    f64 shrink = 1;
+    Number grow = 0;
+    Number shrink = 1;
+
+    bool isRowOriented() const {
+        return direction == FlexDirection::ROW or
+               direction == FlexDirection::ROW_REVERSE;
+    }
 };
 
 } // namespace Vaev

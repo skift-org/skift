@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "vaev-script.cli",
+    "type": "exe",
+    "requires": [
+        "karm-sys",
+        "vaev-script"
+    ]
+}

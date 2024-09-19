@@ -1,33 +1,26 @@
+#include <karm-base/clamp.h>
 #include <karm-text/loader.h>
-#include <vaev-paint/borders.h>
-#include <vaev-paint/box.h>
-#include <vaev-paint/text.h>
 
-#include "block.h"
-#include "flex.h"
 #include "frag.h"
-#include "grid.h"
-#include "table.h"
-#include "values.h"
 
 namespace Vaev::Layout {
 
 // MARK: Frag ------------------------------------------------------------------
 
-Frag::Frag(Strong<Style::Computed> style, Text::Font font)
-    : style{std::move(style)}, font{font} {}
+Frag::Frag(Strong<Style::Computed> style, Strong<Karm::Text::Fontface> font)
+    : style{std::move(style)}, fontFace{font} {}
 
-Frag::Frag(Strong<Style::Computed> style, Text::Font font, Content content)
-    : style{std::move(style)}, font{font}, content{std::move(content)} {}
+Frag::Frag(Strong<Style::Computed> style, Strong<Karm::Text::Fontface> font, Content content)
+    : style{std::move(style)}, fontFace{font}, content{std::move(content)} {}
 
 Karm::Slice<Frag> Frag::children() const {
-    if (auto *frags = content.is<Vec<Frag>>())
+    if (auto frags = content.is<Vec<Frag>>())
         return *frags;
     return {};
 }
 
 Karm::MutSlice<Frag> Frag::children() {
-    if (auto *frags = content.is<Vec<Frag>>()) {
+    if (auto frags = content.is<Vec<Frag>>()) {
         return *frags;
     }
     return {};
@@ -37,14 +30,14 @@ void Frag::add(Frag &&frag) {
     if (content.is<None>())
         content = Vec<Frag>{};
 
-    if (auto *frags = content.is<Vec<Frag>>()) {
+    if (auto frags = content.is<Vec<Frag>>()) {
         frags->pushBack(std::move(frag));
     }
 }
 
 void Frag::repr(Io::Emit &e) const {
     if (children()) {
-        e("(flow {} {}", style->display, layout.borderBox());
+        e("(flow {} {} {} {}", attrs, style->display, style->position, layout.borderBox());
         e.indentNewline();
         for (auto &c : children()) {
             c.repr(e);
@@ -53,29 +46,97 @@ void Frag::repr(Io::Emit &e) const {
         e.deindent();
         e(")");
     } else {
-        e("(frag {} {})", style->display, layout.borderBox());
+        e("(frag {} {} {} {})", attrs, style->display, style->position, layout.borderBox());
     }
+}
+
+// MARK: Attributes ------------------------------------------------------------
+
+static Opt<Str> _parseStrAttr(Markup::Element const &el, AttrName name) {
+    return el.getAttribute(name);
+}
+
+static Opt<usize> _parseUsizeAttr(Markup::Element const &el, AttrName name) {
+    auto str = _parseStrAttr(el, name);
+    if (not str)
+        return NONE;
+    return Io::atoi(str.unwrap());
+}
+
+static Attrs _parseDomAttr(Markup::Element const &el) {
+    Attrs attrs;
+
+    // https://html.spec.whatwg.org/multipage/tables.html#the-col-element
+
+    // The element may have a span content attribute specified, whose value must
+    // be a valid non-negative integer greater than zero and less than or equal to 1000.
+
+    attrs.span = _parseUsizeAttr(el, Html::SPAN_ATTR).unwrapOr(1);
+    if (attrs.span == 0 or attrs.span > 1000)
+        attrs.span = 1;
+
+    // https://html.spec.whatwg.org/multipage/tables.html#attributes-common-to-td-and-th-elements
+
+    // The td and th elements may have a colspan content attribute specified,
+    // whose value must be a valid non-negative integer greater than zero and less than or equal to 1000.
+    attrs.colSpan = _parseUsizeAttr(el, Html::COLSPAN_ATTR).unwrapOr(1);
+    if (attrs.colSpan == 0 or attrs.colSpan > 1000)
+        attrs.colSpan = 1;
+
+    // The td and th elements may also have a rowspan content attribute specified,
+    // whose value must be a valid non-negative integer less than or equal to 65534.
+    attrs.rowSpan = _parseUsizeAttr(el, Html::ROWSPAN_ATTR).unwrapOr(1);
+    if (attrs.rowSpan > 65534)
+        attrs.rowSpan = 65534;
+
+    return attrs;
 }
 
 // MARK: Build -----------------------------------------------------------------
 
-static Opt<Strong<Text::Fontface>> _regularFontface = NONE;
+static Opt<Strong<Karm::Text::Fontface>> _regularFontface = NONE;
+static Opt<Strong<Karm::Text::Fontface>> _boldFontface = NONE;
 
-static Strong<Text::Fontface> regularFontface() {
-    if (not _regularFontface)
-        _regularFontface = Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Regular.ttf"_url).unwrap();
-    return *_regularFontface;
-}
-
-static void buildChildren(Style::Computer &c, Vec<Strong<Markup::Node>> const &children, Frag &parent) {
-    for (auto &child : children) {
-        build(c, *child, parent);
+static Strong<Karm::Text::Fontface> _lookupFontface(Style::Computed &style) {
+    if (style.font->weight != FontWeight::NORMAL) {
+        if (not _boldFontface)
+            _boldFontface = Karm::Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Bold.ttf"_url).unwrap();
+        return *_boldFontface;
+    } else {
+        if (not _regularFontface)
+            _regularFontface = Karm::Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Regular.ttf"_url).unwrap();
+        return *_regularFontface;
     }
 }
 
-static void buildElement(Style::Computer &c, Markup::Element const &el, Frag &parent) {
+void _buildChildren(Style::Computer &c, Vec<Strong<Markup::Node>> const &children, Frag &parent) {
+    for (auto &child : children) {
+        _buildNode(c, *child, parent);
+    }
+}
+
+static void _buildTableChildren(Style::Computer &c, Vec<Strong<Markup::Node>> const &children, Frag &tableWrapperBox, Strong<Style::Computed> tableBoxStyle) {
+    Frag tableBox{
+        tableBoxStyle, tableWrapperBox.fontFace
+    };
+
+    tableBox.style->display = Display::Internal::TABLE_BOX;
+
+    for (auto &child : children) {
+        if (auto el = child->is<Markup::Element>()) {
+            if (el->tagName == Html::CAPTION) {
+                _buildNode(c, *child, tableWrapperBox);
+            } else {
+                _buildNode(c, *child, tableBox);
+            }
+        }
+    }
+    tableWrapperBox.add(std::move(tableBox));
+}
+
+static void _buildElement(Style::Computer &c, Markup::Element const &el, Frag &parent) {
     auto style = c.computeFor(*parent.style, el);
-    auto font = Text::Font{regularFontface(), 16};
+    auto font = _lookupFontface(*style);
 
     if (el.tagName == Html::IMG) {
         Image::Picture img = Gfx::Surface::fallback();
@@ -89,279 +150,84 @@ static void buildElement(Style::Computer &c, Markup::Element const &el, Frag &pa
         return;
 
     if (display == Display::CONTENTS) {
-        buildChildren(c, el.children(), parent);
+        _buildChildren(c, el.children(), parent);
         return;
     }
 
-    Frag frag = {style, font};
-    buildChildren(c, el.children(), frag);
+    auto buildFrag = [](Style::Computer &c, Markup::Element const &el, Strong<Karm::Text::Fontface> font, Strong<Style::Computed> style) {
+        if (el.tagName == Html::TagId::TABLE) {
+
+            auto wrapperStyle = makeStrong<Style::Computed>(Style::Computed::initial());
+            wrapperStyle->display = style->display;
+            wrapperStyle->margin = style->margin;
+
+            Frag wrapper = {wrapperStyle, font};
+            _buildTableChildren(c, el.children(), wrapper, style);
+            return wrapper;
+        } else {
+            Frag frag = {style, font};
+            _buildChildren(c, el.children(), frag);
+            return frag;
+        }
+    };
+
+    auto frag = buildFrag(c, el, font, style);
+    frag.attrs = _parseDomAttr(el);
     parent.add(std::move(frag));
 }
 
-static void buildRun(Style::Computer &, Markup::Text const &node, Frag &parent) {
+static void _buildRun(Style::Computer &, Markup::Text const &node, Frag &parent) {
     auto style = makeStrong<Style::Computed>(Style::Computed::initial());
     style->inherit(*parent.style);
 
-    auto font = Text::Font{regularFontface(), 16};
+    auto font = _lookupFontface(*style);
     Io::SScan scan{node.data};
     scan.eat(Re::space());
     if (scan.ended())
         return;
-    auto run = makeStrong<Text::Run>(font);
+    Karm::Text::Run run;
+
     while (not scan.ended()) {
-        run->append(scan.next());
+        switch (style->text->transform) {
+        case TextTransform::UPPERCASE:
+            run.append(toAsciiUpper(scan.next()));
+            break;
+
+        case TextTransform::LOWERCASE:
+            run.append(toAsciiLower(scan.next()));
+            break;
+
+        case TextTransform::NONE:
+            run.append(scan.next());
+            break;
+
+        default:
+            break;
+        }
+
         if (scan.eat(Re::space())) {
-            run->append(' ');
+            run.append(' ');
         }
     }
 
-    parent.add({style, font, run});
+    parent.add({style, font, std::move(run)});
 }
 
-void build(Style::Computer &c, Markup::Node const &node, Frag &parent) {
-    if (auto *el = node.is<Markup::Element>()) {
-        buildElement(c, *el, parent);
-    } else if (auto *text = node.is<Markup::Text>()) {
-        buildRun(c, *text, parent);
-    } else if (auto *doc = node.is<Markup::Document>()) {
-        buildChildren(c, doc->children(), parent);
+void _buildNode(Style::Computer &c, Markup::Node const &node, Frag &parent) {
+    if (auto el = node.is<Markup::Element>()) {
+        _buildElement(c, *el, parent);
+    } else if (auto text = node.is<Markup::Text>()) {
+        _buildRun(c, *text, parent);
+    } else if (auto doc = node.is<Markup::Document>()) {
+        _buildChildren(c, doc->children(), parent);
     }
 }
 
 Frag build(Style::Computer &c, Markup::Document const &doc) {
-    auto font = Text::Font{regularFontface(), 16};
-    Frag root = {makeStrong<Style::Computed>(Style::Computed::initial()), font};
-    build(c, doc, root);
+    auto style = makeStrong<Style::Computed>(Style::Computed::initial());
+    Frag root = {style, _lookupFontface(*style)};
+    _buildNode(c, doc, root);
     return root;
-}
-
-// MARK: Layout ----------------------------------------------------------------
-
-Output _contentLayout(Tree &t, Frag &f, Input input) {
-    auto display = f.style->display;
-
-    if (auto *run = f.content.is<Strong<Text::Run>>()) {
-        return Output::fromSize((*run)->layout().cast<Px>());
-    } else if (display == Display::FLOW or display == Display::FLOW_ROOT) {
-        return blockLayout(t, f, input);
-    } else if (display == Display::FLEX) {
-        return flexLayout(t, f, input);
-    } else if (display == Display::GRID) {
-        return gridLayout(t, f, input);
-    } else if (display == Display::TABLE) {
-        return tableLayout(t, f, input);
-    } else {
-        return blockLayout(t, f, input);
-    }
-}
-
-static InsetsPx _computeMargins(Tree &t, Frag &f, Input input) {
-    InsetsPx res;
-    auto margin = f.style->margin;
-
-    res.top = resolve(t, f, margin->top, input.containingBlock.height);
-    res.end = resolve(t, f, margin->end, input.containingBlock.width);
-    res.bottom = resolve(t, f, margin->bottom, input.containingBlock.height);
-    res.start = resolve(t, f, margin->start, input.containingBlock.width);
-
-    return res;
-}
-
-static InsetsPx _computeBorders(Tree &t, Frag &f) {
-    InsetsPx res;
-    auto borders = f.style->borders;
-
-    if (borders->top.style != BorderStyle::NONE)
-        res.top = resolve(t, f, borders->top.width);
-
-    if (borders->end.style != BorderStyle::NONE)
-        res.end = resolve(t, f, borders->end.width);
-
-    if (borders->bottom.style != BorderStyle::NONE)
-        res.bottom = resolve(t, f, borders->bottom.width);
-
-    if (borders->start.style != BorderStyle::NONE)
-        res.start = resolve(t, f, borders->start.width);
-
-    return res;
-}
-
-static InsetsPx _computePaddings(Tree &t, Frag &f, Input input) {
-    InsetsPx res;
-    auto padding = f.style->padding;
-
-    res.top = resolve(t, f, padding->top, input.containingBlock.height);
-    res.end = resolve(t, f, padding->end, input.containingBlock.width);
-    res.bottom = resolve(t, f, padding->bottom, input.containingBlock.height);
-    res.start = resolve(t, f, padding->start, input.containingBlock.width);
-
-    return res;
-}
-
-static Math::Radii<Px> _computeRadii(Tree &t, Frag &f, Vec2Px size) {
-    auto radii = f.style->borders->radii;
-    Math::Radii<Px> res;
-
-    res.a = resolve(t, f, radii.a, size.height);
-    res.b = resolve(t, f, radii.b, size.width);
-    res.c = resolve(t, f, radii.c, size.width);
-    res.d = resolve(t, f, radii.d, size.height);
-    res.e = resolve(t, f, radii.e, size.height);
-    res.f = resolve(t, f, radii.f, size.width);
-    res.g = resolve(t, f, radii.g, size.width);
-    res.h = resolve(t, f, radii.h, size.height);
-
-    return res;
-}
-
-static Cons<Opt<Px>, IntrinsicSize> _computeSpecifiedSize(Tree &t, Frag &f, Input input, Size size) {
-    if (size == Size::MIN_CONTENT) {
-        return {NONE, IntrinsicSize::MIN_CONTENT};
-    } else if (size == Size::MAX_CONTENT) {
-        return {NONE, IntrinsicSize::MAX_CONTENT};
-    } else if (size == Size::AUTO) {
-        return {NONE, IntrinsicSize::AUTO};
-    } else if (size == Size::FIT_CONTENT) {
-        return {NONE, IntrinsicSize::STRETCH_TO_FIT};
-    } else if (size == Size::LENGTH) {
-        return {resolve(t, f, size.value, input.containingBlock.width), IntrinsicSize::AUTO};
-    } else {
-        logWarn("unknown specified size: {}", size);
-        return {Px{0}, IntrinsicSize::AUTO};
-    }
-}
-
-Output layout(Tree &t, Frag &f, Input input) {
-    auto margin = _computeMargins(t, f, input);
-    auto borders = _computeBorders(t, f);
-    auto padding = _computePaddings(t, f, input);
-    auto sizing = f.style->sizing;
-
-    auto [specifiedWidth, widthIntrinsicSize] = _computeSpecifiedSize(t, f, input, sizing->width);
-    if (input.knownSize.width == NONE) {
-        input.knownSize.width = specifiedWidth;
-    }
-    input.knownSize.width = input.knownSize.width.map([&](auto s) {
-        // FIXME: Take box-sizing into account
-        return s - padding.horizontal() - borders.horizontal();
-    });
-    input.intrinsic = widthIntrinsicSize;
-
-    auto [specifiedHeight, heightIntrinsicSize] = _computeSpecifiedSize(t, f, input, sizing->height);
-    if (input.knownSize.height == NONE) {
-        input.knownSize.height = specifiedHeight;
-    }
-
-    input.knownSize.height = input.knownSize.height.map([&](auto s) {
-        // FIXME: Take box-sizing into account
-        return s - padding.vertical() - borders.vertical();
-    });
-    input.intrinsic = heightIntrinsicSize;
-
-    auto [size, _] = _contentLayout(t, f, input);
-
-    size.width = input.knownSize.width.unwrapOr(size.width);
-    size.height = input.knownSize.height.unwrapOr(size.height);
-
-    size = size + padding.all() + borders.all();
-
-    if (input.commit == Commit::YES) {
-        f.layout.borderSize = size;
-        f.layout.padding = padding;
-        f.layout.borders = borders;
-        f.layout.margin = margin;
-        f.layout.radii = _computeRadii(t, f, size);
-    }
-
-    return Output::fromSizeAndMargin(size, margin);
-}
-
-// MARK: Paint -----------------------------------------------------------------
-
-static void _paintInner(Frag &frag, Paint::Stack &stack, Math::Vec2f pos) {
-    auto const &backgrounds = frag.style->backgrounds;
-
-    Gfx::Color currentColor = Gfx::BLACK;
-    currentColor = resolve(frag.style->color, currentColor);
-
-    if (backgrounds.len()) {
-        Paint::Box paint;
-
-        paint.backgrounds.ensure(backgrounds.len());
-        for (auto &bg : backgrounds) {
-            paint.backgrounds.pushBack(resolve(bg.fill, currentColor));
-        }
-
-        paint.radii = frag.layout.radii.cast<f64>();
-        paint.bound = frag.layout.borderBox().cast<f64>().offset(pos);
-
-        stack.add(makeStrong<Paint::Box>(std::move(paint)));
-    }
-
-    for (auto &c : frag.children()) {
-        paint(c, stack, pos + frag.layout.contentBox().topStart().cast<f64>());
-    }
-
-    if (auto *run = frag.content.is<Strong<Text::Run>>()) {
-        Math::Vec2f baseline = {0, frag.font.metrics().ascend};
-        stack.add(makeStrong<Paint::Text>(
-            pos + frag.layout.borderBox().topStart().cast<f64>() + baseline,
-            *run,
-            currentColor
-        ));
-    }
-
-    if (not frag.layout.borders.zero()) {
-        Paint::Borders paint;
-        auto bordersLayout = frag.layout.borders;
-        auto bordersStyle = frag.style->borders;
-
-        paint = Paint::Borders();
-        paint.bound = frag.layout.paddingBox().cast<f64>().offset(pos);
-        paint.radii = frag.layout.radii.cast<f64>().reduceOverlap(paint.bound.size());
-
-        paint.top.width = bordersLayout.top.cast<f64>();
-        paint.top.style = bordersStyle->top.style;
-        paint.top.fill = resolve(bordersStyle->top.color, currentColor);
-
-        paint.bottom.width = bordersLayout.bottom.cast<f64>();
-        paint.bottom.style = bordersStyle->bottom.style;
-        paint.bottom.fill = resolve(bordersStyle->bottom.color, currentColor);
-
-        paint.start.width = bordersLayout.start.cast<f64>();
-        paint.start.style = bordersStyle->start.style;
-        paint.start.fill = resolve(bordersStyle->start.color, currentColor);
-
-        paint.end.width = bordersLayout.end.cast<f64>();
-        paint.end.style = bordersStyle->end.style;
-        paint.end.fill = resolve(bordersStyle->end.color, currentColor);
-
-        stack.add(makeStrong<Paint::Borders>(std::move(paint)));
-    }
-}
-
-void paint(Frag &frag, Paint::Stack &stack, Math::Vec2f pos) {
-    if (frag.style->zIndex == ZIndex::AUTO) {
-        _paintInner(frag, stack, pos);
-    } else {
-        auto innerStack = makeStrong<Paint::Stack>();
-        innerStack->zIndex = frag.style->zIndex.value;
-        _paintInner(frag, *innerStack, pos);
-        stack.add(std::move(innerStack));
-    }
-}
-
-void wireframe(Frag &frag, Gfx::Canvas &g) {
-    for (auto &c : frag.children())
-        wireframe(c, g);
-
-    g.strokeStyle({
-        .fill = Gfx::BLACK,
-        .width = 1,
-        .align = Gfx::INSIDE_ALIGN,
-    });
-
-    g.stroke(frag.layout.borderBox().cast<f64>());
 }
 
 } // namespace Vaev::Layout

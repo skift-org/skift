@@ -31,7 +31,7 @@ Ui::Child navbarItem(Ui::OnPress onPress, Mdi::Icon icon, Str text, bool selecte
                    Ui::empty(4),
                    Ui::labelSmall(text)
                ) |
-                   Ui::insets({8, 10, 8, 6})
+                   Ui::insets({ 10, 8, 6, 8})
            ) |
            Ui::grow();
 }

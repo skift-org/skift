@@ -76,7 +76,7 @@ struct Token {
     }
 
     bool operator==(Token const &other) const {
-        return type == other.type && data == other.data;
+        return type == other.type and data == other.data;
     }
 };
 

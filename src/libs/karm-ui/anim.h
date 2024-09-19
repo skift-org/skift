@@ -70,7 +70,7 @@ struct Eased {
         if (not _animated)
             return false;
 
-        auto *e = event.is<Node::AnimateEvent>();
+        auto e = event.is<Node::AnimateEvent>();
         if (not e)
             return false;
 

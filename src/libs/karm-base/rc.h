@@ -2,6 +2,7 @@
 
 #include <karm-meta/traits.h>
 
+#include "cursor.h"
 #include "lock.h"
 #include "opt.h"
 
@@ -235,15 +236,31 @@ struct Strong {
     }
 
     template <typename U>
-    constexpr U *is() {
+    constexpr MutCursor<U> is() {
         if (not _cell)
             return nullptr;
 
-        return Meta::Same<T, U> or
-                       Meta::Derive<T, U> or
-                       _cell->inspect().id() == Meta::idOf<U>()
-                   ? &_cell->unwrap<U>()
-                   : nullptr;
+        if (not Meta::Same<T, U> and
+            not Meta::Derive<T, U> and
+            not(_cell->inspect().id() == Meta::idOf<U>())) {
+            return nullptr;
+        }
+
+        return &_cell->unwrap<U>();
+    }
+
+    template <typename U>
+    constexpr Cursor<U> is() const {
+        if (not _cell)
+            return nullptr;
+
+        if (not Meta::Same<T, U> and
+            not Meta::Derive<T, U> and
+            not _cell->inspect().id() == Meta::idOf<U>()) {
+            return nullptr;
+        }
+
+        return &_cell->unwrap<U>();
     }
 
     Meta::Type<> inspect() const {

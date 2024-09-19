@@ -1,5 +1,6 @@
 #include <karm-kira/scaffold.h>
 #include <karm-ui/layout.h>
+#include <mdi/code-braces.h>
 
 #include "app.h"
 

@@ -1,6 +1,10 @@
 #include <karm-kira/scaffold.h>
 #include <karm-kira/side-nav.h>
 #include <karm-ui/layout.h>
+#include <mdi/apps.h>
+#include <mdi/atom.h>
+#include <mdi/cog.h>
+#include <mdi/view-dashboard.h>
 
 #include "app.h"
 #include "model.h"
@@ -115,4 +119,4 @@ Ui::Child app() {
     });
 }
 
-} // namespace Hideo::Tasks
+} // namespace Hideo::Sysmon

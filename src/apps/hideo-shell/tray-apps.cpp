@@ -5,6 +5,10 @@
 #include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
+#include <mdi/close.h>
+#include <mdi/format-list-bulleted-square.h>
+#include <mdi/magnify.h>
+#include <mdi/view-grid.h>
 
 #include "app.h"
 
@@ -17,7 +21,7 @@ Ui::Child searchInput() {
                Ui::text(Ui::TextStyles::labelMedium().withColor(Ui::GRAY400), "Search…") | Ui::grow(),
                Ui::icon(Mdi::MAGNIFY, 24)
            ) |
-           Ui::insets({12, 8}) |
+           Ui::insets({8, 12}) |
            Ui::box({
                .borderRadii = 4,
                .borderWidth = 1,
@@ -107,7 +111,7 @@ Ui::Child runningApps(State const &state) {
                    })
                    .collect<Ui::Children>()
            ) |
-           Ui::center() | Ui::insets({0, 64, 0, 16});
+           Ui::center() | Ui::insets({64, 0, 16, 0});
 }
 
 Ui::Child apps(State const &state) {
@@ -135,7 +139,7 @@ Ui::Child apps(State const &state) {
         (state.isAppPanelThumbnails
              ? appsGrid(state)
              : appsList(state)) |
-            Ui::insets({0, 12}) | Ui::vscroll() | Ui::grow()
+            Ui::insets({12, 0}) | Ui::vscroll() | Ui::grow()
     );
 }
 
@@ -151,8 +155,8 @@ Ui::Child appsFlyout(State const &state) {
             apps(state) | Ui::grow()
         ) |
             Ui::box({
-                .margin = {8, 8, 8, 8},
-                .padding = {12, 0},
+                .margin = 8,
+                .padding = {0, 12},
                 .borderRadii = 8,
                 .borderWidth = 1,
                 .borderFill = Ui::GRAY800,

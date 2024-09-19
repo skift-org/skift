@@ -4,6 +4,7 @@
 
 #include <karm-gfx/mixbox/mixbox.h>
 #include <karm-ui/view.h>
+#include <mdi/gradient-horizontal.h>
 
 #include "base.h"
 

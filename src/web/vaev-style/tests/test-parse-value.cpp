@@ -1,5 +1,7 @@
 #include <karm-test/macros.h>
 #include <vaev-css/parser.h>
+#include <vaev-style/decls.h>
+#include <vaev-style/styles.h>
 #include <vaev-style/values.h>
 
 namespace Vaev::Style::Tests {
@@ -64,4 +66,55 @@ test$("vaev-css-build-display") {
     return Ok();
 }
 
+test$("vaev-css-build-margin") {
+    auto testCase = [&](Str input, Math::Insets<Width> expected) -> Res<> {
+        auto lex = Css::Lexer{input};
+        auto val = consumeDeclaration(lex);
+        Css::Sst sst{val.unwrap()};
+
+        auto res = parseDeclaration<StyleProp>(sst);
+        expect$(res);
+
+        Computed c;
+        res.unwrap().apply(c);
+
+        expectEq$(Io::format("{}", *c.margin).unwrap(), Io::format("{}", expected).unwrap());
+
+        return Ok();
+    };
+
+    try$(testCase(
+        "margin: 30px;",
+        Margin{Width{Px{30}}}
+    ));
+
+    try$(testCase(
+        "margin: 1px 2px;",
+        Margin{
+            Width{Px{1}},
+            Width{Px{2}},
+        }
+    ));
+
+    try$(testCase(
+        "margin: 1px 2px 3px;",
+        Margin{
+            Width{Px{1}},
+            Width{Px{2}},
+            Width{Px{3}},
+        }
+    ));
+
+    try$(testCase(
+        "margin: 1px 2px 3px 4px;",
+        Margin{
+            Width{Px{1}},
+            Width{Px{2}},
+            Width{Px{3}},
+            Width{Px{4}},
+        }
+    ));
+
+    return Ok();
+}
 } // namespace Vaev::Style::Tests

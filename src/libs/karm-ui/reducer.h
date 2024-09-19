@@ -104,7 +104,7 @@ struct Reducer :
     }
 
     void event(App::Event &e) override {
-        if (auto *a = e.is<Action>()) {
+        if (auto a = e.is<Action>()) {
             Model::reduce(_state, *a);
             e.accept();
             _rebuild = true;
@@ -116,7 +116,7 @@ struct Reducer :
     }
 
     void bubble(App::Event &e) override {
-        if (auto *a = e.is<Action>()) {
+        if (auto a = e.is<Action>()) {
             Model::reduce(_state, *a);
             e.accept();
 

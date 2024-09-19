@@ -5,6 +5,8 @@
 #include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
 
+#include <mdi/weather-partly-cloudy.h>
+
 namespace Hideo::Weather {
 
 Ui::Child app() {

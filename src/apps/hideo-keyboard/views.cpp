@@ -1,6 +1,12 @@
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
 #include <karm-ui/input.h>
+#include <mdi/arrow-up-bold-outline.h>
+#include <mdi/arrow-up-bold.h>
+#include <mdi/backspace-outline.h>
+#include <mdi/cog-outline.h>
+#include <mdi/emoticon.h>
+#include <mdi/keyboard-return.h>
 
 #include "model.h"
 
@@ -57,7 +63,11 @@ static Ui::Child keyboard(State const &k) {
 
     auto thirdRow = Ui::hflow(
         8,
-        Ui::button(Model::bind<ToggleShift>(), Ui::ButtonStyle::secondary(), k.shift ? Mdi::ARROW_UP_BOLD : Mdi::ARROW_UP_BOLD_OUTLINE) | Ui::grow(),
+        Ui::button(
+            Model::bind<ToggleShift>(),
+            Ui::ButtonStyle::secondary(),
+            k.shift ? Mdi::ARROW_UP_BOLD : Mdi::ARROW_UP_BOLD_OUTLINE
+        ) | Ui::grow(),
         key(k.shift ? "Z" : "z"),
         key(k.shift ? "X" : "x"),
         key(k.shift ? "C" : "c"),
@@ -65,7 +75,11 @@ static Ui::Child keyboard(State const &k) {
         key(k.shift ? "B" : "b"),
         key(k.shift ? "N" : "n"),
         key(k.shift ? "M" : "m"),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::secondary(), Mdi::BACKSPACE_OUTLINE) | Ui::grow()
+        Ui::button(
+            Ui::NOP,
+            Ui::ButtonStyle::secondary(),
+            Mdi::BACKSPACE_OUTLINE
+        ) | Ui::grow()
     );
 
     auto fourthRow = Ui::hflow(

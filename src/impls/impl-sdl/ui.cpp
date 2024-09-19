@@ -534,7 +534,7 @@ struct SdlHost :
     }
 
     void bubble(App::Event &event) override {
-        if (auto *e = event.is<DragEvent>()) {
+        if (auto e = event.is<DragEvent>()) {
             if (e->type == DragEvent::START) {
                 SDL_CaptureMouse(SDL_TRUE);
             } else if (e->type == DragEvent::END) {

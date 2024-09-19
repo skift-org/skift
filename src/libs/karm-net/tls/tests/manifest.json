@@ -1,12 +1,12 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "vaev-tls.tests",
+    "id": "karm-net.tls.tests",
     "type": "lib",
     "props": {
         "cpp-excluded": true
     },
     "requires": [
-        "vaev-httlstp",
+        "karm-net.tls",
         "karm-test"
     ],
     "injects": [

@@ -53,7 +53,7 @@ struct MouseListener {
         bool result = false;
         MouseState state = _state;
 
-        if (auto *e = event.is<App::MouseEvent>()) {
+        if (auto e = event.is<App::MouseEvent>()) {
             if (not node.bound().contains(e->pos)) {
                 state = IDLE;
             } else {
@@ -76,7 +76,7 @@ struct MouseListener {
                     event.accept();
                 }
             }
-        } else if (auto *e = event.is<App::MouseLeaveEvent>()) {
+        } else if (auto e = event.is<App::MouseLeaveEvent>()) {
             state = IDLE;
         }
 
@@ -138,9 +138,9 @@ inline auto button(OnPress onPress, ButtonStyle style) {
 
 Child button(OnPress onPress, ButtonStyle style, Str t);
 
-Child button(OnPress onPress, ButtonStyle style, Media::Icon i);
+Child button(OnPress onPress, ButtonStyle style, Gfx::Icon i);
 
-Child button(OnPress onPress, ButtonStyle style, Media::Icon i, Str t);
+Child button(OnPress onPress, ButtonStyle style, Gfx::Icon i, Str t);
 
 Child button(OnPress onPress, Child child);
 

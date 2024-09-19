@@ -8,40 +8,22 @@
 
 namespace Vaev::Driver {
 
-Res<Strong<Markup::Document>> fetchDocument(Mime::Url url) {
-    logInfo("fetching: {}", url);
-
-    if (url.scheme == "about") {
-        if (url.path.str() == "blank")
-            return fetchDocument("bundle://vaev-driver/blank.xhtml"_url);
-
-        if (url.path.str() == "start")
-            return fetchDocument("bundle://vaev-driver/start-page.xhtml"_url);
-
-        return Error::invalidInput("unsupported about page");
-    }
-
-    auto mime = Mime::sniffSuffix(url.path.suffix());
-
-    if (not mime.has())
-        return Error::invalidInput("cannot determine MIME type");
-
+Res<Strong<Markup::Document>> loadDocument(Mime::Url const &, Mime::Mime const &mime, Io::Reader &reader) {
     auto dom = makeStrong<Markup::Document>();
-    auto file = try$(Sys::File::open(url));
-    auto buf = try$(Io::readAllUtf8(file));
+    auto buf = try$(Io::readAllUtf8(reader));
 
-    if (mime->is("text/html"_mime)) {
+    if (mime.is("text/html"_mime)) {
         Markup::HtmlParser parser{dom};
         parser.write(buf);
 
         return Ok(dom);
-    } else if (mime->is("application/xhtml+xml"_mime)) {
+    } else if (mime.is("application/xhtml+xml"_mime)) {
         Io::SScan scan{buf};
         Markup::XmlParser parser;
         dom = try$(parser.parse(scan, HTML));
 
         return Ok(dom);
-    } else if (mime->is("image/svg+xml"_mime)) {
+    } else if (mime.is("image/svg+xml"_mime)) {
         Io::SScan scan{buf};
         Markup::XmlParser parser;
         dom = try$(parser.parse(scan, SVG));
@@ -50,6 +32,29 @@ Res<Strong<Markup::Document>> fetchDocument(Mime::Url url) {
     } else {
         logError("unsupported MIME type: {}", mime);
         return Error::invalidInput("unsupported MIME type");
+    }
+}
+
+Res<Strong<Markup::Document>> fetchDocument(Mime::Url const &url) {
+    if (url.scheme == "about") {
+        if (url.path.str() == "blank")
+            return fetchDocument("bundle://vaev-driver/blank.xhtml"_url);
+
+        if (url.path.str() == "start")
+            return fetchDocument("bundle://vaev-driver/start-page.xhtml"_url);
+
+        return Error::invalidInput("unsupported about page");
+    } else if (url.scheme == "file" or url.scheme == "bundle") {
+        auto mime = Mime::sniffSuffix(url.path.suffix());
+
+        if (not mime.has())
+            return Error::invalidInput("cannot determine MIME type");
+
+        auto dom = makeStrong<Markup::Document>();
+        auto file = try$(Sys::File::open(url));
+        return loadDocument(url, *mime, file);
+    } else {
+        return Error::invalidInput("unsupported url scheme");
     }
 }
 

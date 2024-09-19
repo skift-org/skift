@@ -1,8 +1,11 @@
+#include <karm-scene/page.h>
+#include <karm-scene/stack.h>
 #include <karm-sys/time.h>
 #include <vaev-layout/frag.h>
+#include <vaev-layout/layout.h>
+#include <vaev-layout/paint.h>
+#include <vaev-layout/positioned.h>
 #include <vaev-markup/dom.h>
-#include <vaev-paint/page.h>
-#include <vaev-paint/stack.h>
 #include <vaev-style/computer.h>
 
 #include "fetcher.h"
@@ -13,7 +16,7 @@ namespace Vaev::Driver {
 static constexpr bool DEBUG_RENDER = false;
 
 static void _collectStyle(Markup::Node const &node, Style::StyleBook &sb) {
-    auto *el = node.is<Markup::Element>();
+    auto el = node.is<Markup::Element>();
     if (el and el->tagName == Html::STYLE) {
         auto text = el->textContent();
         Io::SScan textScan{text};
@@ -94,23 +97,25 @@ RenderResult render(Markup::Document const &dom, Style::Media const &media, Vec2
             .containingBlock = {vp.small.width, vp.small.height},
         }
     );
+    Layout::layoutPositioned(tree, tree.root, {vp.small.width, vp.small.height});
 
-    auto paintRoot = makeStrong<Paint::Stack>();
+    auto sceneRoot = makeStrong<Scene::Stack>();
 
     elapsed = Sys::now() - start;
     logDebugIf(DEBUG_RENDER, "layout tree layout time: {}", elapsed);
 
     auto paintStart = Sys::now();
 
-    Layout::paint(tree.root, *paintRoot);
-    paintRoot->prepare();
+    Layout::paint(tree.root, *sceneRoot);
+    sceneRoot->prepare();
 
     elapsed = Sys::now() - paintStart;
     logDebugIf(DEBUG_RENDER, "layout tree paint time: {}", elapsed);
 
     return {
+        std::move(stylebook),
         makeStrong<Layout::Frag>(std::move(tree.root)),
-        paintRoot,
+        sceneRoot,
     };
 }
 
@@ -151,13 +156,14 @@ RenderResult render(Markup::Document &dom, Style::Media const &media, Print::Pap
         }
     );
 
-    auto paintRoot = makeStrong<Paint::Page>();
-    Layout::paint(tree.root, *paintRoot);
-    paintRoot->prepare();
+    auto sceneRoot = makeStrong<Scene::Page>();
+    Layout::paint(tree.root, *sceneRoot);
+    sceneRoot->prepare();
 
     return {
+        std::move(stylebook),
         makeStrong<Layout::Frag>(std::move(tree.root)),
-        paintRoot,
+        sceneRoot,
     };
 }
 

@@ -2,6 +2,8 @@
 
 #include <karm-ui/view.h>
 
+#include <mdi/gradient-horizontal.h>
+
 #include "base.h"
 
 namespace Hideo::Demos {

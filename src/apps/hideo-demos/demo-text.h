@@ -4,6 +4,7 @@
 #include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
+#include <mdi/text.h>
 
 #include "base.h"
 

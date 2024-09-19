@@ -49,28 +49,28 @@ struct HtmlToken {
     bool selfClosing{false};
 
     void repr(Io::Emit &e) const {
-        e("type={}", type);
+        e("({}", type);
         if (name)
             e(" name={}", name);
         if (rune)
-            e(" rune={#c}", rune);
+            e(" rune='{#c}'", rune);
         if (data)
-            e(" data={}", data);
+            e(" data={#}", data);
         if (publicIdent)
-            e(" publicIdent={}", publicIdent);
+            e(" publicIdent={#}", publicIdent);
         if (systemIdent)
-            e(" systemIdent={}", systemIdent);
+            e(" systemIdent={#}", systemIdent);
         if (attrs.len() > 0) {
             e.indentNewline();
-            for (auto &attr : attrs) {
-                e(" attr:{}={}", attr.name, attr.value);
-            }
+            for (auto &attr : attrs)
+                e("({} {#})", attr.name, attr.value);
             e.deindent();
         }
         if (forceQuirks)
             e(" forceQuirks");
         if (selfClosing)
             e(" selfClosing");
+        e(")");
     }
 };
 
@@ -230,6 +230,17 @@ struct HtmlParser : public HtmlSink {
 
     void _raise(Str msg = "parse-error");
 
+    // MARL: Utilities
+
+    bool _hasElementInScope(TagName tag) {
+        for (auto &el : _openElements)
+            if (el->tagName == tag)
+                return true;
+        return false;
+    }
+
+    // MARK: Modes
+
     void _handleInitialMode(HtmlToken const &t);
 
     void _handleBeforeHtml(HtmlToken const &t);
@@ -245,6 +256,8 @@ struct HtmlParser : public HtmlSink {
     void _handleInBody(HtmlToken const &t);
 
     void _handleText(HtmlToken const &t);
+
+    void _handleAfterBody(HtmlToken const &t);
 
     void _switchTo(Mode mode);
 

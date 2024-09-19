@@ -9,6 +9,15 @@
 #include <karm-ui/dialog.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
+#include <mdi/alert-decagram.h>
+#include <mdi/circle-small.h>
+#include <mdi/content-save-plus.h>
+#include <mdi/content-save.h>
+#include <mdi/file.h>
+#include <mdi/folder.h>
+#include <mdi/redo.h>
+#include <mdi/text.h>
+#include <mdi/undo.h>
 
 namespace Hideo::Text {
 
@@ -74,22 +83,34 @@ Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
                 .title = "Text"s,
                 .startTools = slots$(
                     Ui::button(Model::bind<New>(), Ui::ButtonStyle::subtle(), Mdi::FILE),
-                    Ui::button([](auto &n) {
-                        Ui::showDialog(n, Files::openFileDialog());
-                    },
-                               Ui::ButtonStyle::subtle(), Mdi::FOLDER),
-                    Ui::button(Model::bindIf(s.text->dirty(), Save{}), Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE), Ui::button(Model::bindIf(s.text->dirty(), Save{true}), Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE_PLUS)
+                    Ui::button(
+                        [](auto &n) {
+                            Ui::showDialog(n, Files::openFileDialog());
+                        },
+                        Ui::ButtonStyle::subtle(), Mdi::FOLDER
+                    ),
+                    Ui::button(
+                        Model::bindIf(s.text->dirty(), Save{}),
+                        Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE
+                    ),
+                    Ui::button(
+                        Model::bindIf(s.text->dirty(), Save{true}), Ui::ButtonStyle::subtle(),
+                        Mdi::CONTENT_SAVE_PLUS
+                    )
                 ),
-                .endTools = slots$(Ui::button(Model::bindIf<Karm::Text::Action>(s.text->canUndo(), Karm::Text::Action::UNDO), Ui::ButtonStyle::subtle(), Mdi::UNDO), Ui::button(Model::bindIf<Karm::Text::Action>(s.text->canRedo(), Karm::Text::Action::REDO), Ui::ButtonStyle::subtle(), Mdi::REDO)),
+                .endTools = slots$(
+                    Ui::button(Model::bindIf<Karm::Text::Action>(s.text->canUndo(), Karm::Text::Action::UNDO), Ui::ButtonStyle::subtle(), Mdi::UNDO),
+                    Ui::button(Model::bindIf<Karm::Text::Action>(s.text->canRedo(), Karm::Text::Action::REDO), Ui::ButtonStyle::subtle(), Mdi::REDO)
+                ),
                 .body = [=] {
                     return Ui::vflow(
                         Ui::hflow(
                             0,
                             Math::Align::CENTER,
                             Ui::labelSmall("{}{}", s.url ? s.url->basename() : "Untitled", s.text->dirty() ? "*" : ""),
-                            Ui::icon(Mdi::CIRCLE_SMALL, Ui::GRAY700) | Ui::insets({-3, 0}),
+                            Ui::icon(Mdi::CIRCLE_SMALL, Ui::GRAY700) | Ui::insets({0, -3}),
                             Ui::text(Ui::TextStyles::labelSmall().withColor(Ui::GRAY500), "{}", s.url)
-                        ) | Ui::insets({16, 6}),
+                        ) | Ui::insets({6, 16}),
                         Ui::separator(),
 
                         s.error
@@ -107,7 +128,7 @@ Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
                             Ui::separator(),
                             Ui::labelSmall("LF")
                         ) | Ui::box({
-                                .padding = {12, 6},
+                                .padding = {6, 12},
                                 .backgroundFill = Ui::GRAY900,
                             })
                     );

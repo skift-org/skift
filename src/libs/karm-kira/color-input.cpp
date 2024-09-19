@@ -289,7 +289,7 @@ Ui::Child colorPickerDialog() {
 
                 Kr::dialogTitleBar("Color Picker"s),
                 content |
-                    Ui::insets({16, 8}),
+                    Ui::insets({8, 16}),
                 Kr::dialogFooter(
                     {
                         Kr::dialogCancel(),
@@ -318,7 +318,7 @@ Ui::Child colorInput(Gfx::Color color, Ui::OnChange<Gfx::Color>) {
         Ui::codeMedium("#{:02x}{:02x}{:02x}", color.red, color.green, color.blue) | Ui::vcenter();
 
     return hflow(8, Math::Align::CENTER, colorPreview, hexPreview) |
-           Ui::insets({6, 6, 12, 6}) |
+           Ui::insets({6, 12, 6, 6}) |
            Ui::minSize({Ui::UNCONSTRAINED, 36}) |
            button(
                [](auto &n) {

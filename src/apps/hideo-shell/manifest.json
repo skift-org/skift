@@ -4,8 +4,7 @@
     "type": "lib",
     "description": "Graphical user interface for desktop and mobile devices",
     "requires": [
-        "hideo-keyboard-base",
-        "karm-kira",
-        "skift-wallpapers"
+        "hideo-keyboard",
+        "karm-kira"
     ]
 }

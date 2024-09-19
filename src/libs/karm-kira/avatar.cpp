@@ -1,5 +1,6 @@
 #include <karm-ui/box.h>
 #include <karm-ui/layout.h>
+#include <mdi/account.h>
 
 #include "avatar.h"
 

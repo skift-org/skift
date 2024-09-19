@@ -1,10 +1,6 @@
 #pragma once
 
-#include <karm-base/checked.h>
 #include <karm-base/map.h>
-#include <karm-base/string.h>
-#include <karm-base/union.h>
-#include <karm-base/vec.h>
 #include <karm-gfx/colors.h>
 #include <karm-math/vec.h>
 #include <karm-text/font.h>

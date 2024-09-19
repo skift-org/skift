@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/box.h>
+#include <karm-base/cursor.h>
 #include <karm-meta/id.h>
 
 #include "event.h"
@@ -20,13 +21,17 @@ struct Event {
     virtual void const *_unwrap() const = 0;
 
     template <typename T>
-    T *is() {
-        return id() == Meta::idOf<T>() ? &unwrap<T>() : nullptr;
+    MutCursor<T> is() {
+        if (id() != Meta::idOf<T>())
+            return nullptr;
+        return &unwrap<T>();
     }
 
     template <typename T>
-    T const *is() const {
-        return id() == Meta::idOf<T>() ? &unwrap<T>() : nullptr;
+    Cursor<T> is() const {
+        if (id() != Meta::idOf<T>())
+            return nullptr;
+        return &unwrap<T>();
     }
 
     template <typename T>

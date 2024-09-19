@@ -53,7 +53,7 @@ struct Table : public Ui::View<Table> {
     // MARK: Events ------------------------------------------------------------
 
     void event(App::Event &event) override {
-        auto *e = event.is<App::MouseEvent>();
+        auto e = event.is<App::MouseEvent>();
         if (not e)
             return;
 

@@ -7,6 +7,7 @@ namespace Vaev {
 // https://www.w3.org/TR/CSS22/visuren.html#propdef-position
 enum struct Position {
     STATIC,
+
     RELATIVE,
     ABSOLUTE,
     FIXED,

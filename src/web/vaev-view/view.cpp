@@ -1,5 +1,6 @@
 #include <karm-ui/view.h>
 #include <vaev-driver/render.h>
+#include <vaev-layout/paint.h>
 
 #include "view.h"
 
@@ -62,7 +63,7 @@ struct View : public Ui::View<View> {
         g.origin(bound().xy.cast<f64>());
         g.clip(viewport);
 
-        auto [layout, paint] = *_renderResult;
+        auto [_, layout, paint] = *_renderResult;
         g.clear(rect, Gfx::WHITE);
 
         paint->paint(g);
@@ -83,7 +84,7 @@ struct View : public Ui::View<View> {
     Math::Vec2i size(Math::Vec2i size, Ui::Hint) override {
         // FIXME: This is wasteful, we should cache the result
         auto media = _constructMedia(size);
-        auto [layout, _] = Driver::render(*_dom, media, size.cast<Px>());
+        auto [_, layout, _] = Driver::render(*_dom, media, size.cast<Px>());
 
         return {
             layout->layout.borderBox().width.cast<isize>(),

@@ -1,12 +1,12 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "vaev-http.tests",
+    "id": "karm-net.http.tests",
     "type": "lib",
     "props": {
         "cpp-excluded": true
     },
     "requires": [
-        "vaev-http",
+        "karm-net.http",
         "karm-test"
     ],
     "injects": [

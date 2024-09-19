@@ -1,6 +1,10 @@
 #include <karm-kira/scaffold.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
+#include <mdi/counter.h>
+#include <mdi/minus-thick.h>
+#include <mdi/plus-thick.h>
+#include <mdi/refresh.h>
 
 #include "model.h"
 

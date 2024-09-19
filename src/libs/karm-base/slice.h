@@ -31,7 +31,7 @@ concept MutSliceable =
 
 template <Sliceable T, Sliceable U>
     requires Meta::Comparable<typename T::Inner, typename U::Inner>
-constexpr auto operator<=>(T const &lhs, U const &rhs) {
+constexpr auto operator<=>(T const &lhs, U const &rhs) -> decltype(lhs[0] <=> rhs[0]) {
     for (usize i = 0; i < min(lhs.len(), rhs.len()); i++) {
         auto result = lhs[i] <=> rhs[i];
         if (result != 0)

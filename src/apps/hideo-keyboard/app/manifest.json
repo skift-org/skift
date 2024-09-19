@@ -1,9 +1,9 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "hideo-keyboard",
+    "id": "hideo-keyboard.main",
     "type": "exe",
     "description": "Virtual keyboard",
     "requires": [
-        "hideo-keyboard-base"
+        "hideo-keyboard"
     ]
 }

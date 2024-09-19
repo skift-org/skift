@@ -12,10 +12,10 @@ static bool _isWord(Rune r) {
 // MARK: Actions ---------------------------------------------------------------
 
 Opt<Action> Action::fromEvent(App::Event &e) {
-    if (auto *te = e.is<App::TypeEvent>()) {
+    if (auto te = e.is<App::TypeEvent>()) {
         return Action{TYPE, te->rune};
     } else if (
-        auto *ke = e.is<App::KeyboardEvent>();
+        auto ke = e.is<App::KeyboardEvent>();
         ke and ke->type == App::KeyboardEvent::PRESS
     ) {
         bool shift = !!(ke->mods & App::KeyMod::SHIFT);

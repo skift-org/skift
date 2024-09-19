@@ -1,6 +1,7 @@
 #pragma once
 
 #include "align.h"
+#include "clamp.h"
 #include "cons.h"
 
 namespace Karm {
@@ -113,14 +114,14 @@ struct Range {
         return U{start, size};
     }
 
-    Res<> ensureAligned(T alignment) const {
+    Opt<bool> ensureAligned(T alignment) const {
         if (not isAlign(start, alignment))
-            return Error::invalidInput("start is not aligned");
+            return NONE;
 
         if (not isAlign(size, alignment))
-            return Error::invalidInput("size is not aligned");
+            return NONE;
 
-        return Ok();
+        return true;
     }
 
     std::strong_ordering operator<=>(Range const &other) const {

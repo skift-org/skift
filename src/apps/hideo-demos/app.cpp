@@ -5,13 +5,13 @@
 #include <karm-ui/reducer.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
+#include <mdi/duck.h>
 
 #include "demo-bezier.h"
 #include "demo-carousel.h"
 #include "demo-circle.h"
 #include "demo-gradient.h"
 #include "demo-hello.h"
-#include "demo-icons.h"
 #include "demo-mixbox.h"
 #include "demo-stroke.h"
 #include "demo-svg.h"
@@ -25,7 +25,6 @@ static Array DEMOS = {
     &CIRCLE_DEMO,
     &GRADIENT_DEMO,
     &HELLO_DEMO,
-    &ICONS_DEMO,
     &MIXBOX_DEMO,
     &STROKE_DEMO,
     &SVG_DEMO,

@@ -3,6 +3,10 @@
 #include <karm-kira/scaffold.h>
 #include <karm-sys/info.h>
 #include <karm-ui/error.h>
+#include <mdi/account.h>
+#include <mdi/cpu-64-bit.h>
+#include <mdi/information-outline.h>
+#include <mdi/memory.h>
 
 #include "app.h"
 

@@ -31,6 +31,10 @@ struct FontMetrics {
         return ascend + descend + linegap;
     }
 
+    f64 baseline() {
+        return linegap / 2 + ascend;
+    }
+
     FontMetrics combine(FontMetrics other) {
         return {
             .ascend = ::max(ascend, other.ascend),

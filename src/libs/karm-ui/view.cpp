@@ -1,6 +1,7 @@
-#include "view.h"
+#include <karm-text/loader.h>
 
 #include "box.h"
+#include "view.h"
 
 namespace Karm::Ui {
 
@@ -260,10 +261,10 @@ Child text(Str text) {
 // MARK: Icon ------------------------------------------------------------------
 
 struct Icon : public View<Icon> {
-    Media::Icon _icon;
+    Gfx::Icon _icon;
     Opt<Gfx::Color> _color;
 
-    Icon(Media::Icon icon, Opt<Gfx::Color> color)
+    Icon(Gfx::Icon icon, Opt<Gfx::Color> color)
         : _icon(icon), _color(color) {}
 
     void reconcile(Icon &o) override {
@@ -286,12 +287,12 @@ struct Icon : public View<Icon> {
     }
 };
 
-Child icon(Media::Icon icon, Opt<Gfx::Color> color) {
+Child icon(Gfx::Icon icon, Opt<Gfx::Color> color) {
     return makeStrong<Icon>(icon, color);
 }
 
 Child icon(Mdi::Icon i, f64 size, Opt<Gfx::Color> color) {
-    return icon(Media::Icon{i, size}, color);
+    return icon(Gfx::Icon{i, size}, color);
 }
 
 // MARK: Image -----------------------------------------------------------------

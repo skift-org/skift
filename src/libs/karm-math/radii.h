@@ -56,7 +56,7 @@ struct Radii {
 
     bool zero() const {
         return iter(radii).all([](T radii) {
-            return epsilonEq(radii, T{});
+            return radii == T{};
         });
     }
 
@@ -143,6 +143,11 @@ struct Radii {
     }
 
     void repr(Io::Emit &_e) const {
+        if (zero()) {
+            _e("(radii {})", a);
+            return;
+        }
+
         _e("(radii {} {} {} {} {} {} {} {})", a, b, c, d, e, f, g, h);
     }
 

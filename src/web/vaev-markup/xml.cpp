@@ -389,14 +389,14 @@ Res<String> XmlParser::_parseAttValue(Io::SScan &s) {
     if (quote != '"' and quote != '\'')
         return Error::invalidData("expected '\"' or '''");
 
-    while (s.curr() != quote and not s.ended()) {
+    while (s.peek() != quote and not s.ended()) {
         if (auto r = _parseReference(s))
             sb.append(r.unwrap());
         else
             sb.append(s.next());
     }
 
-    if (s.curr() != quote)
+    if (s.peek() != quote)
         return Error::invalidData("expected closing quote");
 
     s.next();

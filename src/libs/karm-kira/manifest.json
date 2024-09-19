@@ -4,6 +4,7 @@
     "type": "lib",
     "description": "A beautiful components library",
     "requires": [
-        "karm-ui"
+        "karm-ui",
+        "fonts-core"
     ]
 }

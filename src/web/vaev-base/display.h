@@ -27,6 +27,7 @@ struct Display {
         TABLE_COLUMN_GROUP,
         TABLE_COLUMN,
         TABLE_CAPTION,
+        TABLE_BOX,
         RUBY_BASE,
         RUBY_TEXT,
         RUBY_BASE_CONTAINER,

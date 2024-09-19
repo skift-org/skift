@@ -3,6 +3,8 @@
 #include <karm-ui/dialog.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/popover.h>
+#include <mdi/menu-open.h>
+#include <mdi/menu.h>
 
 #include "scaffold.h"
 

@@ -129,7 +129,7 @@ struct Color {
     }
 
     void repr(Io::Emit &e) const {
-        e("(color {} {} {} {})", red, green, blue, alpha);
+        e("(color #{:02x}{:02x}{:02x}{:02x})", red, green, blue, alpha);
     }
 
     auto operator<=>(Color const &other) const = default;

@@ -36,19 +36,23 @@ struct Node :
 
     Node *_parent = nullptr;
     Vec<Strong<Node>> _children;
- 
+
     virtual ~Node() = default;
 
     virtual NodeType nodeType() const = 0;
 
     template <typename T>
-    T *is() {
-        return nodeType() == T::TYPE ? static_cast<T *>(this) : nullptr;
+    MutCursor<T> is() {
+        if (nodeType() != T::TYPE)
+            return nullptr;
+        return static_cast<T *>(this);
     }
 
     template <typename T>
-    T const *is() const {
-        return nodeType() == T::TYPE ? static_cast<T const *>(this) : nullptr;
+    Cursor<T> is() const {
+        if (nodeType() != T::TYPE)
+            return nullptr;
+        return static_cast<T const *>(this);
     }
 
     // MARK: Parent
@@ -127,7 +131,7 @@ struct Node :
         return _parentIndex() > 0;
     }
 
-    Strong<Node> nextSibling() {
+    Strong<Node> nextSibling() const {
         usize index = _parentIndex();
         return parentNode()._children[index + 1];
     }
@@ -269,9 +273,7 @@ struct Attr : public Node {
     }
 
     void _repr(Io::Emit &e) const override {
-        e(" namespaceURI={#}", name.ns.url());
-        e(" prefix={#}", name.ns.name());
-        e(" localName={#} value={#}", name.name(), value);
+        e(" localName={}:{} value={#}", name.ns.name(), name.name(), value);
     }
 };
 
@@ -328,7 +330,7 @@ struct TokenList {
 struct Element : public Node {
     static constexpr auto TYPE = NodeType::ELEMENT;
 
-    Opt<String> id() const {
+    Opt<Str> id() const {
         return this->getAttribute(Html::ID_ATTR);
     }
 
@@ -354,7 +356,7 @@ struct Element : public Node {
             panic("textContent is not implemented for elements with multiple children");
 
         auto const &child = *_children[0];
-        if (auto *text = child.is<Text>()) {
+        if (auto text = child.is<Text>()) {
             return text->data;
         }
 
@@ -387,7 +389,7 @@ struct Element : public Node {
         return this->attributes.tryGet(name) != NONE;
     }
 
-    Opt<String> getAttribute(AttrName name) const {
+    Opt<Str> getAttribute(AttrName name) const {
         auto attr = this->attributes.tryGet(name);
         if (attr == NONE)
             return NONE;

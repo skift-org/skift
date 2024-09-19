@@ -180,7 +180,7 @@ struct FileProto : public Fd {
         try$(_proto->getInfo(_proto, &Efi::FileInfo::GUID, &bufSize, info));
 
         return Ok<Stat>(Stat{
-            .type = info->attribute & EFI_FILE_DIRECTORY ? Stat::DIR : Stat::FILE,
+            .type = info->attribute & EFI_FILE_DIRECTORY ? Type::DIR : Type::FILE,
             .size = info->fileSize,
             .accessTime = fromEfi(info->lastAccessTime),
             .modifyTime = fromEfi(info->modificationTime),

@@ -1,6 +1,10 @@
 #include <karm-kira/scaffold.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
+#include <mdi/camera-flip.h>
+#include <mdi/camera.h>
+#include <mdi/cog.h>
+#include <mdi/tune.h>
 
 #include "app.h"
 
@@ -43,20 +47,20 @@ Ui::Child appContent() {
                 Mdi::TUNE
             )
         ) |
-        Ui::insets({24, 24});
+        Ui::insets(24);
 
     auto bottomBar =
         Ui::hflow(
             Ui::button(
                 Ui::NOP,
                 Ui::ButtonStyle::regular().withRadii(999).withPadding(12),
-                Media::Icon(Mdi::CAMERA_FLIP, 24)
+                Gfx::Icon(Mdi::CAMERA_FLIP, 24)
             ) | Ui::center(),
 
             Ui::button(
                 Ui::NOP,
                 Ui::ButtonStyle::regular().withRadii(999).withPadding(16),
-                Media::Icon(Mdi::CAMERA, 38)
+                Gfx::Icon(Mdi::CAMERA, 38)
             ) | Ui::center() |
                 Ui::grow(),
             Ui::button(
@@ -66,7 +70,7 @@ Ui::Child appContent() {
             ) | Ui::center()
         ) |
         Ui::box({
-            .padding = {24, 16},
+            .padding = {16, 24},
             .backgroundFill = Gfx::BLACK.withOpacity(0.25),
         });
 

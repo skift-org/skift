@@ -11,6 +11,18 @@
 #include <karm-ui/layout.h>
 #include <karm-ui/popover.h>
 #include <karm-ui/scroll.h>
+#include <mdi/alert-decagram.h>
+#include <mdi/arrow-left.h>
+#include <mdi/arrow-right.h>
+#include <mdi/bookmark-outline.h>
+#include <mdi/bookmark.h>
+#include <mdi/button-cursor.h>
+#include <mdi/code-tags.h>
+#include <mdi/cog.h>
+#include <mdi/dots-horizontal.h>
+#include <mdi/printer.h>
+#include <mdi/refresh.h>
+#include <mdi/web.h>
 #include <vaev-driver/fetcher.h>
 #include <vaev-view/inspect.h>
 #include <vaev-view/view.h>
@@ -99,7 +111,7 @@ Ui::Child addressBar(Mime::Url const &url) {
                Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BOOKMARK_OUTLINE)
            ) |
            Ui::box({
-               .padding = {12, 0, 0, 0},
+               .padding = {0, 0, 0, 12},
                .borderRadii = 4,
                .borderWidth = 1,
                .backgroundFill = Ui::GRAY800,

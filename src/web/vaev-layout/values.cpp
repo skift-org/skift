@@ -5,46 +5,63 @@
 
 namespace Vaev::Layout {
 
-Px resolve(Tree &t, Frag &f, Length l) {
+Px _resolveFontRelative(Tree &t, Frag &f, Length l) {
+    Karm::Text::Font rootFont = {
+        t.root.fontFace,
+        t.root.layout.fontSize.cast<f64>(),
+    };
+
+    Karm::Text::Font fragFont = {
+        f.fontFace,
+        f.layout.fontSize.cast<f64>(),
+    };
+
     switch (l.unit()) {
 
-        // Font-relative
-
     case Length::Unit::EM:
-        return Px::fromFloatNearest(l.val() * f.font.fontSize());
+        return Px::fromFloatNearest(l.val() * fragFont.fontSize());
 
     case Length::Unit::REM:
-        return Px::fromFloatNearest(l.val() * t.root.font.fontSize());
+        return Px::fromFloatNearest(l.val() * rootFont.fontSize());
 
     case Length::Unit::EX:
-        return Px::fromFloatNearest(l.val() * f.font.xHeight());
+        return Px::fromFloatNearest(l.val() * fragFont.xHeight());
 
     case Length::Unit::REX:
-        return Px::fromFloatNearest(l.val() * t.root.font.xHeight());
+        return Px::fromFloatNearest(l.val() * rootFont.xHeight());
 
     case Length::Unit::CAP:
-        return Px::fromFloatNearest(l.val() * f.font.capHeight());
+        return Px::fromFloatNearest(l.val() * fragFont.capHeight());
 
     case Length::Unit::RCAP:
-        return Px::fromFloatNearest(l.val() * t.root.font.capHeight());
+        return Px::fromFloatNearest(l.val() * rootFont.capHeight());
 
     case Length::Unit::CH:
-        return Px::fromFloatNearest(l.val() * f.font.zeroAdvance());
+        return Px::fromFloatNearest(l.val() * fragFont.zeroAdvance());
 
     case Length::Unit::RCH:
-        return Px::fromFloatNearest(l.val() * t.root.font.zeroAdvance());
+        return Px::fromFloatNearest(l.val() * rootFont.zeroAdvance());
 
     case Length::Unit::IC:
-        return Px::fromFloatNearest(l.val() * f.font.zeroAdvance());
+        return Px::fromFloatNearest(l.val() * fragFont.zeroAdvance());
 
     case Length::Unit::RIC:
-        return Px::fromFloatNearest(l.val() * t.root.font.zeroAdvance());
+        return Px::fromFloatNearest(l.val() * rootFont.zeroAdvance());
 
     case Length::Unit::LH:
-        return Px::fromFloatNearest(l.val() * f.font.lineHeight());
+        return Px::fromFloatNearest(l.val() * fragFont.lineHeight());
 
     case Length::Unit::RLH:
-        return Px::fromFloatNearest(l.val() * t.root.font.lineHeight());
+        return Px::fromFloatNearest(l.val() * rootFont.lineHeight());
+    default:
+        panic("expected font-relative unit");
+    }
+}
+
+Px resolve(Tree &t, Frag &f, Length l) {
+    if (l.isFontRelative())
+        return _resolveFontRelative(t, f, l);
+    switch (l.unit()) {
 
     // Viewport-relative
 
@@ -224,9 +241,9 @@ Resolved<T> resolveInfix(typename CalcValue<T>::OpCode op, Resolved<T> lhs, Reso
 
 template <typename T>
 auto resolve(Tree &t, Frag &f, CalcValue<T> const &p, Px relative) {
-    if (p.type == CalcValue<T>::OpType::FIXED) {
+    if (p.type == CalcValue<T>::FIXED) {
         return resolve(t, f, p.lhs.template unwrap<T>(), relative);
-    } else if (p.type == CalcValue<T>::OpType::SINGLE) {
+    } else if (p.type == CalcValue<T>::SINGLE) {
         // TODO: compute result of funtion here with the resolved value
         return resolve(t, f, p.lhs.template unwrap<T>(), relative);
     } else if (p.type == CalcValue<T>::OpType::CALC) {
@@ -240,7 +257,7 @@ auto resolve(Tree &t, Frag &f, CalcValue<T> const &p, Px relative) {
             [&](Number const &v) {
                 return Math::i24f8{v};
             },
-            [&](None const &) -> Resolved<T>{
+            [&](None const &) -> Resolved<T> {
                 panic("invalid value in calc expression");
             }
         };
@@ -259,6 +276,43 @@ Px resolve(Tree &t, Frag &f, Width w, Px relative) {
     if (w == Width::Type::AUTO)
         return Px{0};
     return resolve(t, f, w.value, relative);
+}
+
+Px resolve(Tree &t, Frag &f, FontSize fs) {
+    // FIXME: get from user settings
+    f64 userFontSizes = 16;
+
+    // FIXME: get from parent
+    f64 parentFontSize = userFontSizes;
+
+    switch (fs.named()) {
+    case FontSize::XX_SMALL:
+        return Px::fromFloatNearest(userFontSizes * 0.5);
+    case FontSize::X_SMALL:
+        return Px::fromFloatNearest(userFontSizes * 0.75);
+    case FontSize::SMALL:
+        return Px::fromFloatNearest(userFontSizes * 0.875);
+    case FontSize::MEDIUM:
+        return Px::fromFloatNearest(userFontSizes);
+    case FontSize::LARGE:
+        return Px::fromFloatNearest(userFontSizes * 1.125);
+    case FontSize::X_LARGE:
+        return Px::fromFloatNearest(userFontSizes * 1.25);
+    case FontSize::XX_LARGE:
+        return Px::fromFloatNearest(userFontSizes * 1.5);
+
+    case FontSize::LARGER:
+        return Px::fromFloatNearest(parentFontSize * 1.25);
+    case FontSize::SMALLER:
+        return Px::fromFloatNearest(parentFontSize * 0.875);
+
+    case FontSize::LENGTH:
+        return resolve(t, f, fs.value(), Px{parentFontSize});
+
+    default:
+        panic("unimplemented font size");
+        break;
+    }
 }
 
 } // namespace Vaev::Layout

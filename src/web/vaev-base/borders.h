@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-gfx/borders.h>
 #include <karm-gfx/fill.h>
 #include <karm-math/radii.h>
 
@@ -18,11 +19,6 @@ enum struct BorderEdge {
     START,
 };
 
-enum struct BorderCollapse {
-    SEPARATE,
-    COLLAPSE,
-};
-
 enum struct BorderStyle {
     NONE,
 
@@ -39,7 +35,7 @@ enum struct BorderStyle {
 
 struct Border {
     Length width;
-    BorderStyle style;
+    Gfx::BorderStyle style;
     Color color = Color::CURRENT;
 
     void repr(Io::Emit &e) const {
@@ -51,8 +47,6 @@ struct Borders {
     static constexpr Length THIN = Px{1};
     static constexpr Length MEDIUM = Px{3};
     static constexpr Length THICK = Px{5};
-
-    BorderCollapse collapse;
 
     Border top, start, bottom, end;
     Math::Radii<PercentOr<Length>> radii;

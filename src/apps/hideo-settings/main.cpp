@@ -8,6 +8,18 @@
 #include <karm-ui/reducer.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
+#include <mdi/account.h>
+#include <mdi/arrow-left.h>
+#include <mdi/arrow-right.h>
+#include <mdi/cog.h>
+#include <mdi/home.h>
+#include <mdi/information-outline.h>
+#include <mdi/laptop.h>
+#include <mdi/palette.h>
+#include <mdi/security.h>
+#include <mdi/update.h>
+#include <mdi/widgets-outline.h>
+#include <mdi/wifi.h>
 
 #include "app.h"
 

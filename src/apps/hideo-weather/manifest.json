@@ -1,9 +1,0 @@
-{
-    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "hideo-weather",
-    "type": "exe",
-    "description": "Get the latest weather information",
-    "requires": [
-        "karm-kira"
-    ]
-}

@@ -6,7 +6,7 @@
     "extern": {
         "skift-org/karm": {
             "git": "https://github.com/skift-org/karm.git",
-            "tag": "v2"
+            "tag": "v0.1.0"
         }
     }
 }

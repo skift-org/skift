@@ -106,7 +106,7 @@ Ui::Child alert(String title, String subtitle) {
 }
 
 void intent(Ui::Node &n, App::Event &e) {
-    if (auto *k = e.is<App::KeyboardEvent>()) {
+    if (auto k = e.is<App::KeyboardEvent>()) {
         if (k->key == App::Key::LEFT) {
             Ui::bubble<Action>(n, MoveSelectionAction{-1});
             e.accept();

@@ -4,6 +4,7 @@
 #include <karm-ui/layout.h>
 #include <karm-ui/reducer.h>
 #include <karm-ui/view.h>
+#include <mdi/alert-decagram.h>
 
 #include "loader.h"
 

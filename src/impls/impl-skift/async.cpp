@@ -44,7 +44,7 @@ struct HjertSched : public Sys::Sched {
     }
 
     virtual Async::Task<_Sent> sendAsync(Strong<Fd> fd, Bytes buf, Slice<Handle> hnds, SocketAddr) {
-        if (auto *ipc = fd.is<Skift::IpcFd>()) {
+        if (auto ipc = fd.is<Skift::IpcFd>()) {
             auto &chan = ipc->_out;
 
             co_trya$(waitFor(chan.cap(), Hj::Sigs::WRITABLE, Hj::Sigs::NONE));
@@ -58,7 +58,7 @@ struct HjertSched : public Sys::Sched {
     }
 
     virtual Async::Task<_Received> recvAsync(Strong<Fd> fd, MutBytes buf, MutSlice<Handle> hnds) {
-        if (auto *ipc = fd.is<Skift::IpcFd>()) {
+        if (auto ipc = fd.is<Skift::IpcFd>()) {
             auto &chan = ipc->_in;
 
             co_trya$(waitFor(chan.cap(), Hj::Sigs::READABLE, Hj::Sigs::NONE));

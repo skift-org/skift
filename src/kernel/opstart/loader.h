@@ -1,9 +1,9 @@
 #pragma once
 
+#include <karm-gfx/icon.h>
 #include <karm-image/loader.h>
 #include <karm-json>
 #include <karm-logger/logger.h>
-#include <karm-media/icon.h>
 #include <karm-sys/context.h>
 #include <karm-sys/file.h>
 
@@ -47,9 +47,7 @@ struct Entry {
         auto maybeIcon = json.get("icon").take<String>();
         if (maybeIcon) {
             auto maybeImage = Image::load(Mime::Url::parse(*maybeIcon));
-            if (not maybeImage) {
-                entry.icon = Mdi::byName(*maybeIcon).unwrap();
-            } else {
+            if (maybeImage) {
                 entry.icon = maybeImage.unwrap();
             }
         }

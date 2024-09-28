@@ -102,7 +102,7 @@ Res<Sys::MmapResult> memMap(Sys::MmapOptions const &) {
 }
 
 Res<Sys::MmapResult> memMap(Sys::MmapOptions const &, Strong<Sys::Fd> fd) {
-    auto *vmoFd = fd.is<Skift::VmoFd>();
+    auto vmoFd = fd.is<Skift::VmoFd>();
     if (not vmoFd)
         return Error::invalidInput("expected VmoFd");
 

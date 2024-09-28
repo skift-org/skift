@@ -100,7 +100,7 @@ Res<> Keyboard::init() {
 }
 
 Res<> Keyboard::event(App::Event &e) {
-    if (auto const *irq = e.is<IrqEvent>()) {
+    if (auto irq = e.is<IrqEvent>()) {
         if (irq->irq == 1) {
             auto status = try$(ctrl().readStatus());
             while (status.has(Status::OUT_BUF) and
@@ -179,7 +179,7 @@ Res<> Mouse::decode() {
 }
 
 Res<> Mouse::event(App::Event &e) {
-    if (auto const *irq = e.is<IrqEvent>()) {
+    if (auto irq = e.is<IrqEvent>()) {
         if (irq->irq == 12) {
             auto status = try$(ctrl().readStatus());
             while (status.has(Status::OUT_BUF) and

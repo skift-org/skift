@@ -4,9 +4,17 @@
     "type": "project",
     "description": "The Skift Operating System",
     "extern": {
+        "skift-org/hideo": {
+            "git": "https://github.com/skift-org/hideo.git",
+            "tag": "v0.1.0"
+        },
         "skift-org/karm": {
             "git": "https://github.com/skift-org/karm.git",
-            "tag": "v0.1.0"
+            "tag": "v0.1.3"
+        },
+        "odoo/paper-muncher": {
+            "git": "https://github.com/odoo/paper-muncher",
+            "tag": "v0.1.2"
         }
     }
 }

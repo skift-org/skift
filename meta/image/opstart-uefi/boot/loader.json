@@ -16,10 +16,9 @@
                 "bundle://grund-seat/_bin",
                 "bundle://grund-shell/_bin",
                 "bundle://grund-bus/_bin",
-                "bundle://skift-wallpapers/images/abstract.qoi",
+                "bundle://hideo-shell/wallpaper.qoi",
                 "bundle://fonts-inter/fonts/Inter-Regular.ttf",
-                "bundle://fonts-inter/fonts/Inter-Medium.ttf",
-                "bundle://fonts-mdi/fonts/Material-Design-Icons.ttf"
+                "bundle://fonts-inter/fonts/Inter-Medium.ttf"
             ]
         }
     ]

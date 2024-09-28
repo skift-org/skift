@@ -1,6 +1,6 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.target.v1",
-    "id": "host-{shell.uname().machine}",
+    "id": "host-{shell.uname().machine}-",
     "type": "target",
     "props": {
         "toolchain": "clang",

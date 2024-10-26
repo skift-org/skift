@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-write",
+    "type": "lib",
+    "description": "Write documents",
+    "requires": [
+        "karm-kira"
+    ]
+}

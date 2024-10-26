@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-chess",
+    "type": "lib",
+    "description": "Play chess",
+    "requires": [
+        "karm-kira"
+    ]
+}

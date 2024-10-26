@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-demos",
+    "type": "lib",
+    "description": "Showcase of Karm Ui and Karm Gfx features",
+    "requires": [
+        "karm-kira"
+    ]
+}

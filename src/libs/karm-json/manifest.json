@@ -1,0 +1,12 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-json",
+    "type": "lib",
+    "description": "Parse and serialize JSON documents.",
+    "props": {
+        "cpp-excluded": true
+    },
+    "requires": [
+        "karm-io"
+    ]
+}

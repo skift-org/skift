@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-avplayer",
+    "type": "lib",
+    "description": "Play audio and video",
+    "requires": [
+        "karm-kira"
+    ]
+}

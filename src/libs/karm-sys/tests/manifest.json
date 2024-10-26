@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-sys.tests",
+    "type": "lib",
+    "props": {
+        "cpp-excluded": true
+    },
+    "requires": [
+        "karm-sys",
+        "karm-test"
+    ],
+    "injects": [
+        "__tests__"
+    ]
+}

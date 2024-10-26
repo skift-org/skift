@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-map",
+    "type": "lib",
+    "description": "Explore and navigate the world",
+    "requires": [
+        "karm-kira"
+    ]
+}

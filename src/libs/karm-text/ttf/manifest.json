@@ -1,0 +1,12 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-text.ttf",
+    "type": "lib",
+    "description": "TrueType font specification",
+    "props": {
+        "cpp-excluded": true
+    },
+    "requires": [
+        "karm-base"
+    ]
+}

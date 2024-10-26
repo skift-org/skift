@@ -1,0 +1,17 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "impl-uring",
+    "type": "lib",
+    "description": "Uring based implementation of karm-sys",
+    "enableIf": {
+        "sys": [
+            "linux"
+        ]
+    },
+    "requires": [
+        "uring"
+    ],
+    "provides": [
+        "karm-sys-async-impl"
+    ]
+}

@@ -1,0 +1,14 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "vaev-layout",
+    "type": "lib",
+    "description": "Layout engine of Vaev",
+    "requires": [
+        "karm-math",
+        "karm-gfx",
+        "karm-text",
+        "karm-scene",
+        "vaev-markup",
+        "vaev-style"
+    ]
+}

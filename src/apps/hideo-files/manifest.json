@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-files",
+    "type": "lib",
+    "description": "Browse and manage files",
+    "requires": [
+        "karm-kira"
+    ]
+}

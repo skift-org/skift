@@ -1,0 +1,17 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "impl-sdl",
+    "type": "lib",
+    "description": "Karm UI platform embedding layer for SDL.",
+    "enableIf": {
+        "karm-ui-backend": [
+            "sdl"
+        ]
+    },
+    "requires": [
+        "sdl2"
+    ],
+    "provides": [
+        "karm-ui-impl"
+    ]
+}

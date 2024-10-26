@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-calculator",
+    "type": "lib",
+    "description": "Evaluate mathematical expressions",
+    "requires": [
+        "karm-kira"
+    ]
+}

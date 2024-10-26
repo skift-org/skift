@@ -1,0 +1,6 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-meta",
+    "type": "lib",
+    "description": "C++ template meta programming library"
+}

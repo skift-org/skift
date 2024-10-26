@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-pdf.cli",
+    "type": "exe",
+    "description": "PDF writer testing tool",
+    "requires": [
+        "karm-sys",
+        "karm-pdf"
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-print.cli",
+    "type": "exe",
+    "description": "Printer testing tool",
+    "requires": [
+        "karm-sys",
+        "karm-print"
+    ]
+}

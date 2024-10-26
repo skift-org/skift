@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-archive",
+    "type": "lib",
+    "description": "Open, create, and manage archive files",
+    "requires": [
+        "karm-base"
+    ]
+}

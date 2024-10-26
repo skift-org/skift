@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-gpu",
+    "type": "lib",
+    "description": "GPU acceleration",
+    "requires": [
+        "karm-io",
+        "karm-math"
+    ]
+}

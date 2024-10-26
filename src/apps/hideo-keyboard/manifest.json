@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-keyboard",
+    "type": "lib",
+    "description": "Virtual keyboard",
+    "requires": [
+        "karm-kira"
+    ]
+}

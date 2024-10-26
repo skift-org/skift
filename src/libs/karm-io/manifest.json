@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-io",
+    "type": "lib",
+    "description": "Base traits for text and binary IO",
+    "requires": [
+        "karm-base"
+    ]
+}

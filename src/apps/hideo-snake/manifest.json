@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-snake",
+    "type": "lib",
+    "description": "Play snake",
+    "requires": [
+        "karm-kira"
+    ]
+}

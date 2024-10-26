@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-print",
+    "type": "lib",
+    "description": "Print documents and images.",
+    "requires": [
+        "karm-pdf"
+    ]
+}

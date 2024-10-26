@@ -1,0 +1,12 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-base",
+    "type": "lib",
+    "description": "Base data types and functions",
+    "requires": [
+        "karm-meta",
+        "stdc-math",
+        "stdc-ansi",
+        "stdcpp"
+    ]
+}

@@ -1,4 +1,5 @@
 #include <hideo-keyboard/views.h>
+#include <karm-kira/searchbar.h>
 #include <karm-ui/box.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
@@ -7,28 +8,11 @@
 #include <karm-ui/view.h>
 #include <mdi/close.h>
 #include <mdi/format-list-bulleted-square.h>
-#include <mdi/magnify.h>
 #include <mdi/view-grid.h>
 
 #include "app.h"
 
 namespace Hideo::Shell {
-
-Ui::Child searchInput() {
-    return Ui::hflow(
-               0,
-               Math::Align::VCENTER | Math::Align::START,
-               Ui::text(Ui::TextStyles::labelMedium().withColor(Ui::GRAY400), "Search…") | Ui::grow(),
-               Ui::icon(Mdi::MAGNIFY, 24)
-           ) |
-           Ui::insets({8, 12}) |
-           Ui::box({
-               .borderRadii = 4,
-               .borderWidth = 1,
-               .backgroundFill = Ui::GRAY900,
-           }) |
-           Ui::button(Keyboard::show);
-}
 
 Ui::Child appIcon(Mdi::Icon const &icon, Gfx::ColorRamp ramp, isize size = 22) {
     return Ui::icon(icon, size) |
@@ -118,7 +102,7 @@ Ui::Child apps(State const &state) {
     return Ui::vflow(
         Ui::hflow(
             4,
-            searchInput() | Ui::grow(),
+            Kr::searchbar() | Ui::grow(),
             Ui::button(
                 Model::bind<ToggleAppThumbnail>(true),
                 state.isAppPanelThumbnails

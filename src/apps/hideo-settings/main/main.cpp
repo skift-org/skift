@@ -21,7 +21,7 @@
 #include <mdi/widgets-outline.h>
 #include <mdi/wifi.h>
 
-#include "app.h"
+#include "../app.h"
 
 namespace Hideo::Settings {
 

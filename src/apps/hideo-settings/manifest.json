@@ -1,8 +1,8 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
     "id": "hideo-settings",
-    "type": "exe",
-    "description": "Edit and manage settings for your system",
+    "type": "lib",
+    "description": "View and manage people",
     "requires": [
         "karm-kira"
     ]

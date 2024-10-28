@@ -1,4 +1,5 @@
 #include <karm-kira/scaffold.h>
+#include <karm-kira/searchbar.h>
 #include <karm-kira/side-nav.h>
 #include <karm-sys/entry.h>
 #include <karm-ui/anim.h>
@@ -27,6 +28,7 @@ namespace Hideo::Settings {
 
 Ui::Child sidebar(State const &state) {
     Ui::Children items = {
+        Kr::searchbar() | Ui::insets({6, 0}),
         Kr::sidenavItem(state.page() == Page::ACCOUNT, Model::bind<GoTo>(Page::ACCOUNT), Mdi::ACCOUNT, "Accounts"s),
         Kr::sidenavItem(state.page() == Page::PERSONALIZATION, Model::bind<GoTo>(Page::PERSONALIZATION), Mdi::PALETTE, "Personalization"s),
         Kr::sidenavItem(state.page() == Page::APPLICATIONS, Model::bind<GoTo>(Page::APPLICATIONS), Mdi::WIDGETS_OUTLINE, "Applications"s),

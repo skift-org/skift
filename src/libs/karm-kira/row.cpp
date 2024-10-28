@@ -26,7 +26,7 @@ Ui::Child rowContent(Opt<Ui::Child> leading, String title, Opt<String> subtitle,
                     ? *leading |
                           Ui::center() |
                           Ui::sizing(26, {Ui::UNCONSTRAINED, 26}) |
-                          Ui::insets({ 0, 12, 0, 0})
+                          Ui::insets({0, 12, 0, 0})
                     : Ui::empty();
 
     auto t = subtitle
@@ -41,13 +41,13 @@ Ui::Child rowContent(Opt<Ui::Child> leading, String title, Opt<String> subtitle,
                      ? *trailing |
                            Ui::center() |
                            Ui::sizing(26, {Ui::UNCONSTRAINED, 26}) |
-                           Ui::insets({ 0, 12, 0, 0})
+                           Ui::insets({0, 12, 0, 0})
                      : Ui::empty();
 
     return minSize(
         {Ui::UNCONSTRAINED, 48},
         insets(
-            {12, 0},
+            {0, 12},
             hflow(
                 0,
                 Math::Align::VCENTER | Math::Align::HFILL,
@@ -61,7 +61,7 @@ Ui::Child rowContent(Opt<Ui::Child> leading, String title, Opt<String> subtitle,
 
 Ui::Child titleRow(String t) {
     return Ui::titleMedium(t) |
-           Ui::insets({ 16, 12, 8, 12});
+           Ui::insets({16, 12, 8, 12});
 }
 
 Ui::Child pressableRow(Ui::OnPress onPress, Opt<Ui::Child> leading, String title, Opt<String> subtitle, Opt<Ui::Child> trailing) {
@@ -165,7 +165,7 @@ Ui::Child treeRow(Opt<Ui::Slot> leading, String title, Opt<String> subtitle, Ui:
                 )
             ),
             state ? insets(
-                        { 0, 0, 0, 38},
+                        {0, 0, 0, 38},
                         child()
                     ) | slideIn(Ui::SlideFrom::TOP)
                   : Ui::empty()

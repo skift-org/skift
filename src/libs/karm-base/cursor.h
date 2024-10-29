@@ -14,6 +14,9 @@ struct Cursor {
 
     constexpr Cursor() = default;
 
+    always_inline constexpr Cursor(None)
+        : Cursor() {}
+
     always_inline constexpr Cursor(T const *ptr)
         : Cursor(ptr, ptr ? 1 : 0) {
     }
@@ -28,7 +31,10 @@ struct Cursor {
         : _begin(begin), _end(end) {
     }
 
-    always_inline constexpr Cursor(Sliceable<T> auto const &slice)
+    always_inline constexpr Cursor(Sliceable<T> auto &slice)
+        : Cursor{begin(slice), end(slice)} {}
+
+    always_inline constexpr Cursor(Slice<T> slice)
         : Cursor{begin(slice), end(slice)} {}
 
     always_inline constexpr T const &operator[](usize i) const {
@@ -127,9 +133,11 @@ struct MutCursor {
 
     constexpr MutCursor() = default;
 
+    always_inline constexpr MutCursor(None)
+        : MutCursor() {}
+
     always_inline constexpr MutCursor(T *ptr)
-        : MutCursor(ptr, ptr ? 1 : 0) {
-    }
+        : MutCursor(ptr, ptr ? 1 : 0) {}
 
     always_inline constexpr MutCursor(T *ptr, usize len)
         : _begin(ptr), _end(ptr + len) {
@@ -141,6 +149,9 @@ struct MutCursor {
         : _begin(begin), _end(end) {}
 
     always_inline constexpr MutCursor(MutSliceable<T> auto &slice)
+        : MutCursor{begin(slice), end(slice)} {}
+
+    always_inline constexpr MutCursor(MutSlice<T> slice)
         : MutCursor{begin(slice), end(slice)} {}
 
     always_inline constexpr T &operator[](usize i) {

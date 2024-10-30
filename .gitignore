@@ -12,3 +12,4 @@ _local/
 *.iml
 *.trace
 compile_commands.json
+.DS_Store

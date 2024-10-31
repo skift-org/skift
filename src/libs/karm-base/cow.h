@@ -6,8 +6,16 @@ namespace Karm {
 
 template <typename T>
 struct Cow {
-    static Strong<T> BASE;
-    Strong<T> _inner = BASE;
+    Strong<T> _inner = base();
+
+    static Opt<Strong<T>> _base;
+
+    static Strong<T> base() {
+        if (not _base) {
+            _base = makeStrong<T>();
+        }
+        return _base.unwrap();
+    }
 
     T &cow() {
         if (_inner.refs() > 1)
@@ -29,7 +37,7 @@ struct Cow {
 };
 
 template <typename T>
-Strong<T> Cow<T>::BASE = makeStrong<T>();
+Opt<Strong<T>> Cow<T>::_base = NONE;
 
 template <typename T>
 Cow<T> makeCow(T const &value) {

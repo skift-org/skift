@@ -382,7 +382,7 @@ struct BackgroundFilter : public ProxyNode<BackgroundFilter> {
     }
 
     void paint(Gfx::Canvas &g, Math::Recti r) override {
-        g.apply(_filter, bound().cast<f64>());
+        g.apply(_filter, bound().clipTo(r).cast<f64>());
         ProxyNode<BackgroundFilter>::paint(g, r);
     }
 };
@@ -405,7 +405,7 @@ struct ForegroundFilter : public ProxyNode<ForegroundFilter> {
 
     void paint(Gfx::Canvas &g, Math::Recti r) override {
         ProxyNode<ForegroundFilter>::paint(g, r);
-        g.apply(_filter, bound().cast<f64>());
+        g.apply(_filter, bound().clipTo(r).cast<f64>());
     }
 };
 

@@ -23,10 +23,12 @@ Ui::Child app() {
                 auto titleText = Ui::headlineMedium("skiftOS");
 
                 auto bodyText =
-                    Ui::bodySmall("Copyright © 2018-2024 The skiftOS Developers\n"
-                                  "Copyright © 2024 Odoo S.A.\n"
-                                  "\n"
-                                  "All rights reserved.");
+                    Ui::bodySmall(
+                        "Copyright © 2018-2024 The skiftOS Developers\n"
+                        "Copyright © 2024 Odoo S.A.\n"
+                        "\n"
+                        "All rights reserved."
+                    );
 
                 auto inspireMe = Ui::state(Sys::now().val(), [](auto v, auto bind) {
                     auto body = Ui::hflow(
@@ -47,7 +49,21 @@ Ui::Child app() {
                     Ui::ButtonStyle::outline(), Mdi::LICENSE, "License"
                 );
 
-                return Ui::vflow(8, Ui::hflow(8, titleText, Kr::versionBadge() | Ui::center()), Ui::empty(), bodyText, Ui::grow(NONE), Ui::hflow(8, inspireMe | Ui::vcenter() | Ui::grow(), licenseBtn)) |
+                return Ui::vflow(
+                           8,
+                           Ui::hflow(
+                               8, titleText,
+                               Kr::versionBadge() | Ui::center()
+                           ),
+                           Ui::empty(),
+                           bodyText,
+                           Ui::grow(NONE),
+                           Ui::hflow(
+                               8,
+                               inspireMe | Ui::vcenter() | Ui::grow(),
+                               licenseBtn
+                           )
+                       ) |
                        Ui::insets(16);
             },
         .size = {460, 320},

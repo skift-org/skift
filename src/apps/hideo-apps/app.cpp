@@ -14,24 +14,28 @@
 
 namespace Hideo::Apps {
 
+Ui::Child sidebar() {
+    return Kr::sidenav({
+        Kr::searchbar() | Ui::insets({6, 0}),
+        Kr::sidenavItem(true, Ui::NOP, Mdi::STAR_OUTLINE, "Discover"s),
+        Kr::sidenavItem(false, Ui::NOP, Mdi::GAMEPAD_OUTLINE, "Play"s),
+        Kr::sidenavItem(false, Ui::NOP, Mdi::BRUSH_OUTLINE, "Create"s),
+        Kr::sidenavItem(false, Ui::NOP, Mdi::BRIEFCASE_OUTLINE, "Work"s),
+        Kr::sidenavItem(false, Ui::NOP, Mdi::SHAPE, "Other"s),
+        Kr::sidenavItem(false, Ui::NOP, Mdi::DOWNLOAD_BOX_OUTLINE, "Updates"s),
+    });
+}
+
+Ui::Child pageContent() {
+    return Ui::empty();
+}
+
 Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::BASKET,
         .title = "Apps"s,
-        .body = [] {
-            return Ui::hflow(
-                Kr::sidenav({
-                    Kr::searchbar() | Ui::insets({6, 0}),
-                    Kr::sidenavItem(true, Ui::NOP, Mdi::STAR_OUTLINE, "Discover"s),
-                    Kr::sidenavItem(false, Ui::NOP, Mdi::GAMEPAD_OUTLINE, "Play"s),
-                    Kr::sidenavItem(false, Ui::NOP, Mdi::BRUSH_OUTLINE, "Create"s),
-                    Kr::sidenavItem(false, Ui::NOP, Mdi::BRIEFCASE_OUTLINE, "Work"s),
-                    Kr::sidenavItem(false, Ui::NOP, Mdi::SHAPE, "Other"s),
-                    Kr::sidenavItem(false, Ui::NOP, Mdi::DOWNLOAD_BOX_OUTLINE, "Updates"s),
-                }),
-                Ui::separator()
-            );
-        },
+        .sidebar = slot$(sidebar()),
+        .body = slot$(pageContent() | Ui::grow()),
     });
 }
 

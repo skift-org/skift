@@ -294,7 +294,7 @@ struct FontSource {
     }
 };
 
-struct Font {
+struct FontProps {
     Vec<String> families;
     FontWeight weight;
     FontWidth width;

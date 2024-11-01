@@ -2,7 +2,7 @@
 
 #include "lexer.h"
 
-namespace Vaev::Script {
+namespace Vaev::Js {
 
 // MARK: Token -----------------------------------------------------------------
 
@@ -183,4 +183,4 @@ Token Lexer::_next(Io::SScan &s) const {
     return {Token::INVALID, s.end()};
 }
 
-} // namespace Vaev::Script
+} // namespace Vaev::Js

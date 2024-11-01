@@ -17,7 +17,7 @@ enum struct TextTransform {
     _LEN,
 };
 
-struct Text {
+struct TextProps {
     TextTransform transform;
 };
 

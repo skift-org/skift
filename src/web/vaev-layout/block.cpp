@@ -1,17 +1,17 @@
 #include "block.h"
 
-#include "frag.h"
+#include "box.h"
 #include "layout.h"
 
 namespace Vaev::Layout {
 
 // https://www.w3.org/TR/CSS22/visuren.html#normal-flow
 struct BlockFormatingContext {
-    static Px _determineWidth(Tree &t, Frag &f, Input input) {
+    static Px _determineWidth(Tree &tree, Box &box, Input input) {
         Px width = Px{0};
-        for (auto &c : f.children()) {
+        for (auto &c : box.children()) {
             auto ouput = layout(
-                t,
+                tree,
                 c,
                 {
                     .commit = Commit::NO,
@@ -25,13 +25,13 @@ struct BlockFormatingContext {
         return width;
     }
 
-    Output run(Tree &t, Frag &f, Input input) {
+    Output run(Tree &tree, Box &box, Input input) {
         Px blockSize = Px{0};
         Px inlineSize = input.knownSize.width.unwrapOrElse([&] {
-            return _determineWidth(t, f, input);
+            return _determineWidth(tree, box, input);
         });
 
-        for (auto &c : f.children()) {
+        for (auto &c : box.children()) {
             if (c.style->float_ != Float::NONE)
                 continue;
 
@@ -44,10 +44,10 @@ struct BlockFormatingContext {
             Input childInput = {
                 .commit = input.commit,
                 .availableSpace = {inlineSize, Px{0}},
-                .containingBlock = {inlineSize, Px{0}},
+                .containingBlock = {inlineSize, input.knownSize.y.unwrapOr(Px{0})},
             };
 
-            auto margin = computeMargins(t, c, childInput);
+            auto margin = computeMargins(tree, c, childInput);
 
             if (c.style->position != Position::ABSOLUTE) {
                 blockSize += margin.top;
@@ -57,7 +57,7 @@ struct BlockFormatingContext {
             childInput.position = input.position + Vec2Px{margin.start, blockSize};
 
             auto ouput = layout(
-                t,
+                tree,
                 c,
                 childInput
             );
@@ -76,9 +76,9 @@ struct BlockFormatingContext {
     }
 };
 
-Output blockLayout(Tree &t, Frag &f, Input input) {
+Output blockLayout(Tree &tree, Box &box, Input input) {
     BlockFormatingContext fc;
-    return fc.run(t, f, input);
+    return fc.run(tree, box, input);
 }
 
 } // namespace Vaev::Layout

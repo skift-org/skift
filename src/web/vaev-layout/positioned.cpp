@@ -1,48 +1,49 @@
 #include "positioned.h"
 
 #include "layout.h"
+#include "values.h"
 
 namespace Vaev::Layout {
 
-void layoutPositioned(Tree &t, Frag &f, RectPx containingBlock) {
-    if (f.style->position == Position::ABSOLUTE or f.style->position == Position::RELATIVE) {
+void layoutPositioned(Tree &tree, Box &box, RectPx containingBlock) {
+    if (box.style->position == Position::ABSOLUTE or box.style->position == Position::RELATIVE) {
         auto origin = containingBlock.topStart();
-        if (f.style->position == Position::RELATIVE)
-            origin = f.layout.position;
+        if (box.style->position == Position::RELATIVE)
+            origin = box.layout.position;
 
-        auto top = f.layout.position.y;
-        auto start = f.layout.position.x;
+        auto top = box.layout.position.y;
+        auto start = box.layout.position.x;
 
-        auto topOffset = f.style->offsets->top;
+        auto topOffset = box.style->offsets->top;
         if (topOffset != Width::AUTO) {
-            top = origin.y + resolve(t, f, topOffset, containingBlock.height);
+            top = origin.y + resolve(tree, box, topOffset, containingBlock.height);
         }
 
-        auto startOffset = f.style->offsets->start;
+        auto startOffset = box.style->offsets->start;
         if (startOffset != Width::AUTO) {
-            start = origin.x + resolve(t, f, startOffset, containingBlock.width);
+            start = origin.x + resolve(tree, box, startOffset, containingBlock.width);
         }
 
-        auto endOffset = f.style->offsets->end;
+        auto endOffset = box.style->offsets->end;
         if (endOffset != Width::AUTO) {
-            start = (origin.x + containingBlock.width) - resolve(t, f, endOffset, containingBlock.width) - f.layout.borderSize.width;
+            start = (origin.x + containingBlock.width) - resolve(tree, box, endOffset, containingBlock.width) - box.layout.borderSize.width;
         }
 
         layout(
-            t,
-            f,
+            tree,
+            box,
             {
                 .commit = Commit::YES,
-                .knownSize = f.layout.borderBox().size().cast<Opt<Px>>(),
+                .knownSize = box.layout.borderBox().size().cast<Opt<Px>>(),
                 .position = {start, top},
             }
         );
 
-        containingBlock = f.layout.contentBox();
+        containingBlock = box.layout.contentBox();
     }
 
-    for (auto &c : f.children()) {
-        layoutPositioned(t, c, containingBlock);
+    for (auto &c : box.children()) {
+        layoutPositioned(tree, c, containingBlock);
     }
 }
 } // namespace Vaev::Layout

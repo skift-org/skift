@@ -1,13 +1,14 @@
 #pragma once
 #include <karm-io/emit.h>
-#include <vaev-base/numbers.h>
+
+#include "numbers.h"
 
 namespace Vaev {
 
 template <typename T>
 struct CalcValue {
     enum struct OpCode {
-        NONE,
+        NOP,
         ADD,
         SUBSTRACT,
         MULTIPLY,
@@ -16,13 +17,15 @@ struct CalcValue {
         TAN,
         COS,
 
-        _LEN
+        _LEN0
     };
 
-    enum OpType {
+    enum struct OpType {
         FIXED,  // a single value
         SINGLE, // 1 value + 1 OP
         CALC,   // 2 values + 1 OP
+
+        _LEN1
     };
 
     using Leaf = Box<CalcValue<T>>;
@@ -31,7 +34,7 @@ struct CalcValue {
     OpType type;
     Value lhs = NONE;
     Value rhs = NONE;
-    OpCode op = OpCode::NONE;
+    OpCode op = OpCode::NOP;
 
     constexpr CalcValue()
         : CalcValue(T{}) {

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <karm-io/emit.h>
-#include <vaev-base/calc.h>
 
+#include "calc.h"
 #include "length.h"
 #include "percent.h"
 #include "writing.h"
@@ -84,7 +84,8 @@ struct Size {
     }
 };
 
-struct Sizing {
+struct SizingProps {
+    BoxSizing boxSizing;
     Size width, height;
     Size minWidth, minHeight;
     Size maxWidth, maxHeight;

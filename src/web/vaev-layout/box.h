@@ -9,11 +9,11 @@
 
 namespace Vaev::Layout {
 
-// MARK: Frag ------------------------------------------------------------------
+// MARK: Box ------------------------------------------------------------------
 
 using Content = Union<
     None,
-    Vec<Frag>,
+    Vec<Box>,
     Karm::Text::Run,
     Image::Picture>;
 
@@ -27,35 +27,29 @@ struct Attrs {
     }
 };
 
-struct Frag : public Meta::NoCopy {
+struct Box : public Meta::NoCopy {
     Strong<Style::Computed> style;
     Strong<Karm::Text::Fontface> fontFace;
     Content content = NONE;
     Layout layout;
     Attrs attrs;
 
-    Frag(Strong<Style::Computed> style, Strong<Karm::Text::Fontface> fontFace);
+    Box(Strong<Style::Computed> style, Strong<Karm::Text::Fontface> fontFace);
 
-    Frag(Strong<Style::Computed> style, Strong<Karm::Text::Fontface> fontFace, Content content);
+    Box(Strong<Style::Computed> style, Strong<Karm::Text::Fontface> fontFace, Content content);
 
-    Slice<Frag> children() const;
+    Slice<Box> children() const;
 
-    MutSlice<Frag> children();
+    MutSlice<Box> children();
 
-    void add(Frag &&frag);
+    void add(Box &&box);
 
     void repr(Io::Emit &e) const;
 };
 
 struct Tree {
-    Frag root;
+    Box root;
     Viewport viewport;
 };
-
-// MARK: Build -----------------------------------------------------------------
-
-void _buildNode(Style::Computer &c, Markup::Node const &n, Frag &parent);
-
-Frag build(Style::Computer &c, Markup::Document const &doc);
 
 } // namespace Vaev::Layout

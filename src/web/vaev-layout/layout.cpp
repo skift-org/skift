@@ -1,22 +1,22 @@
 #include "layout.h"
 
 #include "block.h"
+#include "box.h"
 #include "flex.h"
-#include "frag.h"
 #include "grid.h"
 #include "table.h"
 #include "values.h"
 
 namespace Vaev::Layout {
 
-Output _contentLayout(Tree &t, Frag &f, Input input) {
-    auto display = f.style->display;
+Output _contentLayout(Tree &tree, Box &box, Input input) {
+    auto display = box.style->display;
 
-    if (auto run = f.content.is<Karm::Text::Run>()) {
-        f.layout.fontSize = resolve(t, f, f.style->font->size);
+    if (auto run = box.content.is<Karm::Text::Run>()) {
+        box.layout.fontSize = resolve(tree, box, box.style->font->size);
         Karm::Text::Font font = {
-            f.fontFace,
-            f.layout.fontSize.cast<f64>(),
+            box.fontFace,
+            box.layout.fontSize.cast<f64>(),
         };
         run->shape(font);
         return Output::fromSize(run->size().cast<Px>());
@@ -26,129 +26,152 @@ Output _contentLayout(Tree &t, Frag &f, Input input) {
         display == Display::TABLE_CELL or
         display == Display::TABLE_CAPTION
     ) {
-        return blockLayout(t, f, input);
+        return blockLayout(tree, box, input);
     } else if (display == Display::FLEX) {
-        return flexLayout(t, f, input);
+        return flexLayout(tree, box, input);
     } else if (display == Display::GRID) {
-        return gridLayout(t, f, input);
+        return gridLayout(tree, box, input);
     } else if (display == Display::TABLE) {
-        return tableLayout(t, f, input);
+        return tableLayout(tree, box, input);
     } else if (display == Display::INTERNAL) {
         return Output{};
     } else {
-        return blockLayout(t, f, input);
+        return blockLayout(tree, box, input);
     }
 }
 
-InsetsPx computeMargins(Tree &t, Frag &f, Input input) {
+InsetsPx computeMargins(Tree &tree, Box &box, Input input) {
     InsetsPx res;
-    auto margin = f.style->margin;
+    auto margin = box.style->margin;
 
-    res.top = resolve(t, f, margin->top, input.containingBlock.height);
-    res.end = resolve(t, f, margin->end, input.containingBlock.width);
-    res.bottom = resolve(t, f, margin->bottom, input.containingBlock.height);
-    res.start = resolve(t, f, margin->start, input.containingBlock.width);
+    res.top = resolve(tree, box, margin->top, input.containingBlock.height);
+    res.end = resolve(tree, box, margin->end, input.containingBlock.width);
+    res.bottom = resolve(tree, box, margin->bottom, input.containingBlock.height);
+    res.start = resolve(tree, box, margin->start, input.containingBlock.width);
 
     return res;
 }
 
-InsetsPx computeBorders(Tree &t, Frag &f) {
+InsetsPx computeBorders(Tree &tree, Box &box) {
     InsetsPx res;
-    auto borders = f.style->borders;
+    auto borders = box.style->borders;
 
     if (borders->top.style != Gfx::BorderStyle::NONE)
-        res.top = resolve(t, f, borders->top.width);
+        res.top = resolve(tree, box, borders->top.width);
 
     if (borders->end.style != Gfx::BorderStyle::NONE)
-        res.end = resolve(t, f, borders->end.width);
+        res.end = resolve(tree, box, borders->end.width);
 
     if (borders->bottom.style != Gfx::BorderStyle::NONE)
-        res.bottom = resolve(t, f, borders->bottom.width);
+        res.bottom = resolve(tree, box, borders->bottom.width);
 
     if (borders->start.style != Gfx::BorderStyle::NONE)
-        res.start = resolve(t, f, borders->start.width);
+        res.start = resolve(tree, box, borders->start.width);
 
     return res;
 }
 
-static InsetsPx _computePaddings(Tree &t, Frag &f, Input input) {
+static InsetsPx _computePaddings(Tree &tree, Box &box, Vec2Px containingBlock) {
     InsetsPx res;
-    auto padding = f.style->padding;
+    auto padding = box.style->padding;
 
-    res.top = resolve(t, f, padding->top, input.containingBlock.height);
-    res.end = resolve(t, f, padding->end, input.containingBlock.width);
-    res.bottom = resolve(t, f, padding->bottom, input.containingBlock.height);
-    res.start = resolve(t, f, padding->start, input.containingBlock.width);
+    res.top = resolve(tree, box, padding->top, containingBlock.height);
+    res.end = resolve(tree, box, padding->end, containingBlock.width);
+    res.bottom = resolve(tree, box, padding->bottom, containingBlock.height);
+    res.start = resolve(tree, box, padding->start, containingBlock.width);
 
     return res;
 }
 
-static Math::Radii<Px> _computeRadii(Tree &t, Frag &f, Vec2Px size) {
-    auto radii = f.style->borders->radii;
+static Math::Radii<Px> _computeRadii(Tree &tree, Box &box, Vec2Px size) {
+    auto radii = box.style->borders->radii;
     Math::Radii<Px> res;
 
-    res.a = resolve(t, f, radii.a, size.height);
-    res.b = resolve(t, f, radii.b, size.width);
-    res.c = resolve(t, f, radii.c, size.width);
-    res.d = resolve(t, f, radii.d, size.height);
-    res.e = resolve(t, f, radii.e, size.height);
-    res.f = resolve(t, f, radii.f, size.width);
-    res.g = resolve(t, f, radii.g, size.width);
-    res.h = resolve(t, f, radii.h, size.height);
+    res.a = resolve(tree, box, radii.a, size.height);
+    res.b = resolve(tree, box, radii.b, size.width);
+    res.c = resolve(tree, box, radii.c, size.width);
+    res.d = resolve(tree, box, radii.d, size.height);
+    res.e = resolve(tree, box, radii.e, size.height);
+    res.f = resolve(tree, box, radii.f, size.width);
+    res.g = resolve(tree, box, radii.g, size.width);
+    res.h = resolve(tree, box, radii.h, size.height);
 
     return res;
 }
 
-static Cons<Opt<Px>, IntrinsicSize> _computeSpecifiedSize(Tree &t, Frag &f, Input input, Size size, IntrinsicSize intrinsic) {
-    if (size == Size::MIN_CONTENT or intrinsic == IntrinsicSize::MIN_CONTENT) {
-        return {NONE, IntrinsicSize::MIN_CONTENT};
-    } else if (size == Size::MAX_CONTENT or intrinsic == IntrinsicSize::MAX_CONTENT) {
-        return {NONE, IntrinsicSize::MAX_CONTENT};
-    } else if (size == Size::AUTO) {
-        return {NONE, IntrinsicSize::AUTO};
+static Vec2Px _computeIntrinsicSize(Tree &tree, Box &box, IntrinsicSize intrinsic, Vec2Px containingBlock) {
+    if (intrinsic == IntrinsicSize::AUTO) {
+        panic("bad argument");
+    }
+
+    auto borders = computeBorders(tree, box);
+    auto padding = _computePaddings(tree, box, containingBlock);
+
+    auto [size] = _contentLayout(
+        tree,
+        box,
+        {
+            .commit = Commit::NO,
+            .knownSize = {NONE, NONE},
+        }
+    );
+
+    return size + padding.all() + borders.all();
+}
+
+static Opt<Px> _computeSpecifiedSize(Tree &tree, Box &box, Size size, Vec2Px containingBlock, bool isWidth) {
+    if (size == Size::MIN_CONTENT) {
+        auto intrinsicSize = _computeIntrinsicSize(tree, box, IntrinsicSize::MIN_CONTENT, containingBlock);
+        return isWidth ? intrinsicSize.x : intrinsicSize.y;
+    } else if (size == Size::MAX_CONTENT) {
+        auto intrinsicSize = _computeIntrinsicSize(tree, box, IntrinsicSize::MAX_CONTENT, containingBlock);
+        return isWidth ? intrinsicSize.x : intrinsicSize.y;
     } else if (size == Size::FIT_CONTENT) {
-        return {NONE, IntrinsicSize::STRETCH_TO_FIT};
+        auto minIntrinsicSize = _computeIntrinsicSize(tree, box, IntrinsicSize::MIN_CONTENT, containingBlock);
+        auto maxIntrinsicSize = _computeIntrinsicSize(tree, box, IntrinsicSize::MAX_CONTENT, containingBlock);
+        auto stretchIntrinsicSize = _computeIntrinsicSize(tree, box, IntrinsicSize::STRETCH_TO_FIT, containingBlock);
+
+        if (isWidth)
+            return clamp(stretchIntrinsicSize.x, minIntrinsicSize.x, maxIntrinsicSize.x);
+        else
+            return clamp(stretchIntrinsicSize.y, minIntrinsicSize.y, maxIntrinsicSize.y);
+    } else if (size == Size::AUTO) {
+        return NONE;
     } else if (size == Size::LENGTH) {
-        return {resolve(t, f, size.value, input.containingBlock.width), IntrinsicSize::AUTO};
+        return resolve(tree, box, size.value, isWidth ? containingBlock.x : containingBlock.y);
     } else {
         logWarn("unknown specified size: {}", size);
-        return {Px{0}, IntrinsicSize::AUTO};
+        return Px{0};
     }
 }
 
-Output layout(Tree &t, Frag &f, Input input) {
+Output layout(Tree &tree, Box &box, Input input) {
     // FIXME: confirm how the preffered width/height parameters interacts with intrinsic size argument from input
-    auto borders = computeBorders(t, f);
-    auto padding = _computePaddings(t, f, input);
-    auto sizing = f.style->sizing;
+    auto borders = computeBorders(tree, box);
+    auto padding = _computePaddings(tree, box, input.containingBlock);
+    auto sizing = box.style->sizing;
 
-    auto [specifiedWidth, widthIntrinsicSize] = _computeSpecifiedSize(t, f, input, sizing->width, input.intrinsic.x);
     if (input.knownSize.width == NONE) {
-        // FIXME: making prefered width as mandatory width; im not sure this is ok
+        auto specifiedWidth = _computeSpecifiedSize(tree, box, sizing->width, input.containingBlock, true);
         input.knownSize.width = specifiedWidth;
     }
-    input.knownSize.width = input.knownSize.width.map([&](auto s) {
-        if (f.style->boxSizing == BoxSizing::CONTENT_BOX)
-            return s;
-        return s - padding.horizontal() - borders.horizontal();
-    });
-    input.intrinsic.x = widthIntrinsicSize;
 
-    auto [specifiedHeight, heightIntrinsicSize] = _computeSpecifiedSize(t, f, input, sizing->height, input.intrinsic.y);
+    input.knownSize.width = input.knownSize.width.map([&](auto s) {
+        return max(Px{0}, s - padding.horizontal() - borders.horizontal());
+    });
+
     if (input.knownSize.height == NONE) {
+        auto specifiedHeight = _computeSpecifiedSize(tree, box, sizing->height, input.containingBlock, false);
         input.knownSize.height = specifiedHeight;
     }
 
     input.knownSize.height = input.knownSize.height.map([&](auto s) {
-        if (f.style->boxSizing == BoxSizing::CONTENT_BOX)
-            return s;
-        return s - padding.vertical() - borders.vertical();
+        return max(Px{0}, s - padding.vertical() - borders.vertical());
     });
-    input.intrinsic.y = heightIntrinsicSize;
 
     input.position = input.position + borders.topStart() + padding.topStart();
 
-    auto [size] = _contentLayout(t, f, input);
+    auto [size] = _contentLayout(tree, box, input);
 
     size.width = input.knownSize.width.unwrapOr(size.width);
     size.height = input.knownSize.height.unwrapOr(size.height);
@@ -156,11 +179,11 @@ Output layout(Tree &t, Frag &f, Input input) {
     size = size + padding.all() + borders.all();
 
     if (input.commit == Commit::YES) {
-        f.layout.position = input.position - borders.topStart() - padding.topStart();
-        f.layout.borderSize = size;
-        f.layout.padding = padding;
-        f.layout.borders = borders;
-        f.layout.radii = _computeRadii(t, f, size);
+        box.layout.position = input.position - borders.topStart() - padding.topStart();
+        box.layout.borderSize = size;
+        box.layout.padding = padding;
+        box.layout.borders = borders;
+        box.layout.radii = _computeRadii(tree, box, size);
     }
 
     return Output::fromSize(size);

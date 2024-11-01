@@ -58,6 +58,21 @@ xmp {
     display: block;
 }
 
+blockquote,
+figure,
+listing,
+p,
+plaintext,
+pre,
+xmp {
+    margin-block: 1em;
+}
+
+blockquote,
+figure {
+    margin-inline: 40px;
+}
+
 
 /* 15.3.4 MARK: Phrasing content -------------------------------------------- */
 /* https://html.spec.whatwg.org/multipage/rendering.html#phrasing-content-3   */

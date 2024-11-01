@@ -33,7 +33,7 @@ struct BorderSpacing {
     }
 };
 
-struct Table {
+struct TableProps {
     TableLayout tableLayout = TableLayout::AUTO;
     CaptionSide captionSide = CaptionSide::TOP;
     BorderSpacing spacing = {Px{0}, Px{0}};

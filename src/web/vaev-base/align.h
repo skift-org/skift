@@ -70,7 +70,7 @@ struct [[gnu::packed]] Align {
     }
 };
 
-struct Aligns {
+struct AlignProps {
     // https://drafts.csswg.org/css-align-3/#propdef-align-content
     Align alignContent;
 

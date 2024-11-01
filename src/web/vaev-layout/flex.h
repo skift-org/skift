@@ -4,6 +4,6 @@
 
 namespace Vaev::Layout {
 
-Output flexLayout(Tree &t, Frag &f, Input input);
+Output flexLayout(Tree &tree, Box &box, Input input);
 
 } // namespace Vaev::Layout

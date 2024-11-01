@@ -110,7 +110,7 @@ struct BackgroundRepeat {
     }
 };
 
-struct Background {
+struct BackgroundProps {
     Color fill;
     BackgroundAttachment attachment;
     BackgroundPosition position;

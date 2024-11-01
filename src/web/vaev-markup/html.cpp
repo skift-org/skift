@@ -4388,6 +4388,74 @@ void HtmlParser::_handleInBody(HtmlToken const &t) {
     // TODO: A start tag whose tag name is "li"
 
     // TODO: A start tag whose tag name is one of: "dd", "dt"
+    else if (t.type == HtmlToken::START_TAG and (t.name == "dd" or t.name == "dt")) {
+        // 1. Set the frameset-ok flag to "not ok".
+        _framesetOk = false;
+
+        // 2. Initialize node to be the current node (the bottommost node of the stack).
+        usize curr = _openElements.len();
+
+        auto done = [&] {
+            // 7. If the stack of open elements has a p element in button scope, then close a p element.
+
+            // 8. Insert an HTML element for the token.
+            insertHtmlElement(*this, t);
+        };
+
+        // 3. Loop:
+        while (curr > 0) {
+            auto tag = _openElements[curr - 1]->tagName;
+            // If node is a dd element, then run these substeps:
+            if (tag == Html::DD) {
+                // 1. Generate implied end tags, except for dd elements.
+                generateImpliedEndTags(*this, "dd");
+
+                // 2. If the current node is not a dd element, then this is a parse error.
+                if (last(_openElements)->tagName != Html::DD) {
+                    _raise();
+                }
+
+                // 3. Pop elements from the stack of open elements until a dd element has been popped from the stack.
+                while (Karm::any(_openElements) and _openElements.popBack()->tagName != Html::DD) {
+                    // do nothing
+                }
+
+                // 4. Jump to the step labeled done below.
+                done();
+                return;
+            }
+
+            if (tag == Html::DT) {
+                // 1. Generate implied end tags, except for dt elements.
+                generateImpliedEndTags(*this, "dt");
+
+                // 2. If the current node is not a dt element, then this is a parse error.
+                if (last(_openElements)->tagName != Html::DT) {
+                    _raise();
+                }
+
+                // 3. Pop elements from the stack of open elements until a dt element has been popped from the stack.
+                while (Karm::any(_openElements) and _openElements.popBack()->tagName != Html::DT) {
+                    // do nothing
+                }
+
+                // 4. Jump to the step labeled done below.
+                done();
+                return;
+            }
+
+            // 5. If node is in the special category, but is not an address,
+            //    div, or p element, then jump to the step labeled done below.
+            if (isSpecial(tag) and not(tag == Html::ADDRESS or tag == Html::DIV or tag == Html::P)) {
+                done();
+                return;
+            }
+
+            // 6. Otherwise, set node to the previous entry in the stack of open
+            //    elements and return to the step labeled loop.
+            curr--;
+        }
+    }
 
     // TODO: A start tag whose tag name is "plaintext"
 

@@ -32,10 +32,12 @@ Ui::Child aboutDialog(String name) {
     return dialogContent({
         dialogHeader({
             Ui::hflow(6, Math::Align::CENTER, dialogTitle(name), versionBadge()),
-            dialogDescription("Copyright © 2018-2024 The skiftOS Developers\n"
-                              "Copyright © 2024 Odoo S.A.\n"
-                              "\n"
-                              "All rights reserved."s),
+            dialogDescription(
+                "Copyright © 2018-2024 The skiftOS Developers\n"
+                "Copyright © 2024 Odoo S.A.\n"
+                "\n"
+                "All rights reserved."s
+            ),
         }),
         dialogFooter({
             button([](auto &n) {

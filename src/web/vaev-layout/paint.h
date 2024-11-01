@@ -2,12 +2,12 @@
 
 #include <karm-scene/stack.h>
 
-#include "frag.h"
+#include "box.h"
 
 namespace Vaev::Layout {
 
-void wireframe(Frag &frag, Gfx::Canvas &g);
+void wireframe(Box &box, Gfx::Canvas &g);
 
-void paint(Frag &frag, Scene::Stack &stack);
+void paint(Box &box, Scene::Stack &stack);
 
 } // namespace Vaev::Layout

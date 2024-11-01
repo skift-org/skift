@@ -4,6 +4,6 @@
 
 namespace Vaev::Layout {
 
-void layoutPositioned(Tree &tree, Box &box, RectPx containingBlock);
+Box build(Style::Computer &c, Markup::Document const &doc);
 
 } // namespace Vaev::Layout

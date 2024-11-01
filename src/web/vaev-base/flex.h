@@ -51,7 +51,7 @@ struct FlexBasis {
     }
 };
 
-struct Flex {
+struct FlexProps {
     FlexDirection direction = FlexDirection::ROW;
     FlexWrap wrap = FlexWrap::NOWRAP;
     FlexBasis basis = Width{Width::AUTO};

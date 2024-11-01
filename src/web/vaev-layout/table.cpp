@@ -1,6 +1,6 @@
 #include "table.h"
 
-#include "frag.h"
+#include "box.h"
 #include "layout.h"
 #include "values.h"
 
@@ -22,7 +22,7 @@ bool isHeadBodyFootRowOrColGroup(Display display) {
     );
 }
 
-void advanceUntil(MutCursor<Frag> &cursor, Func<bool(Display)> pred) {
+void advanceUntil(MutCursor<Box> &cursor, Func<bool(Display)> pred) {
     while (not cursor.ended() and not pred(cursor->style->display)) {
         cursor.next();
     }
@@ -30,27 +30,27 @@ void advanceUntil(MutCursor<Frag> &cursor, Func<bool(Display)> pred) {
 
 struct TableCell {
     Math::Vec2u anchorIdx = {};
-    MutCursor<Frag> frag = nullptr;
+    MutCursor<Box> box = nullptr;
 
     static TableCell const EMPTY;
 
     bool operator==(TableCell const &c) const {
-        return frag == c.frag and anchorIdx == c.anchorIdx;
+        return box == c.box and anchorIdx == c.anchorIdx;
     }
 
     bool isOccupied() const {
-        return frag != nullptr;
+        return box != nullptr;
     }
 };
 
 struct TableAxis {
     usize start, end;
-    Frag &el;
+    Box &el;
 };
 
 struct TableGroup {
     usize start, end;
-    Frag &el;
+    Box &el;
 };
 
 struct TableGrid {
@@ -97,8 +97,8 @@ struct TableFormatingContext {
     Vec<TableGroup> colGroups;
 
     Vec<usize> captionsIdxs;
-    Frag &wrapperBox;
-    Frag &tableBox;
+    Box &wrapperBox;
+    Box &tableBox;
 
     // Table forming algorithm
     Math::Vec2u current;
@@ -123,14 +123,14 @@ struct TableFormatingContext {
     InsetsPx boxBorder;
     Vec2Px spacing;
 
-    TableFormatingContext(Tree &fragTree, Frag &tableWrapperBox)
+    TableFormatingContext(Tree &tree, Box &tableWrapperBox)
         : wrapperBox(tableWrapperBox),
           tableBox(findTableBox(tableWrapperBox)),
-          boxBorder(computeBorders(fragTree, tableBox)),
+          boxBorder(computeBorders(tree, tableBox)),
           spacing(
               {
-                  resolve(fragTree, tableBox, tableBox.style->table->spacing.horizontal),
-                  resolve(fragTree, tableBox, tableBox.style->table->spacing.vertical),
+                  resolve(tree, tableBox, tableBox.style->table->spacing.horizontal),
+                  resolve(tree, tableBox, tableBox.style->table->spacing.vertical),
               }
           ) {
 
@@ -142,7 +142,7 @@ struct TableFormatingContext {
         }
 
         run();
-        buildBordersGrid(fragTree);
+        buildBordersGrid(tree);
     }
 
     // https://html.spec.whatwg.org/multipage/tables.html#algorithm-for-growing-downward-growing-cells
@@ -154,9 +154,9 @@ struct TableFormatingContext {
     }
 
     // https://html.spec.whatwg.org/multipage/tables.html#algorithm-for-processing-rows
-    void processRows(Frag &tableRowElement) {
+    void processRows(Box &tableRowElement) {
         auto tableRowChildren = tableRowElement.children();
-        MutCursor<Frag> tableRowCursor{tableRowChildren};
+        MutCursor<Box> tableRowCursor{tableRowChildren};
 
         if (grid.size.y == current.y)
             grid.increaseHeight();
@@ -197,7 +197,7 @@ struct TableFormatingContext {
             {
                 TableCell cell = {
                     .anchorIdx = current,
-                    .frag = tableRowCursor,
+                    .box = tableRowCursor,
                 };
 
                 for (usize x = current.x; x < current.x + colSpan; ++x) {
@@ -235,9 +235,9 @@ struct TableFormatingContext {
     }
 
     // https://html.spec.whatwg.org/multipage/tables.html#algorithm-for-processing-row-groups
-    void processRowGroup(Frag &rowGroupElement) {
+    void processRowGroup(Box &rowGroupElement) {
         auto rowGroupChildren = rowGroupElement.children();
-        MutCursor<Frag> rowGroupCursor{rowGroupChildren};
+        MutCursor<Box> rowGroupCursor{rowGroupChildren};
 
         usize ystartRowGroup = grid.size.y;
 
@@ -266,7 +266,7 @@ struct TableFormatingContext {
     // https://html.spec.whatwg.org/multipage/tables.html#forming-a-table
     void run() {
         auto tableBoxChildren = tableBox.children();
-        MutCursor<Frag> tableBoxCursor{tableBoxChildren};
+        MutCursor<Box> tableBoxCursor{tableBoxChildren};
 
         if (tableBoxCursor.ended())
             return;
@@ -281,7 +281,7 @@ struct TableFormatingContext {
         // MARK: Columns groups
         while (not tableBoxCursor.ended() and tableBoxCursor->style->display == Display::TABLE_COLUMN_GROUP) {
             auto columnGroupChildren = tableBoxCursor->children();
-            MutCursor<Frag> columnGroupCursor = {columnGroupChildren};
+            MutCursor<Box> columnGroupCursor = {columnGroupChildren};
 
             advanceUntil(columnGroupCursor, [](Display d) {
                 return d == Vaev::Display::TABLE_COLUMN;
@@ -360,15 +360,15 @@ struct TableFormatingContext {
         }
     }
 
-    Frag &findTableBox(Frag &tableWrapperBox) {
+    Box &findTableBox(Box &tableWrapperBox) {
         for (auto &child : tableWrapperBox.children())
             if (child.style->display != Display::Internal::TABLE_CAPTION)
                 return child;
 
-        panic("table box not found in frag tree");
+        panic("table box not found in box tree");
     }
 
-    void buildBordersGrid(Tree &fragTree) {
+    void buildBordersGrid(Tree &tree) {
         bordersGrid.borders.clear();
         bordersGrid.borders.resize(grid.size.x * grid.size.y);
 
@@ -380,10 +380,10 @@ struct TableFormatingContext {
                 if (cell.anchorIdx != Math::Vec2u{j, i})
                     continue;
 
-                usize rowSpan = cell.frag->attrs.rowSpan;
-                usize colSpan = cell.frag->attrs.colSpan;
+                usize rowSpan = cell.box->attrs.rowSpan;
+                usize colSpan = cell.box->attrs.colSpan;
 
-                auto cellBorder = computeBorders(fragTree, *cell.frag);
+                auto cellBorder = computeBorders(tree, *cell.box);
 
                 // Top and bottom borders
                 for (usize k = 0; k < rowSpan; ++k) {
@@ -430,7 +430,7 @@ struct TableFormatingContext {
     // MARK: Fixed Table Layout
     // https://www.w3.org/TR/CSS22/tables.html#fixed-table-layout
 
-    Tuple<Vec<Px>, Px> getFixedColWidths(Tree &t, Input &input) {
+    Tuple<Vec<Px>, Px> getFixedColWidths(Tree &tree, Input &input) {
         // NOTE: Percentages for 'width' and 'height' on the table (box)
         //       are calculated relative to the containing block of the
         //       table wrapper box, not the table wrapper box itself.
@@ -442,7 +442,7 @@ struct TableFormatingContext {
         auto tableUsedWidth =
             tableBox.style->sizing->width == Size::Type::AUTO
                 ? Px{0}
-                : resolve(t, tableBox, tableBox.style->sizing->width.value, input.availableSpace.x);
+                : resolve(tree, tableBox, tableBox.style->sizing->width.value, input.availableSpace.x);
 
         auto [columnBorders, sumBorders] = getColumnBorders();
 
@@ -456,7 +456,7 @@ struct TableFormatingContext {
                 continue;
 
             for (usize x = col.start; x <= col.end; ++x) {
-                colWidth[x] = resolve(t, col.el, width.value, tableUsedWidth);
+                colWidth[x] = resolve(tree, col.el, width.value, tableUsedWidth);
             }
         }
 
@@ -465,7 +465,7 @@ struct TableFormatingContext {
         usize x = 0;
         while (x < grid.size.x) {
             auto cell = grid.get(x, 0);
-            if (cell.frag->style->sizing->width == Size::Type::AUTO) {
+            if (cell.box->style->sizing->width == Size::Type::AUTO) {
                 x++;
                 continue;
             }
@@ -473,8 +473,8 @@ struct TableFormatingContext {
             if (cell.anchorIdx != Math::Vec2u{x, 0})
                 continue;
 
-            auto cellWidth = resolve(t, *cell.frag, cell.frag->style->sizing->width.value, tableUsedWidth);
-            auto colSpan = cell.frag->attrs.colSpan;
+            auto cellWidth = resolve(tree, *cell.box, cell.box->style->sizing->width.value, tableUsedWidth);
+            auto colSpan = cell.box->attrs.colSpan;
 
             for (usize j = 0; j < colSpan; ++j, x++) {
                 // FIXME: Not overriding values already computed,
@@ -519,7 +519,7 @@ struct TableFormatingContext {
     // MARK: Auto Table Layout -------------------------------------------------
     // https://www.w3.org/TR/CSS22/tables.html#auto-table-layout
 
-    Tuple<Vec<Px>, Px> getAutoColWidths(Tree &t, Input &input) {
+    Tuple<Vec<Px>, Px> getAutoColWidths(Tree &tree, Input &input) {
         // FIXME: This is a rough approximation of the algorithm.
         //        We need to distinguish between percentage-based and fixed lengths:
         //         - Percentage-based sizes are fixed and cannot have extra space distributed to them.
@@ -533,36 +533,36 @@ struct TableFormatingContext {
         Px capmin{0};
         for (auto i : captionsIdxs) {
             auto captionOutput = layout(
-                t,
+                tree,
                 wrapperBox.children()[i],
                 Input{
                     .commit = Commit::NO,
-                    .intrinsic = {IntrinsicSize::MIN_CONTENT, IntrinsicSize::AUTO},
+                    .intrinsic = IntrinsicSize::MIN_CONTENT,
                     .knownSize = {NONE, NONE}
                 }
             );
             capmin = max(capmin, captionOutput.size.x);
         }
 
-        auto getCellMinMaxWidth = [](Tree &t, Frag &f, Input &input, TableCell &cell) {
+        auto getCellMinMaxWidth = [](Tree &tree, Box &box, Input &input, TableCell &cell) {
             // FIXME: What should be the parameter for intrinsic in the vertical axis?
             auto cellMinOutput = layout(
-                t,
-                *cell.frag,
+                tree,
+                *cell.box,
                 Input{
                     .commit = Commit::NO,
-                    .intrinsic = {IntrinsicSize::MIN_CONTENT, IntrinsicSize::AUTO},
+                    .intrinsic = IntrinsicSize::MIN_CONTENT,
                     .knownSize = {NONE, NONE}
                 }
             );
 
             // FIXME: What should be the parameter for intrinsic in the vertical axis?
             auto cellMaxOutput = layout(
-                t,
-                *cell.frag,
+                tree,
+                *cell.box,
                 Input{
                     .commit = Commit::NO,
-                    .intrinsic = {IntrinsicSize::MAX_CONTENT, IntrinsicSize::AUTO},
+                    .intrinsic = IntrinsicSize::MAX_CONTENT,
                     .knownSize = {NONE, NONE}
                 }
             );
@@ -570,11 +570,11 @@ struct TableFormatingContext {
             auto cellMinWidth = cellMinOutput.size.x;
             auto cellMaxWidth = cellMaxOutput.size.x;
 
-            if (cell.frag->style->sizing->width != Size::Type::AUTO) {
+            if (cell.box->style->sizing->width != Size::Type::AUTO) {
                 auto cellPreferredWidth = resolve(
-                    t,
-                    f,
-                    cell.frag->style->sizing->width.value,
+                    tree,
+                    box,
+                    cell.box->style->sizing->width.value,
                     input.availableSpace.x
                 );
                 cellMinWidth = max(cellMinWidth, cellPreferredWidth);
@@ -597,11 +597,11 @@ struct TableFormatingContext {
                 if (cell.anchorIdx != Math::Vec2u{j, i})
                     continue;
 
-                auto colSpan = cell.frag->attrs.colSpan;
+                auto colSpan = cell.box->attrs.colSpan;
                 if (colSpan > 1)
                     continue;
 
-                auto [cellMinWidth, cellMaxWidth] = getCellMinMaxWidth(t, *cell.frag, input, cell);
+                auto [cellMinWidth, cellMaxWidth] = getCellMinMaxWidth(tree, *cell.box, input, cell);
 
                 minColWidth[j] = max(minColWidth[j], cellMinWidth);
                 maxColWidth[j] = max(maxColWidth[j], cellMaxWidth);
@@ -610,7 +610,7 @@ struct TableFormatingContext {
 
         Opt<Px> tableComputedWidth;
         if (tableBox.style->sizing->width != Size::Type::AUTO) {
-            tableComputedWidth = resolve(t, tableBox, tableBox.style->sizing->width.value, input.availableSpace.x);
+            tableComputedWidth = resolve(tree, tableBox, tableBox.style->sizing->width.value, input.availableSpace.x);
         }
 
         for (auto &[start, end, el] : cols) {
@@ -620,7 +620,7 @@ struct TableFormatingContext {
             if (width == Size::Type::AUTO)
                 continue;
 
-            auto widthValue = resolve(t, el, width.value, tableComputedWidth.unwrapOr(Px{0}));
+            auto widthValue = resolve(tree, el, width.value, tableComputedWidth.unwrapOr(Px{0}));
 
             for (usize x = start; x <= end; ++x) {
                 minColWidth[x] = max(minColWidth[x], widthValue);
@@ -635,11 +635,11 @@ struct TableFormatingContext {
                 if (not(cell.anchorIdx == Math::Vec2u{j, i}))
                     continue;
 
-                auto colSpan = cell.frag->attrs.span;
+                auto colSpan = cell.box->attrs.span;
                 if (colSpan <= 1)
                     continue;
 
-                auto [cellMinWidth, cellMaxWidth] = getCellMinMaxWidth(t, *cell.frag, input, cell);
+                auto [cellMinWidth, cellMaxWidth] = getCellMinMaxWidth(tree, *cell.box, input, cell);
 
                 Px currSumMinColWidth{0}, currSumMaxColWidth{0};
                 for (usize k = 0; k < colSpan; ++k) {
@@ -674,7 +674,7 @@ struct TableFormatingContext {
                 currSumOfGroupWidth += minColWidth[x];
             }
 
-            auto columnGroupWidthValue = resolve(t, group.el, columnGroupWidth.value, input.availableSpace.x);
+            auto columnGroupWidthValue = resolve(tree, group.el, columnGroupWidth.value, input.availableSpace.x);
             if (currSumOfGroupWidth >= columnGroupWidthValue)
                 continue;
 
@@ -720,7 +720,7 @@ struct TableFormatingContext {
     }
 
     // https://www.w3.org/TR/CSS22/tables.html#height-layout
-    Vec<Px> getRowHeights(Tree &t, Vec<Px> const &colWidth) {
+    Vec<Px> getRowHeights(Tree &tree, Vec<Px> const &colWidth) {
         // NOTE: CSS 2.2 does not define how the height of table cells and
         //       table rows is calculated when their height is
         //       specified using percentage values.
@@ -738,7 +738,7 @@ struct TableFormatingContext {
                 continue;
 
             for (usize y = row.start; y <= row.end; ++y) {
-                rowHeight[y] = resolve(t, row.el, height.value, Px{0});
+                rowHeight[y] = resolve(tree, row.el, height.value, Px{0});
             }
         }
 
@@ -752,12 +752,12 @@ struct TableFormatingContext {
                 // [A] CSS 2.2 does not specify how cells that span more than one row affect row height calculations except
                 // that the sum of the row heights involved must be great enough to encompass the cell spanning the rows.
 
-                auto rowSpan = cell.frag->attrs.rowSpan;
-                if (cell.frag->style->sizing->height != Size::Type::AUTO) {
+                auto rowSpan = cell.box->attrs.rowSpan;
+                if (cell.box->style->sizing->height != Size::Type::AUTO) {
                     auto computedHeight = resolve(
-                        t,
-                        *cell.frag,
-                        cell.frag->style->sizing->height.value,
+                        tree,
+                        *cell.box,
+                        cell.box->style->sizing->height.value,
                         Px{0}
                     );
 
@@ -767,11 +767,11 @@ struct TableFormatingContext {
                 }
 
                 auto cellOutput = layout(
-                    t,
-                    *cell.frag,
+                    tree,
+                    *cell.box,
                     Input{
                         .commit = Commit::NO,
-                        .intrinsic = {IntrinsicSize::AUTO, IntrinsicSize::MIN_CONTENT},
+                        .intrinsic = IntrinsicSize::MIN_CONTENT,
                         .knownSize = {colWidth[j], NONE}
                     }
                 );
@@ -795,11 +795,11 @@ struct TableFormatingContext {
     }
 };
 
-Output tableLayout(Tree &t, Frag &wrapper, Input input) {
+Output tableLayout(Tree &tree, Box &wrapper, Input input) {
     // TODO: - vertical and horizontal alignment
     //       - borders collapse
 
-    TableFormatingContext table(t, wrapper);
+    TableFormatingContext table(tree, wrapper);
 
     // NOTE: When "table-layout: fixed" is set but "width: auto", the specs suggest
     //       that the UA can use the fixed layout after computing the width
@@ -812,16 +812,16 @@ Output tableLayout(Tree &t, Frag &wrapper, Input input) {
 
     auto [colWidth, tableUsedWidth] =
         shouldRunAutoAlgorithm
-            ? table.getAutoColWidths(t, input)
-            : table.getFixedColWidths(t, input);
+            ? table.getAutoColWidths(tree, input)
+            : table.getFixedColWidths(tree, input);
 
-    auto rowHeight = table.getRowHeights(t, colWidth);
+    auto rowHeight = table.getRowHeights(tree, colWidth);
 
     Px currPositionY{input.position.y}, captionsHeight{0};
     if (table.tableBox.style->table->captionSide == CaptionSide::TOP) {
         for (auto i : table.captionsIdxs) {
             auto cellOutput = layout(
-                t,
+                tree,
                 wrapper.children()[i],
                 {
                     .commit = input.commit,
@@ -864,7 +864,7 @@ Output tableLayout(Tree &t, Frag &wrapper, Input input) {
 
         // table box
         layout(
-            t,
+            tree,
             table.tableBox,
             {
                 .commit = Commit::YES,
@@ -882,7 +882,7 @@ Output tableLayout(Tree &t, Frag &wrapper, Input input) {
         // column groups
         for (auto &group : table.colGroups) {
             layout(
-                t,
+                tree,
                 group.el,
                 Input{
                     .commit = Commit::YES,
@@ -901,7 +901,7 @@ Output tableLayout(Tree &t, Frag &wrapper, Input input) {
         // columns
         for (auto &col : table.cols) {
             layout(
-                t,
+                tree,
                 col.el,
                 {
                     .commit = Commit::YES,
@@ -920,7 +920,7 @@ Output tableLayout(Tree &t, Frag &wrapper, Input input) {
         // row groups
         for (auto &group : table.rowGroups) {
             layout(
-                t,
+                tree,
                 group.el,
                 {
                     .commit = Commit::YES,
@@ -939,7 +939,7 @@ Output tableLayout(Tree &t, Frag &wrapper, Input input) {
         // rows
         for (auto &row : table.rows) {
             layout(
-                t,
+                tree,
                 row.el,
                 {
                     .commit = Commit::YES,
@@ -964,8 +964,8 @@ Output tableLayout(Tree &t, Frag &wrapper, Input input) {
                 if (cell.anchorIdx != Math::Vec2u{j, i})
                     continue;
 
-                auto colSpan = cell.frag->attrs.colSpan;
-                auto rowSpan = cell.frag->attrs.rowSpan;
+                auto colSpan = cell.box->attrs.colSpan;
+                auto rowSpan = cell.box->attrs.rowSpan;
 
                 // TODO: In CSS 2.2, the height of a cell box is the minimum
                 //       height required by the content.
@@ -975,8 +975,8 @@ Output tableLayout(Tree &t, Frag &wrapper, Input input) {
                 //
                 //       (See https://www.w3.org/TR/CSS22/tables.html#height-layout)
                 auto cellOutput = layout(
-                    t,
-                    *cell.frag,
+                    tree,
+                    *cell.box,
                     {
                         .commit = Commit::YES,
                         .knownSize = {
@@ -993,7 +993,7 @@ Output tableLayout(Tree &t, Frag &wrapper, Input input) {
     if (table.tableBox.style->table->captionSide == CaptionSide::BOTTOM) {
         for (auto i : table.captionsIdxs) {
             auto cellOutput = layout(
-                t,
+                tree,
                 wrapper.children()[i],
                 Input{
                     .commit = input.commit,

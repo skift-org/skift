@@ -4,7 +4,7 @@
 #include <karm-base/union.h>
 #include <karm-base/vec.h>
 
-namespace Vaev::Script {
+namespace Vaev::Js {
 
 struct Expr;
 
@@ -59,4 +59,4 @@ struct Stmt : public _Stmt {
 
 struct Decl {};
 
-} // namespace Vaev::Script
+} // namespace Vaev::Js

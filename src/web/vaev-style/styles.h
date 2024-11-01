@@ -554,7 +554,7 @@ struct BorderTopWidthProp {
 
     static constexpr Str name() { return "border-top-width"; }
 
-    static constexpr Length initial() { return Borders::MEDIUM; }
+    static constexpr Length initial() { return BorderProps::MEDIUM; }
 
     void apply(Computed &c) const {
         c.borders.cow().top.width = value;
@@ -572,7 +572,7 @@ struct BorderRightWidthProp {
 
     static constexpr Str name() { return "border-right-width"; }
 
-    static constexpr Length initial() { return Borders::MEDIUM; }
+    static constexpr Length initial() { return BorderProps::MEDIUM; }
 
     void apply(Computed &c) const {
         c.borders.cow().end.width = value;
@@ -590,7 +590,7 @@ struct BorderBottomWidthProp {
 
     static constexpr Str name() { return "border-bottom-width"; }
 
-    static constexpr Length initial() { return Borders::MEDIUM; }
+    static constexpr Length initial() { return BorderProps::MEDIUM; }
 
     void apply(Computed &c) const {
         c.borders.cow().bottom.width = value;
@@ -608,7 +608,7 @@ struct BorderLeftWidthProp {
 
     static constexpr Str name() { return "border-left-width"; }
 
-    static constexpr Length initial() { return Borders::MEDIUM; }
+    static constexpr Length initial() { return BorderProps::MEDIUM; }
 
     void apply(Computed &c) const {
         c.borders.cow().start.width = value;
@@ -654,8 +654,8 @@ struct BorderRadiusTopLeft {
     static constexpr Length initial() { return Px{0}; }
 
     void apply(Computed &c) const {
-        c.borders.cow().radii.a = value[0];
-        c.borders.cow().radii.b = value[1];
+        c.borders.cow().radii.a = value[1];
+        c.borders.cow().radii.b = value[0];
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -680,8 +680,8 @@ struct BorderRadiusBottomRight {
     static constexpr Length initial() { return Px{0}; }
 
     void apply(Computed &c) const {
-        c.borders.cow().radii.e = value[0];
-        c.borders.cow().radii.f = value[1];
+        c.borders.cow().radii.e = value[1];
+        c.borders.cow().radii.f = value[0];
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
@@ -927,7 +927,7 @@ struct BorderProp {
 
 // https://www.w3.org/TR/css-backgrounds-3/#border-width
 struct BorderWidthProp {
-    Math::Insets<Length> value = Borders::MEDIUM;
+    Math::Insets<Length> value = BorderProps::MEDIUM;
 
     static constexpr Str name() { return "border-width"; }
 
@@ -1905,7 +1905,7 @@ struct BoxSizingProp {
     static constexpr BoxSizing initial() { return BoxSizing::CONTENT_BOX; }
 
     void apply(Computed &c) const {
-        c.boxSizing = value;
+        c.sizing.cow().boxSizing = value;
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {

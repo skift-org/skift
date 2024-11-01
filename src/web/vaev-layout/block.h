@@ -4,6 +4,6 @@
 
 namespace Vaev::Layout {
 
-Output blockLayout(Tree &t, Frag &f, Input input);
+Output blockLayout(Tree &tree, Box &box, Input input);
 
 } // namespace Vaev::Layout

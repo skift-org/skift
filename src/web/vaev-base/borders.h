@@ -43,7 +43,7 @@ struct Border {
     }
 };
 
-struct Borders {
+struct BorderProps {
     static constexpr Length THIN = Px{1};
     static constexpr Length MEDIUM = Px{3};
     static constexpr Length THICK = Px{5};

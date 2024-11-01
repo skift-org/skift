@@ -1,305 +1,253 @@
 #include "values.h"
 
-#include "frag.h"
+#include "box.h"
 #include "writing.h"
 
 namespace Vaev::Layout {
 
-Px _resolveFontRelative(Tree &t, Frag &f, Length l) {
-    Karm::Text::Font rootFont = {
-        t.root.fontFace,
-        t.root.layout.fontSize.cast<f64>(),
-    };
+Resolver Resolver::from(Tree const &tree, Box const &box) {
+    Resolver resolver;
+    resolver.rootFont = Text::Font{tree.root.fontFace, tree.root.layout.fontSize.cast<f64>()};
+    resolver.boxFont = Text::Font{box.fontFace, box.layout.fontSize.cast<f64>()};
+    resolver.viewport = tree.viewport;
+    resolver.boxAxis = mainAxis(box);
+    return resolver;
+}
 
-    Karm::Text::Font fragFont = {
-        f.fontFace,
-        f.layout.fontSize.cast<f64>(),
-    };
+Resolver Resolver::inherit(Resolver const &resolver) {
+    Resolver copy = resolver;
+    copy.boxFont = NONE;
+    copy.parentFontSize = resolver.boxFont->fontsize;
+    return copy;
+}
 
-    switch (l.unit()) {
+Px Resolver::_resolveFontRelative(Length value) {
+    if (not boxFont or not rootFont) {
+        logWarn("missing font information");
+        return Px{0};
+    }
 
-    case Length::Unit::EM:
-        return Px::fromFloatNearest(l.val() * fragFont.fontSize());
+    switch (value.unit()) {
 
-    case Length::Unit::REM:
-        return Px::fromFloatNearest(l.val() * rootFont.fontSize());
+    case Length::EM:
+        return Px::fromFloatNearest(value.val() * boxFont->fontSize());
 
-    case Length::Unit::EX:
-        return Px::fromFloatNearest(l.val() * fragFont.xHeight());
+    case Length::REM:
+        return Px::fromFloatNearest(value.val() * rootFont->fontSize());
 
-    case Length::Unit::REX:
-        return Px::fromFloatNearest(l.val() * rootFont.xHeight());
+    case Length::EX:
+        return Px::fromFloatNearest(value.val() * boxFont->xHeight());
 
-    case Length::Unit::CAP:
-        return Px::fromFloatNearest(l.val() * fragFont.capHeight());
+    case Length::REX:
+        return Px::fromFloatNearest(value.val() * rootFont->xHeight());
 
-    case Length::Unit::RCAP:
-        return Px::fromFloatNearest(l.val() * rootFont.capHeight());
+    case Length::CAP:
+        return Px::fromFloatNearest(value.val() * boxFont->capHeight());
 
-    case Length::Unit::CH:
-        return Px::fromFloatNearest(l.val() * fragFont.zeroAdvance());
+    case Length::RCAP:
+        return Px::fromFloatNearest(value.val() * rootFont->capHeight());
 
-    case Length::Unit::RCH:
-        return Px::fromFloatNearest(l.val() * rootFont.zeroAdvance());
+    case Length::CH:
+        return Px::fromFloatNearest(value.val() * boxFont->zeroAdvance());
 
-    case Length::Unit::IC:
-        return Px::fromFloatNearest(l.val() * fragFont.zeroAdvance());
+    case Length::RCH:
+        return Px::fromFloatNearest(value.val() * rootFont->zeroAdvance());
 
-    case Length::Unit::RIC:
-        return Px::fromFloatNearest(l.val() * rootFont.zeroAdvance());
+    case Length::IC:
+        return Px::fromFloatNearest(value.val() * boxFont->zeroAdvance());
 
-    case Length::Unit::LH:
-        return Px::fromFloatNearest(l.val() * fragFont.lineHeight());
+    case Length::RIC:
+        return Px::fromFloatNearest(value.val() * rootFont->zeroAdvance());
 
-    case Length::Unit::RLH:
-        return Px::fromFloatNearest(l.val() * rootFont.lineHeight());
+    case Length::LH:
+        return Px::fromFloatNearest(value.val() * boxFont->lineHeight());
+
+    case Length::RLH:
+        return Px::fromFloatNearest(value.val() * rootFont->lineHeight());
+
     default:
         panic("expected font-relative unit");
     }
 }
 
-Px resolve(Tree &t, Frag &f, Length l) {
-    if (l.isFontRelative())
-        return _resolveFontRelative(t, f, l);
-    switch (l.unit()) {
+Px Resolver::resolve(Length value) {
+    if (value.isFontRelative())
+        return _resolveFontRelative(value);
+    switch (value.unit()) {
 
     // Viewport-relative
 
     // https://drafts.csswg.org/css-values/#vw
 
     // Equal to 1% of the width of current viewport.
-    case Length::Unit::VW:
-    case Length::Unit::LVW:
-        return Px::fromFloatNearest(l.val() * t.viewport.large.width.cast<f64>() / 100);
+    case Length::VW:
+    case Length::LVW:
+        return Px::fromFloatNearest(value.val() * viewport.large.width.cast<f64>() / 100);
 
-    case Length::Unit::SVW:
-        return Px::fromFloatNearest(l.val() * t.viewport.small.width.cast<f64>() / 100);
+    case Length::SVW:
+        return Px::fromFloatNearest(value.val() * viewport.small.width.cast<f64>() / 100);
 
-    case Length::Unit::DVW:
-        return Px::fromFloatNearest(l.val() * t.viewport.dynamic.width.cast<f64>() / 100);
+    case Length::DVW:
+        return Px::fromFloatNearest(value.val() * viewport.dynamic.width.cast<f64>() / 100);
 
     // https://drafts.csswg.org/css-values/#vh
     // Equal to 1% of the height of current viewport.
-    case Length::Unit::VH:
-    case Length::Unit::LVH:
-        return Px::fromFloatNearest(l.val() * t.viewport.large.height.cast<f64>() / 100);
+    case Length::VH:
+    case Length::LVH:
+        return Px::fromFloatNearest(value.val() * viewport.large.height.cast<f64>() / 100);
 
-    case Length::Unit::SVH:
-        return Px::fromFloatNearest(l.val() * t.viewport.small.height.cast<f64>() / 100);
+    case Length::SVH:
+        return Px::fromFloatNearest(value.val() * viewport.small.height.cast<f64>() / 100);
 
-    case Length::Unit::DVH:
-        return Px::fromFloatNearest(l.val() * t.viewport.dynamic.height.cast<f64>() / 100);
+    case Length::DVH:
+        return Px::fromFloatNearest(value.val() * viewport.dynamic.height.cast<f64>() / 100);
 
     // https://drafts.csswg.org/css-values/#vi
     // Equal to 1% of the size of the viewport in the box’s inline axis.
-    case Length::Unit::VI:
-    case Length::Unit::LVI:
-        if (mainAxis(f) == Axis::HORIZONTAL) {
-            return Px::fromFloatNearest(l.val() * t.viewport.large.width.cast<f64>() / 100);
+    case Length::VI:
+    case Length::LVI:
+        if (boxAxis == Axis::HORIZONTAL) {
+            return Px::fromFloatNearest(value.val() * viewport.large.width.cast<f64>() / 100);
         } else {
-            return Px::fromFloatNearest(l.val() * t.viewport.large.height.cast<f64>() / 100);
+            return Px::fromFloatNearest(value.val() * viewport.large.height.cast<f64>() / 100);
         }
 
-    case Length::Unit::SVI:
-        if (mainAxis(f) == Axis::HORIZONTAL) {
-            return Px::fromFloatNearest(l.val() * t.viewport.small.width.cast<f64>() / 100);
+    case Length::SVI:
+        if (boxAxis == Axis::HORIZONTAL) {
+            return Px::fromFloatNearest(value.val() * viewport.small.width.cast<f64>() / 100);
         } else {
-            return Px::fromFloatNearest(l.val() * t.viewport.small.height.cast<f64>() / 100);
+            return Px::fromFloatNearest(value.val() * viewport.small.height.cast<f64>() / 100);
         }
 
-    case Length::Unit::DVI:
-        if (mainAxis(f) == Axis::HORIZONTAL) {
-            return Px::fromFloatNearest(l.val() * t.viewport.dynamic.width.cast<f64>() / 100);
+    case Length::DVI:
+        if (boxAxis == Axis::HORIZONTAL) {
+            return Px::fromFloatNearest(value.val() * viewport.dynamic.width.cast<f64>() / 100);
         } else {
-            return Px::fromFloatNearest(l.val() * t.viewport.dynamic.height.cast<f64>() / 100);
+            return Px::fromFloatNearest(value.val() * viewport.dynamic.height.cast<f64>() / 100);
         }
 
     // https://drafts.csswg.org/css-values/#vb
     // Equal to 1% of the size of the viewport in the box’s block axis.
-    case Length::Unit::VB:
-    case Length::Unit::LVB:
-        if (crossAxis(f) == Axis::HORIZONTAL) {
-            return Px::fromFloatNearest(l.val() * t.viewport.large.width.cast<f64>() / 100);
+    case Length::VB:
+    case Length::LVB:
+        if (boxAxis.cross() == Axis::HORIZONTAL) {
+            return Px::fromFloatNearest(value.val() * viewport.large.width.cast<f64>() / 100);
         } else {
-            return Px::fromFloatNearest(l.val() * t.viewport.large.height.cast<f64>() / 100);
+            return Px::fromFloatNearest(value.val() * viewport.large.height.cast<f64>() / 100);
         }
 
-    case Length::Unit::SVB:
-        if (crossAxis(f) == Axis::HORIZONTAL) {
-            return Px::fromFloatNearest(l.val() * t.viewport.small.width.cast<f64>() / 100);
+    case Length::SVB:
+        if (boxAxis.cross() == Axis::HORIZONTAL) {
+            return Px::fromFloatNearest(value.val() * viewport.small.width.cast<f64>() / 100);
         } else {
-            return Px::fromFloatNearest(l.val() * t.viewport.small.height.cast<f64>() / 100);
+            return Px::fromFloatNearest(value.val() * viewport.small.height.cast<f64>() / 100);
         }
 
-    case Length::Unit::DVB:
-        if (crossAxis(f) == Axis::HORIZONTAL) {
-            return Px::fromFloatNearest(l.val() * t.viewport.dynamic.width.cast<f64>() / 100);
+    case Length::DVB:
+        if (boxAxis.cross() == Axis::HORIZONTAL) {
+            return Px::fromFloatNearest(value.val() * viewport.dynamic.width.cast<f64>() / 100);
         } else {
-            return Px::fromFloatNearest(l.val() * t.viewport.dynamic.height.cast<f64>() / 100);
+            return Px::fromFloatNearest(value.val() * viewport.dynamic.height.cast<f64>() / 100);
         }
 
     // https://drafts.csswg.org/css-values/#vmin
     // Equal to the smaller of vw and vh.
-    case Length::Unit::VMIN:
-    case Length::Unit::LVMIN:
+    case Length::VMIN:
+    case Length::LVMIN:
         return min(
-            resolve(t, f, Length(l.val(), Length::Unit::VW)),
-            resolve(t, f, Length(l.val(), Length::Unit::VH))
+            resolve(Length(value.val(), Length::VW)),
+            resolve(Length(value.val(), Length::VH))
         );
 
-    case Length::Unit::SVMIN:
+    case Length::SVMIN:
         return min(
-            resolve(t, f, Length(l.val(), Length::Unit::SVW)),
-            resolve(t, f, Length(l.val(), Length::Unit::SVH))
+            resolve(Length(value.val(), Length::SVW)),
+            resolve(Length(value.val(), Length::SVH))
         );
 
-    case Length::Unit::DVMIN:
+    case Length::DVMIN:
         return min(
-            resolve(t, f, Length(l.val(), Length::Unit::DVW)),
-            resolve(t, f, Length(l.val(), Length::Unit::DVH))
+            resolve(Length(value.val(), Length::DVW)),
+            resolve(Length(value.val(), Length::DVH))
         );
 
     // https://drafts.csswg.org/css-values/#vmax
     // Equal to the larger of vw and vh.
-    case Length::Unit::VMAX:
-    case Length::Unit::LVMAX:
+    case Length::VMAX:
+    case Length::LVMAX:
         return max(
-            resolve(t, f, Length(l.val(), Length::Unit::VW)),
-            resolve(t, f, Length(l.val(), Length::Unit::VH))
+            resolve(Length(value.val(), Length::VW)),
+            resolve(Length(value.val(), Length::VH))
         );
 
-    case Length::Unit::DVMAX:
+    case Length::DVMAX:
         return max(
-            resolve(t, f, Length(l.val(), Length::Unit::DVW)),
-            resolve(t, f, Length(l.val(), Length::Unit::DVH))
+            resolve(Length(value.val(), Length::DVW)),
+            resolve(Length(value.val(), Length::DVH))
         );
 
-    case Length::Unit::SVMAX:
+    case Length::SVMAX:
         return max(
-            resolve(t, f, Length(l.val(), Length::Unit::SVW)),
-            resolve(t, f, Length(l.val(), Length::Unit::SVH))
+            resolve(Length(value.val(), Length::SVW)),
+            resolve(Length(value.val(), Length::SVH))
         );
 
     // Absolute
     // https://drafts.csswg.org/css-values/#absolute-lengths
-    case Length::Unit::CM:
-        return Px::fromFloatNearest(l.val() * t.viewport.dpi.cast<f64>() / 2.54);
+    case Length::CM:
+        return Px::fromFloatNearest(value.val() * viewport.dpi.cast<f64>() / 2.54);
 
-    case Length::Unit::MM:
-        return Px::fromFloatNearest(l.val() * t.viewport.dpi.cast<f64>() / 25.4);
+    case Length::MM:
+        return Px::fromFloatNearest(value.val() * viewport.dpi.cast<f64>() / 25.4);
 
-    case Length::Unit::Q:
-        return Px::fromFloatNearest(l.val() * t.viewport.dpi.cast<f64>() / 101.6);
+    case Length::Q:
+        return Px::fromFloatNearest(value.val() * viewport.dpi.cast<f64>() / 101.6);
 
-    case Length::Unit::IN:
-        return Px::fromFloatNearest(l.val() * t.viewport.dpi.cast<f64>());
+    case Length::IN:
+        return Px::fromFloatNearest(value.val() * viewport.dpi.cast<f64>());
 
-    case Length::Unit::PT:
-        return Px::fromFloatNearest(l.val() * t.viewport.dpi.cast<f64>() / 72.0);
+    case Length::PT:
+        return Px::fromFloatNearest(value.val() * viewport.dpi.cast<f64>() / 72.0);
 
-    case Length::Unit::PC:
-        return Px::fromFloatNearest(l.val() * t.viewport.dpi.cast<f64>() / 6.0);
+    case Length::PC:
+        return Px::fromFloatNearest(value.val() * viewport.dpi.cast<f64>() / 6.0);
 
-    case Length::Unit::PX:
-        return Px::fromFloatNearest(l.val());
+    case Length::PX:
+        return Px::fromFloatNearest(value.val());
 
     default:
         panic("invalid length unit");
     }
 }
 
-template <typename T>
-concept Resolvable = requires {
-    typename T::Resolved;
-};
-
-template <typename T>
-using Resolved = Meta::Cond<Resolvable<T>, typename T::Resolved, T>;
-static_assert(Resolvable<PercentOr<Length>>);
-
-Px resolve(Tree &t, Frag &f, PercentOr<Length> p, Px relative) {
-    if (p.resolved())
-        return resolve(t, f, p.value());
-    return Px{relative.cast<f64>() * (p.percent().value() / 100.)};
+Px Resolver::resolve(PercentOr<Length> value, Px relative) {
+    if (value.resolved())
+        return resolve(value.value());
+    return Px{relative.cast<f64>() * (value.percent().value() / 100.)};
 }
 
-template <typename T>
-Resolved<T> resolveInfix(typename CalcValue<T>::OpCode op, Resolved<T> lhs, Resolved<T> rhs) {
-    switch (op) {
-    case CalcValue<T>::OpCode::ADD:
-        return lhs + rhs;
-    case CalcValue<T>::OpCode::SUBSTRACT:
-        return lhs - rhs;
-    case CalcValue<T>::OpCode::MULTIPLY:
-        return lhs * rhs;
-    case CalcValue<T>::OpCode::DIVIDE:
-        return lhs / rhs;
-    default:
-        return lhs;
-    }
-}
-
-template <typename T>
-auto resolve(Tree &t, Frag &f, CalcValue<T> const &p, Px relative) {
-    if (p.type == CalcValue<T>::FIXED) {
-        return resolve(t, f, p.lhs.template unwrap<T>(), relative);
-    } else if (p.type == CalcValue<T>::SINGLE) {
-        // TODO: compute result of funtion here with the resolved value
-        return resolve(t, f, p.lhs.template unwrap<T>(), relative);
-    } else if (p.type == CalcValue<T>::OpType::CALC) {
-        auto resolveUnion = Visitor{
-            [&](T const &v) {
-                return resolve<T>(t, f, v, relative);
-            },
-            [&](CalcValue<T>::Leaf const &v) {
-                return resolve<T>(t, f, *v, relative);
-            },
-            [&](Number const &v) {
-                return Math::i24f8{v};
-            },
-            [&](None const &) -> Resolved<T> {
-                panic("invalid value in calc expression");
-            }
-        };
-
-        return resolveInfix<T>(
-            p.op,
-            p.lhs.visit(resolveUnion),
-            p.rhs.visit(resolveUnion)
-        );
-    }
-
-    unreachable();
-}
-
-Px resolve(Tree &t, Frag &f, Width w, Px relative) {
-    if (w == Width::Type::AUTO)
+Px Resolver::resolve(Width value, Px relative) {
+    if (value == Width::Type::AUTO)
         return Px{0};
-    return resolve(t, f, w.value, relative);
+    return resolve(value.value, relative);
 }
 
-Px resolve(Tree &t, Frag &f, FontSize fs) {
-    // FIXME: get from user settings
-    f64 userFontSizes = 16;
-
-    // FIXME: get from parent
-    f64 parentFontSize = userFontSizes;
-
-    switch (fs.named()) {
+Px Resolver::resolve(FontSize value) {
+    switch (value.named()) {
     case FontSize::XX_SMALL:
-        return Px::fromFloatNearest(userFontSizes * 0.5);
+        return Px::fromFloatNearest(userFontSize * 0.5);
     case FontSize::X_SMALL:
-        return Px::fromFloatNearest(userFontSizes * 0.75);
+        return Px::fromFloatNearest(userFontSize * 0.75);
     case FontSize::SMALL:
-        return Px::fromFloatNearest(userFontSizes * 0.875);
+        return Px::fromFloatNearest(userFontSize * 0.875);
     case FontSize::MEDIUM:
-        return Px::fromFloatNearest(userFontSizes);
+        return Px::fromFloatNearest(userFontSize);
     case FontSize::LARGE:
-        return Px::fromFloatNearest(userFontSizes * 1.125);
+        return Px::fromFloatNearest(userFontSize * 1.125);
     case FontSize::X_LARGE:
-        return Px::fromFloatNearest(userFontSizes * 1.25);
+        return Px::fromFloatNearest(userFontSize * 1.25);
     case FontSize::XX_LARGE:
-        return Px::fromFloatNearest(userFontSizes * 1.5);
+        return Px::fromFloatNearest(userFontSize * 1.5);
 
     case FontSize::LARGER:
         return Px::fromFloatNearest(parentFontSize * 1.25);
@@ -307,12 +255,30 @@ Px resolve(Tree &t, Frag &f, FontSize fs) {
         return Px::fromFloatNearest(parentFontSize * 0.875);
 
     case FontSize::LENGTH:
-        return resolve(t, f, fs.value(), Px{parentFontSize});
+        return resolve(value.value(), Px{parentFontSize});
 
     default:
         panic("unimplemented font size");
         break;
     }
+}
+
+// MARK: Resolve during layout -------------------------------------------------
+
+Px resolve(Tree const &tree, Box const &box, Length value) {
+    return Resolver::from(tree, box).resolve(value);
+}
+
+Px resolve(Tree const &tree, Box const &box, PercentOr<Length> value, Px relative) {
+    return Resolver::from(tree, box).resolve(value, relative);
+}
+
+Px resolve(Tree const &tree, Box const &box, Width value, Px relative) {
+    return Resolver::from(tree, box).resolve(value, relative);
+}
+
+Px resolve(Tree const &tree, Box const &box, FontSize value) {
+    return Resolver::from(tree, box).resolve(value);
 }
 
 } // namespace Vaev::Layout

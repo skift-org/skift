@@ -4,6 +4,7 @@
 #include <vaev-base/align.h>
 #include <vaev-base/background.h>
 #include <vaev-base/borders.h>
+#include <vaev-base/break.h>
 #include <vaev-base/color.h>
 #include <vaev-base/display.h>
 #include <vaev-base/flex.h>
@@ -27,15 +28,14 @@ struct Computed {
     Color color;
     Number opacity;
 
-    Aligns aligns;
+    AlignProps aligns;
     Math::Vec2<PercentOr<Length>> gaps;
 
-    Vec<Background> backgrounds;
-    Cow<Borders> borders;
+    Vec<BackgroundProps> backgrounds;
+    Cow<BorderProps> borders;
     Cow<Margin> margin;
     Cow<Padding> padding;
-    BoxSizing boxSizing;
-    Cow<Sizing> sizing;
+    Cow<SizingProps> sizing;
     Overflows overflows;
 
     // 9.3 Positioning schemes
@@ -54,14 +54,15 @@ struct Computed {
     Integer order;
     Visibility visibility;
     // https://w3.org/TR/css-tables-3/#table-structure
-    Cow<Table> table;
+    Cow<TableProps> table;
 
     // CSS Fonts Module Level 4
     // https://www.w3.org/TR/css-fonts-4/
-    Cow<Font> font;
-    Cow<Text> text;
+    Cow<FontProps> font;
+    Cow<TextProps> text;
 
-    Cow<Flex> flex;
+    Cow<FlexProps> flex;
+    Cow<BreakProps> break_;
 
     Float float_ = Float::NONE;
     Clear clear = Clear::NONE;

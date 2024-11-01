@@ -31,7 +31,7 @@ enum struct Commit {
 
 struct Input {
     Commit commit = Commit::NO; //< Should the computed values be committed to the layout?
-    Math::Vec2<IntrinsicSize> intrinsic = {IntrinsicSize::AUTO, IntrinsicSize::AUTO};
+    IntrinsicSize intrinsic = IntrinsicSize::AUTO;
     Math::Vec2<Opt<Px>> knownSize = {};
     Vec2Px position = {};
     Vec2Px availableSpace = {};
@@ -87,7 +87,7 @@ struct Layout {
     }
 };
 
-struct Frag;
+struct Box;
 
 struct Tree;
 

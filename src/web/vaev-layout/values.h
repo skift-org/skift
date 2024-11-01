@@ -44,7 +44,7 @@ struct Resolver {
     // MARK: Eval --------------------------------------------------------------
 
     template <typename T>
-    Resolved<T> _evalInfix(typename CalcValue<T>::OpCode op, Resolved<T> lhs, Resolved<T> rhs) {
+    Resolved<T> _resolveInfix(typename CalcValue<T>::OpCode op, Resolved<T> lhs, Resolved<T> rhs) {
         switch (op) {
         case CalcValue<T>::OpCode::ADD:
             return lhs + rhs;
@@ -60,7 +60,7 @@ struct Resolver {
     }
 
     template <typename T>
-    auto eval(CalcValue<T> const &value, Px relative) {
+    auto resolve(CalcValue<T> const &value, Px relative) {
         if (value.type == CalcValue<T>::OpType::FIXED) {
             return resolve(value.lhs.template unwrap<T>(), relative);
         } else if (value.type == CalcValue<T>::OpType::SINGLE) {
@@ -82,7 +82,7 @@ struct Resolver {
                 }
             };
 
-            return _evalInfix<T>(
+            return _resolveInfix<T>(
                 value.op,
                 value.lhs.visit(resolveUnion),
                 value.rhs.visit(resolveUnion)

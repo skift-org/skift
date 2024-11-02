@@ -9,7 +9,7 @@ namespace Hideo::Recorder {
 Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::MICROPHONE,
-        .title = "Microphone"s,
+        .title = "Recorder"s,
         .body = slot$(Ui::empty()),
     });
 }

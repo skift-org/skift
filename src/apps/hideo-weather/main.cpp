@@ -4,7 +4,6 @@
 #include <karm-ui/app.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
-
 #include <mdi/weather-partly-cloudy.h>
 
 namespace Hideo::Weather {
@@ -13,7 +12,7 @@ Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::WEATHER_PARTLY_CLOUDY,
         .title = "Weather"s,
-        .body = slot$(Ui::image(Image::load("bundle://hideo-weather/images/weather-few-clouds.jpg"_url).unwrap()) | Ui::cover()),
+        .body = slot$(Ui::image(Image::load("bundle://hideo-weather/images/weather-few-clouds.jpg"_url).unwrap()) | Ui::cover() | Ui::vhclip()),
         .size = {460, 320},
     });
 }

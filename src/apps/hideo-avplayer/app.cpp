@@ -46,8 +46,6 @@ Ui::Child player() {
                 Ui::box({
                     .margin = {0, 8},
                     .borderRadii = 99,
-                    .borderWidth = 1,
-                    .borderFill = Ui::ACCENT600,
                     .backgroundFill = Ui::ACCENT500,
                 }) |
                 Ui::grow(),

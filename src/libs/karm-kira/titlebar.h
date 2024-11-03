@@ -9,10 +9,10 @@ namespace Karm::Kira {
 enum struct TitlebarStyle {
     DEFAULT,
     FIXED,
-    DIALOG,
+    DIALOG
 };
 
-Ui::Child titlebarTitle(Mdi::Icon icon, String title);
+Ui::Child titlebarTitle(Mdi::Icon icon, String title, bool compact = false);
 
 Ui::Child titlebarControls(TitlebarStyle style = TitlebarStyle::DEFAULT);
 

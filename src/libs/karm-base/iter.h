@@ -283,6 +283,10 @@ struct Iter {
         return NONE;
     }
 
+    constexpr auto collect() {
+        forEach([&](auto const&...) {});
+    }
+
     template <typename C>
     constexpr auto collect(C &c) {
         forEach([&](auto v) {

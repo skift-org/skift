@@ -13,7 +13,7 @@
 #include <mdi/arrow-left.h>
 #include <mdi/arrow-right.h>
 #include <mdi/arrow-up.h>
-#include <mdi/bookmark.h>
+#include <mdi/bookmark-outline.h>
 #include <mdi/chevron-right.h>
 #include <mdi/content-copy.h>
 #include <mdi/content-cut.h>
@@ -185,6 +185,17 @@ Ui::Child breadcrumbRoot(Mime::Url const &url) {
 }
 
 Ui::Child breadcrumb(State const &state) {
+    Ui::Children items;
+    items.pushBack(breadcrumbRoot(state.currentUrl()));
+    state
+        .currentUrl()
+        .iter()
+        .mapi([&](auto const &text, usize i) {
+            items.pushBack(breadcrumbItem(text, state.currentUrl().len() - i - 1));
+            return true;
+        })
+        .collect();
+
     return Ui::box(
         {
             .borderRadii = 4,
@@ -193,18 +204,10 @@ Ui::Child breadcrumb(State const &state) {
         },
         Ui::hflow(
             Ui::empty(12),
-            breadcrumbRoot(state.currentUrl()),
-
-            Ui::hflow(state
-                          .currentUrl()
-                          .iter()
-                          .mapi([&](auto const &text, usize i) {
-                              return breadcrumbItem(text, state.currentUrl().len() - i - 1);
-                          })
-                          .collect<Ui::Children>()) |
+            Ui::hflow(items) |
                 Ui::hscroll() |
                 Ui::grow(),
-            Ui::button(Model::bind<AddBookmark>(), Ui::ButtonStyle::subtle(), Mdi::BOOKMARK)
+            Ui::button(Model::bind<AddBookmark>(), Ui::ButtonStyle::subtle(), Mdi::BOOKMARK_OUTLINE)
         )
     );
 }

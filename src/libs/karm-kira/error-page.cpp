@@ -25,7 +25,7 @@ Ui::Child errorPageBody(String text) {
 
 Ui::Child errorPageContent(Ui::Children children) {
     return Ui::vflow(
-               0,
+               6,
                Math::Align::CENTER,
                children
            ) |
@@ -37,7 +37,7 @@ Ui::Child errorPageContent(Ui::Children children) {
 }
 
 Ui::Child errorPageFooter(Ui::Children children) {
-    return Ui::hflow(16, children);
+    return Ui::hflow(16, children) | Ui::insets({8, 0, 0, 0});
 }
 
 Ui::Child errorPage(Mdi::Icon icon, String text, String body) {

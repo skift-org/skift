@@ -19,6 +19,7 @@ struct Scaffold : Meta::NoCopy {
     Ui::Slot body;
 
     Math::Vec2i size = {800, 600};
+    bool compact = false;
 
     struct State {
         bool sidebarOpen = false;

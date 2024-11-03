@@ -1,6 +1,7 @@
 #include <karm-app/form-factor.h>
 #include <karm-kira/toolbar.h>
 #include <karm-ui/dialog.h>
+#include <karm-ui/drag.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/popover.h>
 #include <mdi/menu-open.h>
@@ -63,9 +64,13 @@ Ui::Child mobilescaffold(Scaffold::State const &s, Scaffold const &scaffold) {
 Ui::Child desktopscaffold(Scaffold::State const &s, Scaffold const &scaffold) {
     Ui::Children body;
 
-    body.pushBack(titlebar(scaffold.icon, scaffold.title, scaffold.titlebar));
+    if (not scaffold.compact)
+        body.pushBack(titlebar(scaffold.icon, scaffold.title, scaffold.titlebar));
 
     Ui::Children tools;
+
+    if (scaffold.compact)
+        tools.pushBack(titlebarTitle(scaffold.icon, scaffold.title, true));
 
     if (scaffold.sidebar)
         tools.pushBack(
@@ -94,9 +99,12 @@ Ui::Child desktopscaffold(Scaffold::State const &s, Scaffold const &scaffold) {
             hflow(4, scaffold.endTools().unwrap())
         );
 
+    if (scaffold.compact)
+        tools.pushBack(titlebarControls(scaffold.titlebar));
+
     if (tools.len())
         body.pushBack(
-            toolbar(tools)
+            toolbar(tools) | Ui::dragRegion()
         );
     else
         body.pushBack(

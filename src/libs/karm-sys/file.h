@@ -86,4 +86,10 @@ struct File :
     static Res<File> openOrCreate(Mime::Url url);
 };
 
+/// Read the entire file as a UTF-8 string.
+static inline Res<String> readAllUtf8(Mime::Url const &url) {
+    auto file = try$(Sys::File::open(url));
+    return Io::readAllUtf8(file);
+}
+
 } // namespace Karm::Sys

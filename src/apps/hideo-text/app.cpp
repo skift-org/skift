@@ -2,7 +2,6 @@
 #include <karm-io/funcs.h>
 #include <karm-kira/error-page.h>
 #include <karm-kira/scaffold.h>
-#include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <karm-text/edit.h>
 #include <karm-ui/app.h>
@@ -138,20 +137,4 @@ Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
     );
 }
 
-Res<String> readAllUtf8(Mime::Url const &url) {
-    auto file = try$(Sys::File::open(url));
-    return Io::readAllUtf8(file);
-}
-
 } // namespace Hideo::Text
-
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
-    auto &args = useArgs(ctx);
-    Opt<Mime::Url> url;
-    Res<String> text = Ok(""s);
-    if (args.len()) {
-        url = co_try$(Mime::parseUrlOrPath(args[0]));
-        text = Hideo::Text::readAllUtf8(*url);
-    }
-    co_return Ui::runApp(ctx, Hideo::Text::app(url, text));
-}

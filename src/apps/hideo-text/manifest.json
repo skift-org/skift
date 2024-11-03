@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
     "id": "hideo-text",
-    "type": "exe",
+    "type": "lib",
     "description": "View and edit text files",
     "requires": [
         "hideo-files",

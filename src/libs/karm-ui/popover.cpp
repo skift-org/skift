@@ -65,6 +65,8 @@ struct PopoverLayer : public ProxyNode<PopoverLayer> {
     }
 
     void event(App::Event &event) override {
+        if (event.accepted())
+            return;
 
         if (_popover) {
             (*_popover)->event(event);
@@ -77,12 +79,9 @@ struct PopoverLayer : public ProxyNode<PopoverLayer> {
                 _closePopover();
                 event.accept();
             }
+        } else {
+            ProxyNode::event(event);
         }
-
-        if (event.accepted())
-            return;
-
-        ProxyNode::event(event);
     }
 
     void bubble(App::Event &event) override {

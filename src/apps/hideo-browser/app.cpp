@@ -20,8 +20,10 @@
 #include <mdi/code-tags.h>
 #include <mdi/cog.h>
 #include <mdi/dots-horizontal.h>
+#include <mdi/google-downasaur.h>
 #include <mdi/printer.h>
 #include <mdi/refresh.h>
+#include <mdi/surfing.h>
 #include <mdi/web.h>
 #include <vaev-driver/fetcher.h>
 #include <vaev-view/inspect.h>
@@ -170,7 +172,7 @@ Ui::Child sidePanel(State const &s) {
 
 Ui::Child alert(State const &s, String title, String body) {
     return Kr::errorPageContent({
-        Kr::errorPageTitle(Mdi::ALERT_DECAGRAM, title),
+        Kr::errorPageTitle(Mdi::GOOGLE_DOWNASAUR, title),
         Kr::errorPageBody(body),
         Kr::errorPageFooter({
             Ui::button(Model::bindIf<GoBack>(s.canGoBack()), "Go Back"),
@@ -209,8 +211,8 @@ Ui::Child app(Mime::Url url, Res<Strong<Vaev::Markup::Document>> dom) {
         },
         [](State const &s) {
             return Kr::scaffold({
-                .icon = Mdi::WEB,
-                .title = "Browser"s,
+                .icon = Mdi::SURFING,
+                .title = "Vaev"s,
                 .startTools = slots$(
                     Ui::button(Model::bindIf<GoBack>(s.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
                     Ui::button(Model::bindIf<GoForward>(s.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
@@ -227,6 +229,7 @@ Ui::Child app(Mime::Url url, Res<Strong<Vaev::Markup::Document>> dom) {
                     )
                 ),
                 .body = slot$(appContent(s)),
+                .compact = true,
             });
         }
     );

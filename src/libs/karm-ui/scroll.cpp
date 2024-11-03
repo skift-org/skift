@@ -153,6 +153,11 @@ struct Scroll : public ProxyNode<Scroll> {
         } else if (_orient == Math::Orien::VERTICAL) {
             childSize.width = r.width;
         }
+
+        // Make sure the child is at least as big as the parent
+        childSize.width = max(childSize.width, r.width);
+        childSize.height = max(childSize.height, r.height);
+
         r.wh = childSize;
         child().layout(r);
         scroll(_scroll.cast<isize>());

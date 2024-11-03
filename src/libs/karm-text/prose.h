@@ -186,9 +186,11 @@ struct Prose {
         auto cs = baseline - Math::Vec2f{0, m.ascend};
         auto ce = baseline + Math::Vec2f{0, m.descend};
 
+        g.beginPath();
         g.moveTo(cs);
         g.lineTo(ce);
         g.strokeStyle(Gfx::stroke(color).withAlign(Gfx::CENTER_ALIGN).withWidth(2));
+        g.stroke();
     }
 
     struct Lbc {

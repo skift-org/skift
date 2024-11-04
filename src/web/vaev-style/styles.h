@@ -2037,6 +2037,39 @@ struct MaxHeightProp {
 // MARK: Text
 // https://drafts.csswg.org/css-text-4
 
+// https://drafts.csswg.org/css-text/#text-align-property
+
+struct TextAlignProp {
+    TextAlign value = initial();
+
+    static constexpr Str name() { return "text-align"; }
+
+    static TextAlign initial() { return TextAlign::LEFT; }
+
+    void apply(Computed &c) const {
+        c.text.cow().align = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        if (c.skip(Css::Token::ident("left"))) {
+            value = TextAlign::LEFT;
+        } else if (c.skip(Css::Token::ident("right"))) {
+            value = TextAlign::RIGHT;
+        } else if (c.skip(Css::Token::ident("center"))) {
+            value = TextAlign::CENTER;
+        } else if (c.skip(Css::Token::ident("justify"))) {
+            value = TextAlign::JUSTIFY;
+        } else if (c.skip(Css::Token::ident("start"))) {
+            value = TextAlign::START;
+        } else if (c.skip(Css::Token::ident("end"))) {
+            value = TextAlign::END;
+        } else {
+            return Error::invalidData("expected text-align");
+        }
+        return Ok();
+    }
+};
+
 // https://drafts.csswg.org/css-text-4/#text-transform-property
 
 struct TextTransformProp {
@@ -2219,6 +2252,7 @@ using _StyleProp = Union<
     MaxHeightProp,
 
     // Text
+    TextAlignProp,
     TextTransformProp,
 
     // ZIndex

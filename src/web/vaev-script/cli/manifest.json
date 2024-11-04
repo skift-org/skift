@@ -1,10 +1,10 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "vaev-js.cli",
+    "id": "vaev-script.cli",
     "type": "exe",
-    "description": "JavaScript engine testing tool",
+    "description": "ECMAScript engine testing tool",
     "requires": [
         "karm-sys",
-        "vaev-js"
+        "vaev-script"
     ]
 }

@@ -2,7 +2,7 @@
 #include <karm-io/funcs.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
-#include <vaev-js>
+#include <vaev-script/lexer.h>
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto args = Sys::useArgs(ctx);
@@ -18,7 +18,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
         auto file = co_try$(Sys::File::open(url));
         auto buf = co_try$(Io::readAllUtf8(file));
         Io::SScan s{buf};
-        Vaev::Js::Lexer lex{s};
+        Vaev::Script::Lexer lex{s};
         while (not lex.ended())
             Sys::println("{}", lex.next());
         co_return Ok();

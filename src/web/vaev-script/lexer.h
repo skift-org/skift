@@ -3,7 +3,7 @@
 #include <karm-io/emit.h>
 #include <karm-io/sscan.h>
 
-namespace Vaev::Js {
+namespace Vaev::Script {
 
 // 12.6 MARK: Tokens -----------------------------------------------------------
 // https://tc39.es/ecma262/#sec-tokens

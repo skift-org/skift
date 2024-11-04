@@ -7,19 +7,19 @@ namespace Vaev::Layout {
 
 // MARK: Box ------------------------------------------------------------------
 
-Box::Box(Strong<Style::Computed> style, Strong<Karm::Text::Fontface> font)
+Box::Box(Strong<Style::Computed> style, Strong<Text::Fontface> font)
     : style{std::move(style)}, fontFace{font} {}
 
-Box::Box(Strong<Style::Computed> style, Strong<Karm::Text::Fontface> font, Content content)
+Box::Box(Strong<Style::Computed> style, Strong<Text::Fontface> font, Content content)
     : style{std::move(style)}, fontFace{font}, content{std::move(content)} {}
 
-Karm::Slice<Box> Box::children() const {
+Slice<Box> Box::children() const {
     if (auto children = content.is<Vec<Box>>())
         return *children;
     return {};
 }
 
-Karm::MutSlice<Box> Box::children() {
+MutSlice<Box> Box::children() {
     if (auto children = content.is<Vec<Box>>()) {
         return *children;
     }

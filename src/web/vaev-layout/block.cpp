@@ -32,8 +32,9 @@ struct BlockFormatingContext {
         });
 
         for (auto &c : box.children()) {
-            if (c.style->float_ != Float::NONE)
-                continue;
+            // TODO: Implement floating
+            // if (c.style->float_ != Float::NONE)
+            //     continue;
 
             Opt<Px> childInlineSize = NONE;
             if (c.style->sizing->width == Size::AUTO and

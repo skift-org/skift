@@ -65,14 +65,14 @@ static void _paintBox(Box &box, Scene::Stack &stack) {
 
     _paintBox(box, currentColor, stack);
 
-    if (auto run = box.content.is<Karm::Text::Run>()) {
+    if (auto prose = box.content.is<Strong<Text::Prose>>()) {
+        (*prose)->_style.color = currentColor;
+
         Karm::Text::Font font = {box.fontFace, box.layout.fontSize.cast<f64>()};
         Math::Vec2f baseline = {0, font.metrics().ascend};
         stack.add(makeStrong<Scene::Text>(
-            box.layout.borderBox().topStart().cast<f64>() + baseline,
-            font,
-            *run,
-            currentColor
+            box.layout.borderBox().topStart().cast<f64>(),
+            *prose
         ));
     }
 }

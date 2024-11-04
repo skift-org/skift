@@ -1,6 +1,7 @@
 #include <karm-text/loader.h>
 
 #include "builder.h"
+#include "values.h"
 
 namespace Vaev::Layout {
 
@@ -148,37 +149,70 @@ static void _buildRun(Style::Computer &, Markup::Text const &node, Box &parent) 
     auto style = makeStrong<Style::Computed>(Style::Computed::initial());
     style->inherit(*parent.style);
 
-    auto font = _lookupFontface(*style);
+    auto fontFace = _lookupFontface(*style);
     Io::SScan scan{node.data};
     scan.eat(Re::space());
     if (scan.ended())
         return;
-    Karm::Text::Run run;
+
+    // FIXME: We should pass this around from the top in order to properly resolve rems
+    Resolver resolver{
+        .rootFont = Text::Font{fontFace, 16},
+        .boxFont = Text::Font{fontFace, 16},
+    };
+    Text::ProseStyle proseStyle{
+        .font = {
+            fontFace,
+            resolver.resolve(style->font->size).cast<f64>(),
+        },
+        .multiline = true,
+    };
+
+    switch (style->text->align) {
+    case TextAlign::START:
+    case TextAlign::LEFT:
+        proseStyle.align = Text::TextAlign::LEFT;
+        break;
+
+    case TextAlign::END:
+    case TextAlign::RIGHT:
+        proseStyle.align = Text::TextAlign::RIGHT;
+        break;
+
+    case TextAlign::CENTER:
+        proseStyle.align = Text::TextAlign::CENTER;
+        break;
+
+    default:
+        // FIXME: Implement the rest
+        break;
+    }
+
+    auto prose = makeStrong<Text::Prose>(proseStyle);
 
     while (not scan.ended()) {
         switch (style->text->transform) {
         case TextTransform::UPPERCASE:
-            run.append(toAsciiUpper(scan.next()));
+            prose->append(toAsciiUpper(scan.next()));
             break;
 
         case TextTransform::LOWERCASE:
-            run.append(toAsciiLower(scan.next()));
+            prose->append(toAsciiLower(scan.next()));
             break;
 
         case TextTransform::NONE:
-            run.append(scan.next());
+            prose->append(scan.next());
             break;
 
         default:
             break;
         }
 
-        if (scan.eat(Re::space())) {
-            run.append(' ');
-        }
+        if (scan.eat(Re::space()))
+            prose->append(' ');
     }
 
-    parent.add({style, font, std::move(run)});
+    parent.add({style, fontFace, std::move(prose)});
 }
 
 void _buildNode(Style::Computer &c, Markup::Node const &node, Box &parent) {

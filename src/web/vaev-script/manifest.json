@@ -1,8 +1,8 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "vaev-js",
+    "id": "vaev-script",
     "type": "lib",
-    "description": "JavaScript library & runtime for Vaev",
+    "description": "ECMAScript library & runtime for Vaev",
     "requires": [
         "karm-io"
     ]

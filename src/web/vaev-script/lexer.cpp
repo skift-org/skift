@@ -2,7 +2,7 @@
 
 #include "lexer.h"
 
-namespace Vaev::Js {
+namespace Vaev::Script {
 
 // MARK: Token -----------------------------------------------------------------
 

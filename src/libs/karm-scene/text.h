@@ -1,36 +1,27 @@
 #pragma once
 
-#include <karm-text/run.h>
+#include <karm-text/prose.h>
 
 #include "base.h"
 
 namespace Karm::Scene {
 
 struct Text : public Node {
-    Math::Vec2f baseline;
-    Karm::Text::Font font;
-    Karm::Text::Run run;
-    Gfx::Fill fill;
+    Math::Vec2f origin;
+    Strong<Karm::Text::Prose> prose;
 
-    Text(Math::Vec2f baseline, Karm::Text::Font font, Karm::Text::Run run, Gfx::Fill fill)
-        : baseline(baseline), font(font), run(run), fill(fill) {}
+    Text(Math::Vec2f origin, Strong<Karm::Text::Prose> prose)
+        : origin(origin), prose(prose) {}
 
     void paint(Gfx::Canvas &g) override {
         g.push();
-        g.fillStyle(fill);
-        g.fill(font, run, baseline);
-
-        // g.beginPath();
-        // g.line(Math::Edgef{baseline, baseline + Math::Vec2f{run->_width, 0}});
-        // g.stroke(Gfx::Stroke{
-        //     .fill = Gfx::PINK,
-        //     .width = 1,
-        // });
+        g.origin(origin);
+        prose->paint(g);
         g.pop();
     }
 
     void repr(Io::Emit &e) const override {
-        e("(text z:{} {})", zIndex, baseline);
+        e("(text z:{} {})", zIndex, origin);
     }
 };
 

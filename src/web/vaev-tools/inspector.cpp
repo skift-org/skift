@@ -103,7 +103,7 @@ Ui::Child addressBar(Mime::Url const &url) {
                0,
 
                Ui::text("{}", url) |
-                   Ui::center() |
+                   Ui::vcenter() |
                    Ui::hscroll() |
                    Ui::grow(),
 
@@ -216,7 +216,9 @@ Ui::Child inspector(Mime::Url url, Res<Strong<Markup::Document>> dom) {
                        }) | Ui::dragRegion(),
                        appContent(s) | Ui::grow()
                    ) |
-                   Ui::pinSize({800, 600}) | Ui::dialogLayer() | Ui::popoverLayer();
+                   Ui::pinSize({800, 600}) |
+                   Ui::dialogLayer() |
+                   Ui::popoverLayer();
         }
     );
 }

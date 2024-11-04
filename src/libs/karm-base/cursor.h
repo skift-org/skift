@@ -37,6 +37,9 @@ struct Cursor {
     always_inline constexpr Cursor(Slice<T> slice)
         : Cursor{begin(slice), end(slice)} {}
 
+    always_inline constexpr Cursor(MutSlice<T> slice)
+        : Cursor{begin(slice), end(slice)} {}
+
     always_inline constexpr T const &operator[](usize i) const {
         if (i >= len()) [[unlikely]]
             panic("index out of bounds");

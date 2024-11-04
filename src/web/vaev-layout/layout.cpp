@@ -4,6 +4,7 @@
 #include "box.h"
 #include "flex.h"
 #include "grid.h"
+#include "inline.h"
 #include "table.h"
 #include "values.h"
 
@@ -12,14 +13,8 @@ namespace Vaev::Layout {
 Output _contentLayout(Tree &tree, Box &box, Input input) {
     auto display = box.style->display;
 
-    if (auto run = box.content.is<Karm::Text::Run>()) {
-        box.layout.fontSize = resolve(tree, box, box.style->font->size);
-        Karm::Text::Font font = {
-            box.fontFace,
-            box.layout.fontSize.cast<f64>(),
-        };
-        run->shape(font);
-        return Output::fromSize(run->size().cast<Px>());
+    if (auto run = box.content.is<Strong<Text::Prose>>()) {
+        return inlineLayout(tree, box, input);
     } else if (
         display == Display::FLOW or
         display == Display::FLOW_ROOT or

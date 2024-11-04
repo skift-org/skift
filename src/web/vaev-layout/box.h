@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-image/picture.h>
-#include <karm-text/run.h>
+#include <karm-text/prose.h>
 #include <vaev-markup/dom.h>
 #include <vaev-style/computer.h>
 
@@ -14,7 +14,7 @@ namespace Vaev::Layout {
 using Content = Union<
     None,
     Vec<Box>,
-    Karm::Text::Run,
+    Strong<Text::Prose>,
     Image::Picture>;
 
 struct Attrs {
@@ -29,7 +29,7 @@ struct Attrs {
 
 struct Box : public Meta::NoCopy {
     Strong<Style::Computed> style;
-    Strong<Karm::Text::Fontface> fontFace;
+    Strong<Text::Fontface> fontFace;
     Content content = NONE;
     Layout layout;
     Attrs attrs;

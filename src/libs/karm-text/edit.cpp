@@ -1,6 +1,3 @@
-#include <karm-app/inputs.h>
-#include <karm-logger/logger.h>
-
 #include "edit.h"
 
 namespace Karm::Text {

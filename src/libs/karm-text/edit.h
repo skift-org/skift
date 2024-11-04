@@ -1,10 +1,6 @@
 #pragma once
 
 #include <karm-app/inputs.h>
-#include <karm-base/ctype.h>
-#include <karm-base/string.h>
-#include <karm-base/vec.h>
-#include <karm-sys/async.h>
 
 namespace Karm::Text {
 

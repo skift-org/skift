@@ -12,11 +12,10 @@
 #include <karm-ui/popover.h>
 #include <karm-ui/scroll.h>
 #include <mdi/alert-decagram.h>
-#include <mdi/arrow-left.h>
-#include <mdi/arrow-right.h>
 #include <mdi/bookmark-outline.h>
 #include <mdi/bookmark.h>
 #include <mdi/button-cursor.h>
+#include <mdi/chevron-left.h>
 #include <mdi/code-tags.h>
 #include <mdi/cog.h>
 #include <mdi/dots-horizontal.h>
@@ -78,6 +77,10 @@ using Model = Ui::Model<State, Action, reduce>;
 
 Ui::Child mainMenu([[maybe_unused]] State const &s) {
     return Kr::contextMenuContent({
+        Kr::contextMenuItem(
+            Ui::NOP,
+            Mdi::BOOKMARK_OUTLINE, "Add bookmark..."
+        ),
         Kr::contextMenuItem(Model::bind(SidePanel::BOOKMARKS), Mdi::BOOKMARK, "Bookmarks"),
         Ui::separator(),
         Kr::contextMenuItem(Ui::NOP, Mdi::PRINTER, "Print..."),
@@ -110,7 +113,7 @@ Ui::Child addressBar(Mime::Url const &url) {
                Math::Align::CENTER,
                Ui::text("{}", url),
                Ui::grow(NONE),
-               Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BOOKMARK_OUTLINE)
+               Ui::button(Model::bind<Reload>(), Ui::ButtonStyle::subtle(), Mdi::REFRESH)
            ) |
            Ui::box({
                .padding = {0, 0, 0, 12},
@@ -123,8 +126,7 @@ Ui::Child addressBar(Mime::Url const &url) {
 Ui::Child contextMenu(State const &s) {
     return Kr::contextMenuContent({
         Kr::contextMenuDock({
-            Kr::contextMenuIcon(Ui::NOP, Mdi::ARROW_LEFT),
-            Kr::contextMenuIcon(Ui::NOP, Mdi::ARROW_RIGHT),
+            Kr::contextMenuIcon(Ui::NOP, Mdi::CHEVRON_LEFT),
             Kr::contextMenuIcon(Ui::NOP, Mdi::REFRESH),
         }),
         Ui::separator(),
@@ -214,9 +216,7 @@ Ui::Child app(Mime::Url url, Res<Strong<Vaev::Markup::Document>> dom) {
                 .icon = Mdi::SURFING,
                 .title = "Vaev"s,
                 .startTools = slots$(
-                    Ui::button(Model::bindIf<GoBack>(s.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
-                    Ui::button(Model::bindIf<GoForward>(s.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
-                    Ui::button(Model::bind<Reload>(), Ui::ButtonStyle::subtle(), Mdi::REFRESH)
+                    Ui::button(Model::bindIf<GoBack>(s.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::CHEVRON_LEFT),
                 ),
                 .midleTools = slots$(addressBar(s.url) | Ui::grow()),
                 .endTools = slots$(

@@ -5,6 +5,8 @@
 
 namespace Karm {
 
+#pragma clang unsafe_buffer_usage begin
+
 using Byte = u8;
 
 inline constexpr Byte operator""_byte(unsigned long long arg) noexcept {
@@ -479,7 +481,7 @@ always_inline constexpr void stableSort(MutSliceable auto &slice) {
 }
 
 template <Sliceable T, typename U = T::Inner>
-always_inline constexpr Opt<usize> indexOf(T const &slice, U const &needle) {
+always_inline constexpr Opt<usize> indexOf(T const &slice, Meta::Equatable<U> auto const &needle) {
     for (usize i = 0; i < slice.len(); i++)
         if (slice[i] == needle)
             return i;
@@ -487,12 +489,12 @@ always_inline constexpr Opt<usize> indexOf(T const &slice, U const &needle) {
 }
 
 template <Sliceable T, typename U = T::Inner>
-always_inline constexpr bool contains(T const &slice, U const &needle) {
+always_inline constexpr bool contains(T const &slice, Meta::Equatable<U> auto const &needle) {
     return indexOf(slice, needle).has();
 }
 
 template <Sliceable T, typename U = T::Inner>
-always_inline constexpr Opt<usize> lastIndexOf(T const &slice, U const &needle) {
+always_inline constexpr Opt<usize> lastIndexOf(T const &slice, Meta::Equatable<U> auto const &needle) {
     for (usize i = slice.len(); i > 0; i--)
         if (slice[i - 1] == needle)
             return i - 1;
@@ -626,5 +628,7 @@ always_inline Match endWith(Sliceable auto const &slice, Sliceable auto const &s
 
     return Match::YES;
 }
+
+#pragma clang unsafe_buffer_usage end
 
 } // namespace Karm

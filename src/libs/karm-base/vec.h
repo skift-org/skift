@@ -23,17 +23,7 @@ struct _Vec {
 
     // MARK: Collection
 
-    bool contains(T const &val) const {
-        for (auto const &v : *this) {
-            if (v == val) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    bool removeAll(T const &val) {
+    bool removeAll(Meta::Equatable<T> auto const &val) {
         bool changed = false;
 
         for (usize i = 1; i < _buf.len() + 1; i++) {
@@ -81,6 +71,16 @@ struct _Vec {
 
     void removeRange(usize index, usize count) { _buf.removeRange(index, count); }
 
+    void removeUnordered(usize index) {
+        if (len() <= 1) [[unlikely]] {
+            clear();
+            return;
+        }
+
+        std::swap(_buf[index], _buf[_buf.len() - 1]);
+        _buf.trunc(_buf.len() - 1);
+    }
+
     // MARK: Front Access
 
     void pushFront(T const &value) { _buf.insert(0, T(value)); }
@@ -93,7 +93,7 @@ struct _Vec {
     }
 
     template <typename... Args>
-    T &emplaceFront(Args &&...args) {
+    T &emplaceFront(Args &&...args) lifetimebound {
         return _buf.emplace(0, std::forward<Args>(args)...);
     }
 
@@ -111,7 +111,7 @@ struct _Vec {
     }
 
     template <typename... Args>
-    T &emplaceBack(Args &&...args) {
+    T &emplaceBack(Args &&...args) lifetimebound {
         return _buf.emplace(len(), std::forward<Args>(args)...);
     }
 
@@ -123,18 +123,18 @@ struct _Vec {
 
     constexpr usize len() const { return _buf.len(); }
 
-    constexpr T *buf() { return _buf.buf(); }
+    constexpr T *buf() lifetimebound { return _buf.buf(); }
 
-    constexpr T const *buf() const { return _buf.buf(); }
+    constexpr T const *buf() const lifetimebound { return _buf.buf(); }
 
-    constexpr T &operator[](usize i) {
+    constexpr T &operator[](usize i) lifetimebound {
         if (i >= len()) [[unlikely]]
             panic("index out of bounds");
 
         return _buf[i];
     }
 
-    constexpr T const &operator[](usize i) const {
+    constexpr T const &operator[](usize i) const lifetimebound {
         if (i >= len()) [[unlikely]]
             panic("index out of bounds");
 

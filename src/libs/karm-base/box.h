@@ -71,29 +71,29 @@ struct Box {
         return unwrap() <=> other.unwrap();
     }
 
-    constexpr T *operator->() {
+    constexpr T *operator->() lifetimebound {
         return &unwrap();
     }
 
-    constexpr T &operator*() {
+    constexpr T &operator*() lifetimebound {
         return unwrap();
     }
 
-    constexpr T const *operator->() const {
+    constexpr T const *operator->() const lifetimebound {
         return &unwrap();
     }
 
-    constexpr T const &operator*() const {
+    constexpr T const &operator*() const lifetimebound {
         return unwrap();
     }
 
-    constexpr T const &unwrap() const {
+    constexpr T const &unwrap() const lifetimebound {
         if (not _ptr) [[unlikely]]
             panic("deferencing moved from Box<T>");
         return *_ptr;
     }
 
-    constexpr T &unwrap() {
+    constexpr T &unwrap() lifetimebound {
         if (not _ptr) [[unlikely]]
             panic("deferencing moved from Box<T>");
         return *_ptr;

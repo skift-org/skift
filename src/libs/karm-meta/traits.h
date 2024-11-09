@@ -117,11 +117,14 @@ inline constexpr bool _Same<T, T> = true;
 template <typename T, typename U>
 concept Same = _Same<T, U>;
 
+/// A type is comparable if it can be compared using the <=> operator.
+/// Comparable does not imply Equatable.
 template <typename T, typename U = T>
 concept Comparable = requires(T const &a, U const &b) {
     { a <=> b } -> Same<decltype(a <=> b)>;
 };
 
+/// A type is equatable if it can be compared for equality.
 template <typename T, typename U = T>
 concept Equatable = requires(T const &a, U const &b) {
     { a == b } -> Same<decltype(a == b)>;

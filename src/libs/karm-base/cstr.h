@@ -4,6 +4,8 @@
 
 namespace Karm {
 
+#pragma clang unsafe_buffer_usage begin
+
 using CStr = char const *;
 
 always_inline constexpr usize cstrLen(CStr s) {
@@ -21,5 +23,7 @@ always_inline constexpr bool cstrEq(char const *str1, char const *str2) {
     }
     return *str1 == *str2;
 }
+
+#pragma clang unsafe_buffer_usage end
 
 } // namespace Karm

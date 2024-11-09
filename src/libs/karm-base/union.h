@@ -93,7 +93,7 @@ struct Union {
     }
 
     template <Meta::Contains<Ts...> T>
-    always_inline T &unwrap(char const *msg = "unwrapping wrong type") {
+    always_inline T &unwrap(char const *msg = "unwrapping wrong type") lifetimebound {
         if (_index != Meta::indexOf<T, Ts...>()) [[unlikely]]
             panic(msg);
 
@@ -101,7 +101,7 @@ struct Union {
     }
 
     template <Meta::Contains<Ts...> T>
-    always_inline T const &unwrap(char const *msg = "unwrapping wrong type") const {
+    always_inline T const &unwrap(char const *msg = "unwrapping wrong type") const lifetimebound {
         if (_index != Meta::indexOf<T, Ts...>()) [[unlikely]]
             panic(msg);
 
@@ -152,14 +152,14 @@ struct Union {
     }
 
     template <Meta::Contains<Ts...> T>
-    always_inline MutCursor<T> is() {
+    always_inline MutCursor<T> is() lifetimebound {
         if (_index != Meta::indexOf<T, Ts...>())
             return nullptr;
         return (T *)_buf;
     }
 
     template <Meta::Contains<Ts...> T>
-    always_inline Cursor<T> is() const {
+    always_inline Cursor<T> is() const lifetimebound {
         if (_index != Meta::indexOf<T, Ts...>())
             return nullptr;
         return (T const *)_buf;

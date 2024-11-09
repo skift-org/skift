@@ -6,6 +6,8 @@
 
 namespace Karm {
 
+#pragma clang unsafe_buffer_usage begin
+
 /// A dynamically sized array of elements.
 /// Often used as a backing store for other data structures. (e.g. `Vec`)
 template <typename T>
@@ -86,11 +88,11 @@ struct Buf {
         return *this;
     }
 
-    constexpr T &operator[](usize i) {
+    constexpr T &operator[](usize i) lifetimebound {
         return _buf[i].unwrap();
     }
 
-    constexpr T const &operator[](usize i) const {
+    constexpr T const &operator[](usize i) const lifetimebound {
         return _buf[i].unwrap();
     }
 
@@ -254,13 +256,13 @@ struct Buf {
         return ret;
     }
 
-    T *buf() {
+    T *buf() lifetimebound {
         if (_buf == nullptr)
             return nullptr;
         return &_buf->unwrap();
     }
 
-    T const *buf() const {
+    T const *buf() const lifetimebound {
         if (_buf == nullptr)
             return nullptr;
 
@@ -356,11 +358,11 @@ struct InlineBuf {
         return *this;
     }
 
-    constexpr T &operator[](usize i) {
+    constexpr T &operator[](usize i) lifetimebound {
         return _buf[i].unwrap();
     }
 
-    constexpr T const &operator[](usize i) const {
+    constexpr T const &operator[](usize i) const lifetimebound {
         return _buf[i].unwrap();
     }
 
@@ -462,11 +464,11 @@ struct InlineBuf {
         _len = newLen;
     }
 
-    T *buf() {
+    T *buf() lifetimebound {
         return &_buf[0].unwrap();
     }
 
-    T const *buf() const {
+    T const *buf() const lifetimebound {
         return &_buf[0].unwrap();
     }
 
@@ -681,5 +683,7 @@ struct ViewBuf {
         return _len * sizeof(T);
     }
 };
+
+#pragma clang unsafe_buffer_usage end
 
 } // namespace Karm

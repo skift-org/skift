@@ -137,7 +137,7 @@ struct _Pixels {
         return {static_cast<Byte const *>(_buf), _stride * _size.y};
     }
 
-    always_inline MutBytes bytes()
+    always_inline MutBytes mutBytes()
         requires(MUT)
     {
         return {static_cast<Byte *>(_buf), _stride * _size.y};

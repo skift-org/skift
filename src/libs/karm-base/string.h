@@ -32,7 +32,7 @@ struct _Str : public Slice<U> {
         return *this <=> _Str<E>(cstr);
     }
 
-    always_inline constexpr auto operator==(Unit const *cstr) const
+    always_inline constexpr bool operator==(Unit const *cstr) const
         requires(Meta::Same<Unit, char>)
     {
         return *this == _Str<E>(cstr);
@@ -70,13 +70,13 @@ struct _InlineString {
     always_inline _InlineString(Sliceable<Unit> auto const &other)
         : _InlineString(other.buf(), other.len()) {}
 
-    always_inline _Str<E> str() const { return *this; }
+    always_inline _Str<E> str() const lifetimebound { return *this; }
 
-    always_inline Unit const &operator[](usize i) const {
+    always_inline Unit const &operator[](usize i) const lifetimebound {
         return _buf[i];
     }
 
-    always_inline Unit const *buf() const { return _buf.buf(); }
+    always_inline Unit const *buf() const lifetimebound { return _buf.buf(); }
 
     always_inline usize len() const { return _len; }
 
@@ -86,7 +86,7 @@ struct _InlineString {
         return str() <=> _Str<E>(cstr);
     }
 
-    always_inline auto operator==(Unit const *cstr) const
+    always_inline bool operator==(Unit const *cstr) const
         requires(Meta::Same<Unit, char>)
     {
         return str() == _Str<E>(cstr);
@@ -163,15 +163,15 @@ struct _String {
         return *this;
     }
 
-    always_inline _Str<E> str() const { return *this; }
+    always_inline _Str<E> str() const lifetimebound { return *this; }
 
-    always_inline Unit const &operator[](usize i) const {
+    always_inline Unit const &operator[](usize i) const lifetimebound {
         if (i >= _len) [[unlikely]]
             panic("index out of bounds");
         return buf()[i];
     }
 
-    always_inline Unit const *buf() const { return _len ? _buf : _EMPTY.buf(); }
+    always_inline Unit const *buf() const lifetimebound { return _len ? _buf : _EMPTY.buf(); }
 
     always_inline usize len() const { return _len; }
 
@@ -181,7 +181,7 @@ struct _String {
         return str() <=> _Str<E>(cstr);
     }
 
-    always_inline auto operator==(Unit const *cstr) const
+    always_inline bool operator==(Unit const *cstr) const
         requires(Meta::Same<Unit, char>)
     {
         return str() == _Str<E>(cstr);
@@ -262,9 +262,9 @@ struct StrLit {
         }
     }
 
-    constexpr operator Str() const { return _buf; }
+    constexpr operator Str() const lifetimebound { return _buf; }
 
-    constexpr operator char const *() const { return _buf; }
+    constexpr operator char const *() const lifetimebound { return _buf; }
 };
 
 // MARK: String Conversion -----------------------------------------------------
@@ -304,11 +304,11 @@ struct _StringBuilder {
         return _buf.size();
     }
 
-    _Str<E> str() {
+    _Str<E> str() lifetimebound {
         return _buf;
     }
 
-    Bytes bytes() const {
+    Bytes bytes() const lifetimebound {
         return ::bytes(_buf);
     }
 

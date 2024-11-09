@@ -141,7 +141,7 @@ struct [[nodiscard]] Res {
         requires Meta::Comparable<Inner>
     = default;
 
-    always_inline auto operator==(bool b) const {
+    always_inline bool operator==(bool b) const {
         return has() == b;
     }
 };

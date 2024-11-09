@@ -24,7 +24,7 @@ Resolver Resolver::inherit(Resolver const &resolver) {
 Px Resolver::_resolveFontRelative(Length value) {
     if (not boxFont or not rootFont) {
         logWarn("missing font information");
-        return Px{0};
+        return 0_px;
     }
 
     switch (value.unit()) {
@@ -228,7 +228,7 @@ Px Resolver::resolve(PercentOr<Length> value, Px relative) {
 
 Px Resolver::resolve(Width value, Px relative) {
     if (value == Width::Type::AUTO)
-        return Px{0};
+        return 0_px;
     return resolve(value.value, relative);
 }
 

@@ -22,10 +22,10 @@ struct Resolver {
     f64 userFontSize = 16;   /// Font size of the user agent
     f64 parentFontSize = 16; /// Font size of the parent box
 
-    Opt<Text::Font> rootFont = NONE;                   /// Font of the root element
-    Opt<Text::Font> boxFont = NONE;                    /// Font of the current box
-    Viewport viewport = {.small = {Px{800}, Px{600}}}; /// Viewport of the current box
-    Axis boxAxis = Axis::HORIZONTAL;                   /// Inline axis of the current box
+    Opt<Text::Font> rootFont = NONE;                 /// Font of the root element
+    Opt<Text::Font> boxFont = NONE;                  /// Font of the current box
+    Viewport viewport = {.small = {800_px, 600_px}}; /// Viewport of the current box
+    Axis boxAxis = Axis::HORIZONTAL;                 /// Inline axis of the current box
 
     static Resolver from(Tree const &tree, Box const &box);
 

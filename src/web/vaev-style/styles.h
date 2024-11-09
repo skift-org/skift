@@ -116,7 +116,7 @@ struct AlignItemsProp {
 
     static constexpr Str name() { return "align-items"; }
 
-    static constexpr Align initial() { return Align::Keywords::FLEX_START; }
+    static constexpr Align initial() { return Align::Keywords::STRETCH; }
 
     void apply(Computed &c) const {
         c.aligns.alignItems = value;
@@ -626,7 +626,7 @@ struct BorderRadiusTopRight {
 
     static constexpr Str name() { return "border-top-right-radius"; }
 
-    static constexpr Length initial() { return Px{0}; }
+    static constexpr Length initial() { return 0_px; }
 
     void apply(Computed &c) const {
         c.borders.cow().radii.c = value[0];
@@ -651,7 +651,7 @@ struct BorderRadiusTopLeft {
 
     static constexpr Str name() { return "border-top-left-radius"; }
 
-    static constexpr Length initial() { return Px{0}; }
+    static constexpr Length initial() { return 0_px; }
 
     void apply(Computed &c) const {
         c.borders.cow().radii.a = value[1];
@@ -677,7 +677,7 @@ struct BorderRadiusBottomRight {
 
     static constexpr Str name() { return "border-bottom-right-radius"; }
 
-    static constexpr Length initial() { return Px{0}; }
+    static constexpr Length initial() { return 0_px; }
 
     void apply(Computed &c) const {
         c.borders.cow().radii.e = value[1];
@@ -702,7 +702,7 @@ struct BorderRadiusBottomLeft {
 
     static constexpr Str name() { return "border-bottom-left-radius"; }
 
-    static constexpr Length initial() { return Px{0}; }
+    static constexpr Length initial() { return 0_px; }
 
     void apply(Computed &c) const {
         c.borders.cow().radii.g = value[0];
@@ -971,7 +971,7 @@ struct BorderSpacingProp {
 
     static constexpr Str name() { return "border-spacing"; }
 
-    static constexpr BorderSpacing initial() { return {Px{0}, Px{0}}; }
+    static constexpr BorderSpacing initial() { return {0_px, 0_px}; }
 
     void apply(Computed &c) const {
         c.table.cow().spacing = value;
@@ -2101,6 +2101,40 @@ struct TextTransformProp {
     }
 };
 
+// https://drafts.csswg.org/css-text/#white-space-property
+
+struct WhiteSpaceProp {
+    WhiteSpace value = initial();
+
+    static constexpr Str name() { return "white-space"; }
+
+    static WhiteSpace initial() { return WhiteSpace::NORMAL; }
+
+    void apply(Computed &c) const {
+        c.text.cow().whiteSpace = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        if (c.skip(Css::Token::ident("normal"))) {
+            value = WhiteSpace::NORMAL;
+        } else if (c.skip(Css::Token::ident("nowrap"))) {
+            value = WhiteSpace::NOWRAP;
+        } else if (c.skip(Css::Token::ident("pre"))) {
+            value = WhiteSpace::PRE;
+        } else if (c.skip(Css::Token::ident("pre-wrap"))) {
+            value = WhiteSpace::PRE_WRAP;
+        } else if (c.skip(Css::Token::ident("pre-line"))) {
+            value = WhiteSpace::PRE_LINE;
+        } else if (c.skip(Css::Token::ident("break-spaces"))) {
+            value = WhiteSpace::BREAK_SPACES;
+        } else {
+            return Error::invalidData("expected white-space");
+        }
+
+        return Ok();
+    }
+};
+
 // https://drafts.csswg.org/css2/#z-index
 
 struct ZIndexProp {
@@ -2254,6 +2288,7 @@ using _StyleProp = Union<
     // Text
     TextAlignProp,
     TextTransformProp,
+    WhiteSpaceProp,
 
     // ZIndex
     ZIndexProp

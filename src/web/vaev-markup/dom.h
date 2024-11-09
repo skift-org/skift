@@ -34,7 +34,7 @@ enum struct NodeType {
 struct Node :
     Meta::Static {
 
-    Node *_parent = nullptr;
+    MutCursor<Node> _parent = nullptr;
     Vec<Strong<Node>> _children;
 
     virtual ~Node() = default;
@@ -294,11 +294,11 @@ struct TokenList {
     }
 
     bool contains(Str token) const {
-        return _tokens.contains(token);
+        return ::contains(_tokens, token);
     }
 
     void add(Str token) {
-        if (not _tokens.contains(token))
+        if (not ::contains(_tokens, token))
             _tokens.pushBack(token);
     }
 
@@ -307,7 +307,7 @@ struct TokenList {
     }
 
     bool toggle(Str token) {
-        if (_tokens.contains(token)) {
+        if (::contains(_tokens, token)) {
             _tokens.removeAll(token);
             return false;
         }
@@ -316,7 +316,7 @@ struct TokenList {
     }
 
     bool replace(Str oldToken, Str newToken) {
-        if (not _tokens.contains(oldToken))
+        if (not ::contains(_tokens, oldToken))
             return false;
         _tokens.removeAll(oldToken);
         _tokens.pushBack(newToken);

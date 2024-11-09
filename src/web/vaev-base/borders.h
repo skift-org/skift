@@ -44,9 +44,9 @@ struct Border {
 };
 
 struct BorderProps {
-    static constexpr Length THIN = Px{1};
-    static constexpr Length MEDIUM = Px{3};
-    static constexpr Length THICK = Px{5};
+    static constexpr Length THIN = 1_px;
+    static constexpr Length MEDIUM = 3_px;
+    static constexpr Length THICK = 5_px;
 
     Border top, start, bottom, end;
     Math::Radii<PercentOr<Length>> radii;

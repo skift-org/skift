@@ -36,10 +36,20 @@ struct Display {
         _LEN1,
     };
 
-    bool isTableGroup() const {
-        return *this == Internal::TABLE_ROW_GROUP or
-               *this == Internal::TABLE_HEADER_GROUP or
-               *this == Internal::TABLE_FOOTER_GROUP;
+    bool isHeadBodyFootOrRow() {
+        return (
+            *this == TABLE_HEADER_GROUP or
+            *this == TABLE_ROW_GROUP or
+            *this == TABLE_FOOTER_GROUP or
+            *this == TABLE_ROW
+        );
+    }
+
+    bool isHeadBodyFootRowOrColGroup() {
+        return (
+            isHeadBodyFootOrRow() or
+            *this == TABLE_COLUMN_GROUP
+        );
     }
 
     using enum Internal;

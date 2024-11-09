@@ -33,9 +33,24 @@ enum struct TextTransform {
     _LEN,
 };
 
+// MARK: White Space -----------------------------------------------------------
+// https://drafts.csswg.org/css-text/#white-space-property
+
+enum struct WhiteSpace {
+    NORMAL,
+    PRE,
+    NOWRAP,
+    PRE_WRAP,
+    BREAK_SPACES,
+    PRE_LINE,
+
+    _LEN,
+};
+
 struct TextProps {
     TextAlign align = TextAlign::START;
     TextTransform transform;
+    WhiteSpace whiteSpace = WhiteSpace::NORMAL;
 };
 
 } // namespace Vaev

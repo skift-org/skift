@@ -6,26 +6,9 @@
 
 namespace Vaev::Layout {
 
-bool isHeadBodyFootOrRow(Display display) {
-    return (
-        display == Vaev::Display::Internal::TABLE_HEADER_GROUP or
-        display == Vaev::Display::Internal::TABLE_ROW_GROUP or
-        display == Vaev::Display::Internal::TABLE_FOOTER_GROUP or
-        display == Vaev::Display::Internal::TABLE_ROW
-    );
-}
-
-bool isHeadBodyFootRowOrColGroup(Display display) {
-    return (
-        isHeadBodyFootOrRow(display) or
-        display == Vaev::Display::Internal::TABLE_COLUMN_GROUP
-    );
-}
-
 void advanceUntil(MutCursor<Box> &cursor, Func<bool(Display)> pred) {
-    while (not cursor.ended() and not pred(cursor->style->display)) {
+    while (not cursor.ended() and not pred(cursor->style->display))
         cursor.next();
-    }
 }
 
 struct TableCell {
@@ -272,7 +255,7 @@ struct TableFormatingContext {
             return;
 
         advanceUntil(tableBoxCursor, [](Display d) {
-            return isHeadBodyFootRowOrColGroup(d);
+            return d.isHeadBodyFootRowOrColGroup();
         });
 
         if (tableBoxCursor.ended())
@@ -313,7 +296,7 @@ struct TableFormatingContext {
 
             tableBoxCursor.next();
             advanceUntil(tableBoxCursor, [](Display d) {
-                return isHeadBodyFootRowOrColGroup(d);
+                return d.isHeadBodyFootRowOrColGroup();
             });
         }
 
@@ -323,7 +306,7 @@ struct TableFormatingContext {
 
         while (true) {
             advanceUntil(tableBoxCursor, [](Display d) {
-                return isHeadBodyFootOrRow(d);
+                return d.isHeadBodyFootOrRow();
             });
 
             if (tableBoxCursor.ended())
@@ -440,19 +423,20 @@ struct TableFormatingContext {
         //       (https://www.w3.org/TR/CSS22/tables.html#width-layout)
 
         auto tableUsedWidth =
-            tableBox.style->sizing->width == Size::Type::AUTO
-                ? Px{0}
+            tableBox.style->sizing->width == Size::AUTO
+                ? 0_px
                 : resolve(tree, tableBox, tableBox.style->sizing->width.value, input.availableSpace.x);
 
         auto [columnBorders, sumBorders] = getColumnBorders();
 
         Px fixedWidthToAccount = boxBorder.horizontal() + Px{grid.size.x + 1} * spacing.x;
 
-        Vec<Opt<Px>> colWidth{Buf<Opt<Px>>::init(grid.size.x, NONE)};
+        Vec<Opt<Px>> colWidth{};
+        colWidth.resize(grid.size.x);
         for (auto &col : cols) {
 
             auto width = col.el.style->sizing->width;
-            if (width == Size::Type::AUTO)
+            if (width == Size::AUTO)
                 continue;
 
             for (usize x = col.start; x <= col.end; ++x) {
@@ -510,7 +494,7 @@ struct TableFormatingContext {
 
         Vec<Px> finalColWidths{colWidth.len()};
         for (usize i = 0; i < grid.size.x; ++i) {
-            auto finalColWidth = colWidth[i].unwrapOr(Px{0});
+            auto finalColWidth = colWidth[i].unwrapOr(0_px);
             finalColWidths.pushBack(finalColWidth);
         }
         return {finalColWidths, tableUsedWidth};
@@ -538,32 +522,27 @@ struct TableFormatingContext {
                 Input{
                     .commit = Commit::NO,
                     .intrinsic = IntrinsicSize::MIN_CONTENT,
-                    .knownSize = {NONE, NONE}
                 }
             );
             capmin = max(capmin, captionOutput.size.x);
         }
 
-        auto getCellMinMaxWidth = [](Tree &tree, Box &box, Input &input, TableCell &cell) {
-            // FIXME: What should be the parameter for intrinsic in the vertical axis?
+        auto getCellMinMaxWidth = [](Tree &tree, Box &box, Input &input, TableCell &cell) -> Pair<Px> {
             auto cellMinOutput = layout(
                 tree,
                 *cell.box,
                 Input{
                     .commit = Commit::NO,
                     .intrinsic = IntrinsicSize::MIN_CONTENT,
-                    .knownSize = {NONE, NONE}
                 }
             );
 
-            // FIXME: What should be the parameter for intrinsic in the vertical axis?
             auto cellMaxOutput = layout(
                 tree,
                 *cell.box,
                 Input{
                     .commit = Commit::NO,
                     .intrinsic = IntrinsicSize::MAX_CONTENT,
-                    .knownSize = {NONE, NONE}
                 }
             );
 
@@ -584,11 +563,14 @@ struct TableFormatingContext {
                 cellMaxWidth = max(cellMaxWidth, cellPreferredWidth);
             }
 
-            return Tuple<Px, Px>{cellMinWidth, cellMaxWidth};
+            return {cellMinWidth, cellMaxWidth};
         };
 
-        Vec<Px> minColWidth{Buf<Px>::init(grid.size.x, Px{0})};
-        Vec<Px> maxColWidth{Buf<Px>::init(grid.size.x, Px{0})};
+        Vec<Px> minColWidth{};
+        minColWidth.resize(grid.size.x);
+
+        Vec<Px> maxColWidth{};
+        maxColWidth.resize(grid.size.x);
 
         for (usize i = 0; i < grid.size.y; ++i) {
             for (usize j = 0; j < grid.size.x; ++j) {
@@ -609,7 +591,7 @@ struct TableFormatingContext {
         }
 
         Opt<Px> tableComputedWidth;
-        if (tableBox.style->sizing->width != Size::Type::AUTO) {
+        if (tableBox.style->sizing->width != Size::AUTO) {
             tableComputedWidth = resolve(tree, tableBox, tableBox.style->sizing->width.value, input.availableSpace.x);
         }
 
@@ -617,10 +599,10 @@ struct TableFormatingContext {
             auto width = el.style->sizing->width;
 
             // FIXME: docs are not clear on what to do for columns with AUTO width
-            if (width == Size::Type::AUTO)
+            if (width == Size::AUTO)
                 continue;
 
-            auto widthValue = resolve(tree, el, width.value, tableComputedWidth.unwrapOr(Px{0}));
+            auto widthValue = resolve(tree, el, width.value, tableComputedWidth.unwrapOr(0_px));
 
             for (usize x = start; x <= end; ++x) {
                 minColWidth[x] = max(minColWidth[x], widthValue);
@@ -632,7 +614,7 @@ struct TableFormatingContext {
             for (usize j = 0; j < grid.size.x; ++j) {
                 auto cell = grid.get(j, i);
 
-                if (not(cell.anchorIdx == Math::Vec2u{j, i}))
+                if (cell.anchorIdx != Math::Vec2u{j, i})
                     continue;
 
                 auto colSpan = cell.box->attrs.span;
@@ -666,7 +648,7 @@ struct TableFormatingContext {
         for (auto &group : colGroups) {
 
             auto columnGroupWidth = group.el.style->sizing->width;
-            if (columnGroupWidth == Size::Type::AUTO)
+            if (columnGroupWidth == Size::AUTO)
                 continue;
 
             Px currSumOfGroupWidth{0};
@@ -691,7 +673,7 @@ struct TableFormatingContext {
             sumMaxColWidths += x;
 
         // TODO: should minColWidth or maxColWidth be forcelly used if input is MIN_CONTENT or MAX_CONTENT respectivelly?
-        if (tableBox.style->sizing->width != Size::Type::AUTO) {
+        if (tableBox.style->sizing->width != Size::AUTO) {
             // TODO: how to resolve percentage if case of table width?
             auto tableUsedWidth = max(capmin, max(tableComputedWidth.unwrap(), sumMinColWidths));
 
@@ -734,11 +716,11 @@ struct TableFormatingContext {
 
         for (auto &row : rows) {
             auto height = row.el.style->sizing->height;
-            if (height == Size::Type::AUTO)
+            if (height == Size::AUTO)
                 continue;
 
             for (usize y = row.start; y <= row.end; ++y) {
-                rowHeight[y] = resolve(tree, row.el, height.value, Px{0});
+                rowHeight[y] = resolve(tree, row.el, height.value, 0_px);
             }
         }
 
@@ -753,12 +735,12 @@ struct TableFormatingContext {
                 // that the sum of the row heights involved must be great enough to encompass the cell spanning the rows.
 
                 auto rowSpan = cell.box->attrs.rowSpan;
-                if (cell.box->style->sizing->height != Size::Type::AUTO) {
+                if (cell.box->style->sizing->height != Size::AUTO) {
                     auto computedHeight = resolve(
                         tree,
                         *cell.box,
                         cell.box->style->sizing->height.value,
-                        Px{0}
+                        0_px
                     );
 
                     for (usize k = 0; k < rowSpan; k++) {
@@ -769,10 +751,12 @@ struct TableFormatingContext {
                 auto cellOutput = layout(
                     tree,
                     *cell.box,
-                    Input{
+                    {
                         .commit = Commit::NO,
-                        .intrinsic = IntrinsicSize::MIN_CONTENT,
-                        .knownSize = {colWidth[j], NONE}
+                        .knownSize = {
+                            colWidth[j],
+                            NONE,
+                        },
                     }
                 );
 
@@ -842,7 +826,7 @@ Output tableLayout(Tree &tree, Box &wrapper, Input input) {
 
     auto queryPref = [](Vec<Px> const &pref, isize l, isize r) -> Px {
         if (r < l)
-            return Px{0};
+            return 0_px;
         if (l == 0)
             return pref[r];
         return pref[r] - pref[l - 1];
@@ -884,7 +868,7 @@ Output tableLayout(Tree &tree, Box &wrapper, Input input) {
             layout(
                 tree,
                 group.el,
-                Input{
+                {
                     .commit = Commit::YES,
                     .knownSize = {
                         queryPref(colWidthPref, group.start, group.end),
@@ -995,7 +979,7 @@ Output tableLayout(Tree &tree, Box &wrapper, Input input) {
             auto cellOutput = layout(
                 tree,
                 wrapper.children()[i],
-                Input{
+                {
                     .commit = input.commit,
                     .knownSize = {tableUsedWidth, NONE},
                     .position = {input.position.x, currPositionY},

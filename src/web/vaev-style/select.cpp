@@ -4,6 +4,8 @@
 
 namespace Vaev::Style {
 
+static constexpr bool DEBUG_SELECTORS = false;
+
 // MARK: Selector Specificity ---------------------------------------------------
 
 // https://www.w3.org/TR/selectors-3/#specificity
@@ -43,7 +45,7 @@ Spec spec(Selector const &s) {
             return Spec::ZERO;
         },
         [](auto const &s) {
-            logWarn("unimplemented selector: {}", s);
+            logWarnIf(DEBUG_SELECTORS, "unimplemented selector: {}", s);
             return Spec::ZERO;
         }
     });
@@ -117,7 +119,7 @@ static bool _match(Infix const &s, Markup::Element const &e) {
         return _matchSubsequent(*s.lhs, e);
 
     default:
-        logWarn("unimplemented selector: {}", s);
+        logWarnIf(DEBUG_SELECTORS, "unimplemented selector: {}", s);
         return false;
     }
 }
@@ -148,7 +150,7 @@ static bool _match(Nfix const &s, Markup::Element const &el) {
         return not s.inners[0].match(el);
 
     default:
-        logWarn("unimplemented selector: {}", s);
+        logWarnIf(DEBUG_SELECTORS, "unimplemented selector: {}", s);
         return false;
     }
 }
@@ -221,7 +223,7 @@ static bool _match(Pseudo const &s, Markup::Element const &el) {
         return _matchLastOfType(el);
 
     default:
-        logDebug("unimplemented pseudo class: {}", s);
+        logDebugIf(DEBUG_SELECTORS, "unimplemented pseudo class: {}", s);
         return false;
     }
 }
@@ -240,7 +242,7 @@ bool Selector::match(Markup::Element const &el) const {
             if constexpr (requires { _match(s, el); })
                 return _match(s, el);
 
-            logWarn("unimplemented selector: {}", s);
+            logWarnIf(DEBUG_SELECTORS, "unimplemented selector: {}", s);
             return false;
         }
     );

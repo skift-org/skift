@@ -36,7 +36,7 @@ struct BorderSpacing {
 struct TableProps {
     TableLayout tableLayout = TableLayout::AUTO;
     CaptionSide captionSide = CaptionSide::TOP;
-    BorderSpacing spacing = {Px{0}, Px{0}};
+    BorderSpacing spacing = {0_px, 0_px};
     BorderCollapse collapse = BorderCollapse::SEPARATE;
 };
 

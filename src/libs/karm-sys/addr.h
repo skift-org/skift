@@ -123,7 +123,7 @@ union Ip6 {
         return _raw <=> b._raw;
     }
 
-    auto operator==(Ip6 const &b) const {
+    bool operator==(Ip6 const &b) const {
         return _raw == b._raw;
     }
 };

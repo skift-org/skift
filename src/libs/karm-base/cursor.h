@@ -5,6 +5,8 @@
 
 namespace Karm {
 
+#pragma clang unsafe_buffer_usage begin
+
 template <typename T>
 struct Cursor {
     using Inner = T;
@@ -113,10 +115,6 @@ struct Cursor {
 
     always_inline constexpr Bytes bytes() const {
         return Bytes{_begin, _end};
-    }
-
-    always_inline constexpr MutBytes bytes() {
-        return MutBytes{_begin, _end};
     }
 
     /// Creates a rollback point for the cursor. If not manually disarmed,
@@ -256,7 +254,7 @@ struct MutCursor {
         return Bytes{_begin, _end};
     }
 
-    always_inline constexpr MutBytes bytes() {
+    always_inline constexpr MutBytes mutBytes() {
         return MutBytes{_begin, _end};
     }
 
@@ -269,5 +267,7 @@ struct MutCursor {
         }};
     }
 };
+
+#pragma clang unsafe_buffer_usage end
 
 } // namespace Karm

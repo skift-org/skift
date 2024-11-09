@@ -194,7 +194,7 @@ union Vec2 {
         return _els <=> other._els;
     }
 
-    auto operator==(Vec2 const &other) const {
+    bool operator==(Vec2 const &other) const {
         return _els == other._els;
     }
 
@@ -434,7 +434,7 @@ union Vec3 {
         return _els <=> other._els;
     }
 
-    auto operator==(Vec3 const &other) const {
+    bool operator==(Vec3 const &other) const {
         return _els == other._els;
     }
 
@@ -659,7 +659,7 @@ union Vec4 {
         return _els <=> other._els;
     }
 
-    auto operator==(Vec4 const &other) const {
+    bool operator==(Vec4 const &other) const {
         return _els == other._els;
     }
 

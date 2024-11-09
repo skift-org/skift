@@ -269,7 +269,7 @@ struct Command {
             std::move(callbackAsync)
         );
         _commands.pushBack(cmd);
-        return *cmd;
+        return *last(_commands);
     }
 
     template <typename T>

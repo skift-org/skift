@@ -20,7 +20,7 @@ struct _Cell {
 
     virtual ~_Cell() = default;
 
-    virtual void *_unwrap() = 0;
+    virtual void *_unwrap() lifetimebound = 0;
 
     virtual void clear() = 0;
 
@@ -40,7 +40,7 @@ struct _Cell {
         }
     }
 
-    _Cell *refStrong() {
+    _Cell *refStrong() lifetimebound {
         LockScope scope(_lock);
 
         if (_clear) [[unlikely]]
@@ -63,7 +63,7 @@ struct _Cell {
         collectAndRelease();
     }
 
-    _Cell *refWeak() {
+    _Cell *refWeak() lifetimebound {
         LockScope scope(_lock);
 
         _weak++;
@@ -84,7 +84,7 @@ struct _Cell {
     }
 
     template <typename T>
-    T &unwrap() {
+    T &unwrap() lifetimebound {
         if (_clear) [[unlikely]]
             panic("unwrap() called on cleared cell");
 
@@ -101,7 +101,7 @@ struct Cell : public _Cell {
         _buf.ctor(std::forward<Args>(args)...);
     }
 
-    void *_unwrap() override {
+    void *_unwrap() lifetimebound override {
         return &_buf.unwrap();
     }
 
@@ -169,19 +169,19 @@ struct Strong {
 
     // MARK: Operators ---------------------------------------------------------
 
-    constexpr T const *operator->() const {
+    constexpr T const *operator->() const lifetimebound {
         return &unwrap();
     }
 
-    constexpr T *operator->() {
+    constexpr T *operator->() lifetimebound {
         return &unwrap();
     }
 
-    constexpr T const &operator*() const {
+    constexpr T const &operator*() const lifetimebound {
         return unwrap();
     }
 
-    constexpr T &operator*() {
+    constexpr T &operator*() lifetimebound {
         return unwrap();
     }
 
@@ -207,18 +207,18 @@ struct Strong {
             panic("null dereference");
     }
 
-    constexpr T const &unwrap() const {
+    constexpr T const &unwrap() const lifetimebound {
         ensure();
         return _cell->unwrap<T>();
     }
 
-    constexpr T &unwrap() {
+    constexpr T &unwrap() lifetimebound {
         ensure();
         return _cell->unwrap<T>();
     }
 
     template <Meta::Derive<T> U>
-    constexpr U const &unwrap() const {
+    constexpr U const &unwrap() const lifetimebound {
         ensure();
         if (not is<U>()) [[unlikely]]
             panic("unwrapping T as U");
@@ -227,7 +227,7 @@ struct Strong {
     }
 
     template <Meta::Derive<T> U>
-    constexpr U &unwrap() {
+    constexpr U &unwrap() lifetimebound {
         ensure();
         if (not is<U>()) [[unlikely]]
             panic("unwrapping T as U");

@@ -257,19 +257,19 @@ struct List {
 
     // MARK: Random Access
 
-    T &peek(usize i) {
+    T &peek(usize i) lifetimebound {
         return _ll.peek(i)->value;
     }
 
-    T const &peek(usize i) const {
+    T const &peek(usize i) const lifetimebound {
         return _ll.peek(i)->value;
     }
 
-    T &operator[](usize i) {
+    T &operator[](usize i) lifetimebound {
         return peek(i);
     }
 
-    T const &operator[](usize i) const {
+    T const &operator[](usize i) const lifetimebound {
         return peek(i);
     }
 
@@ -295,11 +295,11 @@ struct List {
         return buf;
     }
 
-    T &peekFront() {
+    T &peekFront() lifetimebound {
         return _ll.head()->value;
     }
 
-    T const &peekFront() const {
+    T const &peekFront() const lifetimebound {
         return _ll.head()->value;
     }
 
@@ -325,7 +325,7 @@ struct List {
         return value;
     }
 
-    T &peekBack() {
+    T &peekBack() lifetimebound {
         return _ll.tail()->value;
     }
 

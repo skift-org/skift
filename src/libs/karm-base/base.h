@@ -17,6 +17,11 @@ namespace Karm {
 #define throw_unless _Pragma("GCC error \"throw_unless is not allowed\"") throw_unless
 #define dynamic_cast _Pragma("GCC error \"dynamic_cast is not allowed\"") dynamic_cast
 
+// Safety
+
+// https://clang.llvm.org/docs/AttributeReference.html#lifetimebound
+#define lifetimebound [[clang::lifetimebound]]
+
 // Utilities
 
 #define arrayLen$(ARR) (sizeof(ARR) / sizeof(ARR[0]))

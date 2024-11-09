@@ -12,10 +12,10 @@
 #include <karm-ui/popover.h>
 #include <karm-ui/scroll.h>
 #include <mdi/alert-decagram.h>
+#include <mdi/arrow-left.h>
 #include <mdi/bookmark-outline.h>
 #include <mdi/bookmark.h>
 #include <mdi/button-cursor.h>
-#include <mdi/chevron-left.h>
 #include <mdi/code-tags.h>
 #include <mdi/cog.h>
 #include <mdi/dots-horizontal.h>
@@ -126,7 +126,7 @@ Ui::Child addressBar(Mime::Url const &url) {
 Ui::Child contextMenu(State const &s) {
     return Kr::contextMenuContent({
         Kr::contextMenuDock({
-            Kr::contextMenuIcon(Ui::NOP, Mdi::CHEVRON_LEFT),
+            Kr::contextMenuIcon(Ui::NOP, Mdi::ARROW_LEFT),
             Kr::contextMenuIcon(Ui::NOP, Mdi::REFRESH),
         }),
         Ui::separator(),
@@ -216,7 +216,7 @@ Ui::Child app(Mime::Url url, Res<Strong<Vaev::Markup::Document>> dom) {
                 .icon = Mdi::SURFING,
                 .title = "Vaev"s,
                 .startTools = slots$(
-                    Ui::button(Model::bindIf<GoBack>(s.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::CHEVRON_LEFT),
+                    Ui::button(Model::bindIf<GoBack>(s.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
                 ),
                 .midleTools = slots$(addressBar(s.url) | Ui::grow()),
                 .endTools = slots$(

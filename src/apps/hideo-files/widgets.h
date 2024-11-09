@@ -9,21 +9,23 @@ namespace Hideo::Files {
 
 // MARK: Common Widgets --------------------------------------------------------
 
-Ui::Child directoryListing(State const &, Sys::Dir const &);
+Ui::Child directoryListing(State const &s, Sys::Dir const &);
 
-Ui::Child breadcrumb(State const &);
+Ui::Child breadcrumb(State const &s);
 
-Ui::Child goBackTool(State const &state);
+Ui::Child goBackTool(State const &s);
 
-Ui::Child goForwardTool(State const &state);
+Ui::Child goForwardTool(State const &s);
 
-Ui::Child goParentTool(State const &state);
+Ui::Child goParentTool(State const &s);
 
 Ui::Child refreshTool();
 
-Ui::Child toolbar(State const &);
+Ui::Child moreTool(State const &s);
 
-Ui::Child alert(State const &state, String title, String body);
+Ui::Child toolbar(State const &s);
+
+Ui::Child alert(State const &s, String title, String body);
 
 // MARK:  Dialogs  -------------------------------------------------------------
 

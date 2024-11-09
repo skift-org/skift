@@ -11,6 +11,10 @@ namespace Karm::Sys {
 struct DirEntry {
     String name;
     Type type;
+
+    bool hidden() const {
+        return name[0] == '.';
+    }
 };
 
 struct Dir {

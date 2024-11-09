@@ -7,6 +7,7 @@
 #include <karm-ui/dialog.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
+#include <karm-ui/popover.h>
 #include <karm-ui/scroll.h>
 #include <mdi/alert-decagram.h>
 #include <mdi/alert-outline.h>
@@ -14,11 +15,15 @@
 #include <mdi/arrow-right.h>
 #include <mdi/arrow-up.h>
 #include <mdi/bookmark-outline.h>
+#include <mdi/bookmark.h>
+#include <mdi/checkbox-blank-outline.h>
+#include <mdi/checkbox-marked.h>
 #include <mdi/chevron-right.h>
 #include <mdi/content-copy.h>
 #include <mdi/content-cut.h>
 #include <mdi/content-paste.h>
 #include <mdi/delete-outline.h>
+#include <mdi/dots-horizontal.h>
 #include <mdi/download.h>
 #include <mdi/file-document.h>
 #include <mdi/film.h>
@@ -111,6 +116,8 @@ Ui::Child directoryListing(State const &s, Sys::Dir const &dir) {
     Ui::Children children;
     bool odd = true;
     for (auto const &entry : dir.entries()) {
+        if (entry.hidden() and not s.showHidden)
+            continue;
         children.pushBack(directorEntry(entry, odd));
         odd = !odd;
     }
@@ -184,14 +191,14 @@ Ui::Child breadcrumbRoot(Mime::Url const &url) {
     );
 }
 
-Ui::Child breadcrumb(State const &state) {
+Ui::Child breadcrumb(State const &s) {
     Ui::Children items;
-    items.pushBack(breadcrumbRoot(state.currentUrl()));
-    state
+    items.pushBack(breadcrumbRoot(s.currentUrl()));
+    s
         .currentUrl()
         .iter()
         .mapi([&](auto const &text, usize i) {
-            items.pushBack(breadcrumbItem(text, state.currentUrl().len() - i - 1));
+            items.pushBack(breadcrumbItem(text, s.currentUrl().len() - i - 1));
             return true;
         })
         .collect();
@@ -207,30 +214,30 @@ Ui::Child breadcrumb(State const &state) {
             Ui::hflow(items) |
                 Ui::hscroll() |
                 Ui::grow(),
-            Ui::button(Model::bind<AddBookmark>(), Ui::ButtonStyle::subtle(), Mdi::BOOKMARK_OUTLINE)
+            refreshTool()
         )
     );
 }
 
-Ui::Child goBackTool(State const &state) {
+Ui::Child goBackTool(State const &s) {
     return Ui::button(
-        Model::bindIf<GoBack>(state.canGoBack()),
+        Model::bindIf<GoBack>(s.canGoBack()),
         Ui::ButtonStyle::subtle(),
         Mdi::ARROW_LEFT
     );
 }
 
-Ui::Child goForwardTool(State const &state) {
+Ui::Child goForwardTool(State const &s) {
     return Ui::button(
-        Model::bindIf<GoForward>(state.canGoForward()),
+        Model::bindIf<GoForward>(s.canGoForward()),
         Ui::ButtonStyle::subtle(),
         Mdi::ARROW_RIGHT
     );
 }
 
-Ui::Child goParentTool(State const &state) {
+Ui::Child goParentTool(State const &s) {
     return Ui::button(
-        Model::bindIf<GoParent>(state.canGoParent(), 1),
+        Model::bindIf<GoParent>(s.canGoParent(), 1),
         Ui::ButtonStyle::subtle(),
         Mdi::ARROW_UP
     );
@@ -244,13 +251,35 @@ Ui::Child refreshTool() {
     );
 }
 
-Ui::Child toolbar(State const &state) {
+Ui::Child mainMenu([[maybe_unused]] State const &s) {
+    return Kr::contextMenuContent({
+        Kr::contextMenuItem(
+            Ui::NOP,
+            Mdi::BOOKMARK_OUTLINE, "Add bookmark..."
+        ),
+        Kr::contextMenuItem(Ui::NOP, Mdi::BOOKMARK, "Bookmarks"),
+        Ui::separator(),
+        Kr::contextMenuItem(Model::bind<ToggleHidden>(), s.showHidden ? Mdi::CHECKBOX_MARKED : Mdi::CHECKBOX_BLANK_OUTLINE, "Show hidden"),
+    });
+}
+
+Ui::Child moreTool(State const &s) {
+    return Ui::button(
+        [&](Ui::Node &n) {
+            Ui::showPopover(n, n.bound().bottomEnd(), mainMenu(s));
+        },
+        Ui::ButtonStyle::subtle(),
+        Mdi::DOTS_HORIZONTAL
+    );
+}
+
+Ui::Child toolbar(State const &s) {
     return Kr::toolbar({
-        Ui::button(Model::bindIf<GoBack>(state.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
-        Ui::button(Model::bindIf<GoForward>(state.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
-        Ui::button(Model::bindIf<GoParent>(state.canGoParent(), 1), Ui::ButtonStyle::subtle(), Mdi::ARROW_UP),
-        Ui::grow(breadcrumb(state)),
-        Ui::button(Model::bind<Refresh>(), Ui::ButtonStyle::subtle(), Mdi::REFRESH),
+        goBackTool(s),
+        goForwardTool(s),
+        goParentTool(s),
+        Ui::grow(breadcrumb(s)),
+        moreTool(s),
     });
 }
 

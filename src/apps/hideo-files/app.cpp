@@ -67,7 +67,7 @@ Ui::Child app() {
                 goParentTool(s)
             ),
             .midleTools = slots$(breadcrumb(s) | Ui::grow()),
-            .endTools = slots$(refreshTool()),
+            .endTools = slots$(moreTool(s)),
             .sidebar = slot$(sidebar(s)),
             .body = slot$(pageContent(s)),
         });

@@ -45,6 +45,9 @@ void reduce(State &s, Action a) {
         },
         [&](AddBookmark) {
         },
+        [&](ToggleHidden) {
+            s.showHidden = not s.showHidden;
+        },
     });
 }
 

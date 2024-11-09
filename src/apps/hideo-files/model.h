@@ -8,6 +8,7 @@ namespace Hideo::Files {
 struct State {
     Vec<Mime::Url> history;
     usize currentIndex = 0;
+    bool showHidden = false;
 
     State(Mime::Url path)
         : history({path}) {}
@@ -54,7 +55,9 @@ struct Refresh {
 
 struct AddBookmark {};
 
-using Action = Union<GoRoot, GoBack, GoForward, GoParent, Navigate, GoTo, Refresh, AddBookmark>;
+struct ToggleHidden {};
+
+using Action = Union<GoRoot, GoBack, GoForward, GoParent, Navigate, GoTo, Refresh, AddBookmark, ToggleHidden>;
 
 void reduce(State &, Action);
 

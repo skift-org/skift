@@ -10,7 +10,7 @@ Output inlineLayout(Tree &, Box &box, Input input) {
 
     auto inlineSize = input.knownSize.x.unwrapOrElse([&] {
         if (input.intrinsic == IntrinsicSize::MIN_CONTENT) {
-            return Px{0};
+            return 0_px;
         } else if (input.intrinsic == IntrinsicSize::MAX_CONTENT) {
             return Limits<Px>::MAX;
         } else {

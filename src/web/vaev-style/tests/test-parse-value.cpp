@@ -85,33 +85,33 @@ test$("vaev-css-build-margin") {
 
     try$(testCase(
         "margin: 30px;",
-        Margin{Width{Px{30}}}
+        Margin{Width{30_px}}
     ));
 
     try$(testCase(
         "margin: 1px 2px;",
         Margin{
-            Width{Px{1}},
-            Width{Px{2}},
+            Width{1_px},
+            Width{2_px},
         }
     ));
 
     try$(testCase(
         "margin: 1px 2px 3px;",
         Margin{
-            Width{Px{1}},
-            Width{Px{2}},
-            Width{Px{3}},
+            Width{1_px},
+            Width{2_px},
+            Width{3_px},
         }
     ));
 
     try$(testCase(
         "margin: 1px 2px 3px 4px;",
         Margin{
-            Width{Px{1}},
-            Width{Px{2}},
-            Width{Px{3}},
-            Width{Px{4}},
+            Width{1_px},
+            Width{2_px},
+            Width{3_px},
+            Width{4_px},
         }
     ));
 

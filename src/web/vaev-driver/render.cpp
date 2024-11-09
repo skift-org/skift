@@ -93,7 +93,7 @@ RenderResult render(Markup::Document const &dom, Style::Media const &media, Vec2
         {
             .commit = Layout::Commit::YES,
             .knownSize = {vp.small.width, NONE},
-            .availableSpace = {vp.small.width, Px{0}},
+            .availableSpace = {vp.small.width, 0_px},
             .containingBlock = {vp.small.width, vp.small.height},
         }
     );
@@ -151,7 +151,7 @@ RenderResult render(Markup::Document &dom, Style::Media const &media, Print::Pap
         {
             .commit = Layout::Commit::YES,
             .knownSize = {vp.small.width, NONE},
-            .availableSpace = {vp.small.width, Px{0}},
+            .availableSpace = {vp.small.width, 0_px},
             .containingBlock = {vp.small.width, vp.small.height},
         }
     );

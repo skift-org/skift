@@ -13,7 +13,7 @@ enum struct IntrinsicSize {
 };
 
 struct Viewport {
-    Px dpi = Px{96};
+    Px dpi = 96_px;
     // https://drafts.csswg.org/css-values/#small-viewport-size
     RectPx small;
     // https://drafts.csswg.org/css-values/#large-viewport-size
@@ -36,12 +36,56 @@ struct Input {
     Vec2Px position = {};
     Vec2Px availableSpace = {};
     Vec2Px containingBlock = {};
+
+    Input withCommit(Commit c) const {
+        auto copy = *this;
+        copy.commit = c;
+        return copy;
+    }
+
+    Input withIntrinsic(IntrinsicSize i) const {
+        auto copy = *this;
+        copy.intrinsic = i;
+        return copy;
+    }
+
+    Input withKnownSize(Math::Vec2<Opt<Px>> size) const {
+        auto copy = *this;
+        copy.knownSize = size;
+        return copy;
+    }
+
+    Input withPosition(Vec2Px pos) const {
+        auto copy = *this;
+        copy.position = pos;
+        return copy;
+    }
+
+    Input withAvailableSpace(Vec2Px space) const {
+        auto copy = *this;
+        copy.availableSpace = space;
+        return copy;
+    }
+
+    Input withContainingBlock(Vec2Px block) const {
+        auto copy = *this;
+        copy.containingBlock = block;
+        return copy;
+    }
 };
 
 /// Output of the layout algorithm.
 
 struct Output {
     Vec2Px size;
+
+    Px width() const {
+        return size.x;
+    }
+
+    Px height() const {
+        return size.y;
+    }
 
     static Output fromSize(Vec2Px size) {
         return Output{size};

@@ -15,7 +15,7 @@ Res<T> parseDeclarationValue(Cursor<Css::Sst> &c) {
 
         return Ok(std::move(t));
     } else {
-        logError("missing parser for declaration: {}", T::name());
+        logDebug("missing parser for declaration: {}", T::name());
         return Error::notImplemented("missing parser for declaration");
     }
 }

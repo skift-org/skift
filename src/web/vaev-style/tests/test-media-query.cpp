@@ -37,7 +37,7 @@ static Media const TEST_MEDIA = {
 test$("logical-and") {
     auto query = MediaQuery::combineAnd(
         TypeFeature{MediaType::SCREEN},
-        WidthFeature::min(Px{1920})
+        WidthFeature::min(1920_px)
     );
 
     expect$(query.match(TEST_MEDIA));
@@ -48,7 +48,7 @@ test$("logical-and") {
 test$("logical-or") {
     auto query = MediaQuery::combineOr(
         TypeFeature{MediaType::SCREEN},
-        WidthFeature::min(Px{1920})
+        WidthFeature::min(1920_px)
     );
 
     expect$(query.match(TEST_MEDIA));

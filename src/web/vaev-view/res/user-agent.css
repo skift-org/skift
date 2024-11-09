@@ -152,6 +152,14 @@ ul {
     display: block;
 }
 
+dir,
+dl,
+menu,
+ol,
+ul {
+    margin-block: 1em;
+}
+
 dd {
     margin-inline-start: 40px;
 }

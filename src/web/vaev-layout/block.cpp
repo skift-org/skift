@@ -7,52 +7,38 @@ namespace Vaev::Layout {
 
 // https://www.w3.org/TR/CSS22/visuren.html#normal-flow
 struct BlockFormatingContext {
-    static Px _determineWidth(Tree &tree, Box &box, Input input) {
-        Px width = Px{0};
-        for (auto &c : box.children()) {
-            auto ouput = layout(
-                tree,
-                c,
-                {
-                    .commit = Commit::NO,
-                    .intrinsic = input.intrinsic,
-                }
-            );
-
-            width = max(width, ouput.size.x);
-        }
-
-        return width;
-    }
-
     Output run(Tree &tree, Box &box, Input input) {
-        Px blockSize = Px{0};
-        Px inlineSize = input.knownSize.width.unwrapOrElse([&] {
-            return _determineWidth(tree, box, input);
-        });
+        Px blockSize = 0_px;
+        Px inlineSize = input.knownSize.width.unwrapOr(0_px);
+
+        // NOTE: Our parent has no clue about our width but wants us to commit,
+        //       we need to compute it first
+        if (input.commit == Commit::YES and not input.knownSize.width)
+            inlineSize = run(tree, box, input.withCommit(Commit::NO)).width();
 
         for (auto &c : box.children()) {
             // TODO: Implement floating
             // if (c.style->float_ != Float::NONE)
             //     continue;
 
-            Opt<Px> childInlineSize = NONE;
-            if (c.style->sizing->width == Size::AUTO and
-                c.style->display != Display::TABLE) {
-                childInlineSize = inlineSize;
-            }
-
             Input childInput = {
                 .commit = input.commit,
-                .availableSpace = {inlineSize, Px{0}},
-                .containingBlock = {inlineSize, input.knownSize.y.unwrapOr(Px{0})},
+                .intrinsic = input.intrinsic,
+                .availableSpace = {inlineSize, 0_px},
+                .containingBlock = {inlineSize, input.knownSize.y.unwrapOr(0_px)},
             };
 
             auto margin = computeMargins(tree, c, childInput);
 
+            Opt<Px> childInlineSize = NONE;
+            if (c.style->sizing->width == Size::AUTO) {
+                childInlineSize = inlineSize - margin.horizontal();
+            }
+
             if (c.style->position != Position::ABSOLUTE) {
                 blockSize += margin.top;
-                childInput.knownSize.width = childInlineSize;
+                if (input.commit == Commit::YES)
+                    childInput.knownSize.width = childInlineSize;
             }
 
             childInput.position = input.position + Vec2Px{margin.start, blockSize};
@@ -66,9 +52,9 @@ struct BlockFormatingContext {
             if (c.style->position != Position::ABSOLUTE) {
                 blockSize += ouput.size.y + margin.bottom;
             }
-        }
 
-        // layoutFloat(t, f, input.containingBlock);
+            inlineSize = max(inlineSize, ouput.size.x + margin.start + margin.end);
+        }
 
         return Output::fromSize({
             inlineSize,

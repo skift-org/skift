@@ -145,6 +145,8 @@ static void _buildElement(Style::Computer &c, Markup::Element const &el, Box &pa
     parent.add(std::move(box));
 }
 
+auto RE_SEGMENT_BREAK = Re::single('\n', '\r', '\f', '\v');
+
 static void _buildRun(Style::Computer &, Markup::Text const &node, Box &parent) {
     auto style = makeStrong<Style::Computed>(Style::Computed::initial());
     style->inherit(*parent.style);
@@ -208,8 +210,25 @@ static void _buildRun(Style::Computer &, Markup::Text const &node, Box &parent) 
             break;
         }
 
-        if (scan.eat(Re::space()))
-            prose->append(' ');
+        if (style->text->whiteSpace == WhiteSpace::PRE_LINE) {
+            bool hasBlank = false;
+            if (scan.eat(Re::blank())) {
+                hasBlank = true;
+            }
+
+            if (scan.eat(RE_SEGMENT_BREAK)) {
+                prose->append('\n');
+                scan.eat(Re::blank());
+                hasBlank = false;
+            }
+
+            if (hasBlank)
+                prose->append(' ');
+        } else {
+            // NORMAL
+            if (scan.eat(Re::space()))
+                prose->append(' ');
+        }
     }
 
     parent.add({style, fontFace, std::move(prose)});

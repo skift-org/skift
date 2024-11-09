@@ -5,8 +5,8 @@ namespace Vaev::Style::Tests {
 
 static Media const TEST_MEDIA = {
     .type = MediaType::SCREEN,
-    .width = Px{1920},
-    .height = Px{1080},
+    .width = 1920_px,
+    .height = 1080_px,
     .aspectRatio = 16.0 / 9.0,
     .orientation = Orientation::LANDSCAPE,
 
@@ -42,26 +42,26 @@ test$("feature-type") {
 }
 
 test$("feature-width") {
-    expect$(WidthFeature::min(Px{1000})
+    expect$(WidthFeature::min(1000_px)
                 .match(TEST_MEDIA));
 
-    expect$(WidthFeature::max(Px{2000})
+    expect$(WidthFeature::max(2000_px)
                 .match(TEST_MEDIA));
 
-    expect$(WidthFeature::exact(Px{1920})
+    expect$(WidthFeature::exact(1920_px)
                 .match(TEST_MEDIA));
 
     return Ok();
 }
 
 test$("feature-height") {
-    expect$(HeightFeature::min(Px{1000})
+    expect$(HeightFeature::min(1000_px)
                 .match(TEST_MEDIA));
 
-    expect$(HeightFeature::max(Px{2000})
+    expect$(HeightFeature::max(2000_px)
                 .match(TEST_MEDIA));
 
-    expect$(HeightFeature::exact(Px{1080})
+    expect$(HeightFeature::exact(1080_px)
                 .match(TEST_MEDIA));
 
     return Ok();

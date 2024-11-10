@@ -174,7 +174,7 @@ struct FontWeight {
 };
 
 struct FontSize {
-    enum _Named {
+    enum struct _Named {
         // absolute
         XX_SMALL,
         X_SMALL,
@@ -193,6 +193,8 @@ struct FontSize {
 
         _LEN,
     };
+
+    using enum _Named;
 
     _Named _named;
     PercentOr<Length> _value;

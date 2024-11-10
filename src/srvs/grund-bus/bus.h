@@ -17,7 +17,7 @@ struct Endpoint : public Meta::Static {
         return Sys::Port{port++};
     }
 
-    Sys::Port _port;
+    Sys::Port _port = nextPort();
     Bus *_bus;
 
     virtual ~Endpoint() = default;

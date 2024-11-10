@@ -79,7 +79,7 @@ struct HjertSched : public Sys::Sched {
         while (_Embed::now() < until) {
             try$(_listener.poll(until));
             while (auto ev = _listener.next()) {
-                auto &prop = _promises.get(ev->cap);
+                auto prop = _promises.take(ev->cap);
                 try$(_listener.mute(ev->cap));
                 prop.resolve(Ok());
             }

@@ -126,7 +126,7 @@ Async::Task<> Service::runAsync() {
 
 Res<> Service::dispatch(Sys::Message &msg) {
     logDebug("Dispatching message on service '{}'", _id);
-    return _con.send(msg.bytes, msg.handles);
+    return _con.send(sub(msg.bytes, msg.len), sub(msg.handles, msg.handlesLen));
 }
 
 // MARK: Bus -------------------------------------------------------------------
@@ -149,8 +149,9 @@ Karm::Res<> Bus::attach(Strong<Endpoint> endpoint) {
 }
 
 Res<> Bus::dispatch(Sys::Header &h, Sys::Message &msg) {
+    logDebug("dispatching message to {}", h.port);
     for (auto &endpoint : _endpoints) {
-        if (endpoint->_port == h.port)
+        if (endpoint->port() == h.port)
             return endpoint->dispatch(msg);
     }
     return Error::notFound("service not found");

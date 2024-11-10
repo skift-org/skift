@@ -21,6 +21,8 @@ inline ChannelHook &useChannel(Sys::Context &ctx = Sys::globalContext()) {
 
 namespace Karm::Sys {
 
+// MARK: Primitive Types -------------------------------------------------------
+
 struct Port : public Distinct<u64, struct _PortTag> {
     static Port const INVALID;
     static Port const BUS;
@@ -74,6 +76,28 @@ struct Message {
     }
 };
 
+// MARK: Primitive Operations --------------------------------------------------
+
+template <typename T, typename... Args>
+Res<> ipcSend(Sys::IpcConnection &con, Port port, u64 seq, Args &&...args) {
+    Header header{seq, port, Meta::idOf<T>()};
+    T msg{std::forward<Args>(args)...};
+
+    Io::BufferWriter reqBuf;
+    Io::PackEmit reqPack{reqBuf};
+
+    try$(Io::pack(reqPack, header));
+    try$(Io::pack(reqPack, msg));
+
+    try$(con.send(reqBuf.bytes(), reqPack.handles()));
+
+    return Ok();
+}
+
+Async::Task<Message> ipcRecvAsync(Sys::IpcConnection &con);
+
+// MARK: Ipc -------------------------------------------------------------------
+
 struct Ipc {
     Sys::IpcConnection _con;
     bool _receiving = false;
@@ -86,24 +110,8 @@ struct Ipc {
     }
 
     template <typename T, typename... Args>
-    Res<> _send(Port port, u64 seq, Args &&...args) {
-        Header header{seq, port, Meta::idOf<T>()};
-        T msg{std::forward<Args>(args)...};
-
-        Io::BufferWriter reqBuf;
-        Io::PackEmit reqPack{reqBuf};
-
-        try$(Io::pack(reqPack, header));
-        try$(Io::pack(reqPack, msg));
-
-        try$(_con.send(reqBuf.bytes(), reqPack.handles()));
-
-        return Ok();
-    }
-
-    template <typename T, typename... Args>
     Res<> send(Port port, Args &&...args) {
-        return _send<T>(port, _seq++, std::forward<Args>(args)...);
+        return ipcSend<T>(_con, port, _seq++, std::forward<Args>(args)...);
     }
 
     Async::Task<Message> recvAsync() {
@@ -116,10 +124,7 @@ struct Ipc {
         }};
 
         while (true) {
-            Message msg;
-            auto [bufLen, hndsLen] = co_trya$(_con.recvAsync(msg.bytes, msg.handles));
-            msg.len = bufLen;
-            msg.handlesLen = hndsLen;
+            Message msg = co_trya$(ipcRecvAsync(_con));
 
             auto maybeHeader = msg.header();
             if (not maybeHeader) {
@@ -141,9 +146,9 @@ struct Ipc {
     Res<> resp(Message &msg, Res<typename T::Response> message) {
         auto header = try$(msg.header());
         if (not message)
-            return _send<Error>(header.port, header.seq, message.none());
+            return ipcSend<Error>(_con, header.port, header.seq, message.none());
 
-        return _send<typename T::Response>(header.port, header.seq, message.take());
+        return ipcSend<typename T::Response>(_con, header.port, header.seq, message.take());
     }
 
     template <typename T, typename... Args>
@@ -154,7 +159,7 @@ struct Ipc {
 
         _pending.put(seq, std::move(promise));
 
-        co_try$(_send<T>(port, seq, std::forward<Args>(args)...));
+        co_try$(ipcSend<T>(_con, port, seq, std::forward<Args>(args)...));
 
         Message msg = co_await future;
 

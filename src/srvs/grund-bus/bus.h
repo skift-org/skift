@@ -1,62 +1,70 @@
 #pragma once
 
 #include <hjert-api/api.h>
+#include <impl-skift/fd.h>
 #include <karm-logger/logger.h>
 #include <karm-mime/url.h>
 #include <karm-sys/context.h>
+#include <karm-sys/ipc.h>
 
 namespace Grund::Bus {
 
-struct Service {
+struct Bus;
+
+struct Endpoint : public Meta::Static {
+    static Sys::Port nextPort() {
+        static usize port = 2;
+        return Sys::Port{port++};
+    }
+
+    Sys::Port _port;
+    Bus *_bus;
+
+    virtual ~Endpoint() = default;
+
+    Sys::Port port() const { return _port; }
+
+    void attach(Bus &bus) { _bus = &bus; }
+
+    virtual Res<> dispatch(Sys::Message &) { return Ok(); }
+
+    virtual Res<> activate(Sys::Context &) { return Ok(); }
+};
+
+struct Service : public Endpoint {
     String _id;
-    Hj::Channel _in;
-    Hj::Channel _out;
+    Strong<Skift::IpcFd> _ipc;
+    Sys::IpcConnection _con;
     Opt<Hj::Task> _task = NONE;
 
     static Res<Strong<Service>> prepare(Sys::Context &ctx, Str id);
 
-    Res<> activate(Sys::Context &ctx);
+    Service(Str id, Strong<Skift::IpcFd> ipc)
+        : _id{id}, _ipc{ipc}, _con{ipc, ""_url} {
+    }
+
+    Res<> activate(Sys::Context &ctx) override;
+
+    Async::Task<> runAsync();
+
+    Res<> dispatch(Sys::Message &msg) override;
 };
 
-struct Bus {
+struct Bus : public Meta::Static {
     Sys::Context &_context;
-    Hj::Listener _listener;
-    Hj::Domain _domain;
 
-    Vec<Strong<Service>> _services{};
+    Vec<Strong<Endpoint>> _endpoints{};
 
-    static Res<Bus> create(Sys::Context &ctx) {
-        auto domain = try$(Hj::Domain::create(Hj::ROOT));
-        auto listener = try$(Hj::Listener::create(Hj::ROOT));
-        return Ok(Bus{ctx, std::move(listener), std::move(domain)});
-    }
+    Bus(Sys::Context &ctx)
+        : _context(ctx) {}
 
-    Res<> prepare(Str id) {
-        auto service = try$(Service::prepare(_context, id));
-        try$(_attach(service));
-        return Ok();
-    }
+    static Res<Strong<Bus>> create(Sys::Context &ctx);
 
-    Res<> _attach(Strong<Service> service) {
-        try$(_listener.listen(service->_out, Hj::Sigs::READABLE, Hj::Sigs::NONE));
-        _services.pushBack(std::move(service));
-        return Ok();
-    }
+    Res<> attach(Strong<Endpoint> endpoint);
 
-    Res<> run() {
-        for (auto &service : _services)
-            try$(service->activate(_context));
+    Res<> dispatch(Sys::Header &h, Sys::Message &msg);
 
-        logDebug("running system event loop");
-        while (true) {
-            try$(_listener.poll(TimeStamp::endOfTime()));
-            while (auto ev = _listener.next()) {
-                logInfo("handling system event");
-
-                try$(Hj::_signal(ev->cap, Hj::Sigs::NONE, Hj::Sigs::READABLE));
-            }
-        }
-    }
+    Res<> startService(Str id);
 };
 
 } // namespace Grund::Bus

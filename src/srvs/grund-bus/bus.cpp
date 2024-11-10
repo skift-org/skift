@@ -10,6 +10,8 @@ namespace Grund::Bus {
 static constexpr bool DEBUG_TASK = false;
 static constexpr bool DEBUG_ELF = false;
 
+// MARK: Service ---------------------------------------------------------------
+
 Res<Strong<Service>> Service::prepare(Sys::Context &, Str id) {
     logInfo("prepare service '{}'", id);
 
@@ -19,11 +21,12 @@ Res<Strong<Service>> Service::prepare(Sys::Context &, Str id) {
     auto out = try$(Hj::Channel::create(Hj::Domain::self(), 512, 16));
     try$(out.label(Io::format("{}-out", id).unwrap()));
 
-    return Ok(makeStrong<Service>(
-        id,
+    auto ipc = makeStrong<Skift::IpcFd>(
         std::move(in),
         std::move(out)
-    ));
+    );
+
+    return Ok(makeStrong<Service>(id, ipc));
 }
 
 Res<> Service::activate(Sys::Context &ctx) {
@@ -83,8 +86,8 @@ Res<> Service::activate(Sys::Context &ctx) {
     auto handoverVrange = try$(elfSpace.map(0, handoverVmo, 0, 0, Hj::MapFlags::READ));
 
     logInfoIf(DEBUG_TASK, "attaching channels...");
-    auto inCap = try$(domain.attach(_in));
-    auto outCap = try$(domain.attach(_out));
+    auto inCap = try$(domain.attach(_ipc->_in));
+    auto outCap = try$(domain.attach(_ipc->_out));
 
     logInfoIf(DEBUG_TASK, "starting the task...");
     try$(task.start(
@@ -92,14 +95,65 @@ Res<> Service::activate(Sys::Context &ctx) {
         stackRange.end(),
         {
             handoverVrange.start,
-            inCap.slot(),
+
+            // NOTE: In and out are intentionally swapped
             outCap.slot(),
+            inCap.slot(),
         }
     ));
 
     _task = std::move(task);
 
     return Ok();
+}
+
+Async::Task<> Service::runAsync() {
+    logDebug("Listening for messages on service '{}'...", _id);
+    while (true) {
+        auto msg = co_trya$(Sys::ipcRecvAsync(_con));
+
+        logDebug("Received message on service '{}'", _id);
+
+        auto maybeHeader = msg.header();
+        if (not maybeHeader)
+            continue;
+        auto &header = maybeHeader.unwrap();
+        auto res = _bus->dispatch(maybeHeader.unwrap(), msg);
+        if (not res)
+            co_try$(Sys::ipcSend<Error>(_con, header.port, header.seq, res.none()));
+    }
+}
+
+Res<> Service::dispatch(Sys::Message &msg) {
+    logDebug("Dispatching message on service '{}'", _id);
+    return _con.send(msg.bytes, msg.handles);
+}
+
+// MARK: Bus -------------------------------------------------------------------
+
+Karm::Res<Strong<Bus>> Bus::create(Sys::Context &ctx) {
+    return Ok(makeStrong<Bus>(ctx));
+}
+
+Karm::Res<> Bus::startService(Str id) {
+    auto service = try$(Service::prepare(_context, id));
+    try$(attach(service));
+    Async::detach(service->runAsync());
+    return Ok();
+}
+
+Karm::Res<> Bus::attach(Strong<Endpoint> endpoint) {
+    endpoint->attach(*this);
+    _endpoints.pushBack(endpoint);
+    return Ok();
+}
+
+Res<> Bus::dispatch(Sys::Header &h, Sys::Message &msg) {
+    for (auto &endpoint : _endpoints) {
+        if (endpoint->_port == h.port)
+            return endpoint->dispatch(msg);
+    }
+    return Error::notFound("service not found");
 }
 
 } // namespace Grund::Bus

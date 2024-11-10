@@ -8,31 +8,28 @@
 
 using namespace Grund::Bus;
 
-Res<> entryPoint(Sys::Context &ctx) {
-    try$(Hj::Task::self().label("grund-bus"));
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
+    co_try$(Hj::Task::self().label("grund-bus"));
 
     logInfo("skiftOS " stringify$(__ck_version_value));
 
-    auto system = try$(Bus::create(ctx));
+    auto system = co_try$(Bus::create(ctx));
 
-    try$(system.prepare("grund-av"s));
-    try$(system.prepare("grund-conf"s));
-    try$(system.prepare("grund-device"s));
-    try$(system.prepare("grund-dhcp"s));
-    try$(system.prepare("grund-dns"s));
-    try$(system.prepare("grund-echo"s));
-    try$(system.prepare("grund-fs"s));
-    try$(system.prepare("grund-net"s));
-    try$(system.prepare("grund-seat"s));
-    try$(system.prepare("grund-shell"s));
+    co_try$(system->startService("grund-av"s));
+    co_try$(system->startService("grund-conf"s));
+    co_try$(system->startService("grund-device"s));
+    co_try$(system->startService("grund-dhcp"s));
+    co_try$(system->startService("grund-dns"s));
+    co_try$(system->startService("grund-echo"s));
+    co_try$(system->startService("grund-fs"s));
+    co_try$(system->startService("grund-net"s));
+    co_try$(system->startService("grund-seat"s));
+    co_try$(system->startService("grund-shell"s));
 
-    return system.run();
-}
+    for (auto &endpoint : system->_endpoints)
+        co_try$(endpoint->activate(ctx));
 
-// NOTE: We can't use the normal entryPointAsync because
-//       the kernel invoke us with a different signature.
-Async::Task<> entryPointAsync(Sys::Context &) {
-    unreachable();
+    co_return Sys::globalSched().wait(TimeStamp::endOfTime());
 }
 
 void __panicHandler(Karm::PanicKind kind, char const *msg);
@@ -46,7 +43,7 @@ extern "C" void __entryPoint(usize rawHandover) {
     ctx.add<Sys::ArgsHook>(1, argv);
     ctx.add<HandoverHook>((Handover::Payload *)rawHandover);
 
-    auto res = entryPoint(ctx);
+    auto res = Sys::run(entryPointAsync(ctx));
 
     auto self = Hj::Task::self();
 

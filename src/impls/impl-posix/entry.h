@@ -13,7 +13,7 @@ int main(int argc, char const **argv) {
     Res<> code = Sys::run(entryPointAsync(ctx));
     if (not code) {
         Karm::Sys::errln("{}: {}", argv[0], code);
-        return 1;
+        return EXIT_FAILURE;
     }
-    return 0;
+    return EXIT_SUCCESS;
 }

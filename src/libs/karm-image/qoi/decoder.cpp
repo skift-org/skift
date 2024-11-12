@@ -70,7 +70,7 @@ Res<> Decoder::decode(Gfx::MutPixels dest) {
                 return Error::invalidData("invalid chunk");
             }
 
-            index[hash(pixel) % index.len()] = pixel;
+            index[hashColor(pixel) % index.len()] = pixel;
             dest.store({x, y}, pixel);
         }
     }

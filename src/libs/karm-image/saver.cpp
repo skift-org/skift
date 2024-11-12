@@ -1,8 +1,11 @@
 #include <karm-sys/file.h>
 
 #include "bmp/encoder.h"
-#include "saver.h"
+#include "jpeg/encoder.h"
 #include "tga/encoder.h"
+
+//
+#include "saver.h"
 
 namespace Karm::Image {
 
@@ -11,6 +14,8 @@ Res<> save(Gfx::Pixels pixels, Io::BEmit &e, Saver const &props) {
         return Bmp::encode(pixels, e);
     } else if (props.format == Mime::Uti::PUBLIC_TGA) {
         return Tga::encode(pixels, e);
+    } else if (props.format == Mime::Uti::PUBLIC_JPEG) {
+        return Jpeg::encode(pixels, e);
     } else {
         return Error::invalidData("unsupported image format");
     }

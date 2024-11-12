@@ -181,36 +181,6 @@ Res<> Decoder::defineRestartInterval(Io::BScan &x) {
     return Ok();
 }
 
-Array<usize, 256> const &Decoder::HuffmanTable::codes() {
-    if (not _codes) {
-        _codes.emplace();
-        usize code = 0;
-        for (usize i = 0; i < 16; ++i) {
-            for (usize j = offs[i]; j < offs[i + 1]; ++j) {
-                (*_codes)[j] = code;
-                ++code;
-            }
-            code <<= 1;
-        }
-    }
-    return *_codes;
-}
-
-Res<Byte> Decoder::HuffmanTable::next(BitStream &bs) {
-    usize code = 0;
-    for (usize i = 0; i < 16; ++i) {
-        code = (code << 1) | try$(bs.nextBit());
-        for (usize j = offs[i]; j < offs[i + 1]; ++j) {
-            if (code == codes()[j]) {
-                return Ok(syms[j]);
-            }
-        }
-    }
-
-    logError("jpeg: invalid huffman code {x}", code);
-    return Error::invalidData("invalid huffman code");
-}
-
 Res<> Decoder::defineHuffmanTable(Io::BScan &x) {
     // logDebug("jpeg: defining huffman table");
 
@@ -227,7 +197,7 @@ Res<> Decoder::defineHuffmanTable(Io::BScan &x) {
             return Error::invalidData("invalid huffman table id");
         }
 
-        HuffmanTable &table = (isAc ? _acHuff : _dcHuff)[id].emplace();
+        auto &table = (isAc ? _acHuff : _dcHuff)[id].emplace();
 
         usize sum = 0;
         for (usize i = 1; i < 17; ++i) {
@@ -333,7 +303,7 @@ Res<> Decoder::decodeHuffman(Io::BScan &s) {
 
     Array<isize, 3> prevDc = {};
 
-    BitStream bs{s};
+    BitReader bs{s};
 
     for (usize i = 0; i < _mcus.len(); ++i) {
         Mcu &mcu = _mcus[i];
@@ -429,160 +399,6 @@ Res<> Decoder::decodeHuffman(Io::BScan &s) {
     return Ok();
 }
 
-void Decoder::idct(Array<short, 64> &mcu) {
-    f32 m0 = 2.0 * Math::cos(1.0 / 16.0 * 2.0 * Math::PI);
-    f32 m1 = 2.0 * Math::cos(2.0 / 16.0 * 2.0 * Math::PI);
-    f32 m3 = 2.0 * Math::cos(2.0 / 16.0 * 2.0 * Math::PI);
-    f32 m5 = 2.0 * Math::cos(3.0 / 16.0 * 2.0 * Math::PI);
-    f32 m2 = m0 - m5;
-    f32 m4 = m0 + m5;
-
-    f32 s0 = Math::cos(0.0 / 16.0 * Math::PI) / Math::sqrt(8.0);
-    f32 s1 = Math::cos(1.0 / 16.0 * Math::PI) / 2.0;
-    f32 s2 = Math::cos(2.0 / 16.0 * Math::PI) / 2.0;
-    f32 s3 = Math::cos(3.0 / 16.0 * Math::PI) / 2.0;
-    f32 s4 = Math::cos(4.0 / 16.0 * Math::PI) / 2.0;
-    f32 s5 = Math::cos(5.0 / 16.0 * Math::PI) / 2.0;
-    f32 s6 = Math::cos(6.0 / 16.0 * Math::PI) / 2.0;
-    f32 s7 = Math::cos(7.0 / 16.0 * Math::PI) / 2.0;
-
-    for (usize i = 0; i < 8; ++i) {
-        f32 g0 = mcu[0 * 8 + i] * s0;
-        f32 g1 = mcu[4 * 8 + i] * s4;
-        f32 g2 = mcu[2 * 8 + i] * s2;
-        f32 g3 = mcu[6 * 8 + i] * s6;
-        f32 g4 = mcu[5 * 8 + i] * s5;
-        f32 g5 = mcu[1 * 8 + i] * s1;
-        f32 g6 = mcu[7 * 8 + i] * s7;
-        f32 g7 = mcu[3 * 8 + i] * s3;
-
-        f32 f0 = g0;
-        f32 f1 = g1;
-        f32 f2 = g2;
-        f32 f3 = g3;
-        f32 f4 = g4 - g7;
-        f32 f5 = g5 + g6;
-        f32 f6 = g5 - g6;
-        f32 f7 = g4 + g7;
-
-        f32 e0 = f0;
-        f32 e1 = f1;
-        f32 e2 = f2 - f3;
-        f32 e3 = f2 + f3;
-        f32 e4 = f4;
-        f32 e5 = f5 - f7;
-        f32 e6 = f6;
-        f32 e7 = f5 + f7;
-        f32 e8 = f4 + f6;
-
-        f32 d0 = e0;
-        f32 d1 = e1;
-        f32 d2 = e2 * m1;
-        f32 d3 = e3;
-        f32 d4 = e4 * m2;
-        f32 d5 = e5 * m3;
-        f32 d6 = e6 * m4;
-        f32 d7 = e7;
-        f32 d8 = e8 * m5;
-
-        f32 c0 = d0 + d1;
-        f32 c1 = d0 - d1;
-        f32 c2 = d2 - d3;
-        f32 c3 = d3;
-        f32 c4 = d4 + d8;
-        f32 c5 = d5 + d7;
-        f32 c6 = d6 - d8;
-        f32 c7 = d7;
-        f32 c8 = c5 - c6;
-
-        f32 b0 = c0 + c3;
-        f32 b1 = c1 + c2;
-        f32 b2 = c1 - c2;
-        f32 b3 = c0 - c3;
-        f32 b4 = c4 - c8;
-        f32 b5 = c8;
-        f32 b6 = c6 - c7;
-        f32 b7 = c7;
-
-        mcu[0 * 8 + i] = b0 + b7;
-        mcu[1 * 8 + i] = b1 + b6;
-        mcu[2 * 8 + i] = b2 + b5;
-        mcu[3 * 8 + i] = b3 + b4;
-        mcu[4 * 8 + i] = b3 - b4;
-        mcu[5 * 8 + i] = b2 - b5;
-        mcu[6 * 8 + i] = b1 - b6;
-        mcu[7 * 8 + i] = b0 - b7;
-    }
-
-    for (usize i = 0; i < 8; ++i) {
-        f32 g0 = mcu[i * 8 + 0] * s0;
-        f32 g1 = mcu[i * 8 + 4] * s4;
-        f32 g2 = mcu[i * 8 + 2] * s2;
-        f32 g3 = mcu[i * 8 + 6] * s6;
-        f32 g4 = mcu[i * 8 + 5] * s5;
-        f32 g5 = mcu[i * 8 + 1] * s1;
-        f32 g6 = mcu[i * 8 + 7] * s7;
-        f32 g7 = mcu[i * 8 + 3] * s3;
-
-        f32 f0 = g0;
-        f32 f1 = g1;
-        f32 f2 = g2;
-        f32 f3 = g3;
-        f32 f4 = g4 - g7;
-        f32 f5 = g5 + g6;
-        f32 f6 = g5 - g6;
-        f32 f7 = g4 + g7;
-
-        f32 e0 = f0;
-        f32 e1 = f1;
-        f32 e2 = f2 - f3;
-        f32 e3 = f2 + f3;
-        f32 e4 = f4;
-        f32 e5 = f5 - f7;
-        f32 e6 = f6;
-        f32 e7 = f5 + f7;
-        f32 e8 = f4 + f6;
-
-        f32 d0 = e0;
-        f32 d1 = e1;
-        f32 d2 = e2 * m1;
-        f32 d3 = e3;
-        f32 d4 = e4 * m2;
-        f32 d5 = e5 * m3;
-        f32 d6 = e6 * m4;
-        f32 d7 = e7;
-        f32 d8 = e8 * m5;
-
-        f32 c0 = d0 + d1;
-        f32 c1 = d0 - d1;
-        f32 c2 = d2 - d3;
-        f32 c3 = d3;
-        f32 c4 = d4 + d8;
-        f32 c5 = d5 + d7;
-        f32 c6 = d6 - d8;
-        f32 c7 = d7;
-        f32 c8 = c5 - c6;
-
-        f32 b0 = c0 + c3;
-        f32 b1 = c1 + c2;
-        f32 b2 = c1 - c2;
-        f32 b3 = c0 - c3;
-        f32 b4 = c4 - c8;
-        f32 b5 = c8;
-        f32 b6 = c6 - c7;
-        f32 b7 = c7;
-
-        mcu[i * 8 + 0] = b0 + b7;
-        mcu[i * 8 + 1] = b1 + b6;
-        mcu[i * 8 + 2] = b2 + b5;
-        mcu[i * 8 + 3] = b3 + b4;
-        mcu[i * 8 + 4] = b3 - b4;
-        mcu[i * 8 + 5] = b2 - b5;
-        mcu[i * 8 + 6] = b1 - b6;
-        mcu[i * 8 + 7] = b0 - b7;
-    }
-}
-
 Res<> Decoder::decode(Gfx::MutPixels pixels) {
     for (usize i = 0; i < _mcus.len(); i += _componentCount) {
         usize x = (i / _componentCount) % mcuWidth();
@@ -597,10 +413,7 @@ Res<> Decoder::decode(Gfx::MutPixels pixels) {
             }
 
             auto &quant = _quant[_components[j]->quantId].unwrap();
-            for (usize k = 0; k < 64; k++) {
-                mcu[k] *= quant[k];
-            }
-
+            dequantize(mcu, quant);
             idct(mcu);
         }
 

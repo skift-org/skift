@@ -167,7 +167,20 @@ Color hsvToRgb(Hsv hsv);
 struct YCbCr {
     f32 y, cb, cr;
 
-    auto operator<=>(YCbCr const &other) const = default;
+    always_inline f32 operator[](usize i) const {
+        switch (i) {
+        case 0:
+            return y;
+        case 1:
+            return cb;
+        case 2:
+            return cr;
+        default:
+            return 0;
+        }
+    }
+
+    always_inline auto operator<=>(YCbCr const &other) const = default;
 
     void repr(Io::Emit &e) const {
         e("(ycbcr {} {} {})", y, cb, cr);

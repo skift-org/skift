@@ -1,3 +1,10 @@
 #!/usr/bin/env bash
 
-brew install nasm llvm sdl2 python3 ninja libmagic pkg-config
+if ! command -v brew &> /dev/null
+then
+    echo "Homebrew is not installed. Please install Homebrew first."
+    echo '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+    exit 1
+fi
+
+brew install libmagic lld llvm nasm ninja pkg-config python3 qemu sdl2

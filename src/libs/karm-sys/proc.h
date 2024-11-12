@@ -14,4 +14,10 @@ inline Res<> sleepUntil(TimeStamp until) {
     return _Embed::sleepUntil(until);
 }
 
+// MARK: Sandboxing ------------------------------------------------------------
+
+void enterSandbox();
+
+Res<> ensureUnrestricted();
+
 } // namespace Karm::Sys

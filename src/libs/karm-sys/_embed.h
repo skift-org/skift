@@ -89,6 +89,10 @@ Res<> sleepUntil(TimeStamp);
 
 Res<> exit(i32);
 
+// MARK: Sandboxing ------------------------------------------------------------
+
+void hardenSandbox();
+
 // MARK: Asynchronous I/O ------------------------------------------------------
 
 Sched &globalSched();

@@ -16,7 +16,7 @@ static Res<> _encodeMcu(
     i16 coeff = mcu[0] - previousDC;
     previousDC = mcu[0];
 
-    usize coeffLength = bitLength(abs(coeff));
+    usize coeffLength = bitLength(Math::abs(coeff));
     if (coeffLength > 11) {
         return Error::invalidData("dc coefficient length exceeds 11 bits");
     }
@@ -59,7 +59,7 @@ static Res<> _encodeMcu(
 
         // find coeff length
         coeff = mcu[ZIGZAG[i]];
-        coeffLength = bitLength(abs(coeff));
+        coeffLength = bitLength(Math::abs(coeff));
         if (coeffLength > 10) {
             return Error::invalidData("ac coefficient length exceeds 10 bits");
         }

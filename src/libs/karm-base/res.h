@@ -63,28 +63,28 @@ struct [[nodiscard]] Res {
         return _inner.template is<Ok<V>>();
     }
 
-    always_inline constexpr E const &none() const {
+    always_inline constexpr E const &none() const lifetimebound {
         if (not _inner.template is<E>()) [[unlikely]]
             panic("none() called on an ok");
 
         return _inner.template unwrap<E>();
     }
 
-    always_inline constexpr V &unwrap(char const *msg = "unwraping an error") {
+    always_inline constexpr V &unwrap(char const *msg = "unwraping an error") lifetimebound {
         if (not _inner.template is<Ok<V>>()) [[unlikely]]
             panic(msg);
 
         return _inner.template unwrap<Ok<V>>().inner;
     }
 
-    always_inline constexpr V const &unwrap(char const *msg = "unwraping an error") const {
+    always_inline constexpr V const &unwrap(char const *msg = "unwraping an error") const lifetimebound {
         if (not _inner.template is<Ok<V>>()) [[unlikely]]
             panic(msg);
 
         return _inner.template unwrap<Ok<V>>().inner;
     }
 
-    always_inline constexpr V const &unwrapOr(V const &other) const {
+    always_inline constexpr V const &unwrapOr(V const &other) const lifetimebound {
         if (_inner.template is<Ok<V>>())
             return _inner.template unwrap<Ok<V>>().inner;
         return other;

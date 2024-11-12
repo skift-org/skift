@@ -124,9 +124,9 @@ struct BufWriter :
     public Seeker {
 
     MutBytes _buf;
-    usize _pos;
+    usize _pos = 0;
 
-    BufWriter(MutBytes buf) : _buf(buf), _pos(0) {}
+    BufWriter(MutBytes buf) : _buf(buf) {}
 
     Res<usize> seek(Seek seek) override {
         _pos = seek.apply(_pos, sizeOf(_buf));

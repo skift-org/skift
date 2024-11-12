@@ -141,28 +141,28 @@ struct [[nodiscard]] Opt {
         return _present;
     }
 
-    always_inline constexpr T *operator->() {
+    always_inline constexpr T *operator->() lifetimebound {
         if (not _present) [[unlikely]]
             panic("unwrapping None");
 
         return &_value;
     }
 
-    always_inline constexpr T &operator*() {
+    always_inline constexpr T &operator*() lifetimebound {
         if (not _present) [[unlikely]]
             panic("unwrapping None");
 
         return _value;
     }
 
-    always_inline constexpr T const *operator->() const {
+    always_inline constexpr T const *operator->() const lifetimebound {
         if (not _present) [[unlikely]]
             panic("unwrapping None");
 
         return &_value;
     }
 
-    always_inline constexpr T const &operator*() const {
+    always_inline constexpr T const &operator*() const lifetimebound {
         if (not _present) [[unlikely]]
             panic("unwrapping None");
 
@@ -170,7 +170,7 @@ struct [[nodiscard]] Opt {
     }
 
     template <typename... Args>
-    always_inline constexpr T &emplace(Args &&...args) {
+    always_inline constexpr T &emplace(Args &&...args) lifetimebound {
         clear();
         _present = true;
         std::construct_at(&_value, std::forward<Args>(args)...);
@@ -188,31 +188,31 @@ struct [[nodiscard]] Opt {
         return NONE;
     }
 
-    always_inline constexpr T &unwrap(char const *msg = "unwraping none") {
+    always_inline constexpr T &unwrap(char const *msg = "unwraping none") lifetimebound {
         if (not _present) [[unlikely]]
             panic(msg);
         return _value;
     }
 
-    always_inline constexpr T const &unwrap(char const *msg = "unwraping none") const {
+    always_inline constexpr T const &unwrap(char const *msg = "unwraping none") const lifetimebound {
         if (not _present) [[unlikely]]
             panic(msg);
         return _value;
     }
 
-    always_inline constexpr T const &unwrapOr(T const &other) const {
+    always_inline constexpr T const &unwrapOr(T const &other) const lifetimebound {
         if (_present)
             return _value;
         return other;
     }
 
-    always_inline constexpr T unwrapOrDefault(T other) const {
+    always_inline constexpr T unwrapOrDefault(T other) const lifetimebound {
         if (_present)
             return _value;
         return other;
     }
 
-    always_inline constexpr T unwrapOrElse(auto f) const {
+    always_inline constexpr T unwrapOrElse(auto f) const lifetimebound {
         if (_present)
             return _value;
         return f();

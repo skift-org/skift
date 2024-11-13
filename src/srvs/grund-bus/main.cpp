@@ -15,6 +15,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
 
     auto system = co_try$(Bus::create(ctx));
 
+    co_try$(system->attach(makeStrong<Locator>()));
     co_try$(system->startService("grund-av"s));
     co_try$(system->startService("grund-conf"s));
     co_try$(system->startService("grund-device"s));

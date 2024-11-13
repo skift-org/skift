@@ -1,6 +1,7 @@
 #pragma once
 
 #include <hjert-api/api.h>
+#include <karm-logger/logger.h>
 #include <karm-sys/fd.h>
 
 namespace Skift {

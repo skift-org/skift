@@ -21,7 +21,11 @@ struct Range {
 
     constexpr Range() = default;
 
-    constexpr Range(T start, Size size = {})
+    explicit constexpr Range(T start)
+        : start(start), size(0) {
+    }
+
+    constexpr Range(T start, Size size)
         : start(start), size(size) {
     }
 

@@ -26,7 +26,11 @@ struct Endpoint : public Meta::Static {
 
     void attach(Bus &bus) { _bus = &bus; }
 
-    virtual Res<> dispatch(Sys::Message &) { return Ok(); }
+    Res<> dispatch(Sys::Message &msg);
+
+    virtual Str id() const = 0;
+
+    virtual Res<> send(Sys::Message &) { return Ok(); }
 
     virtual Res<> activate(Sys::Context &) { return Ok(); }
 };
@@ -43,11 +47,21 @@ struct Service : public Endpoint {
         : _id{id}, _ipc{ipc}, _con{ipc, ""_url} {
     }
 
+    Str id() const override { return _id; }
+
     Res<> activate(Sys::Context &ctx) override;
 
     Async::Task<> runAsync();
 
-    Res<> dispatch(Sys::Message &msg) override;
+    Res<> send(Sys::Message &msg) override;
+};
+
+struct Locator : public Endpoint {
+    Locator();
+
+    Str id() const override;
+
+    Res<> send(Sys::Message &msg) override;
 };
 
 struct Bus : public Meta::Static {
@@ -62,7 +76,7 @@ struct Bus : public Meta::Static {
 
     Res<> attach(Strong<Endpoint> endpoint);
 
-    Res<> dispatch(Sys::Header &h, Sys::Message &msg);
+    Res<> dispatch(Sys::Message &msg);
 
     Res<> startService(Str id);
 };

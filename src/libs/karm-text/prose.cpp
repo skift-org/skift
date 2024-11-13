@@ -14,8 +14,8 @@ Prose::Prose(ProseStyle style, Str str) : _style(style) {
 
 void Prose::_beginBlock() {
     _blocks.pushBack({
-        .runeRange = _runes.len(),
-        .cellRange = _cells.len(),
+        .runeRange = {_runes.len(), 0},
+        .cellRange = {_cells.len(), 0},
     });
 }
 
@@ -91,7 +91,10 @@ void Prose::_wrapLines(f64 width) {
 
             if (block.newline(*this)) {
                 _lines.pushBack(line);
-                line = {block.runeRange.end(), {i + 1, 0}};
+                line = {
+                    {block.runeRange.end(), 0},
+                    {i + 1, 0},
+                };
                 adv = 0;
             }
         } else {
@@ -100,7 +103,10 @@ void Prose::_wrapLines(f64 width) {
 
             if (block.newline(*this) and _style.multiline) {
                 _lines.pushBack(line);
-                line = {block.runeRange.end(), {i + 1, 0}};
+                line = {
+                    {block.runeRange.end(), 0},
+                    {i + 1, 0},
+                };
                 adv = 0;
             } else {
                 adv += block.width;

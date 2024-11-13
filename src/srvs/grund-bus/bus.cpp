@@ -3,6 +3,7 @@
 #include <karm-base/size.h>
 #include <karm-logger/logger.h>
 
+#include "api.h"
 #include "bus.h"
 
 namespace Grund::Bus {
@@ -10,11 +11,16 @@ namespace Grund::Bus {
 static constexpr bool DEBUG_TASK = false;
 static constexpr bool DEBUG_ELF = false;
 
+// MARK: Endpoint --------------------------------------------------------------
+
+Res<> Endpoint::dispatch(Sys::Message &msg) {
+    msg.header().from = _port;
+    return _bus->dispatch(msg);
+}
+
 // MARK: Service ---------------------------------------------------------------
 
 Res<Strong<Service>> Service::prepare(Sys::Context &, Str id) {
-    logInfo("prepare service '{}'", id);
-
     auto in = try$(Hj::Channel::create(Hj::Domain::self(), 4096, 16));
     try$(in.label(Io::format("{}-in", id).unwrap()));
 
@@ -108,25 +114,51 @@ Res<> Service::activate(Sys::Context &ctx) {
 }
 
 Async::Task<> Service::runAsync() {
-    logDebug("Listening for messages on service '{}'...", _id);
     while (true) {
         auto msg = co_trya$(Sys::ipcRecvAsync(_con));
 
-        logDebug("Received message on service '{}'", _id);
+        logDebug("Received message on service '{}' {}", _id, msg.header());
 
-        auto maybeHeader = msg.header();
-        if (not maybeHeader)
-            continue;
-        auto &header = maybeHeader.unwrap();
-        auto res = _bus->dispatch(maybeHeader.unwrap(), msg);
+        auto res = dispatch(msg);
         if (not res)
-            co_try$(Sys::ipcSend<Error>(_con, header.port, header.seq, res.none()));
+            co_try$(Sys::ipcSend<Error>(_con, port(), msg.header().seq, res.none()));
     }
 }
 
-Res<> Service::dispatch(Sys::Message &msg) {
+Res<> Service::send(Sys::Message &msg) {
     logDebug("Dispatching message on service '{}'", _id);
-    return _con.send(sub(msg.bytes, msg.len), sub(msg.handles, msg.handlesLen));
+    return _con.send(
+        msg.bytes(),
+        msg.handles()
+    );
+}
+
+// MARK: Locator ---------------------------------------------------------------
+
+Locator::Locator() {
+    _port = Sys::Port::BUS;
+}
+
+Str Locator::id() const {
+    return "grund-bus";
+}
+
+Res<> Locator::send(Sys::Message &msg) {
+    if (msg.is<Locate>()) {
+        auto locate = try$(msg.unpack<Locate>());
+        logDebug("looking for {#}", locate.id);
+        for (auto &endpoint : _bus->_endpoints) {
+            if (endpoint->id() == locate.id) {
+                auto resp = try$(msg.packResp<Locate>(endpoint->port()));
+                try$(dispatch(resp));
+                return Ok();
+            }
+        }
+
+        return Error::notFound("service not found");
+    }
+
+    return Error::invalidInput("invalid message");
 }
 
 // MARK: Bus -------------------------------------------------------------------
@@ -148,11 +180,11 @@ Karm::Res<> Bus::attach(Strong<Endpoint> endpoint) {
     return Ok();
 }
 
-Res<> Bus::dispatch(Sys::Header &h, Sys::Message &msg) {
-    logDebug("dispatching message to {}", h.port);
+Res<> Bus::dispatch(Sys::Message &msg) {
+    logDebug("dispatching message from {p} to {p}", msg.header().from, msg.header().to);
     for (auto &endpoint : _endpoints) {
-        if (endpoint->port() == h.port)
-            return endpoint->dispatch(msg);
+        if (endpoint->port() == msg.header().to)
+            return endpoint->send(msg);
     }
     return Error::notFound("service not found");
 }

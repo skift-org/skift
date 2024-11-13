@@ -91,7 +91,7 @@ Glyph FontFamily::glyph(Rune rune) {
 
     for (usize i = 0; i < _members.len(); i++) {
         auto &member = _members[i];
-        if (member.ranges and not member.ranges->contains(rune)) {
+        if (member.ranges and not member.ranges->contains({rune, 1})) {
             continue;
         }
 

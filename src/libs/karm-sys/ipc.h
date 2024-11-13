@@ -35,40 +35,109 @@ struct Port : public Distinct<u64, struct _PortTag> {
 };
 
 constexpr Port Port::INVALID{0};
-constexpr Port Port::BUS{1};
+constexpr Port Port::BUS{Limits<u64>::MAX};
 
 struct Header {
     u64 seq;
-    Port port;
+    Port from;
+    Port to;
     Meta::Id mid;
 
     void repr(Io::Emit &e) const {
-        e("(header seq: {}, port: {}, mid: {:016x})", seq, port, mid);
+        e("(header seq: {}, from: {}, to: {}, mid: {:016x})", seq, from, to, mid);
     }
 };
 
-struct Message {
-    Array<u8, 4096> bytes;
-    usize len;
-    Array<Sys::Handle, 16> handles;
-    usize handlesLen;
+static_assert(Meta::TrivialyCopyable<Header>);
 
-    Res<Header> header() const {
-        Io::PackScan s{bytes, handles};
-        return Io::unpack<Header>(s);
+struct Message {
+    static constexpr usize CAP = 4096;
+
+    union {
+        struct {
+            Header _header;
+            Array<u8, CAP - sizeof(Header)> _payload;
+        };
+
+        Array<u8, CAP> _buf;
+    };
+
+    usize _len = 0;
+
+    Array<Sys::Handle, 16> _hnds;
+    usize _hndsLen = 0;
+
+    Header &header() {
+        return _header;
+    }
+
+    Header const &header() const {
+        return _header;
+    }
+
+    usize len() const {
+        return _len;
+    }
+
+    Bytes bytes() {
+        return sub(_buf, 0, len());
+    }
+
+    Slice<Handle> handles() {
+        return sub(_hnds, 0, _hndsLen);
     }
 
     template <typename T>
     bool is() const {
-        auto maybeHeader = header();
-        if (not maybeHeader)
-            return false;
-        return maybeHeader.unwrap().mid == Meta::idOf<T>();
+        return _header.mid == Meta::idOf<T>();
+    }
+
+    template <typename T, typename... Args>
+    static Res<Message> packReq(Port to, u64 seq, Args &&...args) {
+        T payload{std::forward<Args>(args)...};
+
+        Message msg;
+        msg._header = {
+            seq,
+            Port::INVALID,
+            to,
+            Meta::idOf<T>(),
+        };
+        Io::BufWriter reqBuf{msg._payload};
+        Io::PackEmit reqPack{reqBuf};
+
+        try$(Io::pack(reqPack, payload));
+
+        msg._len = try$(Io::tell(reqBuf)) + sizeof(Header);
+
+        return Ok(std::move(msg));
+    }
+
+    template <typename T, typename... Args>
+    Res<Message> packResp(Args &&...args) {
+        typename T::Response payload{std::forward<Args>(args)...};
+
+        Message resp;
+        resp._header = {
+            header().seq,
+            header().to,
+            header().from,
+            Meta::idOf<T>(),
+        };
+
+        Io::BufWriter respBuf{resp._payload};
+        Io::PackEmit respPack{respBuf};
+
+        try$(Io::pack(respPack, payload));
+
+        resp._len = try$(Io::tell(respBuf)) + sizeof(Header);
+
+        return Ok(std::move(resp));
     }
 
     template <typename T>
     Res<T> unpack() {
-        Io::PackScan s{bytes, handles};
+        Io::PackScan s{_buf, _hnds};
         if (not is<T>())
             return Error::invalidData("unexpected message");
         try$(Io::unpack<Header>(s));
@@ -79,22 +148,25 @@ struct Message {
 // MARK: Primitive Operations --------------------------------------------------
 
 template <typename T, typename... Args>
-Res<> ipcSend(Sys::IpcConnection &con, Port port, u64 seq, Args &&...args) {
-    Header header{seq, port, Meta::idOf<T>()};
-    T msg{std::forward<Args>(args)...};
+Res<> ipcSend(Sys::IpcConnection &con, Port to, u64 seq, Args &&...args) {
+    Message msg = Message::packReq<T>(to, seq, std::forward<Args>(args)...).take();
 
-    Io::BufferWriter reqBuf;
-    Io::PackEmit reqPack{reqBuf};
-
-    try$(Io::pack(reqPack, header));
-    try$(Io::pack(reqPack, msg));
-
-    try$(con.send(reqBuf.bytes(), reqPack.handles()));
-
+    logDebug("ipcSend : {}, len: {}", msg.header(), msg.len());
+    try$(con.send(msg.bytes(), msg.handles()));
     return Ok();
 }
 
-Async::Task<Message> ipcRecvAsync(Sys::IpcConnection &con);
+static inline Async::Task<Message> ipcRecvAsync(Sys::IpcConnection &con) {
+    Message msg;
+    auto [bufLen, hndsLen] = co_trya$(con.recvAsync(msg._buf, msg._hnds));
+    if (bufLen < sizeof(Header))
+        co_return Error::invalidData("invalid message");
+    msg._len = bufLen;
+    msg._hndsLen = hndsLen;
+
+    logDebug("ipcRecv: {}, len: {}", msg.header(), msg.len());
+    co_return msg;
+}
 
 // MARK: Ipc -------------------------------------------------------------------
 
@@ -126,15 +198,11 @@ struct Ipc {
         while (true) {
             Message msg = co_trya$(ipcRecvAsync(_con));
 
-            auto maybeHeader = msg.header();
-            if (not maybeHeader) {
-                logWarn("dropping message: {}", maybeHeader.none().msg());
-                continue;
-            }
+            auto header = msg._header;
 
-            if (_pending.has(maybeHeader.unwrap().seq)) {
-                auto promise = _pending.take(maybeHeader.unwrap().seq);
-                promise.resolve(msg);
+            if (_pending.has(header.seq)) {
+                auto promise = _pending.take(header.seq);
+                promise.resolve(std::move(msg));
                 continue;
             }
 
@@ -144,11 +212,10 @@ struct Ipc {
 
     template <typename T>
     Res<> resp(Message &msg, Res<typename T::Response> message) {
-        auto header = try$(msg.header());
+        auto header = msg._header;
         if (not message)
-            return ipcSend<Error>(_con, header.port, header.seq, message.none());
-
-        return ipcSend<typename T::Response>(_con, header.port, header.seq, message.take());
+            return ipcSend<Error>(_con, header.from, header.seq, message.none());
+        return ipcSend<typename T::Response>(_con, header.from, header.seq, message.take());
     }
 
     template <typename T, typename... Args>

@@ -78,7 +78,7 @@ struct ScaleIn : public ProxyNode<ScaleIn> {
     }
 
     Math::Vec2f scale() {
-        return {_scale.value(), _scale.value()};
+        return Math::Vec2f{0.9} + Math::Vec2f{_scale.value() * 0.1};
     }
 
     void paint(Gfx::Canvas &g, Math::Recti r) override {
@@ -101,7 +101,6 @@ struct ScaleIn : public ProxyNode<ScaleIn> {
 
     void attach(Node *parent) override {
         Ui::ProxyNode<ScaleIn>::attach(parent);
-        _scale.set(*this, 0.9);
         _scale.animate(*this, 1.0, 0.25, Math::Easing::cubicOut);
     }
 };

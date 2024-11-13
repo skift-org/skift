@@ -80,7 +80,11 @@ Ui::Child dateAndTime(State const &state) {
            ) |
            Ui::center() |
            Ui::bound() |
-           Ui::button(Ui::NOP, Ui::ButtonStyle::subtle().withPadding({12, 0}));
+           Ui::button(
+               Ui::NOP,
+               Ui::ButtonStyle::subtle()
+                   .withPadding({0, 12})
+           );
 }
 
 Ui::Child quickheader(State const &state) {

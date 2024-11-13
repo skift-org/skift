@@ -31,7 +31,7 @@ void reduce(State &s, Action a) {
         [&](StartInstance start) {
             auto instance = makeStrong<Instance>(
                 0,
-                Math::Recti{0, 0, 400, 300},
+                Math::Recti{100, 100, 600, 400},
                 Gfx::randomColor(),
                 s.manifests[start.index]
             );

@@ -79,7 +79,7 @@ Ui::Child runningApp(Instance const &, usize i) {
                    Ui::button(Model::bind<FocusInstance>(i)),
                Ui::button(Model::bind<CloseInstance>(i), Ui::ButtonStyle::secondary(), Mdi::CLOSE) |
                    Ui::align(Math::Align::TOP_END) |
-                   Ui::insets({0, 6, 6, 0})
+                   Ui::insets({6, 6, 0, 0})
            ) |
            Ui::pinSize({120, 192});
 }

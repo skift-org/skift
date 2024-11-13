@@ -257,6 +257,11 @@ Res<Str> repoRoot() {
     if (not maybeRepo)
         maybeRepo = getenv("SKIFT_BUNDLES");
 
+#ifdef __ck_prefix__
+    if (not maybeRepo)
+        maybeRepo = __ck_prefix__;
+#endif
+
     if (not maybeRepo)
         return Error::notFound("SKIFT_BUNDLES not set");
 

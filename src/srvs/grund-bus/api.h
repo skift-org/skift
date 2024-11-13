@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-base/string.h>
-#include <karm-sys/ipc.h>
+#include <karm-sys/rpc.h>
 
 namespace Grund::Bus {
 

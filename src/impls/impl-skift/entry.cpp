@@ -4,7 +4,7 @@
 #include <karm-base/panic.h>
 #include <karm-logger/logger.h>
 #include <karm-sys/context.h>
-#include <karm-sys/ipc.h>
+#include <karm-sys/rpc.h>
 
 #include "fd.h"
 

@@ -1,17 +1,17 @@
 #include <karm-sys/entry.h>
-#include <karm-sys/ipc.h>
+#include <karm-sys/rpc.h>
 
 #include "api.h"
 
 namespace Grund::Echo {
 
 Async::Task<> serv(Sys::Context &ctx) {
-    Sys::Ipc ipc = Sys::Ipc::create(ctx);
+    auto rpc = Sys::Rpc::create(ctx);
     while (true) {
-        auto msg = co_trya$(ipc.recvAsync());
+        auto msg = co_trya$(rpc.recvAsync());
         if (msg.is<Echo::Request>()) {
             auto req = co_try$(msg.unpack<Echo::Request>());
-            co_try$(ipc.resp<Echo::Request>(msg, Ok(req.msg)));
+            co_try$(rpc.resp<Echo::Request>(msg, Ok(req.msg)));
         }
     }
 

@@ -148,15 +148,15 @@ struct Message {
 // MARK: Primitive Operations --------------------------------------------------
 
 template <typename T, typename... Args>
-Res<> ipcSend(Sys::IpcConnection &con, Port to, u64 seq, Args &&...args) {
+Res<> rpcSend(Sys::IpcConnection &con, Port to, u64 seq, Args &&...args) {
     Message msg = Message::packReq<T>(to, seq, std::forward<Args>(args)...).take();
 
-    logDebug("ipcSend : {}, len: {}", msg.header(), msg.len());
+    logDebug("rpcSend : {}, len: {}", msg.header(), msg.len());
     try$(con.send(msg.bytes(), msg.handles()));
     return Ok();
 }
 
-static inline Async::Task<Message> ipcRecvAsync(Sys::IpcConnection &con) {
+static inline Async::Task<Message> rpcRecvAsync(Sys::IpcConnection &con) {
     Message msg;
     auto [bufLen, hndsLen] = co_trya$(con.recvAsync(msg._buf, msg._hnds));
     if (bufLen < sizeof(Header))
@@ -164,26 +164,26 @@ static inline Async::Task<Message> ipcRecvAsync(Sys::IpcConnection &con) {
     msg._len = bufLen;
     msg._hndsLen = hndsLen;
 
-    logDebug("ipcRecv: {}, len: {}", msg.header(), msg.len());
+    logDebug("rpcRecv: {}, len: {}", msg.header(), msg.len());
     co_return msg;
 }
 
-// MARK: Ipc -------------------------------------------------------------------
+// MARK: Rpc -------------------------------------------------------------------
 
-struct Ipc {
+struct Rpc {
     Sys::IpcConnection _con;
     bool _receiving = false;
     Map<u64, Async::_Promise<Message>> _pending{};
     u64 _seq = 1;
 
-    static Ipc create(Sys::Context &ctx) {
+    static Rpc create(Sys::Context &ctx) {
         auto &channel = useChannel(ctx);
-        return Ipc{std::move(channel.con)};
+        return Rpc{std::move(channel.con)};
     }
 
     template <typename T, typename... Args>
     Res<> send(Port port, Args &&...args) {
-        return ipcSend<T>(_con, port, _seq++, std::forward<Args>(args)...);
+        return rpcSend<T>(_con, port, _seq++, std::forward<Args>(args)...);
     }
 
     Async::Task<Message> recvAsync() {
@@ -196,7 +196,7 @@ struct Ipc {
         }};
 
         while (true) {
-            Message msg = co_trya$(ipcRecvAsync(_con));
+            Message msg = co_trya$(rpcRecvAsync(_con));
 
             auto header = msg._header;
 
@@ -214,8 +214,8 @@ struct Ipc {
     Res<> resp(Message &msg, Res<typename T::Response> message) {
         auto header = msg._header;
         if (not message)
-            return ipcSend<Error>(_con, header.from, header.seq, message.none());
-        return ipcSend<typename T::Response>(_con, header.from, header.seq, message.take());
+            return rpcSend<Error>(_con, header.from, header.seq, message.none());
+        return rpcSend<typename T::Response>(_con, header.from, header.seq, message.take());
     }
 
     template <typename T, typename... Args>
@@ -226,7 +226,7 @@ struct Ipc {
 
         _pending.put(seq, std::move(promise));
 
-        co_try$(ipcSend<T>(_con, port, seq, std::forward<Args>(args)...));
+        co_try$(rpcSend<T>(_con, port, seq, std::forward<Args>(args)...));
 
         Message msg = co_await future;
 

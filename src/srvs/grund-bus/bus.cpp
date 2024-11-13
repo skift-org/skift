@@ -115,13 +115,13 @@ Res<> Service::activate(Sys::Context &ctx) {
 
 Async::Task<> Service::runAsync() {
     while (true) {
-        auto msg = co_trya$(Sys::ipcRecvAsync(_con));
+        auto msg = co_trya$(Sys::rpcRecvAsync(_con));
 
         logDebug("Received message on service '{}' {}", _id, msg.header());
 
         auto res = dispatch(msg);
         if (not res)
-            co_try$(Sys::ipcSend<Error>(_con, port(), msg.header().seq, res.none()));
+            co_try$(Sys::rpcSend<Error>(_con, port(), msg.header().seq, res.none()));
     }
 }
 

@@ -5,7 +5,7 @@
 #include <karm-logger/logger.h>
 #include <karm-mime/url.h>
 #include <karm-sys/context.h>
-#include <karm-sys/ipc.h>
+#include <karm-sys/rpc.h>
 
 namespace Grund::Bus {
 

@@ -13,8 +13,6 @@
 #include <vaev-markup/html.h>
 #include <vaev-markup/xml.h>
 
-#include "inspector.h"
-
 namespace Vaev::Tools {
 
 Res<> cssDumpStylesheet(Mime::Url const &url) {
@@ -452,27 +450,6 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
             co_return Vaev::Tools::render(inputUrl, *input, *output, options);
         }
     );
-
-    auto &inspectorCmd = cmd.subCommand(
-        "inspect"s,
-        'i',
-        "View a document in the inspector for debugging"s,
-        {inputArg}
-    );
-
-    Ui::mountApp(inspectorCmd, [inputArg] -> Ui::Child {
-        if (inputArg.unwrap() == "-"s) {
-            auto input = Mime::parseUrlOrPath(inputArg).unwrap();
-            auto dom = Vaev::Driver::loadDocument(
-                "about:stdin"_url, "application/xhtml+xml"_mime, Sys::in()
-            );
-            return Vaev::Tools::inspector(input, dom);
-        }
-
-        auto input = Mime::parseUrlOrPath(inputArg).unwrap();
-        auto dom = Vaev::Driver::fetchDocument(input);
-        return Vaev::Tools::inspector(input, dom);
-    });
 
     co_return co_await cmd.execAsync(ctx);
 }

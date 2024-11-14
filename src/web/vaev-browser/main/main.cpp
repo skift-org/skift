@@ -14,6 +14,6 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
 
     co_return Ui::runApp(
         ctx,
-        Hideo::Browser::app(url, dom)
+        Vaev::Browser::app(url, dom)
     );
 }

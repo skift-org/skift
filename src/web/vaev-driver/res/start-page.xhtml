@@ -4,11 +4,98 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Start Page</title>
+    <title>New Tab</title>
 </head>
 
+
 <body>
-    Hello, world!
+    <div class="search-container">
+        <div class="search-bar">
+            Search or type a URL…
+        </div>
+
+        <div class="recent">
+            <div class="recent-item">
+                <div class="recent-icon">S</div>
+                Search
+            </div>
+
+            <div class="recent-item">
+                <div class="recent-icon">V</div>
+                Video
+            </div>
+
+            <div class="recent-item">
+                <div class="recent-icon">S</div>
+                Social
+            </div>
+
+            <div class="recent-item">
+                <div class="recent-icon">E</div>
+                Email
+            </div>
+        </div>
+    </div>
 </body>
+<style>
+    body {
+        margin: 0;
+        font-family: sans-serif;
+        background-color: #09090b;
+        height: 100vh;
+        color: #fff;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .search-bar {
+        background-color: #18181b;
+        border: 1px solid #3f3f46;
+        border-radius: 99px;
+        color: #71717a;
+        padding: 1rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        font-size: 1.2rem;
+    }
+
+    .search-container {
+        display: flex;
+        flex-direction: column;
+        width: 60%;
+    }
+
+    .recent {
+        display: flex;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+
+    .recent-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem;
+        font-size: 1rem;
+
+        color: #a1a1aa;
+    }
+
+    .recent-icon {
+        background-color: #52525b;
+        color: #a1a1aa;
+        border-radius: 99px;
+        margin-bottom: 1em;
+        width: 3rem;
+        height: 3rem;
+        font-size: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
 
 </html>

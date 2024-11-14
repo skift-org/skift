@@ -723,9 +723,11 @@ struct BorderRadiusBottomLeft {
 
 // https://drafts.csswg.org/css-backgrounds/#the-border-radius
 struct BorderRadius {
-    Math::Radii<PercentOr<Length>> value = {};
+    Math::Radii<PercentOr<Length>> value = initial();
 
     static constexpr Str name() { return "border-radius"; }
+
+    static constexpr Math::Radii<PercentOr<Length>> initial() { return {}; }
 
     void apply(Computed &c) const {
         c.borders.cow().radii = value;

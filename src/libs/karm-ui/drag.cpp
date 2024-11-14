@@ -86,7 +86,10 @@ struct Dismisable :
                 );
 
                 _drag.set(*this, d);
-            } else if (de->type == DragEvent::END) {
+                e.accept();
+            }
+
+            if (de->type == DragEvent::END) {
                 if ((bool)(_dir & DismisDir::HORIZONTAL)) {
                     if (Math::abs(_drag.targetX()) / (f64)bound().width > _threshold) {
                         _drag.animate(*this, {bound().width * (_drag.targetX() < 0.0 ? -1.0 : 1), 0}, 0.25, Math::Easing::cubicOut);
@@ -94,6 +97,7 @@ struct Dismisable :
                     } else {
                         _drag.animate(*this, {0, _drag.targetY()}, 0.25, Math::Easing::exponentialOut);
                     }
+                    e.accept();
                 }
                 if ((bool)(_dir & DismisDir::VERTICAL)) {
                     if (Math::abs(_drag.targetY()) / (f64)bound().height > _threshold) {
@@ -102,11 +106,12 @@ struct Dismisable :
                     } else {
                         _drag.animate(*this, {_drag.targetX(), 0}, 0.25, Math::Easing::exponentialOut);
                     }
+                    e.accept();
                 }
             }
-        } else {
-            Ui::ProxyNode<Dismisable>::bubble(e);
         }
+
+        Ui::ProxyNode<Dismisable>::bubble(e);
     }
 };
 
@@ -118,6 +123,11 @@ Child dismisable(OnDismis onDismis, DismisDir dir, f64 threshold, Ui::Child chil
 
 struct DragRegion : public ProxyNode<DragRegion> {
     bool _grabbed{};
+    Math::Vec2i _dir;
+
+    DragRegion(Child child, Math::Vec2i dir)
+        : ProxyNode(child),
+          _dir(dir) {}
 
     using ProxyNode::ProxyNode;
 
@@ -143,14 +153,14 @@ struct DragRegion : public ProxyNode<DragRegion> {
             bubble<DragEvent>(*this, DragEvent::END);
             event.accept();
         } else if (e->type == App::MouseEvent::MOVE and _grabbed) {
-            bubble<DragEvent>(*this, DragEvent::DRAG, e->delta);
+            bubble<DragEvent>(*this, DragEvent::DRAG, e->delta * _dir);
             event.accept();
         }
     }
 };
 
-Child dragRegion(Child child) {
-    return makeStrong<DragRegion>(child);
+Child dragRegion(Child child, Math::Vec2i dir) {
+    return makeStrong<DragRegion>(child, dir);
 }
 
 // MARK: Handle ----------------------------------------------------------------

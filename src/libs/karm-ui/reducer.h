@@ -179,4 +179,7 @@ inline Child state(auto build) {
     return state<T>({}, std::move(build));
 }
 
+template <typename T>
+using Action = SharedFunc<void(Ui::Node &, T const &)>;
+
 } // namespace Karm::Ui

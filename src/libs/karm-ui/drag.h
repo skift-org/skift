@@ -45,11 +45,11 @@ inline auto dismisable(OnDismis onDismis, DismisDir dir, f64 threshold) {
 
 // MARK: Drag Region -----------------------------------------------------------
 
-Child dragRegion(Child child);
+Child dragRegion(Child child, Math::Vec2i dir = {1, 1});
 
-inline auto dragRegion() {
-    return [](Child child) {
-        return dragRegion(child);
+inline auto dragRegion(Math::Vec2i dir = {1, 1}) {
+    return [dir](Child child) {
+        return dragRegion(child, dir);
     };
 }
 

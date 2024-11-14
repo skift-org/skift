@@ -214,6 +214,10 @@ struct Button : public _Box<Button> {
     }
 
     void event(App::Event &e) override {
+        _Box<Button>::event(e);
+        if (e.accepted())
+            return;
+
         if (_onPress and _mouseListener.listen(*this, e)) {
             _onPress(*this);
         }

@@ -57,7 +57,6 @@ struct MouseListener {
             if (not node.bound().contains(e->pos)) {
                 state = IDLE;
             } else {
-
                 if (state != PRESS) {
                     state = HOVER;
                 }
@@ -71,9 +70,11 @@ struct MouseListener {
 
                 } else if (e->type == App::MouseEvent::RELEASE and
                            e->button == App::MouseButton::LEFT) {
-                    state = HOVER;
-                    result = true;
-                    event.accept();
+                    if (state == PRESS) {
+                        state = HOVER;
+                        result = true;
+                        event.accept();
+                    }
                 }
             }
         } else if (auto e = event.is<App::MouseLeaveEvent>()) {

@@ -30,12 +30,12 @@ Ui::Child sidenavTree(Mdi::Icon icon, String title, Ui::Slot child) {
                         Ui::vcenter() |
                         Ui::grow(),
                     Ui::icon(state ? Mdi::CHEVRON_UP : Mdi::CHEVRON_DOWN, 18)
-                ) | Ui::insets({ 8, 12, 8, 0})
+                ) | Ui::insets({8, 12, 8, 0})
             ),
 
             state
                 ? child() |
-                      Ui::insets({ 0, 0, 0, 32}) |
+                      Ui::insets({0, 0, 0, 32}) |
                       Ui::slideIn(Ui::SlideFrom::TOP)
                 : Ui::empty()
         );
@@ -62,7 +62,7 @@ Ui::Child sidenavItem(bool selected, Ui::OnPress onPress, Mdi::Icon icon, String
         std::move(onPress),
         buttonStyle,
         Ui::insets(
-            { 8, 12, 8, 0},
+            {8, 12, 8, 0},
             hflow(
                 indicator,
                 Ui::empty(8),
@@ -75,7 +75,7 @@ Ui::Child sidenavItem(bool selected, Ui::OnPress onPress, Mdi::Icon icon, String
 }
 
 Ui::Child sidenavTitle(String title) {
-    return Ui::titleMedium(title) | Ui::insets({ 8, 12, 8, 8});
+    return Ui::titleMedium(title) | Ui::insets({8, 12, 8, 8});
 }
 
 } // namespace Karm::Kira

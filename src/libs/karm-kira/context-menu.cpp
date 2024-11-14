@@ -78,6 +78,7 @@ Ui::Child contextMenuItem(Ui::OnPress onPress, Opt<Mdi::Icon> i, Str t) {
 Ui::Child contextMenuDock(Ui::Children children) {
     return Ui::hflow(
                2,
+               Math::Align::CENTER,
                children
            ) |
            Ui::insets(4);

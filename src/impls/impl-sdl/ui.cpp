@@ -1,4 +1,6 @@
 #include <SDL.h>
+#include <karm-image/loader.h>
+#include <karm-pkg/bundle.h>
 #include <karm-ui/drag.h>
 
 #include <karm-ui/_embed.h>
@@ -590,10 +592,35 @@ static SDL_HitTestResult _hitTestCallback(SDL_Window *window, SDL_Point const *a
     return SDL_HITTEST_NORMAL;
 }
 
+static Res<> _setWindowIcon(SDL_Window *window) {
+    auto url = try$(Pkg::currentBundle()).url() / "images/icon.qoi"_path;
+    auto defaultUrl = "bundle://karm-ui/images/icon.qoi"_url;
+    auto image = Image::load(url).unwrapOrElse([&] {
+        return Image::loadOrFallback(defaultUrl).take();
+    });
+
+    auto *surface = SDL_CreateRGBSurface(0, image.width(), image.height(), 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+    if (not surface)
+        return Error::other(SDL_GetError());
+    defer$(SDL_FreeSurface(surface));
+
+    Gfx::MutPixels pixels{
+        surface->pixels,
+        {surface->w, surface->h},
+        (usize)surface->pitch,
+        Gfx::BGRA8888,
+    };
+    blitUnsafe(pixels, image.pixels());
+
+    SDL_SetWindowIcon(window, surface);
+
+    return Ok();
+}
+
 Res<Strong<Host>> makeHost(Child root) {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 
-    auto size = root->size({700, 500}, Hint::MIN);
+    auto size = root->size({1024, 720}, Hint::MIN);
 
     SDL_Window *window = SDL_CreateWindow(
         "Application",
@@ -606,6 +633,10 @@ Res<Strong<Host>> makeHost(Child root) {
 
     if (not window)
         return Error::other(SDL_GetError());
+
+    auto iconRes = _setWindowIcon(window);
+    if (not iconRes)
+        logWarn("could not set window icon: {}", iconRes);
 
     auto host = makeStrong<SdlHost>(root, window);
 

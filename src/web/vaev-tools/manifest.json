@@ -6,6 +6,7 @@
     "requires": [
         "karm-cli",
         "karm-sys",
+        "karm-image",
         "vaev-driver"
     ],
     "provides": [

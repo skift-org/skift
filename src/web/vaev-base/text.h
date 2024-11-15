@@ -1,5 +1,7 @@
 #pragma once
 
+#include <karm-io/emit.h>
+
 namespace Vaev {
 
 // CSS Text Module Level 4
@@ -51,6 +53,14 @@ struct TextProps {
     TextAlign align = TextAlign::START;
     TextTransform transform;
     WhiteSpace whiteSpace = WhiteSpace::NORMAL;
+
+    void repr(Io::Emit &e) const {
+        e("(text");
+        e(" align: {}", align);
+        e(" transform: {}", transform);
+        e(" whiteSpace: {}", whiteSpace);
+        e(")");
+    }
 };
 
 } // namespace Vaev

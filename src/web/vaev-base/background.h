@@ -13,6 +13,8 @@ enum struct BackgroundAttachment {
     SCROLL,
     FIXED,
     LOCAL,
+
+    _LEN
 };
 
 struct BackgroundPosition {
@@ -20,12 +22,16 @@ struct BackgroundPosition {
         LEFT,
         CENTER,
         RIGHT,
+
+        _LEN0
     };
 
     enum struct VerticalPosition {
         TOP,
         CENTER,
         BOTTOM,
+
+        _LEN1
     };
 
     HorizontalAnchor horizontalAnchor;
@@ -59,6 +65,9 @@ struct BackgroundPosition {
         case HorizontalAnchor::RIGHT:
             e("right");
             break;
+
+        default:
+            unreachable();
         }
 
         e(" ");
@@ -73,6 +82,9 @@ struct BackgroundPosition {
         case VerticalPosition::BOTTOM:
             e("bottom");
             break;
+
+        default:
+            unreachable();
         }
 
         e(" ");
@@ -115,6 +127,15 @@ struct BackgroundProps {
     BackgroundAttachment attachment;
     BackgroundPosition position;
     BackgroundRepeat repeat;
+
+    void repr(Io::Emit &e) const {
+        e("(background");
+        e(" fill={}", fill);
+        e(" attachment={}", attachment);
+        e(" position={}", position);
+        e(" repeat={}", repeat);
+        e(")");
+    }
 };
 
 } // namespace Vaev

@@ -113,6 +113,18 @@ struct SizingProps {
     Size const maxSize(Axis axis) const {
         return axis == Axis::HORIZONTAL ? maxWidth : maxHeight;
     }
+
+    void repr(Io::Emit &e) const {
+        e("(sizing");
+        e(" boxSizing={}", boxSizing);
+        e(" width={}", width);
+        e(" height={}", height);
+        e(" minWidth={}", minWidth);
+        e(" minHeight={}", minHeight);
+        e(" maxWidth={}", maxWidth);
+        e(" maxHeight={}", maxHeight);
+        e(")");
+    }
 };
 
 } // namespace Vaev

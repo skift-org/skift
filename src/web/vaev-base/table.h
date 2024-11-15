@@ -38,6 +38,15 @@ struct TableProps {
     CaptionSide captionSide = CaptionSide::TOP;
     BorderSpacing spacing = {0_px, 0_px};
     BorderCollapse collapse = BorderCollapse::SEPARATE;
+
+    void repr(Io::Emit &e) const {
+        e("(table");
+        e(" tableLayout={}", tableLayout);
+        e(" captionSide={}", captionSide);
+        e(" spacing={}", spacing);
+        e(" collapse={}", collapse);
+        e(")");
+    }
 };
 
 } // namespace Vaev

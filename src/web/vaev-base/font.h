@@ -302,6 +302,16 @@ struct FontProps {
     FontWidth width;
     FontStyle style;
     FontSize size;
+
+    void repr(Io::Emit &e) const {
+        e("(font");
+        e(" families={}", families);
+        e(" weight={}", weight);
+        e(" width={}", width);
+        e(" style={}", style);
+        e(" size={}", size);
+        e(")");
+    }
 };
 
 } // namespace Vaev

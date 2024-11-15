@@ -3,14 +3,14 @@
 namespace Vaev {
 
 Opt<Color> parseNamedColor(Str name) {
-    if (name == "transparent")
+    if (eqCi(name, "transparent"s))
         return TRANSPARENT;
 
-    if (name == "currentColor")
+    if (eqCi(name, "currentColor"s))
         return Color::CURRENT;
 
-#define COLOR(ID, NAME, ...) \
-    if (name == #NAME)       \
+#define COLOR(ID, NAME, ...)   \
+    if (eqCi(name, #NAME ""s)) \
         return ID;
 #include "defs/colors.inc"
 #undef COLOR

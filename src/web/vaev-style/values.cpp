@@ -23,11 +23,11 @@ Res<Align> ValueParser<Align>::parse(Cursor<Css::Sst> &c) {
     Align align;
 
     if (c.skip(Css::Token::ident("legacy"))) {
-        align.perfix = Align::Perfix::LEGACY;
+        align.prefix = Align::Prefix::LEGACY;
     } else if (c.skip(Css::Token::ident("safe"))) {
-        align.perfix = Align::Perfix::SAFE;
+        align.prefix = Align::Prefix::SAFE;
     } else if (c.skip(Css::Token::ident("unsafe"))) {
-        align.perfix = Align::Perfix::UNSAFE;
+        align.prefix = Align::Prefix::UNSAFE;
     }
 
     if (c.skip(Css::Token::ident("auto"))) {

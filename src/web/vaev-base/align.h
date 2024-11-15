@@ -6,7 +6,7 @@
 namespace Vaev::Style {
 
 struct [[gnu::packed]] Align {
-    enum Perfix : u8 {
+    enum Prefix : u8 {
         NO_PREFIX,
 
         LEGACY,
@@ -50,23 +50,23 @@ struct [[gnu::packed]] Align {
         _LEN1,
     };
 
-    Perfix perfix : 2;
+    Prefix prefix : 2;
     Keywords keyword : 6;
 
-    constexpr Align() : perfix(NO_PREFIX), keyword(NO_KEYWORD) {}
+    constexpr Align() : prefix(NO_PREFIX), keyword(NO_KEYWORD) {}
 
-    constexpr Align(Perfix perfix) : perfix(perfix), keyword(NO_KEYWORD) {}
+    constexpr Align(Prefix prefix) : prefix(prefix), keyword(NO_KEYWORD) {}
 
-    constexpr Align(Keywords keyword) : perfix(NO_PREFIX), keyword(keyword) {}
+    constexpr Align(Keywords keyword) : prefix(NO_PREFIX), keyword(keyword) {}
 
-    constexpr Align(Perfix perfix, Keywords keyword) : perfix(perfix), keyword(keyword) {}
+    constexpr Align(Prefix prefix, Keywords keyword) : prefix(prefix), keyword(keyword) {}
 
-    bool operator==(Perfix perfix) const { return this->perfix == perfix; }
+    bool operator==(Prefix prefix) const { return this->prefix == prefix; }
 
     bool operator==(Keywords keyword) const { return this->keyword == keyword; }
 
     void repr(Io::Emit &e) const {
-        e("{} {}", perfix, keyword);
+        e("{} {}", prefix, keyword);
     }
 };
 
@@ -88,6 +88,17 @@ struct AlignProps {
 
     // https://drafts.csswg.org/css-align-3/#propdef-align-items
     Align alignItems;
+
+    void repr(Io::Emit &e) const {
+        e("(aligns");
+        e(" alignContent={}", alignContent);
+        e(" justifyContent={}", justifyContent);
+        e(" justifySelf={}", justifySelf);
+        e(" alignSelf={}", alignSelf);
+        e(" justifyItems={}", justifyItems);
+        e(" alignItems={}", alignItems);
+        e(")");
+    }
 };
 
 } // namespace Vaev::Style

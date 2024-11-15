@@ -1,7 +1,5 @@
 #pragma once
 
-#include "length.h"
-#include "percent.h"
 #include "width.h"
 
 namespace Vaev {
@@ -64,6 +62,16 @@ struct FlexProps {
     bool isRowOriented() const {
         return direction == FlexDirection::ROW or
                direction == FlexDirection::ROW_REVERSE;
+    }
+
+    void repr(Io::Emit &e) const {
+        e("(flex");
+        e(" direction={}", direction);
+        e(" wrap={}", wrap);
+        e(" basis={}", basis);
+        e(" grow={}", grow);
+        e(" shrink={}", shrink);
+        e(")");
     }
 };
 

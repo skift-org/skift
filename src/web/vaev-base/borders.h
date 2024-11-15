@@ -74,6 +74,16 @@ struct BorderProps {
             break;
         }
     }
+
+    void repr(Io::Emit &e) const {
+        e("(border");
+        e(" top={}", top);
+        e(" start={}", start);
+        e(" bottom={}", bottom);
+        e(" end={}", end);
+        e(" radii={}", radii);
+        e(")");
+    }
 };
 
 } // namespace Vaev

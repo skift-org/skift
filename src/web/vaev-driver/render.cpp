@@ -54,7 +54,7 @@ static void _collectStyle(Markup::Node const &node, Style::StyleBook &sb) {
 RenderResult render(Markup::Document const &dom, Style::Media const &media, Vec2Px viewport) {
     Style::StyleBook stylebook;
     stylebook.add(
-        fetchStylesheet("bundle://vaev-view/user-agent.css"_url)
+        fetchStylesheet("bundle://vaev-driver/user-agent.css"_url)
             .take("user agent stylesheet not available")
     );
 
@@ -122,7 +122,7 @@ RenderResult render(Markup::Document const &dom, Style::Media const &media, Vec2
 RenderResult render(Markup::Document &dom, Style::Media const &media, Print::PaperStock paper) {
     Style::StyleBook stylebook;
     stylebook.add(
-        fetchStylesheet("bundle://vaev-view/user-agent.css"_url)
+        fetchStylesheet("bundle://vaev-driver/user-agent.css"_url)
             .take("user agent stylesheet not available")
     );
 

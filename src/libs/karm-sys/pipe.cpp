@@ -2,9 +2,12 @@
 
 #include "_embed.h"
 
+#include "proc.h"
+
 namespace Karm::Sys {
 
 Res<Pipe> Pipe::create() {
+    try$(ensureUnrestricted());
     auto pipe = try$(_Embed::createPipe());
     return Ok(Pipe{
         FileWriter{pipe.car, "pipe:"_url},

@@ -27,7 +27,8 @@ struct Format {
     }
 };
 
-static constexpr Level PRINT = {-1, "print", Cli::BLUE};
+static constexpr Level PRINT = {-2, "print", Cli::BLUE};
+static constexpr Level YAP = {-1, "yappin'", Cli::GREEN};
 static constexpr Level DEBUG = {0, "debug", Cli::BLUE};
 static constexpr Level INFO = {1, "info ", Cli::GREEN};
 static constexpr Level WARNING = {2, "warn ", Cli::YELLOW};
@@ -91,6 +92,12 @@ template <typename... Args>
 inline void logInfoIf(bool condition, Format format, Args &&...va) {
     if (condition)
         logInfo(format, std::forward<Args>(va)...);
+}
+
+template <typename... Args>
+inline void yap(Format format, Args &&...va) {
+    Io::Args<Args...> args{std::forward<Args>(va)...};
+    _log(YAP, format, args);
 }
 
 template <typename... Args>

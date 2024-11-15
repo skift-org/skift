@@ -1,8 +1,10 @@
 #pragma once
 
 #include <karm-base/box.h>
+#include <karm-base/cow.h>
 #include <karm-base/endian.h>
 #include <karm-base/enum.h>
+#include <karm-base/map.h>
 #include <karm-base/rc.h>
 #include <karm-base/time.h>
 #include <karm-base/tuple.h>
@@ -749,6 +751,23 @@ struct Formatter<Box<T>> {
     }
 };
 
+template <typename T>
+struct Formatter<Cow<T>> {
+    Formatter<T> formatter;
+
+    void parse(Io::SScan &scan) {
+        if constexpr (requires() {
+                          formatter.parse(scan);
+                      }) {
+            formatter.parse(scan);
+        }
+    }
+
+    Res<usize> format(Io::TextWriter &writer, Cow<T> const &val) {
+        return formatter.format(writer, *val);
+    }
+};
+
 // MARK: Format Reflectable ----------------------------------------------------
 
 struct Emit;
@@ -793,10 +812,45 @@ struct Formatter<T> {
     }
 };
 
+// MARK: Format Map ------------------------------------------------------------
+
+template <typename K, typename V>
+struct Formatter<Map<K, V>> {
+    Formatter<K> keyFormatter;
+    Formatter<V> valFormatter;
+
+    void parse(Io::SScan &scan) {
+        if constexpr (requires() {
+                          keyFormatter.parse(scan);
+                          valFormatter.parse(scan);
+                      }) {
+            keyFormatter.parse(scan);
+            valFormatter.parse(scan);
+        }
+    }
+
+    Res<usize> format(Io::TextWriter &writer, Map<K, V> const &val) {
+        usize written = 0;
+        written += try$(writer.writeStr("{"s));
+        bool first = true;
+        for (auto const &[key, value] : val.iter()) {
+            if (not first)
+                written += try$(writer.writeStr(", "s));
+            first = false;
+            written += try$(keyFormatter.format(writer, key));
+            written += try$(writer.writeStr(": "s));
+            written += try$(valFormatter.format(writer, value));
+        }
+        written += try$(writer.writeStr("}"s));
+        return Ok(written);
+    }
+};
+
 // MARK: Format Range ----------------------------------------------------------
 
 template <typename T, typename Tag>
 struct Formatter<Range<T, Tag>> {
+
     Formatter<T> inner;
 
     void parse(Io::SScan &scan) {

@@ -175,6 +175,17 @@ test$("fmt-sliceable") {
     return Ok();
 }
 
+// MARK: Format Map ------------------------------------------------------------
+
+test$("fmt-map") {
+    Map<int, int> map;
+    map.put(1, 2);
+    map.put(3, 4);
+
+    try$(testCase("{1: 2, 3: 4}", map));
+    return Ok();
+}
+
 // MARK: Format String ---------------------------------------------------------
 
 test$("fmt-string") {

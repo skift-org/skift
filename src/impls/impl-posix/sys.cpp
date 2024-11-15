@@ -27,8 +27,6 @@
 namespace Karm::Sys::_Embed {
 
 Res<Mime::Path> resolve(Mime::Url const &url) {
-    try$(ensureUnrestricted());
-
     Mime::Path resolved;
     if (url.scheme == "file") {
         resolved = url.path;
@@ -117,8 +115,6 @@ Res<Strong<Fd>> openOrCreateFile(Mime::Url const &url) {
 }
 
 Res<Pair<Strong<Fd>>> createPipe() {
-    try$(ensureUnrestricted());
-
     int fds[2];
 
     if (::pipe(fds) < 0)
@@ -149,8 +145,6 @@ Res<Strong<Fd>> createErr() {
 }
 
 Res<Vec<DirEntry>> readDir(Mime::Url const &url) {
-    try$(ensureUnrestricted());
-
     String str = try$(resolve(url)).str();
 
     DIR *dir = ::opendir(str.buf());
@@ -181,8 +175,6 @@ Res<Vec<DirEntry>> readDir(Mime::Url const &url) {
 }
 
 Res<Stat> stat(Mime::Url const &url) {
-    try$(ensureUnrestricted());
-
     String str = try$(resolve(url)).str();
     struct stat buf;
     if (::stat(str.buf(), &buf) < 0)
@@ -193,8 +185,6 @@ Res<Stat> stat(Mime::Url const &url) {
 // MARK: User interactions -----------------------------------------------------
 
 Res<> launch([[maybe_unused]] Mime::Uti const &uti, [[maybe_unused]] Mime::Url const &url) {
-    try$(ensureUnrestricted());
-
     String str = try$(resolve(url)).str();
 
     int pid = fork();
@@ -231,8 +221,6 @@ Async::Task<> launchAsync(Mime::Uti const &uti, Mime::Url const &url) {
 // MARK: Sockets ---------------------------------------------------------------
 
 Res<Strong<Fd>> listenUdp(SocketAddr addr) {
-    try$(ensureUnrestricted());
-
     int fd = ::socket(AF_INET, SOCK_DGRAM, 0);
     if (fd < 0)
         return Posix::fromLastErrno();
@@ -246,8 +234,6 @@ Res<Strong<Fd>> listenUdp(SocketAddr addr) {
 }
 
 Res<Strong<Fd>> connectTcp(SocketAddr addr) {
-    try$(ensureUnrestricted());
-
     int fd = ::socket(AF_INET, SOCK_STREAM, 0);
     if (fd < 0)
         return Posix::fromLastErrno();
@@ -260,8 +246,6 @@ Res<Strong<Fd>> connectTcp(SocketAddr addr) {
 }
 
 Res<Strong<Fd>> listenTcp(SocketAddr addr) {
-    try$(ensureUnrestricted());
-
     int fd = ::socket(AF_INET, SOCK_STREAM, 0);
     if (fd < 0)
         return Posix::fromLastErrno();
@@ -282,8 +266,6 @@ Res<Strong<Fd>> listenTcp(SocketAddr addr) {
 }
 
 Res<Strong<Fd>> listenIpc(Mime::Url url) {
-    try$(ensureUnrestricted());
-
     int fd = ::socket(AF_UNIX, SOCK_STREAM, 0);
     if (fd < 0)
         return Posix::fromLastErrno();

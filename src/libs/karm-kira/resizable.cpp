@@ -1,12 +1,12 @@
 #include "resizable.h"
 
-namespace Karm::Ui {
+namespace Karm::Kira {
 
-struct Resizable : public ProxyNode<Resizable> {
+struct Resizable : public Ui::ProxyNode<Resizable> {
     Math::Vec2i _size;
-    OnChange<Math::Vec2i> _onChange;
+    Ui::OnChange<Math::Vec2i> _onChange;
 
-    Resizable(Child child, Math::Vec2i size, OnChange<Math::Vec2i> onChange)
+    Resizable(Ui::Child child, Math::Vec2i size, Ui::OnChange<Math::Vec2i> onChange)
         : ProxyNode<Resizable>(child),
           _size(size),
           _onChange(std::move(onChange)) {}
@@ -19,10 +19,10 @@ struct Resizable : public ProxyNode<Resizable> {
     }
 
     void bubble(App::Event &e) override {
-        if (auto de = e.is<DragEvent>()) {
-            if (de->type == DragEvent::DRAG) {
+        if (auto de = e.is<Ui::DragEvent>()) {
+            if (de->type == Ui::DragEvent::DRAG) {
                 _size = _size + de->delta;
-                auto minSize = child().size({}, Hint::MIN);
+                auto minSize = child().size({}, Ui::Hint::MIN);
                 _size = _size.max(minSize);
                 if (_onChange) {
                     _onChange(*this, _size);
@@ -36,56 +36,56 @@ struct Resizable : public ProxyNode<Resizable> {
         ProxyNode<Resizable>::bubble(e);
     }
 
-    Math::Vec2i size(Math::Vec2i s, Hint hint) override {
+    Math::Vec2i size(Math::Vec2i s, Ui::Hint hint) override {
         return child()
             .size(s, hint)
             .max(_size);
     }
 };
 
-Child resizable(Child child, Math::Vec2i size, OnChange<Math::Vec2i> onChange) {
+Ui::Child resizable(Ui::Child child, Math::Vec2i size, Ui::OnChange<Math::Vec2i> onChange) {
     return makeStrong<Resizable>(child, size, std::move(onChange));
 }
 
-static Child _resizeHandle(Math::Vec2i dir) {
-    return empty(4) |
-           box({
-               .backgroundFill = GRAY800,
+static Ui::Child _resizeHandle(Math::Vec2i dir) {
+    return Ui::empty(4) |
+           Ui::box({
+               .backgroundFill = Ui::GRAY800,
            }) |
-           dragRegion(dir);
+           Ui::dragRegion(dir);
 }
 
-Child resizable(Child child, ResizeHandle handlePosition, Math::Vec2i size, OnChange<Math::Vec2i> onChange) {
+Ui::Child resizable(Ui::Child child, ResizeHandle handlePosition, Math::Vec2i size, Ui::OnChange<Math::Vec2i> onChange) {
     if (handlePosition == ResizeHandle::TOP) {
-        return stack(
+        return Ui::stack(
                    child,
-                   vflow(
+                   Ui::vflow(
                        _resizeHandle({0, -1})
                    )
                ) |
                resizable(size, std::move(onChange));
     } else if (handlePosition == ResizeHandle::START) {
-        return stack(
+        return Ui::stack(
                    child,
-                   hflow(
+                   Ui::hflow(
                        _resizeHandle({-1, 0})
                    )
                ) |
                resizable(size, std::move(onChange));
     } else if (handlePosition == ResizeHandle::BOTTOM) {
-        return stack(
+        return Ui::stack(
                    child,
-                   hflow(
-                       grow(NONE),
+                   Ui::vflow(
+                       Ui::grow(NONE),
                        _resizeHandle({0, 1})
                    )
                ) |
                resizable(size, std::move(onChange));
     } else if (handlePosition == ResizeHandle::END) {
-        return stack(
+        return Ui::stack(
                    child,
-                   vflow(
-                       grow(NONE),
+                   Ui::hflow(
+                       Ui::grow(NONE),
                        _resizeHandle({1, 0})
                    )
                ) |
@@ -95,4 +95,4 @@ Child resizable(Child child, ResizeHandle handlePosition, Math::Vec2i size, OnCh
     }
 }
 
-} // namespace Karm::Ui
+} // namespace Karm::Kira

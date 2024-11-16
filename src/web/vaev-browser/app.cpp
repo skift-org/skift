@@ -1,6 +1,7 @@
 #include <karm-kira/context-menu.h>
 #include <karm-kira/dialog.h>
 #include <karm-kira/error-page.h>
+#include <karm-kira/resizable.h>
 #include <karm-kira/scaffold.h>
 #include <karm-kira/side-panel.h>
 #include <karm-mime/mime.h>
@@ -10,7 +11,6 @@
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/popover.h>
-#include <karm-ui/resizable.h>
 #include <karm-ui/scroll.h>
 #include <mdi/alert-decagram.h>
 #include <mdi/arrow-left.h>
@@ -231,7 +231,7 @@ Ui::Child appContent(State const &s) {
         return webview(s);
     return Ui::hflow(
         webview(s) | Ui::grow(),
-        sidePanel(s) | Ui::resizable(Ui::ResizeHandle::START, {320}, NONE)
+        sidePanel(s) | Kr::resizable(Kr::ResizeHandle::START, {320}, NONE)
     );
 }
 

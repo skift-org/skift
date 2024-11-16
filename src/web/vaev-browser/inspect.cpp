@@ -1,8 +1,8 @@
+#include <karm-kira/resizable.h>
 #include <karm-kira/side-panel.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/reducer.h>
-#include <karm-ui/resizable.h>
 #include <karm-ui/scroll.h>
 #include <karm-ui/view.h>
 #include <mdi/chevron-down.h>
@@ -146,7 +146,7 @@ Ui::Child computedStyles() {
 Ui::Child inspect(Strong<Vaev::Markup::Document> n, InspectState const &s, Ui::Action<InspectorAction> a) {
     return Ui::vflow(
         node(n, s, a) | Ui::vscroll() | Ui::grow(),
-        computedStyles() | Ui::resizable(Ui::ResizeHandle::TOP, {128}, NONE)
+        computedStyles() | Kr::resizable(Kr::ResizeHandle::TOP, {128}, NONE)
     );
 }
 

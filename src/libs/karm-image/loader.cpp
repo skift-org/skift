@@ -1,6 +1,7 @@
 #include <karm-sys/file.h>
 
 #include "bmp/decoder.h"
+#include "gif/decoder.h"
 #include "jpeg/decoder.h"
 #include "png/decoder.h"
 #include "qoi/decoder.h"
@@ -39,10 +40,17 @@ static Res<Picture> loadJpeg(Bytes bytes) {
     return Ok(img);
 }
 
-static Res<Picture> load(Bytes bytes) {
+static Res<Picture> loadTga(Bytes bytes) {
     auto tga = try$(Tga::Decoder::init(bytes));
     auto img = Gfx::Surface::alloc({tga.width(), tga.height()});
     try$(tga.decode(*img));
+    return Ok(img);
+}
+
+static Res<Picture> loadGif(Bytes bytes) {
+    auto gif = try$(Gif::Decoder::init(bytes));
+    auto img = Gfx::Surface::alloc({gif.width(), gif.height()});
+    try$(gif.decode(*img));
     return Ok(img);
 }
 
@@ -56,7 +64,9 @@ Res<Picture> load(Sys::Mmap &&map) {
     } else if (Jpeg::Decoder::sniff(map.bytes())) {
         return loadJpeg(map.bytes());
     } else if (Tga::Decoder::sniff(map.bytes())) {
-        return load(map.bytes());
+        return loadTga(map.bytes());
+    } else if (Gif::Decoder::sniff(map.bytes())) {
+        return loadGif(map.bytes());
     } else {
         return Error::invalidData("unknown image format");
     }

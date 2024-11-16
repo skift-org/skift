@@ -35,6 +35,10 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     if (args.len()) {
         auto url = co_try$(Mime::parseUrlOrPath(args[0]));
         image = Image::load(url);
+
+        if (not image) {
+            logError("Failed to load image: {}", image.none());
+        }
     }
 
     co_return Ui::runApp(ctx, Hideo::Images::app(image));

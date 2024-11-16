@@ -9,15 +9,15 @@ Res<Decoder> Decoder::init(Bytes slice) {
 
     Decoder dec{};
     Io::BScan s{slice};
-    try$(dec.readHeader(s));
-    try$(dec.readInfoHeader(s));
+    try$(dec._readHeader(s));
+    try$(dec._readInfoHeader(s));
     try$(dec._readPalette(s));
     try$(dec._readPixels(s));
 
     return Ok(dec);
 }
 
-Res<> Decoder::readHeader(Io::BScan &s) {
+Res<> Decoder::_readHeader(Io::BScan &s) {
     if (s.rem() < 54) {
         return Error::invalidData("image too small");
     }
@@ -30,7 +30,7 @@ Res<> Decoder::readHeader(Io::BScan &s) {
     return Ok();
 }
 
-Res<> Decoder::readInfoHeader(Io::BScan &s) {
+Res<> Decoder::_readInfoHeader(Io::BScan &s) {
     auto start = s.tell();
     auto size = s.nextU32le(); // header size
     if (size < 40) {

@@ -1,6 +1,6 @@
 #pragma once
 
-// BMP image decoder/encoder
+// BMP image decoder
 // References:
 //  - https://en.wikipedia.org/wiki/BMP_file_format
 //  - https://docs.microsoft.com/en-us/windows/win32/gdi/bitmap-storage
@@ -10,7 +10,6 @@
 #include <karm-base/vec.h>
 #include <karm-gfx/buffer.h>
 #include <karm-io/bscan.h>
-#include <karm-io/emit.h>
 #include <karm-logger/logger.h>
 
 namespace Bmp {
@@ -31,7 +30,7 @@ struct Decoder {
 
     usize _dataOffset;
 
-    Res<> readHeader(Io::BScan &s);
+    Res<> _readHeader(Io::BScan &s);
 
     isize _width;
     isize _height;
@@ -53,7 +52,7 @@ struct Decoder {
 
     usize _numsColors;
 
-    Res<> readInfoHeader(Io::BScan &s);
+    Res<> _readInfoHeader(Io::BScan &s);
 
     // MARK: Palette -----------------------------------------------------------
 

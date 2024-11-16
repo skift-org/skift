@@ -25,7 +25,7 @@ Ui::Child viewer(State const &state) {
 
 Ui::Child viewerPreview(State const &state) {
     if (not state.image)
-        return Kr::errorPage(Mdi::ALERT_DECAGRAM, "No Image"s, "Unable to display this image."s);
+        return Kr::errorPage(Mdi::ALERT_DECAGRAM, "Unable to display this image."s, Str{state.image.none().msg()});
 
     return Ui::image(state.image.unwrap()) |
            Ui::box({

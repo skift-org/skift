@@ -456,4 +456,10 @@ Res<> exit(i32) {
         ;
 }
 
+// MARK: Sandboxing ------------------------------------------------------------
+
+void hardenSandbox() {
+    logError("could not harden sandbox");
+}
+
 } // namespace Karm::Sys::_Embed

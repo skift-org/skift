@@ -1,6 +1,7 @@
 #include <karm-base/func.h>
 #include <karm-base/res.h>
 #include <karm-base/time.h>
+#include <karm-logger/logger.h>
 
 #include <karm-sys/_embed.h>
 
@@ -169,6 +170,12 @@ Res<> populate(Sys::UserInfo &) {
 
 Res<> populate(Vec<Sys::UserInfo> &) {
     return Ok();
+}
+
+// MARK: Sandboxing ------------------------------------------------------------
+
+void hardenSandbox() {
+    logError("could not harden sandbox");
 }
 
 } // namespace Karm::Sys::_Embed

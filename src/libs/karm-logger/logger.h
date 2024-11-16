@@ -45,7 +45,7 @@ inline void _catch(Res<usize> res) {
 inline void _log(Level level, Format fmt, Io::_Args &args) {
     Logger::_Embed::loggerLock();
 
-    if (level.value != -1) {
+    if (level.value != -2) {
         _catch(Io::format(Logger::_Embed::loggerOut(), "{} ", Cli::styled(level.name, level.style)));
         _catch(Io::format(Logger::_Embed::loggerOut(), "{}{}:{}: ", Cli::reset().fg(Cli::GRAY_DARK), fmt.loc.file, fmt.loc.line));
     }

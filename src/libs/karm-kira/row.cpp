@@ -47,7 +47,7 @@ Ui::Child rowContent(Opt<Ui::Child> leading, String title, Opt<String> subtitle,
     return minSize(
         {Ui::UNCONSTRAINED, 48},
         insets(
-            {0, 12},
+            {0, 16},
             hflow(
                 0,
                 Math::Align::VCENTER | Math::Align::HFILL,
@@ -176,7 +176,8 @@ Ui::Child treeRow(Opt<Ui::Slot> leading, String title, Opt<String> subtitle, Ui:
             state ? insets(
                         {0, 0, 0, 0},
                         child()
-                    ) | slideIn(Ui::SlideFrom::TOP)
+                    ) | slideIn(Ui::SlideFrom::TOP) |
+                        Ui::grow()
                   : Ui::empty()
         );
     });

@@ -33,7 +33,7 @@ Ui::Child select(Ui::Child value, Ui::Slots slots) {
         Ui::hflow(
             8,
             Math::Align::CENTER,
-            value,
+            value | Ui::grow(),
             Ui::icon(Mdi::CHEVRON_DOWN)
         ) | Ui::insets({6, 12, 6, 16}) |
             Ui::minSize({Ui::UNCONSTRAINED, 36})

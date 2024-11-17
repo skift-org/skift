@@ -23,7 +23,7 @@ struct Radio : public Ui::View<Radio> {
             g.fill(bound(), 999);
 
             g.fillStyle(Gfx::GRAY50);
-            g.fill(bound().shrink(6), 999);
+            g.fill(bound().shrink(4), 999);
 
             if (_mouseListener.isPress()) {
                 g.strokeStyle(Gfx::stroke(Ui::ACCENT600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
@@ -49,7 +49,7 @@ struct Radio : public Ui::View<Radio> {
     }
 
     Math::Vec2i size(Math::Vec2i, Ui::Hint) override {
-        return {26, 26};
+        return {18, 18};
     }
 };
 

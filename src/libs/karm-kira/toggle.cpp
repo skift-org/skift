@@ -4,6 +4,9 @@
 namespace Karm::Kira {
 
 struct Toggle : public Ui::View<Toggle> {
+    static constexpr auto PADDING = 3;
+    static constexpr auto SIZE = 18;
+
     bool _value = false;
     Ui::Easedf _anim;
     Ui::OnChange<bool> _onChange;
@@ -26,10 +29,10 @@ struct Toggle : public Ui::View<Toggle> {
         g.push();
 
         Math::Recti thumb = {
-            bound().x + (isize)(6 + 26 * _anim.value()),
-            bound().y + 6,
-            14,
-            14,
+            bound().x + (isize)(PADDING + SIZE * _anim.value()),
+            bound().y + PADDING,
+            SIZE - PADDING * 2,
+            SIZE - PADDING * 2,
         };
 
         auto inactiveBackground = (_mouseListener.isHover() ? Ui::GRAY600 : Ui::GRAY700);
@@ -69,7 +72,7 @@ struct Toggle : public Ui::View<Toggle> {
     }
 
     Math::Vec2i size(Math::Vec2i, Ui::Hint) override {
-        return {52, 26};
+        return {SIZE * 2, SIZE};
     }
 };
 

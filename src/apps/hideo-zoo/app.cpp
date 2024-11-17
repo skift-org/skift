@@ -17,6 +17,7 @@
 #include "page-radio.h"
 #include "page-resizable.h"
 #include "page-rows.h"
+#include "page-select.h"
 #include "page-side-nav.h"
 #include "page-side-panel.h"
 #include "page-slider.h"
@@ -39,6 +40,7 @@ static Array PAGES = {
     &PAGE_RADIO,
     &PAGE_RESIZABLE,
     &PAGE_ROWS,
+    &PAGE_SELECT,
     &PAGE_SIDE_PANEL,
     &PAGE_SIDENAV,
     &PAGE_SLIDER,

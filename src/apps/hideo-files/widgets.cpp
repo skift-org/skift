@@ -259,7 +259,7 @@ Ui::Child mainMenu([[maybe_unused]] State const &s) {
         ),
         Kr::contextMenuItem(Ui::NOP, Mdi::BOOKMARK, "Bookmarks"),
         Ui::separator(),
-        Kr::contextMenuItem(Model::bind<ToggleHidden>(), s.showHidden ? Mdi::CHECKBOX_MARKED : Mdi::CHECKBOX_BLANK_OUTLINE, "Show hidden"),
+        Kr::contextMenuCheck(Model::bind<ToggleHidden>(), s.showHidden, "Show hidden"),
     });
 }
 

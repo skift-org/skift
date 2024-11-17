@@ -2,6 +2,7 @@
 #include <karm-ui/layout.h>
 #include <karm-ui/popover.h>
 
+#include "checkbox.h"
 #include "context-menu.h"
 
 namespace Karm::Kira {
@@ -61,6 +62,25 @@ Ui::Child contextMenuItem(Ui::OnPress onPress, Opt<Mdi::Icon> i, Str t) {
                12,
                Math::Align::CENTER,
                i ? Ui::icon(*i) : Ui::empty(18),
+               Ui::text(t)
+           ) |
+           Ui::insets({6, 6, 6, 10}) |
+           Ui::minSize({Ui::UNCONSTRAINED, 36}) |
+           Ui::button(
+               [onPress = std::move(onPress)](auto &n) {
+                   onPress(n);
+                   Ui::closePopover(n);
+               },
+               Ui::ButtonStyle::subtle()
+           ) |
+           Ui::insets(4);
+}
+
+Ui::Child contextMenuCheck(Ui::OnPress onPress, bool checked, Str t) {
+    return Ui::hflow(
+               12,
+               Math::Align::CENTER,
+               checkbox(checked, NONE),
                Ui::text(t)
            ) |
            Ui::insets({6, 6, 6, 10}) |

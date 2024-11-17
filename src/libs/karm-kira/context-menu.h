@@ -18,6 +18,8 @@ Ui::Child contextMenuContent(Ui::Children children);
 
 Ui::Child contextMenuItem(Ui::OnPress onPress, Opt<Mdi::Icon> i, Str t);
 
+Ui::Child contextMenuCheck(Ui::OnPress onPress, bool checked, Str t);
+
 Ui::Child contextMenuDock(Ui::Children children);
 
 Ui::Child contextMenuIcon(Ui::OnPress onPress, Mdi::Icon i);

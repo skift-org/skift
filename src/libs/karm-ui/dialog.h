@@ -4,6 +4,10 @@
 
 namespace Karm::Ui {
 
+struct ShowDialogEvent {
+    Child child;
+};
+
 Child dialogLayer(Child child);
 
 inline auto dialogLayer() {

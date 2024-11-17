@@ -1,5 +1,6 @@
 #include "popover.h"
 
+#include "dialog.h"
 #include "funcs.h"
 
 namespace Karm::Ui {
@@ -68,7 +69,9 @@ struct PopoverLayer : public ProxyNode<PopoverLayer> {
         if (event.accepted())
             return;
 
-        if (_popover) {
+        bool allowToGoDown = event.is<ShowDialogEvent>();
+
+        if (_popover and not allowToGoDown) {
             (*_popover)->event(event);
 
             if (event.accepted())

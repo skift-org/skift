@@ -5,10 +5,6 @@
 
 namespace Karm::Ui {
 
-struct ShowDialogEvent {
-    Child child;
-};
-
 void showDialog(Node &n, Child child) {
     bubble<ShowDialogEvent>(n, child);
 }

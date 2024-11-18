@@ -55,7 +55,7 @@ struct View : public Ui::View<View> {
         auto viewport = bound().size();
         if (not _renderResult) {
             auto media = _constructMedia(viewport);
-            _renderResult = Driver::render(*_dom, media, viewport.cast<Px>());
+            _renderResult = Driver::render(*_dom, media, {.small = viewport.cast<Px>()});
         }
 
         g.push();
@@ -84,7 +84,7 @@ struct View : public Ui::View<View> {
     Math::Vec2i size(Math::Vec2i size, Ui::Hint) override {
         // FIXME: This is wasteful, we should cache the result
         auto media = _constructMedia(size);
-        auto [_, layout, _] = Driver::render(*_dom, media, size.cast<Px>());
+        auto [_, layout, _] = Driver::render(*_dom, media, {.small = size.cast<Px>()});
 
         return {
             layout->layout.borderBox().width.cast<isize>(),

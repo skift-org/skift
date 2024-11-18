@@ -117,7 +117,7 @@ void FontFaceRule::repr(Io::Emit &e) const {
 }
 
 FontFaceRule FontFaceRule::parse(Css::Sst const &sst) {
-    return {parseDeclarations<FontDesc>(sst)};
+    return {parseDeclarations<FontDesc>(sst, false)};
 }
 
 // MARK: Rule ------------------------------------------------------------------

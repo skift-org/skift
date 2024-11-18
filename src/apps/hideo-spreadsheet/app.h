@@ -81,7 +81,7 @@ struct Sheet {
     usize freezedRows = 0;
     usize freezedCols = 0;
     Vec<Row> rows = {{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}};
-    Vec<Col> cols = {{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}};
+    Vec<Col> cols = {{}, {}, {}, {}, {}, {}, {}, {}};
     Map<Pos, Cell> cells = {};
 
     void recompute() {

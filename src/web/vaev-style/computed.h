@@ -19,6 +19,7 @@
 #include <vaev-base/text.h>
 #include <vaev-base/visibility.h>
 #include <vaev-base/z-index.h>
+#include <vaev-css/parser.h>
 
 namespace Vaev::Style {
 
@@ -64,6 +65,8 @@ struct Computed {
     Cow<FlexProps> flex;
     Cow<BreakProps> break_;
 
+    Cow<Map<String, Css::Content>> variables;
+
     Float float_ = Float::NONE;
     Clear clear = Clear::NONE;
 
@@ -74,6 +77,7 @@ struct Computed {
         color = parent.color;
         font = parent.font;
         text = parent.text;
+        variables = parent.variables;
     }
 
     void repr(Io::Emit &e) const {
@@ -103,6 +107,7 @@ struct Computed {
         e(" float: {}", float_);
         e(" clear: {}", clear);
         e(" zIndex: {}", zIndex);
+        e(" variables: {}", variables);
         e(")");
     }
 };

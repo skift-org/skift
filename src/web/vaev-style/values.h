@@ -33,6 +33,14 @@ always_inline static Res<T> parseValue(Cursor<Css::Sst> &c) {
     return ValueParser<T>::parse(c);
 }
 
+template <typename T>
+always_inline static Res<T> parseValue(Str str) {
+    Css::Lexer lex{str};
+    auto content = Css::consumeDeclarationValue(lex);
+    Cursor<Css::Sst> c{content};
+    return ValueParser<T>::parse(c);
+}
+
 template <>
 struct ValueParser<Align> {
     static Res<Align> parse(Cursor<Css::Sst> &c);
@@ -76,6 +84,7 @@ struct ValueParser<CalcValue<T>> {
             if (prefixToken.data == "calc(") {
                 Cursor<Css::Sst> content = c.peek().content;
                 auto lhs = try$(parseVal(content));
+                c.next();
 
                 auto op = parseOp(content);
                 if (not op)
@@ -121,8 +130,9 @@ struct ValueParser<CalcValue<T>> {
         if (c.ended())
             return Error::invalidData("unexpected end of input");
 
-        if (c.peek().token == Css::Token::NUMBER)
+        if (c.peek().token == Css::Token::NUMBER) {
             return Ok(try$(parseValue<Number>(c)));
+        }
 
         return Ok(try$(parseValue<T>(c)));
     }

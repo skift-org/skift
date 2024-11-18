@@ -26,7 +26,7 @@ static Style::Feature _parseMediaFeature(Cursor<Css::Sst> &c) {
     }
 
     auto unexplodedName = c.next().token.data;
-    auto [prefix, name] = _explodeFeatureName(unexplodedName);
+    auto [prefix, name] = _explodeFeatureName(unexplodedName.str());
 
     Opt<Style::Feature> prop;
 

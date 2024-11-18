@@ -51,7 +51,7 @@ static void _collectStyle(Markup::Node const &node, Style::StyleBook &sb) {
     }
 }
 
-RenderResult render(Markup::Document const &dom, Style::Media const &media, Vec2Px viewport) {
+RenderResult render(Markup::Document const &dom, Style::Media const &media, Layout::Viewport viewport) {
     Style::StyleBook stylebook;
     stylebook.add(
         fetchStylesheet("bundle://vaev-driver/user-agent.css"_url)
@@ -68,9 +68,7 @@ RenderResult render(Markup::Document const &dom, Style::Media const &media, Vec2
     Style::Computer computer{media, stylebook};
     Layout::Tree tree = {
         Layout::build(computer, dom),
-        {
-            .small = viewport,
-        }
+        viewport,
     };
 
     elapsed = Sys::now() - start;
@@ -79,25 +77,18 @@ RenderResult render(Markup::Document const &dom, Style::Media const &media, Vec2
 
     start = Sys::now();
 
-    Layout::Viewport vp{.small = viewport};
-
-    elapsed = Sys::now() - start;
-
-    logDebugIf(DEBUG_RENDER, "layout tree measure time: {}", elapsed);
-
-    start = Sys::now();
-
     Layout::layout(
         tree,
         tree.root,
         {
             .commit = Layout::Commit::YES,
-            .knownSize = {vp.small.width, NONE},
-            .availableSpace = {vp.small.width, 0_px},
-            .containingBlock = {vp.small.width, vp.small.height},
+            .knownSize = {viewport.small.width, NONE},
+            .availableSpace = {viewport.small.width, 0_px},
+            .containingBlock = {viewport.small.width, viewport.small.height},
         }
     );
-    Layout::layoutPositioned(tree, tree.root, {vp.small.width, vp.small.height});
+
+    Layout::layoutPositioned(tree, tree.root, {viewport.small.width, viewport.small.height});
 
     auto sceneRoot = makeStrong<Scene::Stack>();
 
@@ -119,7 +110,7 @@ RenderResult render(Markup::Document const &dom, Style::Media const &media, Vec2
     };
 }
 
-RenderResult render(Markup::Document &dom, Style::Media const &media, Print::PaperStock paper) {
+Vec<Scene::Page> print(Markup::Document &dom, Style::Media const &media) {
     Style::StyleBook stylebook;
     stylebook.add(
         fetchStylesheet("bundle://vaev-driver/user-agent.css"_url)
@@ -135,8 +126,8 @@ RenderResult render(Markup::Document &dom, Style::Media const &media, Print::Pap
 
     Layout::Viewport vp{
         .small = {
-            Px{paper.width},
-            Px{paper.height},
+            Px{media.width},
+            Px{media.height},
         },
     };
 
@@ -156,15 +147,11 @@ RenderResult render(Markup::Document &dom, Style::Media const &media, Print::Pap
         }
     );
 
-    auto sceneRoot = makeStrong<Scene::Page>();
-    Layout::paint(tree.root, *sceneRoot);
-    sceneRoot->prepare();
+    Vec<Scene::Page> pages;
+    Layout::paint(tree.root, pages.emplaceBack());
+    last(pages).prepare();
 
-    return {
-        std::move(stylebook),
-        makeStrong<Layout::Box>(std::move(tree.root)),
-        sceneRoot,
-    };
+    return pages;
 }
 
 } // namespace Vaev::Driver

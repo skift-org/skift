@@ -19,6 +19,12 @@ struct PdfPrinter : public Printer {
         _density = density;
     }
 
+    PdfPrinter(Math::Vec2i size, Density density = Density::DEFAULT) {
+        _paperSize.width = size.x;
+        _paperSize.height = size.y;
+        _density = density;
+    }
+
     Gfx::Canvas &beginPage() override {
         _pages.emplaceBack();
         _canvas = Pdf::Canvas{last(_pages), _paperSize};

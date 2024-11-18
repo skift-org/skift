@@ -10,8 +10,10 @@
 #include <karm-ui/app.h>
 #include <vaev-driver/fetcher.h>
 #include <vaev-driver/render.h>
+#include <vaev-layout/values.h>
 #include <vaev-markup/html.h>
 #include <vaev-markup/xml.h>
+#include <vaev-style/values.h>
 
 namespace Vaev::Tools {
 
@@ -97,15 +99,16 @@ Res<> markupDumpTokens(Mime::Url const &url) {
     return Ok();
 }
 
-Vaev::Style::Media constructMediaForPrint(Print::PaperStock paper) {
+Vaev::Style::Media constructMediaForPrint(Resolution resolution, Vec2Px paperSize) {
     return {
         .type = Vaev::MediaType::PRINT,
-        .width = Vaev::Px{paper.width},
-        .height = Vaev::Px{paper.height},
-        .aspectRatio = paper.width / paper.height,
+
+        .width = paperSize.width,
+        .height = paperSize.height,
+        .aspectRatio = (double)paperSize.width / (double)paperSize.height,
         .orientation = Vaev::Orientation::PORTRAIT,
 
-        .resolution = Vaev::Resolution::fromDpi(96),
+        .resolution = resolution,
         .scan = Vaev::Scan::PROGRESSIVE,
         .grid = false,
         .update = Vaev::Update::NONE,
@@ -136,27 +139,45 @@ struct PrintOption {
     bool dumpDom = false;
     bool dumpLayout = false;
     bool dumpPaint = false;
+
+    Resolution resolution = Resolution::fromDpi(96);
+    Opt<Length> width = NONE;
+    Opt<Length> height = NONE;
+    Print::PaperStock paper = Print::A4;
 };
 
 Res<> print(Mime::Url const &, Strong<Markup::Document> dom, Io::Writer &output, PrintOption options = {}) {
-    auto paper = Print::A4;
-    auto media = constructMediaForPrint(paper);
-    auto [style, layout, paint] = Vaev::Driver::render(*dom, media, paper);
+    Layout::Resolver resolver;
+    resolver.viewport.dpi = options.resolution;
+
+    Length paperWidth = options.width.unwrapOr({options.paper.width, Length::MM});
+    Length paperHeight = options.height.unwrapOr({options.paper.height, Length::MM});
+
+    Vec2Px paperSize = {
+        resolver.resolve(paperWidth),
+        resolver.resolve(paperHeight),
+    };
+
+    auto media = constructMediaForPrint(options.resolution, paperSize);
+    auto pages = Vaev::Driver::print(
+        *dom,
+        media
+    );
 
     if (options.dumpDom)
         Sys::println("--- START OF DOM ---\n{}\n--- END OF DOM ---\n", dom);
 
-    if (options.dumpStyle)
-        Sys::println("--- START OF STYLE ---\n{}\n--- END OF STYLE ---\n", style);
-
-    if (options.dumpLayout)
-        Sys::println("--- START OF LAYOUT ---\n{}\n--- END OF LAYOUT ---\n", layout);
-
     if (options.dumpPaint)
-        Sys::println("--- START OF PAINT ---\n{}\n--- END OF PAINT ---\n", paint);
+        Sys::println("--- START OF PAINT ---\n{}\n--- END OF PAINT ---\n", pages);
 
-    Print::PdfPrinter printer{Print::A4, Print::Density::DEFAULT};
-    paint->print(printer);
+    Print::PdfPrinter printer{
+        paperSize.cast<isize>(),
+        Print::Density::fromDpi(options.resolution.toDpi()),
+    };
+
+    for (auto &page : pages) {
+        page.print(printer);
+    }
 
     Io::TextEncoder<> encoder{output};
     Io::Emit e{encoder};
@@ -176,15 +197,15 @@ Res<> print(Mime::Url const &url, Io::Writer &output, PrintOption options = {}) 
     return print(url, dom, output, options);
 }
 
-Vaev::Style::Media constructMediaForRender(Math::Vec2i size) {
+Vaev::Style::Media constructMediaForRender(Resolution resolution, Vec2Px size) {
     return {
         .type = Vaev::MediaType::SCREEN,
-        .width = Vaev::Px{size.width},
-        .height = Vaev::Px{size.height},
-        .aspectRatio = size.width / (Number)size.height,
+        .width = size.width,
+        .height = size.height,
+        .aspectRatio = (Number)size.width / (Number)size.height,
         .orientation = Vaev::Orientation::PORTRAIT,
 
-        .resolution = Vaev::Resolution::fromDpi(96),
+        .resolution = resolution,
         .scan = Vaev::Scan::PROGRESSIVE,
         .grid = false,
         .update = Vaev::Update::NONE,
@@ -211,17 +232,27 @@ Vaev::Style::Media constructMediaForRender(Math::Vec2i size) {
 }
 
 struct RenderOption {
-    Math::Vec2i size = {800, 600};
-
     bool dumpStyle = false;
     bool dumpDom = false;
     bool dumpLayout = false;
     bool dumpPaint = false;
+
+    Resolution resolution = Resolution::fromDpi(96);
+    Length width = 800_px;
+    Length height = 600_px;
 };
 
 Res<> render(Mime::Url const &, Strong<Markup::Document> dom, Io::Writer &output, RenderOption options = {}) {
-    auto media = constructMediaForRender(options.size);
-    auto [style, layout, paint] = Vaev::Driver::render(*dom, media, options.size.cast<Px>());
+    Layout::Resolver resolver;
+    resolver.viewport.dpi = options.resolution;
+
+    Vec2Px imageSize = {
+        resolver.resolve(options.width),
+        resolver.resolve(options.height),
+    };
+
+    auto media = constructMediaForRender(options.resolution, imageSize);
+    auto [style, layout, paint] = Vaev::Driver::render(*dom, media, {.small = imageSize});
 
     if (options.dumpDom)
         Sys::println("--- START OF DOM ---\n{}\n--- END OF DOM ---\n", dom);
@@ -235,7 +266,7 @@ Res<> render(Mime::Url const &, Strong<Markup::Document> dom, Io::Writer &output
     if (options.dumpPaint)
         Sys::println("--- START OF PAINT ---\n{}\n--- END OF PAINT ---\n", paint);
 
-    auto image = Gfx::Surface::alloc(options.size, Gfx::RGBA8888);
+    auto image = Gfx::Surface::alloc(imageSize.cast<isize>(), Gfx::RGBA8888);
     Gfx::CpuCanvas g;
     g.begin(*image);
     g.clear(Gfx::WHITE);
@@ -360,6 +391,10 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     Cli::Flag dumpDomArg = Cli::flag('d', "dump-dom"s, "Dump the DOM tree"s);
     Cli::Flag dumpLayoutArg = Cli::flag('l', "dump-layout"s, "Dump the layout tree"s);
     Cli::Flag dumpPaintArg = Cli::flag('p', "dump-paint"s, "Dump the paint tree"s);
+    Cli::Option resolutionArg = Cli::option<Str>(NONE, "resolution"s, "Resolution of the output document in css units (e.g. 96dpi)"s, "96dpi"s);
+    Cli::Option widthArg = Cli::option<Str>('w', "width"s, "Width of the output document in css units (e.g. 800px)"s, ""s);
+    Cli::Option heightArg = Cli::option<Str>('h', "height"s, "Height of the output document in css units (e.g. 600px)"s, ""s);
+    Cli::Option paperArg = Cli::option<Str>(NONE, "paper"s, "Paper size for printing (default: A4)"s, "A4"s);
 
     cmd.subCommand(
         "print"s,
@@ -372,6 +407,10 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
             dumpDomArg,
             dumpLayoutArg,
             dumpPaintArg,
+            resolutionArg,
+            widthArg,
+            heightArg,
+            paperArg,
         },
         [=](Sys::Context &) -> Async::Task<> {
             Vaev::Tools::PrintOption options{
@@ -380,6 +419,16 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
                 .dumpLayout = dumpLayoutArg,
                 .dumpPaint = dumpPaintArg,
             };
+
+            options.resolution = co_try$(Vaev::Style::parseValue<Vaev::Resolution>(resolutionArg.unwrap()));
+
+            if (widthArg.unwrap())
+                options.width = co_try$(Vaev::Style::parseValue<Vaev::Length>(widthArg.unwrap()));
+
+            if (heightArg.unwrap())
+                options.height = co_try$(Vaev::Style::parseValue<Vaev::Length>(heightArg.unwrap()));
+
+            options.paper = co_try$(Print::findPaperStock(paperArg.unwrap()));
 
             Mime::Url inputUrl = "about:stdin"_url;
             MutCursor<Io::Reader> input = &Sys::in();
@@ -403,9 +452,6 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
         }
     );
 
-    Cli::Option<isize> widthArg = Cli::option<isize>('w', "width"s, "Width of the output image"s, 800);
-    Cli::Option<isize> heightArg = Cli::option<isize>('h', "height"s, "Height of the output image"s, 600);
-
     cmd.subCommand(
         "render"s,
         'r',
@@ -417,17 +463,25 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
             dumpDomArg,
             dumpLayoutArg,
             dumpPaintArg,
+            resolutionArg,
             widthArg,
             heightArg,
         },
         [=](Sys::Context &) -> Async::Task<> {
             Vaev::Tools::RenderOption options{
-                .size = {widthArg, heightArg},
                 .dumpStyle = dumpStyleArg,
                 .dumpDom = dumpDomArg,
                 .dumpLayout = dumpLayoutArg,
                 .dumpPaint = dumpPaintArg,
             };
+
+            options.resolution = co_try$(Vaev::Style::parseValue<Vaev::Resolution>(resolutionArg.unwrap()));
+
+            if (widthArg.unwrap())
+                options.width = co_try$(Vaev::Style::parseValue<Vaev::Length>(widthArg.unwrap()));
+
+            if (heightArg.unwrap())
+                options.height = co_try$(Vaev::Style::parseValue<Vaev::Length>(heightArg.unwrap()));
 
             Mime::Url inputUrl = "about:stdin"_url;
             MutCursor<Io::Reader> input = &Sys::in();

@@ -53,7 +53,7 @@ struct Token {
     using enum Type;
 
     Type type;
-    Str data;
+    String data;
 
 #define ITER(ID, NAME) \
     static Token NAME(Str data = "") { return {ID, data}; }
@@ -62,7 +62,7 @@ struct Token {
 
     Token() : type(NIL) {}
 
-    Token(Type type, Str data = "")
+    Token(Type type, String data = ""s)
         : type(type), data(data) {}
 
     explicit operator bool() const {

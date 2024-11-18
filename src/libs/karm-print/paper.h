@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/distinct.h>
+#include <karm-base/res.h>
 #include <karm-base/string.h>
 
 namespace Karm::Print {
@@ -114,5 +115,15 @@ static constexpr Array PAPER_STOCKS = {
     US_SERIES,
     ENVELOPE_SERIES,
 };
+
+static inline Res<PaperStock> findPaperStock(Str name) {
+    for (auto const &series : PAPER_STOCKS) {
+        for (auto const &stock : series) {
+            if (eqCi(stock.name, name))
+                return Ok(stock);
+        }
+    }
+    return Error::invalidData("unknown paper stock");
+}
 
 } // namespace Karm::Print

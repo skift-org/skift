@@ -2156,6 +2156,45 @@ struct ZIndexProp {
     }
 };
 
+// MARK: OTHER -----------------------------------------------------------------
+// These are no specs or behave differently than the others, you can find more details for each one in the comments.
+
+// https://drafts.csswg.org/css-variables/#defining-variables
+// this symbolizes a custom property, it starts with `--` and can be used to store a value that can be reused in the stylesheet
+struct CustomProp {
+    String varName;
+    Css::Content value;
+
+    CustomProp(String varName, Css::Content value)
+        : varName(varName), value(value) {
+    }
+
+    static constexpr Str name() { return "custom prop"; }
+
+    void apply(Computed &c) const {
+        c.variables.cow().put(varName, value);
+    }
+
+    void repr(Io::Emit &e) const {
+        e("(var {#} = {})", varName, value);
+    }
+};
+
+// NOSPEC: This is a property that could not be parsed, it's used to store the value as is and apply it with the cascade and custom properties
+struct DeferredProp {
+    String propName;
+    Css::Content value;
+
+    static constexpr Str name() { return "deferred prop"; }
+
+    void apply(Computed &) const {
+    }
+
+    void repr(Io::Emit &e) const {
+        e("(Deffered {#} = {})", propName, value);
+    }
+};
+
 // MARK: Style Property  -------------------------------------------------------
 
 using _StyleProp = Union<
@@ -2293,7 +2332,11 @@ using _StyleProp = Union<
     WhiteSpaceProp,
 
     // ZIndex
-    ZIndexProp
+    ZIndexProp,
+
+    // Other
+    CustomProp, // this is generally a variable declaration
+    DeferredProp
 
     /**/
     >;

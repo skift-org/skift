@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-scene/base.h>
+#include <karm-scene/page.h>
 #include <vaev-base/length.h>
 #include <vaev-layout/box.h>
 #include <vaev-markup/dom.h>
@@ -14,8 +15,8 @@ struct RenderResult {
     Strong<Scene::Node> scene;
 };
 
-RenderResult render(Markup::Document const &dom, Style::Media const &media, Vec2Px viewport);
+RenderResult render(Markup::Document const &dom, Style::Media const &media, Layout::Viewport viewport);
 
-RenderResult render(Markup::Document &dom, Style::Media const &media, Print::PaperStock paper);
+Vec<Scene::Page> print(Markup::Document &dom, Style::Media const &media);
 
 } // namespace Vaev::Driver

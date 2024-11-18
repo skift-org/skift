@@ -20,11 +20,11 @@ struct Media {
 
     /// 4.1. Width: the width feature
     /// https://drafts.csswg.org/mediaqueries/#width
-    Length width;
+    Px width;
 
     /// 4.2. Height: the height feature
     /// https://drafts.csswg.org/mediaqueries/#height
-    Length height;
+    Px height;
 
     /// 4.3. Device Width: the device-width feature
     /// https://drafts.csswg.org/mediaqueries/#aspect-ratio
@@ -42,11 +42,11 @@ struct Media {
 
     /// 5.2. Scan: the scan feature
     /// https://drafts.csswg.org/mediaqueries/#scan
-    Scan scan;
+    Scan scan = Scan::PROGRESSIVE;
 
     /// 5.3. Grid: the grid feature
     /// https://drafts.csswg.org/mediaqueries/#grid
-    bool grid;
+    bool grid = false;
 
     /// 5.4. Update: the update feature
     /// https://drafts.csswg.org/mediaqueries/#update

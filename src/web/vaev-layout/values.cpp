@@ -195,22 +195,22 @@ Px Resolver::resolve(Length value) {
     // Absolute
     // https://drafts.csswg.org/css-values/#absolute-lengths
     case Length::CM:
-        return Px::fromFloatNearest(value.val() * viewport.dpi.cast<f64>() / 2.54);
+        return Px::fromFloatNearest(value.val() * viewport.dpi.toDpi() / 2.54);
 
     case Length::MM:
-        return Px::fromFloatNearest(value.val() * viewport.dpi.cast<f64>() / 25.4);
+        return Px::fromFloatNearest(value.val() * viewport.dpi.toDpi() / 25.4);
 
     case Length::Q:
-        return Px::fromFloatNearest(value.val() * viewport.dpi.cast<f64>() / 101.6);
+        return Px::fromFloatNearest(value.val() * viewport.dpi.toDpi() / 101.6);
 
     case Length::IN:
-        return Px::fromFloatNearest(value.val() * viewport.dpi.cast<f64>());
+        return Px::fromFloatNearest(value.val() * viewport.dpi.toDpi());
 
     case Length::PT:
-        return Px::fromFloatNearest(value.val() * viewport.dpi.cast<f64>() / 72.0);
+        return Px::fromFloatNearest(value.val() * viewport.dpi.toDpi() / 72.0);
 
     case Length::PC:
-        return Px::fromFloatNearest(value.val() * viewport.dpi.cast<f64>() / 6.0);
+        return Px::fromFloatNearest(value.val() * viewport.dpi.toDpi() / 6.0);
 
     case Length::PX:
         return Px::fromFloatNearest(value.val());

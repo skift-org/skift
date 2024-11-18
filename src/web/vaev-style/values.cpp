@@ -93,7 +93,7 @@ Res<Angle> ValueParser<Angle>::parse(Cursor<Css::Sst> &c) {
         return Error::invalidData("unexpected end of input");
 
     if (c.peek() == Css::Token::DIMENSION) {
-        Io::SScan scan = c->token.data;
+        Io::SScan scan = c->token.data.str();
         auto value = Io::atof(scan).unwrapOr(0.0);
         auto unit = try$(_parseAngleUnit(scan.remStr()));
         return Ok(Angle{value, unit});
@@ -273,11 +273,11 @@ Res<Color> ValueParser<Color>::parse(Cursor<Css::Sst> &c) {
         return Error::invalidData("unexpected end of input");
 
     if (c.peek() == Css::Token::HASH) {
-        Io::SScan scan = c->token.data;
+        Io::SScan scan = c->token.data.str();
         c.next();
         return Ok(try$(_parseHexColor(scan)));
     } else if (c.peek() == Css::Token::IDENT) {
-        Str data = c->token.data;
+        Str data = c->token.data.str();
 
         auto maybeColor = parseNamedColor(data);
         if (maybeColor) {
@@ -696,7 +696,7 @@ Res<Integer> ValueParser<Integer>::parse(Cursor<Css::Sst> &c) {
         return Error::invalidData("unexpected end of input");
 
     if (c.peek() == Css::Token::NUMBER) {
-        Io::SScan scan = c->token.data;
+        Io::SScan scan = c->token.data.str();
         c.next();
         return Ok(try$(Io::atoi(scan)));
     }
@@ -723,7 +723,7 @@ Res<Length> ValueParser<Length>::parse(Cursor<Css::Sst> &c) {
         return Error::invalidData("unexpected end of input");
 
     if (c.peek() == Css::Token::DIMENSION) {
-        Io::SScan scan = c->token.data;
+        Io::SScan scan = c->token.data.str();
         auto value = Io::atof(scan, {.allowExp = false}).unwrapOr(0.0);
         auto unit = try$(_parseLengthUnit(scan.remStr()));
         c.next();
@@ -795,7 +795,7 @@ Res<Number> ValueParser<Number>::parse(Cursor<Css::Sst> &c) {
         return Error::invalidData("unexpected end of input");
 
     if (c.peek() == Css::Token::NUMBER) {
-        Io::SScan scan = c->token.data;
+        Io::SScan scan = c->token.data.str();
         c.next();
         return Ok(try$(Io::atof(scan)));
     }
@@ -876,7 +876,7 @@ Res<Percent> ValueParser<Percent>::parse(Cursor<Css::Sst> &c) {
         return Error::invalidData("unexpected end of input");
 
     if (c.peek() == Css::Token::PERCENTAGE) {
-        Io::SScan scan = c->token.data;
+        Io::SScan scan = c->token.data.str();
         c.next();
         return Ok(Percent{Io::atof(scan).unwrapOr(0.0)});
     }
@@ -939,7 +939,7 @@ Res<Resolution> ValueParser<Resolution>::parse(Cursor<Css::Sst> &c) {
         return Error::invalidData("unexpected end of input");
 
     if (c.peek() == Css::Token::DIMENSION) {
-        Io::SScan scan = c->token.data;
+        Io::SScan scan = c->token.data.str();
         auto value = Io::atof(scan).unwrapOr(0.0);
         auto unit = try$(_parseResolutionUnit(scan.remStr()));
         return Ok(Resolution{value, unit});
@@ -998,7 +998,7 @@ Res<String> ValueParser<String>::parse(Cursor<Css::Sst> &c) {
 
     if (c.peek() == Css::Token::STRING) {
         // TODO: Handle escape sequences
-        Io::SScan s = c.next().token.data;
+        Io::SScan s = c.next().token.data.str();
         StringBuilder sb{s.rem()};
         auto quote = s.next();
         while (not s.skip(quote) and not s.ended()) {

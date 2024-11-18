@@ -15,13 +15,13 @@ Res<T> parseDeclarationValue(Cursor<Css::Sst> &c) {
 
         return Ok(std::move(t));
     } else {
-        logDebug("missing parser for declaration: {}", T::name());
+        logError("missing parser for declaration: {}", T::name());
         return Error::notImplemented("missing parser for declaration");
     }
 }
 
 template <typename P>
-Res<P> parseDeclaration(Css::Sst const &sst) {
+Res<P> parseDeclaration(Css::Sst const &sst, bool allowDeferred = true) {
     if (sst != Css::Sst::DECL)
         panic("expected declaration");
 
@@ -30,32 +30,52 @@ Res<P> parseDeclaration(Css::Sst const &sst) {
 
     Res<P> resDecl = Error::invalidData("unknown declaration");
 
-    P::any([&]<typename T>(Meta::Type<T>) -> bool {
-        if (sst.token != Css::Token::ident(T::name()))
-            return false;
+    P::any(
+        Visitor{
+            [&](Meta::Type<CustomProp>) -> bool {
+                if constexpr (requires(P &p) { p.template unwrap<CustomProp>(); }) {
+                    if (startWith(sst.token.data, "--"s) == Match::NO) {
+                        return false;
+                    }
 
-        Cursor<Css::Sst> cursor = sst.content;
+                    resDecl = Ok(CustomProp(sst.token.data, sst.content));
+                    return true;
+                }
+                return false;
+            },
+            [&]<typename T>(Meta::Type<T>) -> bool {
+                if (sst.token != Css::Token::ident(T::name())) {
+                    return false;
+                }
+                Cursor<Css::Sst> cursor = sst.content;
 
-        auto res = parseDeclarationValue<T>(cursor);
-        if (not res) {
-            resDecl = res.none();
-            return true;
-        }
+                auto res = parseDeclarationValue<T>(cursor);
 
-        resDecl = Ok(res.take());
+                if (not res and allowDeferred) {
+                    if constexpr (Meta::Constructible<P, DeferredProp>) {
+                        resDecl = Ok(DeferredProp{T::name(), sst.content});
+                        return true;
+                    }
+                } else if (not res) {
+                    resDecl = res.none();
+                    return true;
+                } else {
+                    resDecl = Ok(res.take());
+                }
 
-        if constexpr (requires { P::important; }) {
-            if (cursor.skip(Css::Token::delim("!")) and cursor.skip(Css::Token::ident("important")))
-                resDecl.unwrap().important = Important::YES;
-        }
+                if constexpr (requires { P::important; }) {
+                    if (cursor.skip(Css::Token::delim("!")) and cursor.skip(Css::Token::ident("important")))
+                        resDecl.unwrap().important = Important::YES;
+                }
 
-        eatWhitespace(cursor);
-        if (not cursor.ended()) {
-            resDecl = Error::invalidData("unknown tokens in content");
-        }
+                eatWhitespace(cursor);
+                if (not cursor.ended())
+                    resDecl = Error::invalidData("unknown tokens in content");
 
-        return true;
-    });
+                return true;
+            }
+        } // namespace Vaev::Style
+    );
 
     if (not resDecl)
         logWarn("failed to parse declaration: {} - {}", sst, resDecl);
@@ -64,7 +84,7 @@ Res<P> parseDeclaration(Css::Sst const &sst) {
 }
 
 template <typename P>
-Vec<P> parseDeclarations(Css::Content const &sst) {
+Vec<P> parseDeclarations(Css::Content const &sst, bool allowDeferred = true) {
     Vec<P> res;
 
     for (auto const &item : sst) {
@@ -73,7 +93,7 @@ Vec<P> parseDeclarations(Css::Content const &sst) {
             continue;
         }
 
-        auto prop = parseDeclaration<P>(item);
+        auto prop = parseDeclaration<P>(item, allowDeferred);
 
         if (not prop) {
             logWarn("failed to parse declaration: {}", prop.none());
@@ -86,15 +106,15 @@ Vec<P> parseDeclarations(Css::Content const &sst) {
 }
 
 template <typename P>
-Vec<P> parseDeclarations(Css::Sst const &sst) {
-    return parseDeclarations<P>(sst.content);
+Vec<P> parseDeclarations(Css::Sst const &sst, bool allowDeferred = true) {
+    return parseDeclarations<P>(sst.content, allowDeferred);
 }
 
 template <typename P>
-Vec<P> parseDeclarations(Str style) {
+Vec<P> parseDeclarations(Str style, bool allowDeferred = true) {
     Css::Lexer lex{style};
     auto sst = Css::consumeDeclarationList(lex, true);
-    return parseDeclarations<P>(sst);
+    return parseDeclarations<P>(sst, allowDeferred);
 }
 
 } // namespace Vaev::Style

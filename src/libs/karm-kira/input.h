@@ -1,20 +1,23 @@
-#include <karm-ui/focus.h>
-#include <karm-ui/layout.h>
-#include <mdi/magnify.h>
+#pragma once
 
-#include "searchbar.h"
+#include <karm-ui/focus.h>
+#include <karm-ui/input.h>
+#include <karm-ui/layout.h>
+#include <karm-ui/view.h>
+
+#include "_prelude.h"
 
 namespace Karm::Kira {
 
-Ui::Child searchbar(String text) {
+static inline Ui::Child input(Mdi::Icon icon, String placeholder, String text) {
     return Ui::hflow(
                8,
-               Math::Align::VCENTER | Math::Align::START,
+               Math::Align::CENTER,
+               Ui::icon(icon),
                Ui::stack(
-                   text ? Ui::empty() : Ui::labelMedium(Gfx::ZINC600, "Search…"),
+                   text ? Ui::empty() : Ui::labelMedium(Gfx::ZINC600, placeholder),
                    Ui::input(Ui::TextStyles::labelMedium(), text, NONE)
-               ) | Ui::grow(),
-               Ui::icon(Mdi::MAGNIFY)
+               ) | Ui::grow()
            ) |
            Ui::box({
                .padding = {6, 12, 6, 12},

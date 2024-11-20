@@ -6,6 +6,6 @@
 
 namespace Karm::Kira {
 
-Ui::Child searchbar();
+Ui::Child searchbar(String text);
 
 } // namespace Karm::Kira

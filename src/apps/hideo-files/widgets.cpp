@@ -5,6 +5,7 @@
 #include <karm-kira/toolbar.h>
 #include <karm-mime/mime.h>
 #include <karm-ui/dialog.h>
+#include <karm-ui/focus.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/popover.h>
@@ -204,19 +205,20 @@ Ui::Child breadcrumb(State const &s) {
         .collect();
 
     return Ui::box(
-        {
-            .borderRadii = 4,
-            .borderWidth = 1,
-            .backgroundFill = Ui::GRAY800,
-        },
-        Ui::hflow(
-            Ui::empty(12),
-            Ui::hflow(items) |
-                Ui::hscroll() |
-                Ui::grow(),
-            refreshTool()
-        )
-    );
+               {
+                   .borderRadii = 4,
+                   .borderWidth = 1,
+                   .backgroundFill = Ui::GRAY800,
+               },
+               Ui::hflow(
+                   Ui::empty(12),
+                   Ui::hflow(items) |
+                       Ui::hscroll() |
+                       Ui::grow(),
+                   refreshTool()
+               )
+           ) |
+           Ui::focusable();
 }
 
 Ui::Child goBackTool(State const &s) {

@@ -38,7 +38,9 @@ Ui::Child _printPaper(usize index) {
         Ui::empty(Math::Vec2f{320 * scale, 452 * scale}.cast<isize>()) |
             Ui::box({
                 .borderRadii = 6,
-                .backgroundFill = Ui::GRAY50,
+                .borderWidth = 1,
+                .borderFill = Gfx::BLACK.withOpacity(0.1),
+                .backgroundFill = Gfx::WHITE,
             }),
         _printSelect(index) | Ui::align(Math::Align::BOTTOM_END)
     );

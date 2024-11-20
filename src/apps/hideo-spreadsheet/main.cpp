@@ -5,6 +5,7 @@
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
+#include <karm-ui/focus.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/scroll.h>
@@ -51,16 +52,17 @@ namespace Hideo::Spreadsheet {
 
 Ui::Child formula() {
     return Ui::box(
-        {
-            .borderRadii = 4,
-            .borderWidth = 1,
-            .backgroundFill = Ui::GRAY800,
-        },
-        Ui::hflow(
-            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FUNCTION),
-            Ui::grow(NONE)
-        )
-    );
+               {
+                   .borderRadii = 4,
+                   .borderWidth = 1,
+                   .backgroundFill = Ui::GRAY800,
+               },
+               Ui::hflow(
+                   Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FUNCTION),
+                   Ui::grow(NONE)
+               )
+           ) |
+           Ui::focusable();
 }
 
 Ui::Child toolbar(State const &state) {

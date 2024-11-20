@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cursor.h"
 #include "vec.h"
 
 namespace Karm {
@@ -42,6 +43,20 @@ struct Map {
         }
 
         panic("key not found");
+    }
+
+    MutCursor<V> access(K const &key) {
+        for (auto &i : _els)
+            if (i.car == key)
+                return &i.cdr;
+        return {};
+    }
+
+    Cursor<V> access(K const &key) const {
+        for (auto &i : _els)
+            if (i.car == key)
+                return &i.cdr;
+        return {};
     }
 
     V take(K const &key) {

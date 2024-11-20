@@ -102,7 +102,7 @@ Ui::Child apps(State const &state) {
     return Ui::vflow(
         Ui::hflow(
             4,
-            Kr::searchbar() | Ui::grow(),
+            Kr::searchbar(""s) | Ui::grow(),
             Ui::button(
                 Model::bind<ToggleAppThumbnail>(true),
                 state.isAppPanelThumbnails

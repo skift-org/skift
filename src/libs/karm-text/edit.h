@@ -98,6 +98,12 @@ struct Model {
         return _buf;
     }
 
+    String string() const {
+        StringBuilder sb;
+        sb.append(runes());
+        return sb.take();
+    }
+
     void load(Str text) {
         for (auto r : iterRunes(text))
             _buf.pushBack(r);

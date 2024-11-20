@@ -1,5 +1,6 @@
 #include <karm-kira/scaffold.h>
 #include <karm-ui/drag.h>
+#include <karm-ui/focus.h>
 #include <karm-ui/layout.h>
 #include <mdi/backspace-outline.h>
 #include <mdi/calculator.h>
@@ -90,7 +91,9 @@ Ui::Child screen(State const &state) {
                      : Ui::headlineMedium("{}", state.hasRhs ? state.rhs : state.lhs)) |
         Ui::align(Math::Align::VCENTER | Math::Align::END);
 
-    return Ui::vflow(8, /* debugExpr, */ currExpr, result) | Ui::insets({8, 16});
+    return Ui::vflow(8, /* debugExpr, */ currExpr, result) |
+           Ui::insets({8, 16}) |
+           Ui::focusable();
 }
 
 Ui::Child app() {

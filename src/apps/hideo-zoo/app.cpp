@@ -14,6 +14,7 @@
 #include "page-dialog.h"
 #include "page-focusable.h"
 #include "page-hsv-square.h"
+#include "page-input.h"
 #include "page-navbar.h"
 #include "page-print-dialog.h"
 #include "page-radio.h"
@@ -39,6 +40,7 @@ static Array PAGES = {
     &PAGE_DIALOG,
     &PAGE_FOCUS,
     &PAGE_HSV_SQUARE,
+    &PAGE_INPUT,
     &PAGE_NAVBAR,
     &PAGE_PRINT_DIALOG,
     &PAGE_RADIO,

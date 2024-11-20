@@ -16,7 +16,7 @@ namespace Hideo::Apps {
 
 Ui::Child sidebar() {
     return Kr::sidenav({
-        Kr::searchbar() | Ui::insets({6, 0}),
+        Kr::searchbar(""s) | Ui::insets({6, 0}),
         Kr::sidenavItem(true, Ui::NOP, Mdi::STAR_OUTLINE, "Discover"s),
         Kr::sidenavItem(false, Ui::NOP, Mdi::GAMEPAD_OUTLINE, "Play"s),
         Kr::sidenavItem(false, Ui::NOP, Mdi::BRUSH_OUTLINE, "Create"s),

@@ -1,6 +1,7 @@
 #include "input.h"
 
 #include "drag.h"
+#include "focus.h"
 #include "funcs.h"
 #include "layout.h"
 #include "view.h"
@@ -338,6 +339,90 @@ Child input(Text::ProseStyle style, Strong<Text::Model> text, OnChange<Text::Act
 
 Child input(Strong<Text::Model> text, OnChange<Text::Action> onChange) {
     return makeStrong<Input>(TextStyles::bodyMedium(), text, std::move(onChange));
+}
+
+struct SimpleInput : public View<SimpleInput> {
+    Text::ProseStyle _style;
+    String _text;
+    OnChange<String> _onChange;
+
+    FocusListener _focus;
+    Opt<Text::Model> _model;
+    Opt<Text::Prose> _prose;
+
+    SimpleInput(Text::ProseStyle style, String text, OnChange<String> onChange)
+        : _style(style),
+          _text(text),
+          _onChange(std::move(onChange)) {}
+
+    void reconcile(SimpleInput &o) override {
+        _style = o._style;
+        _model = o._model;
+        _onChange = std::move(o._onChange);
+
+        // NOTE: The model might have changed,
+        //       so we need to invalidate the presentation.
+        _prose = NONE;
+    }
+
+    Text::Model &_ensureModel() {
+        if (not _model)
+            _model = Text::Model(_text);
+        return *_model;
+    }
+
+    Text::Prose &_ensureText() {
+        if (not _prose) {
+            _prose = Text::Prose(_style);
+            _prose->append(_ensureModel().runes());
+        }
+        return *_prose;
+    }
+
+    void paint(Gfx::Canvas &g, Math::Recti) override {
+        g.push();
+        g.clip(bound());
+        g.origin(bound().xy.cast<f64>());
+
+        auto &text = _ensureText();
+
+        if (_focus)
+            text.paintCaret(g, _ensureModel()._cur.head, _style.color.unwrapOr(Ui::GRAY100));
+        text.paint(g);
+
+        g.pop();
+        if (debugShowLayoutBounds)
+            g.plot(bound(), Gfx::CYAN);
+    }
+
+    void event(App::Event &e) override {
+        _focus.event(*this, e);
+        auto a = Text::Action::fromEvent(e);
+        if (a) {
+            e.accept();
+            _ensureModel().reduce(*a);
+            _text = _ensureModel().string();
+            _prose = NONE;
+            if (_onChange)
+                _onChange(*this, _text);
+            else
+                Ui::shouldLayout(*this);
+        }
+    }
+
+    void layout(Math::Recti bound) override {
+        _ensureText().layout(bound.width);
+        View<SimpleInput>::layout(bound);
+    }
+
+    Math::Vec2i size(Math::Vec2i s, Hint) override {
+        auto size = _ensureText().layout(s.width);
+        return size.ceil().cast<isize>();
+    }
+};
+
+Child input(Text::ProseStyle style, String text, OnChange<String> onChange) {
+    return makeStrong<SimpleInput>(style, text, std::move(onChange));
 }
 
 // MARK: Slider -----------------------------------------------------------------

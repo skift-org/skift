@@ -27,7 +27,7 @@ Ui::Child sidenavItem(State const &s, Mdi::Icon icon, String title, Mime::Url ur
 
 Ui::Child sidebar(State const &s) {
     return Kr::sidenav({
-        Kr::searchbar() | Ui::insets({6, 0}),
+        Kr::searchbar(""s) | Ui::insets({6, 0}),
         sidenavItem(s, Mdi::HOME, "Home"s, "location://home"_url),
         sidenavItem(s, Mdi::FILE_DOCUMENT, "Documents"s, "location://documents"_url),
         sidenavItem(s, Mdi::IMAGE, "Pictures"s, "location://pictures"_url),

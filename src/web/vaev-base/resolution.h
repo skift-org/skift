@@ -13,6 +13,7 @@ struct Resolution {
         DPI,
         DPCM,
         DPPX,
+        X = DPPX,
         INFINITE,
     };
 

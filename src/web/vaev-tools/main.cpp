@@ -171,12 +171,11 @@ Res<> print(Mime::Url const &, Strong<Markup::Document> dom, Io::Writer &output,
         Sys::println("--- START OF PAINT ---\n{}\n--- END OF PAINT ---\n", pages);
 
     Print::PdfPrinter printer{
-        paperSize.cast<isize>(),
-        Print::Density::fromDpi(options.resolution.toDpi()),
+        options.paper
     };
 
     for (auto &page : pages) {
-        page.print(printer);
+        page->print(printer);
     }
 
     Io::TextEncoder<> encoder{output};

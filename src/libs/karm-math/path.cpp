@@ -5,6 +5,20 @@
 
 namespace Karm::Math {
 
+Math::Rectf Path::bound() {
+    if (isEmpty(_verts))
+        return {};
+
+    if (_bound)
+        return *_bound;
+
+    Math::Rectf rect = {_verts[0], 0};
+    for (auto &p : _verts)
+        rect = rect.mergeWith(p);
+    _bound = rect;
+    return rect;
+}
+
 // MARK: Flattening ------------------------------------------------------------
 
 void Path::_flattenClose() {

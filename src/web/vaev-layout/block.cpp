@@ -37,7 +37,7 @@ struct BlockFormatingContext {
 
             if (c.style->position != Position::ABSOLUTE) {
                 blockSize += margin.top;
-                if (input.commit == Commit::YES)
+                if (input.commit == Commit::YES or input.knownSize.x)
                     childInput.knownSize.width = childInlineSize;
             }
 

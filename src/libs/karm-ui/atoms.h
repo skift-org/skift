@@ -65,7 +65,7 @@ inline constexpr Gfx::Color GRAY800 = GRAYS[8];
 inline constexpr Gfx::Color GRAY900 = GRAYS[9];
 inline constexpr Gfx::Color GRAY950 = GRAYS[10];
 
-inline constexpr Gfx::ColorRamp ACCENTS = darkMode ? Gfx::SLATE_RAMP : Gfx::SLATE_RAMP.reversed();
+inline constexpr Gfx::ColorRamp ACCENTS = darkMode ? Gfx::BLUE_RAMP : Gfx::BLUE_RAMP.reversed();
 inline constexpr Gfx::Color ACCENT = ACCENTS[5];
 
 inline constexpr Gfx::Color ACCENT50 = ACCENTS[0];

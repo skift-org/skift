@@ -110,7 +110,7 @@ RenderResult render(Markup::Document const &dom, Style::Media const &media, Layo
     };
 }
 
-Vec<Scene::Page> print(Markup::Document &dom, Style::Media const &media) {
+Vec<Strong<Scene::Page>> print(Markup::Document const &dom, Style::Media const &media) {
     Style::StyleBook stylebook;
     stylebook.add(
         fetchStylesheet("bundle://vaev-driver/user-agent.css"_url)
@@ -147,9 +147,11 @@ Vec<Scene::Page> print(Markup::Document &dom, Style::Media const &media) {
         }
     );
 
-    Vec<Scene::Page> pages;
-    Layout::paint(tree.root, pages.emplaceBack());
-    last(pages).prepare();
+    Vec<Strong<Scene::Page>> pages;
+    auto page = makeStrong<Scene::Page>(vp.small.size().cast<isize>());
+    Layout::paint(tree.root, *page);
+    page->prepare();
+    pages.pushBack(page);
 
     return pages;
 }

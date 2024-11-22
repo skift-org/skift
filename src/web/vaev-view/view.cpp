@@ -41,7 +41,7 @@ struct View : public Ui::View<View> {
             .prefersReducedTransparency = ReducedTransparency::NO_PREFERENCE,
             .prefersContrast = Contrast::NO_PREFERENCE,
             .forcedColors = Colors::NONE,
-            .prefersColorScheme = ColorScheme::DARK,
+            .prefersColorScheme = Ui::darkMode ? ColorScheme::DARK : ColorScheme::LIGHT,
             .prefersReducedData = ReducedData::NO_PREFERENCE,
         };
     }
@@ -66,7 +66,7 @@ struct View : public Ui::View<View> {
         auto [_, layout, paint] = *_renderResult;
         g.clear(rect, Gfx::WHITE);
 
-        paint->paint(g);
+        paint->paint(g, rect.offset(-bound().xy).cast<f64>());
         if (Ui::debugShowLayoutBounds) {
             logDebug("layout tree: {}", layout);
             logDebug("paint tree: {}", paint);

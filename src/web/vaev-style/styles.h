@@ -271,12 +271,16 @@ struct BackgroundProp {
     }
 
     Res<> parse(Cursor<Css::Sst> &c) {
-        eatWhitespace(c);
         value.clear();
-        while (not c.ended()) {
-            value.pushBack(try$(parseValue<Color>(c)));
+
+        eatWhitespace(c);
+        auto maybeColor = parseValue<Color>(c);
+        while (maybeColor) {
+            value.pushBack(maybeColor.take());
             eatWhitespace(c);
+            maybeColor = parseValue<Color>(c);
         }
+
         return Ok();
     }
 };
@@ -2187,8 +2191,13 @@ struct DeferredProp {
 
     static constexpr Str name() { return "deferred prop"; }
 
-    void apply(Computed &) const {
-    }
+    static bool _expandVariable(Cursor<Css::Sst> &c, Map<String, Css::Content> const &env, Css::Content &out);
+
+    static bool _expandFunction(Cursor<Css::Sst> &c, Map<String, Css::Content> const &env, Css::Content &out);
+
+    static void _expandContent(Cursor<Css::Sst> &c, Map<String, Css::Content> const &env, Css::Content &out);
+
+    void apply(Computed &c) const;
 
     void repr(Io::Emit &e) const {
         e("(Deffered {#} = {})", propName, value);

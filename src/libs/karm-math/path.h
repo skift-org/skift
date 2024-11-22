@@ -98,6 +98,10 @@ struct Path {
         });
     }
 
+    Opt<Math::Rectf> _bound;
+
+    Math::Rectf bound();
+
     // MARK: Flattening --------------------------------------------------------
 
     void _flattenClose();

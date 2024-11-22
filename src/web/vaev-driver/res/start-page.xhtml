@@ -39,11 +39,65 @@
 </body>
 <style>
     body {
+        --k-gray50: #09090b;
+        --k-gray100: #18181b;
+        --k-gray200: #27272a;
+        --k-gray300: #3f3f46;
+        --k-gray400: #52525b;
+        --k-gray500: #71717a;
+        --k-gray600: #a1a1aa;
+        --k-gray700: #d4d4d8;
+        --k-gray800: #e4e4e7;
+        --k-gray900: #f4f4f5;
+        --k-gray950: #fafafa;
+
+        --k-accent50: #172554;
+        --k-accent100: #1e3a8a;
+        --k-accent200: #1e40af;
+        --k-accent300: #1d4ed8;
+        --k-accent400: #2563eb;
+        --k-accent500: #3b82f6;
+        --k-accent600: #60a5fa;
+        --k-accent700: #93c5fd;
+        --k-accent800: #bfdbfe;
+        --k-accent900: #dbeafe;
+        --k-accent950: #eff6ff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        body {
+            --k-gray50: #fafafa;
+            --k-gray100: #f4f4f5;
+            --k-gray200: #e4e4e7;
+            --k-gray300: #d4d4d8;
+            --k-gray400: #a1a1aa;
+            --k-gray500: #71717a;
+            --k-gray600: #52525b;
+            --k-gray700: #3f3f46;
+            --k-gray800: #27272a;
+            --k-gray900: #18181b;
+            --k-gray950: #09090b;
+
+            --k-accent50: #eff6ff;
+            --k-accent100: #dbeafe;
+            --k-accent200: #bfdbfe;
+            --k-accent300: #93c5fd;
+            --k-accent400: #60a5fa;
+            --k-accent500: #3b82f6;
+            --k-accent600: #2563eb;
+            --k-accent700: #1d4ed8;
+            --k-accent800: #1e40af;
+            --k-accent900: #1e3a8a;
+            --k-accent950: #172554;
+        }
+    }
+
+    body {
         margin: 0;
         font-family: sans-serif;
-        background-color: #09090b;
+        background-color: var(--k-gray950);
         height: 100vh;
-        color: #fff;
+        color: var(--k-gray50);
 
         display: flex;
         justify-content: center;
@@ -51,14 +105,12 @@
     }
 
     .search-bar {
-        background-color: #18181b;
-        border: 1px solid #3f3f46;
+        background-color: var(--k-gray900);
+        border: 1px solid var(--k-gray800);
         border-radius: 99px;
-        color: #71717a;
-        padding: 1rem;
-        padding-left: 2rem;
-        padding-right: 2rem;
-        font-size: 1.2rem;
+        color: var(--k-gray500);
+        padding: 0.6rem 1.2rem;
+        font-size: 1rem;
     }
 
 
@@ -75,12 +127,12 @@
         padding: 2rem;
         font-size: 1rem;
 
-        color: #a1a1aa;
+        color: var(--k-gray400);
     }
 
     .recent-icon {
-        background-color: #52525b;
-        color: #a1a1aa;
+        background-color: var(--k-gray700);
+        color: var(--k-gray400);
         border-radius: 99px;
         margin-bottom: 1em;
         width: 3rem;

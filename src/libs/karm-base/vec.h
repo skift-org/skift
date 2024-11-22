@@ -88,7 +88,7 @@ struct _Vec {
     void pushFront(T &&value) { _buf.insert(0, std::move(value)); }
 
     void pushFront(Sliceable<T> auto &other) {
-        for (auto &v : other)
+        for (auto &v : iterRev(other))
             pushFront(v);
     }
 

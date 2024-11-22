@@ -7,21 +7,28 @@
 namespace Karm::Scene {
 
 struct Text : public Node {
-    Math::Vec2f origin;
-    Strong<Karm::Text::Prose> prose;
+    Math::Vec2f _origin;
+    Strong<Karm::Text::Prose> _prose;
 
     Text(Math::Vec2f origin, Strong<Karm::Text::Prose> prose)
-        : origin(origin), prose(prose) {}
+        : _origin(origin), _prose(prose) {}
 
-    void paint(Gfx::Canvas &g) override {
+    Math::Rectf bound() override {
+        return {_origin, _prose->size()};
+    }
+
+    void paint(Gfx::Canvas &g, Math::Rectf r) override {
+        if (not bound().colide(r))
+            return;
+
         g.push();
-        g.origin(origin);
-        prose->paint(g);
+        g.origin(_origin);
+        _prose->paint(g);
         g.pop();
     }
 
     void repr(Io::Emit &e) const override {
-        e("(text z:{} {})", zIndex, origin);
+        e("(text z:{} {})", zIndex, _origin);
     }
 };
 

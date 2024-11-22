@@ -3,6 +3,7 @@
 #include <karm-io/fmt.h>
 
 #include "edge.h"
+#include "quad.h"
 #include "vec.h"
 
 namespace Karm::Math {
@@ -132,11 +133,12 @@ union Trans2 {
         return {apply(e.start), apply(e.end)};
     }
 
-    constexpr Rect<T> apply(Rect<T> r) const {
-        return Rect<T>::fromTwoPoint(
-            apply(r.topStart()),
-            apply(r.bottomEnd())
-        );
+    constexpr Quad<T> apply(Quad<T> q) const {
+        return {apply(q.a), apply(q.b), apply(q.c), apply(q.d)};
+    }
+
+    constexpr Quad<T> apply(Rect<T> r) const {
+        return apply(Quad<T>{r});
     }
 
     constexpr Trans2 multiply(Trans2 const &other) const {
@@ -149,7 +151,7 @@ union Trans2 {
             oy * other.yy + other.oy,
         };
 
-        if (xy != 0.0 or yx != 0.0 ||
+        if (xy != 0.0 or yx != 0.0 or
             other.xy != 0.0 or other.yx != 0.0) {
             res.xx += xy * other.yx;
             res.xy += xx * other.xy + xy * other.yy;
@@ -166,20 +168,16 @@ union Trans2 {
         return multiply(makeRotate(angle));
     }
 
-    constexpr Trans2 skewed(T x, T y) {
-        return multiply(makeSkew(x, y));
+    constexpr Trans2 skewed(Vec2<T> v) {
+        return multiply(makeSkew(v));
     }
 
-    constexpr Trans2 scaled(T x, T y) {
-        return multiply(makeScale(x, y));
+    constexpr Trans2 scaled(Vec2<T> v) {
+        return multiply(makeScale(v));
     }
 
-    constexpr Trans2 scaled(T s) {
-        return scaled(s, s);
-    }
-
-    constexpr Trans2 translated(T x, T y) {
-        return multiply(makeTranslate(x, y));
+    constexpr Trans2 translated(Vec2<T> v) {
+        return multiply(makeTranslate(v));
     }
 
     constexpr Trans2 inverse() const {

@@ -20,16 +20,19 @@ struct Stack : public Node {
             child->prepare();
     }
 
-    Math::Recti bound() override {
-        Math::Recti rect;
+    Math::Rectf bound() override {
+        Math::Rectf rect;
         for (auto &child : _children)
             rect = rect.mergeWith(child->bound());
         return rect;
     }
 
-    void paint(Gfx::Canvas &g) override {
+    void paint(Gfx::Canvas &g, Math::Rectf r) override {
+        if (not bound().colide(r))
+            return;
+
         for (auto &child : _children)
-            child->paint(g);
+            child->paint(g, r);
     }
 
     void print(Print::Printer &p) override {
@@ -51,4 +54,4 @@ struct Stack : public Node {
     }
 };
 
-} // namespace Vaev::Paint
+} // namespace Karm::Scene

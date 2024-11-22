@@ -327,13 +327,13 @@ union Rect {
 };
 
 template <typename T>
-constexpr Rect<T> const Rect<T>::ZERO = {};
+Rect<T> const Rect<T>::ZERO = {};
 
 template <typename T>
-constexpr Rect<T> const Rect<T>::ONE = {1, 1};
+Rect<T> const Rect<T>::ONE = {1, 1};
 
 template <typename T>
-constexpr Rect<T> const Rect<T>::MAX = {Limits<T>::MAX, Limits<T>::MAX};
+Rect<T> const Rect<T>::MAX = {Limits<T>::MAX, Limits<T>::MAX};
 
 using Recti = Rect<isize>;
 

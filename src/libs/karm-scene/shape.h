@@ -7,22 +7,29 @@
 namespace Karm::Scene {
 
 struct Shape : public Node {
-    Math::Path path;
-    Opt<Gfx::Stroke> stroke;
-    Opt<Gfx::Fill> fill;
-    Gfx::FillRule rule = Gfx::FillRule::NONZERO;
+    Math::Path _path;
+    Opt<Gfx::Stroke> _stroke;
+    Opt<Gfx::Fill> _fill;
+    Gfx::FillRule _rule = Gfx::FillRule::NONZERO;
 
     Shape(Math::Path path, Opt<Gfx::Stroke> stroke, Opt<Gfx::Fill> fill)
-        : path(path), stroke(stroke), fill(fill) {}
+        : _path(path), _stroke(stroke), _fill(fill) {}
 
-    void paint(Gfx::Canvas &g) override {
-        g.path(path);
+    Math::Rectf bound() override {
+        return _path.bound();
+    }
 
-        if (fill)
-            g.fill(*fill, rule);
+    void paint(Gfx::Canvas &g, Math::Rectf r) override {
+        if (not bound().colide(r))
+            return;
 
-        if (stroke)
-            g.stroke(*stroke);
+        g.path(_path);
+
+        if (_fill)
+            g.fill(*_fill, _rule);
+
+        if (_stroke)
+            g.stroke(*_stroke);
     }
 
     void repr(Io::Emit &e) const override {

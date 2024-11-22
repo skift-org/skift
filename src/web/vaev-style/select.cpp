@@ -308,7 +308,7 @@ static Selector _parseAttributeSelector(Slice<Css::Sst> content) {
             step++;
             break;
         case 2:
-            value = parseValue<String>(cur).unwrap();
+            value = parseValue<String>(cur).unwrapOr(""s);
             step++;
             break;
         case 3:

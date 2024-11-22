@@ -9,6 +9,7 @@
 #include <karm-sys/file.h>
 #include <karm-sys/launch.h>
 #include <karm-ui/dialog.h>
+#include <karm-ui/focus.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
 #include <karm-ui/popover.h>
@@ -31,6 +32,7 @@
 #include <mdi/tune-variant.h>
 #include <mdi/web.h>
 #include <vaev-driver/fetcher.h>
+#include <vaev-view/dialog.h>
 #include <vaev-view/view.h>
 
 #include "inspect.h"
@@ -95,29 +97,29 @@ Ui::Child mainMenu([[maybe_unused]] State const &s) {
         Kr::contextMenuItem(Model::bind(SidePanel::BOOKMARKS), Mdi::BOOKMARK, "Bookmarks"),
         Ui::separator(),
         Kr::contextMenuItem(
-            [](auto &n) {
-                Ui::showDialog(
-                    n,
-                    Kr::printDialog()
-                );
-            },
+            not s.dom
+                ? Ui::OnPress{NONE}
+                : [dom = s.dom.unwrap()](auto &n) {
+                      Ui::showDialog(
+                          n,
+                          View::printDialog(dom)
+                      );
+                  },
             Mdi::PRINTER, "Print..."
         ),
 #ifdef __ck_host__
-        Kr::contextMenuItem(
-            [&](auto &n) {
-                auto res = Sys::launch(Mime::Uti::PUBLIC_OPEN, s.url);
-                if (not res)
-                    Ui::showDialog(
-                        n,
-                        Kr::alert(
-                            "Error"s,
-                            Io::format("Failed to open in default browser\n\n{}", res).unwrap()
-                        )
-                    );
-            },
-            Mdi::WEB, "Open in default browser..."
-        ),
+        Kr::contextMenuItem([&](auto &n) {
+            auto res = Sys::launch(Mime::Uti::PUBLIC_OPEN, s.url);
+            if (not res)
+                Ui::showDialog(
+                    n,
+                    Kr::alert(
+                        "Error"s,
+                        Io::format("Failed to open in default browser\n\n{}", res).unwrap()
+                    )
+                );
+        },
+                            Mdi::WEB, "Open in default browser..."),
 #endif
         Ui::separator(),
         Kr::contextMenuItem(Model::bind(SidePanel::DEVELOPER_TOOLS), Mdi::CODE_TAGS, "Developer Tools"),
@@ -143,7 +145,7 @@ Ui::Child addressBar(Mime::Url const &url) {
                    },
                    Ui::ButtonStyle::subtle(), Mdi::TUNE_VARIANT
                ),
-               Ui::text("{}", url) |
+               Ui::input(Ui::TextStyles::labelMedium(), url.str(), NONE) |
                    Ui::vcenter() |
                    Ui::hscroll() |
                    Ui::grow(),
@@ -154,7 +156,8 @@ Ui::Child addressBar(Mime::Url const &url) {
                .borderRadii = 4,
                .borderWidth = 1,
                .backgroundFill = Ui::GRAY800,
-           });
+           }) |
+           Ui::focusable();
 }
 
 Ui::Child contextMenu(State const &s) {

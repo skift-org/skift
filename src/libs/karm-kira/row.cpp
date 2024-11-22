@@ -33,10 +33,10 @@ Ui::Child rowContent(Opt<Ui::Child> leading, String title, Opt<String> subtitle,
     auto t = subtitle
                  ? Ui::vflow(
                        8,
-                       Ui::labelLarge(title),
-                       Ui::labelMedium(*subtitle)
+                       Ui::labelMedium(title),
+                       Ui::labelSmall(*subtitle)
                    )
-                 : Ui::labelLarge(title);
+                 : Ui::labelMedium(title);
 
     auto trail = trailing
                      ? *trailing |

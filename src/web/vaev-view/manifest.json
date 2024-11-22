@@ -5,6 +5,7 @@
     "description": "Host Vaev web content withing a user interface.",
     "requires": [
         "karm-ui",
+        "karm-kira",
         "vaev-driver"
     ]
 }

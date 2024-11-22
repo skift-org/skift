@@ -8,26 +8,16 @@
 namespace Karm::Print {
 
 struct PdfPrinter : public Printer {
-    Math::Vec2f _paperSize;
-    Density _density;
+    PaperStock _paper;
     Vec<Io::StringWriter> _pages;
     Opt<Pdf::Canvas> _canvas;
 
-    PdfPrinter(PaperStock stock, Density density = Density::DEFAULT) {
-        _paperSize.width = (stock.width / INCH_TO_MM) * (density.toDpi());
-        _paperSize.height = (stock.height / INCH_TO_MM) * (density.toDpi());
-        _density = density;
-    }
-
-    PdfPrinter(Math::Vec2i size, Density density = Density::DEFAULT) {
-        _paperSize.width = size.x;
-        _paperSize.height = size.y;
-        _density = density;
-    }
+    PdfPrinter(PaperStock stock)
+        : _paper(stock) {}
 
     Gfx::Canvas &beginPage() override {
         _pages.emplaceBack();
-        _canvas = Pdf::Canvas{last(_pages), _paperSize};
+        _canvas = Pdf::Canvas{last(_pages), _paper.size()};
         return *_canvas;
     }
 
@@ -79,8 +69,8 @@ struct PdfPrinter : public Printer {
                  Pdf::Array{
                      usize{0},
                      usize{0},
-                     _paperSize.width,
-                     _paperSize.height,
+                     _paper.width,
+                     _paper.height,
                  }},
                 {"Count"s, _pages.len()},
                 {"Kids"s, std::move(pagesKids)},

@@ -20,6 +20,47 @@ Res<T> parseDeclarationValue(Cursor<Css::Sst> &c) {
     }
 }
 
+static inline Important _consumeImportant(Cursor<Css::Sst> &c, bool eatEverything) {
+    eatWhitespace(c);
+    while (not c.ended()) {
+        if (c.skip(Css::Token::delim("!")) and
+            c.skip(Css::Token::ident("important"))) {
+
+            eatWhitespace(c);
+            return Important::YES;
+        }
+        if (not eatEverything)
+            break;
+        c.next();
+    }
+
+    return Important::NO;
+}
+
+template <typename P>
+static inline P _deferProperty(Css::Sst const &sst) {
+    StyleProp prop = DeferredProp{sst.token.data, sst.content};
+    if constexpr (requires { P::important; }) {
+        Cursor<Css::Sst> content = sst.content;
+        prop.important = _consumeImportant(content, true);
+    }
+    return prop;
+}
+
+template <typename P, typename T>
+static inline Res<P> _parseDeclaration(Css::Sst const &sst) {
+    Cursor<Css::Sst> content = sst.content;
+    P prop = try$(parseDeclarationValue<T>(content));
+
+    if constexpr (requires { P::important; })
+        prop.important = _consumeImportant(content, false);
+
+    if (not content.ended())
+        return Error::invalidData("unknown tokens in content");
+
+    return Ok(std::move(prop));
+}
+
 template <typename P>
 Res<P> parseDeclaration(Css::Sst const &sst, bool allowDeferred = true) {
     if (sst != Css::Sst::DECL)
@@ -47,34 +88,17 @@ Res<P> parseDeclaration(Css::Sst const &sst, bool allowDeferred = true) {
                 if (sst.token != Css::Token::ident(T::name())) {
                     return false;
                 }
-                Cursor<Css::Sst> cursor = sst.content;
 
-                auto res = parseDeclarationValue<T>(cursor);
-
-                if (not res and allowDeferred) {
+                resDecl = _parseDeclaration<P, T>(sst);
+                if (not resDecl and allowDeferred) {
                     if constexpr (Meta::Constructible<P, DeferredProp>) {
-                        resDecl = Ok(DeferredProp{T::name(), sst.content});
-                        return true;
+                        resDecl = Ok(_deferProperty<P>(sst));
                     }
-                } else if (not res) {
-                    resDecl = res.none();
-                    return true;
-                } else {
-                    resDecl = Ok(res.take());
                 }
-
-                if constexpr (requires { P::important; }) {
-                    if (cursor.skip(Css::Token::delim("!")) and cursor.skip(Css::Token::ident("important")))
-                        resDecl.unwrap().important = Important::YES;
-                }
-
-                eatWhitespace(cursor);
-                if (not cursor.ended())
-                    resDecl = Error::invalidData("unknown tokens in content");
 
                 return true;
             }
-        } // namespace Vaev::Style
+        }
     );
 
     if (not resDecl)

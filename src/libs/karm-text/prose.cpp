@@ -179,6 +179,7 @@ Math::Vec2f Prose::layout(f64 width) {
     _wrapLines(width);
     auto textHeight = _layoutVerticaly();
     auto textWidth = _layoutHorizontaly(width);
+    _size = {textWidth, textHeight};
     return {textWidth, textHeight};
 }
 

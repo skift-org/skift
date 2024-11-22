@@ -190,7 +190,9 @@ void CpuCanvas::clip(FillRule) {
 // MARK: Shape Operations ------------------------------------------------------
 
 [[gnu::flatten]] void CpuCanvas::_fillRect(Math::Recti r, Gfx::Color color) {
-    r = current().trans.apply(r.cast<f64>()).cast<isize>();
+    // FIXME: Properly handle offaxis rectangles
+    r = current().trans.apply(r.cast<f64>()).bound().cast<isize>();
+
     r = current().clip.clipTo(r);
 
     if (color.alpha == 255) {
@@ -226,7 +228,9 @@ void CpuCanvas::fill(Math::Recti r, Math::Radiif radii) {
 }
 
 void CpuCanvas::clip(Math::Rectf rect) {
-    rect = current().trans.apply(rect.cast<f64>());
+    // FIXME: Properly handle offaxis rectangles
+    rect = current().trans.apply(rect.cast<f64>()).bound();
+
     current().clip = rect.cast<isize>().clipTo(current().clip);
 }
 
@@ -257,7 +261,9 @@ void CpuCanvas::clear(Color color) {
 }
 
 void CpuCanvas::clear(Math::Recti rect, Color color) {
-    rect = current().trans.apply(rect.cast<f64>()).cast<isize>();
+    // FIXME: Properly handle offaxis rectangles
+    rect = current().trans.apply(rect.cast<f64>()).bound().cast<isize>();
+
     rect = current().clip.clipTo(rect);
     mutPixels()
         .clip(rect)
@@ -312,7 +318,9 @@ void CpuCanvas::plot(Math::Recti rect, Color color) {
     Pixels src, Math::Recti srcRect, auto srcFmt,
     MutPixels dest, Math::Recti destRect, auto destFmt
 ) {
-    destRect = current().trans.apply(destRect.cast<f64>()).cast<isize>();
+    // FIXME: Properly handle offaxis rectangles
+    destRect = current().trans.apply(destRect.cast<f64>()).bound().cast<isize>();
+
     auto clipDest = current().clip.clipTo(destRect);
 
     auto hratio = srcRect.height / (f64)destRect.height;
@@ -355,7 +363,9 @@ void CpuCanvas::apply(Filter filter) {
 }
 
 void CpuCanvas::apply(Filter filter, Math::Recti r) {
-    r = current().trans.apply(r.cast<f64>()).cast<isize>();
+    // FIXME: Properly handle offaxis rectangles
+    r = current().trans.apply(r.cast<f64>()).bound().cast<isize>();
+
     r = current().clip.clipTo(r);
 
     filter.apply(mutPixels().clip(r));

@@ -1,5 +1,7 @@
 #include <karm-app/form-factor.h>
+#include <karm-print/paper.h>
 #include <karm-ui/layout.h>
+#include <karm-ui/reducer.h>
 #include <karm-ui/scroll.h>
 
 #include "checkbox.h"
@@ -10,12 +12,29 @@
 
 namespace Karm::Kira {
 
-Ui::Child _printSelect(usize index) {
+// MARK: Model -----------------------------------------------------------------
+
+struct State {
+    PrintPreview preview;
+    Print::Settings settings = {};
+    Vec<Strong<Scene::Page>> pages = preview(settings);
+};
+
+using Action = Union<None>;
+
+void reduce(State &, Action) {
+}
+
+using Model = Ui::Model<State, Action, reduce>;
+
+// MARK: Dialog ----------------------------------------------------------------
+
+Ui::Child _printSelect(State const &s, usize index) {
     return Ui::hflow(
                8,
                Math::Align::CENTER,
                checkbox(true, NONE),
-               Ui::labelMedium("Page {} of 3", index + 1)
+               Ui::labelMedium("Page {} of {}", index + 1, s.pages.len())
            ) |
            Ui::box({
                .margin = 8,
@@ -27,7 +46,7 @@ Ui::Child _printSelect(usize index) {
            });
 }
 
-Ui::Child _printPaper(usize index) {
+Ui::Child _printPaper(State const &s, usize index) {
     auto scale = 1.;
     auto isMobile = App::useFormFactor() == App::FormFactor::MOBILE;
     if (isMobile) {
@@ -35,48 +54,53 @@ Ui::Child _printPaper(usize index) {
     }
 
     return Ui::stack(
-        Ui::empty(Math::Vec2f{320 * scale, 452 * scale}.cast<isize>()) |
-            Ui::box({
-                .borderRadii = 6,
-                .borderWidth = 1,
-                .borderFill = Gfx::BLACK.withOpacity(0.1),
-                .backgroundFill = Gfx::WHITE,
-            }),
-        _printSelect(index) | Ui::align(Math::Align::BOTTOM_END)
-    );
+               Ui::canvas(s.pages[index]) |
+                   Ui::box({
+                       .borderRadii = 6,
+                       .borderWidth = 1,
+                       .borderFill = Ui::GRAY50.withOpacity(0.1),
+                       .backgroundFill = Gfx::WHITE,
+                   }),
+               _printSelect(s, index) | Ui::align(Math::Align::BOTTOM_END)
+           ) |
+           Ui::pinSize(Math::Vec2f{320 * scale, 452 * scale}.cast<isize>());
 }
 
-Ui::Child _printPreviewMobile() {
+Ui::Child _printPreviewMobile(State const &s) {
+    Ui::Children pages;
+    for (usize i = 0; i < s.pages.len(); ++i) {
+        pages.pushBack(_printPaper(s, i));
+    }
+
     return Ui::hflow(
                8,
                Math::Align::CENTER,
-               _printPaper(0),
-               _printPaper(1),
-               _printPaper(2)
+               std::move(pages)
            ) |
            Ui::insets(32) |
            Ui::hscroll() |
            Ui::box(
                {
-                   .borderRadii = {0, 0, 0, 12},
                    .backgroundFill = Ui::GRAY950,
                }
            );
 }
 
-Ui::Child _printPreview() {
+Ui::Child _printPreview(State const &s) {
+    Ui::Children pages;
+    for (usize i = 0; i < s.pages.len(); ++i) {
+        pages.pushBack(_printPaper(s, i));
+    }
+
     return Ui::vflow(
                8,
                Math::Align::CENTER,
-               _printPaper(0),
-               _printPaper(1),
-               _printPaper(2)
+               std::move(pages)
            ) |
            Ui::insets(32) |
            Ui::vscroll() |
            Ui::box(
                {
-                   .borderRadii = {0, 0, 0, 12},
                    .backgroundFill = Ui::GRAY950,
                }
            );
@@ -104,6 +128,24 @@ Ui::Child _destinationSelect() {
             };
         }
     );
+}
+
+Ui::Child _paperSelect() {
+    return select(selectValue("A4"s), [] -> Ui::Children {
+        Vec<Ui::Child> groups;
+
+        for (auto &serie : Print::SERIES) {
+            Vec<Ui::Child> items;
+            items.pushBack(selectLabel(serie.name));
+            for (auto const &stock : serie.stocks) {
+                items.pushBack(selectItem(Ui::NOP, stock.name));
+            }
+
+            groups.pushBack(selectGroup(std::move(items)));
+        }
+
+        return groups;
+    });
 }
 
 Ui::Child _printSettings() {
@@ -158,18 +200,11 @@ Ui::Child _printSettings() {
             NONE,
             Karm::Ui::Slots{[] -> Ui::Children {
                 return {
-                    selectRow(
-                        selectValue("A4"s),
-                        [] -> Ui::Children {
-                            return {
-                                selectItem(Ui::NOP, "A3"s),
-                                selectItem(Ui::NOP, "A4"s),
-                                selectItem(Ui::NOP, "A5"s),
-                                selectItem(Ui::NOP, "Letter"s),
-                                selectItem(Ui::NOP, "Legal"s),
-                            };
-                        },
-                        "Paper size"s
+                    rowContent(
+                        NONE,
+                        "Paper"s,
+                        NONE,
+                        _paperSelect()
                     ),
                     selectRow(
                         selectValue("1"s),
@@ -213,11 +248,11 @@ Ui::Child _printControls() {
            Ui::minSize({320, Ui::UNCONSTRAINED});
 }
 
-Ui::Child _printDialog() {
+Ui::Child _printDialog(State const &s) {
     return dialogContent({
         dialogTitleBar("Print"s),
         Ui::hflow(
-            _printPreview(),
+            _printPreview(s),
             _printControls() | Ui::grow()
         ) | Ui::maxSize({Ui::UNCONSTRAINED, 500}) |
             Ui::grow(),
@@ -229,16 +264,17 @@ Ui::Child _printDialog() {
     });
 }
 
-Ui::Child _printDialogMobile() {
+Ui::Child _printDialogMobile(State const &s) {
     return dialogContent({
         dialogTitleBar("Print"s),
         Ui::separator(),
         Ui::vflow(
-            _printPreviewMobile(),
+            _printPreviewMobile(s),
             Ui::separator(),
             titleRow("Settings"s),
             _printSettings()
-        ) | Ui::vscroll() |
+        ) | Ui::minSize(500) |
+            Ui::vscroll() |
             Ui::grow(),
         Ui::separator(),
         dialogFooter({
@@ -248,13 +284,13 @@ Ui::Child _printDialogMobile() {
     });
 }
 
-Ui::Child printDialog() {
-    auto isMobile = App::useFormFactor() == App::FormFactor::MOBILE;
-
-    if (isMobile) {
-        return _printDialogMobile();
-    }
-    return _printDialog();
+Ui::Child printDialog(PrintPreview preview) {
+    return Ui::reducer<Model>({preview}, [](State const &s) {
+        auto isMobile = App::useFormFactor() == App::FormFactor::MOBILE;
+        if (isMobile)
+            return _printDialogMobile(s);
+        return _printDialog(s);
+    });
 }
 
 } // namespace Karm::Kira

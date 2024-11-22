@@ -2,6 +2,7 @@
 
 #include <karm-gfx/icon.h>
 #include <karm-image/picture.h>
+#include <karm-scene/base.h>
 #include <karm-text/prose.h>
 
 #include "node.h"
@@ -119,6 +120,8 @@ Child image(Image::Picture image, Math::Radiif radii);
 using OnPaint = Func<void(Gfx::Canvas &g, Math::Vec2i size)>;
 
 Child canvas(OnPaint onPaint);
+
+Child canvas(Strong<Scene::Node> child);
 
 // MARK: Blur ------------------------------------------------------------------
 

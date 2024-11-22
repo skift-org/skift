@@ -301,7 +301,9 @@ Res<Color> ValueParser<Color>::parse(Cursor<Css::Sst> &c) {
             return Ok(TRANSPARENT);
         }
     } else if (c.peek() == Css::Sst::FUNC) {
-        return Ok(try$(_parseFuncColor(c.next())));
+        auto color = try$(_parseFuncColor(*c));
+        c.next();
+        return Ok(color);
     }
 
     return Error::invalidData("expected color");
@@ -928,7 +930,7 @@ static Res<Resolution::Unit> _parseResolutionUnit(Str unit) {
         return Ok(Resolution::Unit::DPI);
     else if (eqCi(unit, "dpcm"s))
         return Ok(Resolution::Unit::DPCM);
-    else if (eqCi(unit, "dppx"s))
+    else if (eqCi(unit, "dppx"s) or eqCi(unit, "x"s))
         return Ok(Resolution::Unit::DPPX);
     else
         return Error::invalidData("unknown resolution unit");

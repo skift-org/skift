@@ -146,7 +146,13 @@ struct Prose {
     f64 _spaceWidth{};
     f64 _lineHeight{};
 
+    Math::Vec2f _size;
+
     Prose(ProseStyle style, Str str = "");
+
+    Math::Vec2f size() const {
+        return _size;
+    }
 
     // MARK: Prose --------------------------------------------------------------
 

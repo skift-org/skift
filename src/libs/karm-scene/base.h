@@ -15,9 +15,9 @@ struct Node {
     virtual void prepare() {}
 
     /// The bounding rectangle of the node
-    virtual Math::Recti bound() { return {}; }
+    virtual Math::Rectf bound() { return {}; }
 
-    virtual void paint(Gfx::Canvas &) {}
+    virtual void paint(Gfx::Canvas &, Math::Rectf = Math::Rectf::MAX) {}
 
     virtual void print(Print::Printer &) {}
 

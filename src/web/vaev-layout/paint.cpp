@@ -31,29 +31,31 @@ static bool _paintBorders(Box &box, Gfx::Color currentColor, Gfx::Borders &borde
 }
 
 static void _paintBox(Box &box, Gfx::Color currentColor, Scene::Stack &stack) {
-    auto const &backgrounds = box.style->backgrounds;
+    auto const &cssBackground = box.style->backgrounds;
 
-    Scene::Box paint;
-    bool hasBackgrounds = any(backgrounds);
+    Gfx::Borders borders;
+    Vec<Gfx::Fill> backgrounds;
+
+    bool hasBackgrounds = any(cssBackground);
 
     if (hasBackgrounds) {
-        paint.backgrounds.ensure(backgrounds.len());
-        for (auto &bg : backgrounds) {
+        backgrounds.ensure(cssBackground.len());
+        for (auto &bg : cssBackground) {
             auto color = resolve(bg.fill, currentColor);
 
             // Skip transparent backgrounds
             if (color.alpha == 0)
                 continue;
 
-            paint.backgrounds.pushBack(color);
+            backgrounds.pushBack(color);
         }
     }
 
-    bool hasBorders = _paintBorders(box, currentColor, paint.borders);
-    paint.bound = box.layout.borderBox().cast<f64>();
+    bool hasBorders = _paintBorders(box, currentColor, borders);
+    Math::Rectf bound = box.layout.borderBox().cast<f64>();
 
     if (hasBackgrounds or hasBorders)
-        stack.add(makeStrong<Scene::Box>(std::move(paint)));
+        stack.add(makeStrong<Scene::Box>(bound, std::move(borders), std::move(backgrounds)));
 }
 
 static void _establishStackingContext(Box &box, Scene::Stack &stack);

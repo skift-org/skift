@@ -1,4 +1,5 @@
 #include <karm-scene/box.h>
+#include <karm-scene/image.h>
 #include <karm-scene/text.h>
 
 #include "paint.h"
@@ -75,6 +76,11 @@ static void _paintBox(Box &box, Scene::Stack &stack) {
         stack.add(makeStrong<Scene::Text>(
             box.layout.borderBox().topStart().cast<f64>(),
             *prose
+        ));
+    } else if (auto image = box.content.is<Image::Picture>()) {
+        stack.add(makeStrong<Scene::Image>(
+            box.layout.borderBox().cast<f64>(),
+            *image
         ));
     }
 }

@@ -1,3 +1,4 @@
+#include <karm-image/loader.h>
 #include <karm-text/loader.h>
 
 #include "builder.h"
@@ -108,7 +109,9 @@ static void _buildElement(Style::Computer &c, Markup::Element const &el, Box &pa
     auto font = _lookupFontface(*style);
 
     if (el.tagName == Html::IMG) {
-        Image::Picture img = Gfx::Surface::fallback();
+        auto src = el.getAttribute(Html::SRC_ATTR).unwrapOr(""s);
+        auto url = Mime::Url::parse(src);
+        Image::Picture img = Image::loadOrFallback(url).unwrap();
         parent.add({style, font, img});
         return;
     }

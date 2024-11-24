@@ -191,6 +191,7 @@ static void _buildRun(Style::Computer &, Markup::Text const &node, Box &parent) 
     }
 
     auto prose = makeStrong<Text::Prose>(proseStyle);
+    auto whitespace = style->text->whiteSpace;
 
     while (not scan.ended()) {
         switch (style->text->transform) {
@@ -210,7 +211,11 @@ static void _buildRun(Style::Computer &, Markup::Text const &node, Box &parent) 
             break;
         }
 
-        if (style->text->whiteSpace == WhiteSpace::PRE_LINE) {
+        if (whitespace == WhiteSpace::PRE) {
+            auto tok = scan.token(Re::space());
+            if (tok)
+                prose->append(tok);
+        } else if (whitespace == WhiteSpace::PRE_LINE) {
             bool hasBlank = false;
             if (scan.eat(Re::blank())) {
                 hasBlank = true;

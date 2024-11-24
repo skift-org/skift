@@ -73,6 +73,18 @@ figure {
     margin-inline: 40px;
 }
 
+address {
+    font-style: italic;
+}
+
+listing,
+plaintext,
+pre,
+xmp {
+    font-family: monospace;
+    white-space: pre;
+}
+
 
 /* 15.3.4 MARK: Phrasing content -------------------------------------------- */
 /* https://html.spec.whatwg.org/multipage/rendering.html#phrasing-content-3   */

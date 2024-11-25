@@ -134,6 +134,7 @@ Ui::Child _paperSelect() {
     return select(selectValue("A4"s), [] -> Ui::Children {
         Vec<Ui::Child> groups;
 
+        bool first = false;
         for (auto &serie : Print::SERIES) {
             Vec<Ui::Child> items;
             items.pushBack(selectLabel(serie.name));
@@ -141,7 +142,11 @@ Ui::Child _paperSelect() {
                 items.pushBack(selectItem(Ui::NOP, stock.name));
             }
 
+            if (not first)
+                groups.pushBack(Ui::separator());
             groups.pushBack(selectGroup(std::move(items)));
+
+            first = false;
         }
 
         return groups;

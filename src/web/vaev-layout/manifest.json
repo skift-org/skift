@@ -4,10 +4,11 @@
     "type": "lib",
     "description": "Layout engine of Vaev",
     "requires": [
-        "karm-math",
         "karm-gfx",
-        "karm-text",
+        "karm-image",
+        "karm-math",
         "karm-scene",
+        "karm-text",
         "vaev-markup",
         "vaev-style"
     ]

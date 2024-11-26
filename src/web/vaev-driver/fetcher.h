@@ -12,4 +12,6 @@ Res<Strong<Markup::Document>> fetchDocument(Mime::Url const &url);
 
 Res<Strong<Markup::Document>> loadDocument(Mime::Url const &url, Mime::Mime const &mime, Io::Reader &reader);
 
+Res<Strong<Markup::Document>> viewSource(Mime::Url const &url);
+
 } // namespace Vaev::Driver

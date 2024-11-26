@@ -1,4 +1,5 @@
 #include <karm-mime/mime.h>
+#include <karm-sys/dir.h>
 #include <karm-sys/file.h>
 #include <vaev-markup/html.h>
 #include <vaev-markup/xml.h>
@@ -35,6 +36,58 @@ Res<Strong<Markup::Document>> loadDocument(Mime::Url const &, Mime::Mime const &
     }
 }
 
+Res<Strong<Markup::Document>> viewSource(Mime::Url const &url) {
+    auto file = try$(Sys::File::open(url));
+    auto buf = try$(Io::readAllUtf8(file));
+
+    auto dom = makeStrong<Markup::Document>();
+
+    auto body = makeStrong<Markup::Element>(Html::BODY);
+    dom->appendChild(body);
+
+    auto pre = makeStrong<Markup::Element>(Html::PRE);
+    body->appendChild(pre);
+
+    auto text = makeStrong<Markup::Text>(buf);
+    pre->appendChild(text);
+
+    return Ok(dom);
+}
+
+Res<Strong<Markup::Document>> indexOf(Mime::Url const &url) {
+    auto dom = makeStrong<Markup::Document>();
+
+    auto body = makeStrong<Markup::Element>(Html::BODY);
+    dom->appendChild(body);
+
+    auto h1 = makeStrong<Markup::Element>(Html::H1);
+    body->appendChild(h1);
+
+    auto text = makeStrong<Markup::Text>(Io::format("Index of {}", url.path).unwrapOr(""s));
+    h1->appendChild(text);
+
+    auto ul = makeStrong<Markup::Element>(Html::UL);
+    body->appendChild(ul);
+
+    auto dir = try$(Sys::Dir::open(url));
+
+    for (auto const &entry : dir.entries()) {
+        auto li = makeStrong<Markup::Element>(Html::LI);
+        ul->appendChild(li);
+
+        auto a = makeStrong<Markup::Element>(Html::A);
+        li->appendChild(a);
+
+        auto href = url.join(entry.name);
+        a->setAttribute(Html::HREF_ATTR, href.str());
+
+        auto text = makeStrong<Markup::Text>(entry.name);
+        a->appendChild(text);
+    }
+
+    return Ok(dom);
+}
+
 Res<Strong<Markup::Document>> fetchDocument(Mime::Url const &url) {
     if (url.scheme == "about") {
         if (url.path.str() == "blank")
@@ -45,14 +98,18 @@ Res<Strong<Markup::Document>> fetchDocument(Mime::Url const &url) {
 
         return Error::invalidInput("unsupported about page");
     } else if (url.scheme == "file" or url.scheme == "bundle") {
-        auto mime = Mime::sniffSuffix(url.path.suffix());
+        if (try$(Sys::isDir(url))) {
+            return indexOf(url);
+        } else {
+            auto mime = Mime::sniffSuffix(url.path.suffix());
 
-        if (not mime.has())
-            return Error::invalidInput("cannot determine MIME type");
+            if (not mime.has())
+                return Error::invalidInput("cannot determine MIME type");
 
-        auto dom = makeStrong<Markup::Document>();
-        auto file = try$(Sys::File::open(url));
-        return loadDocument(url, *mime, file);
+            auto dom = makeStrong<Markup::Document>();
+            auto file = try$(Sys::File::open(url));
+            return loadDocument(url, *mime, file);
+        }
     } else {
         return Error::invalidInput("unsupported url scheme");
     }

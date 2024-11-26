@@ -105,11 +105,15 @@ Ui::Child contextMenuDock(Ui::Children children) {
 }
 
 Ui::Child contextMenuIcon(Ui::OnPress onPress, Mdi::Icon i) {
-    return Ui::button(
-        [onPress = std::move(onPress)](auto &n) {
+    if (onPress) {
+        onPress = [onPress = std::move(onPress)](auto &n) {
             onPress(n);
             Ui::closePopover(n);
-        },
+        };
+    }
+
+    return Ui::button(
+        std::move(onPress),
         Ui::ButtonStyle::subtle(),
         i
     );

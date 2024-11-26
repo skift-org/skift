@@ -16,6 +16,7 @@
 #include <karm-ui/scroll.h>
 #include <mdi/alert-decagram.h>
 #include <mdi/arrow-left.h>
+#include <mdi/arrow-right.h>
 #include <mdi/bookmark-outline.h>
 #include <mdi/bookmark.h>
 #include <mdi/button-cursor.h>
@@ -45,18 +46,31 @@ enum struct SidePanel {
     DEVELOPER_TOOLS,
 };
 
-struct State {
+struct Navigate {
     Mime::Url url;
+    Mime::Uti action = Mime::Uti::PUBLIC_OPEN;
+};
+
+struct State {
+    usize currentIndex = 0;
+    Vec<Navigate> history;
     Res<Strong<Markup::Document>> dom;
     SidePanel sidePanel = SidePanel::CLOSE;
     InspectState inspect = {};
 
+    State(Navigate nav, Res<Strong<Markup::Document>> dom)
+        : history{nav}, dom{dom} {}
+
     bool canGoBack() const {
-        return false;
+        return currentIndex > 0;
     }
 
     bool canGoForward() const {
-        return false;
+        return currentIndex < history.len() - 1;
+    }
+
+    Navigate const &currentUrl() const {
+        return history[currentIndex];
     }
 };
 
@@ -66,23 +80,43 @@ struct GoBack {};
 
 struct GoForward {};
 
-using Action = Union<Reload, GoBack, GoForward, SidePanel, InspectorAction>;
+using Action = Union<
+    Reload,
+    GoBack,
+    GoForward,
+    SidePanel,
+    InspectorAction,
+    Navigate>;
 
 void reduce(State &s, Action a) {
     a.visit(Visitor{
         [&](Reload) {
-            s.dom = Vaev::Driver::fetchDocument(s.url);
+            auto const &object = s.currentUrl();
+            if (object.action == Mime::Uti::PUBLIC_MODIFY) {
+                s.dom = Vaev::Driver::viewSource(object.url);
+            } else {
+                s.dom = Vaev::Driver::fetchDocument(object.url);
+            }
         },
         [&](GoBack) {
+            s.currentIndex--;
+            reduce(s, Reload{});
         },
         [&](GoForward) {
+            s.currentIndex++;
+            reduce(s, Reload{});
         },
         [&](SidePanel p) {
             s.sidePanel = p;
         },
         [&](InspectorAction a) {
             s.inspect.apply(a);
-        }
+        },
+        [&](Navigate n) {
+            s.history.pushBack(n);
+            s.currentIndex++;
+            reduce(s, Reload{});
+        },
     });
 }
 
@@ -109,7 +143,11 @@ Ui::Child mainMenu([[maybe_unused]] State const &s) {
         ),
 #ifdef __ck_host__
         Kr::contextMenuItem([&](auto &n) {
-            auto res = Sys::launch(Mime::Uti::PUBLIC_OPEN, s.url);
+            auto res = Sys::launch({
+                .action = Mime::Uti::PUBLIC_OPEN,
+                .objects = {s.currentUrl().url},
+            });
+
             if (not res)
                 Ui::showDialog(
                     n,
@@ -163,17 +201,22 @@ Ui::Child addressBar(Mime::Url const &url) {
 Ui::Child contextMenu(State const &s) {
     return Kr::contextMenuContent({
         Kr::contextMenuDock({
-            Kr::contextMenuIcon(Ui::NOP, Mdi::ARROW_LEFT),
-            Kr::contextMenuIcon(Ui::NOP, Mdi::REFRESH),
+            Kr::contextMenuIcon(Model::bindIf<GoBack>(s.canGoBack()), Mdi::ARROW_LEFT),
+            Kr::contextMenuIcon(Model::bindIf<GoForward>(s.canGoForward()), Mdi::ARROW_RIGHT),
+            Kr::contextMenuIcon(Model::bind<Reload>(), Mdi::REFRESH),
         }),
         Ui::separator(),
         Kr::contextMenuItem(
-            [s](auto &) {
-                (void)Sys::launch(Mime::Uti::PUBLIC_MODIFY, s.url);
-            },
+            Model::bind<Navigate>(
+                s.currentUrl().url,
+                Mime::Uti::PUBLIC_MODIFY
+            ),
             Mdi::CODE_TAGS, "View Source..."
         ),
-        Kr::contextMenuItem(Model::bind(SidePanel::DEVELOPER_TOOLS), Mdi::BUTTON_CURSOR, "Inspect"),
+        Kr::contextMenuItem(
+            Model::bind(SidePanel::DEVELOPER_TOOLS),
+            Mdi::BUTTON_CURSOR, "Inspect"
+        ),
     });
 }
 
@@ -250,7 +293,7 @@ Ui::Child appContent(State const &s) {
 Ui::Child app(Mime::Url url, Res<Strong<Vaev::Markup::Document>> dom) {
     return Ui::reducer<Model>(
         {
-            url,
+            Navigate{url},
             dom,
         },
         [](State const &s) {
@@ -259,8 +302,9 @@ Ui::Child app(Mime::Url url, Res<Strong<Vaev::Markup::Document>> dom) {
                 .title = "Vaev"s,
                 .startTools = slots$(
                     Ui::button(Model::bindIf<GoBack>(s.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
+                    Ui::button(Model::bindIf<GoForward>(s.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
                 ),
-                .midleTools = slots$(addressBar(s.url) | Ui::grow()),
+                .midleTools = slots$(addressBar(s.currentUrl().url) | Ui::grow()),
                 .endTools = slots$(
                     Ui::button(
                         [&](Ui::Node &n) {

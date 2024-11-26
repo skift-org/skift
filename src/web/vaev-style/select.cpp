@@ -216,6 +216,9 @@ static bool _match(Pseudo const &s, Markup::Element const &el) {
     case Pseudo::LINK:
         return _matchLink(el);
 
+    case Pseudo::ROOT:
+        return el.tagName == Html::HTML;
+
     case Pseudo::FIRST_OF_TYPE:
         return _matchFirstOfType(el);
 

@@ -11,6 +11,12 @@
 #include "info.h"
 #include "types.h"
 
+namespace Karm::Sys {
+
+struct Intent;
+
+} // namespace Karm::Sys
+
 namespace Karm::Sys::_Embed {
 
 // MARK: Fd --------------------------------------------------------------------
@@ -39,9 +45,9 @@ Res<Stat> stat(Mime::Url const &url);
 
 // MARK: User interactions -----------------------------------------------------
 
-Res<> launch(Mime::Uti const &intent, Mime::Url const &url);
+Res<> launch(Intent intent);
 
-Async::Task<> launchAsync(Mime::Uti const &intent, Mime::Url const &url);
+Async::Task<> launchAsync(Intent intent);
 
 // MARK: Sockets ---------------------------------------------------------------
 

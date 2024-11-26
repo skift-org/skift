@@ -17,6 +17,7 @@
 //
 #include <karm-io/funcs.h>
 #include <karm-logger/logger.h>
+#include <karm-sys/launch.h>
 #include <karm-sys/proc.h>
 
 #include <karm-sys/_embed.h>
@@ -184,7 +185,12 @@ Res<Stat> stat(Mime::Url const &url) {
 
 // MARK: User interactions -----------------------------------------------------
 
-Res<> launch([[maybe_unused]] Mime::Uti const &uti, [[maybe_unused]] Mime::Url const &url) {
+Res<> launch(Intent intent) {
+    if (intent.objects.len() != 1)
+        return Error::invalidInput("expected exactly one object");
+
+    auto [url, _] = intent.objects[0];
+
     String str = try$(resolve(url)).str();
 
     int pid = fork();
@@ -193,7 +199,7 @@ Res<> launch([[maybe_unused]] Mime::Uti const &uti, [[maybe_unused]] Mime::Url c
 
     if (pid == 0) {
 #ifdef __ck_sys_darwin__
-        if (uti == Mime::Uti::PUBLIC_MODIFY) {
+        if (intent.action == Mime::Uti::PUBLIC_MODIFY) {
             execlp("open", "open", "-t", str.buf(), nullptr);
         } else {
             execlp("open", "open", str.buf(), nullptr);
@@ -214,8 +220,8 @@ Res<> launch([[maybe_unused]] Mime::Uti const &uti, [[maybe_unused]] Mime::Url c
     return Posix::fromStatus(status);
 }
 
-Async::Task<> launchAsync(Mime::Uti const &uti, Mime::Url const &url) {
-    co_return launch(uti, url);
+Async::Task<> launchAsync(Intent intent) {
+    co_return _Embed::launch(intent);
 }
 
 // MARK: Sockets ---------------------------------------------------------------

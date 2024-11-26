@@ -6,6 +6,7 @@
 #include <karm-json>
 #include <karm-logger/logger.h>
 #include <karm-sys/file.h>
+#include <karm-sys/launch.h>
 
 #include <karm-sys/_embed.h>
 
@@ -427,11 +428,11 @@ Res<> populate(Vec<UserInfo> &) {
 
 // MARK: User interactions -----------------------------------------------------
 
-Res<> launch(Mime::Uti const &, Mime::Url const &) {
+Res<> launch(Sys::Intent) {
     notImplemented();
 }
 
-Async::Task<> launchAsync(Mime::Uti const &, Mime::Url const &) {
+Async::Task<> launchAsync(Sys::Intent) {
     notImplemented();
 }
 

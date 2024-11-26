@@ -1,6 +1,7 @@
 #include <handover/hook.h>
 #include <hjert-api/api.h>
 #include <karm-logger/logger.h>
+#include <karm-sys/launch.h>
 
 #include <karm-sys/_embed.h>
 
@@ -59,11 +60,11 @@ Res<Stat> stat(Mime::Url const &) {
 
 // MARK: User interactions -----------------------------------------------------
 
-Res<> launch(Mime::Uti const &, Mime::Url const &) {
+Res<> launch(Intent) {
     notImplemented();
 }
 
-Async::Task<> launchAsync(Mime::Uti const &, Mime::Url const &) {
+Async::Task<> launchAsync(Intent) {
     notImplemented();
 }
 

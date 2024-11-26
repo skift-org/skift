@@ -6,14 +6,14 @@
 
 namespace Karm::Sys {
 
-Res<> launch(Mime::Uti const &uti, Mime::Url const &url) {
+Res<> launch(Intent intent) {
     try$(ensureUnrestricted());
-    return _Embed::launch(uti, url);
+    return _Embed::launch(intent);
 }
 
-Async::Task<> launchAsync(Mime::Uti const &uti, Mime::Url const &url) {
+Async::Task<> launchAsync(Intent intent) {
     co_try$(ensureUnrestricted());
-    co_return co_await _Embed::launchAsync(uti, url);
+    co_return co_await _Embed::launchAsync(intent);
 }
 
 } // namespace Karm::Sys

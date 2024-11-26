@@ -28,7 +28,10 @@ void reduce(State &s, Action a) {
 
             auto stat = Sys::stat(dest).unwrap();
             if (stat.type == Sys::Type::FILE) {
-                (void)Sys::launch(Mime::Uti::PUBLIC_PREVIEW, dest);
+                (void)Sys::launch({
+                    .action = Mime::Uti::PUBLIC_PREVIEW,
+                    .objects = {dest},
+                });
             } else {
                 reduce(s, GoTo{dest});
             }

@@ -6,8 +6,24 @@
 
 namespace Karm::Sys {
 
-Res<> launch(Mime::Uti const &itent, Mime::Url const &url);
+struct Object {
+    Mime::Url url;
+    Opt<Mime::Uti> type = NONE;
 
-Async::Task<> launchAsync(Mime::Uti const &itent, Mime::Url const &url);
+    Object(Mime::Url url) : url(url) {}
+
+    Object(Mime::Url url, Mime::Uti type) : url(url), type(type) {}
+};
+
+struct Intent {
+    Mime::Uti action;
+    Vec<Object> objects;
+    Opt<Mime::Url> handler = NONE;
+    Opt<Mime::Url> callback = NONE;
+};
+
+Res<> launch(Intent intent);
+
+Async::Task<> launchAsync(Intent intent);
 
 } // namespace Karm::Sys

@@ -272,7 +272,7 @@ Res<> render(Mime::Url const &, Strong<Markup::Document> dom, Io::Writer &output
     paint->paint(g);
     g.end();
 
-    try$(Image::save(image->pixels(), output));
+    try$(Karm::Image::save(image->pixels(), output));
 
     return Ok();
 }

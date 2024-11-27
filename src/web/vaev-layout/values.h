@@ -59,20 +59,20 @@ struct Resolver {
         }
     }
 
-    template <typename T>
-    auto resolve(CalcValue<T> const &value, Px relative) {
+    template <typename T, typename... Args>
+    auto resolve(CalcValue<T> const &value, Args... args) -> Resolved<T> {
         if (value.type == CalcValue<T>::OpType::FIXED) {
-            return resolve(value.lhs.template unwrap<T>(), relative);
+            return resolve(value.lhs.template unwrap<T>(), args...);
         } else if (value.type == CalcValue<T>::OpType::SINGLE) {
             // TODO: compute result of funtion here with the resolved value
-            return resolve(value.lhs.template unwrap<T>(), relative);
+            return resolve(value.lhs.template unwrap<T>(), args...);
         } else if (value.type == CalcValue<T>::OpType::CALC) {
             auto resolveUnion = Visitor{
                 [&](T const &v) {
-                    return resolve<T>(v, relative);
+                    return resolve<T>(v, args...);
                 },
                 [&](CalcValue<T>::Leaf const &v) {
-                    return resolve<T>(*v, relative);
+                    return resolve<T>(*v, args...);
                 },
                 [&](Number const &v) {
                     return Math::i24f8{v};
@@ -102,5 +102,10 @@ Px resolve(Tree const &tree, Box const &box, PercentOr<Length> value, Px relativ
 Px resolve(Tree const &tree, Box const &box, Width value, Px relative);
 
 Px resolve(Tree const &tree, Box const &box, FontSize value);
+
+template <typename T, typename... Args>
+static inline auto resolve(Tree const &tree, Box const &box, CalcValue<T> const &value, Args... args) -> Resolved<T> {
+    return Resolver::from(tree, box).resolve(value, args...);
+}
 
 } // namespace Vaev::Layout

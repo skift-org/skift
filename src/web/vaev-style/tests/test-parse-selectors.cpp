@@ -117,6 +117,11 @@ test$("vaev-style-parse-infix-selectors") {
         )
     );
 
+    expectEq$(
+        Selector::parse(":not(.className)"),
+        Selector::not_(ClassSelector{"className"s})
+    );
+
     return Ok();
 }
 
@@ -167,6 +172,40 @@ test$("vaev-style-parse-mixed-selectors") {
         )
     );
 
+    expectEq$(
+        Selector::parse(":not(:first-child)"),
+        Selector::not_(Pseudo{Pseudo::FIRST_CHILD})
+    );
+
+    expectEq$(
+        Selector::parse("tr:not(:last-child) th:not(:first-child)"),
+        Selector::descendant(
+            Selector::and_({TypeSelector{Html::TR}, Selector::not_(Pseudo{Pseudo::LAST_CHILD})}),
+            Selector::and_({TypeSelector{Html::TH}, {Selector::not_(Pseudo{Pseudo::FIRST_CHILD})}})
+        )
+    );
+
+    expectEq$(
+        Selector::parse(".o_content .o_table > thead > tr:not(:last-child) th:not(:first-child)"),
+        Selector::descendant(
+            Selector::child(
+                Selector::descendant(
+                    ClassSelector{"o_content"s},
+                    Selector::child(ClassSelector{"o_table"s}, TypeSelector{Html::THEAD})
+                ),
+                Selector::and_({TypeSelector{Html::TR}, Selector::not_(Pseudo{Pseudo::LAST_CHILD})})
+            ),
+            Selector::and_({TypeSelector{Html::TH}, {Selector::not_(Pseudo{Pseudo::FIRST_CHILD})}})
+        )
+    );
+
+    expectEq$(
+        Selector::parse(".o_content .o_table thead, .o_content .o_table tbody, .o_content .o_table tfoot, .o_content .o_table tr, .o_content .o_table td, .o_content .o_table th "),
+        Selector::descendant(
+            Selector::and_({TypeSelector{Html::TR}, Selector::not_(Pseudo{Pseudo::LAST_CHILD})}),
+            Selector::and_({TypeSelector{Html::TH}, {Selector::not_(Pseudo{Pseudo::FIRST_CHILD})}})
+        )
+    );
     return Ok();
 }
 
@@ -184,6 +223,24 @@ test$("vaev-style-parse-pseudo-selectors") {
     expectEq$(
         Selector::parse(":root"),
         Pseudo{Pseudo::make("root")}
+    );
+
+    expectEq$(
+        Selector::parse(":first-child"),
+        Pseudo{Pseudo::FIRST_CHILD}
+    );
+
+    expectEq$(
+        Selector::parse(":last-child"),
+        Pseudo{Pseudo::LAST_CHILD}
+    );
+
+    expectEq$(
+        Selector::parse(".class :last-child"),
+        Selector::descendant(
+            ClassSelector{"class"s},
+            Pseudo{Pseudo::LAST_CHILD}
+        )
     );
 
     expectEq$(

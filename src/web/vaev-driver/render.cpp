@@ -37,7 +37,7 @@ static void _collectStyle(Markup::Node const &node, Style::StyleBook &sb) {
                 return;
             }
 
-            auto sheet = fetchStylesheet(url.take());
+            auto sheet = fetchStylesheet(url.take(), Style::Origin::AUTHOR);
             if (not sheet) {
                 logWarn("failed to fetch stylesheet: {}", sheet);
                 return;
@@ -54,7 +54,7 @@ static void _collectStyle(Markup::Node const &node, Style::StyleBook &sb) {
 RenderResult render(Markup::Document const &dom, Style::Media const &media, Layout::Viewport viewport) {
     Style::StyleBook stylebook;
     stylebook.add(
-        fetchStylesheet("bundle://vaev-driver/user-agent.css"_url)
+        fetchStylesheet("bundle://vaev-driver/user-agent.css"_url, Style::Origin::USER_AGENT)
             .take("user agent stylesheet not available")
     );
 
@@ -113,7 +113,7 @@ RenderResult render(Markup::Document const &dom, Style::Media const &media, Layo
 Vec<Strong<Scene::Page>> print(Markup::Document const &dom, Style::Media const &media) {
     Style::StyleBook stylebook;
     stylebook.add(
-        fetchStylesheet("bundle://vaev-driver/user-agent.css"_url)
+        fetchStylesheet("bundle://vaev-driver/user-agent.css"_url, Style::Origin::USER_AGENT)
             .take("user agent stylesheet not available")
     );
 

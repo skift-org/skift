@@ -30,9 +30,9 @@ struct Computed {
     Number opacity;
 
     AlignProps aligns;
-    Math::Vec2<PercentOr<Length>> gaps;
+    Math::Vec2<CalcValue<PercentOr<Length>>> gaps;
 
-    Vec<BackgroundProps> backgrounds;
+    Cow<BackgroundProps> backgrounds;
     Cow<BorderProps> borders;
     Cow<Margin> margin;
     Cow<Padding> padding;

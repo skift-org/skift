@@ -36,26 +36,14 @@ static void _paintBox(Box &box, Gfx::Color currentColor, Scene::Stack &stack) {
 
     Gfx::Borders borders;
     Vec<Gfx::Fill> backgrounds;
-
-    bool hasBackgrounds = any(cssBackground);
-
-    if (hasBackgrounds) {
-        backgrounds.ensure(cssBackground.len());
-        for (auto &bg : cssBackground) {
-            auto color = resolve(bg.fill, currentColor);
-
-            // Skip transparent backgrounds
-            if (color.alpha == 0)
-                continue;
-
-            backgrounds.pushBack(color);
-        }
-    }
+    auto color = resolve(cssBackground->color, currentColor);
+    if (color.alpha != 0)
+        backgrounds.pushBack(color);
 
     bool hasBorders = _paintBorders(box, currentColor, borders);
     Math::Rectf bound = box.layout.borderBox().cast<f64>();
 
-    if (hasBackgrounds or hasBorders)
+    if (any(backgrounds) or hasBorders)
         stack.add(makeStrong<Scene::Box>(bound, std::move(borders), std::move(backgrounds)));
 }
 
@@ -71,13 +59,11 @@ static void _paintBox(Box &box, Scene::Stack &stack) {
     if (auto prose = box.content.is<Strong<Text::Prose>>()) {
         (*prose)->_style.color = currentColor;
 
-        Karm::Text::Font font = {box.fontFace, box.layout.fontSize.cast<f64>()};
-        Math::Vec2f baseline = {0, font.metrics().ascend};
         stack.add(makeStrong<Scene::Text>(
             box.layout.borderBox().topStart().cast<f64>(),
             *prose
         ));
-    } else if (auto image = box.content.is<Image::Picture>()) {
+    } else if (auto image = box.content.is<Karm::Image::Picture>()) {
         stack.add(makeStrong<Scene::Image>(
             box.layout.borderBox().cast<f64>(),
             *image

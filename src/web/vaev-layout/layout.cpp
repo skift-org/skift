@@ -13,7 +13,7 @@ namespace Vaev::Layout {
 Output _contentLayout(Tree &tree, Box &box, Input input) {
     auto display = box.style->display;
 
-    if (auto image = box.content.is<Image::Picture>()) {
+    if (auto image = box.content.is<Karm::Image::Picture>()) {
         return Output::fromSize(image->bound().size().cast<Px>());
     } else if (auto run = box.content.is<Strong<Text::Prose>>()) {
         return inlineLayout(tree, box, input);

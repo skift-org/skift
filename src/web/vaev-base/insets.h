@@ -18,7 +18,7 @@ enum struct Position {
 
 using Margin = Math::Insets<Width>;
 
-using Padding = Math::Insets<PercentOr<Length>>;
+using Padding = Math::Insets<CalcValue<PercentOr<Length>>>;
 
 // https://www.w3.org/TR/CSS22/visuren.html#propdef-top
 // https://www.w3.org/TR/CSS22/visuren.html#propdef-right

@@ -68,8 +68,6 @@ struct View : public Ui::View<View> {
 
         paint->paint(g, rect.offset(-bound().xy).cast<f64>());
         if (Ui::debugShowLayoutBounds) {
-            logDebug("layout tree: {}", layout);
-            logDebug("paint tree: {}", paint);
             Layout::wireframe(*layout, g);
         }
 

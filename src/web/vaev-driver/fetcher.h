@@ -6,7 +6,7 @@
 
 namespace Vaev::Driver {
 
-Res<Style::StyleSheet> fetchStylesheet(Mime::Url url);
+Res<Style::StyleSheet> fetchStylesheet(Mime::Url url, Style::Origin origin = Style::Origin::AUTHOR);
 
 Res<Strong<Markup::Document>> fetchDocument(Mime::Url const &url);
 

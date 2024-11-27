@@ -176,6 +176,37 @@ static bool _matchLink(Markup::Element const &el) {
     return el.tagName == Html::A and el.hasAttribute(Html::HREF_ATTR);
 }
 
+// 14.3.3. :first-child pseudo-class
+// https://www.w3.org/TR/selectors-4/#the-first-child-pseudo
+
+static bool _matchFirstChild(Markup::Element const &e) {
+    Cursor<Markup::Node> curr = &e;
+    while (curr->hasPreviousSibling()) {
+        auto prev = curr->previousSibling();
+        if (auto el = prev.is<Markup::Element>())
+            return false;
+        curr = &prev.unwrap();
+    }
+    return true;
+}
+
+// 14.3.4. :last-child pseudo-class
+// https://www.w3.org/TR/selectors-4/#the-last-child-pseudo
+
+static bool _matchLastChild(Markup::Element const &e) {
+    //    yap("coucouuuuuu {}", e);
+    Cursor<Markup::Node> curr = &e;
+    while (curr->hasNextSibling()) {
+        auto next = curr->nextSibling();
+        //        yap("next: {}", next);
+        if (auto el = next.is<Markup::Element>())
+            return false;
+        curr = &next.unwrap();
+    }
+    //    yap("bruh");
+    return true;
+}
+
 // 14.4.3. :first-of-type pseudo-class
 // https://www.w3.org/TR/selectors-4/#the-first-of-type-pseudo
 
@@ -224,6 +255,12 @@ static bool _match(Pseudo const &s, Markup::Element const &el) {
 
     case Pseudo::LAST_OF_TYPE:
         return _matchLastOfType(el);
+
+    case Pseudo::FIRST_CHILD:
+        return _matchFirstChild(el);
+
+    case Pseudo::LAST_CHILD:
+        return _matchLastChild(el);
 
     default:
         logDebugIf(DEBUG_SELECTORS, "unimplemented pseudo class: {}", s);
@@ -355,7 +392,8 @@ static OpCode _peekOpCode(Cursor<Css::Sst> &cur) {
             cur.peek() == Css::Token::IDENT or
             cur.peek() == Css::Token::HASH or
             cur.peek().token.data == "." or
-            cur.peek().token.data == "*"
+            cur.peek().token.data == "*" or
+            cur.peek().token.data == ":"
         ) {
             return OpCode::DESCENDANT;
         } else {
@@ -409,7 +447,7 @@ static Selector _parseInfixExpr(Selector lhs, Cursor<Css::Sst> &cur, OpCode opCo
 
 static Selector _parseSelectorElement(Cursor<Css::Sst> &cur, OpCode currentOp) {
     if (cur.ended()) {
-        // logError("ERROR : unterminated selector");
+        logErrorIf(DEBUG_SELECTORS, "ERROR : unterminated selector");
         return EmptySelector{};
     }
     Selector val;
@@ -438,11 +476,17 @@ static Selector _parseSelectorElement(Cursor<Css::Sst> &cur, OpCode currentOp) {
             if (cur->token.type == Css::Token::COLON) {
                 cur.next();
                 if (cur.ended()) {
-                    // logError("ERROR : unterminated selector");
+                    logErrorIf(DEBUG_SELECTORS, "ERROR : unterminated selector");
                     return EmptySelector{};
                 }
             }
-            val = Pseudo::make(cur->token.data);
+
+            if (cur->prefix == Css::Token::function("not(")) {
+                Cursor<Css::Sst> c = cur->content;
+                val = Selector::not_(_parseSelectorElement(c, OpCode::NOT));
+            } else {
+                val = Pseudo::make(cur->token.data);
+            }
             break;
         default:
             val = ClassSelector{cur->token.data};
@@ -551,6 +595,7 @@ Selector Selector::parse(Cursor<Css::Sst> &c) {
         return EmptySelector{};
     }
 
+    logDebugIf(DEBUG_SELECTORS, "PARSING SELECTOR : {}", c);
     Selector currentSelector = _parseSelectorElement(c, OpCode::NOP);
 
     while (not c.ended()) {

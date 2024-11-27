@@ -49,6 +49,15 @@ struct FlexBasis {
     }
 };
 
+struct FlexItemProps {
+    FlexBasis flexBasis;
+    Number flexGrow, flexShrink;
+
+    void repr(Io::Emit &e) const {
+        e("({} {} {})", flexBasis, flexGrow, flexShrink);
+    }
+};
+
 struct FlexProps {
     // FlexContainer
     FlexDirection direction = FlexDirection::ROW;

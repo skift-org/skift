@@ -40,8 +40,8 @@ struct CalcValue {
         : CalcValue(T{}) {
     }
 
-    constexpr CalcValue(T value)
-        : type(OpType::FIXED), lhs(value) {
+    constexpr CalcValue(Meta::Convertible<T> auto value)
+        : type(OpType::FIXED), lhs(T{value}) {
     }
 
     constexpr CalcValue(Value value)

@@ -4,6 +4,7 @@
 #include <karm-gfx/fill.h>
 #include <karm-math/radii.h>
 
+#include "calc.h"
 #include "color.h"
 #include "length.h"
 #include "percent.h"
@@ -34,7 +35,7 @@ enum struct BorderStyle {
 };
 
 struct Border {
-    Length width;
+    CalcValue<Length> width;
     Gfx::BorderStyle style;
     Color color = Color::CURRENT;
 
@@ -49,7 +50,7 @@ struct BorderProps {
     static constexpr Length THICK = 5_px;
 
     Border top, start, bottom, end;
-    Math::Radii<PercentOr<Length>> radii;
+    Math::Radii<CalcValue<PercentOr<Length>>> radii;
 
     void all(Border b) {
         top = start = bottom = end = b;

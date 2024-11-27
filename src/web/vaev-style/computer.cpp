@@ -32,6 +32,7 @@ void Computer::_evalRule(Rule const &rule, Markup::Element const &el, MatchingRu
     });
 }
 
+// https://drafts.csswg.org/css-cascade/#cascade-origin
 Strong<Computed> Computer::computeFor(Computed const &parent, Markup::Element const &el) {
     MatchingRules matchingRules;
 
@@ -42,10 +43,12 @@ Strong<Computed> Computer::computeFor(Computed const &parent, Markup::Element co
         }
     }
 
-    // Sort rules by specificity
+    // Sort origin and specificity
     stableSort(
         matchingRules,
         [](auto const &a, auto const &b) {
+            if (a->origin != b->origin)
+                return a->origin <=> b->origin;
             return spec(a->selector) <=> spec(b->selector);
         }
     );
@@ -54,7 +57,6 @@ Strong<Computed> Computer::computeFor(Computed const &parent, Markup::Element co
     auto styleAttr = el.getAttribute(Html::STYLE_ATTR);
 
     StyleRule styleRule{
-        .selector = UNIVERSAL,
         .props = parseDeclarations<StyleProp>(styleAttr ? *styleAttr : ""),
     };
     matchingRules.pushBack(&styleRule);
@@ -64,17 +66,27 @@ Strong<Computed> Computer::computeFor(Computed const &parent, Markup::Element co
     computed->inherit(parent);
     Vec<Cursor<StyleProp>> importantProps;
 
+    // HACK: Apply custom properties first
     for (auto const &styleRule : matchingRules) {
         for (auto &prop : styleRule->props) {
-            if (prop.important == Important::NO)
-                prop.apply(*computed);
-            else
-                importantProps.pushBack(&prop);
+            if (prop.is<CustomProp>())
+                prop.apply(parent, *computed);
         }
     }
 
-    for (auto const &prop : importantProps)
-        prop->apply(*computed);
+    for (auto const &styleRule : matchingRules) {
+        for (auto &prop : styleRule->props) {
+            if (not prop.is<CustomProp>()) {
+                if (prop.important == Important::NO)
+                    prop.apply(parent, *computed);
+                else
+                    importantProps.pushBack(&prop);
+            }
+        }
+    }
+
+    for (auto const &prop : iterRev(importantProps))
+        prop->apply(parent, *computed);
 
     return computed;
 }

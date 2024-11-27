@@ -54,7 +54,29 @@ struct Radii {
     constexpr Radii(T a, T b, T c, T d, T e, T f, T g, T h)
         : a(a), b(b), c(c), d(d), e(e), f(f), g(g), h(h) {}
 
-    bool zero() const {
+    constexpr Radii(Radii const &other)
+        : radii(other.radii) {}
+
+    constexpr Radii(Radii const &&other)
+        : radii(std::move(other.radii)) {}
+
+    constexpr Radii &operator=(Radii const &other) {
+        radii = other.radii;
+        return *this;
+    }
+
+    constexpr Radii &operator=(Radii &&other) {
+        radii = std::move(other.radii);
+        return *this;
+    }
+
+    constexpr ~Radii() {
+        radii.~Array();
+    }
+
+    bool zero() const
+        requires(Meta::Equatable<T>)
+    {
         return iter(radii).all([](T radii) {
             return radii == T{};
         });
@@ -143,9 +165,11 @@ struct Radii {
     }
 
     void repr(Io::Emit &_e) const {
-        if (zero()) {
-            _e("(radii {})", a);
-            return;
+        if constexpr (Meta::Equatable<T>) {
+            if (zero()) {
+                _e("(radii {})", a);
+                return;
+            }
         }
 
         _e("(radii {} {} {} {} {} {} {} {})", a, b, c, d, e, f, g, h);

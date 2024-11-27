@@ -27,10 +27,10 @@ enum struct TextAlign {
 // https://drafts.csswg.org/css-text-4/#text-transform
 
 enum struct TextTransform {
-    NONE,
+    NONE, //< https://drafts.csswg.org/css-text-4/#valdef-text-transform-none
 
-    UPPERCASE,
-    LOWERCASE,
+    UPPERCASE, //< https://drafts.csswg.org/css-text-4/#valdef-text-transform-uppercase
+    LOWERCASE, //< https://drafts.csswg.org/css-text-4/#valdef-text-transform-lowercase
 
     _LEN,
 };
@@ -39,19 +39,20 @@ enum struct TextTransform {
 // https://drafts.csswg.org/css-text/#white-space-property
 
 enum struct WhiteSpace {
-    NORMAL,
-    PRE,
-    NOWRAP,
-    PRE_WRAP,
-    BREAK_SPACES,
-    PRE_LINE,
+    NORMAL, //< https://drafts.csswg.org/css-text/#valdef-white-space-normal
+
+    PRE,          //< https://drafts.csswg.org/css-text/#valdef-white-space-pre
+    NOWRAP,       //< https://drafts.csswg.org/css-text/#valdef-white-space-nowrap
+    PRE_WRAP,     //< https://drafts.csswg.org/css-text/#valdef-white-space-pre-wrap
+    BREAK_SPACES, //< https://drafts.csswg.org/css-text/#valdef-white-space-break-spaces
+    PRE_LINE,     //< https://drafts.csswg.org/css-text/#valdef-white-space-pre-line
 
     _LEN,
 };
 
 struct TextProps {
     TextAlign align = TextAlign::START;
-    TextTransform transform;
+    TextTransform transform = TextTransform::NONE;
     WhiteSpace whiteSpace = WhiteSpace::NORMAL;
 
     void repr(Io::Emit &e) const {

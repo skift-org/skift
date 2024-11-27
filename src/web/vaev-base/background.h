@@ -4,6 +4,7 @@
 #include <karm-mime/url.h>
 
 #include "color.h"
+#include "image.h"
 #include "length.h"
 #include "percent.h"
 
@@ -122,18 +123,30 @@ struct BackgroundRepeat {
     }
 };
 
-struct BackgroundProps {
-    Color fill;
+struct BackgroundLayer {
+    Opt<Image> image;
     BackgroundAttachment attachment;
     BackgroundPosition position;
     BackgroundRepeat repeat;
 
     void repr(Io::Emit &e) const {
         e("(background");
-        e(" fill={}", fill);
+        e(" image={}", image);
         e(" attachment={}", attachment);
         e(" position={}", position);
         e(" repeat={}", repeat);
+        e(")");
+    }
+};
+
+struct BackgroundProps {
+    Color color;
+    Vec<BackgroundLayer> layers = {};
+
+    void repr(Io::Emit &e) const {
+        e("(background");
+        e(" color={}", color);
+        e(" layers={}", layers);
         e(")");
     }
 };

@@ -22,19 +22,20 @@ void StyleSheet::repr(Io::Emit &e) const {
     e(")");
 }
 
-StyleSheet StyleSheet::parse(Css::Sst const &sst) {
+StyleSheet StyleSheet::parse(Css::Sst const &sst, Origin origin) {
     if (sst != Css::Sst::LIST)
         panic("expected list");
 
     Style::StyleSheet res;
     for (auto const &item : sst.content) {
         if (item == Css::Sst::RULE) {
-            res.rules.pushBack(Rule::parse(item));
+            res.rules.pushBack(Rule::parse(item, origin));
         } else {
             logWarn("unexpected item in stylesheet: {}", item.type);
         }
     }
 
+    res.origin = origin;
     return res;
 }
 

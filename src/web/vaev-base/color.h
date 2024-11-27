@@ -73,4 +73,93 @@ Opt<SystemColor> parseSystemColor(Str name);
 
 Gfx::Color resolve(Color c, Gfx::Color currentColor);
 
+// MARK: Color Interpolation ---------------------------------------------------
+
+// https://www.w3.org/TR/css-color-4/#typedef-color-space
+struct ColorSpace {
+    enum struct _Type {
+        POLAR,
+        RECTANGULAR,
+
+        _LEN0,
+    };
+
+    using enum _Type;
+
+    // https://www.w3.org/TR/css-color-4/#typedef-rectangular-color-space
+    enum struct _Rectangular {
+        SRGB,
+        SRGB_LINEAR,
+        DISPLAY_P3,
+        A98_RGB,
+        PROPHOTO_RGB,
+        REC2020,
+        LAB,
+        OKLAB,
+        XYZ,
+        XYZ_D50,
+        XYZ_D65,
+
+        _LEN1,
+
+    };
+
+    using enum _Rectangular;
+
+    // https://www.w3.org/TR/css-color-4/#typedef-hue-interpolation-method
+    enum struct _Interpolation {
+        SHORTER,
+        LONGER,
+        INCREASING,
+        DECREASING,
+
+        _LEN2,
+    };
+
+    using enum _Interpolation;
+
+    // https://www.w3.org/TR/css-color-4/#typedef-polar-color-space
+    enum struct _Polar {
+        HSL,
+        HWB,
+        LCH,
+        OKLCH,
+
+        _LEN3,
+    };
+
+    using enum _Polar;
+
+    _Type type;
+
+    union {
+        _Rectangular rectangular;
+
+        struct {
+            _Polar polar;
+            _Interpolation interpolation;
+        };
+    };
+
+    constexpr ColorSpace(_Rectangular rectangular)
+        : type(_Type::RECTANGULAR), rectangular(rectangular) {
+    }
+
+    constexpr ColorSpace(_Polar polar, _Interpolation interpolation)
+        : type(_Type::POLAR), polar(polar), interpolation(interpolation) {
+    }
+
+    constexpr ColorSpace()
+        : type(_Type::RECTANGULAR), rectangular(_Rectangular::SRGB) {
+    }
+
+    void repr(Io::Emit &e) const {
+        if (type == ColorSpace::RECTANGULAR) {
+            e("{}", rectangular);
+        } else {
+            e("{} {}", polar, interpolation);
+        }
+    }
+};
+
 } // namespace Vaev

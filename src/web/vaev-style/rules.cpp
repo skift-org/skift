@@ -4,6 +4,8 @@
 
 namespace Vaev::Style {
 
+static bool DEBUG_RULE = false;
+
 // MARK: StyleRule -------------------------------------------------------------
 
 void StyleRule::repr(Io::Emit &e) const {
@@ -24,7 +26,7 @@ void StyleRule::repr(Io::Emit &e) const {
     e(")");
 }
 
-StyleRule StyleRule::parse(Css::Sst const &sst) {
+StyleRule StyleRule::parse(Css::Sst const &sst, Origin origin) {
     if (sst != Css::Sst::RULE)
         panic("expected rule");
 
@@ -45,10 +47,11 @@ StyleRule StyleRule::parse(Css::Sst const &sst) {
             if (prop)
                 res.props.pushBack(prop.take());
         } else {
-            logWarn("unexpected item in style rule: {}", item.type);
+            logWarnIf(DEBUG_RULE, "unexpected item in style rule: {}", item);
         }
     }
 
+    res.origin = origin;
     return res;
 }
 
@@ -128,7 +131,7 @@ void Rule::repr(Io::Emit &e) const {
     });
 }
 
-Rule Rule::parse(Css::Sst const &sst) {
+Rule Rule::parse(Css::Sst const &sst, Origin origin) {
     if (sst != Css::Sst::RULE)
         panic("expected rule");
 
@@ -140,7 +143,7 @@ Rule Rule::parse(Css::Sst const &sst) {
     else if (tok.data == "@font-face")
         return FontFaceRule::parse(sst);
     else
-        return StyleRule::parse(sst);
+        return StyleRule::parse(sst, origin);
 }
 
 } // namespace Vaev::Style

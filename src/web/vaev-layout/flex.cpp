@@ -241,35 +241,46 @@ struct FlexItem {
         );
     }
 
-    void computeFlexBaseSize(Tree &tree, Px mainContainerSize) {
-        // TODO: check specs
-        if (flexItemProps.basis.type == FlexBasis::WIDTH) {
-            if (flexItemProps.basis.width.type == Width::Type::VALUE) {
-                flexBaseSize = resolve(
-                    tree,
-                    *box,
-                    flexItemProps.basis.width.value,
-                    mainContainerSize
-                );
-            } else if (flexItemProps.basis.width.type == Width::Type::AUTO) {
-                flexBaseSize = fa.mainAxis(speculativeSize);
-            }
+    // https://www.w3.org/TR/css-flexbox-1/#valdef-flex-basis-auto
+    void computeFlexBaseSize(Tree &tree, Px mainContainerSize, IntrinsicSize containerSizing) {
+        // A NONE return here indicates a CONTENT case for the flex basis
+        auto getDefiniteFlexBasisSize = [](FlexProps &flexItemProps, FlexAxis &fa, Box *box) -> Opt<CalcValue<PercentOr<Length>>> {
+            if (flexItemProps.basis.type != FlexBasis::WIDTH)
+                return NONE;
+
+            if (flexItemProps.basis.width.type == Width::Type::VALUE)
+                return flexItemProps.basis.width.value;
+
+            if (fa.mainAxis(box->style->sizing).type == Size::Type::AUTO)
+                return NONE;
+
+            return fa.mainAxis(box->style->sizing).value;
+        };
+
+        if (auto flexBasisDefiniteSize = getDefiniteFlexBasisSize(flexItemProps, fa, box)) {
+            flexBaseSize = resolve(
+                tree,
+                *box,
+                flexBasisDefiniteSize.unwrap(),
+                mainContainerSize
+            );
+            return;
         }
 
-        if (flexItemProps.basis.type == FlexBasis::Type::CONTENT and
-            box->style->sizing->height.type == Size::Type::LENGTH /* and
-            intrinsic aspect ratio*/
-        ) {
-            // TODO: placehold value, check specs
-            Px aspectRatio{1};
-            auto crossSize = resolve(tree, *box, box->style->sizing->height.value, 0_px);
-            flexBaseSize = (crossSize)*aspectRatio;
+        if (isMinMaxIntrinsicSize(containerSizing)) {
+            flexBaseSize = fa.mainAxis(
+                containerSizing == IntrinsicSize::MIN_CONTENT
+                    ? minContentSize
+                    : maxContentSize
+            );
+            return;
         }
 
-        if (false) {
-            // TODO: other flex base size cases
-            logWarn("not implemented flex base size case");
-        }
+        // TODO:
+        //  https://www.w3.org/TR/css-flexbox-1/#algo-main-item
+        //  - intrinsic aspect ratio case
+        //  - what does it mean: "depends on its available space"?
+        flexBaseSize = fa.mainAxis(maxContentSize);
     }
 
     void computeHypotheticalMainSize(Tree &tree, Vec2Px containerSize) {
@@ -278,6 +289,43 @@ struct FlexItem {
             getMinMaxPrefferedSize(tree, fa.isRowOriented, true, containerSize),
             getMinMaxPrefferedSize(tree, fa.isRowOriented, false, containerSize)
         );
+    }
+
+    // https://www.w3.org/TR/css-flexbox-1/#min-size-auto
+    Px getMinAutoPrefMainSize(Tree &tree, Vec2Px containerSize) const {
+
+        Opt<Px> definiteMaxMainSize;
+        auto maxMainSize = box->style->sizing->maxSize(fa.isRowOriented ? Axis::HORIZONTAL : Axis::VERTICAL);
+        if (maxMainSize.type == Size::Type::LENGTH) {
+            definiteMaxMainSize = resolve(
+                tree,
+                *box,
+                maxMainSize.value,
+                fa.mainAxis(containerSize)
+            );
+        }
+
+        Px contentSizeSuggestion = fa.mainAxis(minContentSize);
+        // TODO: clamped by cross size if there is an aspect ratio
+        if (definiteMaxMainSize)
+            contentSizeSuggestion = min(contentSizeSuggestion, definiteMaxMainSize.unwrap());
+
+        if (fa.mainAxis(box->style->sizing).type == Size::Type::LENGTH) {
+            Px specifiedSizeSuggestion = resolve(
+                tree,
+                *box,
+                fa.mainAxis(box->style->sizing).value,
+                fa.mainAxis(containerSize)
+            );
+
+            if (definiteMaxMainSize)
+                specifiedSizeSuggestion = min(specifiedSizeSuggestion, definiteMaxMainSize.unwrap());
+
+            return min(contentSizeSuggestion, specifiedSizeSuggestion);
+            // TODO: else if(aspect ratio)
+        } else {
+            return contentSizeSuggestion;
+        }
     }
 
     Px getMinMaxPrefferedSize(Tree &tree, bool isWidth, bool isMin, Vec2Px containerSize) const {
@@ -308,27 +356,13 @@ struct FlexItem {
         case Size::FIT_CONTENT:
             logWarn("not implemented");
         case Size::AUTO:
-            if (isMin) {
-                // https://www.w3.org/TR/css-flexbox-1/#min-size-auto
-                Size specifiedSizeToResolve{isWidth ? box->style->sizing->width : box->style->sizing->height};
-
-                if (specifiedSizeToResolve.type == Size::Type::LENGTH) {
-                    auto resolvedSpecifiedSize = resolve(
-                        tree,
-                        *box,
-                        specifiedSizeToResolve.value,
-                        isWidth
-                            ? containerSize.x
-                            : containerSize.y
-                    );
-                    return min(resolvedSpecifiedSize, isWidth ? minContentSize.x : minContentSize.y);
-                } else {
-                    return isWidth ? minContentSize.x : minContentSize.y;
-                }
-
-            } else {
+            if (not isMin)
                 panic("AUTO is an invalid value for max-width");
-            }
+
+            // used cross min sizes are resolved to 0 whereas main sizes have specific method
+            return isWidth == fa.isRowOriented
+                       ? getMinAutoPrefMainSize(tree, containerSize)
+                       : 0_px;
         case Size::NONE:
             if (isMin)
                 panic("NONE is an invalid value for min-width");
@@ -632,11 +666,12 @@ struct FlexFormatingContext {
     // 3. MARK: Flex base size and hypothetical main size of each item ---------
     // https://www.w3.org/TR/css-flexbox-1/#algo-main-item
 
-    void _determineFlexBaseSizeAndHypotheticalMainSize(Tree &tree) {
+    void _determineFlexBaseSizeAndHypotheticalMainSize(Tree &tree, IntrinsicSize containerSize) {
         for (auto &i : _items) {
             i.computeFlexBaseSize(
                 tree,
-                fa.mainAxis(availableSpace)
+                fa.mainAxis(availableSpace),
+                containerSize
             );
 
             i.computeHypotheticalMainSize(tree, availableSpace);
@@ -1043,8 +1078,6 @@ struct FlexFormatingContext {
                     .availableSpace = fa.extractMainAxisAndFillOther(i.usedSize, availableCrossSpace),
                 }
             );
-
-            // COMO PODE EU TER UM HEIGHT PEQUENO AQUI??????????
         }
     }
 
@@ -1136,7 +1169,7 @@ struct FlexFormatingContext {
     void _handleAlignContentStretch(Input input, Box &box) {
         // FIXME: If the flex container has a definite cross size <=?=> f.style->sizing->height.type != Size::Type::AUTO
         if (
-            (not(input.intrinsic == IntrinsicSize::MIN_CONTENT) and true) and
+            not(input.intrinsic == IntrinsicSize::MIN_CONTENT) and
             (fa.crossAxis(box.style->sizing).type != Size::Type::AUTO or fa.crossAxis(input.knownSize)) and
             box.style->aligns.alignContent == Style::Align::STRETCH
         ) {
@@ -1466,7 +1499,7 @@ struct FlexFormatingContext {
         _determineAvailableMainAndCrossSpace(tree, input);
 
         // 3. Determine the flex base size and hypothetical main size of each item
-        _determineFlexBaseSizeAndHypotheticalMainSize(tree);
+        _determineFlexBaseSizeAndHypotheticalMainSize(tree, input.intrinsic);
 
         // 4. Determine the main size of the flex container
         _determineMainSize(tree, input, box);

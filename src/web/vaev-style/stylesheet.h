@@ -12,15 +12,20 @@ struct StyleSheet {
     Mime::Url href = ""_url;
     Str title = "";
     Vec<Rule> rules;
+    Origin origin = Origin::AUTHOR;
 
     void repr(Io::Emit &e) const;
 
-    static StyleSheet parse(Css::Sst const &sst);
+    static StyleSheet parse(Css::Sst const &sst, Origin origin = Origin::AUTHOR);
 
-    static Style::StyleSheet parse(Io::SScan &s) {
+    static Style::StyleSheet parse(Io::SScan &s, Origin origin = Origin::AUTHOR) {
         Css::Lexer lex{s};
         Css::Sst sst = consumeRuleList(lex, true);
-        return parse(sst);
+        return parse(sst, origin);
+    }
+
+    void add(Rule &&rule) {
+        rules.pushBack(std::move(rule));
     }
 };
 

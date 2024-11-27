@@ -6,7 +6,7 @@
 
 namespace Vaev::Layout {
 
-void _buildNode(Style::Computer &c, Markup::Node const &node, Box &parent);
+static void _buildNode(Style::Computer &c, Markup::Node const &node, Box &parent);
 
 // MARK: Attributes ------------------------------------------------------------
 
@@ -50,13 +50,18 @@ static Attrs _parseDomAttr(Markup::Element const &el) {
     return attrs;
 }
 
-// MARK: Build -----------------------------------------------------------------
+// MARK: Build Inline ----------------------------------------------------------
 
+static Opt<Strong<Karm::Text::Fontface>> _monospaceFontface = NONE;
 static Opt<Strong<Karm::Text::Fontface>> _regularFontface = NONE;
 static Opt<Strong<Karm::Text::Fontface>> _boldFontface = NONE;
 
 static Strong<Karm::Text::Fontface> _lookupFontface(Style::Computed &style) {
-    if (style.font->style != FontStyle::NORMAL) {
+    if (contains(style.font->families, "monospace"s)) {
+        if (not _monospaceFontface)
+            _monospaceFontface = Karm::Text::loadFontfaceOrFallback("bundle://fonts-fira-code/fonts/FiraCode-Regular.ttf"_url).unwrap();
+        return *_monospaceFontface;
+    } else if (style.font->style != FontStyle::NORMAL) {
         if (style.font->weight != FontWeight::NORMAL) {
             if (not _boldFontface)
                 _boldFontface = Karm::Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-BoldItalic.ttf"_url).unwrap();
@@ -77,75 +82,6 @@ static Strong<Karm::Text::Fontface> _lookupFontface(Style::Computed &style) {
             return *_regularFontface;
         }
     }
-}
-
-void _buildChildren(Style::Computer &c, Vec<Strong<Markup::Node>> const &children, Box &parent) {
-    for (auto &child : children) {
-        _buildNode(c, *child, parent);
-    }
-}
-
-static void _buildTableChildren(Style::Computer &c, Vec<Strong<Markup::Node>> const &children, Box &tableWrapperBox, Strong<Style::Computed> tableBoxStyle) {
-    Box tableBox{
-        tableBoxStyle, tableWrapperBox.fontFace
-    };
-
-    tableBox.style->display = Display::Internal::TABLE_BOX;
-
-    for (auto &child : children) {
-        if (auto el = child->is<Markup::Element>()) {
-            if (el->tagName == Html::CAPTION) {
-                _buildNode(c, *child, tableWrapperBox);
-            } else {
-                _buildNode(c, *child, tableBox);
-            }
-        }
-    }
-    tableWrapperBox.add(std::move(tableBox));
-}
-
-static void _buildElement(Style::Computer &c, Markup::Element const &el, Box &parent) {
-    auto style = c.computeFor(*parent.style, el);
-    auto font = _lookupFontface(*style);
-
-    if (el.tagName == Html::IMG) {
-        auto src = el.getAttribute(Html::SRC_ATTR).unwrapOr(""s);
-        auto url = Mime::Url::parse(src);
-        Image::Picture img = Image::loadOrFallback(url).unwrap();
-        parent.add({style, font, img});
-        return;
-    }
-
-    auto display = style->display;
-
-    if (display == Display::NONE)
-        return;
-
-    if (display == Display::CONTENTS) {
-        _buildChildren(c, el.children(), parent);
-        return;
-    }
-
-    auto buildBox = [](Style::Computer &c, Markup::Element const &el, Strong<Karm::Text::Fontface> font, Strong<Style::Computed> style) {
-        if (el.tagName == Html::TagId::TABLE) {
-
-            auto wrapperStyle = makeStrong<Style::Computed>(Style::Computed::initial());
-            wrapperStyle->display = style->display;
-            wrapperStyle->margin = style->margin;
-
-            Box wrapper = {wrapperStyle, font};
-            _buildTableChildren(c, el.children(), wrapper, style);
-            return wrapper;
-        } else {
-            Box box = {style, font};
-            _buildChildren(c, el.children(), box);
-            return box;
-        }
-    };
-
-    auto box = buildBox(c, el, font, style);
-    box.attrs = _parseDomAttr(el);
-    parent.add(std::move(box));
 }
 
 auto RE_SEGMENT_BREAK = Re::single('\n', '\r', '\f', '\v');
@@ -242,7 +178,94 @@ static void _buildRun(Style::Computer &, Markup::Text const &node, Box &parent) 
     parent.add({style, fontFace, std::move(prose)});
 }
 
-void _buildNode(Style::Computer &c, Markup::Node const &node, Box &parent) {
+// MARK: Build Block -----------------------------------------------------------
+
+void _buildChildren(Style::Computer &c, Vec<Strong<Markup::Node>> const &children, Box &parent) {
+    for (auto &child : children) {
+        _buildNode(c, *child, parent);
+    }
+}
+
+static void _buildBlock(Style::Computer &c, Strong<Style::Computed> style, Markup::Element const &el, Box &parent) {
+    auto font = _lookupFontface(*style);
+    Box box = {style, font};
+    _buildChildren(c, el.children(), box);
+    box.attrs = _parseDomAttr(el);
+    parent.add(std::move(box));
+}
+
+// MARK: Build Replace ---------------------------------------------------------
+
+static void _buildImage(Style::Computer &c, Markup::Element const &el, Box &parent) {
+    auto style = c.computeFor(*parent.style, el);
+    auto font = _lookupFontface(*style);
+
+    auto src = el.getAttribute(Html::SRC_ATTR).unwrapOr(""s);
+    auto url = Mime::Url::parse(src);
+    auto img = Karm::Image::loadOrFallback(url).unwrap();
+    parent.add({style, font, img});
+}
+
+// MARK: Build Table -----------------------------------------------------------
+
+static void _buildTableChildren(Style::Computer &c, Vec<Strong<Markup::Node>> const &children, Box &tableWrapperBox, Strong<Style::Computed> tableBoxStyle) {
+    Box tableBox{
+        tableBoxStyle, tableWrapperBox.fontFace
+    };
+
+    tableBox.style->display = Display::Internal::TABLE_BOX;
+
+    for (auto &child : children) {
+        if (auto el = child->is<Markup::Element>()) {
+            if (el->tagName == Html::CAPTION) {
+                _buildNode(c, *child, tableWrapperBox);
+            } else {
+                _buildNode(c, *child, tableBox);
+            }
+        }
+    }
+    tableWrapperBox.add(std::move(tableBox));
+}
+
+static void _buildTable(Style::Computer &c, Strong<Style::Computed> style, Markup::Element const &el, Box &parent) {
+    auto font = _lookupFontface(*style);
+
+    auto wrapperStyle = makeStrong<Style::Computed>(Style::Computed::initial());
+    wrapperStyle->display = style->display;
+    wrapperStyle->margin = style->margin;
+
+    Box wrapper = {wrapperStyle, font};
+    _buildTableChildren(c, el.children(), wrapper, style);
+    wrapper.attrs = _parseDomAttr(el);
+
+    parent.add(std::move(wrapper));
+}
+
+// MARK: Build -----------------------------------------------------------------
+
+static void _buildElement(Style::Computer &c, Markup::Element const &el, Box &parent) {
+    if (el.tagName == Html::IMG) {
+        _buildImage(c, el, parent);
+        return;
+    }
+
+    auto style = c.computeFor(*parent.style, el);
+    auto font = _lookupFontface(*style);
+
+    auto display = style->display;
+
+    if (display == Display::NONE) {
+        // Do nothing
+    } else if (display == Display::CONTENTS) {
+        _buildChildren(c, el.children(), parent);
+    } else if (display == Display::TABLE) {
+        _buildTable(c, style, el, parent);
+    } else {
+        _buildBlock(c, style, el, parent);
+    }
+}
+
+static void _buildNode(Style::Computer &c, Markup::Node const &node, Box &parent) {
     if (auto el = node.is<Markup::Element>()) {
         _buildElement(c, *el, parent);
     } else if (auto text = node.is<Markup::Text>()) {

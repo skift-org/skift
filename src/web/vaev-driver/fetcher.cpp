@@ -115,11 +115,11 @@ Res<Strong<Markup::Document>> fetchDocument(Mime::Url const &url) {
     }
 }
 
-Res<Style::StyleSheet> fetchStylesheet(Mime::Url url) {
+Res<Style::StyleSheet> fetchStylesheet(Mime::Url url, Style::Origin origin) {
     auto file = try$(Sys::File::open(url));
     auto buf = try$(Io::readAllUtf8(file));
     Io::SScan s{buf};
-    return Ok(Style::StyleSheet::parse(s));
+    return Ok(Style::StyleSheet::parse(s, origin));
 }
 
 } // namespace Vaev::Driver

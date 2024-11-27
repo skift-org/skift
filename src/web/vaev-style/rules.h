@@ -2,6 +2,7 @@
 
 #include "fonts.h"
 #include "media.h"
+#include "origin.h"
 #include "select.h"
 #include "styles.h"
 
@@ -11,8 +12,9 @@ struct Rule;
 
 // https://www.w3.org/TR/cssom-1/#the-cssstylerule-interface
 struct StyleRule {
-    Selector selector;
+    Selector selector = UNIVERSAL;
     Vec<StyleProp> props;
+    Origin origin = Origin::AUTHOR;
 
     void repr(Io::Emit &e) const;
 
@@ -20,7 +22,7 @@ struct StyleRule {
         return selector.match(el);
     }
 
-    static StyleRule parse(Css::Sst const &sst);
+    static StyleRule parse(Css::Sst const &sst, Origin origin = Origin::AUTHOR);
 };
 
 // https://www.w3.org/TR/cssom-1/#the-cssimportrule-interface
@@ -65,7 +67,7 @@ struct Rule : public _Rule {
 
     void repr(Io::Emit &e) const;
 
-    static Rule parse(Css::Sst const &sst);
+    static Rule parse(Css::Sst const &sst, Origin origin = Origin::AUTHOR);
 };
 
 } // namespace Vaev::Style

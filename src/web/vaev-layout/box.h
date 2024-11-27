@@ -15,7 +15,7 @@ using Content = Union<
     None,
     Vec<Box>,
     Strong<Text::Prose>,
-    Image::Picture>;
+    Karm::Image::Picture>;
 
 struct Attrs {
     usize span = 1;

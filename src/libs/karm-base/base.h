@@ -80,8 +80,6 @@ namespace Karm {
 
 #define always_inline [[gnu::always_inline]]
 
-#define _ concat$(__p_, __COUNTER__)
-
 // MARK: Unsigned --------------------------------------------------------------
 
 using usize = __SIZE_TYPE__;

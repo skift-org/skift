@@ -1,9 +1,0 @@
-{
-    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "byg",
-    "type": "exe",
-    "description": "Build system",
-    "requires": [
-        "karm-sys"
-    ]
-}

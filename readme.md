@@ -1,11 +1,19 @@
-![skiftOS Screenshot](doc/assets/bento.png)
+<br/>
+<br/>
 
-## About
-
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/3ad24f7f90be4c969de7444377906c1c)](https://app.codacy.com/gh/skift-org/skift/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade) -
+<p align="center">
+<img src="doc/logo-light.svg#gh-light-mode-only" width="192" />
+<img src="doc/logo-dark.svg#gh-dark-mode-only" width="192" />
+</p>
+<br/>
+<p align="center">
 <a href="https://skiftos.org/">Website</a> -
 <a href="https://discord.com/invite/gamGsfg">Discord</a> -
 <a href="https://docs.skiftos.org">Documentation</a>
+</p>
+
+<br/>
+<br/>
 
 > **⚠ Warning**<br> skiftOS is currently in the early stages of development and is not yet ready for daily use. Please do not use it in production environments. Here be dragons! 🐉
 
@@ -14,12 +22,12 @@
 
 ## Key Features
 
-- **Karm**: A modern C++ core library providing foundational building blocks.
-- **KarmUI**: A reactive UI framework for building elegant user interfaces.
-- **Hideo**: A beautiful desktop environment prioritizing intuitive design.
-- **Hjert**: A capability-based "pragmatic" microkernel.
-- **CuteKit**: A versatile build system and package manager designed for cross-compilation and complex project management.
-- **Vaev**: A browser engine built for speed, accuracy, and simplicity.
+- [**Karm**](src/libs): A modern C++ core library providing foundational building blocks.
+- [**KarmUI**](src/libs/karm-ui/): A reactive UI framework for building elegant user interfaces.
+- [**Hideo**](src/apps): A beautiful desktop environment prioritizing intuitive design.
+- [**Hjert**](src/kernel): A capability-based "pragmatic" microkernel.
+- [**CuteKit**](https://github.com/cute-engineering/cutekit): A versatile build system and package manager designed for cross-compilation and complex project management.
+- [**Vaev**](src/web): A browser engine built for speed, accuracy, and simplicity.
 
 ## Core Philosophy
 

@@ -194,16 +194,13 @@ static bool _matchFirstChild(Markup::Element const &e) {
 // https://www.w3.org/TR/selectors-4/#the-last-child-pseudo
 
 static bool _matchLastChild(Markup::Element const &e) {
-    //    yap("coucouuuuuu {}", e);
     Cursor<Markup::Node> curr = &e;
     while (curr->hasNextSibling()) {
         auto next = curr->nextSibling();
-        //        yap("next: {}", next);
         if (auto el = next.is<Markup::Element>())
             return false;
         curr = &next.unwrap();
     }
-    //    yap("bruh");
     return true;
 }
 

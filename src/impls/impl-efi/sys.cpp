@@ -101,7 +101,7 @@ struct FileProto : public Fd {
 
     ~FileProto() {
         if (_proto) {
-            _proto->close(_proto).unwrap("close() failled");
+            _proto->close(_proto).unwrap("close() failed");
         }
     }
 

@@ -31,8 +31,8 @@ concept Tryable = requires(T t) {
 // Give us a symbole to break one when debbuging error handling.
 // This is a no-op in release mode.
 #if defined(__ck_debug__) and !defined(KARM_DISABLE_TRY_FAIL_HOOK)
-extern "C" void __try_failled();
-#    define __tryFail() __try_failled()
+extern "C" void __try_failed();
+#    define __tryFail() __try_failed()
 #else
 #    define __tryFail() /* NOP */
 #endif

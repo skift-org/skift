@@ -49,7 +49,7 @@ Async::Task<> Driver::runAllAsync() {
 
     if (failed) {
         Sys::errln(
-            " {5} failled - {} {}",
+            " {5} failed - {} {}",
             Cli::styled(failed, RED),
             Cli::styled(witty(Sys::now().val()), NOTE),
             badEmoji(Sys::now().val())

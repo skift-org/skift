@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/backtrace.h>
 #include <karm-base/box.h>
 #include <karm-base/cow.h>
 #include <karm-base/endian.h>
@@ -1014,6 +1015,28 @@ struct Formatter<Tuple<Ts...>> {
             return Ok(0uz);
         }));
         written += try$(writer.writeRune('}'));
+        return Ok(written);
+    }
+};
+
+// MARK: Format backtrace ------------------------------------------------------
+
+template <>
+struct Formatter<Backtrace> {
+    Res<usize> format(Io::TextWriter &writer, Backtrace const &val) {
+        if (val.status() == Backtrace::DISABLED)
+            return writer.writeStr("(backtrace disabled)"s);
+
+        if (val.status() == Backtrace::UNSUPPORTED)
+            return writer.writeStr("(backtrace unsupported)"s);
+
+        usize index = 1;
+        usize written = 0;
+        for (auto const &frame : val.frames()) {
+            written += try$(Io::format(writer, "#{}: {} at {}:{}\n", index, frame.desc, frame.file, frame.line));
+            index++;
+        }
+
         return Ok(written);
     }
 };

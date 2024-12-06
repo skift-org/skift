@@ -123,7 +123,7 @@ static inline void _sha256ComputeBlock(Array<u32, 8> &state, u8 const *buf) {
 static inline Array<u32, 8> _sha256Internal(Array<u32, 8> const &init, Bytes bytes) {
     Array<u32, 8> state = init;
     auto [buf, len] = bytes;
-    usize padlen = len << 3;
+    u64 padlen = len << 3;
 
     for (; len >= 64; len -= 64, buf += 64) {
         _sha256ComputeBlock(state, buf);
@@ -223,7 +223,7 @@ static inline void _sha512ComputeBlock(Array<u64, 8> &state, u8 const *buf) {
 static inline Array<u64, 8> _sha512Internal(Array<u64, 8> const &init, Bytes bytes) {
     Array<u64, 8> state = init;
     auto [buf, len] = bytes;
-    usize padlen = len << 3;
+    u64 padlen = len << 3;
 
     for (; len >= 128; len -= 128, buf += 128) {
         _sha512ComputeBlock(state, buf);

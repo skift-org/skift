@@ -3,6 +3,7 @@
 #include "fonts.h"
 #include "media.h"
 #include "origin.h"
+#include "page.h"
 #include "select.h"
 #include "styles.h"
 
@@ -18,9 +19,7 @@ struct StyleRule {
 
     void repr(Io::Emit &e) const;
 
-    bool match(Markup::Element const &el) const {
-        return selector.match(el);
-    }
+    bool match(Markup::Element const &el) const;
 
     static StyleRule parse(Css::Sst const &sst, Origin origin = Origin::AUTHOR);
 };
@@ -60,7 +59,8 @@ using _Rule = Union<
     StyleRule,
     FontFaceRule,
     MediaRule,
-    ImportRule>;
+    ImportRule,
+    PageRule>;
 
 struct Rule : public _Rule {
     using _Rule::_Rule;

@@ -3,11 +3,11 @@
 #include <karm-pdf/canvas.h>
 #include <karm-pdf/values.h>
 
-#include "base.h"
+#include "file-printer.h"
 
 namespace Karm::Print {
 
-struct PdfPrinter : public Printer {
+struct PdfPrinter : public FilePrinter {
     PaperStock _paper;
     Vec<Io::StringWriter> _pages;
     Opt<Pdf::Canvas> _canvas;
@@ -99,8 +99,9 @@ struct PdfPrinter : public Printer {
         pdf().write(e);
     }
 
-    void write(Io::TextWriter &w) {
-        Io::Emit e{w};
+    void write(Io::Writer &w) override {
+        Io::TextEncoder<> encoder{w};
+        Io::Emit e{encoder};
         write(e);
     }
 };

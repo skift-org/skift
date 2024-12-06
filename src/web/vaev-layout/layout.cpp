@@ -5,6 +5,7 @@
 #include "flex.h"
 #include "grid.h"
 #include "inline.h"
+#include "positioned.h"
 #include "table.h"
 #include "values.h"
 
@@ -21,14 +22,15 @@ Output _contentLayout(Tree &tree, Box &box, Input input) {
         display == Display::FLOW or
         display == Display::FLOW_ROOT or
         display == Display::TABLE_CELL or
-        display == Display::TABLE_CAPTION
+        display == Display::TABLE_CAPTION or
+        display == Display::TABLE
     ) {
         return blockLayout(tree, box, input);
     } else if (display == Display::FLEX) {
         return flexLayout(tree, box, input);
     } else if (display == Display::GRID) {
         return gridLayout(tree, box, input);
-    } else if (display == Display::TABLE) {
+    } else if (display == Display::TABLE_BOX) {
         return tableLayout(tree, box, input);
     } else if (display == Display::INTERNAL) {
         return Output{};
@@ -167,6 +169,9 @@ Output layout(Tree &tree, Box &box, Input input) {
         return max(0_px, s - padding.vertical() - borders.vertical());
     });
 
+    input.availableSpace.height = max(0_px, input.availableSpace.height - padding.vertical() - borders.vertical());
+    input.availableSpace.width = max(0_px, input.availableSpace.width - padding.horizontal() - borders.horizontal());
+
     input.position = input.position + borders.topStart() + padding.topStart();
 
     auto [size] = _contentLayout(tree, box, input);
@@ -185,6 +190,12 @@ Output layout(Tree &tree, Box &box, Input input) {
     }
 
     return Output::fromSize(size);
+}
+
+Output layout(Tree &tree, Input input) {
+    auto out = layout(tree, tree.root, input);
+    layoutPositioned(tree, tree.root, input.containingBlock);
+    return out;
 }
 
 } // namespace Vaev::Layout

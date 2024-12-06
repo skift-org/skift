@@ -215,16 +215,36 @@ static void _buildTableChildren(Style::Computer &c, Vec<Strong<Markup::Node>> co
 
     tableBox.style->display = Display::Internal::TABLE_BOX;
 
+    bool captionsOnTop = tableBox.style->table->captionSide == CaptionSide::TOP;
+
+    if (captionsOnTop) {
+        for (auto &child : children) {
+            if (auto el = child->is<Markup::Element>()) {
+                if (el->tagName == Html::CAPTION) {
+                    _buildNode(c, *el, tableWrapperBox);
+                }
+            }
+        }
+    }
+
     for (auto &child : children) {
         if (auto el = child->is<Markup::Element>()) {
-            if (el->tagName == Html::CAPTION) {
-                _buildNode(c, *child, tableWrapperBox);
-            } else {
-                _buildNode(c, *child, tableBox);
+            if (el->tagName != Html::CAPTION) {
+                _buildNode(c, *el, tableBox);
             }
         }
     }
     tableWrapperBox.add(std::move(tableBox));
+
+    if (not captionsOnTop) {
+        for (auto &child : children) {
+            if (auto el = child->is<Markup::Element>()) {
+                if (el->tagName == Html::CAPTION) {
+                    _buildNode(c, *el, tableWrapperBox);
+                }
+            }
+        }
+    }
 }
 
 static void _buildTable(Style::Computer &c, Strong<Style::Computed> style, Markup::Element const &el, Box &parent) {
@@ -280,6 +300,32 @@ Box build(Style::Computer &c, Markup::Document const &doc) {
     Box root = {style, _lookupFontface(*style)};
     _buildNode(c, doc, root);
     return root;
+}
+
+Box buildForPseudoElement(Strong<Style::Computed> style) {
+    auto fontFace = _lookupFontface(*style);
+
+    // FIXME: We should pass this around from the top in order to properly resolve rems
+    Resolver resolver{
+        .rootFont = Text::Font{fontFace, 16},
+        .boxFont = Text::Font{fontFace, 16},
+    };
+    Text::ProseStyle proseStyle{
+        .font = {
+            fontFace,
+            resolver.resolve(style->font->size).cast<f64>(),
+        },
+        .multiline = true,
+    };
+
+    auto prose = makeStrong<Text::Prose>(proseStyle);
+    if (style->content) {
+        logDebug("content: '{}'", style->content);
+        prose->append(style->content.str());
+        return {style, fontFace, prose};
+    }
+
+    return {style, fontFace};
 }
 
 } // namespace Vaev::Layout

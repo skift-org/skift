@@ -44,6 +44,8 @@ struct Mime {
     void repr(Io::Emit &e) const {
         e("{}", str());
     }
+
+    bool operator==(Mime const &) const = default;
 };
 
 /// Try to sniff the mime type from a file extension.

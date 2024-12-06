@@ -34,7 +34,7 @@ Style::Media _constructMedia(Print::Settings const &settings) {
         .prefersReducedTransparency = ReducedTransparency::NO_PREFERENCE,
         .prefersContrast = Contrast::NO_PREFERENCE,
         .forcedColors = Colors::NONE,
-        .prefersColorScheme = ColorScheme::DARK,
+        .prefersColorScheme = ColorScheme::LIGHT,
         .prefersReducedData = ReducedData::NO_PREFERENCE,
     };
 }

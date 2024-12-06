@@ -12,4 +12,6 @@ Vec2Px computeIntrinsicSize(Tree &tree, Box &box, IntrinsicSize intrinsic, Vec2P
 
 Output layout(Tree &tree, Box &box, Input input);
 
+Output layout(Tree &tree, Input input);
+
 } // namespace Vaev::Layout

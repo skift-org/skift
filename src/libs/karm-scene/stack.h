@@ -6,6 +6,9 @@ namespace Karm::Scene {
 
 struct Stack : public Node {
     Vec<Strong<Node>> _children;
+    Opt<Math::Trans2f> _transform;
+
+    Stack(Opt<Math::Trans2f> transform = NONE) : _transform(transform) {}
 
     void add(Strong<Node> child) {
         _children.pushBack(child);
@@ -31,8 +34,16 @@ struct Stack : public Node {
         if (not bound().colide(r))
             return;
 
+        if (_transform) {
+            g.push();
+            g.transform(_transform.unwrap());
+        }
+
         for (auto &child : _children)
             child->paint(g, r);
+
+        if (_transform)
+            g.pop();
     }
 
     void print(Print::Printer &p) override {

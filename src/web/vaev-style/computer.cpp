@@ -32,17 +32,24 @@ void Computer::_evalRule(Rule const &rule, Markup::Element const &el, MatchingRu
     });
 }
 
-// https://drafts.csswg.org/css-cascade/#cascade-origin
-Strong<Computed> Computer::computeFor(Computed const &parent, Markup::Element const &el) {
-    MatchingRules matchingRules;
-
-    // Collect matching styles rules
-    for (auto const &sheet : _styleBook.styleSheets) {
-        for (auto const &rule : sheet.rules) {
-            _evalRule(rule, el, matchingRules);
+void Computer::_evalRule(Rule const &rule, Page const &page, PageComputedStyle &c) {
+    rule.visit(Visitor{
+        [&](PageRule const &r) {
+            if (r.match(page))
+                r.apply(c);
+        },
+        [&](MediaRule const &r) {
+            if (r.match(_media))
+                for (auto const &subRule : r.rules)
+                    _evalRule(subRule, page, c);
+        },
+        [&](auto const &) {
+            // Ignore other rule types
         }
-    }
+    });
+}
 
+Strong<Computed> Computer::_evalCascade(Computed const &parent, MatchingRules &matchingRules) {
     // Sort origin and specificity
     stableSort(
         matchingRules,
@@ -52,14 +59,6 @@ Strong<Computed> Computer::computeFor(Computed const &parent, Markup::Element co
             return spec(a->selector) <=> spec(b->selector);
         }
     );
-
-    // Get the style attribute if any
-    auto styleAttr = el.getAttribute(Html::STYLE_ATTR);
-
-    StyleRule styleRule{
-        .props = parseDeclarations<StyleProp>(styleAttr ? *styleAttr : ""),
-    };
-    matchingRules.pushBack(&styleRule);
 
     // Compute computed style
     auto computed = makeStrong<Computed>(Computed::initial());
@@ -87,6 +86,37 @@ Strong<Computed> Computer::computeFor(Computed const &parent, Markup::Element co
 
     for (auto const &prop : iterRev(importantProps))
         prop->apply(parent, *computed);
+
+    return computed;
+}
+
+// https://drafts.csswg.org/css-cascade/#cascade-origin
+Strong<Computed> Computer::computeFor(Computed const &parent, Markup::Element const &el) {
+    MatchingRules matchingRules;
+
+    // Collect matching styles rules
+    for (auto const &sheet : _styleBook.styleSheets)
+        for (auto const &rule : sheet.rules)
+            _evalRule(rule, el, matchingRules);
+
+    // Get the style attribute if any
+    auto styleAttr = el.getAttribute(Html::STYLE_ATTR);
+
+    StyleRule styleRule{
+        .props = parseDeclarations<StyleProp>(styleAttr ? *styleAttr : ""),
+        .origin = Origin::INLINE,
+    };
+    matchingRules.pushBack(&styleRule);
+
+    return _evalCascade(parent, matchingRules);
+}
+
+Strong<PageComputedStyle> Computer::computeFor(Page const &page) {
+    auto computed = makeStrong<PageComputedStyle>();
+
+    for (auto const &sheet : _styleBook.styleSheets)
+        for (auto const &rule : sheet.rules)
+            _evalRule(rule, page, *computed);
 
     return computed;
 }

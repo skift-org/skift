@@ -8,6 +8,10 @@ static bool DEBUG_RULE = false;
 
 // MARK: StyleRule -------------------------------------------------------------
 
+bool StyleRule::match(Markup::Element const &el) const {
+    return selector.match(el);
+}
+
 void StyleRule::repr(Io::Emit &e) const {
     e("(style-rule");
     e.indent();
@@ -142,6 +146,8 @@ Rule Rule::parse(Css::Sst const &sst, Origin origin) {
         return ImportRule::parse(sst);
     else if (tok.data == "@font-face")
         return FontFaceRule::parse(sst);
+    else if (tok.data == "@page")
+        return PageRule::parse(sst);
     else
         return StyleRule::parse(sst, origin);
 }

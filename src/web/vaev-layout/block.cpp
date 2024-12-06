@@ -7,7 +7,34 @@ namespace Vaev::Layout {
 
 // https://www.w3.org/TR/CSS22/visuren.html#normal-flow
 struct BlockFormatingContext {
+
+    Px computeCAPMIN(Tree &tree, Box &box, Input input, Px inlineSize) {
+        Px capmin{};
+        for (auto &c : box.children()) {
+            if (c.style->display != Display::TABLE_BOX) {
+                auto margin = computeMargins(
+                    tree, c,
+                    {
+                        .containingBlock = {inlineSize, input.knownSize.y.unwrapOr(0_px)},
+                    }
+                );
+
+                auto minContentContrib = computeIntrinsicSize(
+                    tree, c, IntrinsicSize::MIN_CONTENT, input.containingBlock
+                );
+
+                capmin = max(
+                    capmin,
+                    minContentContrib.width + margin.horizontal()
+                );
+            }
+        }
+
+        return capmin;
+    }
+
     Output run(Tree &tree, Box &box, Input input) {
+
         Px blockSize = 0_px;
         Px inlineSize = input.knownSize.width.unwrapOr(0_px);
 
@@ -24,7 +51,7 @@ struct BlockFormatingContext {
             Input childInput = {
                 .commit = input.commit,
                 .intrinsic = input.intrinsic,
-                .availableSpace = {inlineSize, 0_px},
+                .availableSpace = {input.availableSpace.x, 0_px},
                 .containingBlock = {inlineSize, input.knownSize.y.unwrapOr(0_px)},
             };
 
@@ -43,17 +70,20 @@ struct BlockFormatingContext {
 
             childInput.position = input.position + Vec2Px{margin.start, blockSize};
 
-            auto ouput = layout(
+            if (c.style->display == Display::Internal::TABLE_BOX) {
+                childInput.capmin = computeCAPMIN(tree, box, input, inlineSize);
+            }
+
+            auto output = layout(
                 tree,
                 c,
                 childInput
             );
-
             if (c.style->position != Position::ABSOLUTE) {
-                blockSize += ouput.size.y + margin.bottom;
+                blockSize += output.size.y + margin.bottom;
             }
 
-            inlineSize = max(inlineSize, ouput.size.x + margin.start + margin.end);
+            inlineSize = max(inlineSize, output.size.x + margin.horizontal());
         }
 
         return Output::fromSize({

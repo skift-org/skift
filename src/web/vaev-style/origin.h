@@ -10,6 +10,7 @@ enum struct Origin {
     USER_AGENT,
     USER,
     AUTHOR,
+    INLINE, //< Declarations from style attributes
 };
 
 static inline std::strong_ordering operator<=>(Origin a, Origin b) {

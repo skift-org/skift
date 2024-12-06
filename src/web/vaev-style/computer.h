@@ -15,7 +15,13 @@ struct Computer {
 
     void _evalRule(Rule const &rule, Markup::Element const &el, MatchingRules &matches);
 
+    void _evalRule(Rule const &rule, Page const &page, PageComputedStyle &c);
+
+    Strong<Computed> _evalCascade(Computed const &parent, MatchingRules &matches);
+
     Strong<Computed> computeFor(Computed const &parent, Markup::Element const &el);
+
+    Strong<PageComputedStyle> computeFor(Page const &page);
 };
 
 } // namespace Vaev::Style

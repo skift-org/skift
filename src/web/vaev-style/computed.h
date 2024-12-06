@@ -28,6 +28,7 @@ struct Computed {
 
     Color color;
     Number opacity;
+    String content = ""s;
 
     AlignProps aligns;
     Math::Vec2<CalcValue<PercentOr<Length>>> gaps;

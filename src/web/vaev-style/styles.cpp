@@ -118,4 +118,39 @@ void DefaultedProp::repr(Io::Emit &e) const {
     e("(Defaulted {#} = {})", propName, value);
 }
 
+// MARK: Style Property  -------------------------------------------------------
+
+Str StyleProp::name() const {
+    return visit([](auto const &p) {
+        return p.name();
+    });
+}
+
+void StyleProp::inherit(Computed const &parent, Computed &child) const {
+    visit([&](auto const &p) {
+        if constexpr (requires { p.inherit(parent, child); })
+            p.inherit(parent, child);
+    });
+}
+
+void StyleProp::apply(Computed const &parent, Computed &c) const {
+    visit([&](auto const &p) {
+        if constexpr (requires { p.apply(c); })
+            p.apply(c);
+
+        if constexpr (requires { p.apply(parent, c); })
+            p.apply(parent, c);
+    });
+}
+
+void StyleProp::repr(Io::Emit &e) const {
+    e("({}", name());
+    visit([&](auto const &p) {
+        e(" {#}", p.value);
+        if (important == Important::YES)
+            e(" !important");
+    });
+    e(")");
+}
+
 } // namespace Vaev::Style

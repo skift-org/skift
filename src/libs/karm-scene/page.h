@@ -7,7 +7,7 @@ namespace Karm::Scene {
 struct Page : public Stack {
     Math::Vec2i _size;
 
-    Page(Math::Vec2i size) : _size(size) {}
+    Page(Math::Vec2i size, Opt<Math::Trans2f> transform = NONE) : Stack(transform), _size(size) {}
 
     void print(Print::Printer &doc) override {
         Stack::print(doc);

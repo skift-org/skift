@@ -199,13 +199,13 @@ test$("vaev-style-parse-mixed-selectors") {
         )
     );
 
-    // expectEq$(
-    //     Selector::parse(".o_content .o_table thead, .o_content .o_table tbody, .o_content .o_table tfoot, .o_content .o_table tr, .o_content .o_table td, .o_content .o_table th "),
-    //     Selector::descendant(
-    //         Selector::and_({TypeSelector{Html::TR}, Selector::not_(Pseudo{Pseudo::LAST_CHILD})}),
-    //         Selector::and_({TypeSelector{Html::TH}, {Selector::not_(Pseudo{Pseudo::FIRST_CHILD})}})
-    //     )
-    // );
+    expectEq$(
+        Selector::parse(".o_content .o_table thead, .o_content .o_table tbody, .o_content .o_table tfoot, .o_content .o_table tr, .o_content .o_table td, .o_content .o_table th "),
+        Selector::descendant(
+            Selector::and_({TypeSelector{Html::TR}, Selector::not_(Pseudo{Pseudo::LAST_CHILD})}),
+            Selector::and_({TypeSelector{Html::TH}, {Selector::not_(Pseudo{Pseudo::FIRST_CHILD})}})
+        )
+    );
     return Ok();
 }
 

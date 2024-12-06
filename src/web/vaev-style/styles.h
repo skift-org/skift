@@ -1149,7 +1149,31 @@ struct BorderWidthProp {
     }
 };
 
-// MARK: Borders - Table ---------------------------------------------------------------
+// MARK: Content ---------------------------------------------------------------
+
+// https://drafts.csswg.org/css-content/#content-property
+struct ContentProp {
+    String value = initial();
+
+    static constexpr Str name() { return "content"; }
+
+    static String initial() { return ""s; }
+
+    void apply(Computed &c) const {
+        c.content = value;
+    }
+
+    static String load(Computed const &c) {
+        return c.content;
+    }
+
+    Res<> parse(Cursor<Css::Sst> &c) {
+        value = try$(parseValue<String>(c));
+        return Ok();
+    }
+};
+
+// MARK: Borders - Table -------------------------------------------------------
 
 // https://www.w3.org/TR/CSS22/tables.html#propdef-border-collapse
 struct BorderCollapseProp {
@@ -2733,6 +2757,9 @@ using _StyleProp = Union<
     BorderCollapseProp,
     BorderSpacingProp,
 
+    // Content
+    ContentProp,
+
     // Flex
     FlexBasisProp,
     FlexDirectionProp,
@@ -2834,38 +2861,13 @@ struct StyleProp : public _StyleProp {
         Cons<Str>{"grid-gap", "gap"},
     };
 
-    Str name() const {
-        return visit([](auto const &p) {
-            return p.name();
-        });
-    }
+    Str name() const;
 
-    void inherit(Computed const &parent, Computed &child) const {
-        visit([&](auto const &p) {
-            if constexpr (requires { p.inherit(parent, child); })
-                p.inherit(parent, child);
-        });
-    }
+    void inherit(Computed const &parent, Computed &child) const;
 
-    void apply(Computed const &parent, Computed &c) const {
-        visit([&](auto const &p) {
-            if constexpr (requires { p.apply(c); })
-                p.apply(c);
+    void apply(Computed const &parent, Computed &c) const;
 
-            if constexpr (requires { p.apply(parent, c); })
-                p.apply(parent, c);
-        });
-    }
-
-    void repr(Io::Emit &e) const {
-        e("({}", name());
-        visit([&](auto const &p) {
-            e(" {}", p.value);
-            if (important == Important::YES)
-                e(" !important");
-        });
-        e(")");
-    }
+    void repr(Io::Emit &e) const;
 };
 
 } // namespace Vaev::Style

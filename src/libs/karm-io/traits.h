@@ -41,7 +41,6 @@ template <typename T>
 concept SeekableDuplexable = Duplexable<T> and Seekable<T>;
 
 struct Writer {
-
     virtual ~Writer() = default;
 
     virtual Res<usize> write(Bytes) = 0;
@@ -89,7 +88,9 @@ struct TextWriter :
 
     virtual Res<usize> writeRune(Rune rune) = 0;
 
-    Res<usize> flush() override { return Ok(0uz); }
+    Res<usize> flush() override {
+        return Ok(0uz);
+    }
 };
 
 template <StaticEncoding E = typename Sys::Encoding>

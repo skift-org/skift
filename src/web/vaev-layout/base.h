@@ -38,6 +38,9 @@ struct Input {
     Vec2Px availableSpace = {};
     Vec2Px containingBlock = {};
 
+    // To be used between table wrapper and table box
+    Opt<Px> capmin = NONE;
+
     Input withCommit(Commit c) const {
         auto copy = *this;
         copy.commit = c;

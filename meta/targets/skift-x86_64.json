@@ -10,14 +10,10 @@
         "bits": "64",
         "freestanding": false,
         "host": false,
-        "version": "{jexpr.include('./meta/scripts/version.json')}",
-        "karm-sys-encoding": "utf8",
-        "karm-sys-line-ending": "lf",
-        "karm-sys-path-separator": "slash",
-        "karm-cli-backend": "ansi"
-    },
-    "routing": {
-        "stdc-math": "ce-libm"
+        "sys-encoding": "utf8",
+        "sys-line-ending": "lf",
+        "sys-path-separator": "slash",
+        "sys-terminal": "ansi"
     },
     "tools": {
         "cc": {
@@ -39,12 +35,12 @@
             "args": [
                 "-m",
                 "elf_x86_64",
-                "-Tmeta/targets/skift-x86_64.ld",
+                "-T{utils.relpath('skift-x86_64.ld')}",
                 "-z",
                 "max-page-size=0x1000"
             ],
             "files": [
-                "meta/targets/skift-x86_64.ld"
+                "{utils.relpath('skift-x86_64.ld')}"
             ]
         },
         "ar": {

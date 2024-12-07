@@ -3,7 +3,7 @@
 #include <karm-io/emit.h>
 #include <karm-io/expr.h>
 #include <karm-io/sscan.h>
-#include <mdi>
+#include <mdi/_prelude.h>
 
 namespace Karm::Mime {
 

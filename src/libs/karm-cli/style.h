@@ -113,7 +113,7 @@ struct Style {
 
     void repr([[maybe_unused]] Io::Emit &e) const {
 
-#ifdef __ck_karm_cli_backend_ansi__
+#ifdef __ck_sys_terminal_ansi__
         if (_reset) {
             e("\x1b[0m"s);
         }
@@ -185,7 +185,7 @@ struct Karm::Io::Formatter<Karm::Cli::Styled<T>> {
     }
 
     Res<usize> format(Io::TextWriter &writer, Karm::Cli::Styled<T> const &val) {
-#ifdef __ck_karm_cli_backend_ansi__
+#ifdef __ck_sys_terminal_ansi__
         return Ok(
             try$(_styleFmt.format(writer, val._color)) +
             try$(_innerFmt.format(writer, val._inner)) +

@@ -3,7 +3,7 @@
 #include <karm-base/align.h>
 #include <karm-io/funcs.h>
 #include <karm-io/impls.h>
-#include <karm-json>
+#include <karm-json/parse.h>
 #include <karm-logger/logger.h>
 #include <karm-sys/file.h>
 #include <karm-sys/launch.h>

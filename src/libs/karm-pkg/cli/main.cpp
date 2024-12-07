@@ -1,6 +1,5 @@
-#include <karm-pkg>
+#include <karm-pkg/bundle.h>
 #include <karm-sys/entry.h>
-#include <karm-sys>
 
 Async::Task<> entryPointAsync(Sys::Context &) {
     auto currentBundle = co_try$(Pkg::currentBundle());

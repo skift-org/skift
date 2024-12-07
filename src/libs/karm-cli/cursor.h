@@ -105,7 +105,7 @@ struct Cmd {
     }
 
     void repr([[maybe_unused]] Io::Emit &e) const {
-#ifdef __ck_karm_cli_backend_ansi__
+#ifdef __ck_sys_terminal_ansi__
         switch (_type) {
         case Cli::Cmd::SAVE:
             e("\x1b[s");

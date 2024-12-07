@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-math/rect.h>
-#include <mdi>
+#include <mdi/_prelude.h>
 
 #include "canvas.h"
 

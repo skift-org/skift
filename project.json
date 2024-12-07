@@ -1,6 +1,7 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.project.v1",
     "id": "skift-org/skift",
+    "version": "v0.1.0",
     "type": "project",
     "description": "The Skift Operating System",
     "extern": {
@@ -23,6 +24,10 @@
         "cute-engineering/ce-stdcpp": {
             "git": "https://github.com/cute-engineering/ce-stdcpp.git",
             "tag": "v1.3.0"
+        },
+        "cute-engineering/ce-targets": {
+            "git": "https://github.com/cute-engineering/ce-targets.git",
+            "tag": "v0.1.1"
         },
         "sdl2": {
             "description": "A cross-platform development library designed to provide low level access to hardware",

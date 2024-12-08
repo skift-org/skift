@@ -284,7 +284,8 @@ struct Iter {
     }
 
     constexpr auto collect() {
-        forEach([&](auto const&...) {});
+        forEach([&](auto const &...) {
+        });
     }
 
     template <typename C>

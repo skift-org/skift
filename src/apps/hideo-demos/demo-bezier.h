@@ -6,7 +6,6 @@
 #include <karm-ui/layout.h>
 #include <karm-ui/reducer.h>
 #include <karm-ui/view.h>
-
 #include <mdi/vector-bezier.h>
 
 #include "base.h"

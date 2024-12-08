@@ -1,7 +1,6 @@
 #pragma once
 
 #include <karm-ui/view.h>
-
 #include <mdi/vector-line.h>
 
 #include "base.h"

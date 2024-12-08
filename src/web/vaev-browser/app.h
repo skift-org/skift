@@ -7,4 +7,4 @@ namespace Vaev::Browser {
 
 Ui::Child app(Mime::Url url, Res<Strong<Vaev::Markup::Document>> dom);
 
-} // namespace Hideo::Browser
+} // namespace Vaev::Browser

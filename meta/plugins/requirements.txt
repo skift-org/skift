@@ -1,2 +1,2 @@
 python-magic ~= 0.4.27
-git+https://github.com/cute-engineering/cutekit.git@0.7.9
+git+https://github.com/cute-engineering/cutekit.git@0.7.10

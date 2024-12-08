@@ -312,9 +312,7 @@ Res<> stringify(Io::Emit &emit, Value const &v);
 
 Res<String> stringify(Value const &v);
 
-
 } // namespace Karm::Json
-
 
 template <>
 struct Karm::Io::Formatter<Karm::Json::Value> {

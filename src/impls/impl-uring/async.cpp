@@ -288,7 +288,7 @@ struct UringSched : public Sys::Sched {
             TimeStamp _until;
             Async::Promise<> _promise;
 
-            struct __kernel_timespec _ts {};
+            struct __kernel_timespec _ts{};
 
             Job(TimeStamp until)
                 : _until(until) {}

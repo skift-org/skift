@@ -204,4 +204,4 @@ struct Lexer {
     }
 };
 
-} // namespace Vaev::Js
+} // namespace Vaev::Script

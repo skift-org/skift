@@ -1,6 +1,5 @@
 #include <karm-ui/box.h>
 #include <karm-ui/drag.h>
-
 #include <mdi/chevron-up.h>
 
 #include "app.h"

@@ -56,7 +56,6 @@ Ui::Child _printPaper(State const &s, usize index) {
     return Ui::stack(
                Ui::canvas(s.pages[index]) |
                    Ui::box({
-                       .borderRadii = 6,
                        .borderWidth = 1,
                        .borderFill = Ui::GRAY50.withOpacity(0.1),
                        .backgroundFill = Gfx::WHITE,

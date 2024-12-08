@@ -8,6 +8,7 @@ namespace Karm {
 
 #define FOREACH_ERROR(ERROR)                                  \
     ERROR(_OK, _ok)                                           \
+    ERROR(SKIPPED, skipped)                                   \
     ERROR(NOT_IMPLEMENTED, notImplemented)                    \
     ERROR(NOT_FOUND, notFound)                                \
     ERROR(PERMISSION_DENIED, permissionDenied)                \
@@ -97,6 +98,10 @@ struct [[nodiscard]] Error {
 
     constexpr bool operator==(Error const &other) const {
         return _code == other._code and cstrEq(_msg, other._msg);
+    }
+
+    constexpr bool operator==(Code const &code) const {
+        return _code == code;
     }
 };
 

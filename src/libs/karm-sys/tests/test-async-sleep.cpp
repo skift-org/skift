@@ -8,7 +8,7 @@ namespace Karm::Sys::Tests {
 Async::Task<> sleepyBoy() {
 #ifdef __ck_sys_darwin__
     logInfo("Skipping test on macOS");
-    co_return Ok();
+    co_return Error::skipped();
 #endif
 
     auto duration = TimeSpan::fromMSecs(100);

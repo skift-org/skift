@@ -14,6 +14,7 @@ namespace {
 
 constexpr auto GREEN = Cli::Style{Cli::GREEN}.bold();
 constexpr auto RED = Cli::Style{Cli::RED}.bold();
+constexpr auto YELLOW = Cli::Style{Cli::YELLOW}.bold();
 constexpr auto NOTE = Cli::Style{Cli::GRAY_DARK}.bold();
 
 } // namespace
@@ -23,7 +24,7 @@ void Driver::add(Test *test) {
 }
 
 Async::Task<> Driver::runAllAsync() {
-    usize passed = 0, failed = 0;
+    usize passed = 0, failed = 0, skipped = 0;
 
     Sys::errln("Running {} tests...\n", _tests.len());
 
@@ -36,7 +37,10 @@ Async::Task<> Driver::runAllAsync() {
 
         auto result = co_await test->runAsync(*this);
 
-        if (not result) {
+        if (not result and result.none() == Error::SKIPPED) {
+            skipped++;
+            Sys::errln("{}", Cli::styled("SKIP"s, Cli::style(Cli::YELLOW).bold()));
+        } else if (not result) {
             failed++;
             Sys::errln("{}", Cli::styled(result.none(), Cli::style(Cli::RED).bold()));
         } else {
@@ -46,6 +50,13 @@ Async::Task<> Driver::runAllAsync() {
     }
 
     Sys::errln("");
+
+    if (skipped) {
+        Sys::errln(
+            " {5} skipped",
+            Cli::styled(skipped, YELLOW)
+        );
+    }
 
     if (failed) {
         Sys::errln(
@@ -63,7 +74,7 @@ Async::Task<> Driver::runAllAsync() {
     }
 
     Sys::errln(
-        "{5} passed - {} {}\n",
+        " {5} passed - {} {}\n",
         Cli::styled(passed, GREEN),
         Cli::styled(nice(Sys::now().val()), NOTE),
         goodEmoji(Sys::now().val())

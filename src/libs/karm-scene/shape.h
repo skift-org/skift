@@ -19,7 +19,7 @@ struct Shape : public Node {
         return _path.bound();
     }
 
-    void paint(Gfx::Canvas &g, Math::Rectf r) override {
+    void paint(Gfx::Canvas &g, Math::Rectf r, PaintOptions) override {
         if (not bound().colide(r))
             return;
 

@@ -175,6 +175,63 @@ Res<BorderSpacing> ValueParser<BorderSpacing>::parse(Cursor<Css::Sst> &c) {
     return Error::invalidData("expected border spacing value");
 }
 
+// MARK: BreakAfter & BreakBefore
+// https://www.w3.org/TR/css-break-3/#propdef-break-after
+// https://www.w3.org/TR/css-break-3/#propdef-break-before
+Res<BreakBetween> ValueParser<BreakBetween>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Css::Token::ident("auto"))) {
+        return Ok(BreakBetween::AUTO);
+    } else if (c.skip(Css::Token::ident("avoid"))) {
+        return Ok(BreakBetween::AVOID);
+    } else if (c.skip(Css::Token::ident("avoid-page"))) {
+        return Ok(BreakBetween::AVOID_PAGE);
+    } else if (c.skip(Css::Token::ident("page"))) {
+        return Ok(BreakBetween::PAGE);
+    } else if (c.skip(Css::Token::ident("left"))) {
+        return Ok(BreakBetween::LEFT);
+    } else if (c.skip(Css::Token::ident("right"))) {
+        return Ok(BreakBetween::RIGHT);
+    } else if (c.skip(Css::Token::ident("recto"))) {
+        return Ok(BreakBetween::RECTO);
+    } else if (c.skip(Css::Token::ident("verso"))) {
+        return Ok(BreakBetween::VERSO);
+    } else if (c.skip(Css::Token::ident("avoid-column"))) {
+        return Ok(BreakBetween::AVOID_COLUMN);
+    } else if (c.skip(Css::Token::ident("column"))) {
+        return Ok(BreakBetween::COLUMN);
+    } else if (c.skip(Css::Token::ident("avoid-region"))) {
+        return Ok(BreakBetween::AVOID_REGION);
+    } else if (c.skip(Css::Token::ident("region"))) {
+        return Ok(BreakBetween::REGION);
+    }
+
+    return Error::invalidData("expected break between value");
+}
+
+// MARK: BreakInside
+// https://www.w3.org/TR/css-break-3/#break-within
+Res<BreakInside> ValueParser<BreakInside>::parse(Cursor<Css::Sst> &c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.skip(Css::Token::ident("auto"))) {
+        return Ok(BreakInside::AUTO);
+    } else if (c.skip(Css::Token::ident("avoid"))) {
+        return Ok(BreakInside::AVOID);
+    } else if (c.skip(Css::Token::ident("avoid-page"))) {
+        return Ok(BreakInside::AVOID_PAGE);
+    } else if (c.skip(Css::Token::ident("avoid-column"))) {
+        return Ok(BreakInside::AVOID_COLUMN);
+    } else if (c.skip(Css::Token::ident("avoid-region"))) {
+        return Ok(BreakInside::AVOID_REGION);
+    }
+
+    return Error::invalidData("expected break between value");
+}
+
 // MARK: Color
 // https://drafts.csswg.org/css-color
 
@@ -807,14 +864,14 @@ Res<Number> ValueParser<Number>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: Orientation
 // https://drafts.csswg.org/mediaqueries/#orientation
-Res<Orientation> ValueParser<Orientation>::parse(Cursor<Css::Sst> &c) {
+Res<Print::Orientation> ValueParser<Print::Orientation>::parse(Cursor<Css::Sst> &c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
     if (c.skip(Css::Token::ident("portrait")))
-        return Ok(Orientation::PORTRAIT);
+        return Ok(Print::Orientation::PORTRAIT);
     else if (c.skip(Css::Token::ident("landscape")))
-        return Ok(Orientation::LANDSCAPE);
+        return Ok(Print::Orientation::LANDSCAPE);
     else
         return Error::invalidData("expected orientation");
 }

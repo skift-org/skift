@@ -20,12 +20,14 @@
         text-align: left;
         vertical-align: middle;
         flex-grow: 1;
+        content: var(-vaev-datetime);
     }
 
     @top-center {
         text-align: center;
         vertical-align: middle;
         flex-grow: 1;
+        content: var(-vaev-title);
     }
 
     @top-right {
@@ -106,6 +108,7 @@
         text-align: left;
         vertical-align: middle;
         flex-grow: 1;
+        content: var(-vaev-url);
     }
 
     @bottom-center {
@@ -118,7 +121,6 @@
         text-align: right;
         vertical-align: middle;
         flex-grow: 1;
-
     }
 
     @bottom-right-corner {

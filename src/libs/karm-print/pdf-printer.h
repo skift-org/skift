@@ -7,17 +7,18 @@
 
 namespace Karm::Print {
 
+struct PdfPage {
+    PaperStock paper;
+    Io::StringWriter data;
+};
+
 struct PdfPrinter : public FilePrinter {
-    PaperStock _paper;
-    Vec<Io::StringWriter> _pages;
+    Vec<PdfPage> _pages;
     Opt<Pdf::Canvas> _canvas;
 
-    PdfPrinter(PaperStock stock)
-        : _paper(stock) {}
-
-    Gfx::Canvas &beginPage() override {
-        _pages.emplaceBack();
-        _canvas = Pdf::Canvas{last(_pages), _paper.size()};
+    Gfx::Canvas &beginPage(PaperStock paper) override {
+        auto &page = _pages.emplaceBack(paper);
+        _canvas = Pdf::Canvas{page.data, paper.size()};
         return *_canvas;
     }
 
@@ -40,6 +41,13 @@ struct PdfPrinter : public FilePrinter {
                 Pdf::Dict{
                     {"Type"s, Pdf::Name{"Page"s}},
                     {"Parent"s, pagesRef},
+                    {"MediaBox"s,
+                     Pdf::Array{
+                         usize{0},
+                         usize{0},
+                         p.paper.width,
+                         p.paper.height,
+                     }},
                     {
                         "Contents"s,
                         contentsRef,
@@ -51,9 +59,9 @@ struct PdfPrinter : public FilePrinter {
                 contentsRef,
                 Pdf::Stream{
                     .dict = Pdf::Dict{
-                        {"Length"s, p.bytes().len()},
+                        {"Length"s, p.data.bytes().len()},
                     },
-                    .data = p.bytes(),
+                    .data = p.data.bytes(),
                 }
             );
 
@@ -65,13 +73,6 @@ struct PdfPrinter : public FilePrinter {
             pagesRef,
             Pdf::Dict{
                 {"Type"s, Pdf::Name{"Pages"s}},
-                {"MediaBox"s,
-                 Pdf::Array{
-                     usize{0},
-                     usize{0},
-                     _paper.width,
-                     _paper.height,
-                 }},
                 {"Count"s, _pages.len()},
                 {"Kids"s, std::move(pagesKids)},
             }
@@ -99,10 +100,12 @@ struct PdfPrinter : public FilePrinter {
         pdf().write(e);
     }
 
-    void write(Io::Writer &w) override {
+    Res<> write(Io::Writer &w) override {
         Io::TextEncoder<> encoder{w};
         Io::Emit e{encoder};
         write(e);
+        try$(e.flush());
+        return Ok();
     }
 };
 

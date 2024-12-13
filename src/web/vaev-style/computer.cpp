@@ -111,8 +111,8 @@ Strong<Computed> Computer::computeFor(Computed const &parent, Markup::Element co
     return _evalCascade(parent, matchingRules);
 }
 
-Strong<PageComputedStyle> Computer::computeFor(Page const &page) {
-    auto computed = makeStrong<PageComputedStyle>();
+Strong<PageComputedStyle> Computer::computeFor(Computed const &parent, Page const &page) {
+    auto computed = makeStrong<PageComputedStyle>(parent);
 
     for (auto const &sheet : _styleBook.styleSheets)
         for (auto const &rule : sheet.rules)

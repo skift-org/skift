@@ -358,11 +358,11 @@ struct Selector : public _Selector {
 
     bool operator==(Selector const &) const = default;
 
-    static Selector parse(Cursor<Css::Sst> &c);
+    static Res<Selector> parse(Cursor<Css::Sst> &c);
 
-    static Selector parse(Io::SScan &s);
+    static Res<Selector> parse(Io::SScan &s);
 
-    static Selector parse(Str input);
+    static Res<Selector> parse(Str input);
 };
 
 inline bool Infix::operator==(Infix const &) const = default;

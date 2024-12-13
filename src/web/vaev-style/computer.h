@@ -21,7 +21,7 @@ struct Computer {
 
     Strong<Computed> computeFor(Computed const &parent, Markup::Element const &el);
 
-    Strong<PageComputedStyle> computeFor(Page const &page);
+    Strong<PageComputedStyle> computeFor(Computed const &parent, Page const &page);
 };
 
 } // namespace Vaev::Style

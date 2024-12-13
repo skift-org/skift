@@ -18,7 +18,7 @@ struct View : public Ui::View<View> {
             .width = Px{viewport.width},
             .height = Px{viewport.height},
             .aspectRatio = viewport.width / (f64)viewport.height,
-            .orientation = Orientation::LANDSCAPE,
+            .orientation = Print::Orientation::LANDSCAPE,
 
             .resolution = Resolution::fromDpi(96),
             .scan = Scan::PROGRESSIVE,
@@ -63,12 +63,12 @@ struct View : public Ui::View<View> {
         g.origin(bound().xy.cast<f64>());
         g.clip(viewport);
 
-        auto [_, layout, paint] = *_renderResult;
+        auto [_, layout, paint, frag] = *_renderResult;
         g.clear(rect, Gfx::WHITE);
 
         paint->paint(g, rect.offset(-bound().xy).cast<f64>());
         if (Ui::debugShowLayoutBounds) {
-            Layout::wireframe(*layout, g);
+            Layout::wireframe(*frag, g);
         }
 
         g.pop();
@@ -82,11 +82,11 @@ struct View : public Ui::View<View> {
     Math::Vec2i size(Math::Vec2i size, Ui::Hint) override {
         // FIXME: This is wasteful, we should cache the result
         auto media = _constructMedia(size);
-        auto [_, layout, _] = Driver::render(*_dom, media, {.small = size.cast<Px>()});
+        auto [_, layout, _, frag] = Driver::render(*_dom, media, {.small = size.cast<Px>()});
 
         return {
-            layout->layout.borderBox().width.cast<isize>(),
-            layout->layout.borderBox().height.cast<isize>(),
+            frag->metrics.borderBox().width.cast<isize>(),
+            frag->metrics.borderBox().height.cast<isize>(),
         };
     }
 };

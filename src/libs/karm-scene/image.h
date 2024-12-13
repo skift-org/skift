@@ -18,7 +18,7 @@ struct Image : public Node {
         return _bound;
     }
 
-    void paint(Gfx::Canvas &ctx, Math::Rectf r) override {
+    void paint(Gfx::Canvas &ctx, Math::Rectf r, PaintOptions) override {
         if (not r.colide(bound()))
             return;
 

@@ -121,7 +121,7 @@ using OnPaint = Func<void(Gfx::Canvas &g, Math::Vec2i size)>;
 
 Child canvas(OnPaint onPaint);
 
-Child canvas(Strong<Scene::Node> child);
+Child canvas(Strong<Scene::Node> child, Scene::PaintOptions options = {});
 
 // MARK: Blur ------------------------------------------------------------------
 

@@ -30,7 +30,7 @@ struct Stack : public Node {
         return rect;
     }
 
-    void paint(Gfx::Canvas &g, Math::Rectf r) override {
+    void paint(Gfx::Canvas &g, Math::Rectf r, PaintOptions o) override {
         if (not bound().colide(r))
             return;
 
@@ -40,15 +40,15 @@ struct Stack : public Node {
         }
 
         for (auto &child : _children)
-            child->paint(g, r);
+            child->paint(g, r, o);
 
         if (_transform)
             g.pop();
     }
 
-    void print(Print::Printer &p) override {
+    void print(Print::Printer &p, PaintOptions o) override {
         for (auto &child : _children)
-            child->print(p);
+            child->print(p, o);
     }
 
     void repr(Io::Emit &e) const override {

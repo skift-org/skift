@@ -10,7 +10,7 @@ namespace Karm::Print {
 struct Printer {
     virtual ~Printer() = default;
 
-    virtual Gfx::Canvas &beginPage() = 0;
+    virtual Gfx::Canvas &beginPage(PaperStock paper) = 0;
 };
 
 } // namespace Karm::Print

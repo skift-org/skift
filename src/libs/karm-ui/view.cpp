@@ -367,12 +367,14 @@ Child canvas(OnPaint onPaint) {
 
 struct SceneCanvas : public View<SceneCanvas> {
     Strong<Scene::Node> _scene;
+    Scene::PaintOptions _options;
 
-    SceneCanvas(Strong<Scene::Node> scene)
-        : _scene(std::move(scene)) {}
+    SceneCanvas(Strong<Scene::Node> scene, Scene::PaintOptions options)
+        : _scene(std::move(scene)), _options(options) {}
 
     void reconcile(SceneCanvas &o) override {
         _scene = o._scene;
+        _options = o._options;
         View<SceneCanvas>::reconcile(o);
     }
 
@@ -388,7 +390,7 @@ struct SceneCanvas : public View<SceneCanvas> {
 
         auto rectInScene = trans.inverse().apply(rect.cast<f64>()).bound();
 
-        _scene->paint(g, Math::Rectf::MAX);
+        _scene->paint(g, Math::Rectf::MAX, _options);
 
         g.pop();
     }
@@ -402,8 +404,8 @@ struct SceneCanvas : public View<SceneCanvas> {
     }
 };
 
-Child canvas(Strong<Scene::Node> child) {
-    return makeStrong<SceneCanvas>(std::move(child));
+Child canvas(Strong<Scene::Node> child, Scene::PaintOptions options) {
+    return makeStrong<SceneCanvas>(std::move(child), options);
 }
 
 // MARK: Filter ----------------------------------------------------------------

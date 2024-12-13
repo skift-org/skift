@@ -42,7 +42,13 @@ StyleRule StyleRule::parse(Css::Sst const &sst, Origin origin) {
     // Parse the selector.
     auto &prefix = sst.prefix.unwrap();
     Cursor<Css::Sst> prefixContent = prefix->content;
-    res.selector = Selector::parse(prefixContent);
+    auto maybeSelector = Selector::parse(prefixContent);
+    if (maybeSelector) {
+        res.selector = maybeSelector.take();
+    } else {
+        logWarn("failed to parse selector: {}: {}", prefix->content, maybeSelector);
+        res.selector = EmptySelector{};
+    }
 
     // Parse the properties.
     for (auto const &item : sst.content) {

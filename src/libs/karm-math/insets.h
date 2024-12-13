@@ -58,6 +58,16 @@ struct Insets {
         return top + bottom;
     }
 
+    template <typename U>
+    Insets<U> cast() const {
+        return {
+            static_cast<U>(start),
+            static_cast<U>(top),
+            static_cast<U>(end),
+            static_cast<U>(bottom),
+        };
+    }
+
     void repr(Io::Emit &e) const {
         e("(insets {} {} {} {})", start, top, end, bottom);
     }

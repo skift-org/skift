@@ -8,7 +8,7 @@ static Media const TEST_MEDIA = {
     .width = 1920_px,
     .height = 1080_px,
     .aspectRatio = 16.0 / 9.0,
-    .orientation = Orientation::LANDSCAPE,
+    .orientation = Print::Orientation::LANDSCAPE,
 
     .resolution = Resolution::fromDpi(96),
     .scan = Scan::PROGRESSIVE,
@@ -81,7 +81,7 @@ test$("feature-aspect-ratio") {
 }
 
 test$("feature-orientation") {
-    expect$(OrientationFeature{Orientation::LANDSCAPE}
+    expect$(OrientationFeature{Print::Orientation::LANDSCAPE}
                 .match(TEST_MEDIA));
 
     return Ok();

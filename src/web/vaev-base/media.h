@@ -14,13 +14,6 @@ enum struct MediaType {
     _LEN,
 };
 
-enum struct Orientation {
-    PORTRAIT,
-    LANDSCAPE,
-
-    _LEN,
-};
-
 enum struct Scan {
     INTERLACE,
     PROGRESSIVE,

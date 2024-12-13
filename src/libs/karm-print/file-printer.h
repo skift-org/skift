@@ -1,13 +1,11 @@
 #pragma once
 
-#include <karm-print/base.h>
+#include <karm-print/printer.h>
 
 namespace Karm::Print {
 
 struct FilePrinter : public Printer {
-    virtual ~FilePrinter() = default;
-
-    virtual void write(Io::Writer &w) = 0;
+    virtual Res<> write(Io::Writer &w) = 0;
 };
 
 } // namespace Karm::Print

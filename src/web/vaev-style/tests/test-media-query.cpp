@@ -8,7 +8,7 @@ static Media const TEST_MEDIA = {
     .width = Px(1920),
     .height = Px(1080),
     .aspectRatio = 16.0 / 9.0,
-    .orientation = Orientation::LANDSCAPE,
+    .orientation = Print::Orientation::LANDSCAPE,
 
     .resolution = Resolution::fromDpi(96),
     .scan = Scan::PROGRESSIVE,

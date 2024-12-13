@@ -17,7 +17,7 @@ struct Text : public Node {
         return {_origin, _prose->size()};
     }
 
-    void paint(Gfx::Canvas &g, Math::Rectf r) override {
+    void paint(Gfx::Canvas &g, Math::Rectf r, PaintOptions) override {
         if (not bound().colide(r))
             return;
 

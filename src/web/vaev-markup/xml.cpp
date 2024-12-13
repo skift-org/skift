@@ -8,16 +8,14 @@ namespace Vaev::Markup {
 // 2 MARK: Documents
 // https://www.w3.org/TR/xml/#sec-documents
 
-Res<Strong<Document>> XmlParser::parse(Io::SScan &s, Ns ns) {
+Res<> XmlParser::parse(Io::SScan &s, Ns ns, Markup::Document &doc) {
     // document :: = prolog element Misc *
 
-    auto doc = makeStrong<Document>();
-    try$(_parseProlog(s, *doc));
-    doc->appendChild(try$(_parseElement(s, ns)));
-    while (_parseMisc(s, *doc))
+    try$(_parseProlog(s, doc));
+    doc.appendChild(try$(_parseElement(s, ns)));
+    while (_parseMisc(s, doc))
         ;
-
-    return Ok(doc);
+    return Ok();
 }
 
 // 2.2 MARK: Characters

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-base/box.h>
+#include <karm-print/paper.h>
 #include <vaev-base/length.h>
 #include <vaev-base/media.h>
 #include <vaev-base/numbers.h>
@@ -32,7 +33,7 @@ struct Media {
 
     /// 4.4. Orientation: the orientation feature
     /// https://drafts.csswg.org/mediaqueries/#orientation
-    Orientation orientation;
+    Print::Orientation orientation;
 
     // 5. MARK: Display Quality Media Features
 
@@ -307,7 +308,7 @@ using AspectRatioFeature = RangeFeature<"aspect-ratio", Number, &Media::aspectRa
 
 /// 4.4. Device Height: the device-height feature
 /// https://drafts.csswg.org/mediaqueries/#orientation
-using OrientationFeature = DiscreteFeature<"orientation", Orientation, &Media::orientation>;
+using OrientationFeature = DiscreteFeature<"orientation", Print::Orientation, &Media::orientation>;
 
 // 5. MARK: Display Quality Media Features
 

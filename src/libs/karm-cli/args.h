@@ -440,12 +440,22 @@ struct Command {
         if (_usage) {
             Io::Emit e{Sys::out()};
             _showUsage(e);
+            e.newline();
+            co_try$(e.flush());
             co_return Ok();
         }
 
         _invoked = true;
         if (callbackAsync)
             co_trya$(callbackAsync.unwrap()(ctx));
+
+        if (any(_commands) and c.ended()) {
+            Io::Emit e{Sys::out()};
+            _showUsage(e);
+            e.newline();
+            co_try$(e.flush());
+            co_return Error::invalidInput("expected subcommand");
+        }
 
         if (not c.ended()) {
             if (c->kind != Token::OPERAND)

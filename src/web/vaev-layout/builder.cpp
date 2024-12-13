@@ -320,7 +320,6 @@ Box buildForPseudoElement(Strong<Style::Computed> style) {
 
     auto prose = makeStrong<Text::Prose>(proseStyle);
     if (style->content) {
-        logDebug("content: '{}'", style->content);
         prose->append(style->content.str());
         return {style, fontFace, prose};
     }

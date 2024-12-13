@@ -19,6 +19,7 @@
 // Darwin is poluting the global namespace with unwanted macros.
 #undef UNDERFLOW
 #undef DOMAIN
+#undef OVERFLOW
 #endif
 
 #include <string.h>

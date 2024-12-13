@@ -69,7 +69,7 @@ void DeferredProp::apply(Computed const &parent, Computed &c) const {
     Css::Sst decl{Css::Sst::DECL};
     decl.token = Css::Token::ident(propName);
     Cursor<Css::Sst> cursor = value;
-    _expandContent(cursor, c.variables.cow(), decl.content);
+    _expandContent(cursor, *c.variables, decl.content);
 
     // Parse the expanded content
     Res<StyleProp> computed = parseDeclaration<StyleProp>(decl, false);

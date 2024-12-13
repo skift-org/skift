@@ -277,8 +277,10 @@ struct Formatter<Cased<T>> {
     }
 
     Res<usize> format(Io::TextWriter &writer, Cased<T> val) {
-        auto result = try$(changeCase(val._inner, val._case));
-        return writer.writeStr(result);
+        Io::StringWriter sw;
+        try$(_innerFmt.format(sw, val._inner));
+        String result = try$(changeCase(sw.str(), val._case));
+        return writer.writeStr(result.str());
     }
 };
 

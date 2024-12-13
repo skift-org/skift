@@ -8,6 +8,8 @@ namespace Vaev::Driver {
 
 Res<Style::StyleSheet> fetchStylesheet(Mime::Url url, Style::Origin origin = Style::Origin::AUTHOR);
 
+void fetchStylesheets(Markup::Node const &node, Style::StyleBook &sb);
+
 Res<Strong<Markup::Document>> fetchDocument(Mime::Url const &url);
 
 Res<Strong<Markup::Document>> loadDocument(Mime::Url const &url, Mime::Mime const &mime, Io::Reader &reader);

@@ -5,7 +5,7 @@
 namespace Vaev::Markup {
 
 struct XmlParser {
-    Res<Strong<Document>> parse(Io::SScan &s, Ns ns);
+    Res<> parse(Io::SScan &s, Ns ns, Markup::Document &doc);
 
     Res<> _parseS(Io::SScan &s);
 

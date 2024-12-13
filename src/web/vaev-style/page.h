@@ -43,15 +43,19 @@ struct Page {
 };
 
 struct PageComputedStyle {
-    Strong<Computed> style = makeStrong<Computed>(Computed::initial());
-    Array<Strong<Computed>, static_cast<usize>(PageArea::_LEN)> _areas = {
-#define ITER(...) makeStrong<Computed>(Computed::initial()),
-        FOREACH_PAGE_AREA(ITER)
-#undef ITER
-    };
+    using Areas = Array<Strong<Computed>, toUnderlyingType(PageArea::_LEN)>;
+
+    Strong<Computed> style;
+    Areas _areas;
+
+    PageComputedStyle(Computed const &initial)
+        : style(makeStrong<Computed>(initial)),
+          _areas(Areas::fill([&](...) {
+              return makeStrong<Computed>(initial);
+          })) {}
 
     Strong<Computed> area(PageArea margin) const {
-        return _areas[static_cast<usize>(margin)];
+        return _areas[toUnderlyingType(margin)];
     }
 };
 

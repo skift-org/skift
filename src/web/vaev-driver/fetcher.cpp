@@ -9,8 +9,8 @@
 
 namespace Vaev::Driver {
 
-Res<Strong<Markup::Document>> loadDocument(Mime::Url const &, Mime::Mime const &mime, Io::Reader &reader) {
-    auto dom = makeStrong<Markup::Document>();
+Res<Strong<Markup::Document>> loadDocument(Mime::Url const &url, Mime::Mime const &mime, Io::Reader &reader) {
+    auto dom = makeStrong<Markup::Document>(url);
     auto buf = try$(Io::readAllUtf8(reader));
 
     if (mime.is("text/html"_mime)) {
@@ -21,13 +21,13 @@ Res<Strong<Markup::Document>> loadDocument(Mime::Url const &, Mime::Mime const &
     } else if (mime.is("application/xhtml+xml"_mime)) {
         Io::SScan scan{buf};
         Markup::XmlParser parser;
-        dom = try$(parser.parse(scan, HTML));
+        try$(parser.parse(scan, HTML, *dom));
 
         return Ok(dom);
     } else if (mime.is("image/svg+xml"_mime)) {
         Io::SScan scan{buf};
         Markup::XmlParser parser;
-        dom = try$(parser.parse(scan, SVG));
+        try$(parser.parse(scan, SVG, *dom));
 
         return Ok(dom);
     } else {
@@ -40,7 +40,7 @@ Res<Strong<Markup::Document>> viewSource(Mime::Url const &url) {
     auto file = try$(Sys::File::open(url));
     auto buf = try$(Io::readAllUtf8(file));
 
-    auto dom = makeStrong<Markup::Document>();
+    auto dom = makeStrong<Markup::Document>(url);
 
     auto body = makeStrong<Markup::Element>(Html::BODY);
     dom->appendChild(body);
@@ -55,7 +55,7 @@ Res<Strong<Markup::Document>> viewSource(Mime::Url const &url) {
 }
 
 Res<Strong<Markup::Document>> indexOf(Mime::Url const &url) {
-    auto dom = makeStrong<Markup::Document>();
+    auto dom = makeStrong<Markup::Document>(url);
 
     auto body = makeStrong<Markup::Element>(Html::BODY);
     dom->appendChild(body);
@@ -106,7 +106,7 @@ Res<Strong<Markup::Document>> fetchDocument(Mime::Url const &url) {
             if (not mime.has())
                 return Error::invalidInput("cannot determine MIME type");
 
-            auto dom = makeStrong<Markup::Document>();
+            auto dom = makeStrong<Markup::Document>(url);
             auto file = try$(Sys::File::open(url));
             return loadDocument(url, *mime, file);
         }
@@ -120,6 +120,42 @@ Res<Style::StyleSheet> fetchStylesheet(Mime::Url url, Style::Origin origin) {
     auto buf = try$(Io::readAllUtf8(file));
     Io::SScan s{buf};
     return Ok(Style::StyleSheet::parse(s, origin));
+}
+
+void fetchStylesheets(Markup::Node const &node, Style::StyleBook &sb) {
+    auto el = node.is<Markup::Element>();
+    if (el and el->tagName == Html::STYLE) {
+        auto text = el->textContent();
+        Io::SScan textScan{text};
+        auto sheet = Style::StyleSheet::parse(textScan);
+        sb.add(std::move(sheet));
+    } else if (el and el->tagName == Html::LINK) {
+        auto rel = el->getAttribute(Html::REL_ATTR);
+        if (rel == "stylesheet"s) {
+            auto href = el->getAttribute(Html::HREF_ATTR);
+            if (not href) {
+                logWarn("link element missing href attribute");
+                return;
+            }
+
+            auto url = Mime::parseUrlOrPath(*href);
+            if (not url) {
+                logWarn("link element href attribute is not a valid URL: {}", *href);
+                return;
+            }
+
+            auto sheet = fetchStylesheet(url.take(), Style::Origin::AUTHOR);
+            if (not sheet) {
+                logWarn("failed to fetch stylesheet: {}", sheet);
+                return;
+            }
+
+            sb.add(sheet.take());
+        }
+    } else {
+        for (auto &child : node.children())
+            fetchStylesheets(*child, sb);
+    }
 }
 
 } // namespace Vaev::Driver

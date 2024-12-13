@@ -1,6 +1,7 @@
 #include <karm-app/form-factor.h>
 #include <karm-print/paper.h>
 #include <karm-ui/layout.h>
+#include <karm-ui/popover.h>
 #include <karm-ui/reducer.h>
 #include <karm-ui/scroll.h>
 
@@ -20,9 +21,55 @@ struct State {
     Vec<Strong<Scene::Page>> pages = preview(settings);
 };
 
-using Action = Union<None>;
+struct ChangePaper {
+    Print::PaperStock paper;
+};
 
-void reduce(State &, Action) {
+struct ChangeOrientation {
+    Print::Orientation orientation;
+};
+
+struct ChangeMargin {
+    Print::Margins margins;
+};
+
+struct ToggleHeaderFooter {};
+
+struct ToggleBackgroundGraphics {};
+
+using Action = Union<
+    ChangePaper,
+    ChangeOrientation,
+    ChangeMargin,
+    ToggleHeaderFooter,
+    ToggleBackgroundGraphics>;
+
+static void reduce(State &s, Action a) {
+    bool shouldUpdatePreview = false;
+
+    if (auto changePaper = a.is<ChangePaper>()) {
+        s.settings.paper = changePaper->paper;
+        shouldUpdatePreview = true;
+    } else if (auto changeOrientation = a.is<ChangeOrientation>()) {
+        s.settings.orientation = changeOrientation->orientation;
+        shouldUpdatePreview = true;
+    } else if (auto changeMargin = a.is<ChangeMargin>()) {
+        s.settings.margins = changeMargin->margins;
+        shouldUpdatePreview = true;
+    } else if (a.is<ToggleHeaderFooter>()) {
+        s.settings.headerFooter = not s.settings.headerFooter;
+        shouldUpdatePreview = true;
+    } else if (a.is<ToggleBackgroundGraphics>()) {
+        s.settings.backgroundGraphics = not s.settings.backgroundGraphics;
+        shouldUpdatePreview = true;
+    }
+
+    if (shouldUpdatePreview) {
+        auto settings = s.settings;
+        if (settings.orientation == Print::Orientation::LANDSCAPE)
+            settings.paper = s.settings.paper.landscape();
+        s.pages = s.preview(settings);
+    }
 }
 
 using Model = Ui::Model<State, Action, reduce>;
@@ -48,21 +95,34 @@ Ui::Child _printSelect(State const &s, usize index) {
 
 Ui::Child _printPaper(State const &s, usize index) {
     auto scale = 1.;
+
+    auto paper = s.settings.paper;
+    if (s.settings.orientation == Print::Orientation::LANDSCAPE)
+        paper = paper.landscape();
+
     auto isMobile = App::useFormFactor() == App::FormFactor::MOBILE;
-    if (isMobile) {
+    if (isMobile)
         scale = 0.5;
-    }
+
+    Math::Vec2f previewSize{
+        320 * scale,
+        320 * (1. / paper.aspect()) * scale,
+    };
 
     return Ui::stack(
-               Ui::canvas(s.pages[index]) |
-                   Ui::box({
+               Ui::canvas(
+                   s.pages[index],
+                   {
+                       .showBackgroundGraphics = s.settings.backgroundGraphics,
+                   }
+               ) | Ui::box({
                        .borderWidth = 1,
                        .borderFill = Ui::GRAY50.withOpacity(0.1),
                        .backgroundFill = Gfx::WHITE,
                    }),
                _printSelect(s, index) | Ui::align(Math::Align::BOTTOM_END)
            ) |
-           Ui::pinSize(Math::Vec2f{320 * scale, 452 * scale}.cast<isize>());
+           Ui::pinSize(previewSize.cast<isize>());
 }
 
 Ui::Child _printPreviewMobile(State const &s) {
@@ -129,8 +189,8 @@ Ui::Child _destinationSelect() {
     );
 }
 
-Ui::Child _paperSelect() {
-    return select(selectValue("A4"s), [] -> Ui::Children {
+Ui::Child _paperSelect(State const &s) {
+    return select(selectValue(s.settings.paper.name), [] -> Ui::Children {
         Vec<Ui::Child> groups;
 
         bool first = false;
@@ -138,7 +198,7 @@ Ui::Child _paperSelect() {
             Vec<Ui::Child> items;
             items.pushBack(selectLabel(serie.name));
             for (auto const &stock : serie.stocks) {
-                items.pushBack(selectItem(Ui::NOP, stock.name));
+                items.pushBack(selectItem(Model::bind<ChangePaper>(stock), stock.name));
             }
 
             if (not first)
@@ -152,7 +212,7 @@ Ui::Child _paperSelect() {
     });
 }
 
-Ui::Child _printSettings() {
+Ui::Child _printSettings(State const &s) {
     return Ui::vflow(
         rowContent(
             NONE,
@@ -187,11 +247,15 @@ Ui::Child _printSettings() {
             "Pages"s
         ),
         selectRow(
-            selectValue("Portrait"s),
+            selectValue(
+                s.settings.orientation == Print::Orientation::PORTRAIT
+                    ? "Portrait"s
+                    : "Landscape"s
+            ),
             [] -> Ui::Children {
                 return {
-                    selectItem(Ui::NOP, "Portrait"s),
-                    selectItem(Ui::NOP, "Landscape"s),
+                    selectItem(Model::bind<ChangeOrientation>(Print::Orientation::PORTRAIT), "Portrait"s),
+                    selectItem(Model::bind<ChangeOrientation>(Print::Orientation::LANDSCAPE), "Landscape"s),
 
                 };
             },
@@ -202,13 +266,13 @@ Ui::Child _printSettings() {
             NONE,
             "More settings"s,
             NONE,
-            Karm::Ui::Slots{[] -> Ui::Children {
+            Karm::Ui::Slots{[&] -> Ui::Children {
                 return {
                     rowContent(
                         NONE,
                         "Paper"s,
                         NONE,
-                        _paperSelect()
+                        _paperSelect(s)
                     ),
                     selectRow(
                         selectValue("1"s),
@@ -225,28 +289,40 @@ Ui::Child _printSettings() {
                         "Page per sheet"s
                     ),
                     selectRow(
-                        selectValue("Default"s),
+                        selectValue(Io::format("{}", Io::cased(s.settings.margins, Io::Case::CAPITAL)).unwrap()),
                         [] -> Ui::Children {
                             return {
-                                selectItem(Ui::NOP, "None"s),
-                                selectItem(Ui::NOP, "Small"s),
-                                selectItem(Ui::NOP, "Default"s),
-                                selectItem(Ui::NOP, "Large"s),
+                                selectItem(Model::bind<ChangeMargin>(Print::Margins::NONE), "None"s),
+                                selectItem(Model::bind<ChangeMargin>(Print::Margins::MINIMUM), "Minimum"s),
+                                selectItem(Model::bind<ChangeMargin>(Print::Margins::DEFAULT), "Default"s),
+                                selectItem(Model::bind<ChangeMargin>(Print::Margins::CUSTOM), "Custom"s),
                             };
                         },
                         "Margins"s
                     ),
 
-                    checkboxRow(true, NONE, "Header and footers"s),
-                    checkboxRow(false, NONE, "Background graphics"s),
+                    checkboxRow(
+                        s.settings.headerFooter,
+                        [&](auto &n, ...) {
+                            Model::bubble<ToggleHeaderFooter>(n);
+                        },
+                        "Header and footers"s
+                    ),
+                    checkboxRow(
+                        s.settings.backgroundGraphics,
+                        [&](auto &n, ...) {
+                            Model::bubble<ToggleBackgroundGraphics>(n);
+                        },
+                        "Background graphics"s
+                    ),
                 };
             }}
         )
     );
 }
 
-Ui::Child _printControls() {
-    return _printSettings() |
+Ui::Child _printControls(State const &s) {
+    return _printSettings(s) |
            Ui::vscroll() |
            Ui::grow() |
            Ui::minSize({320, Ui::UNCONSTRAINED});
@@ -257,7 +333,7 @@ Ui::Child _printDialog(State const &s) {
         dialogTitleBar("Print"s),
         Ui::hflow(
             _printPreview(s),
-            _printControls() | Ui::grow()
+            _printControls(s) | Ui::grow()
         ) | Ui::maxSize({Ui::UNCONSTRAINED, 500}) |
             Ui::grow(),
         Ui::separator(),
@@ -276,7 +352,7 @@ Ui::Child _printDialogMobile(State const &s) {
             _printPreviewMobile(s),
             Ui::separator(),
             titleRow("Settings"s),
-            _printSettings()
+            _printSettings(s)
         ) | Ui::minSize(500) |
             Ui::vscroll() |
             Ui::grow(),
@@ -293,7 +369,7 @@ Ui::Child printDialog(PrintPreview preview) {
         auto isMobile = App::useFormFactor() == App::FormFactor::MOBILE;
         if (isMobile)
             return _printDialogMobile(s);
-        return _printDialog(s);
+        return _printDialog(s) | Ui::popoverLayer();
     });
 }
 

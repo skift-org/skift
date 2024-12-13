@@ -233,6 +233,12 @@ struct Sizing : public ProxyNode<Sizing> {
         return _rect;
     }
 
+    void reconcile(Sizing &o) override {
+        _min = o._min;
+        _max = o._max;
+        ProxyNode<Sizing>::reconcile(o);
+    }
+
     void layout(Math::Recti bound) override {
         _rect = bound;
         child().layout(bound);

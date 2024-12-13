@@ -111,6 +111,17 @@ struct Computed {
         e(" variables: {}", variables);
         e(")");
     }
+
+    void setCustomProp(Str varName, Css::Content value) {
+        variables.cow().put(varName, value);
+    }
+
+    Css::Content getCustomProp(Str varName) const {
+        auto value = variables->access(varName);
+        if (value)
+            return *value;
+        return {};
+    }
 };
 
 } // namespace Vaev::Style

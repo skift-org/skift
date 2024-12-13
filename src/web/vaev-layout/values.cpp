@@ -1,14 +1,16 @@
 #include "values.h"
 
-#include "box.h"
+#include "tree.h"
 #include "writing.h"
 
 namespace Vaev::Layout {
 
 Resolver Resolver::from(Tree const &tree, Box const &box) {
+    Px fontSize{16};
+
     Resolver resolver;
-    resolver.rootFont = Text::Font{tree.root.fontFace, tree.root.layout.fontSize.cast<f64>()};
-    resolver.boxFont = Text::Font{box.fontFace, box.layout.fontSize.cast<f64>()};
+    resolver.rootFont = Text::Font{tree.root.fontFace, fontSize.cast<f64>()};
+    resolver.boxFont = Text::Font{box.fontFace, fontSize.cast<f64>()};
     resolver.viewport = tree.viewport;
     resolver.boxAxis = mainAxis(box);
     return resolver;

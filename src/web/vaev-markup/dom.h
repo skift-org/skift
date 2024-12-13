@@ -5,6 +5,7 @@
 #include <karm-base/rc.h>
 #include <karm-base/vec.h>
 #include <karm-io/emit.h>
+#include <karm-mime/url.h>
 
 #include "tags.h"
 
@@ -28,6 +29,11 @@ enum struct NodeType {
     FOREACH_NODE_TYPE(ITER)
 #undef ITER
         _LEN,
+};
+
+enum struct Iter {
+    CONTINUE,
+    BREAK,
 };
 
 // https://dom.spec.whatwg.org/#interface-node
@@ -140,6 +146,20 @@ struct Node :
         return _parentIndex() < parentNode()._children.len() - 1;
     }
 
+    // MARK: Iter
+
+    Iter iterDepthFirst(this auto &self, auto f) {
+        if (f(self) == Iter::BREAK)
+            return Iter::BREAK;
+        for (auto &child : self._children) {
+            if (child->iterDepthFirst(f) == Iter::BREAK)
+                return Iter::BREAK;
+        }
+        return Iter::CONTINUE;
+    }
+
+    // MARK: Repr
+
     virtual void _repr(Io::Emit &) const {}
 
     void repr(Io::Emit &e) const {
@@ -178,10 +198,21 @@ enum struct QuirkMode {
 struct Document : public Node {
     static constexpr auto TYPE = NodeType::DOCUMENT;
 
+    Mime::Url _url;
     QuirkMode quirkMode{QuirkMode::NO};
+
+    Document(Mime::Url url)
+        : _url(url) {
+    }
 
     NodeType nodeType() const override {
         return TYPE;
+    }
+
+    String title() const;
+
+    Mime::Url const &url() const {
+        return _url;
     }
 };
 
@@ -298,7 +329,7 @@ struct TokenList {
     }
 
     void add(Str token) {
-        if (not ::contains(_tokens, token))
+        if (not::contains(_tokens, token))
             _tokens.pushBack(token);
     }
 
@@ -316,7 +347,7 @@ struct TokenList {
     }
 
     bool replace(Str oldToken, Str newToken) {
-        if (not ::contains(_tokens, oldToken))
+        if (not::contains(_tokens, oldToken))
             return false;
         _tokens.removeAll(oldToken);
         _tokens.pushBack(newToken);
@@ -356,9 +387,8 @@ struct Element : public Node {
             panic("textContent is not implemented for elements with multiple children");
 
         auto const &child = *_children[0];
-        if (auto text = child.is<Text>()) {
+        if (auto text = child.is<Text>())
             return text->data;
-        }
 
         panic("textContent is not implemented for elements with children other than text nodes");
     }

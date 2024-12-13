@@ -2,6 +2,7 @@
 #include <karm-text/loader.h>
 
 #include "box.h"
+#include "frag.h"
 
 namespace Vaev::Layout {
 
@@ -37,7 +38,7 @@ void Box::add(Box &&box) {
 
 void Box::repr(Io::Emit &e) const {
     if (children()) {
-        e("(box {} {} {} {}", attrs, style->display, style->position, layout.borderBox());
+        e("(box {} {} {}", attrs, style->display, style->position);
         e.indentNewline();
         for (auto &c : children()) {
             c.repr(e);
@@ -46,7 +47,7 @@ void Box::repr(Io::Emit &e) const {
         e.deindent();
         e(")");
     } else {
-        e("(box {} {} {} {})", attrs, style->display, style->position, layout.borderBox());
+        e("(box {} {} {})", attrs, style->display, style->position);
     }
 }
 

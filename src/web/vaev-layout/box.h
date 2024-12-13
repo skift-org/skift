@@ -11,6 +11,8 @@ namespace Vaev::Layout {
 
 // MARK: Box ------------------------------------------------------------------
 
+struct Box;
+
 using Content = Union<
     None,
     Vec<Box>,
@@ -31,7 +33,6 @@ struct Box : public Meta::NoCopy {
     Strong<Style::Computed> style;
     Strong<Text::Fontface> fontFace;
     Content content = NONE;
-    Layout layout;
     Attrs attrs;
 
     Box(Strong<Style::Computed> style, Strong<Karm::Text::Fontface> fontFace);
@@ -45,11 +46,6 @@ struct Box : public Meta::NoCopy {
     void add(Box &&box);
 
     void repr(Io::Emit &e) const;
-};
-
-struct Tree {
-    Box root;
-    Viewport viewport;
 };
 
 } // namespace Vaev::Layout

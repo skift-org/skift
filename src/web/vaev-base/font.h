@@ -212,7 +212,8 @@ struct FontSize {
     }
 
     PercentOr<Length> value() const {
-        assume$(_named == LENGTH, "not a length");
+        if (_named != LENGTH)
+            panic("not a length");
         return _value;
     }
 

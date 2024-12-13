@@ -602,7 +602,9 @@ static Res<> _setWindowIcon(SDL_Window *window) {
     auto *surface = SDL_CreateRGBSurface(0, image.width(), image.height(), 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
     if (not surface)
         return Error::other(SDL_GetError());
-    defer$(SDL_FreeSurface(surface));
+    Defer defer{[&] {
+        SDL_FreeSurface(surface);
+    }};
 
     Gfx::MutPixels pixels{
         surface->pixels,

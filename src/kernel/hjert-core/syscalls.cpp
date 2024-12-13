@@ -25,7 +25,9 @@ Res<> doLog(Task &self, UserSlice<Str> msg) {
     try$(self.ensure(Hj::Pledge::LOG));
     return msg.with(self.space(), [&](Str str) -> Res<> {
         Logger::_Embed::loggerLock();
-        defer$(Logger::_Embed::loggerUnlock());
+        Defer defer{[] {
+            Logger::_Embed::loggerUnlock();
+        }};
 
         auto styledLabel = Cli::styled(self.label(), Cli::style(Cli::random(self.id())));
         try$(Io::format(Hjert::Arch::globalOut(), "{} | ", Io::aligned(styledLabel, Io::Align::LEFT, 26)));

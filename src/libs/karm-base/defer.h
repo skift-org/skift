@@ -6,13 +6,6 @@
 
 namespace Karm {
 
-#define defer$(expr) \
-    auto _ = Defer { \
-        [&] {        \
-            expr;    \
-        }            \
-    }
-
 /// Defer a computation until the end of the current scope.
 /// The computation is executed in the reverse order of the defer calls.
 template <typename F>

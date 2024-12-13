@@ -47,12 +47,14 @@ struct Run {
     }
 
     Slice<Cell> cells() const {
-        assume$(_shaped, "run not shaped");
+        if (not _shaped)
+            panic("run not shaped");
         return _cells;
     }
 
     Math::Vec2f size() const {
-        assume$(_shaped, "run not shaped");
+        if (not _shaped)
+            panic("run not shaped");
         return _size;
     }
 

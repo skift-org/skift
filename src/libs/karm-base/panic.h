@@ -46,9 +46,4 @@ inline void breakpoint() {
 #endif
 }
 
-#define assume$(__expr, ...)                                                                                                          \
-    if (not(__expr)) [[unlikely]] {                                                                                                   \
-        panic(__FILE__ "::" stringify$(__func__) ":" stringify$(__LINE__) ": bad assumption: " #__expr __VA_OPT__(": ") __VA_ARGS__); \
-    }
-
 } // namespace Karm

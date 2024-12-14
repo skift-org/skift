@@ -9,6 +9,7 @@
 #include <karm-sys/async.h>
 
 #include "atoms.h"
+#include "macros.h"
 
 namespace Karm::Ui {
 
@@ -288,17 +289,3 @@ using Slot = Func<Child()>;
 using Slots = Func<Children()>;
 
 } // namespace Karm::Ui
-
-#define slot$(EXPR)      \
-    Karm::Ui::Slot {     \
-        [=] {            \
-            return EXPR; \
-        }                \
-    }
-
-#define slots$(...)               \
-    Karm::Ui::Slots {             \
-        [=] -> Ui::Children {     \
-            return {__VA_ARGS__}; \
-        }                         \
-    }

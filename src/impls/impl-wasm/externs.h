@@ -2,10 +2,9 @@
 
 #include <karm-base/size.h>
 
-static constexpr usize PAGE_SIZE = kib(64);
+#include "macros.h"
 
-#define wasm_import(name) __attribute__((import_module("env"), import_name(#name))) name
-#define wasm_export(name) __attribute__((visibility("default"), export_name(#name))) name
+static constexpr usize PAGE_SIZE = kib(64);
 
 extern "C" ExternSym __heap_base;
 extern "C" ExternSym __heap_end;

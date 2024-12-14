@@ -1,8 +1,9 @@
 #pragma once
 
-#include <karm-base/base.h>
-#include <karm-base/string.h>
 #include <karm-meta/traits.h>
+
+#include "base.h"
+#include "string.h"
 
 namespace Karm {
 
@@ -126,40 +127,6 @@ struct Flags {
         return _value >= other._value;
     }
 };
-
-#define FlagsEnum$(T)                              \
-    inline T operator~(T a) {                      \
-        using U = ::Karm::Meta::UnderlyingType<T>; \
-        return (T) ~(U)a;                          \
-    }                                              \
-    inline T operator|(T a, T b) {                 \
-        using U = ::Karm::Meta::UnderlyingType<T>; \
-        return (T)((U)a | (U)b);                   \
-    }                                              \
-    inline T operator&(T a, T b) {                 \
-        using U = ::Karm::Meta::UnderlyingType<T>; \
-        return (T)((U)a & (U)b);                   \
-    }                                              \
-    inline T operator^(T a, T b) {                 \
-        using U = ::Karm::Meta::UnderlyingType<T>; \
-        return (T)((U)a ^ (U)b);                   \
-    }                                              \
-    inline bool operator!(T a) {                   \
-        using U = ::Karm::Meta::UnderlyingType<T>; \
-        return not(U) a;                           \
-    }                                              \
-    inline T &operator|=(T &a, T b) {              \
-        using U = ::Karm::Meta::UnderlyingType<T>; \
-        return (T &)((U &)a |= (U)b);              \
-    }                                              \
-    inline T &operator&=(T &a, T b) {              \
-        using U = ::Karm::Meta::UnderlyingType<T>; \
-        return (T &)((U &)a &= (U)b);              \
-    }                                              \
-    inline T &operator^=(T &a, T b) {              \
-        using U = ::Karm::Meta::UnderlyingType<T>; \
-        return (T &)((U &)a ^= (U)b);              \
-    }
 
 template <Meta::Enum E, typename U = Meta::UnderlyingType<E>>
 constexpr U toUnderlyingType(E value) {

@@ -4,18 +4,9 @@
 
 #include "_prelude.h"
 
+#include "macros.h"
+
 namespace Karm {
-
-// MARK: Macros ----------------------------------------------------------------
-
-// https://clang.llvm.org/docs/AttributeReference.html#lifetimebound
-#define lifetimebound [[clang::lifetimebound]]
-#define __concat$(LHS, RHS) LHS##RHS
-#define concat$(LHS, RHS) __concat$(LHS, RHS)
-#define __stringify$(SYM) #SYM
-#define stringify$(SYM) __stringify$(SYM)
-#define var$(NAME) concat$(__m_##NAME##_, __LINE__)
-#define always_inline [[gnu::always_inline]]
 
 // MARK: Unsigned --------------------------------------------------------------
 

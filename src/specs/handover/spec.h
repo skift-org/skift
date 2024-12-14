@@ -3,6 +3,8 @@
 #include <karm-base/cstr.h>
 #include <karm-base/limits.h>
 
+#include "macros.h"
+
 namespace Handover {
 
 #ifdef __ck_bits_64__
@@ -260,21 +262,6 @@ inline bool valid(u32 magic, Payload const &payload) {
 }
 
 static constexpr char const *REQUEST_SECTION = ".handover";
-
-#define HandoverSection$() \
-    [[gnu::used, gnu::section(".handover")]]
-
-// clang-format off
-
-#define HandoverRequests$(...)                          \
-    HandoverSection$()                                  \
-    static ::Handover::Request const __handover__[] = { \
-        {::Handover::Tag::MAGIC, 0, 0},                 \
-        __VA_ARGS__ __VA_OPT__(, )                      \
-        {::Handover::Tag::END, 0, 0},                   \
-    };
-
-// clang-format on
 
 using EntryPoint = void (*)(u64 magic, Payload const *handover);
 

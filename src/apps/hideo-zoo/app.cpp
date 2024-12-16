@@ -19,6 +19,7 @@
 #include "page-print-dialog.h"
 #include "page-radio.h"
 #include "page-resizable.h"
+#include "page-rich-text.h"
 #include "page-rows.h"
 #include "page-select.h"
 #include "page-side-nav.h"
@@ -45,6 +46,7 @@ static Array PAGES = {
     &PAGE_PRINT_DIALOG,
     &PAGE_RADIO,
     &PAGE_RESIZABLE,
+    &PAGE_RICHTEXT,
     &PAGE_ROWS,
     &PAGE_SELECT,
     &PAGE_SIDE_PANEL,

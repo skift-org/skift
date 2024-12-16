@@ -14,21 +14,24 @@ Prose::Prose(ProseStyle style, Str str) : _style(style) {
 
 void Prose::_beginBlock() {
     _blocks.pushBack({
+        .prose = this,
         .runeRange = {_runes.len(), 0},
         .cellRange = {_cells.len(), 0},
     });
 }
 
 void Prose::append(Rune rune) {
-    if (any(_blocks) and last(_blocks).newline(*this))
+    if (any(_blocks) and last(_blocks).newline())
         _beginBlock();
 
-    if (any(_blocks) and last(_blocks).spaces(*this))
+    if (any(_blocks) and last(_blocks).spaces())
         _beginBlock();
 
     auto glyph = _style.font.glyph(rune == '\n' ? ' ' : rune);
 
     _cells.pushBack({
+        .prose = this,
+        .span = _currentSpan,
         .runeRange = {_runes.len(), 1},
         .glyph = glyph,
     });
@@ -61,7 +64,7 @@ void Prose::_measureBlocks() {
         auto adv = 0.0f;
         bool first = true;
         Glyph prev = Glyph::TOFU;
-        for (auto &cell : block.cells(*this)) {
+        for (auto &cell : block.cells()) {
             if (not first)
                 adv += _style.font.kern(prev, cell.glyph);
             else
@@ -79,19 +82,20 @@ void Prose::_measureBlocks() {
 void Prose::_wrapLines(f64 width) {
     _lines.clear();
 
-    Line line{{}, {}};
+    Line line{this, {}, {}};
     bool first = true;
     f64 adv = 0;
     for (usize i = 0; i < _blocks.len(); i++) {
         auto &block = _blocks[i];
         if (adv + block.width > width and _style.wordwrap and _style.multiline and not first) {
             _lines.pushBack(line);
-            line = {block.runeRange, {i, 1}};
+            line = {this, block.runeRange, {i, 1}};
             adv = block.width;
 
-            if (block.newline(*this)) {
+            if (block.newline()) {
                 _lines.pushBack(line);
                 line = {
+                    this,
                     {block.runeRange.end(), 0},
                     {i + 1, 0},
                 };
@@ -101,9 +105,10 @@ void Prose::_wrapLines(f64 width) {
             line.blockRange.size++;
             line.runeRange.end(block.runeRange.end());
 
-            if (block.newline(*this) and _style.multiline) {
+            if (block.newline() and _style.multiline) {
                 _lines.pushBack(line);
                 line = {
+                    this,
                     {block.runeRange.end(), 0},
                     {i + 1, 0},
                 };
@@ -136,7 +141,7 @@ f64 Prose::_layoutHorizontaly(f64 width) {
             continue;
 
         f64 pos = 0;
-        for (auto &block : line.blocks(*this)) {
+        for (auto &block : line.blocks()) {
             block.pos = pos;
             pos += block.width;
         }
@@ -151,12 +156,12 @@ f64 Prose::_layoutHorizontaly(f64 width) {
             break;
 
         case TextAlign::CENTER:
-            for (auto &block : line.blocks(*this))
+            for (auto &block : line.blocks())
                 block.pos += free / 2;
             break;
 
         case TextAlign::RIGHT:
-            for (auto &block : line.blocks(*this))
+            for (auto &block : line.blocks())
                 block.pos += free;
             break;
         }
@@ -192,9 +197,16 @@ void Prose::paint(Gfx::Canvas &g) {
         g.fillStyle(*_style.color);
 
     for (auto const &line : _lines) {
-        for (auto &block : line.blocks(*this)) {
-            for (auto &cell : block.cells(*this)) {
-                g.fill(_style.font, cell.glyph, {block.pos + cell.pos, line.baseline});
+        for (auto &block : line.blocks()) {
+            for (auto &cell : block.cells()) {
+                if (cell.span and cell.span->color) {
+                    g.push();
+                    g.fillStyle(*cell.span->color);
+                    g.fill(_style.font, cell.glyph, {block.pos + cell.pos, line.baseline});
+                    g.pop();
+                } else {
+                    g.fill(_style.font, cell.glyph, {block.pos + cell.pos, line.baseline});
+                }
             }
         }
     }

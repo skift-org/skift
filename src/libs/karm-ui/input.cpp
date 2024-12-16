@@ -276,7 +276,7 @@ struct Input : public View<Input> {
     Strong<Text::Model> _model;
     OnChange<Text::Action> _onChange;
 
-    Opt<Text::Prose> _text;
+    Opt<Strong<Text::Prose>> _text;
 
     Input(Text::ProseStyle style, Strong<Text::Model> model, OnChange<Text::Action> onChange)
         : _style(style), _model(model), _onChange(std::move(onChange)) {}
@@ -293,10 +293,10 @@ struct Input : public View<Input> {
 
     Text::Prose &_ensureText() {
         if (not _text) {
-            _text = Text::Prose(_style);
-            _text->append(_model->runes());
+            _text = makeStrong<Text::Prose>(_style);
+            (*_text)->append(_model->runes());
         }
-        return *_text;
+        return **_text;
     }
 
     void paint(Gfx::Canvas &g, Math::Recti) override {
@@ -348,7 +348,7 @@ struct SimpleInput : public View<SimpleInput> {
 
     FocusListener _focus;
     Opt<Text::Model> _model;
-    Opt<Text::Prose> _prose;
+    Opt<Strong<Text::Prose>> _prose;
 
     SimpleInput(Text::ProseStyle style, String text, OnChange<String> onChange)
         : _style(style),
@@ -373,10 +373,10 @@ struct SimpleInput : public View<SimpleInput> {
 
     Text::Prose &_ensureText() {
         if (not _prose) {
-            _prose = Text::Prose(_style);
-            _prose->append(_ensureModel().runes());
+            _prose = makeStrong<Text::Prose>(_style);
+            (*_prose)->append(_ensureModel().runes());
         }
-        return *_prose;
+        return **_prose;
     }
 
     void paint(Gfx::Canvas &g, Math::Recti) override {

@@ -221,31 +221,34 @@ Text::ProseStyle TextStyles::codeSmall() {
 }
 
 struct Text : public View<Text> {
-    Karm::Text::Prose _text;
+    Strong<Karm::Text::Prose> _prose;
+
+    Text(Strong<Karm::Text::Prose> prose)
+        : _prose(std::move(prose)) {}
 
     Text(::Text::ProseStyle style, Str text)
-        : _text(style, text) {}
+        : _prose(makeStrong<Karm::Text::Prose>(style, text)) {}
 
     void reconcile(Text &o) override {
-        _text = o._text;
+        _prose = std::move(o._prose);
     }
 
     void paint(Gfx::Canvas &g, Math::Recti) override {
         g.push();
         g.origin(bound().xy.cast<f64>());
-        _text.paint(g);
+        _prose->paint(g);
         g.pop();
         if (debugShowLayoutBounds)
             g.plot(bound(), Gfx::CYAN);
     }
 
     void layout(Math::Recti bound) override {
-        _text.layout(bound.width);
+        _prose->layout(bound.width);
         View<Text>::layout(bound);
     }
 
     Math::Vec2i size(Math::Vec2i s, Hint) override {
-        auto size = _text.layout(s.width);
+        auto size = _prose->layout(s.width);
         return size.ceil().cast<isize>();
     }
 };
@@ -256,6 +259,10 @@ Child text(Karm::Text::ProseStyle style, Str text) {
 
 Child text(Str text) {
     return makeStrong<Text>(TextStyles::labelMedium(), text);
+}
+
+Child text(Strong<Karm::Text::Prose> prose) {
+    return makeStrong<Text>(prose);
 }
 
 // MARK: Icon ------------------------------------------------------------------

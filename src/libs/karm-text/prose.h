@@ -57,30 +57,38 @@ struct ProseStyle {
     }
 };
 
-struct Prose {
+struct Prose : public Meta::Static {
+    struct Span {
+        MutCursor<Span> parent = nullptr;
+        Opt<Gfx::Color> color;
+    };
+
     struct Cell {
+        MutCursor<Prose> prose;
+        MutCursor<Span> span;
+
         urange runeRange;
         Glyph glyph;
         f64 pos = 0; //< Position of the glyph within the block
         f64 adv = 0; //< Advance of the glyph
 
-        MutSlice<Rune> runes(Prose &t) {
-            return mutSub(t._runes, runeRange);
+        MutSlice<Rune> runes() {
+            return mutSub(prose->_runes, runeRange);
         }
 
-        Slice<Rune> runes(Prose const &t) const {
-            return sub(t._runes, runeRange);
+        Slice<Rune> runes() const {
+            return sub(prose->_runes, runeRange);
         }
 
-        bool newline(Prose const &t) const {
-            auto r = runes(t);
+        bool newline() const {
+            auto r = runes();
             if (not r)
                 return false;
             return last(r) == '\n';
         }
 
-        bool space(Prose const &t) const {
-            auto r = runes(t);
+        bool space() const {
+            auto r = runes();
             if (not r)
                 return false;
             return last(r) == '\n' or isAsciiSpace(last(r));
@@ -88,49 +96,53 @@ struct Prose {
     };
 
     struct Block {
+        MutCursor<Prose> prose;
+
         urange runeRange;
         urange cellRange;
 
         f64 pos = 0; // Position of the block within the line
         f64 width = 0;
 
-        MutSlice<Cell> cells(Prose &t) {
-            return mutSub(t._cells, cellRange);
+        MutSlice<Cell> cells() {
+            return mutSub(prose->_cells, cellRange);
         }
 
-        Slice<Cell> cells(Prose const &t) const {
-            return sub(t._cells, cellRange);
+        Slice<Cell> cells() const {
+            return sub(prose->_cells, cellRange);
         }
 
         bool empty() const {
             return cellRange.empty();
         }
 
-        bool spaces(Prose const &t) const {
+        bool spaces() const {
             if (empty())
                 return false;
-            return last(cells(t)).space(t);
+            return last(cells()).space();
         }
 
-        bool newline(Prose const &t) const {
+        bool newline() const {
             if (empty())
                 return false;
-            return last(cells(t)).newline(t);
+            return last(cells()).newline();
         }
     };
 
     struct Line {
+        MutCursor<Prose> prose;
+
         urange runeRange;
         urange blockRange;
         f64 baseline = 0; // Baseline of the line within the text
         f64 width = 0;
 
-        Slice<Block> blocks(Prose const &t) const {
-            return sub(t._blocks, blockRange);
+        Slice<Block> blocks() const {
+            return sub(prose->_blocks, blockRange);
         }
 
-        MutSlice<Block> blocks(Prose &t) {
-            return mutSub(t._blocks, blockRange);
+        MutSlice<Block> blocks() {
+            return mutSub(prose->_blocks, blockRange);
         }
     };
 
@@ -170,7 +182,29 @@ struct Prose {
 
     void append(Slice<Rune> runes);
 
-    // MARK: Layout -------------------------------------------------------------
+    // MARK: Span --------------------------------------------------------------
+
+    Vec<Box<Span>> _spans;
+    MutCursor<Span> _currentSpan = nullptr;
+
+    void pushSpan() {
+        _spans.pushBack(makeBox<Span>(_currentSpan));
+        _currentSpan = &*last(_spans);
+    }
+
+    void spanColor(Gfx::Color color) {
+        if (not _currentSpan)
+            return;
+
+        _currentSpan->color = color;
+    }
+
+    void popSpan() {
+        if (_currentSpan)
+            _currentSpan = _currentSpan->parent;
+    }
+
+    // MARK: Layout ------------------------------------------------------------
 
     void _measureBlocks();
 
@@ -218,7 +252,7 @@ struct Prose {
         auto &line = _lines[li];
 
         auto maybeBi = searchLowerBound(
-            line.blocks(*this), [&](Block const &b) {
+            line.blocks(), [&](Block const &b) {
                 return b.runeRange.start <=> runeIndex;
             }
         );
@@ -228,10 +262,10 @@ struct Prose {
 
         auto bi = *maybeBi;
 
-        auto &block = line.blocks(*this)[bi];
+        auto &block = line.blocks()[bi];
 
         auto maybeCi = searchLowerBound(
-            block.cells(*this), [&](Cell const &c) {
+            block.cells(), [&](Cell const &c) {
                 return c.runeRange.start <=> runeIndex;
             }
         );
@@ -241,7 +275,7 @@ struct Prose {
 
         auto ci = *maybeCi;
 
-        auto cell = block.cells(*this)[ci];
+        auto cell = block.cells()[ci];
 
         if (cell.runeRange.end() == runeIndex) {
             // Handle the case where the rune is the last of the text
@@ -259,21 +293,21 @@ struct Prose {
 
         auto &line = _lines[li];
 
-        if (isEmpty(line.blocks(*this)))
+        if (isEmpty(line.blocks()))
             return {0, line.baseline};
 
-        auto &block = line.blocks(*this)[bi];
+        auto &block = line.blocks()[bi];
 
-        if (isEmpty(block.cells(*this)))
+        if (isEmpty(block.cells()))
             return {block.pos, line.baseline};
 
-        if (ci >= block.cells(*this).len()) {
+        if (ci >= block.cells().len()) {
             // Handle the case where the rune is the last of the text
-            auto &cell = last(block.cells(*this));
+            auto &cell = last(block.cells());
             return {block.pos + cell.pos + cell.adv, line.baseline};
         }
 
-        auto &cell = block.cells(*this)[ci];
+        auto &cell = block.cells()[ci];
 
         return {block.pos + cell.pos, line.baseline};
     }

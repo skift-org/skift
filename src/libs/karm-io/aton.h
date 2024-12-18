@@ -94,11 +94,15 @@ static inline Opt<f64> atof(_SScan<E> &s, AtoxOptions const &options = {}) {
     f64 fpart = 0.0;
     i64 exp = 0;
 
-    if (s.peek(0) != '.' or not _parseDigit(s.peek(1), options)) {
-        ipart = try$(atoi(s, options));
+    bool negDot = s.skip("-.");
+
+    if (not negDot) {
+        if (s.peek(0) != '.' or not _parseDigit(s.peek(1), options)) {
+            ipart = try$(atoi(s, options));
+        }
     }
 
-    if (s.skip('.')) {
+    if (negDot or s.skip('.')) {
         f64 multiplier = (1.0 / options.base);
         while (not s.ended()) {
             auto maybeDigit = _nextDigit(s, options);
@@ -115,6 +119,8 @@ static inline Opt<f64> atof(_SScan<E> &s, AtoxOptions const &options = {}) {
             exp = maybeExp.unwrap();
     }
 
+    if (negDot)
+        return -fpart * pow(options.base, exp);
     if (ipart < 0)
         return ipart - fpart * pow(options.base, exp);
     return ipart + fpart * pow(options.base, exp);
@@ -139,7 +145,7 @@ static inline Opt<isize> atoi(_Str<E> str, AtoxOptions const &options = {}) {
 template <StaticEncoding E>
 static inline Opt<f64> atof(_Str<E> str, AtoxOptions const &options = {}) {
     auto s = _SScan<E>(str);
-    return stof(s, options);
+    return atof(s, options);
 }
 
 #endif

@@ -635,7 +635,7 @@ struct Formatter<Res<T, E>> {
         }
     }
 
-    Res<usize> format(Io::TextWriter &writer, Res<T> const &val) {
+    Res<usize> format(Io::TextWriter &writer, Res<T, E> const &val) {
         if (val)
             return _fmtOk.format(writer, val.unwrap());
         return _fmtErr.format(writer, val.none());

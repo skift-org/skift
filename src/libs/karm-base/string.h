@@ -334,4 +334,12 @@ inline constexpr Karm::Str operator""s(char const *buf, usize len) {
     return {buf, len};
 }
 
+inline constexpr Karm::_Str<Karm::Utf8> operator""_s8(char const *buf, usize len) {
+    return {buf, len};
+}
+
+inline constexpr Karm::_Str<Karm::Utf16> operator""_s16(char16_t const *buf, usize len) {
+    return {reinterpret_cast<u16 const *>(buf), len};
+}
+
 #pragma clang diagnostic pop

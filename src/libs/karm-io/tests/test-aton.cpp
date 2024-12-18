@@ -46,6 +46,10 @@ test$("atof") {
     expect$(Math::epsilonEq(try$(Io::atof("-.1"s)), -.1));
     expect$(Math::epsilonEq(try$(Io::atof("-.5"s)), -.5));
 
+    expect$(Math::epsilonEq(try$(Io::atof("-0.0"s)), -0.0));
+    expect$(Math::epsilonEq(try$(Io::atof("-0.1"s)), -0.1));
+    expect$(Math::epsilonEq(try$(Io::atof("-0.5"s)), -0.5));
+
     return Ok();
 }
 

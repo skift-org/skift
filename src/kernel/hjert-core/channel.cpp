@@ -56,7 +56,7 @@ Res<Hj::SentRecv> Channel::send(Domain &dom, Bytes bytes, Slice<Hj::Cap> caps) {
             _caps.trunc(save);
             return res.none();
         }
-        _caps.pushBack(try$(dom.get(cap)));
+        _caps.pushBack(res.unwrap());
     }
 
     for (usize i = 0; i < bytes.len(); i++)

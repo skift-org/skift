@@ -249,9 +249,8 @@ struct Value {
     }
 
     Value get(Str key) const {
-        if (not isObject()) {
+        if (not isObject())
             return NONE;
-        }
         return try$(asObject().tryGet(key));
     }
 
@@ -260,6 +259,12 @@ struct Value {
             return NONE;
         }
         return asArray()[index];
+    }
+
+    void set(Str key, Value value) {
+        if (not isObject())
+            return;
+        asObject().put(key, value);
     }
 
     usize len() const {
@@ -305,6 +310,11 @@ struct Value {
     template <typename T>
     Opt<T> take() const {
         return _store.take<T>();
+    }
+
+    template <Meta::Equatable<_Store> T>
+    bool operator==(T const &other) const {
+        return _store == other;
     }
 };
 

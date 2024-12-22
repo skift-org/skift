@@ -23,6 +23,10 @@ struct Dir {
 
     static Res<Dir> open(Mime::Url url);
 
+    static Res<Dir> create(Mime::Url url);
+
+    static Res<Dir> openOrCreate(Mime::Url url);
+
     auto const &entries() const { return _entries; }
 
     auto const &path() const { return _url; }

@@ -183,7 +183,6 @@ struct None {
     explicit operator bool() const { return false; }
 
     bool operator==(None const &) const = default;
-
     auto operator<=>(None const &) const = default;
 };
 

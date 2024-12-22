@@ -86,20 +86,31 @@ Res<None, Output> processBreakpointsBeforeChild(usize endAt, Vec2Px currentSize,
 Output fragmentEmptyBox(Tree &tree, Input input) {
     // put this here instead of in layout.py since we want to know if its the empty box case
     Vec2Px knownSize{input.knownSize.x.unwrapOr(0_px), input.knownSize.y.unwrapOr(0_px)};
-    if (tree.fc.acceptsFit(
-            input.position.y,
-            knownSize.y,
-            input.pendingVerticalSizes
-        )) {
-        return Output{
-            .size = knownSize,
-            .completelyLaidOut = true,
-        };
+    if (tree.fc.isDiscoveryMode()) {
+        if (tree.fc.acceptsFit(
+                input.position.y,
+                knownSize.y,
+                input.pendingVerticalSizes
+            )) {
+            return Output{
+                .size = knownSize,
+                .completelyLaidOut = true,
+            };
+        } else {
+            return Output{
+                .size = {},
+                .completelyLaidOut = false,
+                .breakpoint = Breakpoint::buildOverflow()
+            };
+        }
     } else {
+        // FIXME: we should be breaking empty boxes using pixels or percentages, this behaviour is not compliant
+        Px verticalSpaceLeft = tree.fc.leftVerticalSpace(
+            input.position.y, input.pendingVerticalSizes
+        );
         return Output{
-            .size = {},
-            .completelyLaidOut = false,
-            .breakpoint = Breakpoint::buildOverflow()
+            .size = {knownSize.x, min(knownSize.y, verticalSpaceLeft)},
+            .completelyLaidOut = verticalSpaceLeft >= knownSize.y,
         };
     }
 }
@@ -149,7 +160,7 @@ struct BlockFormatingContext {
 
         usize endChildren = stopAt.unwrapOr(box.children().len());
 
-        bool blockWasCompletelyLaidOut = box.children().len() == 0;
+        bool blockWasCompletelyLaidOut = false;
 
         for (usize i = startAt; i < endChildren; ++i) {
             auto &c = box.children()[i];

@@ -20,7 +20,8 @@ Output _contentLayout(Tree &tree, Box &box, Input input, usize startAt, Opt<usiz
     } else if (auto run = box.content.is<Strong<Text::Prose>>()) {
         auto out = inlineLayout(tree, box, input);
 
-        if (not tree.fc.acceptsFit(
+        if (tree.fc.allowBreak() and
+            not tree.fc.acceptsFit(
                 input.position.y,
                 out.size.y,
                 input.pendingVerticalSizes
@@ -225,16 +226,17 @@ Output layout(Tree &tree, Box &box, Input input) {
     input.position = input.position + borders.topStart() + padding.topStart();
     input.pendingVerticalSizes += borders.bottom + padding.bottom;
 
+    bool isMonolticDisplay =
+        box.style->display == Display::Inside::FLEX or
+        box.style->display == Display::Inside::GRID;
+
     usize startAt = tree.fc.allowBreak() ? input.breakpointTraverser.getStart().unwrapOr(0) : 0;
     if (tree.fc.isDiscoveryMode()) {
-        bool isMonolticDisplay =
-            box.style->display == Display::Inside::FLEX or
-            box.style->display == Display::Inside::GRID;
+
+        try$(shouldAbortFragmentingBeforeLayout(tree.fc, input));
 
         if (isMonolticDisplay)
             tree.fc.enterMonolithicBox();
-
-        try$(shouldAbortFragmentingBeforeLayout(tree.fc, input));
 
         // TODO: Class C breakpoint
 
@@ -275,6 +277,9 @@ Output layout(Tree &tree, Box &box, Input input) {
         Frag currFrag(&box);
         input.fragment = input.fragment ? &currFrag : nullptr;
 
+        if (isMonolticDisplay)
+            tree.fc.enterMonolithicBox();
+
         auto out = _contentLayout(tree, box, input, startAt, stopAt);
 
         auto size = out.size;
@@ -282,6 +287,9 @@ Output layout(Tree &tree, Box &box, Input input) {
         if ((not tree.fc.allowBreak()) or (out.completelyLaidOut and not input.breakpointTraverser.prevIteration)) {
             size.height = input.knownSize.height.unwrapOr(size.height);
         }
+
+        if (isMonolticDisplay)
+            tree.fc.leaveMonolithicBox();
 
         size = size + padding.all() + borders.all();
 

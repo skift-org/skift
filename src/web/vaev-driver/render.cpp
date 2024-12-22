@@ -66,7 +66,7 @@ RenderResult render(Markup::Document const &dom, Style::Media const &media, Layo
         std::move(stylebook),
         makeStrong<Layout::Box>(std::move(tree.root)),
         sceneRoot,
-        makeStrong<Layout::Frag>(root)
+        makeStrong<Layout::Frag>(std::move(root))
     };
 }
 

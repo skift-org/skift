@@ -52,7 +52,12 @@ struct FragmentationContext {
     }
 
     bool acceptsFit(Px verticalPosition, Px verticalSize, Px pendingVerticalSizes) {
+        // TODO: consider apply this check only when in discovery mode
         return verticalPosition + verticalSize + pendingVerticalSizes <= currSize.y;
+    }
+
+    Px leftVerticalSpace(Px verticalPosition, Px pendingVerticalSizes) {
+        return currSize.y - verticalPosition - pendingVerticalSizes;
     }
 };
 

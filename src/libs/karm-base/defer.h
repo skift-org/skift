@@ -9,7 +9,7 @@ namespace Karm {
 /// Defer a computation until the end of the current scope.
 /// The computation is executed in the reverse order of the defer calls.
 template <typename F>
-struct Defer : Meta::Static {
+struct Defer : Meta::Pinned {
     F _f;
 
     always_inline Defer(F f) : _f(f) {}

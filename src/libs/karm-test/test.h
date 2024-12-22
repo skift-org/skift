@@ -11,7 +11,7 @@
 
 namespace Karm::Test {
 
-struct Test : Meta::Static {
+struct Test : Meta::Pinned {
     enum struct Kind {
         SYNC,
         ASYNC,

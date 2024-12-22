@@ -11,7 +11,7 @@ namespace Grund::Bus {
 
 struct Bus;
 
-struct Endpoint : public Meta::Static {
+struct Endpoint : public Meta::Pinned {
     static Sys::Port nextPort() {
         static usize port = 2;
         return Sys::Port{port++};
@@ -64,7 +64,7 @@ struct Locator : public Endpoint {
     Res<> send(Sys::Message &msg) override;
 };
 
-struct Bus : public Meta::Static {
+struct Bus : public Meta::Pinned {
     Sys::Context &_context;
 
     Vec<Strong<Endpoint>> _endpoints{};

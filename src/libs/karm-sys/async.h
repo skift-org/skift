@@ -7,7 +7,7 @@
 namespace Karm::Sys {
 
 struct Sched :
-    Meta::Static {
+    Meta::Pinned {
 
     Opt<Res<>> _ret;
 

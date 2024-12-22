@@ -38,7 +38,7 @@ enum struct Iter {
 
 // https://dom.spec.whatwg.org/#interface-node
 struct Node :
-    Meta::Static {
+    Meta::Pinned {
 
     MutCursor<Node> _parent = nullptr;
     Vec<Strong<Node>> _children;

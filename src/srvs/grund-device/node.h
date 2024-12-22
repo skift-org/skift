@@ -12,7 +12,7 @@ struct IrqEvent {
 };
 
 struct Node :
-    Meta::Static {
+    Meta::Pinned {
 
     usize _id = 0;
     Node *_parent = nullptr;

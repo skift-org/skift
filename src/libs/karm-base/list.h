@@ -7,7 +7,7 @@
 namespace Karm {
 
 template <typename T>
-struct LlItem : Meta::Static {
+struct LlItem : Meta::Pinned {
     T *prev = nullptr;
     T *next = nullptr;
 

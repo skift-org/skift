@@ -13,7 +13,7 @@ struct Service {
 };
 
 struct Context :
-    Meta::Static {
+    Meta::Pinned {
     Vec<Strong<Service>> _srvs;
 
     template <typename T>

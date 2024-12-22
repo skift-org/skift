@@ -170,11 +170,14 @@ static inline Async::Task<Message> rpcRecvAsync(Sys::IpcConnection &con) {
 
 // MARK: Rpc -------------------------------------------------------------------
 
-struct Rpc {
+struct Rpc : Meta::Pinned {
     Sys::IpcConnection _con;
     bool _receiving = false;
     Map<u64, Async::_Promise<Message>> _pending{};
     u64 _seq = 1;
+
+    Rpc(Sys::IpcConnection con)
+        : _con(std::move(con)) {}
 
     static Rpc create(Sys::Context &ctx) {
         auto &channel = useChannel(ctx);
@@ -223,7 +226,6 @@ struct Rpc {
         auto seq = _seq++;
         Async::_Promise<Message> promise;
         auto future = promise.future();
-
         _pending.put(seq, std::move(promise));
 
         co_try$(rpcSend<T>(_con, port, seq, std::forward<Args>(args)...));

@@ -87,7 +87,7 @@ using Audio = _Audio<false>;
 
 using MutAudio = _Audio<true>;
 
-struct AudioStream : Meta::Static {
+struct AudioStream : Meta::Pinned {
     struct Configs {
         AudioChannel channels;
         AudioFormat format;

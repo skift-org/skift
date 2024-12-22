@@ -12,10 +12,10 @@ struct NoCopy {
 };
 
 /// A type that can't be moved or copied.
-struct Static {
-    Static() = default;
-    Static(Static &&) = delete;
-    Static &operator=(Static &&) = delete;
+struct Pinned {
+    Pinned() = default;
+    Pinned(Pinned &&) = delete;
+    Pinned &operator=(Pinned &&) = delete;
 };
 
 } // namespace Karm::Meta

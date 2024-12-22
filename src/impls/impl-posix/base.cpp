@@ -1,10 +1,9 @@
 #include <execinfo.h>
+#include <karm-base/_embed.h>
 #include <karm-base/backtrace.h>
 #include <karm-io/aton.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <karm-base/_embed.h>
 
 namespace Karm::_Embed {
 

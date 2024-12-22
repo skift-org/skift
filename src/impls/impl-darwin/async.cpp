@@ -7,10 +7,9 @@
 #include <impl-posix/fd.h>
 #include <impl-posix/utils.h>
 #include <karm-base/map.h>
+#include <karm-sys/_embed.h>
 #include <karm-sys/async.h>
 #include <karm-sys/time.h>
-
-#include <karm-sys/_embed.h>
 
 namespace Karm::Sys::_Embed {
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "input_output.h"
-
 #include "tree.h"
 
 namespace Vaev::Layout {

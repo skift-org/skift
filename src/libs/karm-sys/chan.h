@@ -2,7 +2,6 @@
 
 #include <karm-io/fmt.h>
 #include <karm-io/traits.h>
-
 #include <karm-sys/_embed.h>
 
 #include "fd.h"

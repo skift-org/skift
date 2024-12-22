@@ -3,7 +3,6 @@
 #include <karm-meta/nocopy.h>
 
 #include "_embed.h"
-
 #include "atomic.h"
 #include "string.h"
 

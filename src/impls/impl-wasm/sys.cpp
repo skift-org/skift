@@ -2,7 +2,6 @@
 #include <karm-base/res.h>
 #include <karm-base/time.h>
 #include <karm-logger/logger.h>
-
 #include <karm-sys/_embed.h>
 
 #include "externs.h"

@@ -1,8 +1,7 @@
 #include <efi/base.h>
+#include <hal-x86_64/vmm.h>
 #include <karm-base/align.h>
 #include <opstart/fw.h>
-
-#include <hal-x86_64/vmm.h>
 
 namespace Opstart::Fw {
 

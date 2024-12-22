@@ -1,5 +1,4 @@
 #include <hjert-api/api.h>
-
 #include <karm-ui/_embed.h>
 
 namespace Karm::Ui::_Embed {

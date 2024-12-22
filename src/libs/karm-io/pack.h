@@ -5,7 +5,6 @@
 #include <karm-base/vec.h>
 #include <karm-meta/nocopy.h>
 #include <karm-meta/visit.h>
-
 #include <karm-sys/_handle.h>
 
 #include "bscan.h"

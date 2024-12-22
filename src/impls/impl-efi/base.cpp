@@ -1,6 +1,5 @@
 #include <efi/base.h>
 #include <efi/spec.h>
-
 #include <karm-base/_embed.h>
 
 namespace Karm::_Embed {

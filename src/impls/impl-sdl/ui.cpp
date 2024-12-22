@@ -1,9 +1,8 @@
 #include <SDL.h>
 #include <karm-image/loader.h>
 #include <karm-pkg/bundle.h>
-#include <karm-ui/drag.h>
-
 #include <karm-ui/_embed.h>
+#include <karm-ui/drag.h>
 
 namespace Karm::Ui::_Embed {
 

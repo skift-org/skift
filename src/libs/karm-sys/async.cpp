@@ -1,7 +1,6 @@
 #include <karm-logger/logger.h>
 
 #include "_embed.h"
-
 #include "async.h"
 
 namespace Karm::Sys {

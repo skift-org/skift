@@ -17,10 +17,9 @@
 //
 #include <karm-io/funcs.h>
 #include <karm-logger/logger.h>
+#include <karm-sys/_embed.h>
 #include <karm-sys/launch.h>
 #include <karm-sys/proc.h>
-
-#include <karm-sys/_embed.h>
 
 #include "fd.h"
 #include "utils.h"

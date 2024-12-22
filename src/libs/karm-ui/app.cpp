@@ -6,7 +6,6 @@
 #include <mdi/ruler-square.h>
 
 #include "_embed.h"
-
 #include "app.h"
 #include "host.h"
 #include "input.h"

@@ -1,3 +1,11 @@
+#include <hal-x86_64/com.h>
+#include <hal-x86_64/gdt.h>
+#include <hal-x86_64/idt.h>
+#include <hal-x86_64/pic.h>
+#include <hal-x86_64/pit.h>
+#include <hal-x86_64/simd.h>
+#include <hal-x86_64/sys.h>
+#include <hal-x86_64/vmm.h>
 #include <hjert-core/arch.h>
 #include <hjert-core/cpu.h>
 #include <hjert-core/irq.h>
@@ -7,15 +15,6 @@
 #include <hjert-core/syscalls.h>
 #include <hjert-core/task.h>
 #include <karm-base/witty.h>
-
-#include <hal-x86_64/com.h>
-#include <hal-x86_64/gdt.h>
-#include <hal-x86_64/idt.h>
-#include <hal-x86_64/pic.h>
-#include <hal-x86_64/pit.h>
-#include <hal-x86_64/simd.h>
-#include <hal-x86_64/sys.h>
-#include <hal-x86_64/vmm.h>
 
 #include "ints.h"
 

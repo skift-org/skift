@@ -1,8 +1,7 @@
 #include <hjert-core/arch.h>
 #include <karm-base/lock.h>
-#include <karm-sys/chan.h>
-
 #include <karm-logger/_embed.h>
+#include <karm-sys/chan.h>
 
 namespace Karm::Logger::_Embed {
 

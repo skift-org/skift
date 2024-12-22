@@ -1,7 +1,6 @@
 #pragma once
 
 #include "_embed.h"
-
 #include "time.h"
 
 namespace Karm::Sys {

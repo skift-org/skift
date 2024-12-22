@@ -3,7 +3,6 @@
 #include <karm-meta/traits.h>
 
 #include "_prelude.h"
-
 #include "macros.h"
 
 namespace Karm {

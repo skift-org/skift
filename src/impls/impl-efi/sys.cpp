@@ -5,10 +5,9 @@
 #include <karm-io/impls.h>
 #include <karm-json/parse.h>
 #include <karm-logger/logger.h>
+#include <karm-sys/_embed.h>
 #include <karm-sys/file.h>
 #include <karm-sys/launch.h>
-
-#include <karm-sys/_embed.h>
 
 namespace Karm::Sys::_Embed {
 

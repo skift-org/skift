@@ -17,7 +17,6 @@ struct Transform : public Node {
 
     Math::Rectf bound() override {
         return _transform
-            .inverse()
             .apply(_content->bound())
             .bound();
     }
@@ -28,6 +27,7 @@ struct Transform : public Node {
 
         g.push();
         g.transform(_transform);
+        r = _transform.inverse().apply(r).bound();
         _content->paint(g, r, o);
         g.pop();
     }

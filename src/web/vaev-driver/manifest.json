@@ -6,6 +6,7 @@
     "requires": [
         "vaev-layout",
         "vaev-markup",
+        "karm-print",
         "karm-mime",
         "karm-sys"
     ]

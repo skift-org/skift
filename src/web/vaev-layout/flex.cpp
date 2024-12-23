@@ -585,6 +585,7 @@ struct FlexLine {
         }
     }
 
+    // https://www.w3.org/TR/css-flexbox-1/#justify-content-property
     void justifyContent(Style::Align::Keywords justifyContent, Px mainSize, Px occupiedSize) {
         switch (justifyContent) {
         case Style::Align::SPACE_AROUND:
@@ -603,7 +604,10 @@ struct FlexLine {
             break;
 
         case Style::Align::SPACE_BETWEEN:
-            alignMainSpaceBetween(mainSize, occupiedSize);
+            if (occupiedSize > mainSize or items.len() == 1)
+                alignMainFlexStart();
+            else
+                alignMainSpaceBetween(mainSize, occupiedSize);
             break;
 
         case Style::Align::FLEX_START:

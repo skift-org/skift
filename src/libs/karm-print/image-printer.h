@@ -11,18 +11,21 @@ struct ImagePrinter : public FilePrinter {
 
     Vec<Strong<Gfx::Surface>> _pages;
     Opt<Gfx::CpuCanvas> _canvas;
+    f64 _density;
     Image::Saver _saver;
 
-    ImagePrinter(Image::Saver saver = {})
-        : _saver(saver) {}
+    ImagePrinter(f64 density = 1, Image::Saver saver = {})
+        : _density(density),
+          _saver(saver) {}
 
     Gfx::Canvas &beginPage(PaperStock paper) override {
-        _pages.emplaceBack(Gfx::Surface::alloc(paper.size().cast<isize>(), Gfx::RGBA8888));
+        _pages.emplaceBack(Gfx::Surface::alloc(paper.size().cast<isize>() * _density, Gfx::RGBA8888));
 
         if (_canvas)
             _canvas->end();
         _canvas = Gfx::CpuCanvas{};
         _canvas->begin(*last(_pages));
+        _canvas->scale(_density);
         _canvas->clear(Gfx::WHITE);
 
         return *_canvas;

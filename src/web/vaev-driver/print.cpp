@@ -279,8 +279,6 @@ Vec<Strong<Scene::Page>> print(Markup::Document const &dom, Print::Settings cons
     initialStyle.setCustomProp("-vaev-title", {Css::Token::string(Io::format("\"{}\"", dom.title()).unwrap())});
     initialStyle.setCustomProp("-vaev-datetime", {Css::Token::string(Io::format("\"{}\"", Sys::now()).unwrap())});
 
-    auto scaleMatrix = Math::Trans2f::makeScale(media.resolution.toDppx());
-
     // MARK: Page Content ------------------------------------------------------
 
     Layout::Tree contentTree = {
@@ -304,16 +302,11 @@ Vec<Strong<Scene::Page>> print(Markup::Document const &dom, Print::Settings cons
         };
 
         auto pageSize = pageRect.size().cast<f64>();
+
+        auto scaleMatrix = Math::Trans2f::makeScale(media.resolution.toDppx());
         auto pageScene = pages.emplaceBack(
             // FIXME: it can be that specific pages have different dimensions
-            makeStrong<Scene::Page>(
-                Print::PaperStock{
-                    "custom"s,
-                    pageSize.width,
-                    pageSize.height,
-                },
-                scaleMatrix
-            )
+            makeStrong<Scene::Page>(settings.paper, scaleMatrix)
         );
 
         InsetsPx pageMargin = {};

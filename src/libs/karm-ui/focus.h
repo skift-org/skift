@@ -60,6 +60,8 @@ struct Focusable : public ProxyNode<Focusable> {
     }
 
     void event(App::Event &e) override {
+        bool passthrough = false;
+
         if (auto fe = e.is<FocusEvent>()) {
             if (fe->type == FocusEvent::STEAL and _focused) {
                 _focused = false;
@@ -67,6 +69,7 @@ struct Focusable : public ProxyNode<Focusable> {
                 event<FocusEvent>(*_child, FocusEvent::LEAVE);
             }
         } else if (auto me = e.is<App::MouseEvent>()) {
+            passthrough = true;
             if (me->type == App::MouseEvent::PRESS) {
                 if (bound().contains(me->pos) and not _focused) {
                     bubble<FocusEvent>(*this, FocusEvent::STEAL);
@@ -81,7 +84,7 @@ struct Focusable : public ProxyNode<Focusable> {
             }
         }
 
-        if (_focused)
+        if (_focused or passthrough)
             ProxyNode<Focusable>::event(e);
     }
 };

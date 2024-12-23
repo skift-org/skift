@@ -7,6 +7,7 @@
 
 #include "checkbox.h"
 #include "color-input.h"
+#include "number.h"
 #include "radio.h"
 #include "row.h"
 #include "select.h"
@@ -155,6 +156,15 @@ Ui::Child colorRow(Gfx::Color c, Ui::OnChange<Gfx::Color> onChange, String title
         title,
         NONE,
         Kr::colorInput(c, std::move(onChange))
+    );
+}
+
+Ui::Child numberRow(f64 value, Ui::OnChange<f64> onChange, f64 step, String title) {
+    return rowContent(
+        NONE,
+        title,
+        NONE,
+        number(value, std::move(onChange), step)
     );
 }
 

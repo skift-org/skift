@@ -18,7 +18,7 @@ namespace Karm::Kira {
 struct State {
     PrintPreview preview;
     Print::Settings settings = {};
-    Vec<Strong<Scene::Page>> pages = preview(settings);
+    Vec<Print::Page> pages = preview(settings);
 };
 
 struct ChangePaper {
@@ -37,12 +37,17 @@ struct ToggleHeaderFooter {};
 
 struct ToggleBackgroundGraphics {};
 
+struct ChangeScale {
+    f64 scale;
+};
+
 using Action = Union<
     ChangePaper,
     ChangeOrientation,
     ChangeMargin,
     ToggleHeaderFooter,
-    ToggleBackgroundGraphics>;
+    ToggleBackgroundGraphics,
+    ChangeScale>;
 
 static void reduce(State &s, Action a) {
     bool shouldUpdatePreview = false;
@@ -61,6 +66,9 @@ static void reduce(State &s, Action a) {
         shouldUpdatePreview = true;
     } else if (a.is<ToggleBackgroundGraphics>()) {
         s.settings.backgroundGraphics = not s.settings.backgroundGraphics;
+        shouldUpdatePreview = true;
+    } else if (auto changeScale = a.is<ChangeScale>()) {
+        s.settings.scale = clamp(changeScale->scale, 0.1, 10.);
         shouldUpdatePreview = true;
     }
 
@@ -111,7 +119,7 @@ Ui::Child _printPaper(State const &s, usize index) {
 
     return Ui::stack(
                Ui::canvas(
-                   s.pages[index],
+                   s.pages[index].content(),
                    {
                        .showBackgroundGraphics = s.settings.backgroundGraphics,
                    }
@@ -299,6 +307,15 @@ Ui::Child _printSettings(State const &s) {
                             };
                         },
                         "Margins"s
+                    ),
+
+                    numberRow(
+                        s.settings.scale,
+                        [](auto &n, f64 scale) {
+                            Model::bubble<ChangeScale>(n, ChangeScale{scale});
+                        },
+                        0.1,
+                        "Scale"s
                     ),
 
                     checkboxRow(

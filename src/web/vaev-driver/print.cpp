@@ -1,4 +1,5 @@
-#include <karm-scene/page.h>
+#include <karm-print/page.h>
+#include <karm-scene/transform.h>
 #include <karm-sys/time.h>
 #include <vaev-layout/builder.h>
 #include <vaev-layout/layout.h>
@@ -250,7 +251,7 @@ static Style::Media _constructMedia(Print::Settings const &settings) {
     };
 }
 
-Vec<Strong<Scene::Page>> print(Markup::Document const &dom, Print::Settings const &settings) {
+Vec<Print::Page> print(Markup::Document const &dom, Print::Settings const &settings) {
     auto media = _constructMedia(settings);
 
     Style::StyleBook stylebook;
@@ -271,7 +272,7 @@ Vec<Strong<Scene::Page>> print(Markup::Document const &dom, Print::Settings cons
 
     // MARK: Page and Margins --------------------------------------------------
 
-    Vec<Strong<Scene::Page>> pages;
+    Vec<Print::Page> pages;
 
     Style::Computed initialStyle = Style::Computed::initial();
     initialStyle.color = Gfx::BLACK;
@@ -303,11 +304,7 @@ Vec<Strong<Scene::Page>> print(Markup::Document const &dom, Print::Settings cons
 
         auto pageSize = pageRect.size().cast<f64>();
 
-        auto scaleMatrix = Math::Trans2f::makeScale(media.resolution.toDppx());
-        auto pageScene = pages.emplaceBack(
-            // FIXME: it can be that specific pages have different dimensions
-            makeStrong<Scene::Page>(settings.paper, scaleMatrix)
-        );
+        auto pageStack = makeStrong<Scene::Stack>();
 
         InsetsPx pageMargin = {};
 
@@ -333,7 +330,7 @@ Vec<Strong<Scene::Page>> print(Markup::Document const &dom, Print::Settings cons
         contentTree.fc.currSize = pageContent.size();
 
         if (settings.headerFooter and settings.margins != Print::Margins::NONE)
-            _paintMargins(*pageStyle, pageRect, pageContent, *pageScene);
+            _paintMargins(*pageStyle, pageRect, pageContent, *pageStack);
 
         Layout::Input pageLayoutInput{
             .knownSize = {pageContent.width, NONE},
@@ -359,8 +356,10 @@ Vec<Strong<Scene::Page>> print(Markup::Document const &dom, Print::Settings cons
                 .withBreakpointTraverser(Layout::BreakpointTraverser(&prevBreakpoint, &currBreakpoint))
         );
 
-        Layout::paint(fragment, *pageScene);
-        pageScene->prepare();
+        Layout::paint(fragment, *pageStack);
+        pageStack->prepare();
+
+        pages.emplaceBack(settings.paper, makeStrong<Scene::Transform>(pageStack, Math::Trans2f::makeScale(media.resolution.toDppx())));
 
         if (outReal.completelyLaidOut)
             break;

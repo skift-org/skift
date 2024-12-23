@@ -27,6 +27,10 @@ struct PaperStock {
     PaperStock landscape() const {
         return {name, height, width};
     }
+
+    void repr(Io::Emit &e) const {
+        e("(paper {} {}x{})", name, width, height);
+    }
 };
 
 struct PaperSeries {
@@ -162,7 +166,7 @@ struct Settings {
     Margins margins = Margins::DEFAULT;
     Orientation orientation = Orientation::PORTRAIT;
 
-    double scale = 1.;
+    f64 scale = 1.;
     bool headerFooter = true;
     bool backgroundGraphics = false;
 };

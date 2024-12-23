@@ -4,7 +4,6 @@
     "type": "lib",
     "description": "2D scene graph library",
     "requires": [
-        "karm-gfx",
-        "karm-print"
+        "karm-gfx"
     ]
 }

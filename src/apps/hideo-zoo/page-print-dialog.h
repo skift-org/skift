@@ -19,8 +19,12 @@ static inline Page PAGE_PRINT_DIALOG{
                    [](auto &n) {
                        Ui::showDialog(
                            n,
-                           Kr::printDialog([](Print::Settings const &Settings) -> Vec<Strong<Scene::Page>> {
-                               return {makeStrong<Scene::Page>(Settings.paper)};
+                           Kr::printDialog([](Print::Settings const &s) -> Vec<Print::Page> {
+                               return {
+                                   {s.paper},
+                                   {s.paper},
+                                   {s.paper},
+                               };
                            })
                        );
                    },

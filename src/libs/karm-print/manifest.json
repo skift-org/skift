@@ -4,6 +4,7 @@
     "type": "lib",
     "description": "Print documents and images.",
     "requires": [
-        "karm-pdf"
+        "karm-pdf",
+        "karm-scene"
     ]
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <karm-scene/base.h>
-#include <karm-scene/page.h>
 #include <vaev-base/length.h>
 #include <vaev-layout/box.h>
 #include <vaev-layout/frag.h>

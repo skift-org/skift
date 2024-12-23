@@ -2,7 +2,6 @@
 
 #include <karm-gfx/canvas.h>
 #include <karm-io/emit.h>
-#include <karm-print/printer.h>
 
 namespace Karm::Scene {
 
@@ -22,8 +21,6 @@ struct Node {
     virtual Math::Rectf bound() { return {}; }
 
     virtual void paint(Gfx::Canvas &, Math::Rectf = Math::Rectf::MAX, PaintOptions = {}) {}
-
-    virtual void print(Print::Printer &, PaintOptions = {.showBackgroundGraphics = false}) {}
 
     virtual void repr(Io::Emit &e) const {
         e("(node z:{})", zIndex);

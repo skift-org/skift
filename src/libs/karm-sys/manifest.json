@@ -7,6 +7,7 @@
         "karm-sys-impl",
         "karm-sys-async-impl",
         "karm-io",
-        "karm-mime"
+        "karm-mime",
+        "karm-async"
     ]
 }

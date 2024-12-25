@@ -1,3 +1,4 @@
+#include <karm-async/cancelation.h>
 #include <karm-kira/navbar.h>
 #include <karm-kira/scaffold.h>
 #include <karm-kira/toggle.h>
@@ -177,7 +178,7 @@ Ui::Child app() {
     );
 }
 
-Async::Task<> timerTask(Ui::Child app, Async::Cancelation::Token ct) {
+Async::Task<> timerTask(Ui::Child app, Async::Ct ct) {
     while (not ct.canceled()) {
         Model::event<TimeTick>(*app);
         co_trya$(Sys::globalSched().sleepAsync(Sys::now() + TimeSpan::fromSecs(1)));

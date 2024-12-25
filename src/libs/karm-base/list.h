@@ -63,6 +63,8 @@ struct Ll {
 
     usize len() const { return _len; }
 
+    bool empty() const { return _len == 0; }
+
     T *detach(T *value) {
         if (not value) [[unlikely]]
             panic("value connot be null");
@@ -81,6 +83,7 @@ struct Ll {
 
         prev(value) = nullptr;
         next(value) = nullptr;
+
         _len--;
 
         return value;

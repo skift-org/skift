@@ -76,6 +76,8 @@ struct Bus : public Meta::Pinned {
 
     Res<> attach(Strong<Endpoint> endpoint);
 
+    void _broadcast(Sys::Message &msg);
+
     Res<> dispatch(Sys::Message &msg);
 
     Res<> startService(Str id);

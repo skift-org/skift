@@ -179,26 +179,33 @@ Karm::Res<> Bus::attach(Strong<Endpoint> endpoint) {
     return Ok();
 }
 
-Res<> Bus::dispatch(Sys::Message &msg) {
+void Bus::_broadcast(Sys::Message &msg) {
     for (auto &endpoint : _endpoints) {
-        bool broadcast = msg.header().to == Sys::Port::BROADCAST and
-                         msg.header().from != endpoint->port();
+        if (msg.header().from != endpoint->port()) {
+            auto res = endpoint->send(msg);
+            if (not res)
+                logError("{}: send failed: {}", endpoint->id(), res);
+        }
+    }
+}
 
-        if (broadcast or endpoint->port() == msg.header().to) {
+Res<> Bus::dispatch(Sys::Message &msg) {
+    if (msg.header().to == Sys::Port::BROADCAST) {
+        _broadcast(msg);
+        return Ok();
+    }
+
+    for (auto &endpoint : _endpoints) {
+        if (endpoint->port() == msg.header().to) {
             auto res = endpoint->send(msg);
             if (not res) {
                 logError("{}: send failed: {}", endpoint->id(), res);
-                if (not broadcast)
-                    return res;
+                return res;
             }
 
-            if (not broadcast)
-                return Ok();
+            return Ok();
         }
     }
-
-    if (msg.header().to == Sys::Port::BROADCAST)
-        return Ok();
 
     return Error::notFound("service not found");
 }

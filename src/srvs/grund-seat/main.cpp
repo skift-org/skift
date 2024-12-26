@@ -9,7 +9,6 @@ Async::Task<> serv(Sys::Context &ctx) {
     logInfo("service started");
     while (true) {
         co_trya$(rpc.recvAsync());
-        logDebug("received message from system");
     }
 }
 

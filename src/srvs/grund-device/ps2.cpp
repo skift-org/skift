@@ -186,7 +186,10 @@ Res<> Mouse::decode() {
     if (_hasWheel)
         scroll = (i8)_buf[3];
 
+    auto event = App::makeEvent<App::MouseEvent>(App::MouseEvent::MOVE, 0, scroll, Math::Vec2i{offx, offy});
     logInfo("ps2: mouse move {} {} {}", offx, offy, scroll);
+    try$(bubble(*event));
+
     return Ok();
 }
 

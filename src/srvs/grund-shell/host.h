@@ -36,6 +36,8 @@ struct RootHost :
     }
 };
 
+Res<Gfx::MutPixels> openFramebuffer(Sys::Context &ctx);
+
 Res<Strong<RootHost>> makeHost(Sys::Context &ctx, Ui::Child root);
 
 } // namespace Grund::Shell

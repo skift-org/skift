@@ -21,12 +21,29 @@ namespace Grund::Shell {
 
 Async::Task<> servAsync(Sys::Context &ctx) {
     auto rpc = Sys::Rpc::create(ctx);
+    auto fontbuffer = co_try$(openFramebuffer(ctx));
+
+    auto backbuffer = Gfx::Surface::alloc(fontbuffer.size(), Gfx::BGRA8888);
+    Gfx::CpuCanvas g;
+
+    Math::Vec2i mouspos = fontbuffer.size() / 2;
 
     while (true) {
+        g.begin(*backbuffer);
+        g.clear(Ui::GRAY950);
+        g.beginPath();
+        g.fillStyle(Gfx::WHITE.withOpacity(0.25));
+        g.ellipse(Math::Ellipsef{mouspos.cast<f64>(), {16, 16}});
+        g.fill(Gfx::FillRule::EVENODD);
+        g.end();
+
+        Gfx::blitUnsafe(fontbuffer, *backbuffer);
+
         auto msg = co_trya$(rpc.recvAsync());
 
         if (msg.is<App::MouseEvent>()) {
-            auto event = msg.unpack<App::MouseEvent>();
+            auto event = msg.unpack<App::MouseEvent>().unwrap();
+            mouspos = mouspos + event.delta;
             logDebug("mouse event!");
         } else if (msg.is<App::KeyboardEvent>()) {
             auto event = msg.unpack<App::MouseEvent>();

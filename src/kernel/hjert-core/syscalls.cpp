@@ -242,9 +242,8 @@ Res<> doPoll(Task &self, Hj::Cap cap, UserSlice<MutSlice<Hj::Event>> events, Use
 
     try$(self.block([&] {
         auto events = obj->pollEvents();
-        if (events.len() > 0) {
+        if (events.len() > 0)
             return TimeStamp::epoch();
-        }
         return until;
     }));
 

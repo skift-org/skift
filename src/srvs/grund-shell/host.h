@@ -22,9 +22,8 @@ struct RootHost :
     }
 
     void flip(Slice<Math::Recti> dirty) override {
-        for (auto d : dirty) {
+        for (auto d : dirty)
             Gfx::blitUnsafe(_front.clip(d), _back->pixels().clip(d));
-        }
     }
 
     Res<> wait(TimeStamp until) override {

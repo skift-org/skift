@@ -3,6 +3,7 @@
 #include <karm-base/enum.h>
 #include <karm-base/tuple.h>
 #include <karm-base/vec.h>
+#include <karm-math/vec.h>
 #include <karm-meta/nocopy.h>
 #include <karm-meta/visit.h>
 #include <karm-sys/_handle.h>
@@ -272,6 +273,24 @@ struct Packer<Tuple<Ts...>> {
             return Ok();
         }));
         return Ok(res);
+    }
+};
+
+// MARK: Math ------------------------------------------------------------------
+
+template <typename T>
+struct Packer<Math::Vec2<T>> {
+    static Res<> pack(PackEmit &e, Math::Vec2<T> const &val) {
+        try$(Io::pack(e, val.x));
+        try$(Io::pack(e, val.y));
+        return Ok();
+    }
+
+    static Res<Math::Vec2<T>> unpack(PackScan &s) {
+        return Ok(Math::Vec2<T>{
+            try$(Io::unpack<T>(s)),
+            try$(Io::unpack<T>(s)),
+        });
     }
 };
 

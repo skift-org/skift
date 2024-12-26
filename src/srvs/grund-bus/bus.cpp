@@ -118,8 +118,10 @@ Async::Task<> Service::runAsync() {
         auto msg = co_trya$(Sys::rpcRecvAsync(_con));
 
         auto res = dispatch(msg);
-        if (not res)
+        if (not res) {
+            logError("{}: dispatch failed: {}", id(), res);
             co_try$(Sys::rpcSend<Error>(_con, port(), msg.header().seq, res.none()));
+        }
     }
 }
 
@@ -154,7 +156,8 @@ Res<> Locator::send(Sys::Message &msg) {
         return Error::notFound("service not found");
     }
 
-    return Error::invalidInput("invalid message");
+    logWarn("unexpected message: {}", msg.header());
+    return Ok();
 }
 
 // MARK: Bus -------------------------------------------------------------------
@@ -178,9 +181,25 @@ Karm::Res<> Bus::attach(Strong<Endpoint> endpoint) {
 
 Res<> Bus::dispatch(Sys::Message &msg) {
     for (auto &endpoint : _endpoints) {
-        if (endpoint->port() == msg.header().to)
-            return endpoint->send(msg);
+        bool broadcast = msg.header().to == Sys::Port::BROADCAST and
+                         msg.header().from != endpoint->port();
+
+        if (broadcast or endpoint->port() == msg.header().to) {
+            auto res = endpoint->send(msg);
+            if (not res) {
+                logError("{}: send failed: {}", endpoint->id(), res);
+                if (not broadcast)
+                    return res;
+            }
+
+            if (not broadcast)
+                return Ok();
+        }
     }
+
+    if (msg.header().to == Sys::Port::BROADCAST)
+        return Ok();
+
     return Error::notFound("service not found");
 }
 

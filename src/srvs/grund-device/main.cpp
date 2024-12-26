@@ -1,7 +1,9 @@
 #include <hjert-api/api.h>
+#include <karm-app/inputs.h>
 #include <karm-base/map.h>
 #include <karm-logger/logger.h>
 #include <karm-sys/entry.h>
+#include <karm-sys/rpc.h>
 
 #include "cmos.h"
 #include "io.h"
@@ -21,11 +23,37 @@ struct IsaRootBus : public Node {
     }
 };
 
+struct RootBus : public Node {
+    Sys::Rpc &rpc;
+
+    RootBus(Sys::Rpc &rpc)
+        : rpc{rpc} {}
+
+    Res<> init() override {
+        try$(attach(makeStrong<IsaRootBus>()));
+        return Ok();
+    }
+
+    Res<> bubble(App::Event &e) override {
+        if (auto me = e.is<App::MouseEvent>()) {
+            try$(rpc.send<App::MouseEvent>(Sys::Port::BROADCAST, *me));
+            e.accept();
+        } else if (auto ke = e.is<App::KeyboardEvent>()) {
+            try$(rpc.send<App::KeyboardEvent>(Sys::Port::BROADCAST, *ke));
+            e.accept();
+        }
+
+        return Node::bubble(e);
+    }
+};
+
 } // namespace Grund::Device
 
-Async::Task<> entryPointAsync(Sys::Context &) {
+Async::Task<> entryPointAsync(Sys::Context &ctx) {
+    auto rpc = Sys::Rpc::create(ctx);
+
     logInfo("devices: building device tree...");
-    auto root = makeStrong<Grund::Device::IsaRootBus>();
+    auto root = makeStrong<Grund::Device::RootBus>(rpc);
     co_try$(root->init());
 
     logInfo("devices: binding IRQs...");

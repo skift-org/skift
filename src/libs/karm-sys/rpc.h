@@ -27,16 +27,25 @@ namespace Karm::Sys {
 struct Port : public Distinct<u64, struct _PortTag> {
     static Port const INVALID;
     static Port const BUS;
+    static Port const BROADCAST;
 
     using Distinct::Distinct;
 
     void repr(Io::Emit &e) const {
-        e("{}", value());
+        if (*this == INVALID)
+            e("invalid");
+        else if (*this == BUS)
+            e("bus");
+        else if (*this == BROADCAST)
+            e("broadcast");
+        else
+            e("{}", value());
     }
 };
 
 constexpr Port Port::INVALID{0};
 constexpr Port Port::BUS{Limits<u64>::MAX};
+constexpr Port Port::BROADCAST{Limits<u64>::MAX - 1};
 
 struct Header {
     u64 seq;

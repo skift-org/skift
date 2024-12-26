@@ -1,5 +1,6 @@
 #include <karm-app/inputs.h>
 #include <karm-logger/logger.h>
+#include <karm-sys/rpc.h>
 
 #include "ps2.h"
 
@@ -110,12 +111,24 @@ Res<> Keyboard::event(App::Event &e) {
                 if (_esc) {
                     App::Key key = {App::Key::Code((data & 0x7F) + 0x80)};
                     logInfo("ps2: keyboard key {} {}", key.name(), data & 0x80 ? "pressed" : "released");
+                    auto event = App::makeEvent<App::KeyboardEvent>(
+                        data & 0x80 ? App::KeyboardEvent::PRESS : App::KeyboardEvent::RELEASE,
+                        key,
+                        key
+                    );
+                    try$(bubble(*event));
                     _esc = false;
                 } else if (data == 0xE0) {
                     _esc = true;
                 } else {
                     App::Key key = {App::Key::Code(data & 0x7F)};
                     logInfo("ps2: keyboard key {} {}", key.name(), data & 0x80 ? "pressed" : "released");
+                    auto event = App::makeEvent<App::KeyboardEvent>(
+                        data & 0x80 ? App::KeyboardEvent::PRESS : App::KeyboardEvent::RELEASE,
+                        key,
+                        key
+                    );
+                    try$(bubble(*event));
                 }
                 status = try$(ctrl().readStatus());
             }
@@ -170,9 +183,8 @@ Res<> Mouse::decode() {
         offy -= 0x100;
 
     int scroll = 0;
-    if (_hasWheel) {
+    if (_hasWheel)
         scroll = (i8)_buf[3];
-    }
 
     logInfo("ps2: mouse move {} {} {}", offx, offy, scroll);
     return Ok();

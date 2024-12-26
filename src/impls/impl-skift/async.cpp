@@ -50,7 +50,6 @@ struct HjertSched : public Sys::Sched {
 
             co_trya$(waitFor(chan.cap(), Hj::Sigs::WRITABLE, Hj::Sigs::NONE));
             static_assert(sizeof(Handle) == sizeof(Hj::Cap) and alignof(Handle) == alignof(Hj::Cap));
-            logDebug("sending len: {}, hndsLen: {}", buf.len(), hnds.len());
             co_try$(chan.send(buf, hnds.cast<Hj::Cap>()));
 
             co_return Ok<_Sent>({buf.len(), hnds.len()});
@@ -63,14 +62,11 @@ struct HjertSched : public Sys::Sched {
         if (auto ipc = fd.is<Skift::IpcFd>()) {
             auto &chan = ipc->_in;
 
-            logDebug("Buffer size: {}", buf.len());
-
             co_trya$(waitFor(chan.cap(), Hj::Sigs::READABLE, Hj::Sigs::NONE));
             static_assert(sizeof(Handle) == sizeof(Hj::Cap) and alignof(Handle) == alignof(Hj::Cap));
             auto [len, hndsLen] = co_try$(chan.recv(buf, hnds.cast<Hj::Cap>()));
-            logDebug("got len: {}, hndsLen: {}", len, hndsLen);
 
-            co_return Ok<_Received>{buf.len(), hnds.len(), Sys::Ip4::unspecified(0)};
+            co_return Ok<_Received>{len, hndsLen, Sys::Ip4::unspecified(0)};
         }
 
         co_return Error::notImplemented("unsupported fd type");

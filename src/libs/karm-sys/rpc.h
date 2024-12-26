@@ -1,10 +1,11 @@
 #pragma once
 
+#include <karm-async/promise.h>
+#include <karm-async/queue.h>
 #include <karm-base/cons.h>
 #include <karm-base/map.h>
 #include <karm-io/pack.h>
 #include <karm-logger/logger.h>
-#include <karm-sys/async.h>
 #include <karm-sys/context.h>
 #include <karm-sys/socket.h>
 
@@ -122,7 +123,7 @@ struct Message {
             header().seq,
             header().to,
             header().from,
-            Meta::idOf<T>(),
+            Meta::idOf<typename T::Response>(),
         };
 
         Io::BufWriter respBuf{resp._payload};
@@ -137,7 +138,7 @@ struct Message {
 
     template <typename T>
     Res<T> unpack() {
-        Io::PackScan s{_buf, _hnds};
+        Io::PackScan s{bytes(), handles()};
         if (not is<T>())
             return Error::invalidData("unexpected message");
         try$(Io::unpack<Header>(s));
@@ -151,7 +152,6 @@ template <typename T, typename... Args>
 Res<> rpcSend(Sys::IpcConnection &con, Port to, u64 seq, Args &&...args) {
     Message msg = Message::packReq<T>(to, seq, std::forward<Args>(args)...).take();
 
-    logDebug("rpcSend : {}, len: {}", msg.header(), msg.len());
     try$(con.send(msg.bytes(), msg.handles()));
     return Ok();
 }
@@ -164,7 +164,6 @@ static inline Async::Task<Message> rpcRecvAsync(Sys::IpcConnection &con) {
     msg._len = bufLen;
     msg._hndsLen = hndsLen;
 
-    logDebug("rpcRecv: {}, len: {}", msg.header(), msg.len());
     co_return msg;
 }
 
@@ -172,16 +171,36 @@ static inline Async::Task<Message> rpcRecvAsync(Sys::IpcConnection &con) {
 
 struct Rpc : Meta::Pinned {
     Sys::IpcConnection _con;
-    bool _receiving = false;
     Map<u64, Async::_Promise<Message>> _pending{};
+    Async::Queue<Message> _incoming{};
     u64 _seq = 1;
 
     Rpc(Sys::IpcConnection con)
-        : _con(std::move(con)) {}
+        : _con(std::move(con)) {
+        // FIXME: Fid a way to do proper cleanup
+        Async::detach(_receiverTask(*this), [](Res<> res) {
+            logError("receiver task exited: {}", res);
+            panic("receiver task exited");
+        });
+    }
 
     static Rpc create(Sys::Context &ctx) {
         auto &channel = useChannel(ctx);
         return Rpc{std::move(channel.con)};
+    }
+
+    static Async::Task<> _receiverTask(Rpc &self) {
+        while (true) {
+            Message msg = co_trya$(rpcRecvAsync(self._con));
+            auto header = msg._header;
+
+            if (self._pending.has(header.seq)) {
+                auto promise = self._pending.take(header.seq);
+                promise.resolve(std::move(msg));
+            } else {
+                self._incoming.enqueue(std::move(msg));
+            }
+        }
     }
 
     template <typename T, typename... Args>
@@ -190,27 +209,7 @@ struct Rpc : Meta::Pinned {
     }
 
     Async::Task<Message> recvAsync() {
-        if (_receiving)
-            co_return Error::other("already receiving");
-
-        _receiving = true;
-        Defer defer{[this] {
-            _receiving = false;
-        }};
-
-        while (true) {
-            Message msg = co_trya$(rpcRecvAsync(_con));
-
-            auto header = msg._header;
-
-            if (_pending.has(header.seq)) {
-                auto promise = _pending.take(header.seq);
-                promise.resolve(std::move(msg));
-                continue;
-            }
-
-            co_return msg;
-        }
+        co_return Ok(co_await _incoming.dequeueAsync());
     }
 
     template <typename T>

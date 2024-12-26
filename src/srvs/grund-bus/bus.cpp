@@ -21,7 +21,7 @@ Res<> Endpoint::dispatch(Sys::Message &msg) {
 // MARK: Service ---------------------------------------------------------------
 
 Res<Strong<Service>> Service::prepare(Sys::Context &, Str id) {
-    auto in = try$(Hj::Channel::create(Hj::Domain::self(), 4096, 16));
+    auto in = try$(Hj::Channel::create(Hj::Domain::self(), 512, 16));
     try$(in.label(Io::format("{}-in", id).unwrap()));
 
     auto out = try$(Hj::Channel::create(Hj::Domain::self(), 512, 16));
@@ -117,8 +117,6 @@ Async::Task<> Service::runAsync() {
     while (true) {
         auto msg = co_trya$(Sys::rpcRecvAsync(_con));
 
-        logDebug("Received message on service '{}' {}", _id, msg.header());
-
         auto res = dispatch(msg);
         if (not res)
             co_try$(Sys::rpcSend<Error>(_con, port(), msg.header().seq, res.none()));
@@ -126,7 +124,6 @@ Async::Task<> Service::runAsync() {
 }
 
 Res<> Service::send(Sys::Message &msg) {
-    logDebug("Dispatching message on service '{}'", _id);
     return _con.send(
         msg.bytes(),
         msg.handles()
@@ -146,7 +143,6 @@ Str Locator::id() const {
 Res<> Locator::send(Sys::Message &msg) {
     if (msg.is<Locate>()) {
         auto locate = try$(msg.unpack<Locate>());
-        logDebug("looking for {#}", locate.id);
         for (auto &endpoint : _bus->_endpoints) {
             if (endpoint->id() == locate.id) {
                 auto resp = try$(msg.packResp<Locate>(endpoint->port()));
@@ -181,7 +177,6 @@ Karm::Res<> Bus::attach(Strong<Endpoint> endpoint) {
 }
 
 Res<> Bus::dispatch(Sys::Message &msg) {
-    logDebug("dispatching message from {p} to {p}", msg.header().from, msg.header().to);
     for (auto &endpoint : _endpoints) {
         if (endpoint->port() == msg.header().to)
             return endpoint->send(msg);

@@ -60,7 +60,8 @@ struct _Future {
 
     template <Receiver<T> R>
     struct _Operation :
-        public State<T>::Listener {
+        public State<T>::Listener,
+        Meta::Pinned {
 
         Strong<State<T>> _state;
         R _r;

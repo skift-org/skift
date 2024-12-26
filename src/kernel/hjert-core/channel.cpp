@@ -85,7 +85,7 @@ Res<Hj::SentRecv> Channel::recv(Domain &dom, MutBytes bytes, MutSlice<Hj::Cap> c
     if (caps.len() < expectedCaps)
         return Error::invalidInput("not enough space for caps");
 
-    if (caps.len() > dom._availableUnlocked())
+    if (dom._availableUnlocked() < expectedCaps)
         return Error::invalidInput("not enough space in domain");
 
     // Everything is ready, let's receive the message

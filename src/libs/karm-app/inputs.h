@@ -125,6 +125,14 @@ struct MouseEvent {
     MouseButton buttons{};
     KeyMod mods{};
     MouseButton button{};
+
+    bool pressed(MouseButton button) const {
+        return (bool)(buttons & button);
+    }
+
+    bool released(MouseButton button) const {
+        return not pressed(button);
+    }
 };
 
 struct MouseLeaveEvent {

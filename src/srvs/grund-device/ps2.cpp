@@ -182,11 +182,17 @@ Res<> Mouse::decode() {
     if (_buf[0] & 0x20)
         offy -= 0x100;
 
+    App::MouseButton buttons = App::MouseButton::NONE;
+
+    buttons |= ((_buf[0] >> 0) & 1) ? App::MouseButton::LEFT : App::MouseButton::NONE;
+    buttons |= ((_buf[0] >> 1) & 1) ? App::MouseButton::RIGHT : App::MouseButton::NONE;
+    buttons |= ((_buf[0] >> 2) & 1) ? App::MouseButton::MIDDLE : App::MouseButton::NONE;
+
     int scroll = 0;
     if (_hasWheel)
         scroll = (i8)_buf[3];
 
-    auto event = App::makeEvent<App::MouseEvent>(App::MouseEvent::MOVE, 0, scroll, Math::Vec2i{offx, -offy});
+    auto event = App::makeEvent<App::MouseEvent>(App::MouseEvent::MOVE, 0, scroll, Math::Vec2i{offx, -offy}, buttons);
     logInfo("ps2: mouse move {} {} {}", offx, offy, scroll);
     try$(bubble(*event));
 

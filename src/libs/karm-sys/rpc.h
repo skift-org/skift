@@ -186,7 +186,7 @@ struct Rpc : Meta::Pinned {
 
     Rpc(Sys::IpcConnection con)
         : _con(std::move(con)) {
-        // FIXME: Fid a way to do proper cleanup
+        // FIXME: Find a way to do proper cleanup
         Async::detach(_receiverTask(*this), [](Res<> res) {
             logError("receiver task exited: {}", res);
             panic("receiver task exited");

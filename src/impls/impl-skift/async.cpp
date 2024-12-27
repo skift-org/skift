@@ -11,6 +11,7 @@ namespace Karm::Sys::_Embed {
 struct HjertSched : public Sys::Sched {
     Hj::Listener _listener;
     Map<Hj::Cap, Async::Promise<>> _promises;
+    Vec<Cons<TimeStamp, Async::Promise<>>> _sleeps;
 
     HjertSched(Hj::Listener listener) : _listener{std::move(listener)} {}
 
@@ -72,13 +73,42 @@ struct HjertSched : public Sys::Sched {
         co_return Error::notImplemented("unsupported fd type");
     }
 
-    virtual Async::Task<> sleepAsync(TimeStamp) {
-        co_return Error::notImplemented("not implemented");
+    virtual Async::Task<> sleepAsync(TimeStamp stamp) {
+        Async::Promise<> promise;
+        auto future = promise.future();
+        _sleeps.pushBack({stamp, std::move(promise)});
+        co_return co_await future;
+    }
+
+    TimeStamp _soonest() {
+        TimeStamp soonest = TimeStamp::endOfTime();
+        for (auto const &[stamp, _] : _sleeps) {
+            if (stamp < soonest)
+                soonest = stamp;
+        }
+        return soonest;
+    }
+
+    void _wake(TimeStamp now) {
+        for (usize i = 0; i < _sleeps.len(); i++) {
+            auto &[stamp, promise] = _sleeps[i];
+            if (stamp <= now) {
+                promise.resolve(Ok());
+                _sleeps.removeAt(i);
+                i--;
+            }
+        }
     }
 
     virtual Res<> wait(TimeStamp until) {
-        while (_Embed::now() < until) {
-            try$(_listener.poll(until));
+        while (true) {
+            auto now = _Embed::now();
+            _wake(now);
+            auto soonest = min(until, _soonest());
+            if (now >= until)
+                return Ok();
+
+            try$(_listener.poll(soonest));
             while (auto ev = _listener.next()) {
                 auto prop = _promises.take(ev->cap);
                 try$(_listener.mute(ev->cap));

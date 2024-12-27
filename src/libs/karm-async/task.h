@@ -14,7 +14,7 @@ enum struct Cfp {
 };
 
 template <typename T>
-struct _Task {
+struct [[nodiscard]] _Task {
     using Inner = T;
 
     struct promise_type {

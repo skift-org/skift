@@ -10,4 +10,8 @@ struct Locate {
     String id;
 };
 
+struct Listen {
+    Meta::Id mid;
+};
+
 } // namespace Grund::Bus

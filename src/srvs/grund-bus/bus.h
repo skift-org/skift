@@ -32,11 +32,14 @@ struct Endpoint : public Meta::Pinned {
 
     virtual Res<> send(Sys::Message &) { return Ok(); }
 
+    virtual bool accept(Sys::Message const &) { return true; }
+
     virtual Res<> activate(Sys::Context &) { return Ok(); }
 };
 
 struct Service : public Endpoint {
     String _id;
+    Vec<Meta::Id> _listen;
     Strong<Skift::IpcFd> _ipc;
     Sys::IpcConnection _con;
     Opt<Hj::Task> _task = NONE;
@@ -54,6 +57,8 @@ struct Service : public Endpoint {
     Async::Task<> runAsync();
 
     Res<> send(Sys::Message &msg) override;
+
+    bool accept(Sys::Message const &msg) override;
 };
 
 struct Locator : public Endpoint {

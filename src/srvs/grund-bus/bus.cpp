@@ -21,10 +21,10 @@ Res<> Endpoint::dispatch(Sys::Message &msg) {
 // MARK: Service ---------------------------------------------------------------
 
 Res<Strong<Service>> Service::prepare(Sys::Context &, Str id) {
-    auto in = try$(Hj::Channel::create(Hj::Domain::self(), 512, 16));
+    auto in = try$(Hj::Channel::create(Hj::Domain::self(), kib(16), 16));
     try$(in.label(Io::format("{}-in", id).unwrap()));
 
-    auto out = try$(Hj::Channel::create(Hj::Domain::self(), 512, 16));
+    auto out = try$(Hj::Channel::create(Hj::Domain::self(), kib(16), 16));
     try$(out.label(Io::format("{}-out", id).unwrap()));
 
     auto ipc = makeStrong<Skift::IpcFd>(
@@ -117,10 +117,15 @@ Async::Task<> Service::runAsync() {
     while (true) {
         auto msg = co_trya$(Sys::rpcRecvAsync(_con));
 
-        auto res = dispatch(msg);
-        if (not res) {
-            logError("{}: dispatch failed: {}", id(), res);
-            co_try$(Sys::rpcSend<Error>(_con, port(), msg.header().seq, res.none()));
+        if (msg.is<Listen>()) {
+            auto listen = co_try$(msg.unpack<Listen>());
+            _listen.pushBack(listen.mid);
+        } else {
+            auto res = dispatch(msg);
+            if (not res) {
+                logError("{}: dispatch failed: {}", id(), res);
+                co_try$(Sys::rpcSend<Error>(_con, port(), msg.header().seq, res.none()));
+            }
         }
     }
 }
@@ -130,6 +135,10 @@ Res<> Service::send(Sys::Message &msg) {
         msg.bytes(),
         msg.handles()
     );
+}
+
+bool Service::accept(Sys::Message const &msg) {
+    return contains(_listen, msg.header().mid);
 }
 
 // MARK: Locator ---------------------------------------------------------------
@@ -156,7 +165,6 @@ Res<> Locator::send(Sys::Message &msg) {
         return Error::notFound("service not found");
     }
 
-    logWarn("unexpected message: {}", msg.header());
     return Ok();
 }
 
@@ -181,7 +189,7 @@ Karm::Res<> Bus::attach(Strong<Endpoint> endpoint) {
 
 void Bus::_broadcast(Sys::Message &msg) {
     for (auto &endpoint : _endpoints) {
-        if (msg.header().from != endpoint->port()) {
+        if (msg.header().from != endpoint->port() and endpoint->accept(msg)) {
             auto res = endpoint->send(msg);
             if (not res)
                 logError("{}: send failed: {}", endpoint->id(), res);

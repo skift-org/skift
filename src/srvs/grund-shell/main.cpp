@@ -22,6 +22,8 @@
 #include <mdi/table.h>
 #include <mdi/widgets.h>
 
+#include "../grund-bus/api.h"
+
 namespace Grund::Shell {
 
 struct Framebuffer : public Gfx::CpuSurface {
@@ -64,6 +66,7 @@ struct Framebuffer : public Gfx::CpuSurface {
 struct InputTranslator : public Ui::ProxyNode<InputTranslator> {
     App::MouseEvent _mousePrev = {};
     Math::Vec2i _mousePos = {};
+    bool _mouseDirty = false;
 
     InputTranslator(Ui::Child child)
         : Ui::ProxyNode<InputTranslator>(std::move(child)) {
@@ -82,9 +85,15 @@ struct InputTranslator : public Ui::ProxyNode<InputTranslator> {
 
     void event(App::Event &e) override {
         if (auto m = e.is<App::MouseEvent>()) {
-            Ui::shouldRepaint(*this, _cursorDamage());
+            if (not _mouseDirty) {
+                _mouseDirty = true;
+                Ui::shouldRepaint(*this, _cursorDamage());
+                Ui::shouldAnimate(*this);
+            }
+
             _mousePos = _mousePos + m->delta;
-            Ui::shouldRepaint(*this, _cursorDamage());
+            _mousePos = _mousePos.min(bound().size() - Math::Vec2i{1, 1});
+            _mousePos = _mousePos.max(Math::Vec2i{0, 0});
             e.accept();
 
             if (m->delta != Math::Vec2i{}) {
@@ -113,6 +122,11 @@ struct InputTranslator : public Ui::ProxyNode<InputTranslator> {
             }
 
             _mousePrev = *m;
+        } else if (auto k = e.is<Node::AnimateEvent>()) {
+            if (_mouseDirty) {
+                _mouseDirty = false;
+                Ui::shouldRepaint(*this, _cursorDamage());
+            }
         }
 
         Ui::ProxyNode<InputTranslator>::event(e);
@@ -157,6 +171,7 @@ struct Root : public Ui::ProxyNode<Root> {
             g.fillStyle(Ui::GRAY50);
             g.clip(r.cast<f64>());
             paint(g, r);
+            // g.plot(r, Gfx::RED);
             g.pop();
 
             Gfx::blitUnsafe(_frontbuffer->mutPixels(), _backbuffer->pixels());
@@ -168,7 +183,6 @@ struct Root : public Ui::ProxyNode<Root> {
 
     Async::Task<> run() {
         _shouldLayout = true;
-        _dirty.pushBack(_backbuffer->bound());
 
         while (true) {
             auto e = App::makeEvent<Node::AnimateEvent>(Ui::FRAME_TIME);
@@ -177,6 +191,8 @@ struct Root : public Ui::ProxyNode<Root> {
             if (_shouldLayout) {
                 layout(bound());
                 _shouldLayout = false;
+                _dirty.clear();
+                _dirty.pushBack(_backbuffer->bound());
             }
 
             if (_dirty.len() > 0) {
@@ -191,9 +207,20 @@ struct Root : public Ui::ProxyNode<Root> {
         return _backbuffer->bound();
     }
 
+    void _damage(Math::Recti r) {
+        for (auto &d : _dirty) {
+            if (d.colide(r)) {
+                d = d.mergeWith(r);
+                return;
+            }
+        }
+
+        _dirty.pushBack(r);
+    }
+
     void bubble(App::Event &event) override {
         if (auto e = event.is<Node::PaintEvent>()) {
-            _dirty.pushBack(e->bound);
+            _damage(e->bound);
             event.accept();
         } else if (auto e = event.is<Node::LayoutEvent>()) {
             _shouldLayout = true;
@@ -244,6 +271,9 @@ Async::Task<> servAsync(Sys::Context &ctx) {
 
     Async::detach(root->run());
 
+    co_try$(rpc.send<Grund::Bus::Listen>(Sys::Port::BUS, Meta::idOf<App::MouseEvent>()));
+    co_try$(rpc.send<Grund::Bus::Listen>(Sys::Port::BUS, Meta::idOf<App::KeyboardEvent>()));
+
     while (true) {
         auto msg = co_trya$(rpc.recvAsync());
 
@@ -251,11 +281,8 @@ Async::Task<> servAsync(Sys::Context &ctx) {
             auto rawEvent = msg.unpack<App::MouseEvent>().unwrap();
             auto event = App::makeEvent<App::MouseEvent>(rawEvent);
             root->child().event(*event);
-
-            logDebug("mouse event!");
         } else if (msg.is<App::KeyboardEvent>()) {
             auto event = msg.unpack<App::MouseEvent>();
-            logDebug("keyboard event!");
         } else {
             logWarn("unsupported event: {}", msg.header());
         }

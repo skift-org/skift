@@ -110,7 +110,6 @@ Res<> Keyboard::event(App::Event &e) {
                 logInfo("ps2: keyboard data {:02x}", data);
                 if (_esc) {
                     App::Key key = {App::Key::Code((data & 0x7F) + 0x80)};
-                    logInfo("ps2: keyboard key {} {}", key.name(), data & 0x80 ? "pressed" : "released");
                     auto event = App::makeEvent<App::KeyboardEvent>(
                         data & 0x80 ? App::KeyboardEvent::PRESS : App::KeyboardEvent::RELEASE,
                         key,
@@ -122,7 +121,6 @@ Res<> Keyboard::event(App::Event &e) {
                     _esc = true;
                 } else {
                     App::Key key = {App::Key::Code(data & 0x7F)};
-                    logInfo("ps2: keyboard key {} {}", key.name(), data & 0x80 ? "pressed" : "released");
                     auto event = App::makeEvent<App::KeyboardEvent>(
                         data & 0x80 ? App::KeyboardEvent::PRESS : App::KeyboardEvent::RELEASE,
                         key,
@@ -193,7 +191,6 @@ Res<> Mouse::decode() {
         scroll = (i8)_buf[3];
 
     auto event = App::makeEvent<App::MouseEvent>(App::MouseEvent::MOVE, 0, scroll, Math::Vec2i{offx, -offy}, buttons);
-    logInfo("ps2: mouse move {} {} {}", offx, offy, scroll);
     try$(bubble(*event));
 
     return Ok();

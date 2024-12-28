@@ -30,10 +30,12 @@ struct Scaffold : Meta::NoCopy {
 
     using Action = Union<ToggleSidebar>;
 
-    static void reduce(State &s, Action a) {
+    static Ui::Task<Action> reduce(State &s, Action a) {
         if (a.is<ToggleSidebar>()) {
             s.sidebarOpen = !s.sidebarOpen;
         }
+
+        return NONE;
     }
 
     using Model = Ui::Model<State, Action, reduce>;

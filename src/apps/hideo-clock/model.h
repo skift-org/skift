@@ -37,7 +37,7 @@ struct TimeTick {};
 
 using Action = Union<Page, TimeTick>;
 
-void reduce(State &, Action);
+Ui::Task<Action> reduce(State &, Action);
 
 using Model = Ui::Model<State, Action, reduce>;
 

@@ -17,7 +17,7 @@ struct DecrementAction {};
 
 using Action = Union<ResetAction, IncrementAction, DecrementAction>;
 
-void reduce(State &, Action);
+Ui::Task<Action> reduce(State &, Action);
 
 using Model = Ui::Model<State, Action, reduce>;
 

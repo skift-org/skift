@@ -41,12 +41,14 @@ struct SwitchAction {
 
 using Action = Union<SwitchAction>;
 
-void reduce(State &s, Action action) {
+Ui::Task<Action> reduce(State &s, Action action) {
     action.visit(
         [&](SwitchAction action) {
             s.current = action.index;
         }
     );
+
+    return NONE;
 }
 
 using Model = Ui::Model<State, Action, reduce>;

@@ -2,7 +2,7 @@
 
 namespace Hideo::Counter {
 
-void reduce(State &s, Action a) {
+Ui::Task<Action> reduce(State &s, Action a) {
     a.visit(Visitor{
         [&](ResetAction) {
             s = State{.initial = true};
@@ -16,6 +16,8 @@ void reduce(State &s, Action a) {
             s.counter -= 1;
         },
     });
+
+    return NONE;
 }
 
 } // namespace Hideo::Counter

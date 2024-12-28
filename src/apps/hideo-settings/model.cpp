@@ -2,7 +2,7 @@
 
 namespace Hideo::Settings {
 
-void reduce(State &s, Action action) {
+Ui::Task<Action> reduce(State &s, Action action) {
     action.visit(Visitor{
         [&](GoTo a) {
             if (s.page() == a.page)
@@ -19,6 +19,8 @@ void reduce(State &s, Action action) {
             s.historyIndex = min(s.historyIndex + 1, s.history.len() - 1);
         },
     });
+
+    return NONE;
 }
 
 } // namespace Hideo::Settings

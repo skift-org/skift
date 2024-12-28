@@ -22,6 +22,12 @@ def kvmAvailable() -> bool:
     return False
 
 
+def hvfAvailable() -> bool:
+    return "hvf" in str(
+        subprocess.check_output(["qemu-system-x86_64", "-accel", "help"])
+    )
+
+
 def sdlAvailable() -> bool:
     return "sdl" in str(
         subprocess.check_output(["qemu-system-x86_64", "-display", "help"])
@@ -78,7 +84,9 @@ class Qemu(Machine):
         if not self.logError:
             if kvmAvailable():
                 qemuCmd += ["-enable-kvm"]
+            elif hvfAvailable():
+                qemuCmd += ["-accel", "hvf"]
             else:
-                print("KVM not available, using QEMU-TCG")
+                qemuCmd += ["-accel", "tcg"]
 
         shell.exec(*qemuCmd)

@@ -2,7 +2,7 @@
 
 namespace Hideo::Images {
 
-void reduce(State &s, Action a) {
+Ui::Task<Action> reduce(State &s, Action a) {
     a.visit(Visitor{
         [&](Refresh) {
         },
@@ -22,6 +22,8 @@ void reduce(State &s, Action a) {
     if (s.isEditor and s.image) {
         computeHistogram(s.hist, s.image.unwrap());
     }
+
+    return NONE;
 }
 
 } // namespace Hideo::Images

@@ -49,7 +49,7 @@ using Action = Union<
     ToggleBackgroundGraphics,
     ChangeScale>;
 
-static void reduce(State &s, Action a) {
+static Ui::Task<Action> reduce(State &s, Action a) {
     bool shouldUpdatePreview = false;
 
     if (auto changePaper = a.is<ChangePaper>()) {
@@ -78,6 +78,8 @@ static void reduce(State &s, Action a) {
             settings.paper = s.settings.paper.landscape();
         s.pages = s.preview(settings);
     }
+
+    return NONE;
 }
 
 using Model = Ui::Model<State, Action, reduce>;

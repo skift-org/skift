@@ -221,7 +221,7 @@ struct UpdateHsv {
 
 using Action = Union<UpdatePage, UpdateHsv>;
 
-void reduce(State &s, Action action) {
+Ui::Task<Action> reduce(State &s, Action action) {
     action.visit(Visitor{
         [&](UpdatePage update) {
             s.page = update.page;
@@ -230,6 +230,8 @@ void reduce(State &s, Action action) {
             s.hsv = update.hsv;
         },
     });
+
+    return NONE;
 }
 
 using Model = Ui::Model<State, Action, reduce>;

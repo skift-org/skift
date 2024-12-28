@@ -2,7 +2,7 @@
 
 namespace Hideo::Shell {
 
-void reduce(State &s, Action a) {
+Ui::Task<Action> reduce(State &s, Action a) {
     a.visit(Visitor{
         [&](ToggleTablet) {
             s.isMobile = not s.isMobile;
@@ -67,6 +67,8 @@ void reduce(State &s, Action a) {
             s.isAppPanelThumbnails = a.value;
         },
     });
+
+    return NONE;
 }
 
 } // namespace Hideo::Shell

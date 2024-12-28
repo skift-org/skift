@@ -35,7 +35,7 @@ struct Save {
 
 using Action = Union<Karm::Text::Action, New, Save>;
 
-void reduce(State &s, Action a) {
+Ui::Task<Action> reduce(State &s, Action a) {
     a.visit(::Visitor{
         [&](Karm::Text::Action &t) {
             s.text->reduce(t);
@@ -49,6 +49,8 @@ void reduce(State &s, Action a) {
 
         },
     });
+
+    return NONE;
 }
 
 using Model = Ui::Model<State, Action, reduce>;

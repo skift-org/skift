@@ -4,7 +4,7 @@
 
 namespace Hideo::Clock {
 
-void reduce(State &s, Action a) {
+Ui::Task<Action> reduce(State &s, Action a) {
     a.visit(Visitor{
         [&](Page p) {
             s.page = p;
@@ -13,6 +13,8 @@ void reduce(State &s, Action a) {
             s.dateTime = Sys::dateTime();
         }
     });
+
+    return NONE;
 }
 
 } // namespace Hideo::Clock

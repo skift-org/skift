@@ -88,7 +88,7 @@ using Action = Union<
     InspectorAction,
     Navigate>;
 
-void reduce(State &s, Action a) {
+Ui::Task<Action> reduce(State &s, Action a) {
     a.visit(Visitor{
         [&](Reload) {
             auto const &object = s.currentUrl();
@@ -100,11 +100,11 @@ void reduce(State &s, Action a) {
         },
         [&](GoBack) {
             s.currentIndex--;
-            reduce(s, Reload{});
+            reduce(s, Reload{}).unwrap();
         },
         [&](GoForward) {
             s.currentIndex++;
-            reduce(s, Reload{});
+            reduce(s, Reload{}).unwrap();
         },
         [&](SidePanel p) {
             s.sidePanel = p;
@@ -115,9 +115,11 @@ void reduce(State &s, Action a) {
         [&](Navigate n) {
             s.history.pushBack(n);
             s.currentIndex++;
-            reduce(s, Reload{});
+            reduce(s, Reload{}).unwrap();
         },
     });
+
+    return NONE;
 }
 
 using Model = Ui::Model<State, Action, reduce>;

@@ -6,7 +6,10 @@ namespace Karm::Ui {
 
 // MARK: Reducer ---------------------------------------------------------------
 
-template <typename S, typename A, void (*R)(S &, A)>
+template <typename A>
+using Task = Opt<Async::_Task<Opt<A>>>;
+
+template <typename S, typename A, Task<A> (*R)(S &, A)>
 struct Model {
     using State = S;
     using Action = A;
@@ -105,7 +108,13 @@ struct Reducer :
 
     void event(App::Event &e) override {
         if (auto a = e.is<Action>()) {
-            Model::reduce(_state, *a);
+            auto task = Model::reduce(_state, *a);
+            if (task != NONE) {
+                Async::detach(task.take(), [this](Opt<Action> const &a) {
+                    if (a)
+                        Ui::bubble<Action>(*this, *a);
+                });
+            }
             e.accept();
             _rebuild = true;
             shouldLayout(*this);
@@ -117,7 +126,13 @@ struct Reducer :
 
     void bubble(App::Event &e) override {
         if (auto a = e.is<Action>()) {
-            Model::reduce(_state, *a);
+            auto task = Model::reduce(_state, *a);
+            if (task != NONE) {
+                Async::detach(task.take(), [this](Opt<Action> const &a) {
+                    if (a)
+                        Ui::bubble<Action>(*this, *a);
+                });
+            }
             e.accept();
 
             _rebuild = true;
@@ -161,8 +176,9 @@ inline Child reducer(Func<Child(typename Model::State const &)> build) {
 
 template <typename T>
 inline Child state(T init, auto build) {
-    auto reduce = [](T &s, T v) {
+    auto reduce = [](T &s, T v) -> Task<T> {
         s = v;
+        return NONE;
     };
 
     using M = Model<T, T, reduce>;

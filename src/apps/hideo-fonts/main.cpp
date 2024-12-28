@@ -34,7 +34,7 @@ struct SelectFace {
 
 using Action = Union<GoBack, SelectFamily, SelectFace>;
 
-void reduce(State &s, Action a) {
+Ui::Task<Action> reduce(State &s, Action a) {
     a.visit(Visitor{
         [&](GoBack) {
             if (s.fontFace) {
@@ -50,6 +50,8 @@ void reduce(State &s, Action a) {
             s.fontFace = a.id;
         },
     });
+
+    return NONE;
 }
 
 using Model = Ui::Model<State, Action, reduce>;

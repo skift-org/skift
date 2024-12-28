@@ -12,8 +12,9 @@
 
 namespace Hideo::Demos {
 
-static void reduce(Math::Curvef &curve, Edit e) {
+static Ui::Task<Edit> reduce(Math::Curvef &curve, Edit e) {
     curve._pts[e.index] = e.pos;
+    return NONE;
 }
 
 static inline Demo BEZIER_DEMO{
@@ -29,7 +30,7 @@ static inline Demo BEZIER_DEMO{
                     g.moveTo(s.a);
                     g.cubicTo(s.b, s.c, s.d);
 
-                    g.strokeStyle(Gfx::Stroke{
+                    g.strokeStyle({
                         .fill = Gfx::WHITE,
                         .width = 2,
                         .align = Gfx::CENTER_ALIGN,

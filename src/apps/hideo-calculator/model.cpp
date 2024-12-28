@@ -67,7 +67,7 @@ void doOperator(State &s, Operator op) {
     }
 }
 
-void reduce(State &s, Action action) {
+Ui::Task<Action> reduce(State &s, Action action) {
     s.error = NONE;
 
     action.visit(Visitor{
@@ -117,14 +117,14 @@ void reduce(State &s, Action action) {
         },
         [&](MemAddAction) {
             if (not s.hasMem) {
-                reduce(s, MemStoreAction{});
+                reduce(s, MemStoreAction{}).unwrap();
             } else {
                 s.mem += s.hasRhs ? s.rhs : s.lhs;
             }
         },
         [&](MemSubAction) {
             if (not s.hasMem) {
-                reduce(s, MemStoreAction{});
+                reduce(s, MemStoreAction{}).unwrap();
                 s.mem = -s.mem;
             } else {
                 s.mem -= s.hasRhs ? s.rhs : s.lhs;
@@ -137,6 +137,8 @@ void reduce(State &s, Action action) {
         [&](EnterDecimalAction) {
         },
     });
+
+    return NONE;
 }
 
 } // namespace Hideo::Calculator

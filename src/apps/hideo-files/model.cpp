@@ -5,10 +5,10 @@
 
 namespace Hideo::Files {
 
-void reduce(State &s, Action a) {
+Ui::Task<Action> reduce(State &s, Action a) {
     a.visit(Visitor{
         [&](GoRoot) {
-            reduce(s, GoTo{"file:/"_url});
+            reduce(s, GoTo{"file:/"_url}).unwrap();
         },
         [&](GoBack) {
             if (s.canGoBack())
@@ -20,7 +20,7 @@ void reduce(State &s, Action a) {
         },
         [&](GoParent p) {
             auto parent = s.currentUrl().parent(p.index);
-            reduce(s, GoTo{parent});
+            reduce(s, GoTo{parent}).unwrap();
         },
         [&](Navigate navigate) {
             auto dest = s.currentUrl();
@@ -33,7 +33,7 @@ void reduce(State &s, Action a) {
                     .objects = {dest},
                 });
             } else {
-                reduce(s, GoTo{dest});
+                reduce(s, GoTo{dest}).unwrap();
             }
         },
         [&](GoTo gotTo) {
@@ -52,6 +52,8 @@ void reduce(State &s, Action a) {
             s.showHidden = not s.showHidden;
         },
     });
+
+    return NONE;
 }
 
 } // namespace Hideo::Files

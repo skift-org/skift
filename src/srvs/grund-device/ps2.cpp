@@ -107,7 +107,6 @@ Res<> Keyboard::event(App::Event &e) {
             while (status.has(Status::OUT_BUF) and
                    not status.has(Status::AUX_BUF)) {
                 auto data = try$(ctrl().readData());
-                logInfo("ps2: keyboard data {:02x}", data);
                 if (_esc) {
                     App::Key key = {App::Key::Code((data & 0x7F) + 0x80)};
                     auto event = App::makeEvent<App::KeyboardEvent>(

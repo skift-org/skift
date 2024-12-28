@@ -59,7 +59,7 @@ struct ToggleHidden {};
 
 using Action = Union<GoRoot, GoBack, GoForward, GoParent, Navigate, GoTo, Refresh, AddBookmark, ToggleHidden>;
 
-void reduce(State &, Action);
+Ui::Task<Action> reduce(State &, Action);
 
 using Model = Ui::Model<State, Action, reduce>;
 

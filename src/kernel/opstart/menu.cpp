@@ -26,7 +26,7 @@ struct SelectAction {};
 
 using Action = Union<MoveSelectionAction, SelectAction>;
 
-void reduce(State &s, Action a) {
+static Ui::Task<Action> reduce(State &s, Action a) {
     a.visit(Visitor{
         [&](MoveSelectionAction a) {
             if (s.selected == 0 and a.delta < 0)
@@ -44,6 +44,8 @@ void reduce(State &s, Action a) {
                 s.error = String{res.none().msg()};
         },
     });
+
+    return NONE;
 }
 
 using Model = Ui::Model<State, Action, reduce>;

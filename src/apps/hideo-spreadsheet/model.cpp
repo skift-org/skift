@@ -1,8 +1,8 @@
-#include "app.h"
+#include "model.h"
 
 namespace Hideo::Spreadsheet {
 
-void reduce(State &s, Action a) {
+Ui::Task<Action> reduce(State &s, Action a) {
     a.visit(
         Visitor{
             [&](UpdateSelection &u) {
@@ -22,6 +22,8 @@ void reduce(State &s, Action a) {
     );
 
     s.activeSheet().recompute();
+
+    return NONE;
 }
 
 } // namespace Hideo::Spreadsheet

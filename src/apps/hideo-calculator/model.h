@@ -100,7 +100,7 @@ using Action = Union<
     MemClearAction, MemRecallAction, MemAddAction, MemSubAction, MemStoreAction,
     EnterDecimalAction>;
 
-void reduce(State &, Action);
+Ui::Task<Action> reduce(State &, Action);
 
 using Model = Ui::Model<State, Action, reduce>;
 

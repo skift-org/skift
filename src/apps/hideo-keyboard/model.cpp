@@ -2,7 +2,7 @@
 
 namespace Hideo::Keyboard {
 
-void reduce(State &s, Action a) {
+Ui::Task<Action> reduce(State &s, Action a) {
     a.visit(
         Visitor{
             [&](ToggleShift) {
@@ -10,6 +10,8 @@ void reduce(State &s, Action a) {
             },
         }
     );
+
+    return NONE;
 }
 
 } // namespace Hideo::Keyboard

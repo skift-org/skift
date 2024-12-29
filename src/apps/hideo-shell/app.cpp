@@ -42,13 +42,14 @@ Ui::Child statusbar(State const &state) {
            }) |
            Ui::box({
                .padding = {0, 12},
-               .backgroundFill = Ui::GRAY900,
+               .backgroundFill = state.instances.len() ? Ui::GRAY900 : Ui::GRAY950.withOpacity(0.6),
            });
 }
 
 Ui::Child statusbarButton(State const &state) {
     return Ui::button(
         Model::bind<Activate>(Panel::SYS),
+        Ui::ButtonStyle::none(),
         statusbar(state)
     );
 }
@@ -121,7 +122,7 @@ Ui::Child taskbar(State const &state) {
                ) |
                    Ui::box({
                        .padding = 6,
-                       .backgroundFill = Ui::GRAY950.withOpacity(0.8),
+                       .backgroundFill = Ui::GRAY950.withOpacity(0.6),
                    }),
                Ui::separator()
            ) |
@@ -162,11 +163,7 @@ Ui::Child tablet(State const &state) {
             ? background(state)
             : Ui::empty(),
         Ui::vflow(
-            Ui::vflow(
-                statusbarButton(state),
-                Ui::separator()
-            ) |
-                Ui::slideIn(Ui::SlideFrom::TOP),
+            statusbarButton(state) | Ui::slideIn(Ui::SlideFrom::TOP),
             appHost(state) | Ui::grow(),
             navbar(state)
         )

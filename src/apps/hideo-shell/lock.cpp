@@ -1,3 +1,4 @@
+#include <karm-text/loader.h>
 #include <karm-ui/box.h>
 #include <karm-ui/drag.h>
 #include <mdi/chevron-up.h>
@@ -6,21 +7,42 @@
 
 namespace Hideo::Shell {
 
+static Opt<Strong<Text::Fontface>> _blackFontface = NONE;
+
+static Strong<Text::Fontface> blackFontface() {
+    if (not _blackFontface) {
+        _blackFontface = Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Bold.ttf"_url).unwrap();
+    }
+    return *_blackFontface;
+}
+
 Ui::Child lock(State const &state) {
     auto [date, time] = state.dateTime;
     auto dateTime = Io::format(
-        // Mon. 28 Jul
-        "{}. {} {}",
-        Io::toCapitalCase(date.dayOfWeek().abbr()),
+        // Mon, 28 Jul
+        "{}, {} {}",
+        Io::toCapitalCase(date.dayOfWeek().str()),
         date.dayOfMonth() + 1,
         Io::toCapitalCase(date.month.str())
     );
 
     auto clock = Ui::vflow(
-        16,
+        0,
         Math::Align::CENTER,
-        Ui::displayMedium("{02}:{02}", time.hour, time.minute),
-        Ui::titleMedium(dateTime.unwrap())
+        Ui::text({
+                     .font = Text::Font{
+                         blackFontface(),
+                         16,
+                     },
+                 },
+                 dateTime.unwrap()),
+        Ui::text({
+                     .font = Text::Font{
+                         blackFontface(),
+                         72,
+                     },
+                 },
+                 "{02}:{02}", time.hour, time.minute)
     );
 
     auto hintText = Ui::vflow(

@@ -57,6 +57,10 @@ Res<> Task::ready(usize ip, usize sp, Hj::Args args) {
 }
 
 Res<> Task::block(Blocker blocker) {
+    // NOTE: If the blocker is already expired, don't block.
+    if (blocker() <= globalSched()._stamp)
+        return Ok();
+
     // NOTE: Can't use ObjectLockScope here because
     //       we need to yield outside of the lock.
     _lock.acquire();

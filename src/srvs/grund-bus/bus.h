@@ -4,35 +4,35 @@
 #include <impl-skift/fd.h>
 #include <karm-logger/logger.h>
 #include <karm-mime/url.h>
+#include <karm-rpc/base.h>
 #include <karm-sys/context.h>
-#include <karm-sys/rpc.h>
 
 namespace Grund::Bus {
 
 struct Bus;
 
 struct Endpoint : public Meta::Pinned {
-    static Sys::Port nextPort() {
+    static Rpc::Port nextPort() {
         static usize port = 2;
-        return Sys::Port{port++};
+        return Rpc::Port{port++};
     }
 
-    Sys::Port _port = nextPort();
+    Rpc::Port _port = nextPort();
     Bus *_bus;
 
     virtual ~Endpoint() = default;
 
-    Sys::Port port() const { return _port; }
+    Rpc::Port port() const { return _port; }
 
     void attach(Bus &bus) { _bus = &bus; }
 
-    Res<> dispatch(Sys::Message &msg);
+    Res<> dispatch(Rpc::Message &msg);
 
     virtual Str id() const = 0;
 
-    virtual Res<> send(Sys::Message &) { return Ok(); }
+    virtual Res<> send(Rpc::Message &) { return Ok(); }
 
-    virtual bool accept(Sys::Message const &) { return true; }
+    virtual bool accept(Rpc::Message const &) { return true; }
 
     virtual Res<> activate(Sys::Context &) { return Ok(); }
 };
@@ -56,17 +56,17 @@ struct Service : public Endpoint {
 
     Async::Task<> runAsync();
 
-    Res<> send(Sys::Message &msg) override;
+    Res<> send(Rpc::Message &msg) override;
 
-    bool accept(Sys::Message const &msg) override;
+    bool accept(Rpc::Message const &msg) override;
 };
 
-struct Locator : public Endpoint {
-    Locator();
+struct System : public Endpoint {
+    System();
 
     Str id() const override;
 
-    Res<> send(Sys::Message &msg) override;
+    Res<> send(Rpc::Message &msg) override;
 };
 
 struct Bus : public Meta::Pinned {
@@ -81,9 +81,9 @@ struct Bus : public Meta::Pinned {
 
     Res<> attach(Strong<Endpoint> endpoint);
 
-    void _broadcast(Sys::Message &msg);
+    void _broadcast(Rpc::Message &msg);
 
-    Res<> dispatch(Sys::Message &msg);
+    Res<> dispatch(Rpc::Message &msg);
 
     Res<> startService(Str id);
 };

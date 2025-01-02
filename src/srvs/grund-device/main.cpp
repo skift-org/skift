@@ -2,8 +2,8 @@
 #include <karm-app/inputs.h>
 #include <karm-base/map.h>
 #include <karm-logger/logger.h>
+#include <karm-rpc/base.h>
 #include <karm-sys/entry.h>
-#include <karm-sys/rpc.h>
 
 #include "cmos.h"
 #include "io.h"
@@ -24,9 +24,9 @@ struct IsaRootBus : public Node {
 };
 
 struct RootBus : public Node {
-    Sys::Rpc &rpc;
+    Rpc::Endpoint &rpc;
 
-    RootBus(Sys::Rpc &rpc)
+    RootBus(Rpc::Endpoint &rpc)
         : rpc{rpc} {}
 
     Res<> init() override {
@@ -36,10 +36,10 @@ struct RootBus : public Node {
 
     Res<> bubble(App::Event &e) override {
         if (auto me = e.is<App::MouseEvent>()) {
-            try$(rpc.send<App::MouseEvent>(Sys::Port::BROADCAST, *me));
+            try$(rpc.send<App::MouseEvent>(Rpc::Port::BROADCAST, *me));
             e.accept();
         } else if (auto ke = e.is<App::KeyboardEvent>()) {
-            try$(rpc.send<App::KeyboardEvent>(Sys::Port::BROADCAST, *ke));
+            try$(rpc.send<App::KeyboardEvent>(Rpc::Port::BROADCAST, *ke));
             e.accept();
         }
 
@@ -50,10 +50,10 @@ struct RootBus : public Node {
 } // namespace Grund::Device
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
-    auto rpc = Sys::Rpc::create(ctx);
+    auto endpoint = Rpc::Endpoint::create(ctx);
 
     logInfo("devices: building device tree...");
-    auto root = makeStrong<Grund::Device::RootBus>(rpc);
+    auto root = makeStrong<Grund::Device::RootBus>(endpoint);
     co_try$(root->init());
 
     logInfo("devices: binding IRQs...");

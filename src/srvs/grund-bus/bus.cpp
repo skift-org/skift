@@ -13,7 +13,7 @@ static constexpr bool DEBUG_ELF = false;
 
 // MARK: Endpoint --------------------------------------------------------------
 
-Res<> Endpoint::dispatch(Sys::Message &msg) {
+Res<> Endpoint::dispatch(Rpc::Message &msg) {
     msg.header().from = _port;
     return _bus->dispatch(msg);
 }
@@ -115,54 +115,57 @@ Res<> Service::activate(Sys::Context &ctx) {
 
 Async::Task<> Service::runAsync() {
     while (true) {
-        auto msg = co_trya$(Sys::rpcRecvAsync(_con));
+        auto msg = co_trya$(Rpc::rpcRecvAsync(_con));
 
-        if (msg.is<Listen>()) {
-            auto listen = co_try$(msg.unpack<Listen>());
+        if (msg.is<Api::Listen>()) {
+            auto listen = co_try$(msg.unpack<Api::Listen>());
             _listen.pushBack(listen.mid);
         } else {
             auto res = dispatch(msg);
             if (not res) {
                 logError("{}: dispatch failed: {}", id(), res);
-                co_try$(Sys::rpcSend<Error>(_con, port(), msg.header().seq, res.none()));
+                co_try$(Rpc::rpcSend<Error>(_con, port(), msg.header().seq, res.none()));
             }
         }
     }
 }
 
-Res<> Service::send(Sys::Message &msg) {
+Res<> Service::send(Rpc::Message &msg) {
     return _con.send(
         msg.bytes(),
         msg.handles()
     );
 }
 
-bool Service::accept(Sys::Message const &msg) {
+bool Service::accept(Rpc::Message const &msg) {
     return contains(_listen, msg.header().mid);
 }
 
 // MARK: Locator ---------------------------------------------------------------
 
-Locator::Locator() {
-    _port = Sys::Port::BUS;
+System::System() {
+    _port = Rpc::Port::BUS;
 }
 
-Str Locator::id() const {
+Str System::id() const {
     return "grund-bus";
 }
 
-Res<> Locator::send(Sys::Message &msg) {
-    if (msg.is<Locate>()) {
-        auto locate = try$(msg.unpack<Locate>());
+Res<> System::send(Rpc::Message &msg) {
+    if (msg.is<Api::Locate>()) {
+        auto locate = try$(msg.unpack<Api::Locate>());
         for (auto &endpoint : _bus->_endpoints) {
             if (endpoint->id() == locate.id) {
-                auto resp = try$(msg.packResp<Locate>(endpoint->port()));
+                auto resp = try$(msg.packResp<Api::Locate>(endpoint->port()));
                 try$(dispatch(resp));
                 return Ok();
             }
         }
 
         return Error::notFound("service not found");
+    } else if (msg.is<Api::Start>()) {
+        auto start = try$(msg.unpack<Api::Start>());
+        return _bus->startService(start.id);
     }
 
     return Ok();
@@ -187,7 +190,7 @@ Karm::Res<> Bus::attach(Strong<Endpoint> endpoint) {
     return Ok();
 }
 
-void Bus::_broadcast(Sys::Message &msg) {
+void Bus::_broadcast(Rpc::Message &msg) {
     for (auto &endpoint : _endpoints) {
         if (msg.header().from != endpoint->port() and endpoint->accept(msg)) {
             auto res = endpoint->send(msg);
@@ -197,8 +200,8 @@ void Bus::_broadcast(Sys::Message &msg) {
     }
 }
 
-Res<> Bus::dispatch(Sys::Message &msg) {
-    if (msg.header().to == Sys::Port::BROADCAST) {
+Res<> Bus::dispatch(Rpc::Message &msg) {
+    if (msg.header().to == Rpc::Port::BROADCAST) {
         _broadcast(msg);
         return Ok();
     }

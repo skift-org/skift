@@ -1,6 +1,6 @@
 #include <karm-app/inputs.h>
 #include <karm-logger/logger.h>
-#include <karm-sys/rpc.h>
+#include <karm-rpc/base.h>
 
 #include "ps2.h"
 

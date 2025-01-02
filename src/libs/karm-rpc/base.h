@@ -20,7 +20,7 @@ inline ChannelHook &useChannel(Sys::Context &ctx = Sys::globalContext()) {
     return ctx.use<ChannelHook>();
 }
 
-namespace Karm::Sys {
+namespace Karm::Rpc {
 
 // MARK: Primitive Types -------------------------------------------------------
 
@@ -93,7 +93,7 @@ struct Message {
         return sub(_buf, 0, len());
     }
 
-    Slice<Handle> handles() {
+    Slice<Sys::Handle> handles() {
         return sub(_hnds, 0, _hndsLen);
     }
 
@@ -178,27 +178,17 @@ static inline Async::Task<Message> rpcRecvAsync(Sys::IpcConnection &con) {
 
 // MARK: Rpc -------------------------------------------------------------------
 
-struct Rpc : Meta::Pinned {
+struct Endpoint : Meta::Pinned {
     Sys::IpcConnection _con;
     Map<u64, Async::_Promise<Message>> _pending{};
     Async::Queue<Message> _incoming{};
     u64 _seq = 1;
 
-    Rpc(Sys::IpcConnection con)
-        : _con(std::move(con)) {
-        // FIXME: Find a way to do proper cleanup
-        Async::detach(_receiverTask(*this), [](Res<> res) {
-            logError("receiver task exited: {}", res);
-            panic("receiver task exited");
-        });
-    }
+    Endpoint(Sys::IpcConnection con);
 
-    static Rpc create(Sys::Context &ctx) {
-        auto &channel = useChannel(ctx);
-        return Rpc{std::move(channel.con)};
-    }
+    static Endpoint create(Sys::Context &ctx);
 
-    static Async::Task<> _receiverTask(Rpc &self) {
+    static Async::Task<> _receiverTask(Endpoint &self) {
         while (true) {
             Message msg = co_trya$(rpcRecvAsync(self._con));
             auto header = msg._header;
@@ -250,4 +240,6 @@ struct Rpc : Meta::Pinned {
     }
 };
 
-} // namespace Karm::Sys
+Endpoint &globalEndpoint();
+
+} // namespace Karm::Rpc

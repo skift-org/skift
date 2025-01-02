@@ -1,12 +1,12 @@
 #pragma once
 
 #include <karm-base/string.h>
-#include <karm-sys/rpc.h>
+#include <karm-rpc/base.h>
 
-namespace Grund::Bus {
+namespace Grund::Bus::Api {
 
 struct Locate {
-    using Response = Sys::Port;
+    using Response = Rpc::Port;
     String id;
 };
 
@@ -14,4 +14,9 @@ struct Listen {
     Meta::Id mid;
 };
 
-} // namespace Grund::Bus
+struct Start {
+    // FIXME: Handle intent instead of simple id?
+    String id;
+};
+
+} // namespace Grund::Bus::Api

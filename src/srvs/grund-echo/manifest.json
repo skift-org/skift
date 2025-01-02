@@ -9,6 +9,7 @@
         ]
     },
     "requires": [
+        "karm-rpc",
         "karm-sys"
     ]
 }

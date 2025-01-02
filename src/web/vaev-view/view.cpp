@@ -67,9 +67,6 @@ struct View : public Ui::View<View> {
         g.clear(rect, Gfx::WHITE);
 
         paint->paint(g, rect.offset(-bound().xy).cast<f64>());
-        if (Ui::debugShowLayoutBounds) {
-            Layout::wireframe(*frag, g);
-        }
 
         g.pop();
     }

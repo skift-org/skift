@@ -3,19 +3,21 @@
 #include <karm-app/host.h>
 #include <karm-base/ring.h>
 #include <karm-gfx/cpu/canvas.h>
+#include <karm-sys/time.h>
 #include <karm-text/loader.h>
 
 #include "node.h"
-#include "perf.h"
 
 namespace Karm::Ui {
+
+static constexpr auto FRAME_RATE = 60;
+static constexpr auto FRAME_TIME = 1.0 / FRAME_RATE;
 
 struct Host : public Node {
     Child _root;
     Opt<Res<>> _res;
     Gfx::CpuCanvas _g;
     Vec<Math::Recti> _dirty;
-    PerfGraph _perf;
 
     bool _shouldLayout{};
     bool _shouldAnimate{};
@@ -30,9 +32,7 @@ struct Host : public Node {
 
     virtual Gfx::MutPixels mutPixels() = 0;
 
-    Gfx::Pixels pixels() {
-        return mutPixels();
-    }
+    Gfx::Pixels pixels() { return mutPixels(); }
 
     virtual void flip(Slice<Math::Recti> regions) = 0;
 
@@ -54,37 +54,14 @@ struct Host : public Node {
 
         _root->paint(g, r);
 
-        if (debugShowRepaintBounds) {
-            static auto hue = 0.0;
-            g.strokeStyle(Gfx::stroke(Gfx::hsvToRgb({hue, 1, 1}).withOpacity(0.5)).withWidth(4).withAlign(Gfx::INSIDE_ALIGN));
-            hue += 1;
-            if (hue > 360)
-                hue = 0;
-            g.stroke(r.cast<f64>());
-        }
-
-        if (debugShowPerfGraph)
-            _perf.paint(_g);
-
         g.pop();
     }
 
     void paint() {
-        if (debugShowPerfGraph)
-            _dirty.pushBack({0, 0, 256, 100});
-
         _g.begin(mutPixels());
 
-        _perf.record(PerfEvent::PAINT);
         for (auto &d : _dirty) {
             paint(_g, d);
-        }
-        auto elapsed = _perf.end();
-
-        static auto threshold = TimeSpan::fromMSecs(15);
-        if (elapsed > threshold) {
-            logWarn("Stutter detected, paint took {} for {} nodes, threshold raised", elapsed, debugNodeCount);
-            threshold = elapsed;
         }
 
         _g.end();
@@ -94,25 +71,11 @@ struct Host : public Node {
     }
 
     void layout(Math::Recti r) override {
-        _perf.record(PerfEvent::LAYOUT);
         _root->layout(r);
-        auto elapsed = _perf.end();
-        static auto threshold = TimeSpan::fromMSecs(1);
-        if (elapsed > threshold) {
-            logWarn("Stutter detected, layout took {} for {} nodes, threshold raised", elapsed, debugNodeCount);
-            threshold = elapsed;
-        }
     }
 
     void event(App::Event &event) override {
-        _perf.record(PerfEvent::INPUT);
         _root->event(event);
-        auto elapsed = _perf.end();
-        static auto threshold = TimeSpan::fromMSecs(1);
-        if (elapsed > threshold) {
-            logWarn("Stutter detected, event took {} for {} nodes, threshold raised", elapsed, debugNodeCount);
-            threshold = elapsed;
-        }
     }
 
     void bubble(App::Event &event) override {

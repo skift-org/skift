@@ -53,14 +53,7 @@ struct Empty : public View<Empty> {
         return _size;
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti) override {
-        if (debugShowEmptyBounds) {
-            auto b = bound();
-            g.plot(b, Gfx::WHITE.withOpacity(0.2));
-            g.plot(Math::Edgei{b.topStart(), b.bottomEnd()}, Gfx::WHITE.withOpacity(0.2));
-            g.plot(Math::Edgei{b.topEnd(), b.bottomStart()}, Gfx::WHITE.withOpacity(0.2));
-        }
-    }
+    void paint(Gfx::Canvas &, Math::Recti) override {}
 };
 
 Child empty(Math::Vec2i size) {
@@ -310,9 +303,6 @@ struct Insets : public ProxyNode<Insets> {
 
     void paint(Gfx::Canvas &g, Math::Recti r) override {
         child().paint(g, r);
-        if (debugShowLayoutBounds) {
-            g.plot(child().bound(), Gfx::LIME);
-        }
     }
 
     void layout(Math::Recti rect) override {
@@ -347,8 +337,6 @@ struct AspectRatio : public ProxyNode<AspectRatio> {
 
     void paint(Gfx::Canvas &g, Math::Recti r) override {
         child().paint(g, r);
-        if (debugShowLayoutBounds)
-            g.plot(child().bound(), Gfx::INDIGO);
     }
 
     Math::Vec2i size(Math::Vec2i s, Hint) override {

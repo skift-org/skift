@@ -310,8 +310,6 @@ struct Input : public View<Input> {
         text.paint(g);
 
         g.pop();
-        if (debugShowLayoutBounds)
-            g.plot(bound(), Gfx::CYAN);
     }
 
     void event(App::Event &e) override {
@@ -391,8 +389,6 @@ struct SimpleInput : public View<SimpleInput> {
         text.paint(g);
 
         g.pop();
-        if (debugShowLayoutBounds)
-            g.plot(bound(), Gfx::CYAN);
     }
 
     void event(App::Event &e) override {

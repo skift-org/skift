@@ -19,13 +19,6 @@ enum struct Hint {
     MAX,
 };
 
-extern bool debugShowLayoutBounds;
-extern bool debugShowRepaintBounds;
-extern bool debugShowEmptyBounds;
-extern bool debugShowScrollBounds;
-extern bool debugShowPerfGraph;
-extern int debugNodeCount;
-
 struct Node;
 
 using Child = Strong<Node>;
@@ -50,14 +43,6 @@ struct Node : public App::Dispatch {
     struct AnimateEvent {
         f64 dt;
     };
-
-    Node() {
-        debugNodeCount++;
-    }
-
-    virtual ~Node() {
-        debugNodeCount--;
-    }
 
     Key key() const {
         return _key;

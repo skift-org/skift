@@ -238,8 +238,6 @@ struct Text : public View<Text> {
         g.origin(bound().xy.cast<f64>());
         _prose->paint(g);
         g.pop();
-        if (debugShowLayoutBounds)
-            g.plot(bound(), Gfx::CYAN);
     }
 
     void layout(Math::Recti bound) override {
@@ -284,8 +282,6 @@ struct Icon : public View<Icon> {
         if (_color)
             g.fillStyle(_color.unwrap());
         _icon.fill(g, bound().topStart());
-        if (debugShowLayoutBounds)
-            g.plot(bound(), Gfx::CYAN);
         g.pop();
     }
 
@@ -320,9 +316,6 @@ struct Image : public View<Image> {
         } else {
             g.blit(bound(), _image);
         }
-
-        if (debugShowLayoutBounds)
-            g.plot(bound(), Gfx::CYAN);
 
         g.pop();
     }

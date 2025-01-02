@@ -55,13 +55,7 @@ struct Scroll : public ProxyNode<Scroll> {
         r.xy = r.xy - _scroll.cast<isize>();
         child().paint(g, r);
 
-        if (debugShowScrollBounds)
-            g.plot(child().bound(), Gfx::PINK);
-
         g.pop();
-
-        if (debugShowScrollBounds)
-            g.plot(_bound, Gfx::CYAN);
 
         // draw scroll bar
         g.push();

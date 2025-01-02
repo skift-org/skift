@@ -12,6 +12,7 @@
     },
     "requires": [
         "hideo-shell",
+        "karm-rpc",
         "karm-sys"
     ]
 }

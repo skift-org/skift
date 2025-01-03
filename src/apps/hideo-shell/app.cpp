@@ -1,6 +1,5 @@
 #include <hideo-keyboard/views.h>
 #include <karm-app/host.h>
-#include <karm-kira/scaffold.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/drag.h>
 #include <karm-ui/input.h>
@@ -149,12 +148,10 @@ Ui::Child tabletPanels(State const &state) {
 }
 
 Ui::Child appHost(State const &state) {
-    if (state.instances.len() == 0)
+    if (isEmpty(state.instances))
         return Ui::grow(NONE);
 
-    auto surface = state.instances[0];
-    return Ui::empty() |
-           Ui::box({.backgroundFill = surface->color});
+    return first(state.instances)->build();
 }
 
 Ui::Child tablet(State const &state) {
@@ -172,33 +169,25 @@ Ui::Child tablet(State const &state) {
 
 Ui::Child appStack(State const &state) {
     Ui::Children apps;
-    usize index = state.instances.len() - 1;
-    for (auto &s : iterRev(state.instances)) {
+    usize zindex = state.instances.len() - 1;
+    for (auto &i : iterRev(state.instances)) {
         apps.pushBack(
-            Kr::scaffold({
-                .icon = s->manifest->icon,
-                .title = s->manifest->name,
-                .body = slot$(Ui::empty()),
-            }) |
+            i->build() |
             Ui::box({
-                .borderRadii = 6,
-                .borderWidth = 1,
-                .borderFill = Ui::GRAY800,
-                .backgroundFill = Ui::GRAY900,
-                .shadowStyle = Gfx::BoxShadow::elevated(index ? 4 : 16),
+                .shadowStyle = Gfx::BoxShadow::elevated(zindex ? 4 : 16),
             }) |
-            Ui::placed(s->bound) |
+            Ui::placed(i->bound) |
             Ui::intent([=](Ui::Node &n, App::Event &e) {
                 if (auto m = e.is<Ui::DragEvent>()) {
                     e.accept();
-                    Model::bubble<MoveInstance>(n, {index, m->delta});
+                    Model::bubble<MoveInstance>(n, {zindex, m->delta});
                 } else if (auto c = e.is<App::RequestExitEvent>()) {
                     e.accept();
-                    Model::bubble<CloseInstance>(n, {index});
+                    Model::bubble<CloseInstance>(n, {zindex});
                 }
             })
         );
-        index--;
+        zindex--;
     }
 
     return Ui::stack(apps);

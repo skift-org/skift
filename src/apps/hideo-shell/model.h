@@ -1,19 +1,52 @@
 #pragma once
 
+#include <karm-app/form-factor.h>
+#include <karm-gfx/icon.h>
 #include <karm-image/picture.h>
 #include <karm-ui/reducer.h>
-
-#include "instance.h"
+#include <mdi/application.h>
 
 namespace Hideo::Shell {
+
+struct State;
+struct Launcher;
+
+// MARK: Notification ----------------------------------------------------------
 
 struct Noti {
     usize id;
     String title;
     String body;
     Vec<String> actions{};
-    Strong<Manifest> manifest;
 };
+
+// MARK: Manifest & Instance ---------------------------------------------------
+
+struct Launcher {
+    Mdi::Icon icon = Mdi::APPLICATION;
+    String name;
+    Gfx::ColorRamp ramp;
+
+    Launcher(Mdi::Icon icon, String name, Gfx::ColorRamp ramp)
+        : icon(icon), name(name), ramp(ramp) {}
+
+    virtual ~Launcher() = default;
+
+    virtual void launch(State &) = 0;
+};
+
+struct Instance {
+    usize id;
+    Math::Recti bound = {100, 100, 600, 400};
+
+    Instance() = default;
+
+    virtual ~Instance() = default;
+
+    virtual Ui::Child build() const = 0;
+};
+
+// MARK: Model -----------------------------------------------------------------
 
 enum struct Panel {
     NIL,
@@ -36,7 +69,7 @@ struct State : Meta::NoCopy {
 
     Image::Picture background;
     Vec<Noti> noti;
-    Vec<Strong<Manifest>> manifests;
+    Vec<Strong<Launcher>> launchers;
     Vec<Strong<Instance>> instances;
 };
 

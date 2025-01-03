@@ -27,7 +27,7 @@ Ui::Child appIcon(Mdi::Icon const &icon, Gfx::ColorRamp ramp, isize size = 22) {
            });
 }
 
-Ui::Child appRow(Manifest const &manifest, usize i) {
+Ui::Child appRow(Launcher const &manifest, usize i) {
     return Ui::ButtonStyle::subtle(),
            Ui::hflow(
                12,
@@ -41,7 +41,7 @@ Ui::Child appRow(Manifest const &manifest, usize i) {
 
 Ui::Child appsList(State const &state) {
     return Ui::vflow(
-        iter(state.manifests)
+        iter(state.launchers)
             .mapi([](auto &man, usize i) {
                 return appRow(*man, i);
             })
@@ -49,7 +49,7 @@ Ui::Child appsList(State const &state) {
     );
 }
 
-Ui::Child appTile(Manifest const &manifest, usize i) {
+Ui::Child appTile(Launcher const &manifest, usize i) {
     return Ui::vflow(
                26,
                appIcon(manifest.icon, manifest.ramp, 26),
@@ -64,7 +64,7 @@ Ui::Child appTile(Manifest const &manifest, usize i) {
 Ui::Child appsGrid(State const &state) {
     return Ui::grid(
         Ui::GridStyle::simpleFixed({8, 64}, {4, 64}),
-        iter(state.manifests)
+        iter(state.launchers)
             .mapi([](auto &man, usize i) {
                 return appTile(*man, i);
             })

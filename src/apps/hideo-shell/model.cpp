@@ -29,15 +29,7 @@ Ui::Task<Action> reduce(State &s, Action a) {
             s.noti.removeAt(dismis.index);
         },
         [&](StartInstance start) {
-            auto instance = makeStrong<Instance>(
-                0,
-                Math::Recti{100, 100, 600, 400},
-                Gfx::randomColor(),
-                s.manifests[start.index]
-            );
-
-            s.activePanel = Panel::NIL;
-            s.instances.emplaceFront(instance);
+            s.launchers[start.index]->launch(s);
         },
         [&](MoveInstance move) {
             s.activePanel = Panel::NIL;

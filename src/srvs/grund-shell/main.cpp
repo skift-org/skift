@@ -1,4 +1,5 @@
 #include <hideo-shell/app.h>
+#include <hideo-shell/mock.h>
 #include <karm-app/host.h>
 #include <karm-gfx/cpu/canvas.h>
 #include <karm-image/loader.h>
@@ -112,8 +113,8 @@ Async::Task<> servAsync(Sys::Context &ctx) {
         .dateTime = Sys::dateTime(),
         .background = co_try$(Image::loadOrFallback("bundle://hideo-shell/wallpapers/winter.qoi"_url)),
         .noti = {},
-        .manifests = {
-            makeStrong<Hideo::Shell::Manifest>(Mdi::CALCULATOR, "hideo-calculator.main"s, Gfx::ORANGE_RAMP),
+        .launchers = {
+            makeStrong<Hideo::Shell::MockLauncher>(Mdi::CALCULATOR, "hideo-calculator.main"s, Gfx::ORANGE_RAMP),
         },
         .instances = {}
     };

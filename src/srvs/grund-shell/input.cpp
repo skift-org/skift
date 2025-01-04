@@ -22,7 +22,11 @@ struct InputTranslator : public Ui::ProxyNode<InputTranslator> {
     }
 
     Math::Recti _cursorDamage() const {
-        return _cursor().bound().grow(1).cast<isize>();
+        if (false) {
+            return _cursor().bound().grow(1).cast<isize>();
+        } else {
+            return _cursor().bound().grow(16).cast<isize>();
+        }
     }
 
     void event(App::Event &e) override {
@@ -78,12 +82,30 @@ struct InputTranslator : public Ui::ProxyNode<InputTranslator> {
         child().paint(g, r);
 
         if (_cursorDamage().colide(r)) {
-            g.push();
-            g.beginPath();
-            g.fillStyle(Gfx::WHITE.withOpacity(0.25));
-            g.ellipse(_cursor());
-            g.fill(Gfx::FillRule::EVENODD);
-            g.pop();
+            if (false) {
+                g.push();
+                g.beginPath();
+                g.fillStyle(Gfx::WHITE.withOpacity(0.25));
+                g.ellipse(_cursor());
+                g.fill(Gfx::FillRule::EVENODD);
+                g.pop();
+            } else {
+                g.push();
+                g.translate(_mousePos.cast<f64>());
+                g.beginPath();
+                g.path(Math::Path::fromSvg(
+#include "hideo-shell/cursor.path"
+                ));
+                g.fillStyle(Gfx::BLACK);
+                g.fill(Gfx::FillRule::EVENODD);
+                g.stroke(Gfx::Stroke{
+                    .fill = Gfx::WHITE,
+                    .width = 1,
+                    .align = Gfx::INSIDE_ALIGN,
+                    .join = Gfx::MITER_JOIN,
+                });
+                g.pop();
+            }
         }
     }
 };

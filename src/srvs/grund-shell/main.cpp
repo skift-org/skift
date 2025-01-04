@@ -10,6 +10,7 @@
 #include <mdi/calculator.h>
 
 #include "../grund-bus/api.h"
+#include "api.h"
 #include "framebuffer.h"
 #include "input.h"
 
@@ -107,6 +108,25 @@ struct Root : public Ui::ProxyNode<Root> {
     }
 };
 
+struct ServiceInstance : public Hideo::Shell::Instance {
+    Ui::Child build() const override {
+        return Ui::empty() | Ui::box({
+                                 .backgroundFill = Ui::GRAY950,
+                             });
+    }
+};
+
+struct ServiceLauncher : public Hideo::Shell::Launcher {
+    String componentId;
+
+    ServiceLauncher(Mdi::Icon icon, String name, Gfx::ColorRamp ramp, String serviceId)
+        : Launcher(icon, name, ramp), componentId(serviceId) {}
+
+    void launch(Hideo::Shell::State &) override {
+        Rpc::globalEndpoint().send<Bus::Api::Start>(Rpc::Port::BUS, componentId).unwrap();
+    }
+};
+
 Async::Task<> servAsync(Sys::Context &ctx) {
     Hideo::Shell::State state = {
         .isMobile = false,
@@ -114,7 +134,8 @@ Async::Task<> servAsync(Sys::Context &ctx) {
         .background = co_try$(Image::loadOrFallback("bundle://hideo-shell/wallpapers/winter.qoi"_url)),
         .noti = {},
         .launchers = {
-            makeStrong<Hideo::Shell::MockLauncher>(Mdi::CALCULATOR, "hideo-calculator.main"s, Gfx::ORANGE_RAMP),
+            makeStrong<Hideo::Shell::MockLauncher>(Mdi::CALCULATOR, "Calculator (Mocked)"s, Gfx::ORANGE_RAMP),
+            makeStrong<Grund::Shell::ServiceLauncher>(Mdi::CALCULATOR, "Calculator (Real)"s, Gfx::ORANGE_RAMP, "hideo-calculator.main"s),
         },
         .instances = {}
     };
@@ -139,6 +160,13 @@ Async::Task<> servAsync(Sys::Context &ctx) {
             root->child().event(*event);
         } else if (msg.is<App::KeyboardEvent>()) {
             auto event = msg.unpack<App::MouseEvent>();
+        } else if (msg.is<Api::CreateInstance>()) {
+            auto call = msg.unpack<Api::CreateInstance>().unwrap();
+            logDebug("create instance {}", call.size);
+            auto instance = makeStrong<ServiceInstance>();
+            instance->bound = {100, call.size};
+            Hideo::Shell::Model::event(*root, Hideo::Shell::AddInstance{instance});
+            (void)msg.packResp<Api::CreateInstance>(0uz);
         } else {
             logWarn("unsupported event: {}", msg.header());
         }

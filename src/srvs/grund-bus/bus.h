@@ -85,7 +85,9 @@ struct Bus : public Meta::Pinned {
 
     Res<> dispatch(Rpc::Message &msg);
 
-    Res<> startService(Str id);
+    Res<> prepareService(Str id);
+
+    Res<> prepareActivateService(Str id);
 };
 
 } // namespace Grund::Bus

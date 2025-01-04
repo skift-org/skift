@@ -16,16 +16,16 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto system = co_try$(Bus::create(ctx));
 
     co_try$(system->attach(makeStrong<System>()));
-    co_try$(system->startService("grund-av"s));
-    co_try$(system->startService("grund-conf"s));
-    co_try$(system->startService("grund-device"s));
-    co_try$(system->startService("grund-dhcp"s));
-    co_try$(system->startService("grund-dns"s));
-    co_try$(system->startService("grund-echo"s));
-    co_try$(system->startService("grund-fs"s));
-    co_try$(system->startService("grund-net"s));
-    co_try$(system->startService("grund-seat"s));
-    co_try$(system->startService("grund-shell"s));
+    co_try$(system->prepareService("grund-av"s));
+    co_try$(system->prepareService("grund-conf"s));
+    co_try$(system->prepareService("grund-device"s));
+    co_try$(system->prepareService("grund-dhcp"s));
+    co_try$(system->prepareService("grund-dns"s));
+    co_try$(system->prepareService("grund-echo"s));
+    co_try$(system->prepareService("grund-fs"s));
+    co_try$(system->prepareService("grund-net"s));
+    co_try$(system->prepareService("grund-seat"s));
+    co_try$(system->prepareService("grund-shell"s));
 
     for (auto &endpoint : system->_endpoints)
         co_try$(endpoint->activate(ctx));

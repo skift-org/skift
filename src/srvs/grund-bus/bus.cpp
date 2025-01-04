@@ -41,8 +41,10 @@ Res<> Service::activate(Sys::Context &ctx) {
     auto &handover = useHandover(ctx);
     auto urlStr = try$(Io::format("bundle://{}/_bin", _id));
     auto *elf = handover.fileByName(urlStr.buf());
-    if (not elf)
+    if (not elf) {
+        logError("service not found: '{}'", _id);
         return Error::invalidFilename("service not found");
+    }
 
     logInfoIf(DEBUG_ELF, "mapping elf...");
     auto elfVmo = try$(Hj::Vmo::create(Hj::ROOT, elf->start, elf->size, Hj::VmoFlags::DMA));
@@ -141,7 +143,7 @@ bool Service::accept(Rpc::Message const &msg) {
     return contains(_listen, msg.header().mid);
 }
 
-// MARK: Locator ---------------------------------------------------------------
+// MARK: System ----------------------------------------------------------------
 
 System::System() {
     _port = Rpc::Port::BUS;
@@ -165,7 +167,8 @@ Res<> System::send(Rpc::Message &msg) {
         return Error::notFound("service not found");
     } else if (msg.is<Api::Start>()) {
         auto start = try$(msg.unpack<Api::Start>());
-        return _bus->startService(start.id);
+        logDebug("starting service '{}'", start.id);
+        return _bus->prepareActivateService(start.id);
     }
 
     return Ok();
@@ -173,18 +176,25 @@ Res<> System::send(Rpc::Message &msg) {
 
 // MARK: Bus -------------------------------------------------------------------
 
-Karm::Res<Strong<Bus>> Bus::create(Sys::Context &ctx) {
+Res<Strong<Bus>> Bus::create(Sys::Context &ctx) {
     return Ok(makeStrong<Bus>(ctx));
 }
 
-Karm::Res<> Bus::startService(Str id) {
+Res<> Bus::prepareService(Str id) {
     auto service = try$(Service::prepare(_context, id));
     try$(attach(service));
     Async::detach(service->runAsync());
     return Ok();
 }
 
-Karm::Res<> Bus::attach(Strong<Endpoint> endpoint) {
+Res<> Bus::prepareActivateService(Str id) {
+    auto service = try$(Service::prepare(_context, id));
+    try$(attach(service));
+    Async::detach(service->runAsync());
+    return service->activate(_context);
+}
+
+Res<> Bus::attach(Strong<Endpoint> endpoint) {
     endpoint->attach(*this);
     _endpoints.pushBack(endpoint);
     return Ok();

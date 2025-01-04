@@ -65,4 +65,8 @@ Res<Strong<Host>> makeHost(Child root) {
     return Ok(makeStrong<EfiHost>(root, stip, front, back));
 }
 
+Async::Task<> runAsync(Sys::Context&,Child) {
+    notImplemented();
+}
+
 } // namespace Karm::Ui::_Embed

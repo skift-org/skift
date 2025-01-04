@@ -11,6 +11,7 @@
         ]
     },
     "requires": [
+        "grund-base",
         "hideo-shell",
         "karm-rpc",
         "karm-sys"

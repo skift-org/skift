@@ -646,4 +646,8 @@ Res<Strong<Host>> makeHost(Child root) {
     return Ok(host);
 }
 
+Async::Task<> runAsync(Sys::Context &, Child) {
+    notImplemented();
+}
+
 } // namespace Karm::Ui::_Embed

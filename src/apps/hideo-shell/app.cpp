@@ -174,6 +174,9 @@ Ui::Child appStack(State const &state) {
         apps.pushBack(
             i->build() |
             Ui::box({
+                .borderRadii = 6,
+                .borderWidth = 1,
+                .borderFill = Ui::GRAY800,
                 .shadowStyle = Gfx::BoxShadow::elevated(zindex ? 4 : 16),
             }) |
             Ui::placed(i->bound) |

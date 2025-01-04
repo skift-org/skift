@@ -11,7 +11,6 @@ void MockLauncher::launch(State &s) {
         name,
         ramp
     );
-    s.activePanel = Panel::NIL;
     s.instances.emplaceFront(instance);
 }
 

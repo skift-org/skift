@@ -15,6 +15,10 @@ Res<> runApp(Sys::Context &, Child root) {
     return try$(_Embed::makeHost(root))->run();
 }
 
+Async::Task<> runAsync(Sys::Context &ctx, Child root) {
+    return _Embed::runAsync(ctx, root);
+}
+
 void mountApp(Cli::Command &cmd, Slot rootSlot) {
     Cli::Flag mobileArg = Cli::flag(NONE, "mobile"s, "Show mobile layout."s);
 

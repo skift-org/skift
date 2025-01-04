@@ -18,7 +18,6 @@
         "karm-logger-impl",
         "karm-sys-impl",
         "karm-pkg-impl",
-        "karm-sys-async-impl",
-        "karm-ui-impl"
+        "karm-sys-async-impl"
     ]
 }

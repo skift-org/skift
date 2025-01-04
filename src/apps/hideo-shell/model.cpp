@@ -30,6 +30,10 @@ Ui::Task<Action> reduce(State &s, Action a) {
         },
         [&](StartInstance start) {
             s.launchers[start.index]->launch(s);
+            s.activePanel = Panel::NIL;
+        },
+        [&](AddInstance add) {
+            s.instances.pushBack(add.instance);
         },
         [&](MoveInstance move) {
             s.activePanel = Panel::NIL;

@@ -9,6 +9,7 @@
         ]
     },
     "requires": [
+        "grund-base",
         "karm-rpc",
         "karm-sys"
     ]

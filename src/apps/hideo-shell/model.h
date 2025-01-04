@@ -97,6 +97,10 @@ struct StartInstance {
     usize index;
 };
 
+struct AddInstance {
+    Strong<Instance> instance;
+};
+
 struct MoveInstance {
     usize index;
     Math::Vec2i off;
@@ -129,6 +133,7 @@ using Action = Union<
     Unlock,
     DimisNoti,
     StartInstance,
+    AddInstance,
     MoveInstance,
     CloseInstance,
     FocusInstance,

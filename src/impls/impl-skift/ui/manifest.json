@@ -1,16 +1,19 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "grund-net",
-    "type": "exe",
-    "description": "Skift's networking stack",
+    "id": "impl-skift.ui",
+    "type": "lib",
+    "props": {
+        "cpp-excluded": true
+    },
     "enableIf": {
         "sys": [
             "skift"
         ]
     },
     "requires": [
-        "grund-base",
-        "karm-rpc",
-        "karm-sys"
+        "karm-rpc"
+    ],
+    "provides": [
+        "karm-ui-impl"
     ]
 }

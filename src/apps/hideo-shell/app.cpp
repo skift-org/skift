@@ -252,6 +252,11 @@ Ui::Child app(State state) {
                 content = Ui::foregroundFilter(Gfx::SepiaFilter{0.7}, content);
             }
 
+            content = Ui::foregroundFilter(
+                Gfx::BrightnessFilter{state.brightness},
+                content
+            );
+
             return content;
         }
     );

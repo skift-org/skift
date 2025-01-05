@@ -59,7 +59,7 @@ struct State : Meta::NoCopy {
     bool locked = true;
     bool isMobile = true;
     bool nightLight = false;
-    f64 brightness = 0.75;
+    f64 brightness = 1;
     f64 volume = 0.5;
     Panel activePanel = Panel::NIL;
     bool isSysPanelColapsed = true;

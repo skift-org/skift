@@ -5,35 +5,84 @@
 
 namespace Grund::Shell {
 
-struct InputTranslator : public Ui::ProxyNode<InputTranslator> {
-    App::MouseEvent _mousePrev = {};
-    Math::Vec2i _mousePos = {};
-    bool _mouseDirty = false;
+struct Cursor {
+    virtual ~Cursor() = default;
 
-    InputTranslator(Ui::Child child)
-        : Ui::ProxyNode<InputTranslator>(std::move(child)) {
-    }
+    virtual Math::Recti bound(Math::Vec2i pos) const = 0;
 
-    Math::Ellipsef _cursor() const {
+    virtual void paint(Math::Vec2i pos, Gfx::Canvas &g) const = 0;
+};
+
+struct BlobCursor : public Cursor {
+    Gfx::Color _fill = Gfx::WHITE;
+    f64 _opacity = 0.25;
+
+    Math::Ellipsef _blob(Math::Vec2i pos) const {
         return {
-            _mousePos.cast<f64>(),
+            pos.cast<f64>(),
             {16, 16},
         };
     }
 
-    Math::Recti _cursorDamage() const {
-        if (false) {
-            return _cursor().bound().grow(1).cast<isize>();
-        } else {
-            return _cursor().bound().grow(16).cast<isize>();
-        }
+    Math::Recti bound(Math::Vec2i pos) const override {
+        return _blob(pos).bound().grow(1).cast<isize>();
     }
+
+    void paint(Math::Vec2i pos, Gfx::Canvas &g) const override {
+        g.push();
+        g.beginPath();
+        g.fillStyle(_fill.withOpacity(_opacity));
+        g.ellipse(_blob(pos));
+        g.fill(Gfx::FillRule::EVENODD);
+        g.pop();
+    }
+};
+
+struct ClassicCursor : public Cursor {
+    Gfx::Color _fill = Gfx::BLACK;
+    Gfx::Color _stroke = Gfx::WHITE;
+    Math::Path _path = Math::Path::fromSvg(
+#include "hideo-shell/cursor.path"
+    );
+
+    Math::Recti bound(Math::Vec2i pos) const override {
+        return Math::Recti{
+            pos,
+            {16, 26},
+        }
+            .grow(1);
+    }
+
+    void paint(Math::Vec2i pos, Gfx::Canvas &g) const override {
+        g.push();
+        g.translate(pos.cast<f64>());
+        g.beginPath();
+        g.path(_path);
+        g.fill(_fill);
+        g.stroke({
+            .fill = _stroke,
+            .width = 1,
+            .align = Gfx::OUTSIDE_ALIGN,
+            .join = Gfx::MITER_JOIN,
+        });
+        g.pop();
+    }
+};
+
+struct InputTranslator : public Ui::ProxyNode<InputTranslator> {
+    App::MouseEvent _mousePrev = {};
+    Math::Vec2i _mousePos = {};
+    bool _mouseDirty = false;
+    Box<Cursor> _cursor;
+
+    InputTranslator(Ui::Child child, Box<Cursor> cursor)
+        : Ui::ProxyNode<InputTranslator>(std::move(child)), _cursor(std::move(cursor)) {}
 
     void event(App::Event &e) override {
         if (auto m = e.is<App::MouseEvent>()) {
             if (not _mouseDirty) {
                 _mouseDirty = true;
-                Ui::shouldRepaint(*this, _cursorDamage());
+                Ui::shouldRepaint(*this, _cursor->bound(_mousePos));
                 Ui::shouldAnimate(*this);
             }
 
@@ -71,7 +120,7 @@ struct InputTranslator : public Ui::ProxyNode<InputTranslator> {
         } else if (auto k = e.is<Node::AnimateEvent>()) {
             if (_mouseDirty) {
                 _mouseDirty = false;
-                Ui::shouldRepaint(*this, _cursorDamage());
+                Ui::shouldRepaint(*this, _cursor->bound(_mousePos));
             }
         }
 
@@ -81,37 +130,14 @@ struct InputTranslator : public Ui::ProxyNode<InputTranslator> {
     void paint(Gfx::Canvas &g, Math::Recti r) override {
         child().paint(g, r);
 
-        if (_cursorDamage().colide(r)) {
-            if (false) {
-                g.push();
-                g.beginPath();
-                g.fillStyle(Gfx::WHITE.withOpacity(0.25));
-                g.ellipse(_cursor());
-                g.fill(Gfx::FillRule::EVENODD);
-                g.pop();
-            } else {
-                g.push();
-                g.translate(_mousePos.cast<f64>());
-                g.beginPath();
-                g.path(Math::Path::fromSvg(
-#include "hideo-shell/cursor.path"
-                ));
-                g.fillStyle(Gfx::BLACK);
-                g.fill(Gfx::FillRule::EVENODD);
-                g.stroke(Gfx::Stroke{
-                    .fill = Gfx::WHITE,
-                    .width = 1,
-                    .align = Gfx::INSIDE_ALIGN,
-                    .join = Gfx::MITER_JOIN,
-                });
-                g.pop();
-            }
+        if (_cursor->bound(_mousePos).colide(r)) {
+            _cursor->paint(_mousePos, g);
         }
     }
 };
 
 Ui::Child inputTranslator(Ui::Child child) {
-    return makeStrong<InputTranslator>(std::move(child));
+    return makeStrong<InputTranslator>(std::move(child), makeBox<ClassicCursor>());
 }
 
 } // namespace Grund::Shell

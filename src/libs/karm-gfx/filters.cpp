@@ -157,6 +157,9 @@ void ContrastFilter::apply(MutPixels p) const {
 }
 
 void BrightnessFilter::apply(MutPixels p) const {
+    if (Math::epsilonEq(amount, 1.0))
+        return;
+
     auto b = p.bound();
 
     for (isize y = 0; y < b.height; y++) {
@@ -193,6 +196,9 @@ void NoiseFilter::apply(MutPixels p) const {
 }
 
 void SepiaFilter::apply(MutPixels p) const {
+    if (Math::epsilonEq(amount, 0.0))
+        return;
+
     auto b = p.bound();
 
     for (isize y = 0; y < b.height; y++) {

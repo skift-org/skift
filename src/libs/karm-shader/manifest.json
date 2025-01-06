@@ -1,11 +1,9 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "karm-gpu",
+    "id": "karm-shader",
     "type": "lib",
-    "description": "GPU acceleration",
+    "description": "Shader language & compiler",
     "requires": [
-        "karm-io",
-        "karm-math",
-        "karm-shader"
+        "karm-jit"
     ]
 }

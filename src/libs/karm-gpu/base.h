@@ -6,7 +6,7 @@
 namespace Karm::Gpu {
 
 struct Device {
-    static Res<Strong<Device>> open();
+    static Res<Rc<Device>> open();
 
     virtual ~Device() = default;
 };

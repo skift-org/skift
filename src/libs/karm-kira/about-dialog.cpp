@@ -33,14 +33,14 @@ Ui::Child aboutDialog(String name) {
         dialogHeader({
             Ui::hflow(6, Math::Align::CENTER, dialogTitle(name), versionBadge()),
             dialogDescription(
-                "Copyright © 2018-2024 The skiftOS Developers\n"
-                "Copyright © 2024 Odoo S.A.\n"
+                "Copyright © 2018-2025 The skiftOS Developers\n"
+                "Copyright © 2024-2025 Odoo S.A.\n"
                 "\n"
                 "All rights reserved."s
             ),
         }),
         dialogFooter({
-            button([](auto &n) {
+            button([](auto& n) {
                 showDialog(n, licenseDialog());
             },
                    Ui::ButtonStyle::regular(), "License"),

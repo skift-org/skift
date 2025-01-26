@@ -2,14 +2,14 @@
 
 namespace Karm::Json {
 
-Res<> stringify(Io::Emit &emit, Value const &v) {
+Res<> stringify(Io::Emit& emit, Value const& v) {
     return v.visit(
         Visitor{
             [&](None) -> Res<> {
                 emit("null");
                 return Ok();
             },
-            [&](Vec<Value> const &v) -> Res<> {
+            [&](Vec<Value> const& v) -> Res<> {
                 emit('[');
                 for (usize i = 0; i < v.len(); ++i) {
                     if (i > 0) {
@@ -21,24 +21,24 @@ Res<> stringify(Io::Emit &emit, Value const &v) {
 
                 return Ok();
             },
-            [&](Map<String, Value> const &m) -> Res<> {
+            [&](Map<String, Value> const& m) -> Res<> {
                 emit('{');
                 bool first = true;
-                for (auto const &kv : m.iter()) {
+                for (auto const& kv : m.iter()) {
                     if (not first) {
                         emit(',');
                     }
                     first = false;
 
                     emit('"');
-                    emit(kv.car);
+                    emit(kv.v0);
                     emit("\":");
-                    try$(stringify(emit, kv.cdr));
+                    try$(stringify(emit, kv.v1));
                 }
                 emit('}');
                 return Ok();
             },
-            [&](String const &s) -> Res<> {
+            [&](String const& s) -> Res<> {
                 emit('"');
                 for (auto c : iterRunes(s)) {
                     if (c == '"') {
@@ -82,7 +82,7 @@ Res<> stringify(Io::Emit &emit, Value const &v) {
     );
 }
 
-Res<String> stringify(Value const &v) {
+Res<String> stringify(Value const& v) {
     Io::StringWriter sw;
     Io::Emit emit{sw};
     try$(stringify(emit, v));

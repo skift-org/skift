@@ -5,6 +5,6 @@
 
 namespace Vaev::View {
 
-Ui::Child printDialog(Strong<Markup::Document> dom);
+Ui::Child printDialog(Rc<Markup::Document> dom);
 
 } // namespace Vaev::View

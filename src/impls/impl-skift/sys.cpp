@@ -8,13 +8,13 @@
 
 namespace Karm::Sys::_Embed {
 
-Res<Strong<Sys::Fd>> unpackFd(Io::PackScan &s) {
+Res<Rc<Sys::Fd>> unpackFd(Io::PackScan &s) {
     return Skift::unpackFd(s);
 }
 
 // MARK: File I/O --------------------------------------------------------------
 
-Res<Strong<Sys::Fd>> openFile(Mime::Url const &url) {
+Res<Rc<Sys::Fd>> openFile(Mime::Url const &url) {
     auto urlStr = url.str();
     auto *fileRecord = useHandover().fileByName(urlStr.buf());
     if (not fileRecord)
@@ -22,31 +22,31 @@ Res<Strong<Sys::Fd>> openFile(Mime::Url const &url) {
     auto vmo = try$(Hj::Vmo::create(Hj::ROOT, fileRecord->start, fileRecord->size, Hj::VmoFlags::DMA));
     try$(vmo.label(urlStr));
 
-    return Ok(makeStrong<Skift::VmoFd>(std::move(vmo)));
+    return Ok(makeRc<Skift::VmoFd>(std::move(vmo)));
 }
 
-Res<Strong<Sys::Fd>> createFile(Mime::Url const &) {
+Res<Rc<Sys::Fd>> createFile(Mime::Url const &) {
     notImplemented();
 }
 
-Res<Strong<Sys::Fd>> openOrCreateFile(Mime::Url const &) {
+Res<Rc<Sys::Fd>> openOrCreateFile(Mime::Url const &) {
     notImplemented();
 }
 
-Res<Cons<Strong<Sys::Fd>, Strong<Sys::Fd>>> createPipe() {
+Res<Pair<Rc<Sys::Fd>, Rc<Sys::Fd>>> createPipe() {
     notImplemented();
 }
 
-Res<Strong<Sys::Fd>> createIn() {
-    return Ok(makeStrong<Sys::NullFd>());
+Res<Rc<Sys::Fd>> createIn() {
+    return Ok(makeRc<Sys::NullFd>());
 }
 
-Res<Strong<Sys::Fd>> createOut() {
-    return Ok(makeStrong<Sys::NullFd>());
+Res<Rc<Sys::Fd>> createOut() {
+    return Ok(makeRc<Sys::NullFd>());
 }
 
-Res<Strong<Sys::Fd>> createErr() {
-    return Ok(makeStrong<Sys::NullFd>());
+Res<Rc<Sys::Fd>> createErr() {
+    return Ok(makeRc<Sys::NullFd>());
 }
 
 Res<Vec<Sys::DirEntry>> readDir(Mime::Url const &) {
@@ -69,29 +69,35 @@ Async::Task<> launchAsync(Intent) {
 
 // MARK: Sockets ---------------------------------------------------------------
 
-Res<Strong<Sys::Fd>> connectTcp(SocketAddr) {
+Res<Rc<Sys::Fd>> connectTcp(SocketAddr) {
     notImplemented();
 }
 
-Res<Strong<Sys::Fd>> listenTcp(SocketAddr) {
+Res<Rc<Sys::Fd>> listenTcp(SocketAddr) {
     notImplemented();
 }
 
-Res<Strong<Sys::Fd>> listenUdp(SocketAddr) {
+Res<Rc<Sys::Fd>> listenUdp(SocketAddr) {
     notImplemented();
 }
 
-Res<Strong<Sys::Fd>> listenIpc(Mime::Url) {
+Res<Rc<Sys::Fd>> listenIpc(Mime::Url) {
     notImplemented();
 }
 
 // MARK: Time ------------------------------------------------------------------
 
-TimeStamp now() {
+SystemTime now() {
+    // TODO
+    return SystemTime::epoch();
+}
+
+Instant instant() {
+    // TODO
     return Hj::now().unwrap();
 }
 
-TimeSpan uptime() {
+Duration uptime() {
     notImplemented();
 }
 
@@ -101,7 +107,7 @@ Res<Sys::MmapResult> memMap(Sys::MmapOptions const &) {
     notImplemented();
 }
 
-Res<Sys::MmapResult> memMap(Sys::MmapOptions const &, Strong<Sys::Fd> fd) {
+Res<Sys::MmapResult> memMap(Sys::MmapOptions const &, Rc<Sys::Fd> fd) {
     auto vmoFd = fd.is<Skift::VmoFd>();
     if (not vmoFd)
         return Error::invalidInput("expected VmoFd");
@@ -148,11 +154,11 @@ Res<> populate(Vec<Sys::UserInfo> &) {
 
 // MARK: Process Managment -----------------------------------------------------
 
-Res<> sleep(TimeSpan span) {
-    return sleepUntil(now() + span);
+Res<> sleep(Duration span) {
+    return sleepUntil(instant() + span);
 }
 
-Res<> sleepUntil(TimeStamp until) {
+Res<> sleepUntil(Instant until) {
     // HACK: listerner abuses ahead
     auto listener = try$(Hj::Listener::create(Hj::ROOT));
     try$(listener.poll(until));

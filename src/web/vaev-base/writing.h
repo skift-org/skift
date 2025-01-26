@@ -28,11 +28,11 @@ struct Axis {
         return value == HORIZONTAL ? VERTICAL : HORIZONTAL;
     }
 
-    bool operator==(_Type const &value) const {
+    bool operator==(_Type const& value) const {
         return this->value == value;
     }
 
-    bool operator==(Axis const &other) const = default;
+    bool operator==(Axis const& other) const = default;
 
     int index() const {
         return value == HORIZONTAL ? 0 : 1;

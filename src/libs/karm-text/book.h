@@ -15,7 +15,7 @@ struct FontQuery {
     FontStretch stretch = FontStretch::NORMAL;
     FontStyle style = FontStyle::NORMAL;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e.ln("family: {#}", family);
         e.ln("weight: {}", weight);
         e.ln("stretch: {}", stretch);
@@ -26,7 +26,7 @@ struct FontQuery {
 struct FontInfo {
     Mime::Url url;
     FontAttrs attrs;
-    Strong<Fontface> face;
+    Rc<Fontface> face;
 };
 
 Str commonFamily(Str lhs, Str rhs);
@@ -39,7 +39,7 @@ struct FontBook {
         _faces.pushBack(info);
     }
 
-    Strong<Fontface> load(Mime::Url url, Opt<FontAttrs> attrs = NONE);
+    Rc<Fontface> load(Mime::Url url, Opt<FontAttrs> attrs = NONE);
 
     Res<> loadAll();
 
@@ -47,11 +47,11 @@ struct FontBook {
 
     Str _resolveFamily(Family family) const;
 
-    Opt<Strong<Fontface>> queryExact(FontQuery query) const;
+    Opt<Rc<Fontface>> queryExact(FontQuery query) const;
 
-    Opt<Strong<Fontface>> queryClosest(FontQuery query) const;
+    Opt<Rc<Fontface>> queryClosest(FontQuery query) const;
 
-    Vec<Strong<Fontface>> queryFamily(String family) const;
+    Vec<Rc<Fontface>> queryFamily(String family) const;
 };
 
 } // namespace Karm::Text

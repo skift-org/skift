@@ -15,8 +15,8 @@ namespace Karm::Sys {
 
 struct Fd;
 
-using _Accepted = Cons<Strong<Fd>, SocketAddr>;
-using _Sent = Cons<usize, usize>;
+using _Accepted = Pair<Rc<Fd>, SocketAddr>;
+using _Sent = Pair<usize, usize>;
 using _Received = Tuple<usize, usize, SocketAddr>;
 
 struct Fd : Meta::NoCopy {
@@ -32,7 +32,7 @@ struct Fd : Meta::NoCopy {
 
     virtual Res<usize> flush() = 0;
 
-    virtual Res<Strong<Fd>> dup() = 0;
+    virtual Res<Rc<Fd>> dup() = 0;
 
     virtual Res<_Accepted> accept() = 0;
 
@@ -42,9 +42,9 @@ struct Fd : Meta::NoCopy {
 
     virtual Res<_Received> recv(MutBytes, MutSlice<Handle>) = 0;
 
-    virtual Res<> pack(Io::PackEmit &e) = 0;
+    virtual Res<> pack(Io::PackEmit& e) = 0;
 
-    static Res<Strong<Fd>> unpack(Io::PackScan &s);
+    static Res<Rc<Fd>> unpack(Io::PackScan& s);
 };
 
 struct NullFd : public Fd {
@@ -60,7 +60,7 @@ struct NullFd : public Fd {
 
     Res<usize> flush() override;
 
-    Res<Strong<Fd>> dup() override;
+    Res<Rc<Fd>> dup() override;
 
     Res<_Accepted> accept() override;
 
@@ -70,12 +70,12 @@ struct NullFd : public Fd {
 
     Res<_Received> recv(MutBytes, MutSlice<Handle>) override;
 
-    Res<> pack(Io::PackEmit &e) override;
+    Res<> pack(Io::PackEmit& e) override;
 };
 
 template <typename T>
 concept AsFd = requires(T t) {
-    { t.fd() } -> Meta::Same<Strong<Fd>>;
+    { t.fd() } -> Meta::Same<Rc<Fd>>;
 };
 
 } // namespace Karm::Sys

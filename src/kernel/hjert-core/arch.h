@@ -30,7 +30,7 @@ Io::TextWriter &globalOut();
 
 Res<Box<Core::Context>> createContext(Core::Mode mode, usize ip, usize sp, usize ksp, Hj::Args args);
 
-Res<Strong<Hal::Vmm>> createVmm();
+Res<Arc<Hal::Vmm>> createVmm();
 
 Res<> init(Handover::Payload &);
 

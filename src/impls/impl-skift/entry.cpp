@@ -25,7 +25,7 @@ extern "C" [[gnu::weak]] void __entryPoint(usize rawHandover, usize rawIn, usize
     char const *argv[] = {"service", nullptr};
     ctx.add<Sys::ArgsHook>(1, argv);
     ctx.add<HandoverHook>((Handover::Payload *)rawHandover);
-    auto fd = makeStrong<Skift::IpcFd>(Hj::Cap{rawIn}, Hj::Cap{rawOut});
+    auto fd = makeRc<Skift::IpcFd>(Hj::Cap{rawIn}, Hj::Cap{rawOut});
     ctx.add<ChannelHook>(Sys::IpcConnection{fd, ""_url});
 
     auto res = Sys::run(entryPointAsync(ctx));

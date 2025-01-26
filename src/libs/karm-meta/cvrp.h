@@ -67,7 +67,7 @@ template <typename>
 inline constexpr bool _LvalueRef = false;
 
 template <typename T>
-inline constexpr bool _LvalueRef<T &> = true;
+inline constexpr bool _LvalueRef<T&> = true;
 
 template <typename T>
 concept LvalueRef = _LvalueRef<T>;
@@ -76,7 +76,7 @@ template <typename>
 inline constexpr bool _RvalueRef = false;
 
 template <typename T>
-inline constexpr bool _RvalueRef<T &&> = true;
+inline constexpr bool _RvalueRef<T&&> = true;
 
 template <typename T>
 concept RvalueRef = _RvalueRef<T>;
@@ -90,12 +90,12 @@ struct _RemoveRef {
 };
 
 template <typename T>
-struct _RemoveRef<T &> {
+struct _RemoveRef<T&> {
     using Type = T;
 };
 
 template <typename T>
-struct _RemoveRef<T &&> {
+struct _RemoveRef<T&&> {
     using Type = T;
 };
 
@@ -111,7 +111,7 @@ template <typename>
 inline constexpr bool _Ptr = false;
 
 template <typename T>
-inline constexpr bool _Ptr<T *> = true;
+inline constexpr bool _Ptr<T*> = true;
 
 template <typename T>
 concept Ptr = _Ptr<T>;
@@ -122,7 +122,7 @@ struct _RemovePtr {
 };
 
 template <typename T>
-struct _RemovePtr<T *> {
+struct _RemovePtr<T*> {
     using Type = T;
 };
 

@@ -23,7 +23,7 @@ Async::Task<Sys::Ip> resolve(Str host) {
     co_return Ok(co_try$(dns.resolve(host)));
 }
 
-Async::Task<usize> _fetch(Mime::Url const &url, Sys::_Connection &conn, Io::Writer &out) {
+Async::Task<usize> _fetch(Mime::Url const& url, Sys::_Connection& conn, Io::Writer& out) {
     // Send request
     logDebug("GET {} HTTP/1.1", url.path);
     Io::StringWriter req;
@@ -61,7 +61,7 @@ Async::Task<usize> _fetch(Mime::Url const &url, Sys::_Connection &conn, Io::Writ
     co_return Ok(contentLength);
 }
 
-Async::Task<usize> fetch(Mime::Url const &url, Io::Writer &out) {
+Async::Task<usize> fetch(Mime::Url const& url, Io::Writer& out) {
     auto ip = co_trya$(resolve(url.host));
     auto port = url.port ? *url.port : 80;
     if (port > 65535)
@@ -81,13 +81,13 @@ Async::Task<usize> fetch(Mime::Url const &url, Io::Writer &out) {
     }
 }
 
-Async::Task<String> fetchString(Mime::Url const &url) {
+Async::Task<String> fetchString(Mime::Url const& url) {
     Io::StringWriter out;
     co_trya$(fetch(url, out));
     co_return Ok(out.take());
 }
 
-Async::Task<Json::Value> fetchJson(Mime::Url const &url) {
+Async::Task<Json::Value> fetchJson(Mime::Url const& url) {
     auto str = co_trya$(fetchString(url));
     co_return Ok(co_try$(Json::parse(str)));
 }

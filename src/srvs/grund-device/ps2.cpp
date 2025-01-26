@@ -10,8 +10,8 @@ namespace Grund::Device::Ps2 {
 
 Res<> I8042::init() {
     logInfo("ps2: i8042 initializing...");
-    try$(attach(makeStrong<Keyboard>(*this)));
-    try$(attach(makeStrong<Mouse>(*this)));
+    try$(attach(makeRc<Keyboard>(*this)));
+    try$(attach(makeRc<Mouse>(*this)));
     try$(flush());
     return Ok();
 }

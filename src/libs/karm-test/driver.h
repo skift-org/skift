@@ -10,18 +10,18 @@ namespace Karm::Test {
 struct Test;
 
 struct Driver {
-    Vec<Test *> _tests;
+    Vec<Test*> _tests;
 
-    void add(Test *test);
+    void add(Test* test);
 
     Async::Task<> runAllAsync();
 
-    Res<> unexpect(auto const &lhs, auto const &rhs, Str op, Loc loc = Loc::current()) {
+    Res<> unexpect(auto const& lhs, auto const& rhs, Str op, Loc loc = Loc::current()) {
         logError({"unexpected: {#} {} {#}", loc}, lhs, op, rhs);
         return Error::other("unexpected");
     }
 };
 
-Driver &driver();
+Driver& driver();
 
 } // namespace Karm::Test

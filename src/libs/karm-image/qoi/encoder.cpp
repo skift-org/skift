@@ -5,7 +5,7 @@
 
 namespace Qoi {
 
-Res<> encode(Gfx::Pixels pixels, Io::BEmit &e) {
+Res<> encode(Gfx::Pixels pixels, Io::BEmit& e) {
     e.writeBytes(MAGIC);
     e.writeU32be(pixels.width());
     e.writeU32be(pixels.height());
@@ -66,9 +66,9 @@ Res<> encode(Gfx::Pixels pixels, Io::BEmit &e) {
                 }
 
                 if (
-                    vg_r > -9 && vg_r < 8 &&
-                    vg > -33 && vg < 32 &&
-                    vg_b > -9 && vg_b < 8
+                    vg_r > -9 and vg_r < 8 &&
+                    vg > -33 and vg < 32 &&
+                    vg_b > -9 and vg_b < 8
                 ) {
                     e.writeU8be(Chunk::LUMA | (vg + 32));
                     e.writeU8be((vg_r + 8) << 4 | (vg_b + 8));

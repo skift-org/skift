@@ -8,7 +8,7 @@
 
 // MARK: WASM Implementation ---------------------------------------------------
 
-static Heap *_ensureHeap() {
+static Heap* _ensureHeap() {
     static Bits _heapBase = [] {
         Bits bits(MutBytes{__heap_base, (usize)__heap_end - (usize)__heap_base});
         bits.fill(false);
@@ -16,16 +16,16 @@ static Heap *_ensureHeap() {
     }();
     static Heap _heapImpl = {
         .ctx = nullptr,
-        .alloc = [](void *, usize size) -> void * {
+        .alloc = [](void*, usize size) -> void* {
             size = alignUp(size, PAGE_SIZE);
             auto range = _heapBase.alloc(size / PAGE_SIZE, 0, false);
-            return (void *)(range.unwrap("out-of-memory").start * PAGE_SIZE);
+            return (void*)(range.unwrap("out-of-memory").start * PAGE_SIZE);
         },
-        .free = [](void *, void *ptr, usize size) {
+        .free = [](void*, void* ptr, usize size) {
             size = alignUp(size, PAGE_SIZE);
             _heapBase.set(BitsRange{(usize)ptr / PAGE_SIZE, size / PAGE_SIZE}, false);
         },
-        .log = [](void *, enum HeapLogType type, char const *msg, va_list) {
+        .log = [](void*, enum HeapLogType type, char const* msg, va_list) {
             if (type == HEAP_ERROR)
                 logError("heap: {}", msg);
         },
@@ -38,26 +38,26 @@ static Heap *_ensureHeap() {
 
 // MARK: New/Delete Implementation ---------------------------------------------
 
-void *operator new(usize size) {
+void* operator new(usize size) {
     return heap_calloc(_ensureHeap(), size, 2);
 }
 
-void *operator new[](usize size) {
+void* operator new[](usize size) {
     return heap_calloc(_ensureHeap(), size, 2);
 }
 
-void operator delete(void *ptr) {
+void operator delete(void* ptr) {
     heap_free(_ensureHeap(), ptr);
 }
 
-void operator delete[](void *ptr) {
+void operator delete[](void* ptr) {
     heap_free(_ensureHeap(), ptr);
 }
 
-void operator delete(void *ptr, usize) {
+void operator delete(void* ptr, usize) {
     heap_free(_ensureHeap(), ptr);
 }
 
-void operator delete[](void *ptr, usize) {
+void operator delete[](void* ptr, usize) {
     heap_free(_ensureHeap(), ptr);
 }

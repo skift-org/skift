@@ -5,11 +5,11 @@
 
 namespace Karm::Sys {
 
-inline Res<> sleep(TimeSpan span) {
+inline Res<> sleep(Duration span) {
     return _Embed::sleep(span);
 }
 
-inline Res<> sleepUntil(TimeStamp until) {
+inline Res<> sleepUntil(Instant until) {
     return _Embed::sleepUntil(until);
 }
 

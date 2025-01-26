@@ -31,7 +31,7 @@ template <typename T>
 struct ValueParser;
 
 template <typename T>
-always_inline static Res<T> parseValue(Cursor<Css::Sst> &c) {
+always_inline static Res<T> parseValue(Cursor<Css::Sst>& c) {
     return ValueParser<T>::parse(c);
 }
 
@@ -45,53 +45,53 @@ always_inline static Res<T> parseValue(Str str) {
 
 template <>
 struct ValueParser<Align> {
-    static Res<Align> parse(Cursor<Css::Sst> &c);
+    static Res<Align> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Angle> {
-    static Res<Angle> parse(Cursor<Css::Sst> &c);
+    static Res<Angle> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<bool> {
-    static Res<bool> parse(Cursor<Css::Sst> &c);
+    static Res<bool> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Gfx::BorderStyle> {
-    static Res<Gfx::BorderStyle> parse(Cursor<Css::Sst> &c);
+    static Res<Gfx::BorderStyle> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<BorderCollapse> {
 
-    static Res<BorderCollapse> parse(Cursor<Css::Sst> &c);
+    static Res<BorderCollapse> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<BorderSpacing> {
-    static Res<BorderSpacing> parse(Cursor<Css::Sst> &c);
+    static Res<BorderSpacing> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<BreakBetween> {
-    static Res<BreakBetween> parse(Cursor<Css::Sst> &c);
+    static Res<BreakBetween> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<BreakInside> {
-    static Res<BreakInside> parse(Cursor<Css::Sst> &c);
+    static Res<BreakInside> parse(Cursor<Css::Sst>& c);
 };
 
 template <typename T>
 struct ValueParser<CalcValue<T>> {
-    static Res<CalcValue<T>> parse(Cursor<Css::Sst> &c) {
+    static Res<CalcValue<T>> parse(Cursor<Css::Sst>& c) {
         if (c.ended())
             return Error::invalidData("unexpected end of input");
 
         if (c.peek() == Css::Sst::FUNC) {
-            auto const &prefix = c.peek().prefix;
+            auto const& prefix = c.peek().prefix;
             auto prefixToken = prefix->unwrap().token;
             if (prefixToken.data == "calc(") {
                 Cursor<Css::Sst> content = c.peek().content;
@@ -113,7 +113,7 @@ struct ValueParser<CalcValue<T>> {
         return Ok(try$(parseValue<T>(c)));
     }
 
-    static Res<typename CalcValue<T>::OpCode> parseOp(Cursor<Css::Sst> &c) {
+    static Res<typename CalcValue<T>::OpCode> parseOp(Cursor<Css::Sst>& c) {
         if (c.ended())
             return Error::invalidData("unexpected end of input");
 
@@ -138,7 +138,7 @@ struct ValueParser<CalcValue<T>> {
         return Error::invalidData("unexpected operator");
     }
 
-    static Res<typename CalcValue<T>::Value> parseVal(Cursor<Css::Sst> &c) {
+    static Res<typename CalcValue<T>::Value> parseVal(Cursor<Css::Sst>& c) {
         if (c.ended())
             return Error::invalidData("unexpected end of input");
 
@@ -152,97 +152,97 @@ struct ValueParser<CalcValue<T>> {
 
 template <>
 struct ValueParser<Colors> {
-    static Res<Colors> parse(Cursor<Css::Sst> &c);
+    static Res<Colors> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<ColorScheme> {
-    static Res<ColorScheme> parse(Cursor<Css::Sst> &c);
+    static Res<ColorScheme> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Color> {
-    static Res<Color> parse(Cursor<Css::Sst> &c);
+    static Res<Color> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<ColorGamut> {
-    static Res<ColorGamut> parse(Cursor<Css::Sst> &c);
+    static Res<ColorGamut> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Contrast> {
-    static Res<Contrast> parse(Cursor<Css::Sst> &c);
+    static Res<Contrast> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Display> {
-    static Res<Display> parse(Cursor<Css::Sst> &c);
+    static Res<Display> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<CaptionSide> {
-    static Res<CaptionSide> parse(Cursor<Css::Sst> &c);
+    static Res<CaptionSide> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<FlexDirection> {
-    static Res<FlexDirection> parse(Cursor<Css::Sst> &c);
+    static Res<FlexDirection> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<FlexWrap> {
-    static Res<FlexWrap> parse(Cursor<Css::Sst> &c);
+    static Res<FlexWrap> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<FlexBasis> {
-    static Res<FlexBasis> parse(Cursor<Css::Sst> &c);
+    static Res<FlexBasis> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<FontSize> {
-    static Res<FontSize> parse(Cursor<Css::Sst> &c);
+    static Res<FontSize> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<FontStyle> {
-    static Res<FontStyle> parse(Cursor<Css::Sst> &c);
+    static Res<FontStyle> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<FontWeight> {
-    static Res<FontWeight> parse(Cursor<Css::Sst> &c);
+    static Res<FontWeight> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<FontWidth> {
-    static Res<FontWidth> parse(Cursor<Css::Sst> &c);
+    static Res<FontWidth> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Float> {
-    static Res<Float> parse(Cursor<Css::Sst> &c);
+    static Res<Float> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Clear> {
-    static Res<Clear> parse(Cursor<Css::Sst> &c);
+    static Res<Clear> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Hover> {
-    static Res<Hover> parse(Cursor<Css::Sst> &c);
+    static Res<Hover> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Integer> {
-    static Res<Integer> parse(Cursor<Css::Sst> &c);
+    static Res<Integer> parse(Cursor<Css::Sst>& c);
 };
 
 template <typename T>
 struct ValueParser<Math::Insets<T>> {
-    static Res<Math::Insets<T>> parse(Cursor<Css::Sst> &c) {
+    static Res<Math::Insets<T>> parse(Cursor<Css::Sst>& c) {
         if (c.ended())
             return Error::invalidData("unexpected end of input");
 
@@ -276,52 +276,52 @@ struct ValueParser<Math::Insets<T>> {
 
 template <>
 struct ValueParser<Length> {
-    static Res<Length> parse(Cursor<Css::Sst> &c);
+    static Res<Length> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Width> {
-    static Res<Width> parse(Cursor<Css::Sst> &c);
+    static Res<Width> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<MediaType> {
-    static Res<MediaType> parse(Cursor<Css::Sst> &c);
+    static Res<MediaType> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Number> {
-    static Res<Number> parse(Cursor<Css::Sst> &c);
+    static Res<Number> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Print::Orientation> {
-    static Res<Print::Orientation> parse(Cursor<Css::Sst> &c);
+    static Res<Print::Orientation> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Overflow> {
-    static Res<Overflow> parse(Cursor<Css::Sst> &c);
+    static Res<Overflow> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<OverflowBlock> {
-    static Res<OverflowBlock> parse(Cursor<Css::Sst> &c);
+    static Res<OverflowBlock> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<OverflowInline> {
-    static Res<OverflowInline> parse(Cursor<Css::Sst> &c);
+    static Res<OverflowInline> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Percent> {
-    static Res<Percent> parse(Cursor<Css::Sst> &c);
+    static Res<Percent> parse(Cursor<Css::Sst>& c);
 };
 
 template <typename T>
 struct ValueParser<PercentOr<T>> {
-    static Res<PercentOr<T>> parse(Cursor<Css::Sst> &c) {
+    static Res<PercentOr<T>> parse(Cursor<Css::Sst>& c) {
         if (c.ended())
             return Error::invalidData("unexpected end of input");
 
@@ -334,43 +334,43 @@ struct ValueParser<PercentOr<T>> {
 
 template <>
 struct ValueParser<Pointer> {
-    static Res<Pointer> parse(Cursor<Css::Sst> &c);
+    static Res<Pointer> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Position> {
-    static Res<Position> parse(Cursor<Css::Sst> &c);
+    static Res<Position> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Resolution> {
-    static Res<Resolution> parse(Cursor<Css::Sst> &c);
+    static Res<Resolution> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Scan> {
-    static Res<Scan> parse(Cursor<Css::Sst> &c);
+    static Res<Scan> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Size> {
-    static Res<Size> parse(Cursor<Css::Sst> &c);
+    static Res<Size> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<String> {
-    static Res<String> parse(Cursor<Css::Sst> &c);
+    static Res<String> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<Update> {
-    static Res<Update> parse(Cursor<Css::Sst> &c);
+    static Res<Update> parse(Cursor<Css::Sst>& c);
 };
 
 template <typename T>
 struct ValueParser<Math::Radii<T>> {
 
-    static Res<Math::Radii<T>> parse(Cursor<Css::Sst> &c) {
+    static Res<Math::Radii<T>> parse(Cursor<Css::Sst>& c) {
         if (c.ended())
             return Error::invalidData("unexpected end of input");
 
@@ -393,7 +393,7 @@ struct ValueParser<Math::Radii<T>> {
         return Ok(parsePostSlash(c, Math::Radii<T>{value1.take(), value2.take(), value3.take(), value4.take()}));
     }
 
-    static Math::Radii<T> parsePostSlash(Cursor<Css::Sst> &c, Math::Radii<T> radii) {
+    static Math::Radii<T> parsePostSlash(Cursor<Css::Sst>& c, Math::Radii<T> radii) {
         // if parse a /
         // 1 value-- > border all(a, d, e, h)
         // 2 values-- > 1 = top - start + bottom - end 2 = the others
@@ -447,27 +447,27 @@ struct ValueParser<Math::Radii<T>> {
 
 template <>
 struct ValueParser<ReducedMotion> {
-    static Res<ReducedMotion> parse(Cursor<Css::Sst> &c);
+    static Res<ReducedMotion> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<ReducedTransparency> {
-    static Res<ReducedTransparency> parse(Cursor<Css::Sst> &c);
+    static Res<ReducedTransparency> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<ReducedData> {
-    static Res<ReducedData> parse(Cursor<Css::Sst> &c);
+    static Res<ReducedData> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<TableLayout> {
-    static Res<TableLayout> parse(Cursor<Css::Sst> &c);
+    static Res<TableLayout> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<ZIndex> {
-    static Res<ZIndex> parse(Cursor<Css::Sst> &c);
+    static Res<ZIndex> parse(Cursor<Css::Sst>& c);
 };
 
 } // namespace Vaev::Style

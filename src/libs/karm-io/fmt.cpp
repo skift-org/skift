@@ -10,7 +10,7 @@ static auto const RE_SEP =
 
 using CaseFn = auto(Rune, usize, usize) -> Rune;
 
-Res<usize> _changeCase(SScan &s, Io::TextWriter &w, CaseFn fn) {
+Res<usize> _changeCase(SScan& s, Io::TextWriter& w, CaseFn fn) {
     bool wasLower = false;
 
     usize si = 0, wi = 0;

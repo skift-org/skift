@@ -28,18 +28,18 @@ union Edge {
     constexpr Edge(T x1, T y1, T x2, T y2)
         : start(x1, y1), end(x2, y2) {}
 
-    constexpr Edge(Edge const &other)
+    constexpr Edge(Edge const& other)
         : _els{other._els} {}
 
-    constexpr Edge(Edge &&other)
+    constexpr Edge(Edge&& other)
         : _els{std::move(other._els)} {}
 
-    constexpr Edge &operator=(Edge const &other) {
+    constexpr Edge& operator=(Edge const& other) {
         _els = other._els;
         return *this;
     }
 
-    constexpr Edge &operator=(Edge &&other) {
+    constexpr Edge& operator=(Edge&& other) {
         _els = std::move(other._els);
         return *this;
     }
@@ -117,7 +117,7 @@ union Edge {
         return start.hasNan() or end.hasNan();
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(edge {} {} {} {})", sx, sy, ex, ey);
     }
 

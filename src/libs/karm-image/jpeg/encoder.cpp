@@ -6,11 +6,11 @@
 namespace Jpeg {
 
 static Res<> _encodeMcu(
-    BitWriter &bitWriter,
-    Mcu &mcu,
-    i16 &previousDC,
-    Huff &dcTable,
-    Huff &acTable
+    BitWriter& bitWriter,
+    Mcu& mcu,
+    i16& previousDC,
+    Huff& dcTable,
+    Huff& acTable
 ) {
     // encode DC value
     i16 coeff = mcu[0] - previousDC;
@@ -26,7 +26,7 @@ static Res<> _encodeMcu(
 
     usize code = 0;
     usize codeLength = 0;
-    if (!dcTable.getCode(coeffLength, code, codeLength)) {
+    if (not dcTable.getCode(coeffLength, code, codeLength)) {
         return Error::invalidData("invalid dc huffman code length");
     }
     bitWriter.writeBits(code, codeLength);
@@ -36,21 +36,21 @@ static Res<> _encodeMcu(
     for (usize i = 1; i < 64; ++i) {
         // find zero run length
         u8 numZeroes = 0;
-        while (i < 64 && mcu[ZIGZAG[i]] == 0) {
+        while (i < 64 and mcu[ZIGZAG[i]] == 0) {
             numZeroes += 1;
             i += 1;
         }
 
         if (i == 64) {
-            if (!acTable.getCode(0x00, code, codeLength)) {
+            if (not acTable.getCode(0x00, code, codeLength))
                 return Error::invalidData("invalid ac huffman code");
-            }
+
             bitWriter.writeBits(code, codeLength);
             return Ok();
         }
 
         while (numZeroes >= 16) {
-            if (!acTable.getCode(0xF0, code, codeLength))
+            if (not acTable.getCode(0xF0, code, codeLength))
                 return Error::invalidData("invalid ac huffman code");
 
             bitWriter.writeBits(code, codeLength);
@@ -69,9 +69,8 @@ static Res<> _encodeMcu(
 
         // find symbol in table
         u8 symbol = numZeroes << 4 | coeffLength;
-        if (!acTable.getCode(symbol, code, codeLength)) {
+        if (not acTable.getCode(symbol, code, codeLength))
             return Error::invalidData("invalid ac huffman code");
-        }
 
         bitWriter.writeBits(code, codeLength);
         bitWriter.writeBits(coeff, coeffLength);
@@ -80,7 +79,7 @@ static Res<> _encodeMcu(
     return Ok();
 }
 
-static Res<> _writePixelData(Gfx::Pixels pixels, BitWriter &w) {
+static Res<> _writePixelData(Gfx::Pixels pixels, BitWriter& w) {
     Array<i16, 3> prev = {};
 
     for (usize y = 0; y < mcuHeight(pixels); y++) {
@@ -106,7 +105,7 @@ static Res<> _writePixelData(Gfx::Pixels pixels, BitWriter &w) {
     return Ok();
 }
 
-static void _writeQuantizationTable(Io::BEmit &e, u8 tableID, Quant const &qTable) {
+static void _writeQuantizationTable(Io::BEmit& e, u8 tableID, Quant const& qTable) {
     e.writeU8be(0xFF);
     e.writeU8be(DQT);
     e.writeU16be(67);
@@ -116,7 +115,7 @@ static void _writeQuantizationTable(Io::BEmit &e, u8 tableID, Quant const &qTabl
     }
 }
 
-static void _writeStartOfFrame(Io::BEmit &e, Gfx::Pixels pixels) {
+static void _writeStartOfFrame(Io::BEmit& e, Gfx::Pixels pixels) {
     e.writeU8be(0xFF);
     e.writeU8be(SOF0);
     e.writeU16be(17);
@@ -131,7 +130,7 @@ static void _writeStartOfFrame(Io::BEmit &e, Gfx::Pixels pixels) {
     }
 }
 
-static void _writeAPP0(Io::BEmit &e) {
+static void _writeAPP0(Io::BEmit& e) {
     e.writeU8be(0xFF);
     e.writeU8be(APP0);
     e.writeU16be(16);
@@ -149,7 +148,7 @@ static void _writeAPP0(Io::BEmit &e) {
     e.writeU8be(0);
 }
 
-static void _writeHuffmanTable(Io::BEmit &e, u8 acdc, u8 tableID, Huff const &hTable) {
+static void _writeHuffmanTable(Io::BEmit& e, u8 acdc, u8 tableID, Huff const& hTable) {
     e.writeU8be(0xFF);
     e.writeU8be(DHT);
     e.writeU16be(19 + hTable.offs[16]);
@@ -164,7 +163,7 @@ static void _writeHuffmanTable(Io::BEmit &e, u8 acdc, u8 tableID, Huff const &hT
     }
 }
 
-static void _writeStartOfScan(Io::BEmit &e) {
+static void _writeStartOfScan(Io::BEmit& e) {
     e.writeU8be(0xFF);
     e.writeU8be(SOS);
     e.writeU16be(12);
@@ -178,7 +177,7 @@ static void _writeStartOfScan(Io::BEmit &e) {
     e.writeU8be(0);
 }
 
-Res<> encode(Gfx::Pixels pixels, Io::BEmit &e) {
+Res<> encode(Gfx::Pixels pixels, Io::BEmit& e) {
     // SOI
     e.writeU8be(0xFF);
     e.writeU8be(SOI);

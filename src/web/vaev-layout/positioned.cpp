@@ -5,9 +5,9 @@
 
 namespace Vaev::Layout {
 
-void layoutPositioned(Tree &tree, Frag &frag, RectPx containingBlock) {
-    auto &style = frag.style();
-    auto &metrics = frag.metrics;
+void layoutPositioned(Tree& tree, Frag& frag, RectPx containingBlock) {
+    auto& style = frag.style();
+    auto& metrics = frag.metrics;
 
     if (style.position == Position::ABSOLUTE or style.position == Position::RELATIVE) {
         auto origin = containingBlock.topStart();
@@ -38,7 +38,7 @@ void layoutPositioned(Tree &tree, Frag &frag, RectPx containingBlock) {
         containingBlock = metrics.contentBox();
     }
 
-    for (auto &c : frag.children) {
+    for (auto& c : frag.children) {
         layoutPositioned(tree, c, containingBlock);
     }
 }

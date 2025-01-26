@@ -5,8 +5,8 @@
 
 namespace Hjert::Core {
 
-Res<Strong<Channel>> Channel::create(usize bufCap, usize capsCap) {
-    return Ok(makeStrong<Channel>(bufCap, capsCap));
+Res<Arc<Channel>> Channel::create(usize bufCap, usize capsCap) {
+    return Ok(makeArc<Channel>(bufCap, capsCap));
 }
 
 Channel::Channel(usize bufCap, usize capsCap)

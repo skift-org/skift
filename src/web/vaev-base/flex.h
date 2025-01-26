@@ -40,7 +40,7 @@ struct FlexBasis {
         : type(Type::WIDTH), width(width) {
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         if (type == Type::CONTENT) {
             e("content");
         } else {
@@ -53,7 +53,7 @@ struct FlexItemProps {
     FlexBasis flexBasis;
     Number flexGrow, flexShrink;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("({} {} {})", flexBasis, flexGrow, flexShrink);
     }
 };
@@ -73,7 +73,7 @@ struct FlexProps {
                direction == FlexDirection::ROW_REVERSE;
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(flex");
         e(" direction={}", direction);
         e(" wrap={}", wrap);

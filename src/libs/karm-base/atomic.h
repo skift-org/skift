@@ -23,11 +23,11 @@ struct Atomic {
 
     always_inline constexpr Atomic() = default;
 
-    always_inline Atomic(T const &val)
+    always_inline Atomic(T const& val)
         : _val(val) {
     }
 
-    always_inline Atomic(T &&val)
+    always_inline Atomic(T&& val)
         : _val(std::move(val)) {
     }
 

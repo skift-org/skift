@@ -40,13 +40,13 @@ struct Endpoint : public Meta::Pinned {
 struct Service : public Endpoint {
     String _id;
     Vec<Meta::Id> _listen;
-    Strong<Skift::IpcFd> _ipc;
+    Rc<Skift::IpcFd> _ipc;
     Sys::IpcConnection _con;
     Opt<Hj::Task> _task = NONE;
 
-    static Res<Strong<Service>> prepare(Sys::Context &ctx, Str id);
+    static Res<Rc<Service>> prepare(Sys::Context &ctx, Str id);
 
-    Service(Str id, Strong<Skift::IpcFd> ipc)
+    Service(Str id, Rc<Skift::IpcFd> ipc)
         : _id{id}, _ipc{ipc}, _con{ipc, ""_url} {
     }
 
@@ -72,14 +72,14 @@ struct System : public Endpoint {
 struct Bus : public Meta::Pinned {
     Sys::Context &_context;
 
-    Vec<Strong<Endpoint>> _endpoints{};
+    Vec<Rc<Endpoint>> _endpoints{};
 
     Bus(Sys::Context &ctx)
         : _context(ctx) {}
 
-    static Res<Strong<Bus>> create(Sys::Context &ctx);
+    static Res<Rc<Bus>> create(Sys::Context &ctx);
 
-    Res<> attach(Strong<Endpoint> endpoint);
+    Res<> attach(Rc<Endpoint> endpoint);
 
     void _broadcast(Rpc::Message &msg);
 

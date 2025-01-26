@@ -1,41 +1,23 @@
 #include "layout.h"
 
 #include "block.h"
-#include "box.h"
 #include "flex.h"
 #include "grid.h"
 #include "inline.h"
 #include "positioned.h"
+#include "replaced.h"
 #include "table.h"
-#include "tree.h"
 #include "values.h"
 
 namespace Vaev::Layout {
 
-Output _contentLayout(Tree &tree, Box &box, Input input, usize startAt, Opt<usize> stopAt) {
+static Opt<Rc<FormatingContext>> _constructFormatingContext(Box& box) {
     auto display = box.style->display;
 
-    if (auto image = box.content.is<Karm::Image::Picture>()) {
-        return Output::fromSize(image->bound().size().cast<Px>());
-    } else if (auto run = box.content.is<Strong<Text::Prose>>()) {
-        auto out = inlineLayout(tree, box, input);
-
-        if (tree.fc.allowBreak() and
-            not tree.fc.acceptsFit(
-                input.position.y,
-                out.size.y,
-                input.pendingVerticalSizes
-            )) {
-            return Output{
-                .size = {},
-                .completelyLaidOut = false,
-                .breakpoint = Breakpoint::buildOverflow()
-            };
-        } else
-            return Output{
-                .size = out.size,
-                .completelyLaidOut = true,
-            };
+    if (box.content.is<Karm::Image::Picture>()) {
+        return constructReplacedFormatingContext(box);
+    } else if (box.content.is<Rc<Text::Prose>>()) {
+        return constructInlineFormatingContext(box);
     } else if (
         display == Display::FLOW or
         display == Display::FLOW_ROOT or
@@ -43,21 +25,29 @@ Output _contentLayout(Tree &tree, Box &box, Input input, usize startAt, Opt<usiz
         display == Display::TABLE_CAPTION or
         display == Display::TABLE
     ) {
-        return blockLayout(tree, box, input, startAt, stopAt);
+        return constructBlockFormatingContext(box);
     } else if (display == Display::FLEX) {
-        return flexLayout(tree, box, input);
+        return constructFlexFormatingContext(box);
     } else if (display == Display::GRID) {
-        return gridLayout(tree, box, input);
+        return constructGridFormatingContext(box);
     } else if (display == Display::TABLE_BOX) {
-        return tableLayout(tree, box, input, startAt, stopAt);
+        return constructTableFormatingContext(box);
     } else if (display == Display::INTERNAL) {
-        return Output{};
+        return NONE;
     } else {
-        return blockLayout(tree, box, input, startAt, stopAt);
+        return constructBlockFormatingContext(box);
     }
 }
 
-InsetsPx computeMargins(Tree &tree, Box &box, Input input) {
+Output _contentLayout(Tree& tree, Box& box, Input input, usize startAt, Opt<usize> stopAt) {
+    if (box.formatingContext == NONE)
+        box.formatingContext = _constructFormatingContext(box);
+    if (not box.formatingContext)
+        return Output{};
+    return box.formatingContext->unwrap().run(tree, box, input, startAt, stopAt);
+}
+
+InsetsPx computeMargins(Tree& tree, Box& box, Input input) {
     InsetsPx res;
     auto margin = box.style->margin;
 
@@ -69,7 +59,7 @@ InsetsPx computeMargins(Tree &tree, Box &box, Input input) {
     return res;
 }
 
-InsetsPx computeBorders(Tree &tree, Box &box) {
+InsetsPx computeBorders(Tree& tree, Box& box) {
     InsetsPx res;
     auto borders = box.style->borders;
 
@@ -88,7 +78,7 @@ InsetsPx computeBorders(Tree &tree, Box &box) {
     return res;
 }
 
-static InsetsPx _computePaddings(Tree &tree, Box &box, Vec2Px containingBlock) {
+static InsetsPx _computePaddings(Tree& tree, Box& box, Vec2Px containingBlock) {
     InsetsPx res;
     auto padding = box.style->padding;
 
@@ -100,7 +90,7 @@ static InsetsPx _computePaddings(Tree &tree, Box &box, Vec2Px containingBlock) {
     return res;
 }
 
-static Math::Radii<Px> _computeRadii(Tree &tree, Box &box, Vec2Px size) {
+static Math::Radii<Px> _computeRadii(Tree& tree, Box& box, Vec2Px size) {
     auto radii = box.style->borders->radii;
     Math::Radii<Px> res;
 
@@ -116,7 +106,7 @@ static Math::Radii<Px> _computeRadii(Tree &tree, Box &box, Vec2Px size) {
     return res;
 }
 
-Vec2Px computeIntrinsicSize(Tree &tree, Box &box, IntrinsicSize intrinsic, Vec2Px containingBlock) {
+Vec2Px computeIntrinsicSize(Tree& tree, Box& box, IntrinsicSize intrinsic, Vec2Px containingBlock) {
     if (intrinsic == IntrinsicSize::AUTO) {
         panic("bad argument");
     }
@@ -137,7 +127,7 @@ Vec2Px computeIntrinsicSize(Tree &tree, Box &box, IntrinsicSize intrinsic, Vec2P
     return output.size + padding.all() + borders.all();
 }
 
-static Opt<Px> _computeSpecifiedSize(Tree &tree, Box &box, Size size, Vec2Px containingBlock, bool isWidth) {
+static Opt<Px> _computeSpecifiedSize(Tree& tree, Box& box, Size size, Vec2Px containingBlock, bool isWidth) {
     if (size == Size::MIN_CONTENT) {
         auto intrinsicSize = computeIntrinsicSize(tree, box, IntrinsicSize::MIN_CONTENT, containingBlock);
         return isWidth ? Opt<Px>{intrinsicSize.x} : Opt<Px>{NONE};
@@ -163,7 +153,7 @@ static Opt<Px> _computeSpecifiedSize(Tree &tree, Box &box, Size size, Vec2Px con
     }
 }
 
-Res<None, Output> shouldAbortFragmentingBeforeLayout(FragmentationContext &fc, Input input) {
+static Res<None, Output> _shouldAbortFragmentingBeforeLayout(Fragmentainer& fc, Input input) {
     if (not fc.acceptsFit(
             input.position.y,
             0_px,
@@ -178,8 +168,10 @@ Res<None, Output> shouldAbortFragmentingBeforeLayout(FragmentationContext &fc, I
     return Ok(NONE);
 }
 
-void maybeSetMonolithicBreakpoint(FragmentationContext &fc, bool isMonolticDisplay, bool childCompletelyLaidOut, usize boxChildrenLen, Opt<Breakpoint> &outputBreakpoint) {
-    if (not(fc.monolithicCount == 1 and isMonolticDisplay) or fc.hasInfiniteDimensions())
+static void _maybeSetMonolithicBreakpoint(Fragmentainer& fc, bool isMonolticDisplay, bool childCompletelyLaidOut, usize boxChildrenLen, Opt<Breakpoint>& outputBreakpoint) {
+    if (not fc.isMonolithicBox() or
+        not isMonolticDisplay or
+        fc.hasInfiniteDimensions())
         return;
 
     if (not childCompletelyLaidOut)
@@ -195,7 +187,7 @@ void maybeSetMonolithicBreakpoint(FragmentationContext &fc, bool isMonolticDispl
     outputBreakpoint = bottomOfContentBreakForTopMonolitic;
 }
 
-Output layout(Tree &tree, Box &box, Input input) {
+Output layout(Tree& tree, Box& box, Input input) {
 
     // FIXME: confirm how the preferred width/height parameters interacts with intrinsic size argument from input
     auto borders = computeBorders(tree, box);
@@ -226,16 +218,16 @@ Output layout(Tree &tree, Box &box, Input input) {
     input.position = input.position + borders.topStart() + padding.topStart();
     input.pendingVerticalSizes += borders.bottom + padding.bottom;
 
-    bool isMonolticDisplay =
+    bool isMonolithicDisplay =
         box.style->display == Display::Inside::FLEX or
         box.style->display == Display::Inside::GRID;
 
     usize startAt = tree.fc.allowBreak() ? input.breakpointTraverser.getStart().unwrapOr(0) : 0;
+
     if (tree.fc.isDiscoveryMode()) {
+        try$(_shouldAbortFragmentingBeforeLayout(tree.fc, input));
 
-        try$(shouldAbortFragmentingBeforeLayout(tree.fc, input));
-
-        if (isMonolticDisplay)
+        if (isMonolithicDisplay)
             tree.fc.enterMonolithicBox();
 
         // TODO: Class C breakpoint
@@ -254,9 +246,9 @@ Output layout(Tree &tree, Box &box, Input input) {
 
         // TODO: Class C breakpoint
 
-        maybeSetMonolithicBreakpoint(
+        _maybeSetMonolithicBreakpoint(
             tree.fc,
-            isMonolticDisplay,
+            isMonolithicDisplay,
             out.completelyLaidOut,
             box.children().len(),
             out.breakpoint
@@ -264,7 +256,7 @@ Output layout(Tree &tree, Box &box, Input input) {
 
         out.size = size + padding.all() + borders.all();
 
-        if (isMonolticDisplay)
+        if (isMonolithicDisplay)
             tree.fc.leaveMonolithicBox();
 
         return out;
@@ -277,7 +269,7 @@ Output layout(Tree &tree, Box &box, Input input) {
         Frag currFrag(&box);
         input.fragment = input.fragment ? &currFrag : nullptr;
 
-        if (isMonolticDisplay)
+        if (isMonolithicDisplay)
             tree.fc.enterMonolithicBox();
 
         auto out = _contentLayout(tree, box, input, startAt, stopAt);
@@ -288,7 +280,7 @@ Output layout(Tree &tree, Box &box, Input input) {
             size.height = input.knownSize.height.unwrapOr(size.height);
         }
 
-        if (isMonolticDisplay)
+        if (isMonolithicDisplay)
             tree.fc.leaveMonolithicBox();
 
         size = size + padding.all() + borders.all();
@@ -310,14 +302,14 @@ Output layout(Tree &tree, Box &box, Input input) {
     }
 }
 
-Output layout(Tree &tree, Input input) {
+Output layout(Tree& tree, Input input) {
     auto out = layout(tree, tree.root, input);
     if (input.fragment)
         layoutPositioned(tree, input.fragment->children[0], input.containingBlock);
     return out;
 }
 
-Tuple<Output, Frag> layoutCreateFragment(Tree &tree, Input input) {
+Tuple<Output, Frag> layoutCreateFragment(Tree& tree, Input input) {
     auto root = Layout::Frag();
     input.fragment = &root;
     auto out = layout(tree, input);

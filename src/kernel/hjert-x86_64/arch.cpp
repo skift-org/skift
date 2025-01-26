@@ -140,7 +140,7 @@ void backtrace(usize rbp) {
     }
 }
 
-void switchTask(TimeSpan span, Frame &frame) {
+void switchTask(Duration span, Frame &frame) {
     Core::Task::self().save(frame);
     Core::globalSched().schedule(span);
     Core::Task::self().load(frame);
@@ -268,7 +268,7 @@ struct UserVmm : public x86_64::Vmm<Hal::UpperHalfMapper> {
     }
 };
 
-Res<Strong<Hal::Vmm>> createVmm() {
+Res<Arc<Hal::Vmm>> createVmm() {
     auto pml4Mem = Core::kmm()
                        .allocRange(Hal::PAGE_SIZE)
                        .unwrap("failed to allocate pml4");
@@ -281,7 +281,7 @@ Res<Strong<Hal::Vmm>> createVmm() {
         pml4->pages[i] = _kpml4->pages[i];
     }
 
-    return Ok(makeStrong<UserVmm>(pml4));
+    return Ok(makeArc<UserVmm>(pml4));
 }
 
 // MARK: Tasking ---------------------------------------------------------------

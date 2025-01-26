@@ -60,11 +60,11 @@ void Prose::append(Slice<Rune> runes) {
 // MARK: Layout -------------------------------------------------------------
 
 void Prose::_measureBlocks() {
-    for (auto &block : _blocks) {
+    for (auto& block : _blocks) {
         auto adv = 0.0f;
         bool first = true;
         Glyph prev = Glyph::TOFU;
-        for (auto &cell : block.cells()) {
+        for (auto& cell : block.cells()) {
             if (not first)
                 adv += _style.font.kern(prev, cell.glyph);
             else
@@ -86,7 +86,7 @@ void Prose::_wrapLines(f64 width) {
     bool first = true;
     f64 adv = 0;
     for (usize i = 0; i < _blocks.len(); i++) {
-        auto &block = _blocks[i];
+        auto& block = _blocks[i];
         if (adv + block.width > width and _style.wordwrap and _style.multiline and not first) {
             _lines.pushBack(line);
             line = {this, block.runeRange, {i, 1}};
@@ -126,7 +126,7 @@ void Prose::_wrapLines(f64 width) {
 f64 Prose::_layoutVerticaly() {
     auto m = _style.font.metrics();
     f64 baseline = m.linegap / 2;
-    for (auto &line : _lines) {
+    for (auto& line : _lines) {
         baseline += m.ascend;
         line.baseline = baseline;
         baseline += m.linegap + m.descend;
@@ -136,12 +136,12 @@ f64 Prose::_layoutVerticaly() {
 
 f64 Prose::_layoutHorizontaly(f64 width) {
     f64 maxWidth = 0;
-    for (auto &line : _lines) {
+    for (auto& line : _lines) {
         if (not line.blockRange.any())
             continue;
 
         f64 pos = 0;
-        for (auto &block : line.blocks()) {
+        for (auto& block : line.blocks()) {
             block.pos = pos;
             pos += block.width;
         }
@@ -156,12 +156,12 @@ f64 Prose::_layoutHorizontaly(f64 width) {
             break;
 
         case TextAlign::CENTER:
-            for (auto &block : line.blocks())
+            for (auto& block : line.blocks())
                 block.pos += free / 2;
             break;
 
         case TextAlign::RIGHT:
-            for (auto &block : line.blocks())
+            for (auto& block : line.blocks())
                 block.pos += free;
             break;
         }
@@ -186,32 +186,6 @@ Math::Vec2f Prose::layout(f64 width) {
     auto textWidth = _layoutHorizontaly(width);
     _size = {textWidth, textHeight};
     return {textWidth, textHeight};
-}
-
-// MARK: Paint -------------------------------------------------------------
-
-void Prose::paint(Gfx::Canvas &g) {
-    g.push();
-
-    if (_style.color)
-        g.fillStyle(*_style.color);
-
-    for (auto const &line : _lines) {
-        for (auto &block : line.blocks()) {
-            for (auto &cell : block.cells()) {
-                if (cell.span and cell.span->color) {
-                    g.push();
-                    g.fillStyle(*cell.span->color);
-                    g.fill(_style.font, cell.glyph, {block.pos + cell.pos, line.baseline});
-                    g.pop();
-                } else {
-                    g.fill(_style.font, cell.glyph, {block.pos + cell.pos, line.baseline});
-                }
-            }
-        }
-    }
-
-    g.pop();
 }
 
 } // namespace Karm::Text

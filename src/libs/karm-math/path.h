@@ -148,13 +148,13 @@ struct Path {
 
     void ellipse(Math::Ellipsef ellipse);
 
-    void path(Math::Path const &path);
+    void path(Math::Path const& path);
 
     // MARK: Svg ---------------------------------------------------------------
 
-    Opt<Math::Vec2f> _nextVec2f(Io::SScan &scan);
+    Opt<Math::Vec2f> _nextVec2f(Io::SScan& scan);
 
-    static Opt<Op> parseOp(Io::SScan &scan, Rune opcode);
+    static Opt<Op> parseOp(Io::SScan& scan, Rune opcode);
 
     bool evalSvg(Str svg);
 

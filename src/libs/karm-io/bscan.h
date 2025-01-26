@@ -21,7 +21,7 @@ struct BScan {
         _cursor = _start;
     }
 
-    always_inline constexpr BScan &seek(usize n) {
+    always_inline constexpr BScan& seek(usize n) {
         rewind();
         return skip(n);
     }
@@ -42,7 +42,7 @@ struct BScan {
         return {_cursor.buf(), rem()};
     }
 
-    always_inline constexpr BScan &skip(usize n) {
+    always_inline constexpr BScan& skip(usize n) {
         n = min(n, rem());
         _cursor.next(n);
         return *this;
@@ -55,12 +55,12 @@ struct BScan {
     }
 
     template <typename T>
-    always_inline constexpr bool readTo(T *buf, usize n = 1) {
+    always_inline constexpr bool readTo(T* buf, usize n = 1) {
         if (rem() < n) {
             return false;
         }
 
-        u8 *b = reinterpret_cast<u8 *>(buf);
+        u8* b = reinterpret_cast<u8*>(buf);
         for (usize i = 0; i < sizeof(T) * n; i++) {
             b[i] = _cursor.next();
         }
@@ -68,11 +68,11 @@ struct BScan {
     }
 
     template <typename T>
-    always_inline constexpr bool peekTo(T *buf, usize n = 1) {
+    always_inline constexpr bool peekTo(T* buf, usize n = 1) {
         if (rem() < n)
             return false;
 
-        u8 *b = reinterpret_cast<u8 *>(buf);
+        u8* b = reinterpret_cast<u8*>(buf);
         for (usize i = 0; i < sizeof(T) * n; i++)
             b[i] = _cursor.buf()[i];
 
@@ -249,7 +249,7 @@ struct BScan {
 
     always_inline constexpr Str nextStr(usize n) {
         n = clamp(n, 0uz, rem());
-        Str s{(char const *)_cursor.buf(), n};
+        Str s{(char const*)_cursor.buf(), n};
         _cursor.next(n);
         return s;
     }
@@ -317,14 +317,14 @@ struct BChunk {
 };
 
 struct BEmit {
-    Io::Writer &_writer;
+    Io::Writer& _writer;
 
-    always_inline constexpr BEmit(Io::Writer &writer)
+    always_inline constexpr BEmit(Io::Writer& writer)
         : _writer(writer) {}
 
     template <Meta::TrivialyCopyable T>
-    always_inline constexpr void writeFrom(T const &v) {
-        (void)_writer.write(Bytes{(Byte const *)&v, sizeof(v)});
+    always_inline constexpr void writeFrom(T const& v) {
+        (void)_writer.write(Bytes{(Byte const*)&v, sizeof(v)});
     }
 
     always_inline constexpr void writeU8be(u8be v) {
@@ -392,12 +392,12 @@ struct BEmit {
     }
 
     always_inline constexpr void writeStr(Str s) {
-        (void)_writer.write(Bytes{(Byte const *)s.buf(), s.len()});
+        (void)_writer.write(Bytes{(Byte const*)s.buf(), s.len()});
     }
 
     always_inline constexpr void writeCStr(Str s) {
-        (void)_writer.write(Bytes{(Byte const *)s.buf(), s.len()});
-        (void)_writer.write(Bytes{(Byte const *)"\0", 1});
+        (void)_writer.write(Bytes{(Byte const*)s.buf(), s.len()});
+        (void)_writer.write(Bytes{(Byte const*)"\0", 1});
     }
 
     always_inline constexpr void writeBytes(Bytes b) {

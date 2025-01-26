@@ -13,7 +13,7 @@ namespace Karm::Io {
 // - ']' closes the group.
 // - '-' specifies a range in the group.
 // - '^' negates the group.
-bool matchGlob(SScan &glob, SScan &in);
+bool matchGlob(SScan& glob, SScan& in);
 
 // Match a string against a glob pattern.
 bool matchGlob(Str glob, Str str);

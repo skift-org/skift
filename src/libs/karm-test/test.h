@@ -17,8 +17,8 @@ struct Test : Meta::Pinned {
     };
 
     using enum Kind;
-    using Func = Res<> (*)(Driver &);
-    using FuncAsync = Async::Task<> (*)(Driver &);
+    using Func = Res<> (*)(Driver&);
+    using FuncAsync = Async::Task<> (*)(Driver&);
 
     Str _name;
     Kind _kind;
@@ -40,7 +40,7 @@ struct Test : Meta::Pinned {
         driver().add(this);
     }
 
-    Async::Task<> runAsync(Driver &driver) {
+    Async::Task<> runAsync(Driver& driver) {
         if (_kind == ASYNC) {
             co_return co_await _funcAsync(driver);
         } else {

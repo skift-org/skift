@@ -10,7 +10,7 @@ static auto const RE_COMPONENT =
         Re::alnum() | '+'_re | '-'_re | '.'_re
     );
 
-Url Url::parse(Io::SScan &s) {
+Url Url::parse(Io::SScan& s) {
     Url url;
 
     url.scheme = s.token(RE_COMPONENT);
@@ -54,7 +54,7 @@ bool Url::isUrl(Str str) {
            s.skip(':');
 }
 
-Url Url::join(Path const &other) const {
+Url Url::join(Path const& other) const {
     Url url = *this;
     url.path = url.path.join(other);
     return url;
@@ -74,7 +74,7 @@ Url Url::parent(usize n) const {
     return url;
 }
 
-bool Url::isParentOf(Url const &other) const {
+bool Url::isParentOf(Url const& other) const {
     bool same = scheme == other.scheme and
                 host == other.host and
                 port == other.port;
@@ -82,7 +82,7 @@ bool Url::isParentOf(Url const &other) const {
     return same and path.isParentOf(other.path);
 }
 
-Res<usize> Url::write(Io::TextWriter &writer) const {
+Res<usize> Url::write(Io::TextWriter& writer) const {
     usize written = 0;
 
     if (scheme.len() > 0)

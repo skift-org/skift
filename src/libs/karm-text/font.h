@@ -53,7 +53,7 @@ struct FontMeasure {
 };
 
 struct Fontface {
-    static Strong<Fontface> fallback();
+    static Rc<Fontface> fallback();
 
     virtual ~Fontface() = default;
 
@@ -67,11 +67,11 @@ struct Fontface {
 
     virtual f64 kern(Glyph prev, Glyph curr) = 0;
 
-    virtual void contour(Gfx::Canvas &g, Glyph glyph) const = 0;
+    virtual void contour(Gfx::Canvas& g, Glyph glyph) const = 0;
 };
 
 struct Font {
-    Strong<Fontface> fontface;
+    Rc<Fontface> fontface;
     f64 fontsize;
     f64 lineheight = 1.2;
 
@@ -87,7 +87,7 @@ struct Font {
 
     FontMeasure measure(Glyph glyph);
 
-    void contour(Gfx::Canvas &g, Glyph glyph) {
+    void contour(Gfx::Canvas& g, Glyph glyph) {
         g.scale(fontsize);
         fontface->contour(g, glyph);
     }

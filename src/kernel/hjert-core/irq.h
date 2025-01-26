@@ -9,7 +9,7 @@ struct Irq :
 
     usize _irq;
 
-    static Res<Strong<Irq>> create(usize irq);
+    static Res<Arc<Irq>> create(usize irq);
 
     static void trigger(usize irq);
 

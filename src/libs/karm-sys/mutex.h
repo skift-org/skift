@@ -6,7 +6,7 @@
 namespace Karm::Sys {
 
 struct Mutex {
-    Res<Strong<Mutex>> create();
+    Res<Rc<Mutex>> create();
 
     virtual ~Mutex() = default;
 
@@ -18,7 +18,7 @@ struct Mutex {
 };
 
 struct Sema {
-    Res<Strong<Sema>> create();
+    Res<Rc<Sema>> create();
 
     virtual ~Sema() = default;
 
@@ -32,7 +32,7 @@ struct Sema {
 };
 
 struct CondVar {
-    Res<Strong<CondVar>> create();
+    Res<Rc<CondVar>> create();
 
     virtual ~CondVar() = default;
 

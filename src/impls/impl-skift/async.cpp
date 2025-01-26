@@ -11,7 +11,7 @@ namespace Karm::Sys::_Embed {
 struct HjertSched : public Sys::Sched {
     Hj::Listener _listener;
     Map<Hj::Cap, Async::Promise<>> _promises;
-    Vec<Cons<TimeStamp, Async::Promise<>>> _sleeps;
+    Vec<Pair<Instant, Async::Promise<>>> _sleeps;
 
     HjertSched(Hj::Listener listener) : _listener{std::move(listener)} {}
 
@@ -29,23 +29,23 @@ struct HjertSched : public Sys::Sched {
         co_return co_await future;
     }
 
-    virtual Async::Task<usize> readAsync(Strong<Fd>, MutBytes) {
+    virtual Async::Task<usize> readAsync(Rc<Fd>, MutBytes) {
         co_return Error::notImplemented("not implemented");
     }
 
-    virtual Async::Task<usize> writeAsync(Strong<Fd>, Bytes) {
+    virtual Async::Task<usize> writeAsync(Rc<Fd>, Bytes) {
         co_return Error::notImplemented("not implemented");
     }
 
-    virtual Async::Task<usize> flushAsync(Strong<Fd>) {
+    virtual Async::Task<usize> flushAsync(Rc<Fd>) {
         co_return Error::notImplemented("not implemented");
     }
 
-    virtual Async::Task<_Accepted> acceptAsync(Strong<Fd>) {
+    virtual Async::Task<_Accepted> acceptAsync(Rc<Fd>) {
         co_return Error::notImplemented("not implemented");
     }
 
-    virtual Async::Task<_Sent> sendAsync(Strong<Fd> fd, Bytes buf, Slice<Handle> hnds, SocketAddr) {
+    virtual Async::Task<_Sent> sendAsync(Rc<Fd> fd, Bytes buf, Slice<Handle> hnds, SocketAddr) {
         if (auto ipc = fd.is<Skift::IpcFd>()) {
             auto &chan = ipc->_out;
 
@@ -59,7 +59,7 @@ struct HjertSched : public Sys::Sched {
         co_return Error::notImplemented("unsupported fd type");
     }
 
-    virtual Async::Task<_Received> recvAsync(Strong<Fd> fd, MutBytes buf, MutSlice<Handle> hnds) {
+    virtual Async::Task<_Received> recvAsync(Rc<Fd> fd, MutBytes buf, MutSlice<Handle> hnds) {
         if (auto ipc = fd.is<Skift::IpcFd>()) {
             auto &chan = ipc->_in;
 
@@ -73,15 +73,15 @@ struct HjertSched : public Sys::Sched {
         co_return Error::notImplemented("unsupported fd type");
     }
 
-    virtual Async::Task<> sleepAsync(TimeStamp stamp) {
+    virtual Async::Task<> sleepAsync(Instant stamp) {
         Async::Promise<> promise;
         auto future = promise.future();
         _sleeps.pushBack({stamp, std::move(promise)});
         co_return co_await future;
     }
 
-    TimeStamp _soonest() {
-        TimeStamp soonest = TimeStamp::endOfTime();
+    Instant _soonest() {
+        auto soonest = Instant::endOfTime();
         for (auto const &[stamp, _] : _sleeps) {
             if (stamp < soonest)
                 soonest = stamp;
@@ -89,7 +89,7 @@ struct HjertSched : public Sys::Sched {
         return soonest;
     }
 
-    void _wake(TimeStamp now) {
+    void _wake(Instant now) {
         for (usize i = 0; i < _sleeps.len(); i++) {
             auto &[stamp, promise] = _sleeps[i];
             if (stamp <= now) {
@@ -100,9 +100,9 @@ struct HjertSched : public Sys::Sched {
         }
     }
 
-    virtual Res<> wait(TimeStamp until) {
+    virtual Res<> wait(Instant until) {
         while (true) {
-            auto now = _Embed::now();
+            auto now = _Embed::instant();
             _wake(now);
             auto soonest = min(until, _soonest());
             if (now >= until)

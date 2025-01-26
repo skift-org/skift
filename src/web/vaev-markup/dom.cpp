@@ -6,7 +6,7 @@ namespace Vaev::Markup {
 
 String Document::title() const {
     String res = ""s;
-    iterDepthFirst([&](auto &node) {
+    iterDepthFirst([&](auto& node) {
         if (auto element = node.template is<Element>()) {
             if (element->tagName == Html::TITLE) {
                 res = element->textContent();

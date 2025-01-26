@@ -8,13 +8,13 @@
 namespace Karm::Io {
 
 struct Emit : public Io::TextWriterBase<> {
-    Io::TextWriter &_writer;
+    Io::TextWriter& _writer;
     usize _ident = 0;
     usize _total = 0;
     Res<> _error = Ok();
     bool _newline = false;
 
-    Emit(Io::TextWriter &writer)
+    Emit(Io::TextWriter& writer)
         : _writer(writer) {
     }
 
@@ -97,12 +97,12 @@ struct Emit : public Io::TextWriterBase<> {
     }
 
     template <typename... Ts>
-    void operator()(Str format, Ts &&...ts) {
+    void operator()(Str format, Ts&&... ts) {
         _tryWrapper(Io::format(*this, format, std::forward<Ts>(ts)...));
     }
 
     template <typename... Ts>
-    void ln(Ts &&...ts) {
+    void ln(Ts&&... ts) {
         _tryWrapper(Io::format(*this, std::forward<Ts>(ts)...));
         newline();
     }
@@ -121,13 +121,13 @@ struct Emit : public Io::TextWriterBase<> {
 
 template <ReprMethod T>
 struct Repr<T> {
-    static void repr(Io::Emit &emit, T const &val) {
+    static void repr(Io::Emit& emit, T const& val) {
         val.repr(emit);
     }
 };
 
 template <Reprable T>
-void repr(Io::Emit &emit, T const &val) {
+void repr(Io::Emit& emit, T const& val) {
     if constexpr (ReprMethod<T>) {
         val.repr(emit);
     } else {
@@ -137,7 +137,7 @@ void repr(Io::Emit &emit, T const &val) {
 
 template <Reprable T>
 struct Formatter<T> {
-    Res<usize> format(Io::TextWriter &writer, T const &val) {
+    Res<usize> format(Io::TextWriter& writer, T const& val) {
         Io::Emit emit{writer};
         repr(emit, val);
         return emit.flush();

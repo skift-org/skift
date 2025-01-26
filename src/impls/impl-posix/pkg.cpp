@@ -6,10 +6,20 @@
 namespace Karm::Pkg::_Embed {
 
 Res<Vec<String>> installedBundles() {
-    auto repoRoot = try$(Mime::parseUrlOrPath(try$(Posix::repoRoot())));
+    auto [repo, format] = try$(Posix::repoRoot());
+    Mime::Url repoRoot;
+    if (format == Posix::RepoType::CUTEKIT) {
+        repoRoot = Mime::Url::parse(repo);
+    } else if (format == Posix::RepoType::PREFIX) {
+        repoRoot = Mime::Url::parse(repo)
+                       .join("share");
+    } else {
+        return Error::notFound("unknown repo type");
+    }
+
     auto dirs = try$(Sys::_Embed::readDir(repoRoot));
     Vec<String> ids;
-    for (auto &dir : dirs) {
+    for (auto& dir : dirs) {
         if (dir.type == Sys::Type::DIR)
             ids.pushBack(dir.name);
     }
@@ -17,7 +27,7 @@ Res<Vec<String>> installedBundles() {
 }
 
 Res<String> currentBundle() {
-    auto *maybeBundle = getenv("CK_COMPONENT");
+    auto* maybeBundle = getenv("CK_COMPONENT");
     if (maybeBundle)
         return Ok(Str::fromNullterminated(maybeBundle));
 

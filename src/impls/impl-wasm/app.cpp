@@ -7,7 +7,7 @@ namespace Karm::App::_Ember {
 
 static Opt<MockPrefs> _globalPrefs;
 
-Prefs &globalPrefs() {
+Prefs& globalPrefs() {
     if (not _globalPrefs)
         _globalPrefs = MockPrefs{};
     return *_globalPrefs;

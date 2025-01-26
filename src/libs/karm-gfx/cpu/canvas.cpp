@@ -32,11 +32,11 @@ Pixels CpuCanvas::pixels() const {
     return _pixels.unwrap("no pixels");
 }
 
-CpuCanvas::Scope &CpuCanvas::current() {
+CpuCanvas::Scope& CpuCanvas::current() {
     return last(_stack);
 }
 
-CpuCanvas::Scope const &CpuCanvas::current() const {
+CpuCanvas::Scope const& CpuCanvas::current() const {
     return last(_stack);
 }
 
@@ -65,7 +65,7 @@ void CpuCanvas::strokeStyle(Stroke style) {
 }
 
 void CpuCanvas::transform(Math::Trans2f trans) {
-    auto &t = current().trans;
+    auto& t = current().trans;
     t = trans.multiply(t);
 }
 
@@ -74,7 +74,7 @@ void CpuCanvas::transform(Math::Trans2f trans) {
 void CpuCanvas::_fillImpl(auto fill, auto format, FillRule fillRule) {
     _rast.fill(_poly, current().clip, fillRule, [&](CpuRast::Frag frag) {
         auto pixels = mutPixels();
-        auto *pixel = pixels.pixelUnsafe(frag.xy);
+        auto* pixel = pixels.pixelUnsafe(frag.xy);
         auto color = fill.sample(frag.uv);
         auto c = format.load(pixel);
         c = color.withOpacity(frag.a).blendOver(c);
@@ -89,7 +89,7 @@ void CpuCanvas::_FillSmoothImpl(auto fill, auto format, FillRule fillRule) {
         last = pos;
 
         _rast.fill(_poly, current().clip, fillRule, [&](CpuRast::Frag frag) {
-            u8 *pixel = static_cast<u8 *>(mutPixels().pixelUnsafe(frag.xy));
+            u8* pixel = static_cast<u8*>(mutPixels().pixelUnsafe(frag.xy));
             auto color = fill.sample(frag.uv);
             auto c = format.load(pixel);
             c = color.withOpacity(frag.a).blendOverComponent(c, comp);
@@ -161,7 +161,7 @@ void CpuCanvas::rect(Math::Rectf rect, Math::Radiif radii) {
     _path.rect(rect, radii);
 }
 
-void CpuCanvas::path(Math::Path const &path) {
+void CpuCanvas::path(Math::Path const& path) {
     _path.path(path);
 }
 
@@ -234,21 +234,21 @@ void CpuCanvas::clip(Math::Rectf rect) {
     current().clip = rect.cast<isize>().clipTo(current().clip);
 }
 
-void CpuCanvas::stroke(Math::Path const &path) {
+void CpuCanvas::stroke(Math::Path const& path) {
     _poly.clear();
     createStroke(_poly, path, current().stroke);
     _poly.transform(current().trans);
     _fill(current().stroke.fill);
 }
 
-void CpuCanvas::fill(Math::Path const &path, FillRule rule) {
+void CpuCanvas::fill(Math::Path const& path, FillRule rule) {
     _poly.clear();
     createSolid(_poly, path);
     _poly.transform(current().trans);
     _fill(current().fill, rule);
 }
 
-void CpuCanvas::fill(Text::Font &font, Text::Glyph glyph, Math::Vec2f baseline) {
+void CpuCanvas::fill(Text::Font& font, Text::Glyph glyph, Math::Vec2f baseline) {
     _useSpaa = true;
     Canvas::fill(font, glyph, baseline);
     _useSpaa = false;
@@ -338,8 +338,8 @@ void CpuCanvas::plot(Math::Recti rect, Color color) {
             auto srcX = srcRect.x + xx * wratio;
             auto destX = clipDest.x + x;
 
-            u8 const *srcPx = static_cast<u8 const *>(src.pixelUnsafe({(isize)srcX, (isize)srcY}));
-            u8 *destPx = static_cast<u8 *>(dest.pixelUnsafe({destX, destY}));
+            u8 const* srcPx = static_cast<u8 const*>(src.pixelUnsafe({(isize)srcX, (isize)srcY}));
+            u8* destPx = static_cast<u8*>(dest.pixelUnsafe({destX, destY}));
             auto srcC = srcFmt.load(srcPx);
             auto destC = destFmt.load(destPx);
             destFmt.store(destPx, srcC.blendOver(destC));

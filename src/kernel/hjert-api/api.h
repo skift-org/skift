@@ -7,8 +7,8 @@
 
 namespace Hj {
 
-inline Res<TimeStamp> now() {
-    TimeStamp ts;
+inline Res<Instant> now() {
+    Instant ts;
     try$(_now(&ts));
     return Ok(ts);
 }
@@ -289,7 +289,7 @@ struct Listener : public Object {
         return _listen(_cap, cap, Sigs::NONE, Sigs::NONE);
     }
 
-    Res<> poll(TimeStamp until) {
+    Res<> poll(Instant until) {
         _evs.resize(256);
         _len = 0;
         return _poll(_cap, _evs.buf(), _evs.len(), &_len, until);

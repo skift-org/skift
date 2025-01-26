@@ -73,12 +73,12 @@ Res<Decoder> Decoder::init(Bytes slice) {
     return Ok(dec);
 };
 
-void Decoder::skipMarker(Io::BScan &s) {
+void Decoder::skipMarker(Io::BScan& s) {
     u16 len = s.nextU16be();
     s.skip(len - 2);
 }
 
-Res<> Decoder::defineQuantizationTable(Io::BScan &x) {
+Res<> Decoder::defineQuantizationTable(Io::BScan& x) {
     // logDebug("jpeg: defining quantization table");
 
     u16 len = x.nextU16be();
@@ -95,7 +95,7 @@ Res<> Decoder::defineQuantizationTable(Io::BScan &x) {
             return Error::invalidData("invalid quantization table id");
         }
 
-        Quant &quant = _quant[id].emplace();
+        Quant& quant = _quant[id].emplace();
         bool is16bit = (infos >> 4) == 1;
 
         for (usize i = 0; i < 64; ++i) {
@@ -107,7 +107,7 @@ Res<> Decoder::defineQuantizationTable(Io::BScan &x) {
     return Ok();
 }
 
-Res<> Decoder::startOfFrame(Io::BScan &x) {
+Res<> Decoder::startOfFrame(Io::BScan& x) {
     // logDebug("jpeg: start of frame");
 
     u16 len = x.nextU16be();
@@ -165,7 +165,7 @@ Res<> Decoder::startOfFrame(Io::BScan &x) {
     return Ok();
 }
 
-Res<> Decoder::defineRestartInterval(Io::BScan &x) {
+Res<> Decoder::defineRestartInterval(Io::BScan& x) {
     // logDebug("jpeg: defining restart interval");
 
     u16 len = x.nextU16be();
@@ -181,7 +181,7 @@ Res<> Decoder::defineRestartInterval(Io::BScan &x) {
     return Ok();
 }
 
-Res<> Decoder::defineHuffmanTable(Io::BScan &x) {
+Res<> Decoder::defineHuffmanTable(Io::BScan& x) {
     // logDebug("jpeg: defining huffman table");
 
     u16 len = x.nextU16be();
@@ -197,7 +197,7 @@ Res<> Decoder::defineHuffmanTable(Io::BScan &x) {
             return Error::invalidData("invalid huffman table id");
         }
 
-        auto &table = (isAc ? _acHuff : _dcHuff)[id].emplace();
+        auto& table = (isAc ? _acHuff : _dcHuff)[id].emplace();
 
         usize sum = 0;
         for (usize i = 1; i < 17; ++i) {
@@ -218,7 +218,7 @@ Res<> Decoder::defineHuffmanTable(Io::BScan &x) {
     return Ok();
 }
 
-Res<> Decoder::startOfScan(Io::BScan &x) {
+Res<> Decoder::startOfScan(Io::BScan& x) {
     // logDebug("jpeg: start of scan");
 
     if (_componentCount == 0) {
@@ -298,7 +298,7 @@ Res<> Decoder::startOfScan(Io::BScan &x) {
     return Ok();
 }
 
-Res<> Decoder::decodeHuffman(Io::BScan &s) {
+Res<> Decoder::decodeHuffman(Io::BScan& s) {
     _mcus.resize(mcuWidth() * mcuHeight() * _componentCount);
 
     Array<isize, 3> prevDc = {};
@@ -306,7 +306,7 @@ Res<> Decoder::decodeHuffman(Io::BScan &s) {
     BitReader bs{s};
 
     for (usize i = 0; i < _mcus.len(); ++i) {
-        Mcu &mcu = _mcus[i];
+        Mcu& mcu = _mcus[i];
         usize cid = i % _componentCount;
 
         // logDebug("jpeg: decoding mcu {} of {} (cid: {})", i + 1, _mcus.len(), cid);
@@ -322,7 +322,7 @@ Res<> Decoder::decodeHuffman(Io::BScan &s) {
             return Error::invalidData("undefined component id");
         }
 
-        auto &c = _scanComponents[cid].unwrap();
+        auto& c = _scanComponents[cid].unwrap();
 
         // logDebug("jpeg: decoding using huffman table (dc: {}, ac: {})", c.dcHuffId, c.acHuffId);
 
@@ -331,14 +331,14 @@ Res<> Decoder::decodeHuffman(Io::BScan &s) {
             return Error::invalidData("undefined dc huffman table id");
         }
 
-        auto &dcHuff = _dcHuff[c.dcHuffId].unwrap();
+        auto& dcHuff = _dcHuff[c.dcHuffId].unwrap();
 
         if (not _acHuff[c.acHuffId]) {
             logError("jpeg: undefined ac huffman table id: {}", c.acHuffId);
             return Error::invalidData("undefined ac huffman table id");
         }
 
-        auto &acHuff = _acHuff[c.acHuffId].unwrap();
+        auto& acHuff = _acHuff[c.acHuffId].unwrap();
 
         Byte len = try$(dcHuff.next(bs));
 
@@ -405,21 +405,21 @@ Res<> Decoder::decode(Gfx::MutPixels pixels) {
         usize y = (i / _componentCount) / mcuWidth();
 
         for (usize j = 0; j < _componentCount; j++) {
-            auto &mcu = _mcus[i + j];
+            auto& mcu = _mcus[i + j];
 
             if (not _quant[_components[j]->quantId]) {
                 logError("jpeg: undefined quantization table id: {}", _components[j]->quantId);
                 return Error::invalidData("undefined quantization table id");
             }
 
-            auto &quant = _quant[_components[j]->quantId].unwrap();
+            auto& quant = _quant[_components[j]->quantId].unwrap();
             dequantize(mcu, quant);
             idct(mcu);
         }
 
-        auto &yMcu = _mcus[i + 0];
-        auto &cbMcu = _mcus[i + 1];
-        auto &crMcu = _mcus[i + 2];
+        auto& yMcu = _mcus[i + 0];
+        auto& cbMcu = _mcus[i + 1];
+        auto& crMcu = _mcus[i + 2];
 
         for (usize k = 0; k < 64; ++k) {
             isize px = x * 8 + k % 8;
@@ -433,7 +433,7 @@ Res<> Decoder::decode(Gfx::MutPixels pixels) {
     return Ok();
 }
 
-void Decoder::repr(Io::Emit &e) {
+void Decoder::repr(Io::Emit& e) {
     e("JPEG image");
     e.indentNewline();
     e.ln("width: {}", width());

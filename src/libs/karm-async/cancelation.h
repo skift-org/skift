@@ -6,11 +6,11 @@ namespace Karm::Async {
 
 struct Cancelation : Meta::Pinned {
     struct Token {
-        Cancelation *_c = nullptr;
+        Cancelation* _c = nullptr;
 
         Token() = default;
 
-        Token(Cancelation &c) : _c{&c} {}
+        Token(Cancelation& c) : _c{&c} {}
 
         bool canceled() const {
             return _c and _c->canceled();

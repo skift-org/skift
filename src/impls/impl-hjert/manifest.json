@@ -8,10 +8,6 @@
             "hjert"
         ]
     },
-    "requires": [
-        "abi",
-        "libheap"
-    ],
     "provides": [
         "karm-logger-impl"
     ]

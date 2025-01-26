@@ -22,7 +22,7 @@ struct Fd : public Sys::Fd {
 
     Res<usize> flush() override;
 
-    Res<Strong<Sys::Fd>> dup() override;
+    Res<Rc<Sys::Fd>> dup() override;
 
     Res<Sys::_Accepted> accept() override;
 
@@ -32,7 +32,7 @@ struct Fd : public Sys::Fd {
 
     Res<Sys::_Received> recv(MutBytes, MutSlice<Sys::Handle>) override;
 
-    Res<> pack(Io::PackEmit &e) override;
+    Res<> pack(Io::PackEmit& e) override;
 };
 
 } // namespace Posix

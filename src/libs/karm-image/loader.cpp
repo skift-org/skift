@@ -54,7 +54,7 @@ static Res<Picture> loadGif(Bytes bytes) {
     return Ok(img);
 }
 
-Res<Picture> load(Sys::Mmap &&map) {
+Res<Picture> load(Sys::Mmap&& map) {
     if (Bmp::Decoder::sniff(map.bytes())) {
         return loadBmp(map.bytes());
     } else if (Qoi::Decoder::sniff(map.bytes())) {

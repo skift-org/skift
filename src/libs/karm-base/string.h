@@ -13,26 +13,26 @@ struct _Str : public Slice<U> {
 
     always_inline constexpr _Str() = default;
 
-    always_inline constexpr _Str(U const *cstr)
+    always_inline constexpr _Str(U const* cstr)
         requires(Meta::Same<U, char>)
         : Slice<U>(cstr, cstrLen(cstr)) {}
 
-    always_inline constexpr _Str(U const *buf, usize len)
+    always_inline constexpr _Str(U const* buf, usize len)
         : Slice<U>(buf, len) {}
 
-    always_inline constexpr _Str(U const *begin, U const *end)
+    always_inline constexpr _Str(U const* begin, U const* end)
         : Slice<U>(begin, end - begin) {}
 
-    always_inline constexpr _Str(Sliceable<U> auto const &other)
+    always_inline constexpr _Str(Sliceable<U> auto const& other)
         : Slice<U>(other.buf(), other.len()) {}
 
-    always_inline constexpr auto operator<=>(Unit const *cstr) const
+    always_inline constexpr auto operator<=>(Unit const* cstr) const
         requires(Meta::Same<Unit, char>)
     {
         return *this <=> _Str<E>(cstr);
     }
 
-    always_inline constexpr bool operator==(Unit const *cstr) const
+    always_inline constexpr bool operator==(Unit const* cstr) const
         requires(Meta::Same<Unit, char>)
     {
         return *this == _Str<E>(cstr);
@@ -55,7 +55,7 @@ struct _InlineString {
 
     constexpr _InlineString() = default;
 
-    _InlineString(Unit const *buf, usize len) {
+    _InlineString(Unit const* buf, usize len) {
         if (len > N) [[unlikely]]
             panic("len too large");
 
@@ -67,26 +67,26 @@ struct _InlineString {
     always_inline _InlineString(_Str<E> str)
         : _InlineString(str.buf(), str.len()) {}
 
-    always_inline _InlineString(Sliceable<Unit> auto const &other)
+    always_inline _InlineString(Sliceable<Unit> auto const& other)
         : _InlineString(other.buf(), other.len()) {}
 
     always_inline _Str<E> str() const lifetimebound { return *this; }
 
-    always_inline Unit const &operator[](usize i) const lifetimebound {
+    always_inline Unit const& operator[](usize i) const lifetimebound {
         return _buf[i];
     }
 
-    always_inline Unit const *buf() const lifetimebound { return _buf.buf(); }
+    always_inline Unit const* buf() const lifetimebound { return _buf.buf(); }
 
     always_inline usize len() const { return _len; }
 
-    always_inline auto operator<=>(Unit const *cstr) const
+    always_inline auto operator<=>(Unit const* cstr) const
         requires(Meta::Same<Unit, char>)
     {
         return str() <=> _Str<E>(cstr);
     }
 
-    always_inline bool operator==(Unit const *cstr) const
+    always_inline bool operator==(Unit const* cstr) const
         requires(Meta::Same<Unit, char>)
     {
         return str() == _Str<E>(cstr);
@@ -108,17 +108,17 @@ struct _String {
 
     static constexpr Array<Unit, 1> _EMPTY = {0};
 
-    Unit const *_buf = nullptr;
+    Unit const* _buf = nullptr;
     usize _len = 0;
 
     constexpr _String() = default;
 
-    always_inline _String(Move, Unit const *buf, usize len)
+    always_inline _String(Move, Unit const* buf, usize len)
         : _buf(buf),
           _len(len) {
     }
 
-    _String(Unit const *buf, usize len)
+    _String(Unit const* buf, usize len)
         : _len(len) {
         if (len == 0)
             // Allow initializing the string using "" and not allocating memory.
@@ -133,14 +133,14 @@ struct _String {
     always_inline _String(_Str<E> str)
         : _String(str.buf(), str.len()) {}
 
-    always_inline _String(Sliceable<Unit> auto const &other)
+    always_inline _String(Sliceable<Unit> auto const& other)
         : _String(other.buf(), other.len()) {}
 
-    always_inline _String(_String const &other)
+    always_inline _String(_String const& other)
         : _String(other._buf, other._len) {
     }
 
-    always_inline _String(_String &&other)
+    always_inline _String(_String&& other)
         : _buf(std::exchange(other._buf, nullptr)),
           _len(std::exchange(other._len, 0)) {
     }
@@ -152,12 +152,12 @@ struct _String {
         }
     }
 
-    always_inline _String &operator=(_String const &other) {
+    always_inline _String& operator=(_String const& other) {
         *this = _String(other);
         return *this;
     }
 
-    always_inline _String &operator=(_String &&other) {
+    always_inline _String& operator=(_String&& other) {
         std::swap(_buf, other._buf);
         std::swap(_len, other._len);
         return *this;
@@ -165,23 +165,23 @@ struct _String {
 
     always_inline _Str<E> str() const lifetimebound { return *this; }
 
-    always_inline Unit const &operator[](usize i) const lifetimebound {
+    always_inline Unit const& operator[](usize i) const lifetimebound {
         if (i >= _len) [[unlikely]]
             panic("index out of bounds");
         return buf()[i];
     }
 
-    always_inline Unit const *buf() const lifetimebound { return _len ? _buf : _EMPTY.buf(); }
+    always_inline Unit const* buf() const lifetimebound { return _len ? _buf : _EMPTY.buf(); }
 
     always_inline usize len() const { return _len; }
 
-    always_inline auto operator<=>(Unit const *cstr) const
+    always_inline auto operator<=>(Unit const* cstr) const
         requires(Meta::Same<Unit, char>)
     {
         return str() <=> _Str<E>(cstr);
     }
 
-    always_inline bool operator==(Unit const *cstr) const
+    always_inline bool operator==(Unit const* cstr) const
         requires(Meta::Same<Unit, char>)
     {
         return str() == _Str<E>(cstr);
@@ -196,7 +196,7 @@ template <
     Sliceable S,
     typename E = typename S::Encoding,
     typename U = typename E::Unit>
-auto iterRunes(S const &slice) {
+auto iterRunes(S const& slice) {
     Cursor<U> cursor(slice);
     return Iter([cursor] mutable -> Opt<Rune> {
         if (cursor.ended()) {
@@ -236,7 +236,7 @@ bool eqCi(_Str<E> a, _Str<E> b) {
 template <::StaticEncoding Target, ::StaticEncoding Source>
 _String<Target> transcode(_Str<Source> str) {
     usize len = transcodeLen<Source, Target>(str);
-    typename Target::Unit *buf = new typename Target::Unit[len + 1];
+    typename Target::Unit* buf = new typename Target::Unit[len + 1];
     buf[len] = '\0';
 
     Cursor<typename Source::Unit> input = str;
@@ -264,7 +264,7 @@ struct StrLit {
 
     constexpr operator Str() const lifetimebound { return _buf; }
 
-    constexpr operator char const *() const lifetimebound { return _buf; }
+    constexpr operator char const*() const lifetimebound { return _buf; }
 };
 
 // MARK: String Conversion -----------------------------------------------------
@@ -291,12 +291,12 @@ struct _StringBuilder {
             _buf.insert(_buf.len(), std::move(unit));
     }
 
-    void append(Sliceable<Rune> auto const &runes) {
+    void append(Sliceable<Rune> auto const& runes) {
         for (auto rune : runes)
             append(rune);
     }
 
-    void append(Sliceable<typename E::Unit> auto const &units) {
+    void append(Sliceable<typename E::Unit> auto const& units) {
         _buf.insert(COPY, _buf.len(), units.buf(), units.len());
     }
 
@@ -330,16 +330,16 @@ using StringBuilder = _StringBuilder<Utf8>;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wuser-defined-literals"
 
-inline constexpr Karm::Str operator""s(char const *buf, usize len) {
+inline constexpr Karm::Str operator""s(char const* buf, usize len) {
     return {buf, len};
 }
 
-inline constexpr Karm::_Str<Karm::Utf8> operator""_s8(char const *buf, usize len) {
+inline constexpr Karm::_Str<Karm::Utf8> operator""_s8(char const* buf, usize len) {
     return {buf, len};
 }
 
-inline constexpr Karm::_Str<Karm::Utf16> operator""_s16(char16_t const *buf, usize len) {
-    return {reinterpret_cast<u16 const *>(buf), len};
+inline constexpr Karm::_Str<Karm::Utf16> operator""_s16(char16_t const* buf, usize len) {
+    return {reinterpret_cast<u16 const*>(buf), len};
 }
 
 #pragma clang diagnostic pop

@@ -5,6 +5,10 @@
 
 namespace Vaev::View {
 
-Ui::Child view(Strong<Markup::Document> dom);
+struct ViewProps {
+    bool wireframe = false;
+};
+
+Ui::Child view(Rc<Markup::Document> dom, ViewProps props);
 
 } // namespace Vaev::View

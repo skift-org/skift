@@ -26,14 +26,14 @@ struct Array {
         }(std::make_index_sequence<N>());
     }
 
-    always_inline constexpr T &operator[](usize i) {
+    always_inline constexpr T& operator[](usize i) {
         if (i >= N) [[unlikely]]
             panic("index out of range");
 
         return _buf[i];
     }
 
-    always_inline constexpr T const &operator[](usize i) const {
+    always_inline constexpr T const& operator[](usize i) const {
         if (i >= N) [[unlikely]]
             panic("index out of range");
 
@@ -42,9 +42,9 @@ struct Array {
 
     always_inline constexpr usize len() const { return N; }
 
-    always_inline constexpr T *buf() { return _buf; }
+    always_inline constexpr T* buf() { return _buf; }
 
-    always_inline constexpr T const *buf() const { return _buf; }
+    always_inline constexpr T const* buf() const { return _buf; }
 
     always_inline constexpr Array reversed() const {
         Array res{};
@@ -54,11 +54,11 @@ struct Array {
     }
 
     always_inline constexpr Bytes bytes() const {
-        return {reinterpret_cast<Byte const *>(buf()), len() * sizeof(T)};
+        return {reinterpret_cast<Byte const*>(buf()), len() * sizeof(T)};
     }
 
     always_inline constexpr MutBytes mutBytes() {
-        return {reinterpret_cast<Byte *>(buf()), len() * sizeof(T)};
+        return {reinterpret_cast<Byte*>(buf()), len() * sizeof(T)};
     }
 };
 

@@ -67,7 +67,7 @@ struct BoxStyle {
         return copy;
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti bound, auto inner) {
+    void paint(Gfx::Canvas& g, Math::Recti bound, auto inner) {
         bound = bound.grow(padding);
 
         g.push();
@@ -92,7 +92,7 @@ struct BoxStyle {
         g.pop();
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti bound) {
+    void paint(Gfx::Canvas& g, Math::Recti bound) {
         paint(g, bound, [&] {
         });
     }
@@ -103,9 +103,9 @@ struct _Box : public ProxyNode<Crtp> {
     _Box(Child child)
         : ProxyNode<Crtp>(child) {}
 
-    virtual BoxStyle &boxStyle() = 0;
+    virtual BoxStyle& boxStyle() = 0;
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
         boxStyle().paint(g, ProxyNode<Crtp>::_child->bound(), [&] {
             ProxyNode<Crtp>::paint(g, r);
         });

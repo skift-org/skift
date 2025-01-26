@@ -9,17 +9,17 @@ enum class PanicKind {
     PANIC,
 };
 
-using PanicHandler = void (*)(PanicKind kind, char const *msg);
+using PanicHandler = void (*)(PanicKind kind, char const* msg);
 
 void registerPanicHandler(PanicHandler handler);
 
-void _panic(PanicKind kind, char const *msg);
+void _panic(PanicKind kind, char const* msg);
 
-inline void debug(char const *msg) {
+inline void debug(char const* msg) {
     _panic(PanicKind::DEBUG, msg);
 }
 
-[[noreturn]] inline void panic(char const *msg) {
+[[noreturn]] inline void panic(char const* msg) {
     _panic(PanicKind::PANIC, msg);
     __builtin_unreachable();
 }

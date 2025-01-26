@@ -1,8 +1,10 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "impl-darwin",
+    "id": "impl-posix.kevent",
     "type": "lib",
-    "description": "Darwin-specific implementation of the sys-async component",
+    "props": {
+        "cpp-excluded": true
+    },
     "enableIf": {
         "sys": [
             "darwin"

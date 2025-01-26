@@ -98,18 +98,18 @@ union Trans2 {
     constexpr Trans2(T xx, T xy, T yx, T yy, T ox, T oy)
         : _els{xx, xy, yx, yy, ox, oy} {}
 
-    constexpr Trans2(Trans2 const &other)
+    constexpr Trans2(Trans2 const& other)
         : _els{other._els} {}
 
-    constexpr Trans2(Trans2 &&other)
+    constexpr Trans2(Trans2&& other)
         : _els{std::move(other._els)} {}
 
-    constexpr Trans2 &operator=(Trans2 const &other) {
+    constexpr Trans2& operator=(Trans2 const& other) {
         _els = other._els;
         return *this;
     }
 
-    constexpr Trans2 &operator=(Trans2 &&other) {
+    constexpr Trans2& operator=(Trans2&& other) {
         _els = std::move(other._els);
         return *this;
     }
@@ -141,7 +141,7 @@ union Trans2 {
         return apply(Quad<T>{r});
     }
 
-    constexpr Trans2 multiply(Trans2 const &other) const {
+    constexpr Trans2 multiply(Trans2 const& other) const {
         Trans2 res = {
             xx * other.xx,
             0.0,
@@ -204,7 +204,7 @@ union Trans2 {
         return {xx, xy};
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(trans {} {} {} {} {} {})", xx, xy, yx, yy, ox, oy);
     }
 };

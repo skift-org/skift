@@ -9,22 +9,22 @@
 namespace Karm::Io {
 
 template <typename T>
-concept Writable = requires(T &writer, Bytes bytes) {
+concept Writable = requires(T& writer, Bytes bytes) {
     { writer.write(bytes) } -> Meta::Same<Res<usize>>;
 };
 
 template <typename T>
-concept Readable = requires(T &reader, MutBytes bytes) {
+concept Readable = requires(T& reader, MutBytes bytes) {
     { reader.read(bytes) } -> Meta::Same<Res<usize>>;
 };
 
 template <typename T>
-concept Seekable = requires(T &seeker, Seek seek) {
+concept Seekable = requires(T& seeker, Seek seek) {
     { seeker.seek(seek) } -> Meta::Same<Res<usize>>;
 };
 
 template <typename T>
-concept Flushable = requires(T &flusher) {
+concept Flushable = requires(T& flusher) {
     { flusher.flush() } -> Meta::Same<Res<usize>>;
 };
 
@@ -112,9 +112,9 @@ template <StaticEncoding E = typename Sys::Encoding>
 struct TextEncoder :
     public TextWriterBase<E> {
 
-    Io::Writer &_writer;
+    Io::Writer& _writer;
 
-    TextEncoder(Io::Writer &writer)
+    TextEncoder(Io::Writer& writer)
         : _writer(writer) {}
 
     Res<usize> write(Bytes bytes) override {

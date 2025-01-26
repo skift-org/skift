@@ -71,11 +71,11 @@ static constexpr Array<u64, 80> SHA512_K = {
     0x5fcb6fab3ad6faec, 0x6c44198c4a475817
 };
 
-static inline void _sha256ComputeBlock(Array<u32, 8> &state, u8 const *buf) {
+static inline void _sha256ComputeBlock(Array<u32, 8>& state, u8 const* buf) {
     Array<u32, 64> w;
 
     for (usize idx = 0; idx < 16; idx++) {
-        w[idx] = toBe(reinterpret_cast<u32 const *>(buf)[idx]);
+        w[idx] = toBe(reinterpret_cast<u32 const*>(buf)[idx]);
     }
 
     for (usize idx = 16; idx < 64; idx++) {
@@ -120,7 +120,7 @@ static inline void _sha256ComputeBlock(Array<u32, 8> &state, u8 const *buf) {
     state[7] += h;
 }
 
-static inline Array<u32, 8> _sha256Internal(Array<u32, 8> const &init, Bytes bytes) {
+static inline Array<u32, 8> _sha256Internal(Array<u32, 8> const& init, Bytes bytes) {
     Array<u32, 8> state = init;
     auto [buf, len] = bytes;
     u64 padlen = len << 3;
@@ -171,11 +171,11 @@ Array<u8, SHA224_BYTES> sha224(Bytes bytes) {
     return Array<u8, SHA224_BYTES>::from(state.bytes());
 }
 
-static inline void _sha512ComputeBlock(Array<u64, 8> &state, u8 const *buf) {
+static inline void _sha512ComputeBlock(Array<u64, 8>& state, u8 const* buf) {
     Array<u64, 80> w{};
 
     for (usize idx = 0; idx < 16; idx++) {
-        w[idx] = toBe(reinterpret_cast<u64 const *>(buf)[idx]);
+        w[idx] = toBe(reinterpret_cast<u64 const*>(buf)[idx]);
     }
 
     for (usize idx = 16; idx < 80; idx++) {
@@ -220,7 +220,7 @@ static inline void _sha512ComputeBlock(Array<u64, 8> &state, u8 const *buf) {
     state[7] += h;
 }
 
-static inline Array<u64, 8> _sha512Internal(Array<u64, 8> const &init, Bytes bytes) {
+static inline Array<u64, 8> _sha512Internal(Array<u64, 8> const& init, Bytes bytes) {
     Array<u64, 8> state = init;
     auto [buf, len] = bytes;
     u64 padlen = len << 3;

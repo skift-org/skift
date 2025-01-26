@@ -7,6 +7,6 @@
 
 namespace Tga {
 
-Res<> encode(Gfx::Pixels pixels, Io::BEmit &e);
+Res<> encode(Gfx::Pixels pixels, Io::BEmit& e);
 
 } // namespace Tga

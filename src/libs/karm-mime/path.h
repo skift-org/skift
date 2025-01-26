@@ -25,7 +25,7 @@ struct Path {
     bool rooted = false;
     Vec<String> _parts;
 
-    static Path parse(Io::SScan &s, bool inUrl = false, bool stopAtWhitespace = false);
+    static Path parse(Io::SScan& s, bool inUrl = false, bool stopAtWhitespace = false);
 
     static Path parse(Str str, bool inUrl = false, bool stopAtWhitespace = false);
 
@@ -33,7 +33,7 @@ struct Path {
 
     Str basename() const;
 
-    Path join(Path const &other) const;
+    Path join(Path const& other) const;
 
     Path join(Str other) const;
 
@@ -43,9 +43,9 @@ struct Path {
 
     Path parent(usize n = 0) const;
 
-    bool isParentOf(Path const &other) const;
+    bool isParentOf(Path const& other) const;
 
-    Res<usize> write(Io::TextWriter &writer) const;
+    Res<usize> write(Io::TextWriter& writer) const;
 
     String str() const;
 
@@ -61,7 +61,7 @@ struct Path {
         return _parts.len();
     }
 
-    auto operator<=>(Path const &) const = default;
+    auto operator<=>(Path const&) const = default;
 
     Str suffix() const {
         if (not _parts.len())
@@ -75,21 +75,21 @@ struct Path {
 
 } // namespace Karm::Mime
 
-inline auto operator""_path(char const *str, usize len) {
+inline auto operator""_path(char const* str, usize len) {
     return Karm::Mime::Path::parse({str, len});
 }
 
-inline auto operator/(Karm::Mime::Path const &path, Karm::Mime::Path const &other) {
+inline auto operator/(Karm::Mime::Path const& path, Karm::Mime::Path const& other) {
     return path.join(other);
 }
 
-inline auto operator/(Karm::Mime::Path const &path, Str other) {
+inline auto operator/(Karm::Mime::Path const& path, Str other) {
     return path.join(other);
 }
 
 template <>
 struct Karm::Io::Formatter<Karm::Mime::Path> {
-    Res<usize> format(Io::TextWriter &writer, Karm::Mime::Path const &path) {
+    Res<usize> format(Io::TextWriter& writer, Karm::Mime::Path const& path) {
         return path.write(writer);
     }
 };

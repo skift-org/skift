@@ -4,7 +4,7 @@ namespace Karm::Math {
 
 // MARK: Unsigned Big Integer --------------------------------------------------
 
-void _add(UBig &lhs, usize rhs) {
+void _add(UBig& lhs, usize rhs) {
     auto lhsLen = lhs._len();
 
     usize carry = 0;
@@ -32,7 +32,7 @@ void _add(UBig &lhs, usize rhs) {
         lhs._value.pushBack(carry);
 }
 
-void _add(UBig &lhs, UBig const &rhs) {
+void _add(UBig& lhs, UBig const& rhs) {
     auto lhsLen = lhs._len();
     auto rhsLen = rhs._len();
 
@@ -66,7 +66,7 @@ void _add(UBig &lhs, UBig const &rhs) {
     }
 }
 
-SubResult _sub(UBig &lhs, usize rhs) {
+SubResult _sub(UBig& lhs, usize rhs) {
     u8 borrow = 0;
     for (usize i = 0; i < lhs._len(); i++) {
         usize rhsV = i < 1 ? rhs : 0;
@@ -101,7 +101,7 @@ SubResult _sub(UBig &lhs, usize rhs) {
     return SubResult::OK;
 }
 
-SubResult _sub(UBig &lhs, UBig const &rhs) {
+SubResult _sub(UBig& lhs, UBig const& rhs) {
     u8 borrow = 0;
     for (usize i = 0; i < lhs._len(); i++) {
         usize rhsV = i < rhs._len()
@@ -138,7 +138,7 @@ SubResult _sub(UBig &lhs, UBig const &rhs) {
     return SubResult::OK;
 }
 
-void _shl(UBig &lhs, usize bits) {
+void _shl(UBig& lhs, usize bits) {
     if (lhs == 0 or bits == 0)
         return;
 
@@ -154,7 +154,7 @@ void _shl(UBig &lhs, usize bits) {
         lhs._value.pushBack(carry);
 }
 
-void _shr(UBig &lhs, usize bits) {
+void _shr(UBig& lhs, usize bits) {
     if (lhs == 0 or bits == 0)
         return;
 
@@ -167,33 +167,33 @@ void _shr(UBig &lhs, usize bits) {
     }
 }
 
-void _binNot(UBig &lhs) {
+void _binNot(UBig& lhs) {
     for (usize i = 0; i < lhs._len(); ++i)
         lhs._value[i] = ~lhs._value[i];
 }
 
-void _binOr(UBig &lhs, UBig const &rhs) {
+void _binOr(UBig& lhs, UBig const& rhs) {
     lhs._value.resize(max(lhs._len(), rhs._len()));
 
     for (usize i = 0; i < rhs._len(); ++i)
         lhs._value[i] |= rhs._value[i];
 }
 
-void _binAnd(UBig &lhs, UBig const &rhs) {
+void _binAnd(UBig& lhs, UBig const& rhs) {
     lhs._value.resize(max(lhs._len(), rhs._len()));
 
     for (usize i = 0; i < rhs._len(); ++i)
         lhs._value[i] &= rhs._value[i];
 }
 
-void _binXor(UBig &lhs, UBig const &rhs) {
+void _binXor(UBig& lhs, UBig const& rhs) {
     lhs._value.resize(max(lhs._len(), rhs._len()));
 
     for (usize i = 0; i < rhs._len(); ++i)
         lhs._value[i] ^= rhs._value[i];
 }
 
-void _mul(UBig &lhs, UBig const &rhs) {
+void _mul(UBig& lhs, UBig const& rhs) {
     UBig shifted = lhs;
     for (usize wi = 0; wi < rhs._len(); wi++) {
         for (usize bi = 0; bi < Limits<usize>::BITS; bi++) {
@@ -206,7 +206,7 @@ void _mul(UBig &lhs, UBig const &rhs) {
     }
 }
 
-void _div(UBig const &numerator, UBig const &denominator, UBig &quotient, UBig &remainder) {
+void _div(UBig const& numerator, UBig const& denominator, UBig& quotient, UBig& remainder) {
     quotient = 0_ubig;
     remainder = numerator;
 
@@ -224,7 +224,7 @@ void _div(UBig const &numerator, UBig const &denominator, UBig &quotient, UBig &
     }
 }
 
-void _gcd(UBig const &lhs, UBig const &rhs, UBig &gcd) {
+void _gcd(UBig const& lhs, UBig const& rhs, UBig& gcd) {
     if (lhs == 0 or rhs == 0) [[unlikely]]
         panic("gcd of zero");
 
@@ -238,7 +238,7 @@ void _gcd(UBig const &lhs, UBig const &rhs, UBig &gcd) {
     }
 }
 
-void _pow(UBig const &base, UBig const &exp, UBig &res) {
+void _pow(UBig const& base, UBig const& exp, UBig& res) {
     UBig b{base}, e{exp};
     res = 1_ubig;
 
@@ -252,7 +252,7 @@ void _pow(UBig const &base, UBig const &exp, UBig &res) {
 
 // MARK: Signed Big Integer ----------------------------------------------------
 
-void _add(IBig &lhs, IBig const &rhs) {
+void _add(IBig& lhs, IBig const& rhs) {
     if (lhs._sign == rhs._sign) {
         _add(lhs._value, rhs._value);
     } else if (lhs < rhs) {
@@ -264,7 +264,7 @@ void _add(IBig &lhs, IBig const &rhs) {
     }
 }
 
-void _sub(IBig &lhs, IBig const &rhs) {
+void _sub(IBig& lhs, IBig const& rhs) {
     if (lhs._sign != rhs._sign) {
         _add(lhs._value, rhs._value);
     } else if (lhs.positive()) {
@@ -298,18 +298,18 @@ void _sub(IBig &lhs, IBig const &rhs) {
     }
 }
 
-void _mul(IBig &lhs, IBig const &rhs) {
+void _mul(IBig& lhs, IBig const& rhs) {
     _mul(lhs._value, rhs._value);
     lhs._sign = lhs._sign == rhs._sign ? Sign::POSITIVE : Sign::NEGATIVE;
 }
 
-void _div(IBig const &numerator, IBig const &denominator, IBig &quotient, IBig &remainder) {
+void _div(IBig const& numerator, IBig const& denominator, IBig& quotient, IBig& remainder) {
     _div(numerator._value, denominator._value, quotient._value, remainder._value);
     quotient._sign = numerator._sign == denominator._sign ? Sign::POSITIVE : Sign::NEGATIVE;
     remainder._sign = numerator._sign;
 }
 
-void _pow(IBig const &base, UBig const &exp, IBig &res) {
+void _pow(IBig const& base, UBig const& exp, IBig& res) {
     IBig b{base}, e{exp};
     res = 1_ibig;
 
@@ -323,7 +323,7 @@ void _pow(IBig const &base, UBig const &exp, IBig &res) {
 
 // MARK: Big Fractional Numbers ------------------------------------------------
 
-void _fromF64(BigFrac &frac, f64 value) {
+void _fromF64(BigFrac& frac, f64 value) {
     IBig const TEN = 10_ibig;
 
     frac.clear();
@@ -356,7 +356,7 @@ void _fromF64(BigFrac &frac, f64 value) {
     frac._num = neg ? -frac._num : frac._num;
 }
 
-void _add(BigFrac &lhs, BigFrac const &rhs) {
+void _add(BigFrac& lhs, BigFrac const& rhs) {
     if (rhs._num == 0uz)
         return;
 
@@ -368,16 +368,16 @@ void _add(BigFrac &lhs, BigFrac const &rhs) {
     _mul(lhs._den, rhs._den);
 }
 
-void _sub(BigFrac &lhs, BigFrac const &rhs) {
+void _sub(BigFrac& lhs, BigFrac const& rhs) {
     _add(lhs, -rhs);
 }
 
-void _mul(BigFrac &lhs, BigFrac const &rhs) {
+void _mul(BigFrac& lhs, BigFrac const& rhs) {
     _mul(lhs._num, rhs._num);
     _mul(lhs._den, rhs._den);
 }
 
-void _div(BigFrac &lhs, BigFrac const &rhs) {
+void _div(BigFrac& lhs, BigFrac const& rhs) {
     _mul(lhs._num.value(), rhs._den);
     _mul(lhs._den, rhs._num.value());
 }

@@ -32,6 +32,10 @@ static Media const TEST_MEDIA = {
     .forcedColors = Colors::NONE,
     .prefersColorScheme = ColorScheme::LIGHT,
     .prefersReducedData = ReducedData::REDUCE,
+
+    .deviceWidth = 1920_px,
+    .deviceHeight = 1080_px,
+    .deviceAspectRatio = 16.0 / 9.0,
 };
 
 test$("feature-type") {
@@ -246,6 +250,45 @@ test$("feature-prefers-color-scheme") {
 
 test$("feature-prefers-reduced-data") {
     expect$(PrefersReducedDataFeature{ReducedData::REDUCE}
+                .match(TEST_MEDIA));
+
+    return Ok();
+}
+
+test$("feature-device-width") {
+    expect$(DeviceWidthFeature::min(1920_px)
+                .match(TEST_MEDIA));
+
+    expect$(DeviceWidthFeature::max(1920_px)
+                .match(TEST_MEDIA));
+
+    expect$(DeviceWidthFeature::exact(1920_px)
+                .match(TEST_MEDIA));
+
+    return Ok();
+}
+
+test$("feature-device-height") {
+    expect$(DeviceHeightFeature::min(1080_px)
+                .match(TEST_MEDIA));
+
+    expect$(DeviceHeightFeature::max(1080_px)
+                .match(TEST_MEDIA));
+
+    expect$(DeviceHeightFeature::exact(1080_px)
+                .match(TEST_MEDIA));
+
+    return Ok();
+}
+
+test$("feature-device-aspect-ratio") {
+    expect$(DeviceAspectRatioFeature::min(16.0 / 9.0)
+                .match(TEST_MEDIA));
+
+    expect$(DeviceAspectRatioFeature::max(16.0 / 9.0)
+                .match(TEST_MEDIA));
+
+    expect$(DeviceAspectRatioFeature::exact(16.0 / 9.0)
                 .match(TEST_MEDIA));
 
     return Ok();

@@ -2,11 +2,11 @@
 
 namespace Hjert::Core {
 
-Res<Strong<Listener>> Listener::create() {
-    return Ok(makeStrong<Listener>());
+Res<Arc<Listener>> Listener::create() {
+    return Ok(makeArc<Listener>());
 }
 
-Res<> Listener::listen(Hj::Cap cap, Strong<Object> obj, Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset) {
+Res<> Listener::listen(Hj::Cap cap, Arc<Object> obj, Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset) {
     ObjectLockScope scope{*this};
 
     for (usize i = 0; i < _listened.len(); ++i) {

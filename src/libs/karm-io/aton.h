@@ -25,7 +25,7 @@ static inline Opt<u8> _parseDigit(Rune rune, AtoxOptions options = {}) {
 }
 
 template <StaticEncoding E>
-static inline Opt<u8> _nextDigit(_SScan<E> &s, AtoxOptions options = {}) {
+static inline Opt<u8> _nextDigit(_SScan<E>& s, AtoxOptions options = {}) {
     if (s.ended())
         return NONE;
 
@@ -38,7 +38,7 @@ static inline Opt<u8> _nextDigit(_SScan<E> &s, AtoxOptions options = {}) {
 }
 
 template <StaticEncoding E>
-static inline Opt<usize> atou(_SScan<E> &s, AtoxOptions options = {}) {
+static inline Opt<usize> atou(_SScan<E>& s, AtoxOptions options = {}) {
     bool isNum = false;
     usize result = 0;
 
@@ -57,7 +57,7 @@ static inline Opt<usize> atou(_SScan<E> &s, AtoxOptions options = {}) {
 }
 
 template <StaticEncoding E>
-static inline Opt<isize> atoi(_SScan<E> &s, AtoxOptions options = {}) {
+static inline Opt<isize> atoi(_SScan<E>& s, AtoxOptions options = {}) {
     bool isNeg = false;
     bool isNum = false;
     isize result = 0;
@@ -89,7 +89,7 @@ static inline Opt<isize> atoi(_SScan<E> &s, AtoxOptions options = {}) {
 #ifndef __ck_freestanding__
 
 template <StaticEncoding E>
-static inline Opt<f64> atof(_SScan<E> &s, AtoxOptions const &options = {}) {
+static inline Opt<f64> atof(_SScan<E>& s, AtoxOptions const& options = {}) {
     i64 ipart = 0.0;
     f64 fpart = 0.0;
     i64 exp = 0;
@@ -126,13 +126,13 @@ static inline Opt<f64> atof(_SScan<E> &s, AtoxOptions const &options = {}) {
 #endif
 
 template <StaticEncoding E>
-static inline Opt<usize> atou(_Str<E> str, AtoxOptions const &options = {}) {
+static inline Opt<usize> atou(_Str<E> str, AtoxOptions const& options = {}) {
     auto s = _SScan<E>(str);
     return atou(s, options);
 }
 
 template <StaticEncoding E>
-static inline Opt<isize> atoi(_Str<E> str, AtoxOptions const &options = {}) {
+static inline Opt<isize> atoi(_Str<E> str, AtoxOptions const& options = {}) {
     auto s = _SScan<E>(str);
     return atoi(s, options);
 }
@@ -140,7 +140,7 @@ static inline Opt<isize> atoi(_Str<E> str, AtoxOptions const &options = {}) {
 #ifndef __ck_freestanding__
 
 template <StaticEncoding E>
-static inline Opt<f64> atof(_Str<E> str, AtoxOptions const &options = {}) {
+static inline Opt<f64> atof(_Str<E> str, AtoxOptions const& options = {}) {
     auto s = _SScan<E>(str);
     return atof(s, options);
 }

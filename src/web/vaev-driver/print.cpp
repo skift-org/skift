@@ -4,7 +4,6 @@
 #include <vaev-layout/builder.h>
 #include <vaev-layout/layout.h>
 #include <vaev-layout/paint.h>
-#include <vaev-layout/tree.h>
 #include <vaev-layout/values.h>
 #include <vaev-style/page.h>
 
@@ -13,7 +12,7 @@
 
 namespace Vaev::Driver {
 
-static void _paintMargins(Style::PageComputedStyle &pageStyle, RectPx pageRect, RectPx pageContent, Scene::Stack &stack) {
+static void _paintMargins(Style::PageComputedStyle& pageStyle, RectPx pageRect, RectPx pageContent, Scene::Stack& stack) {
     // MARK: Top Left Corner ---------------------------------------------------
 
     auto topLeftMarginCornerRect = RectPx::fromTwoPoint(
@@ -217,7 +216,7 @@ static void _paintMargins(Style::PageComputedStyle &pageStyle, RectPx pageRect, 
     Layout::paint(rightFrag, stack);
 }
 
-static Style::Media _constructMedia(Print::Settings const &settings) {
+static Style::Media _constructMedia(Print::Settings const& settings) {
     return {
         .type = MediaType::SCREEN,
         .width = Px{settings.paper.width},
@@ -248,10 +247,15 @@ static Style::Media _constructMedia(Print::Settings const &settings) {
         .forcedColors = Colors::NONE,
         .prefersColorScheme = ColorScheme::LIGHT,
         .prefersReducedData = ReducedData::NO_PREFERENCE,
+
+        // NOTE: Deprecated Media Features
+        .deviceWidth = Px{settings.paper.width},
+        .deviceHeight = Px{settings.paper.height},
+        .deviceAspectRatio = settings.paper.width / (f64)settings.paper.height,
     };
 }
 
-Vec<Print::Page> print(Markup::Document const &dom, Print::Settings const &settings) {
+Vec<Print::Page> print(Markup::Document const& dom, Print::Settings const& settings) {
     auto media = _constructMedia(settings);
 
     Style::StyleBook stylebook;
@@ -304,7 +308,7 @@ Vec<Print::Page> print(Markup::Document const &dom, Print::Settings const &setti
 
         auto pageSize = pageRect.size().cast<f64>();
 
-        auto pageStack = makeStrong<Scene::Stack>();
+        auto pageStack = makeRc<Scene::Stack>();
 
         InsetsPx pageMargin = {};
 
@@ -327,7 +331,7 @@ Vec<Print::Page> print(Markup::Document const &dom, Print::Settings const &setti
         };
 
         contentTree.viewport = vp;
-        contentTree.fc.currSize = pageContent.size();
+        contentTree.fc = {pageContent.size()};
 
         if (settings.headerFooter and settings.margins != Print::Margins::NONE)
             _paintMargins(*pageStyle, pageRect, pageContent, *pageStack);
@@ -359,7 +363,7 @@ Vec<Print::Page> print(Markup::Document const &dom, Print::Settings const &setti
         Layout::paint(fragment, *pageStack);
         pageStack->prepare();
 
-        pages.emplaceBack(settings.paper, makeStrong<Scene::Transform>(pageStack, Math::Trans2f::makeScale(media.resolution.toDppx())));
+        pages.emplaceBack(settings.paper, makeRc<Scene::Transform>(pageStack, Math::Trans2f::makeScale(media.resolution.toDppx())));
 
         if (outReal.completelyLaidOut)
             break;

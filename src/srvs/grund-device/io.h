@@ -13,9 +13,9 @@ struct PortIo : public Hal::Io {
     PortIo(Hj::Io io)
         : _io(std::move(io)) {}
 
-    static Res<Strong<Hal::Io>> open(Hal::PortRange range) {
+    static Res<Rc<Hal::Io>> open(Hal::PortRange range) {
         auto io = try$(Hj::Io::create(Hj::ROOT, range.start, range.size));
-        return Ok(makeStrong<PortIo>(std::move(io)));
+        return Ok(makeRc<PortIo>(std::move(io)));
     }
 
     Res<usize> in(usize offset, usize size) {
@@ -33,10 +33,10 @@ struct DmaIo : public Hal::Io {
     DmaIo(Hj::Mapped mapped)
         : _mapped(std::move(mapped)) {}
 
-    static Res<Strong<Hal::Io>> open(Hal::DmaRange range) {
+    static Res<Rc<Hal::Io>> open(Hal::DmaRange range) {
         auto vmo = try$(Hj::Vmo::create(Hj::ROOT, range.start, range.size, Hj::VmoFlags::DMA));
         auto mapped = try$(Hj::map(vmo, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
-        return Ok(makeStrong<DmaIo>(std::move(mapped)));
+        return Ok(makeRc<DmaIo>(std::move(mapped)));
     }
 
     Res<usize> in(usize offset, usize size) override {

@@ -7,7 +7,7 @@
 
 namespace Karm::Kira {
 
-using PrintPreview = SharedFunc<Vec<Print::Page>(Print::Settings const &)>;
+using PrintPreview = SharedFunc<Vec<Print::Page>(Print::Settings const&)>;
 
 Ui::Child printDialog(PrintPreview preview);
 

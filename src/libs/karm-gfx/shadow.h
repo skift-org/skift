@@ -19,27 +19,27 @@ struct BoxShadow {
         };
     }
 
-    auto &withFill(Gfx::Color p) {
+    auto& withFill(Gfx::Color p) {
         fill = p;
         return *this;
     }
 
-    auto &withBlur(f64 r) {
+    auto& withBlur(f64 r) {
         blur = r;
         return *this;
     }
 
-    auto &withSpread(f64 r) {
+    auto& withSpread(f64 r) {
         spread = r;
         return *this;
     }
 
-    auto &withOffset(Math::Vec2i o) {
+    auto& withOffset(Math::Vec2i o) {
         offset = o;
         return *this;
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti bound) const {
+    void paint(Gfx::Canvas& g, Math::Recti bound) const {
         /// 1 / sqrt(2)
         static constexpr f64 IS2 = 0.7071067811865475;
 

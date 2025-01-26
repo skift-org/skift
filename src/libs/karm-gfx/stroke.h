@@ -36,27 +36,27 @@ struct Stroke {
     StrokeCap cap = BUTT_CAP;
     StrokeJoin join = BEVEL_JOIN;
 
-    auto &withFill(Fill p) {
+    auto& withFill(Fill p) {
         fill = p;
         return *this;
     }
 
-    auto &withWidth(f64 w) {
+    auto& withWidth(f64 w) {
         width = w;
         return *this;
     }
 
-    auto &withAlign(StrokeAlign a) {
+    auto& withAlign(StrokeAlign a) {
         align = a;
         return *this;
     }
 
-    auto &withCap(StrokeCap c) {
+    auto& withCap(StrokeCap c) {
         cap = c;
         return *this;
     }
 
-    auto &withJoin(StrokeJoin j) {
+    auto& withJoin(StrokeJoin j) {
         join = j;
         return *this;
     }
@@ -66,8 +66,8 @@ inline Stroke stroke(auto... args) {
     return {args...};
 }
 
-void createStroke(Math::Polyf &poly, Math::Path const &path, Stroke stroke);
+void createStroke(Math::Polyf& poly, Math::Path const& path, Stroke stroke);
 
-void createSolid(Math::Polyf &poly, Math::Path const &path);
+void createSolid(Math::Polyf& poly, Math::Path const& path);
 
 } // namespace Karm::Gfx

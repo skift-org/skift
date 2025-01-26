@@ -26,14 +26,14 @@ struct Decoder {
 
     static Res<Decoder> init(Bytes slice);
 
-    void skipMarker(Io::BScan &s);
+    void skipMarker(Io::BScan& s);
 
     // MARK: Quantization Tables -----------------------------------------------
 
     Array<Opt<Quant>, 4> _quant;
     bool _quirkZeroBased = false;
 
-    Res<> defineQuantizationTable(Io::BScan &x);
+    Res<> defineQuantizationTable(Io::BScan& x);
 
     // MARK: Start of frame ----------------------------------------------------
 
@@ -57,20 +57,20 @@ struct Decoder {
     Array<Opt<Component>, 4> _components;
     usize _componentCount = 0;
 
-    Res<> startOfFrame(Io::BScan &x);
+    Res<> startOfFrame(Io::BScan& x);
 
     // MARK: Restart interval --------------------------------------------------
 
     usize _restartInterval = 0;
 
-    Res<> defineRestartInterval(Io::BScan &x);
+    Res<> defineRestartInterval(Io::BScan& x);
 
     // MARK: Huffman Tables ----------------------------------------------------
 
     Array<Opt<Huff>, 4> _dcHuff;
     Array<Opt<Huff>, 4> _acHuff;
 
-    Res<> defineHuffmanTable(Io::BScan &x);
+    Res<> defineHuffmanTable(Io::BScan& x);
 
     // MARK: Start of scan -----------------------------------------------------
 
@@ -85,13 +85,13 @@ struct Decoder {
     u8 _ah = 0;
     u8 _al = 0;
 
-    Res<> startOfScan(Io::BScan &x);
+    Res<> startOfScan(Io::BScan& x);
 
     // MARK: Huffman Data ------------------------------------------------------
 
     Vec<Mcu> _mcus;
 
-    Res<> decodeHuffman(Io::BScan &s);
+    Res<> decodeHuffman(Io::BScan& s);
 
     // MARK: Decoding ----------------------------------------------------------
 
@@ -99,7 +99,7 @@ struct Decoder {
 
     // MARK: Dumping -----------------------------------------------------------
 
-    void repr(Io::Emit &e);
+    void repr(Io::Emit& e);
 };
 
 } // namespace Jpeg

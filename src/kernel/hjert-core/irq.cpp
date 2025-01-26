@@ -7,8 +7,8 @@ namespace Hjert::Core {
 static Vec<Irq *> _irqs;
 static Lock _irqsLock;
 
-Res<Strong<Irq>> Irq::create(usize irq) {
-    return Ok(makeStrong<Irq>(irq));
+Res<Arc<Irq>> Irq::create(usize irq) {
+    return Ok(makeArc<Irq>(irq));
 }
 
 void Irq::trigger(usize irqNum) {

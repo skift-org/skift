@@ -76,17 +76,17 @@ struct Flags {
         return Flags(_value ^ other._value);
     }
 
-    Flags &operator|=(Flags other) {
+    Flags& operator|=(Flags other) {
         _value |= other._value;
         return *this;
     }
 
-    Flags &operator&=(Flags other) {
+    Flags& operator&=(Flags other) {
         _value &= other._value;
         return *this;
     }
 
-    Flags &operator^=(Flags other) {
+    Flags& operator^=(Flags other) {
         _value ^= other._value;
         return *this;
     }
@@ -242,7 +242,7 @@ static constexpr auto enumItems() {
 template <Meta::Enum E>
 static constexpr Str nameOf(E v) {
     auto items = enumItems<E>();
-    for (auto &i : items) {
+    for (auto& i : items) {
         if (i.value == toUnderlyingType(v))
             return i.name;
     }
@@ -252,7 +252,7 @@ static constexpr Str nameOf(E v) {
 template <Meta::Enum E>
 static constexpr Opt<E> valueOf(Str name) {
     auto items = enumItems<E>();
-    for (auto &i : items) {
+    for (auto& i : items) {
         if (i.name == name)
             return E(i.value);
     }

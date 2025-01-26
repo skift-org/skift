@@ -44,14 +44,14 @@ Res<> Node::bubble(App::Event &e) {
     return Ok();
 }
 
-Res<> Node::attach(Strong<Node> child) {
+Res<> Node::attach(Rc<Node> child) {
     child->_parent = this;
     _children.pushBack(child);
     try$(child->init());
     return Ok();
 }
 
-void Node::detach(Strong<Node> child) {
+void Node::detach(Rc<Node> child) {
     child->_parent = nullptr;
     _children.removeAll(child);
 }

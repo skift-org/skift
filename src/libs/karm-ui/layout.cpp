@@ -21,7 +21,7 @@ struct Grow : public ProxyNode<Grow> {
 };
 
 Child grow(Opt<Child> child) {
-    return makeStrong<Grow>(
+    return makeRc<Grow>(
         child.unwrapOrElse([] {
             return empty();
         })
@@ -29,7 +29,7 @@ Child grow(Opt<Child> child) {
 }
 
 Child grow(isize grow, Opt<Child> child) {
-    return makeStrong<Grow>(
+    return makeRc<Grow>(
         grow,
         child.unwrapOrElse([] {
             return empty();
@@ -45,7 +45,7 @@ struct Empty : public View<Empty> {
     Empty(Math::Vec2i size)
         : _size(size) {}
 
-    void reconcile(Empty &o) override {
+    void reconcile(Empty& o) override {
         _size = o._size;
     }
 
@@ -53,11 +53,11 @@ struct Empty : public View<Empty> {
         return _size;
     }
 
-    void paint(Gfx::Canvas &, Math::Recti) override {}
+    void paint(Gfx::Canvas&, Math::Recti) override {}
 };
 
 Child empty(Math::Vec2i size) {
-    return makeStrong<Empty>(size);
+    return makeRc<Empty>(size);
 }
 
 Child cond(bool cond, Child child) {
@@ -89,7 +89,7 @@ struct Bound : public ProxyNode<Bound> {
 };
 
 Child bound(Child child) {
-    return makeStrong<Bound>(child);
+    return makeRc<Bound>(child);
 }
 
 struct Placed : public ProxyNode<Placed> {
@@ -99,7 +99,7 @@ struct Placed : public ProxyNode<Placed> {
     Placed(Math::Recti place, Child child)
         : ProxyNode(child), _place(place) {}
 
-    void reconcile(Placed &o) override {
+    void reconcile(Placed& o) override {
         _place = o._place;
         ProxyNode<Placed>::reconcile(o);
     }
@@ -121,7 +121,7 @@ struct Placed : public ProxyNode<Placed> {
 };
 
 Child placed(Math::Recti place, Child child) {
-    return makeStrong<Placed>(place, child);
+    return makeRc<Placed>(place, child);
 }
 
 // MARK: Separator -------------------------------------------------------------
@@ -131,7 +131,7 @@ struct Separator : public View<Separator> {
         return {1};
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti) override {
+    void paint(Gfx::Canvas& g, Math::Recti) override {
         g.push();
         g.fillStyle(GRAY800);
         g.fill(bound());
@@ -140,7 +140,7 @@ struct Separator : public View<Separator> {
 };
 
 Child separator() {
-    return makeStrong<Separator>();
+    return makeRc<Separator>();
 }
 
 // MARK: Align -----------------------------------------------------------------
@@ -173,7 +173,7 @@ struct Align : public ProxyNode<Align> {
 };
 
 Child align(Math::Align align, Child child) {
-    return makeStrong<Align>(align, child);
+    return makeRc<Align>(align, child);
 }
 
 Child center(Child child) {
@@ -226,7 +226,7 @@ struct Sizing : public ProxyNode<Sizing> {
         return _rect;
     }
 
-    void reconcile(Sizing &o) override {
+    void reconcile(Sizing& o) override {
         _min = o._min;
         _max = o._max;
         ProxyNode<Sizing>::reconcile(o);
@@ -261,11 +261,11 @@ struct Sizing : public ProxyNode<Sizing> {
 };
 
 Child sizing(Math::Vec2i min, Math::Vec2i max, Child child) {
-    return makeStrong<Sizing>(min, max, child);
+    return makeRc<Sizing>(min, max, child);
 }
 
 Child minSize(Math::Vec2i size, Child child) {
-    return makeStrong<Sizing>(size, UNCONSTRAINED, child);
+    return makeRc<Sizing>(size, UNCONSTRAINED, child);
 }
 
 Child minSize(isize size, Child child) {
@@ -273,7 +273,7 @@ Child minSize(isize size, Child child) {
 }
 
 Child maxSize(Math::Vec2i size, Child child) {
-    return makeStrong<Sizing>(UNCONSTRAINED, size, child);
+    return makeRc<Sizing>(UNCONSTRAINED, size, child);
 }
 
 Child maxSize(isize size, Child child) {
@@ -281,7 +281,7 @@ Child maxSize(isize size, Child child) {
 }
 
 Child pinSize(Math::Vec2i size, Child child) {
-    return makeStrong<Sizing>(size, size, child);
+    return makeRc<Sizing>(size, size, child);
 }
 
 Child pinSize(isize size, Child child) {
@@ -296,12 +296,12 @@ struct Insets : public ProxyNode<Insets> {
     Insets(Math::Insetsi insets, Child child)
         : ProxyNode(child), _insets(insets) {}
 
-    void reconcile(Insets &o) override {
+    void reconcile(Insets& o) override {
         _insets = o._insets;
         ProxyNode<Insets>::reconcile(o);
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
         child().paint(g, r);
     }
 
@@ -319,7 +319,7 @@ struct Insets : public ProxyNode<Insets> {
 };
 
 Child insets(Math::Insetsi s, Child child) {
-    return makeStrong<Insets>(s, child);
+    return makeRc<Insets>(s, child);
 }
 
 // MARK: Aspect Ratio ----------------------------------------------------------
@@ -330,12 +330,12 @@ struct AspectRatio : public ProxyNode<AspectRatio> {
     AspectRatio(f64 ratio, Child child)
         : ProxyNode(child), _ratio(ratio) {}
 
-    void reconcile(AspectRatio &o) override {
+    void reconcile(AspectRatio& o) override {
         _ratio = o._ratio;
         ProxyNode<AspectRatio>::reconcile(o);
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
         child().paint(g, r);
     }
 
@@ -352,7 +352,7 @@ struct AspectRatio : public ProxyNode<AspectRatio> {
 };
 
 Child aspectRatio(f64 ratio, Child child) {
-    return makeStrong<AspectRatio>(ratio, child);
+    return makeRc<AspectRatio>(ratio, child);
 }
 
 // MARK: Stack -----------------------------------------------------------------
@@ -360,11 +360,11 @@ Child aspectRatio(f64 ratio, Child child) {
 struct StackLayout : public GroupNode<StackLayout> {
     using GroupNode::GroupNode;
 
-    void event(App::Event &e) override {
+    void event(App::Event& e) override {
         if (e.accepted())
             return;
 
-        for (auto &child : mutIterRev(children())) {
+        for (auto& child : mutIterRev(children())) {
             child->event(e);
             if (e.accepted())
                 return;
@@ -375,7 +375,7 @@ struct StackLayout : public GroupNode<StackLayout> {
         isize w{};
         isize h{};
 
-        for (auto &child : children()) {
+        for (auto& child : children()) {
             auto childSize = child->size(s, hint);
             w = max(w, childSize.x);
             h = max(h, childSize.y);
@@ -386,7 +386,7 @@ struct StackLayout : public GroupNode<StackLayout> {
 };
 
 Child stack(Children children) {
-    return makeStrong<StackLayout>(children);
+    return makeRc<StackLayout>(children);
 }
 
 // MARK: Flow ------------------------------------------------------------------
@@ -399,7 +399,7 @@ struct FlowLayout : public GroupNode<FlowLayout> {
     FlowLayout(FlowStyle style, Children children)
         : GroupNode(children), _style(style) {}
 
-    void reconcile(FlowLayout &o) override {
+    void reconcile(FlowLayout& o) override {
         _style = o._style;
         GroupNode::reconcile(o);
     }
@@ -408,7 +408,7 @@ struct FlowLayout : public GroupNode<FlowLayout> {
         f64 total = 0;
         f64 grows = 0;
 
-        for (auto &child : children()) {
+        for (auto& child : children()) {
             if (child.is<Grow>()) {
                 grows += child.unwrap<Grow>().grow();
             } else {
@@ -427,7 +427,7 @@ struct FlowLayout : public GroupNode<FlowLayout> {
         f64 growUnit = _computeGrowUnit(r);
         f64 start = _style.flow.getStart(r);
 
-        for (auto &child : children()) {
+        for (auto& child : children()) {
             Math::Recti inner = {};
             auto childSize = child->size(r.size(), Hint::MIN);
 
@@ -451,7 +451,7 @@ struct FlowLayout : public GroupNode<FlowLayout> {
         isize h{hint == Hint::MAX ? _style.flow.getY(s) : 0};
         bool grow = false;
 
-        for (auto &child : children()) {
+        for (auto& child : children()) {
             if (child.is<Grow>())
                 grow = true;
 
@@ -472,7 +472,7 @@ struct FlowLayout : public GroupNode<FlowLayout> {
 };
 
 Child flow(FlowStyle style, Children children) {
-    return makeStrong<FlowLayout>(style, children);
+    return makeRc<FlowLayout>(style, children);
 }
 
 // MARK: Grid ------------------------------------------------------------------
@@ -494,11 +494,11 @@ struct Cell : public ProxyNode<Cell> {
 };
 
 Child cell(Math::Vec2i pos, Child child) {
-    return makeStrong<Cell>(pos, pos, child);
+    return makeRc<Cell>(pos, pos, child);
 }
 
 Child cell(Math::Vec2i start, Math::Vec2i end, Child child) {
-    return makeStrong<Cell>(start, end, child);
+    return makeRc<Cell>(start, end, child);
 }
 
 struct GridLayout : public GroupNode<GridLayout> {
@@ -530,7 +530,7 @@ struct GridLayout : public GroupNode<GridLayout> {
         isize total = 0;
         isize grows = 0;
 
-        for (auto &row : _style.rows) {
+        for (auto& row : _style.rows) {
             if (row.unit == GridUnit::GROW) {
                 grows += row.value;
             } else {
@@ -548,7 +548,7 @@ struct GridLayout : public GroupNode<GridLayout> {
         isize total = 0;
         isize grows = 0;
 
-        for (auto &column : _style.columns) {
+        for (auto& column : _style.columns) {
             if (column.unit == GridUnit::GROW) {
                 grows += column.value;
             } else {
@@ -590,7 +590,7 @@ struct GridLayout : public GroupNode<GridLayout> {
         _rows.clear();
         isize growUnitRows = computeGrowUnitRows(r);
         isize row = _style.flow.getTop(r);
-        for (auto &r : _style.rows) {
+        for (auto& r : _style.rows) {
             if (r.unit == GridUnit::GROW) {
                 _rows.pushBack({_Dim{row, growUnitRows * r.value}});
                 row += growUnitRows * r.value;
@@ -605,7 +605,7 @@ struct GridLayout : public GroupNode<GridLayout> {
         _columns.clear();
         isize growUnitColumns = computeGrowUnitColumns(r);
         isize column = _style.flow.getStart(r);
-        for (auto &c : _style.columns) {
+        for (auto& c : _style.columns) {
             if (c.unit == GridUnit::GROW) {
                 _columns.pushBack({_Dim{column, growUnitColumns * c.value}});
                 column += growUnitColumns * c.value;
@@ -619,9 +619,9 @@ struct GridLayout : public GroupNode<GridLayout> {
 
         // layout the children
         isize index = 0;
-        for (auto &child : children()) {
+        for (auto& child : children()) {
             if (child.is<Cell>()) {
-                auto &cell = child.unwrap<Cell>();
+                auto& cell = child.unwrap<Cell>();
                 auto start = cell.start();
                 auto end = cell.end();
                 place(child, start, end);
@@ -640,7 +640,7 @@ struct GridLayout : public GroupNode<GridLayout> {
         isize row = 0;
         bool rowGrow = false;
         isize growUnitRows = computeGrowUnitRows(Math::Recti{0, s});
-        for (auto &r : _style.rows) {
+        for (auto& r : _style.rows) {
             if (r.unit == GridUnit::GROW) {
                 row += growUnitRows * r.value;
                 rowGrow = true;
@@ -658,7 +658,7 @@ struct GridLayout : public GroupNode<GridLayout> {
         isize column = 0;
         bool columnGrow = false;
         isize growUnitColumns = computeGrowUnitColumns(Math::Recti{0, s});
-        for (auto &c : _style.columns) {
+        for (auto& c : _style.columns) {
             if (c.unit == GridUnit::GROW) {
                 column += growUnitColumns * c.value;
                 columnGrow = true;
@@ -678,7 +678,7 @@ struct GridLayout : public GroupNode<GridLayout> {
 };
 
 Child grid(GridStyle style, Children children) {
-    return makeStrong<GridLayout>(style, children);
+    return makeRc<GridLayout>(style, children);
 }
 
 } // namespace Karm::Ui

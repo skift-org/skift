@@ -12,7 +12,7 @@ test$("crypto-sha224") {
         0xc5, 0xb3, 0xe4, 0x2f
     };
 
-    auto testCase = [&](Str data, Array<u8, SHA224_BYTES> const &expected) -> Res<> {
+    auto testCase = [&](Str data, Array<u8, SHA224_BYTES> const& expected) -> Res<> {
         auto sha = sha224(bytes(data));
 
         expectEq$(sha.len(), expected.len());
@@ -49,7 +49,7 @@ test$("crypto-sha256") {
         0x04, 0x6d, 0x39, 0xcc, 0xc7, 0x11, 0x2c, 0xd0
     };
 
-    auto testCase = [&](Str data, Array<u8, SHA256_BYTES> const &expected) -> Res<> {
+    auto testCase = [&](Str data, Array<u8, SHA256_BYTES> const& expected) -> Res<> {
         auto sha = sha256(bytes(data));
 
         expectEq$(sha.len(), expected.len());
@@ -94,7 +94,7 @@ test$("crypto-sha384") {
         0x66, 0xc3, 0xe9, 0xfa, 0x91, 0x74, 0x60, 0x39
     };
 
-    auto testCase = [&](Str data, Array<u8, SHA384_BYTES> const &expected) -> Res<> {
+    auto testCase = [&](Str data, Array<u8, SHA384_BYTES> const& expected) -> Res<> {
         auto sha = sha384(bytes(data));
 
         expectEq$(sha.len(), expected.len());
@@ -144,7 +144,7 @@ test$("crypto-sha512") {
         0x5e, 0x96, 0xe5, 0x5b, 0x87, 0x4b, 0xe9, 0x09
     };
 
-    auto testCase = [&](Str data, Array<u8, SHA512_BYTES> const &expected) -> Res<> {
+    auto testCase = [&](Str data, Array<u8, SHA512_BYTES> const& expected) -> Res<> {
         auto sha = sha512(bytes(data));
 
         expectEq$(sha.len(), expected.len());

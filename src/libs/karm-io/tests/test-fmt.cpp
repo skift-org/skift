@@ -6,7 +6,7 @@
 namespace Karm::Io::Tests {
 
 template <typename T>
-Res<> testCase(Str expected, T const &value, Str format = "") {
+Res<> testCase(Str expected, T const& value, Str format = "") {
     auto str = try$(toStr(value, format));
     if (str != expected) {
         logError("expected: {}, got: {}", expected, str);
@@ -152,10 +152,10 @@ test$("fmt-union") {
 // MARK: Format References -----------------------------------------------------
 
 test$("fmt-references") {
-    auto number = makeStrong<int>(123);
+    auto number = makeRc<int>(123);
     try$(testCase("123", number));
 
-    Opt<Strong<Str>> str = makeStrong<Str>("test");
+    Opt<Rc<Str>> str = makeRc<Str>("test");
     try$(testCase("test", str));
 
     Weak<Str> weakStr = *str;
@@ -198,7 +198,7 @@ test$("fmt-string") {
 // MARK: Format Tuple ----------------------------------------------------------
 
 test$("fmt-cons") {
-    try$(testCase("{1, 2}", Cons{1, 2}));
+    try$(testCase("{1, 2}", Pair{1, 2}));
     return Ok();
 }
 

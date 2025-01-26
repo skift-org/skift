@@ -43,18 +43,18 @@ struct Page {
 };
 
 struct PageComputedStyle {
-    using Areas = Array<Strong<Computed>, toUnderlyingType(PageArea::_LEN)>;
+    using Areas = Array<Rc<Computed>, toUnderlyingType(PageArea::_LEN)>;
 
-    Strong<Computed> style;
+    Rc<Computed> style;
     Areas _areas;
 
-    PageComputedStyle(Computed const &initial)
-        : style(makeStrong<Computed>(initial)),
+    PageComputedStyle(Computed const& initial)
+        : style(makeRc<Computed>(initial)),
           _areas(Areas::fill([&](...) {
-              return makeStrong<Computed>(initial);
+              return makeRc<Computed>(initial);
           })) {}
 
-    Strong<Computed> area(PageArea margin) const {
+    Rc<Computed> area(PageArea margin) const {
         return _areas[toUnderlyingType(margin)];
     }
 };
@@ -77,24 +77,24 @@ struct PageSelector {
     String name = ""s;
     Vec<PagePseudo> pseudos;
 
-    static PageSelector parse(Cursor<Css::Sst> &c);
+    static PageSelector parse(Cursor<Css::Sst>& c);
 
-    static Vec<PageSelector> parseList(Cursor<Css::Sst> &c);
+    static Vec<PageSelector> parseList(Cursor<Css::Sst>& c);
 
-    bool match(Page const &page) const;
+    bool match(Page const& page) const;
 
-    void repr(Io::Emit &e) const;
+    void repr(Io::Emit& e) const;
 };
 
 struct PageAreaRule {
     PageArea area;
     Vec<StyleProp> props;
 
-    static Opt<PageAreaRule> parse(Css::Sst const &sst);
+    static Opt<PageAreaRule> parse(Css::Sst const& sst);
 
-    void apply(Style::Computed &c) const;
+    void apply(Style::Computed& c) const;
 
-    void repr(Io::Emit &e) const;
+    void repr(Io::Emit& e) const;
 };
 
 struct PageRule {
@@ -102,13 +102,13 @@ struct PageRule {
     Vec<StyleProp> props;
     Vec<PageAreaRule> areas;
 
-    static PageRule parse(Css::Sst const &sst);
+    static PageRule parse(Css::Sst const& sst);
 
-    bool match(Page const &page) const;
+    bool match(Page const& page) const;
 
-    void apply(PageComputedStyle &c) const;
+    void apply(PageComputedStyle& c) const;
 
-    void repr(Io::Emit &e) const;
+    void repr(Io::Emit& e) const;
 };
 
 } // namespace Vaev::Style

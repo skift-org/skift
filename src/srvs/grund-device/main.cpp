@@ -14,10 +14,10 @@ namespace Grund::Device {
 struct IsaRootBus : public Node {
     Res<> init() override {
         auto i18042port = try$(PortIo::open({0x60, 0x8}));
-        try$(attach(makeStrong<Ps2::I8042>(i18042port)));
+        try$(attach(makeRc<Ps2::I8042>(i18042port)));
 
         auto cmosPort = try$(PortIo::open({0x70, 0x2}));
-        try$(attach(makeStrong<Cmos::Cmos>(cmosPort)));
+        try$(attach(makeRc<Cmos::Cmos>(cmosPort)));
 
         return Ok();
     }
@@ -30,7 +30,7 @@ struct RootBus : public Node {
         : rpc{rpc} {}
 
     Res<> init() override {
-        try$(attach(makeStrong<IsaRootBus>()));
+        try$(attach(makeRc<IsaRootBus>()));
         return Ok();
     }
 
@@ -53,7 +53,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto endpoint = Rpc::Endpoint::create(ctx);
 
     logInfo("devices: building device tree...");
-    auto root = makeStrong<Grund::Device::RootBus>(endpoint);
+    auto root = makeRc<Grund::Device::RootBus>(endpoint);
     co_try$(root->init());
 
     logInfo("devices: binding IRQs...");
@@ -72,7 +72,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     logInfo("service started");
 
     while (true) {
-        co_try$(listener.poll(TimeStamp::endOfTime()));
+        co_try$(listener.poll(Instant::endOfTime()));
 
         while (auto ev = listener.next()) {
             co_try$(Hj::_signal(ev->cap, Hj::Sigs::NONE, Hj::Sigs::TRIGGERED));

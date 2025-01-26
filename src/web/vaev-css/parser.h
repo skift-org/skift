@@ -45,18 +45,18 @@ struct Sst {
 
     Sst(Content content) : type(LIST), content(content) {}
 
-    void repr(Io::Emit &e) const;
+    void repr(Io::Emit& e) const;
 
     bool operator==(Type type) const {
         return this->type == type;
     }
 
-    bool operator==(Token::Type const &type) const {
+    bool operator==(Token::Type const& type) const {
         return this->type == TOKEN and
                token.type == type;
     }
 
-    bool operator==(Token const &other) const {
+    bool operator==(Token const& other) const {
         return type == TOKEN and
                token == other;
     }
@@ -64,28 +64,28 @@ struct Sst {
 
 // MARK: Parser ----------------------------------------------------------------
 
-Content consumeRuleList(Lexer &lex, bool topLevel);
+Content consumeRuleList(Lexer& lex, bool topLevel);
 
-Sst consumeAtRule(Lexer &lex);
+Sst consumeAtRule(Lexer& lex);
 
-Opt<Sst> consumeRule(Lexer &lex);
+Opt<Sst> consumeRule(Lexer& lex);
 
-Content consumeDeclarationValue(Lexer &lex);
+Content consumeDeclarationValue(Lexer& lex);
 
-Content consumeDeclarationList(Lexer &lex, bool topLevel = false);
+Content consumeDeclarationList(Lexer& lex, bool topLevel = false);
 
-Content consumeDeclarationBlock(Lexer &lex);
+Content consumeDeclarationBlock(Lexer& lex);
 
 bool declarationAhead(Lexer lex);
 
-Opt<Sst> consumeDeclaration(Lexer &lex);
+Opt<Sst> consumeDeclaration(Lexer& lex);
 
-Sst consumeComponentValue(Lexer &lex);
+Sst consumeComponentValue(Lexer& lex);
 
-Sst consumeBlock(Lexer &lex, Token::Type term);
+Sst consumeBlock(Lexer& lex, Token::Type term);
 
-Sst consumeFunc(Lexer &lex);
+Sst consumeFunc(Lexer& lex);
 
-Content consumeSelector(Lexer &lex);
+Content consumeSelector(Lexer& lex);
 
 } // namespace Vaev::Css

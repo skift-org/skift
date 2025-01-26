@@ -134,11 +134,6 @@ def checkForSymbol(header: str, symbol: str) -> bool:
     )
 
 
-@cli.command(None, "tools", "Manage the development tools")
-def _():
-    pass
-
-
 @cli.command("n", "tools/nuke", "Nuke the development tools")
 @cli.command("s", "tools/setup", "Setup the development environment")
 def _():

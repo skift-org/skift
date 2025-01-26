@@ -16,7 +16,7 @@ struct Node :
 
     usize _id = 0;
     Node *_parent = nullptr;
-    Vec<Strong<Node>> _children = {};
+    Vec<Rc<Node>> _children = {};
 
     Node();
 
@@ -28,9 +28,9 @@ struct Node :
 
     virtual Res<> bubble(App::Event &e);
 
-    Res<> attach(Strong<Node> child);
+    Res<> attach(Rc<Node> child);
 
-    void detach(Strong<Node> child);
+    void detach(Rc<Node> child);
 
     auto operator<=>(Node const &o) const {
         return _id <=> o._id;

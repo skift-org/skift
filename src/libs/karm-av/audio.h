@@ -94,9 +94,9 @@ struct AudioStream : Meta::Pinned {
         usize sampleRate;
     };
 
-    static Res<Strong<AudioStream>> create(Configs const &configs);
+    static Res<Rc<AudioStream>> create(Configs const& configs);
 
-    static Res<Strong<AudioStream>> create(Configs const &configs, Func<Res<>(MutAudio)> callback);
+    static Res<Rc<AudioStream>> create(Configs const& configs, Func<Res<>(MutAudio)> callback);
 
     virtual ~AudioStream() = default;
 };

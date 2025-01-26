@@ -8,7 +8,7 @@ static bool _isWord(Rune r) {
 
 // MARK: Actions ---------------------------------------------------------------
 
-Opt<Action> Action::fromEvent(App::Event &e) {
+Opt<Action> Action::fromEvent(App::Event& e) {
     if (auto te = e.is<App::TypeEvent>()) {
         return Action{TYPE, te->rune};
     } else if (
@@ -94,7 +94,7 @@ Opt<Action> Action::fromEvent(App::Event &e) {
 
 // MARK: Model -----------------------------------------------------------------
 
-void Model::_do(Record &r) {
+void Model::_do(Record& r) {
     switch (r.op) {
     case INSERT:
         _buf.insert(r.pos, r.rune);
@@ -124,7 +124,7 @@ void Model::_do(Record &r) {
     }
 }
 
-void Model::_undo(Record &r) {
+void Model::_undo(Record& r) {
     switch (r.op) {
     case INSERT:
         _buf.removeAt(r.pos);
@@ -146,7 +146,7 @@ void Model::_push(Op op, usize pos, Rune rune) {
     if (_index != _records.len())
         _records.trunc(_index);
 
-    auto &record = _records.emplaceBack();
+    auto& record = _records.emplaceBack();
     record.op = op;
     record.pos = min(pos, _buf.len());
     record.rune = rune;
@@ -446,7 +446,7 @@ void Model::flush() {
     _records.clear();
 }
 
-void Model::reduce(Action const &a) {
+void Model::reduce(Action const& a) {
     switch (a.op) {
     case Action::TYPE:
         insert(a.rune);

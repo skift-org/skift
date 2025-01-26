@@ -69,11 +69,11 @@ struct Angle {
         }
     }
 
-    constexpr bool operator==(Angle const &other) const {
+    constexpr bool operator==(Angle const& other) const {
         return toRadian() == other.toRadian();
     }
 
-    constexpr std::partial_ordering operator<=>(Angle const &other) const {
+    constexpr std::partial_ordering operator<=>(Angle const& other) const {
         return toRadian() <=> other.toRadian();
     }
 
@@ -85,7 +85,7 @@ struct Angle {
         return fromRadian(toRadian() - other.toRadian());
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         switch (_unit) {
         case Unit::DEGREE:
             e("{}deg", _val);

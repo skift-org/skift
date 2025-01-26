@@ -7,7 +7,7 @@
 
 namespace Opstart::Fw {
 
-Res<Strong<Hal::Vmm>> createVmm();
+Res<Arc<Hal::Vmm>> createVmm();
 
 Res<> finalizeHandover(Handover::Builder &builder);
 

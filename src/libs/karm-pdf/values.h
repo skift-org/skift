@@ -15,8 +15,8 @@ struct Ref {
         return {++num, gen};
     }
 
-    bool operator==(Ref const &other) const = default;
-    auto operator<=>(Ref const &other) const = default;
+    bool operator==(Ref const& other) const = default;
+    auto operator<=>(Ref const& other) const = default;
 };
 
 struct Name : public String {
@@ -48,7 +48,7 @@ using _Value = Union<
 struct Value : public _Value {
     using _Value::_Value;
 
-    void write(Io::Emit &e) const;
+    void write(Io::Emit& e) const;
 };
 
 struct File {
@@ -61,7 +61,7 @@ struct File {
         return ref;
     }
 
-    void write(Io::Emit &e) const;
+    void write(Io::Emit& e) const;
 };
 
 struct XRef {
@@ -77,7 +77,7 @@ struct XRef {
         entries.pushBack({offset, gen, true});
     }
 
-    void write(Io::Emit &e) const;
+    void write(Io::Emit& e) const;
 };
 
 } // namespace Karm::Pdf

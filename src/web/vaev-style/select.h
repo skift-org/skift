@@ -22,7 +22,7 @@ struct Spec {
     Spec(isize a, isize b, isize c)
         : a(a), b(b), c(c) {}
 
-    Spec operator+(Spec const &other) const {
+    Spec operator+(Spec const& other) const {
         return {
             a + other.a,
             b + other.b,
@@ -30,7 +30,7 @@ struct Spec {
         };
     }
 
-    Spec operator and(Spec const &other) const {
+    Spec operator and(Spec const& other) const {
         return {
             a + other.a,
             b + other.b,
@@ -38,7 +38,7 @@ struct Spec {
         };
     }
 
-    Spec operator or(Spec const &other) const {
+    Spec operator or(Spec const& other) const {
         if (*this > other)
             return *this;
         return other;
@@ -52,10 +52,10 @@ struct Spec {
         };
     }
 
-    bool operator==(Spec const &other) const = default;
-    auto operator<=>(Spec const &other) const = default;
+    bool operator==(Spec const& other) const = default;
+    auto operator<=>(Spec const& other) const = default;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("{}-{}-{}", a, b, c);
     }
 };
@@ -65,24 +65,26 @@ inline Spec const Spec::A = {1, 0, 0};
 inline Spec const Spec::B = {0, 1, 0};
 inline Spec const Spec::C = {0, 0, 1};
 
+Spec const INLINE_SPEC = Spec::ZERO;
+
 struct Selector;
 
 struct UniversalSelector {
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("*");
     }
 
-    bool operator==(UniversalSelector const &) const = default;
+    bool operator==(UniversalSelector const&) const = default;
 };
 
 static constexpr UniversalSelector UNIVERSAL = {};
 
 struct EmptySelector {
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("EMPTY");
     }
 
-    bool operator==(EmptySelector const &) const = default;
+    bool operator==(EmptySelector const&) const = default;
 };
 
 static constexpr EmptySelector EMPTY = {};
@@ -102,14 +104,15 @@ struct Infix {
     Box<Selector> lhs;
     Box<Selector> rhs;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("({} {} {})", *lhs, type, *rhs);
     }
 
-    bool operator==(Infix const &) const;
+    bool operator==(Infix const&) const;
 };
 
 struct Nfix {
+    // NOTE: is(), not() and where() are coded as Nfixes instead of Pseudo
     enum struct Type {
         AND,   // ''
         OR,    // :is(), ', '
@@ -123,51 +126,51 @@ struct Nfix {
     Type type;
     Vec<Selector> inners;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("({} {})", type, inners);
     }
 
-    bool operator==(Nfix const &) const;
+    bool operator==(Nfix const&) const;
 };
 
 struct TypeSelector {
     TagName type;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("{}", type);
     }
 
-    bool operator==(TypeSelector const &) const = default;
+    bool operator==(TypeSelector const&) const = default;
 };
 
 struct IdSelector {
     String id;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("#{}", id);
     }
 
-    bool operator==(IdSelector const &) const = default;
+    bool operator==(IdSelector const&) const = default;
 };
 
 struct ClassSelector {
     String class_;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e(".{}", class_);
     }
 
-    bool operator==(ClassSelector const &) const = default;
+    bool operator==(ClassSelector const&) const = default;
 };
 
 struct AnB {
     isize a, b;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("{}n{}{}", a, b < 0 ? "-"s : "+"s, b);
     }
 
-    bool operator==(AnB const &) const = default;
+    bool operator==(AnB const&) const = default;
 };
 
 enum struct Dir {
@@ -215,9 +218,9 @@ struct Pseudo {
     Pseudo(Type type, Extra extra = NONE)
         : type(type), extra(extra) {}
 
-    bool operator==(Pseudo const &) const = default;
+    bool operator==(Pseudo const&) const = default;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("{}", type);
     }
 };
@@ -249,11 +252,11 @@ struct AttributeSelector {
     Match match;
     String value;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("[{} {} {} {}]", name, case_, match, value);
     }
 
-    bool operator==(AttributeSelector const &) const = default;
+    bool operator==(AttributeSelector const&) const = default;
 };
 
 using _Selector = Union<
@@ -348,27 +351,29 @@ struct Selector : public _Selector {
         };
     }
 
-    void repr(Io::Emit &e) const {
-        visit([&](auto const &v) {
+    void repr(Io::Emit& e) const {
+        visit([&](auto const& v) {
             e("{}", v);
         });
     }
 
-    bool match(Markup::Element const &el) const;
+    bool match(Markup::Element const& el) const;
 
-    bool operator==(Selector const &) const = default;
+    Opt<Spec> matchWithSpecificity(Markup::Element const& el) const;
 
-    static Res<Selector> parse(Cursor<Css::Sst> &c);
+    bool operator==(Selector const&) const = default;
 
-    static Res<Selector> parse(Io::SScan &s);
+    static Res<Selector> parse(Cursor<Css::Sst>& c);
+
+    static Res<Selector> parse(Io::SScan& s);
 
     static Res<Selector> parse(Str input);
 };
 
-inline bool Infix::operator==(Infix const &) const = default;
+inline bool Infix::operator==(Infix const&) const = default;
 
-inline bool Nfix::operator==(Nfix const &) const = default;
+inline bool Nfix::operator==(Nfix const&) const = default;
 
-Spec spec(Selector const &sel);
+Spec spec(Selector const& sel);
 
 } // namespace Vaev::Style

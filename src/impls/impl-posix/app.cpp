@@ -44,18 +44,18 @@ struct XdgConfigPrefs : public Prefs {
 static Opt<XdgConfigPrefs> _globalPrefs;
 
 static Res<Mime::Url> _resolveConfigDir() {
-    auto *xdgConfigHome = getenv("XDG_CONFIG_HOME");
+    auto* xdgConfigHome = getenv("XDG_CONFIG_HOME");
     if (xdgConfigHome)
         return Ok(Mime::Url::parse(xdgConfigHome) / try$(Pkg::_Embed::currentBundle()));
 
-    auto *home = getenv("HOME");
+    auto* home = getenv("HOME");
     if (home)
         return Ok(Mime::Url::parse(home) / ".config" / try$(Pkg::_Embed::currentBundle()));
 
     return Error::notFound("could not find XDG_CONFIG_HOME nor HOME");
 }
 
-Prefs &globalPrefs() {
+Prefs& globalPrefs() {
     if (not _globalPrefs) {
         auto url = _resolveConfigDir().unwrap("could not resolve preferences directory");
         Sys::Dir::openOrCreate(url).unwrap("could not create preferences directory");

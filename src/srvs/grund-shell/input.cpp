@@ -137,7 +137,7 @@ struct InputTranslator : public Ui::ProxyNode<InputTranslator> {
 };
 
 Ui::Child inputTranslator(Ui::Child child) {
-    return makeStrong<InputTranslator>(std::move(child), makeBox<ClassicCursor>());
+    return makeRc<InputTranslator>(std::move(child), makeBox<ClassicCursor>());
 }
 
 } // namespace Grund::Shell

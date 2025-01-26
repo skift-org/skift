@@ -2,7 +2,7 @@
 
 namespace Karm::Rpc {
 
-static Endpoint *_globalEndpoint = nullptr;
+static Endpoint* _globalEndpoint = nullptr;
 
 Endpoint::Endpoint(Sys::IpcConnection con)
     : _con(std::move(con)) {
@@ -14,12 +14,12 @@ Endpoint::Endpoint(Sys::IpcConnection con)
     });
 }
 
-Endpoint Endpoint::create(Sys::Context &ctx) {
-    auto &channel = useChannel(ctx);
+Endpoint Endpoint::create(Sys::Context& ctx) {
+    auto& channel = useChannel(ctx);
     return {std::move(channel.con)};
 }
 
-Endpoint &globalEndpoint() {
+Endpoint& globalEndpoint() {
     if (not _globalEndpoint)
         panic("no active endpoint");
     return *_globalEndpoint;

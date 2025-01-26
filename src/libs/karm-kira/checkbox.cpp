@@ -14,12 +14,12 @@ struct Checkbox : public Ui::View<Checkbox> {
         : _value(value), _onChange(std::move(onChange)) {
     }
 
-    void reconcile(Checkbox &o) override {
+    void reconcile(Checkbox& o) override {
         _value = o._value;
         _onChange = std::move(o._onChange);
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti) override {
+    void paint(Gfx::Canvas& g, Math::Recti) override {
         g.push();
 
         if (_value) {
@@ -46,7 +46,7 @@ struct Checkbox : public Ui::View<Checkbox> {
         g.pop();
     }
 
-    void event(App::Event &e) override {
+    void event(App::Event& e) override {
         if (_mouseListener.listen(*this, e)) {
             _value = not _value;
             _onChange(*this, _value);
@@ -59,7 +59,7 @@ struct Checkbox : public Ui::View<Checkbox> {
 };
 
 Ui::Child checkbox(bool value, Ui::OnChange<bool> onChange) {
-    return makeStrong<Checkbox>(value, std::move(onChange));
+    return makeRc<Checkbox>(value, std::move(onChange));
 }
 
 } // namespace Karm::Kira

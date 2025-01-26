@@ -41,9 +41,9 @@ struct Token {
     Token(Rune flag)
         : kind(Kind::FLAG), flag(flag) {}
 
-    bool operator==(Token const &other) const = default;
+    bool operator==(Token const& other) const = default;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         if (kind == Kind::FLAG)
             e("(token {} {#c})", kind, flag);
         else
@@ -51,11 +51,11 @@ struct Token {
     }
 };
 
-void tokenize(Str arg, Vec<Token> &out);
+void tokenize(Str arg, Vec<Token>& out);
 
-void tokenize(Slice<Str> args, Vec<Token> &out);
+void tokenize(Slice<Str> args, Vec<Token>& out);
 
-void tokenize(int argc, char **argv, Vec<Token> &out);
+void tokenize(int argc, char** argv, Vec<Token>& out);
 
 // MARK: Values ----------------------------------------------------------------
 
@@ -64,33 +64,33 @@ struct ValueParser;
 
 template <>
 struct ValueParser<bool> {
-    static void usage(Io::Emit &e);
+    static void usage(Io::Emit& e);
 
-    static Res<bool> parse(Cursor<Token> &);
+    static Res<bool> parse(Cursor<Token>&);
 };
 
 template <>
 struct ValueParser<isize> {
-    static void usage(Io::Emit &e);
+    static void usage(Io::Emit& e);
 
-    static Res<isize> parse(Cursor<Token> &c);
+    static Res<isize> parse(Cursor<Token>& c);
 };
 
 template <>
 struct ValueParser<Str> {
-    static void usage(Io::Emit &e);
+    static void usage(Io::Emit& e);
 
-    static Res<Str> parse(Cursor<Token> &c);
+    static Res<Str> parse(Cursor<Token>& c);
 };
 
 template <typename T>
 struct ValueParser<Vec<T>> {
-    static void usage(Io::Emit &e) {
+    static void usage(Io::Emit& e) {
         ValueParser<T>::usage(e);
         e("...");
     }
 
-    static Res<Vec<T>> parse(Cursor<Token> &c) {
+    static Res<Vec<T>> parse(Cursor<Token>& c) {
         Vec<T> values;
 
         while (not c.ended() and c->kind == Token::OPERAND) {
@@ -103,11 +103,11 @@ struct ValueParser<Vec<T>> {
 
 template <typename T>
 struct ValueParser<Opt<T>> {
-    static void usage(Io::Emit &e) {
+    static void usage(Io::Emit& e) {
         ValueParser<T>::usage(e);
     }
 
-    static Res<Opt<T>> parse(Cursor<Token> &c) {
+    static Res<Opt<T>> parse(Cursor<Token>& c) {
         if (c.ended() or c->kind != Token::OPERAND)
             return Ok(NONE);
 
@@ -141,9 +141,9 @@ struct _OptionImpl {
 
     virtual ~_OptionImpl() = default;
 
-    virtual Res<> eval(Cursor<Token> &c) = 0;
+    virtual Res<> eval(Cursor<Token>& c) = 0;
 
-    virtual void usage(Io::Emit &e) {
+    virtual void usage(Io::Emit& e) {
         if (kind == OptionKind::OPTION) {
             e("[");
             if (shortName)
@@ -171,7 +171,7 @@ struct OptionImpl : public _OptionImpl {
     ) : _OptionImpl(kind, shortName, std::move(longName), std::move(description)),
         value(defaultValue) {}
 
-    Res<> eval(Cursor<Token> &c) override {
+    Res<> eval(Cursor<Token>& c) override {
         value = try$(ValueParser<T>::parse(c));
         return Ok();
     }
@@ -179,12 +179,12 @@ struct OptionImpl : public _OptionImpl {
 
 template <typename T>
 struct Option {
-    Strong<OptionImpl<T>> _impl;
+    Rc<OptionImpl<T>> _impl;
 
-    Option(Strong<OptionImpl<T>> impl)
+    Option(Rc<OptionImpl<T>> impl)
         : _impl(std::move(impl)) {}
 
-    T const &unwrap() const {
+    T const& unwrap() const {
         return _impl->value.unwrap();
     }
 
@@ -192,7 +192,7 @@ struct Option {
         return _impl->value.unwrapOr(T{});
     }
 
-    operator Strong<_OptionImpl>() {
+    operator Rc<_OptionImpl>() {
         return _impl;
     }
 };
@@ -200,27 +200,27 @@ struct Option {
 using Flag = Option<bool>;
 
 static inline Flag flag(Opt<Rune> shortName, String longName, String description) {
-    return makeStrong<OptionImpl<bool>>(OptionKind::OPTION, shortName, longName, description, false);
+    return makeRc<OptionImpl<bool>>(OptionKind::OPTION, shortName, longName, description, false);
 }
 
 template <typename T>
 static inline Option<T> option(Opt<Rune> shortName, String longName, String description, Opt<T> defaultValue = NONE) {
-    return makeStrong<OptionImpl<T>>(OptionKind::OPTION, shortName, longName, description, defaultValue);
+    return makeRc<OptionImpl<T>>(OptionKind::OPTION, shortName, longName, description, defaultValue);
 }
 
 template <typename T>
 static inline Option<T> operand(String longName, String description, T defaultValue = {}) {
-    return makeStrong<OptionImpl<T>>(OptionKind::OPERAND, NONE, longName, description, defaultValue);
+    return makeRc<OptionImpl<T>>(OptionKind::OPERAND, NONE, longName, description, defaultValue);
 }
 
 static inline Option<Vec<Str>> extra(String description) {
-    return makeStrong<OptionImpl<Vec<Str>>>(OptionKind::EXTRA, NONE, ""s, description, Vec<Str>{});
+    return makeRc<OptionImpl<Vec<Str>>>(OptionKind::EXTRA, NONE, ""s, description, Vec<Str>{});
 }
 
 // MARK: Command ---------------------------------------------------------------
 
 struct Command {
-    using Callback = Func<Async::Task<>(Sys::Context &)>;
+    using Callback = Func<Async::Task<>(Sys::Context&)>;
 
     struct Props {
     };
@@ -228,10 +228,10 @@ struct Command {
     String longName;
     Opt<Rune> shortName;
     String description = ""s;
-    Vec<Strong<_OptionImpl>> options;
+    Vec<Rc<_OptionImpl>> options;
     Opt<Callback> callbackAsync;
 
-    Vec<Strong<Command>> _commands;
+    Vec<Rc<Command>> _commands;
 
     Option<bool> _help = flag('h', "help"s, "Show this help message and exit."s);
     Option<bool> _usage = flag('u', "usage"s, "Show usage message and exit."s);
@@ -242,7 +242,7 @@ struct Command {
         String longName,
         Opt<Rune> shortName = NONE,
         String description = ""s,
-        Vec<Strong<_OptionImpl>> options = {},
+        Vec<Rc<_OptionImpl>> options = {},
         Opt<Callback> callbackAsync = NONE
     )
         : longName(std::move(longName)),
@@ -254,14 +254,14 @@ struct Command {
         options.pushBack(_usage);
     }
 
-    Command &subCommand(
+    Command& subCommand(
         String longName,
         Opt<Rune> shortName = NONE,
         String description = ""s,
-        Vec<Strong<_OptionImpl>> options = {},
+        Vec<Rc<_OptionImpl>> options = {},
         Opt<Callback> callbackAsync = NONE
     ) {
-        auto cmd = makeStrong<Command>(
+        auto cmd = makeRc<Command>(
             longName,
             shortName,
             description,
@@ -284,7 +284,7 @@ struct Command {
         String description,
         Opt<T> defaultValue = NONE
     ) {
-        auto store = makeStrong<OptionImpl<T>>(
+        auto store = makeRc<OptionImpl<T>>(
             OptionKind::OPTION,
             shortName,
             longName,
@@ -296,7 +296,7 @@ struct Command {
     }
 
     Flag flag(Opt<Rune> shortName, String longName, String description) {
-        auto store = makeStrong<OptionImpl<bool>>(
+        auto store = makeRc<OptionImpl<bool>>(
             OptionKind::OPTION,
             shortName,
             longName,
@@ -307,41 +307,41 @@ struct Command {
         return {store};
     }
 
-    void usage(Io::Emit &e) {
+    void usage(Io::Emit& e) {
         e("{} ", longName);
 
-        for (auto &opt : options) {
+        for (auto& opt : options) {
             if (opt->kind != OptionKind::OPTION)
                 continue;
             opt->usage(e);
             e(" ");
         }
 
-        for (auto &opt : options) {
+        for (auto& opt : options) {
             if (opt->kind != OptionKind::OPERAND)
                 continue;
             opt->usage(e);
             e(" ");
         }
 
-        for (auto &opt : options) {
+        for (auto& opt : options) {
             if (opt->kind != OptionKind::EXTRA)
                 continue;
             opt->usage(e);
         }
 
-        if (any(_commands)) {
+        if (Karm::any(_commands)) {
             e("<command> [args...]");
         }
     }
 
-    void _showUsage(Io::Emit &e) {
+    void _showUsage(Io::Emit& e) {
         e("Usage: ");
         usage(e);
         e("\n");
     }
 
-    void _showHelp(Io::Emit &e) {
+    void _showHelp(Io::Emit& e) {
         e("{}\n\n", longName);
 
         e("Usage:\n\t");
@@ -350,9 +350,9 @@ struct Command {
 
         e("Description:\n\t{}\n\n", description);
 
-        if (any(options)) {
+        if (Karm::any(options)) {
             e("Options:\n");
-            for (auto &opt : options) {
+            for (auto& opt : options) {
                 if (opt->kind != OptionKind::OPTION)
                     continue;
 
@@ -365,18 +365,18 @@ struct Command {
             e("\n");
         }
 
-        if (any(_commands)) {
+        if (Karm::any(_commands)) {
             e("Subcommands:\n");
-            for (auto &cmd : _commands) {
+            for (auto& cmd : _commands) {
                 e("\t{c} {} - {}\n", cmd->shortName.unwrapOr(' '), cmd->longName, cmd->description);
             }
         }
     }
 
-    Res<bool> _evalOption(Cursor<Token> &c) {
+    Res<bool> _evalOption(Cursor<Token>& c) {
         bool found = false;
 
-        for (auto &opt : options) {
+        for (auto& opt : options) {
             if (c.ended())
                 break;
 
@@ -397,8 +397,8 @@ struct Command {
         return Ok(found);
     }
 
-    Res<> _evalParams(Cursor<Token> &c) {
-        for (auto &opt : options) {
+    Res<> _evalParams(Cursor<Token>& c) {
+        for (auto& opt : options) {
             while (try$(_evalOption(c)))
                 ;
 
@@ -414,7 +414,7 @@ struct Command {
         return Ok();
     }
 
-    Async::Task<> execAsync(Sys::Context &ctx) {
+    Async::Task<> execAsync(Sys::Context& ctx) {
         auto args = Sys::useArgs(ctx);
         Vec<Token> tokens;
         for (usize i = 0; i < args.len(); ++i)
@@ -422,13 +422,13 @@ struct Command {
         co_return co_await execAsync(ctx, tokens);
     }
 
-    Async::Task<> execAsync(Sys::Context &ctx, Slice<Str> args) {
+    Async::Task<> execAsync(Sys::Context& ctx, Slice<Str> args) {
         Vec<Token> tokens;
         tokenize(args, tokens);
         co_return co_await execAsync(ctx, tokens);
     }
 
-    Async::Task<> execAsync(Sys::Context &ctx, Cursor<Token> c) {
+    Async::Task<> execAsync(Sys::Context& ctx, Cursor<Token> c) {
         co_try$(_evalParams(c));
 
         if (_help) {
@@ -449,7 +449,7 @@ struct Command {
         if (callbackAsync)
             co_trya$(callbackAsync.unwrap()(ctx));
 
-        if (any(_commands) and c.ended()) {
+        if (Karm::any(_commands) and c.ended()) {
             Io::Emit e{Sys::out()};
             _showUsage(e);
             e.newline();
@@ -461,13 +461,13 @@ struct Command {
             if (c->kind != Token::OPERAND)
                 co_return Error::invalidInput("expected subcommand");
 
-            if (not any(_commands))
+            if (not Karm::any(_commands))
                 co_return Error::invalidInput("unexpected subcommand");
 
             auto value = c->value;
             c.next();
 
-            for (auto &cmd : _commands) {
+            for (auto& cmd : _commands) {
 
                 bool shortNameMatch = value.len() == 1 and iterRunes(value).first() == cmd->shortName;
                 bool longNameMatch = value == cmd->longName;

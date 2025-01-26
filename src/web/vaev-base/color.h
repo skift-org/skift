@@ -43,7 +43,7 @@ struct Color {
     constexpr Color(SystemColor system)
         : type(Type::SYSTEM), system(system) {}
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         switch (type) {
         case Type::SRGB:
             e("#{02x}{02x}{02x}{02x}", srgb.red, srgb.green, srgb.blue, srgb.alpha);
@@ -153,7 +153,7 @@ struct ColorSpace {
         : type(_Type::RECTANGULAR), rectangular(_Rectangular::SRGB) {
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         if (type == ColorSpace::RECTANGULAR) {
             e("{}", rectangular);
         } else {

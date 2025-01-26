@@ -10,7 +10,7 @@ namespace Karm {
 
 struct Level {
     isize value;
-    char const *name;
+    char const* name;
     Cli::Style style;
 };
 
@@ -18,7 +18,7 @@ struct Format {
     Str str;
     Loc loc;
 
-    Format(char const *str, Loc loc = Loc::current())
+    Format(char const* str, Loc loc = Loc::current())
         : str(str), loc(loc) {
     }
 
@@ -42,7 +42,7 @@ inline void _catch(Res<usize> res) {
     panic(res.none().msg());
 }
 
-inline void _log(Level level, Format fmt, Io::_Args &args) {
+inline void _log(Level level, Format fmt, Io::_Args& args) {
     Logger::_Embed::loggerLock();
 
     if (level.value != -2) {
@@ -59,73 +59,73 @@ inline void _log(Level level, Format fmt, Io::_Args &args) {
 }
 
 template <typename... Args>
-inline void logPrint(Format format, Args &&...va) {
+inline void logPrint(Format format, Args&&... va) {
     Io::Args<Args...> args{std::forward<Args>(va)...};
     _log(PRINT, format, args);
 }
 
 template <typename... Args>
-inline void logPrintIf(bool condition, Format format, Args &&...va) {
+inline void logPrintIf(bool condition, Format format, Args&&... va) {
     if (condition)
         logPrint(format, std::forward<Args>(va)...);
 }
 
 template <typename... Args>
-inline void logDebug(Format format, Args &&...va) {
+inline void logDebug(Format format, Args&&... va) {
     Io::Args<Args...> args{std::forward<Args>(va)...};
     _log(DEBUG, format, args);
 }
 
 template <typename... Args>
-inline void logDebugIf(bool condition, Format format, Args &&...va) {
+inline void logDebugIf(bool condition, Format format, Args&&... va) {
     if (condition)
         logDebug(format, std::forward<Args>(va)...);
 }
 
 template <typename... Args>
-inline void logInfo(Format format, Args &&...va) {
+inline void logInfo(Format format, Args&&... va) {
     Io::Args<Args...> args{std::forward<Args>(va)...};
     _log(INFO, format, args);
 }
 
 template <typename... Args>
-inline void logInfoIf(bool condition, Format format, Args &&...va) {
+inline void logInfoIf(bool condition, Format format, Args&&... va) {
     if (condition)
         logInfo(format, std::forward<Args>(va)...);
 }
 
 template <typename... Args>
-inline void yap(Format format, Args &&...va) {
+inline void yap(Format format, Args&&... va) {
     Io::Args<Args...> args{std::forward<Args>(va)...};
     _log(YAP, format, args);
 }
 
 template <typename... Args>
-inline void logWarn(Format format, Args &&...va) {
+inline void logWarn(Format format, Args&&... va) {
     Io::Args<Args...> args{std::forward<Args>(va)...};
     _log(WARNING, format, args);
 }
 
 template <typename... Args>
-inline void logWarnIf(bool condition, Format format, Args &&...va) {
+inline void logWarnIf(bool condition, Format format, Args&&... va) {
     if (condition)
         logWarn(format, std::forward<Args>(va)...);
 }
 
 template <typename... Args>
-inline void logError(Format format, Args &&...va) {
+inline void logError(Format format, Args&&... va) {
     Io::Args<Args...> args{std::forward<Args>(va)...};
     _log(ERROR, format, args);
 }
 
 template <typename... Args>
-inline void logErrorIf(bool condition, Format format, Args &&...va) {
+inline void logErrorIf(bool condition, Format format, Args&&... va) {
     if (condition)
         logError(format, std::forward<Args>(va)...);
 }
 
 template <typename... Args>
-[[noreturn]] inline void logFatal(Format format, Args &&...va) {
+[[noreturn]] inline void logFatal(Format format, Args&&... va) {
     Io::Args<Args...> args{std::forward<Args>(va)...};
     _log(FATAL, format, args);
     panic("fatal error occured, see logs");

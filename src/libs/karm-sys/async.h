@@ -18,29 +18,29 @@ struct Sched :
 
     void quit(Res<> ret) { _ret = ret; }
 
-    virtual Res<> wait(TimeStamp until) = 0;
+    virtual Res<> wait(Instant until) = 0;
 
-    virtual Async::Task<usize> readAsync(Strong<Fd>, MutBytes) = 0;
+    virtual Async::Task<usize> readAsync(Rc<Fd>, MutBytes) = 0;
 
-    virtual Async::Task<usize> writeAsync(Strong<Fd>, Bytes) = 0;
+    virtual Async::Task<usize> writeAsync(Rc<Fd>, Bytes) = 0;
 
-    virtual Async::Task<usize> flushAsync(Strong<Fd>) = 0;
+    virtual Async::Task<usize> flushAsync(Rc<Fd>) = 0;
 
-    virtual Async::Task<_Accepted> acceptAsync(Strong<Fd>) = 0;
+    virtual Async::Task<_Accepted> acceptAsync(Rc<Fd>) = 0;
 
-    virtual Async::Task<_Sent> sendAsync(Strong<Fd>, Bytes, Slice<Handle>, SocketAddr) = 0;
+    virtual Async::Task<_Sent> sendAsync(Rc<Fd>, Bytes, Slice<Handle>, SocketAddr) = 0;
 
-    virtual Async::Task<_Received> recvAsync(Strong<Fd>, MutBytes, MutSlice<Handle>) = 0;
+    virtual Async::Task<_Received> recvAsync(Rc<Fd>, MutBytes, MutSlice<Handle>) = 0;
 
-    virtual Async::Task<> sleepAsync(TimeStamp until) = 0;
+    virtual Async::Task<> sleepAsync(Instant until) = 0;
 };
 
-Sched &globalSched();
+Sched& globalSched();
 
 template <Async::Sender S>
-auto run(S s, Sched &sched = globalSched()) {
+auto run(S s, Sched& sched = globalSched()) {
     return Async::run(std::move(s), [&] {
-        (void)sched.wait(TimeStamp::endOfTime());
+        (void)sched.wait(Instant::endOfTime());
     });
 }
 

@@ -67,7 +67,7 @@ Ui::Child dialogFooter(Ui::Children children) {
 
 Ui::Child dialogAction(Ui::OnPress onPress, String text) {
     return Ui::button(
-        [onPress = std::move(onPress)](auto &n) {
+        [onPress = std::move(onPress)](auto& n) {
             onPress(n);
             Ui::closeDialog(n);
         },

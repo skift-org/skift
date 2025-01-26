@@ -49,7 +49,7 @@ using Action = Union<
     ToggleBackgroundGraphics,
     ChangeScale>;
 
-static Ui::Task<Action> reduce(State &s, Action a) {
+static Ui::Task<Action> reduce(State& s, Action a) {
     bool shouldUpdatePreview = false;
 
     if (auto changePaper = a.is<ChangePaper>()) {
@@ -86,7 +86,7 @@ using Model = Ui::Model<State, Action, reduce>;
 
 // MARK: Dialog ----------------------------------------------------------------
 
-Ui::Child _printSelect(State const &s, usize index) {
+Ui::Child _printSelect(State const& s, usize index) {
     return Ui::hflow(
                8,
                Math::Align::CENTER,
@@ -103,7 +103,7 @@ Ui::Child _printSelect(State const &s, usize index) {
            });
 }
 
-Ui::Child _printPaper(State const &s, usize index) {
+Ui::Child _printPaper(State const& s, usize index) {
     auto scale = 1.;
 
     auto paper = s.settings.paper;
@@ -135,7 +135,7 @@ Ui::Child _printPaper(State const &s, usize index) {
            Ui::pinSize(previewSize.cast<isize>());
 }
 
-Ui::Child _printPreviewMobile(State const &s) {
+Ui::Child _printPreviewMobile(State const& s) {
     Ui::Children pages;
     for (usize i = 0; i < s.pages.len(); ++i) {
         pages.pushBack(_printPaper(s, i));
@@ -155,7 +155,7 @@ Ui::Child _printPreviewMobile(State const &s) {
            );
 }
 
-Ui::Child _printPreview(State const &s) {
+Ui::Child _printPreview(State const& s) {
     Ui::Children pages;
     for (usize i = 0; i < s.pages.len(); ++i) {
         pages.pushBack(_printPaper(s, i));
@@ -199,15 +199,15 @@ Ui::Child _destinationSelect() {
     );
 }
 
-Ui::Child _paperSelect(State const &s) {
+Ui::Child _paperSelect(State const& s) {
     return select(selectValue(s.settings.paper.name), [] -> Ui::Children {
         Vec<Ui::Child> groups;
 
         bool first = false;
-        for (auto &serie : Print::SERIES) {
+        for (auto& serie : Print::SERIES) {
             Vec<Ui::Child> items;
             items.pushBack(selectLabel(serie.name));
-            for (auto const &stock : serie.stocks) {
+            for (auto const& stock : serie.stocks) {
                 items.pushBack(selectItem(Model::bind<ChangePaper>(stock), stock.name));
             }
 
@@ -222,7 +222,7 @@ Ui::Child _paperSelect(State const &s) {
     });
 }
 
-Ui::Child _printSettings(State const &s) {
+Ui::Child _printSettings(State const& s) {
     return Ui::vflow(
         rowContent(
             NONE,
@@ -313,7 +313,7 @@ Ui::Child _printSettings(State const &s) {
 
                     numberRow(
                         s.settings.scale,
-                        [](auto &n, f64 scale) {
+                        [](auto& n, f64 scale) {
                             Model::bubble<ChangeScale>(n, ChangeScale{scale});
                         },
                         0.1,
@@ -322,14 +322,14 @@ Ui::Child _printSettings(State const &s) {
 
                     checkboxRow(
                         s.settings.headerFooter,
-                        [&](auto &n, ...) {
+                        [&](auto& n, ...) {
                             Model::bubble<ToggleHeaderFooter>(n);
                         },
                         "Header and footers"s
                     ),
                     checkboxRow(
                         s.settings.backgroundGraphics,
-                        [&](auto &n, ...) {
+                        [&](auto& n, ...) {
                             Model::bubble<ToggleBackgroundGraphics>(n);
                         },
                         "Background graphics"s
@@ -340,14 +340,14 @@ Ui::Child _printSettings(State const &s) {
     );
 }
 
-Ui::Child _printControls(State const &s) {
+Ui::Child _printControls(State const& s) {
     return _printSettings(s) |
            Ui::vscroll() |
            Ui::grow() |
            Ui::minSize({320, Ui::UNCONSTRAINED});
 }
 
-Ui::Child _printDialog(State const &s) {
+Ui::Child _printDialog(State const& s) {
     return dialogContent({
         dialogTitleBar("Print"s),
         Ui::hflow(
@@ -363,7 +363,7 @@ Ui::Child _printDialog(State const &s) {
     });
 }
 
-Ui::Child _printDialogMobile(State const &s) {
+Ui::Child _printDialogMobile(State const& s) {
     return dialogContent({
         dialogTitleBar("Print"s),
         Ui::separator(),
@@ -384,7 +384,7 @@ Ui::Child _printDialogMobile(State const &s) {
 }
 
 Ui::Child printDialog(PrintPreview preview) {
-    return Ui::reducer<Model>({preview}, [](State const &s) {
+    return Ui::reducer<Model>({preview}, [](State const& s) {
         auto isMobile = App::useFormFactor() == App::FormFactor::MOBILE;
         if (isMobile)
             return _printDialogMobile(s);

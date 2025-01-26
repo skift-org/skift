@@ -14,14 +14,14 @@ Res<> FontBook::loadAll() {
 
     auto bundles = try$(Pkg::installedBundles());
     usize count = 0;
-    for (auto &bundle : bundles) {
+    for (auto& bundle : bundles) {
         auto maybeDir = Sys::Dir::open(bundle.url() / "fonts");
         if (not maybeDir)
             continue;
 
         auto dir = maybeDir.take();
 
-        for (auto &diren : dir.entries()) {
+        for (auto& diren : dir.entries()) {
             if (diren.type != Sys::Type::FILE)
                 continue;
 
@@ -58,7 +58,7 @@ Res<> FontBook::loadAll() {
 
 // MARK: Family Gathering ------------------------------------------------------
 
-static Str _nextWord(Io::SScan &s) {
+static Str _nextWord(Io::SScan& s) {
     s.eat(Re::space());
     s.eat(Re::word());
     return s.end();
@@ -94,9 +94,9 @@ Str commonFamily(Str lhs, Str rhs) {
 
 Vec<String> FontBook::families() const {
     Vec<String> families;
-    for (auto &info : _faces) {
+    for (auto& info : _faces) {
         bool found = false;
-        for (auto &f : families) {
+        for (auto& f : families) {
             auto prefix = commonFamily(f, info.attrs.family);
             if (prefix) {
                 found = true;
@@ -214,11 +214,11 @@ Str FontBook::_resolveFamily(Family family) const {
     return family.unwrap<Str>();
 }
 
-Opt<Strong<Fontface>> FontBook::queryExact(FontQuery query) const {
+Opt<Rc<Fontface>> FontBook::queryExact(FontQuery query) const {
     auto family = _resolveFamily(query.family);
 
-    for (auto &info : _faces) {
-        auto &attrs = info.attrs;
+    for (auto& info : _faces) {
+        auto& attrs = info.attrs;
 
         if (attrs.family == family and
             attrs.weight == query.weight and
@@ -230,17 +230,17 @@ Opt<Strong<Fontface>> FontBook::queryExact(FontQuery query) const {
     return NONE;
 }
 
-Opt<Strong<Fontface>> FontBook::queryClosest(FontQuery query) const {
+Opt<Rc<Fontface>> FontBook::queryClosest(FontQuery query) const {
     Str desiredfamily = _resolveFamily(query.family);
 
-    Opt<Strong<Fontface>> matchingFace;
+    Opt<Rc<Fontface>> matchingFace;
     auto matchingFamily = ""s;
     auto matchingStretch = FontStretch::NO_MATCH;
     auto matchingStyle = FontStyle::NO_MATCH;
     auto matchingWeight = FontWeight::NO_MATCH;
 
-    for (auto &info : _faces) {
-        auto const &attrs = info.attrs;
+    for (auto& info : _faces) {
+        auto const& attrs = info.attrs;
 
         auto currFamily = matchingFamily;
         auto currStretch = matchingStretch;
@@ -288,13 +288,13 @@ Opt<Strong<Fontface>> FontBook::queryClosest(FontQuery query) const {
     return matchingFace;
 }
 
-Vec<Strong<Fontface>> FontBook::queryFamily(String family) const {
-    Vec<Strong<Fontface>> res;
-    for (auto &info : _faces)
+Vec<Rc<Fontface>> FontBook::queryFamily(String family) const {
+    Vec<Rc<Fontface>> res;
+    for (auto& info : _faces)
         if (commonFamily(info.attrs.family, family) == family)
             res.pushBack(info.face);
 
-    sort(res, [](auto &lhs, auto &rhs) {
+    sort(res, [](auto& lhs, auto& rhs) {
         return lhs->attrs() <=> rhs->attrs();
     });
     return res;

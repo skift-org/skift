@@ -2,7 +2,7 @@
 
 namespace Karm::Sys {
 
-Context &globalContext() {
+Context& globalContext() {
     static Context ctx;
     return ctx;
 }

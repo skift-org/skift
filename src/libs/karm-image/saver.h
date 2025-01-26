@@ -16,10 +16,10 @@ struct Saver {
     f64 quality = DEFAULT_QUALITY;
 };
 
-Res<> save(Gfx::Pixels pixels, Io::BEmit &e, Saver const &props = {});
+Res<> save(Gfx::Pixels pixels, Io::BEmit& e, Saver const& props = {});
 
-Res<> save(Gfx::Pixels pixels, Io::Writer &w, Saver const &props = {});
+Res<> save(Gfx::Pixels pixels, Io::Writer& w, Saver const& props = {});
 
-Res<> save(Gfx::Pixels pixels, Mime::Url const &url, Saver const &props = {});
+Res<> save(Gfx::Pixels pixels, Mime::Url const& url, Saver const& props = {});
 
 } // namespace Karm::Image

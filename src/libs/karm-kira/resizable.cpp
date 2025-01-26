@@ -11,14 +11,14 @@ struct Resizable : public Ui::ProxyNode<Resizable> {
           _size(size),
           _onChange(std::move(onChange)) {}
 
-    void reconcile(Resizable &o) override {
+    void reconcile(Resizable& o) override {
         if (o._onChange)
             _size = o._size;
         _onChange = std::move(o._onChange);
         ProxyNode<Resizable>::reconcile(o);
     }
 
-    void bubble(App::Event &e) override {
+    void bubble(App::Event& e) override {
         if (auto de = e.is<Ui::DragEvent>()) {
             if (de->type == Ui::DragEvent::DRAG) {
                 _size = _size + de->delta;
@@ -44,7 +44,7 @@ struct Resizable : public Ui::ProxyNode<Resizable> {
 };
 
 Ui::Child resizable(Ui::Child child, Math::Vec2i size, Ui::OnChange<Math::Vec2i> onChange) {
-    return makeStrong<Resizable>(child, size, std::move(onChange));
+    return makeRc<Resizable>(child, size, std::move(onChange));
 }
 
 static Ui::Child _resizeHandle(Math::Vec2i dir) {

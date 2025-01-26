@@ -4,7 +4,7 @@ namespace Vaev::Style {
 
 // MARK: StyleSheet ------------------------------------------------------------
 
-void StyleSheet::repr(Io::Emit &e) const {
+void StyleSheet::repr(Io::Emit& e) const {
     e("(style-sheet {} {} {}", mime, href, title);
 
     e.indent();
@@ -12,7 +12,7 @@ void StyleSheet::repr(Io::Emit &e) const {
         e.newline();
         e("rules: [");
         e.indentNewline();
-        for (auto const &rule : rules) {
+        for (auto const& rule : rules) {
             e("{}\n", rule);
         }
         e.deindent();
@@ -22,12 +22,12 @@ void StyleSheet::repr(Io::Emit &e) const {
     e(")");
 }
 
-StyleSheet StyleSheet::parse(Css::Sst const &sst, Origin origin) {
+StyleSheet StyleSheet::parse(Css::Sst const& sst, Origin origin) {
     if (sst != Css::Sst::LIST)
         panic("expected list");
 
     Style::StyleSheet res;
-    for (auto const &item : sst.content) {
+    for (auto const& item : sst.content) {
         if (item == Css::Sst::RULE) {
             res.rules.pushBack(Rule::parse(item, origin));
         } else {
@@ -41,11 +41,11 @@ StyleSheet StyleSheet::parse(Css::Sst const &sst, Origin origin) {
 
 // MARK: StyleBook -------------------------------------------------------------
 
-void StyleBook::repr(Io::Emit &e) const {
+void StyleBook::repr(Io::Emit& e) const {
     e("(style-book {})", styleSheets);
 }
 
-void StyleBook::add(StyleSheet &&sheet) {
+void StyleBook::add(StyleSheet&& sheet) {
     styleSheets.pushBack(std::move(sheet));
 }
 

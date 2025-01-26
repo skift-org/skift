@@ -2,9 +2,9 @@
 
 namespace Karm::Io {
 
-bool _matchWildCard(SScan &glob, SScan &in);
+bool _matchWildCard(SScan& glob, SScan& in);
 
-bool _matchGroupe(SScan &glob, Rune curr) {
+bool _matchGroupe(SScan& glob, Rune curr) {
     bool neg = glob.skip('^');
 
     while (not glob.ended() and
@@ -33,7 +33,7 @@ bool _matchGroupe(SScan &glob, Rune curr) {
     return neg;
 }
 
-bool _matchWildCard(SScan &glob, SScan &in) {
+bool _matchWildCard(SScan& glob, SScan& in) {
     for (usize n = in.rem(); n > 0; n--) {
         SScan g = glob, s = in;
         s.next(n);
@@ -47,7 +47,7 @@ bool _matchWildCard(SScan &glob, SScan &in) {
     return matchGlob(glob, in);
 }
 
-bool matchGlob(SScan &glob, SScan &in) {
+bool matchGlob(SScan& glob, SScan& in) {
     while (not glob.ended() and !in.ended()) {
         auto op = glob.next();
 

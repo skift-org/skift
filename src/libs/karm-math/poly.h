@@ -21,17 +21,17 @@ struct Poly {
             return *_bound;
 
         Rect<T> res = _edges[0].bound();
-        for (auto const &edge : *this)
+        for (auto const& edge : *this)
             res = res.mergeWith(edge.bound());
         _bound = res;
         return *_bound;
     }
 
-    Edgef const &operator[](usize i) const {
+    Edgef const& operator[](usize i) const {
         return _edges[i];
     }
 
-    Edgef const *buf() const {
+    Edgef const* buf() const {
         return _edges.buf();
     }
 
@@ -39,11 +39,11 @@ struct Poly {
         return _edges.len();
     }
 
-    Edge<T> const *begin() const {
+    Edge<T> const* begin() const {
         return buf();
     }
 
-    Edge<T> const *end() const {
+    Edge<T> const* end() const {
         return buf() + len();
     }
 
@@ -56,7 +56,7 @@ struct Poly {
 
     void offset(Vec2<T> off) {
         _bound = NONE;
-        for (auto &e : _edges) {
+        for (auto& e : _edges) {
             e = e + off;
         }
     }
@@ -66,9 +66,9 @@ struct Poly {
         _bound = NONE;
     }
 
-    void transform(Trans2<T> const &trans) {
+    void transform(Trans2<T> const& trans) {
         _bound = NONE;
-        for (auto &e : _edges) {
+        for (auto& e : _edges) {
             e.start = trans.apply(e.start);
             e.end = trans.apply(e.end);
         }

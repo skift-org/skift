@@ -68,9 +68,9 @@ struct Key {
         return _code;
     }
 
-    auto operator<=>(Key const &other) const = default;
+    auto operator<=>(Key const& other) const = default;
 
-    auto operator<=>(Code const &other) const {
+    auto operator<=>(Code const& other) const {
         return _code <=> other;
     }
 };

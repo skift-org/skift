@@ -15,25 +15,25 @@ inline constexpr Byte operator""_byte(unsigned long long arg) noexcept {
 
 template <typename T, typename U = typename T::Inner>
 concept Sliceable =
-    requires(T const &t) {
+    requires(T const& t) {
         typename T::Inner;
         { t.len() } -> Meta::Same<usize>;
-        { t.buf() } -> Meta::Same<U const *>;
-        { t[0uz] } -> Meta::Same<U const &>;
+        { t.buf() } -> Meta::Same<U const*>;
+        { t[0uz] } -> Meta::Same<U const&>;
     };
 
 template <typename T, typename U = typename T::Inner>
 concept MutSliceable =
     Sliceable<T, U> and
-    requires(T &t) {
+    requires(T& t) {
         { t.len() } -> Meta::Same<usize>;
-        { t.buf() } -> Meta::Same<U *>;
-        { t[0uz] } -> Meta::Same<U &>;
+        { t.buf() } -> Meta::Same<U*>;
+        { t[0uz] } -> Meta::Same<U&>;
     };
 
 template <Sliceable T, Sliceable U>
     requires Meta::Comparable<typename T::Inner, typename U::Inner>
-constexpr auto operator<=>(T const &lhs, U const &rhs) -> decltype(lhs[0] <=> rhs[0]) {
+constexpr auto operator<=>(T const& lhs, U const& rhs) -> decltype(lhs[0] <=> rhs[0]) {
     for (usize i = 0; i < min(lhs.len(), rhs.len()); i++) {
         auto result = lhs[i] <=> rhs[i];
         if (result != 0)
@@ -44,7 +44,7 @@ constexpr auto operator<=>(T const &lhs, U const &rhs) -> decltype(lhs[0] <=> rh
 
 template <Sliceable T, Sliceable U>
     requires Meta::Equatable<typename T::Inner, typename U::Inner>
-constexpr bool operator==(T const &lhs, U const &rhs) {
+constexpr bool operator==(T const& lhs, U const& rhs) {
     if (lhs.len() != rhs.len())
         return false;
 
@@ -60,17 +60,17 @@ template <typename T>
 struct Slice {
     using Inner = T;
 
-    T const *_buf{};
+    T const* _buf{};
     usize _len{};
 
-    static constexpr Slice fromNullterminated(T const *buf) {
+    static constexpr Slice fromNullterminated(T const* buf) {
         usize len = 0;
         while (buf[len])
             len++;
         return {buf, len};
     }
 
-    static constexpr Slice fromNullterminated(T const *buf, usize maxLen) {
+    static constexpr Slice fromNullterminated(T const* buf, usize maxLen) {
         usize len = 0;
         while (buf[len] and len < maxLen)
             len++;
@@ -79,33 +79,33 @@ struct Slice {
 
     constexpr Slice() = default;
 
-    constexpr Slice(T const *buf, usize len)
+    constexpr Slice(T const* buf, usize len)
         : _buf(buf), _len(len) {}
 
-    constexpr Slice(T const *begin, T const *end)
+    constexpr Slice(T const* begin, T const* end)
         : Slice(begin, end - begin) {}
 
-    constexpr Slice(Sliceable<T> auto const &other)
+    constexpr Slice(Sliceable<T> auto const& other)
         : Slice(other.buf(), other.len()) {}
 
-    constexpr T const &operator[](usize i) const {
+    constexpr T const& operator[](usize i) const {
         if (i >= _len) {
             panic("index out of bounds");
         }
         return _buf[i];
     }
 
-    constexpr T const *buf() const { return _buf; }
+    constexpr T const* buf() const { return _buf; }
 
-    constexpr T const *begin() const { return _buf; }
+    constexpr T const* begin() const { return _buf; }
 
-    constexpr T const *end() const { return _buf + _len; }
+    constexpr T const* end() const { return _buf + _len; }
 
     constexpr usize len() const { return _len; }
 
     template <typename U>
     constexpr Slice<U> cast() const {
-        return Slice<U>{(U const *)_buf, _len};
+        return Slice<U>{(U const*)_buf, _len};
     }
 
     constexpr explicit operator bool() const {
@@ -117,10 +117,10 @@ template <typename T>
 struct MutSlice {
     using Inner = T;
 
-    T *_buf{};
+    T* _buf{};
     usize _len{};
 
-    static constexpr MutSlice fromNullterminated(T *buf) {
+    static constexpr MutSlice fromNullterminated(T* buf) {
         usize len = 0;
         while (buf[len])
             len++;
@@ -129,46 +129,46 @@ struct MutSlice {
 
     constexpr MutSlice() = default;
 
-    constexpr MutSlice(T *buf, usize len)
+    constexpr MutSlice(T* buf, usize len)
         : _buf(buf), _len(len) {}
 
-    constexpr MutSlice(T *begin, T *end)
+    constexpr MutSlice(T* begin, T* end)
         : MutSlice(begin, end - begin) {}
 
-    constexpr MutSlice(MutSliceable<T> auto &other)
+    constexpr MutSlice(MutSliceable<T> auto& other)
         : MutSlice(other.buf(), other.len()) {}
 
-    constexpr T &operator[](usize i) {
+    constexpr T& operator[](usize i) {
         if (i >= _len) {
             panic("index out of bounds");
         }
         return _buf[i];
     }
 
-    constexpr T const &operator[](usize i) const {
+    constexpr T const& operator[](usize i) const {
         if (i >= _len) {
             panic("index out of bounds");
         }
         return _buf[i];
     }
 
-    constexpr T *buf() { return _buf; }
+    constexpr T* buf() { return _buf; }
 
-    constexpr T const *buf() const { return _buf; }
+    constexpr T const* buf() const { return _buf; }
 
-    constexpr T *begin() { return _buf; }
+    constexpr T* begin() { return _buf; }
 
-    constexpr T *end() { return _buf + _len; }
+    constexpr T* end() { return _buf + _len; }
 
-    constexpr T const *begin() const { return _buf; }
+    constexpr T const* begin() const { return _buf; }
 
-    constexpr T const *end() const { return _buf + _len; }
+    constexpr T const* end() const { return _buf + _len; }
 
     constexpr usize len() const { return _len; }
 
     template <typename U>
     constexpr MutSlice<U> cast() const {
-        return MutSlice<U>{(U *)_buf, _len * sizeof(T) / sizeof(U)};
+        return MutSlice<U>{(U*)_buf, _len * sizeof(T) / sizeof(U)};
     }
 
     constexpr explicit operator bool() const {
@@ -181,7 +181,7 @@ using Bytes = Slice<Byte>;
 using MutBytes = MutSlice<Byte>;
 
 template <Sliceable S, typename T = typename S::Inner>
-constexpr Slice<T> sub(S const &slice, usize start, usize end) {
+constexpr Slice<T> sub(S const& slice, usize start, usize end) {
     return {
         slice.buf() + start,
         clamp(end, start, slice.len()) - start,
@@ -189,12 +189,12 @@ constexpr Slice<T> sub(S const &slice, usize start, usize end) {
 }
 
 template <Sliceable S, typename T = typename S::Inner>
-constexpr Slice<T> sub(S const &slice, Range<usize> range) {
+constexpr Slice<T> sub(S const& slice, Range<usize> range) {
     return sub(slice, range.start, range.end());
 }
 
 template <Sliceable S, typename T = typename S::Inner>
-constexpr Slice<T> sub(S const &slice) {
+constexpr Slice<T> sub(S const& slice) {
     return {
         slice.buf(),
         slice.len(),
@@ -202,12 +202,12 @@ constexpr Slice<T> sub(S const &slice) {
 }
 
 template <Sliceable S, typename T = typename S::Inner>
-Slice<T> next(S const &slice, usize start = 1) {
+Slice<T> next(S const& slice, usize start = 1) {
     return sub(slice, start, slice.len());
 }
 
 template <MutSliceable S, typename T = typename S::Inner>
-MutSlice<T> mutSub(S &slice, usize start, usize end) {
+MutSlice<T> mutSub(S& slice, usize start, usize end) {
     return {
         slice.buf() + start,
         clamp(end, start, slice.len()) - start,
@@ -215,12 +215,12 @@ MutSlice<T> mutSub(S &slice, usize start, usize end) {
 }
 
 template <MutSliceable S, typename T = typename S::Inner>
-MutSlice<T> mutSub(S &slice, urange range) {
+MutSlice<T> mutSub(S& slice, urange range) {
     return mutSub(slice, range.start, range.end());
 }
 
 template <MutSliceable S, typename T = typename S::Inner>
-MutSlice<T> mutSub(S &slice) {
+MutSlice<T> mutSub(S& slice) {
     return {
         slice.buf(),
         slice.len(),
@@ -228,34 +228,34 @@ MutSlice<T> mutSub(S &slice) {
 }
 
 template <MutSliceable S, typename T = typename S::Inner>
-MutSlice<T> mutNext(S &slice, usize start = 1) {
+MutSlice<T> mutNext(S& slice, usize start = 1) {
     return mutSub(slice, start, slice.len());
 }
 
 template <Sliceable S>
-Bytes bytes(S const &slice) {
+Bytes bytes(S const& slice) {
     return {
-        reinterpret_cast<Byte const *>(slice.buf()),
+        reinterpret_cast<Byte const*>(slice.buf()),
         slice.len() * sizeof(typename S::Inner),
     };
 }
 
 template <MutSliceable S>
-MutBytes mutBytes(S &slice) {
+MutBytes mutBytes(S& slice) {
     return {
-        reinterpret_cast<Byte *>(slice.buf()),
+        reinterpret_cast<Byte*>(slice.buf()),
         slice.len() * sizeof(typename S::Inner),
     };
 }
 
 template <Sliceable S>
-usize sizeOf(S const &slice) {
+usize sizeOf(S const& slice) {
     return slice.len() * sizeof(typename S::Inner);
 }
 
 template <Sliceable S>
-constexpr auto iter(S const &slice) {
-    return Iter([&slice, i = 0uz] mutable -> typename S::Inner const * {
+constexpr auto iter(S const& slice) {
+    return Iter([&slice, i = 0uz] mutable -> typename S::Inner const* {
         if (i >= slice.len()) {
             return nullptr;
         }
@@ -265,8 +265,8 @@ constexpr auto iter(S const &slice) {
 }
 
 template <Sliceable S>
-constexpr auto iterRev(S const &slice) {
-    return Iter([&slice, i = slice.len()] mutable -> typename S::Inner const * {
+constexpr auto iterRev(S const& slice) {
+    return Iter([&slice, i = slice.len()] mutable -> typename S::Inner const* {
         if (i == 0) {
             return nullptr;
         }
@@ -276,8 +276,8 @@ constexpr auto iterRev(S const &slice) {
 }
 
 template <MutSliceable S>
-constexpr auto mutIter(S &slice) {
-    return Iter([&slice, i = 0uz] mutable -> typename S::Inner * {
+constexpr auto mutIter(S& slice) {
+    return Iter([&slice, i = 0uz] mutable -> typename S::Inner* {
         if (i >= slice.len()) {
             return nullptr;
         }
@@ -287,8 +287,8 @@ constexpr auto mutIter(S &slice) {
 }
 
 template <MutSliceable S>
-constexpr auto mutIterRev(S &slice) {
-    return Iter([&slice, i = slice.len()] mutable -> typename S::Inner * {
+constexpr auto mutIterRev(S& slice) {
+    return Iter([&slice, i = slice.len()] mutable -> typename S::Inner* {
         if (i == 0) {
             return nullptr;
         }
@@ -298,7 +298,7 @@ constexpr auto mutIterRev(S &slice) {
 }
 
 template <Sliceable S>
-constexpr auto iterSplit(S const &slice, typename S::Inner const &sep) {
+constexpr auto iterSplit(S const& slice, typename S::Inner const& sep) {
     return Iter([&slice, sep, i = 0uz] mutable -> Opt<Slice<typename S::Inner>> {
         if (i >= slice.len())
             return NONE;
@@ -320,49 +320,49 @@ constexpr auto iterSplit(S const &slice, typename S::Inner const &sep) {
     });
 }
 
-constexpr bool isEmpty(Sliceable auto const &slice) {
+constexpr bool isEmpty(Sliceable auto const& slice) {
     return slice.len() == 0;
 }
 
-constexpr bool any(Sliceable auto const &slice) {
+constexpr bool any(Sliceable auto const& slice) {
     return slice.len() > 0;
 }
 
-constexpr auto const *begin(Sliceable auto const &slice) {
+constexpr auto const* begin(Sliceable auto const& slice) {
     return slice.buf();
 }
 
-constexpr auto const *end(Sliceable auto const &slice) {
+constexpr auto const* end(Sliceable auto const& slice) {
     return slice.buf() + slice.len();
 }
 
-constexpr auto *begin(MutSliceable auto &slice) {
+constexpr auto* begin(MutSliceable auto& slice) {
     return slice.buf();
 }
 
-constexpr auto *end(MutSliceable auto &slice) {
+constexpr auto* end(MutSliceable auto& slice) {
     return slice.buf() + slice.len();
 }
 
-constexpr auto const &first(Sliceable auto const &slice) {
+constexpr auto const& first(Sliceable auto const& slice) {
     if (isEmpty(slice)) [[unlikely]]
         panic("empty slice");
     return slice.buf()[0];
 }
 
-constexpr auto &first(MutSliceable auto &slice) {
+constexpr auto& first(MutSliceable auto& slice) {
     if (isEmpty(slice)) [[unlikely]]
         panic("empty slice");
     return slice.buf()[0];
 }
 
-constexpr auto const &last(Sliceable auto const &slice) {
+constexpr auto const& last(Sliceable auto const& slice) {
     if (isEmpty(slice)) [[unlikely]]
         panic("empty slice");
     return slice.buf()[slice.len() - 1];
 }
 
-constexpr auto &last(MutSliceable auto &slice) {
+constexpr auto& last(MutSliceable auto& slice) {
     if (isEmpty(slice)) [[unlikely]]
         panic("empty slice");
     return slice.buf()[slice.len() - 1];
@@ -423,7 +423,7 @@ constexpr usize zeroFill(MutSlice<T> slice) {
     return fill(slice, {});
 }
 
-always_inline constexpr void sort(MutSliceable auto &slice, auto cmp) {
+always_inline constexpr void sort(MutSliceable auto& slice, auto cmp) {
     if (slice.len() <= 1)
         return;
 
@@ -454,13 +454,13 @@ always_inline constexpr void sort(MutSliceable auto &slice, auto cmp) {
     sort(leftSlice, cmp);
 }
 
-always_inline constexpr void sort(MutSliceable auto &slice) {
-    sort(slice, [](auto const &a, auto const &b) {
+always_inline constexpr void sort(MutSliceable auto& slice) {
+    sort(slice, [](auto const& a, auto const& b) {
         return a <=> b;
     });
 }
 
-always_inline constexpr void stableSort(MutSliceable auto &slice, auto cmp) {
+always_inline constexpr void stableSort(MutSliceable auto& slice, auto cmp) {
     for (usize i = 1; i < slice.len(); i++) {
         auto key = slice[i];
         isize j = i - 1;
@@ -474,14 +474,14 @@ always_inline constexpr void stableSort(MutSliceable auto &slice, auto cmp) {
     }
 }
 
-always_inline constexpr void stableSort(MutSliceable auto &slice) {
-    stableSort(slice, [](auto const &a, auto const &b) {
+always_inline constexpr void stableSort(MutSliceable auto& slice) {
+    stableSort(slice, [](auto const& a, auto const& b) {
         return a <=> b;
     });
 }
 
 template <Sliceable T, typename U = T::Inner>
-always_inline constexpr Opt<usize> indexOf(T const &slice, Meta::Equatable<U> auto const &needle) {
+always_inline constexpr Opt<usize> indexOf(T const& slice, Meta::Equatable<U> auto const& needle) {
     for (usize i = 0; i < slice.len(); i++)
         if (slice[i] == needle)
             return i;
@@ -489,19 +489,19 @@ always_inline constexpr Opt<usize> indexOf(T const &slice, Meta::Equatable<U> au
 }
 
 template <Sliceable T, typename U = T::Inner>
-always_inline constexpr bool contains(T const &slice, Meta::Equatable<U> auto const &needle) {
+always_inline constexpr bool contains(T const& slice, Meta::Equatable<U> auto const& needle) {
     return indexOf(slice, needle).has();
 }
 
 template <Sliceable T, typename U = T::Inner>
-always_inline constexpr Opt<usize> lastIndexOf(T const &slice, Meta::Equatable<U> auto const &needle) {
+always_inline constexpr Opt<usize> lastIndexOf(T const& slice, Meta::Equatable<U> auto const& needle) {
     for (usize i = slice.len(); i > 0; i--)
         if (slice[i - 1] == needle)
             return i - 1;
     return NONE;
 }
 
-always_inline Opt<usize> search(Sliceable auto const &slice, auto const &cmp) {
+always_inline Opt<usize> search(Sliceable auto const& slice, auto const& cmp) {
     if (slice.len() == 0)
         return NONE;
 
@@ -532,7 +532,7 @@ always_inline Opt<usize> search(Sliceable auto const &slice, auto const &cmp) {
     return NONE;
 }
 
-always_inline Opt<usize> searchLowerBound(Sliceable auto const &slice, auto const &cmp) {
+always_inline Opt<usize> searchLowerBound(Sliceable auto const& slice, auto const& cmp) {
     if (slice.len() == 0)
         return NONE;
 
@@ -563,7 +563,7 @@ always_inline Opt<usize> searchLowerBound(Sliceable auto const &slice, auto cons
     return left - 1;
 }
 
-always_inline Opt<usize> searchUpperBound(Sliceable auto const &slice, auto const &cmp) {
+always_inline Opt<usize> searchUpperBound(Sliceable auto const& slice, auto const& cmp) {
     if (slice.len() == 0)
         return NONE;
 
@@ -601,7 +601,7 @@ enum struct Match {
     YES,     //< The pattern is the input.
 };
 
-always_inline Match startWith(Sliceable auto const &slice, Sliceable auto const &prefix) {
+always_inline Match startWith(Sliceable auto const& slice, Sliceable auto const& prefix) {
     if (slice.len() < prefix.len())
         return Match::NO;
 
@@ -615,7 +615,7 @@ always_inline Match startWith(Sliceable auto const &slice, Sliceable auto const 
     return Match::YES;
 }
 
-always_inline Match endWith(Sliceable auto const &slice, Sliceable auto const &suffix) {
+always_inline Match endWith(Sliceable auto const& slice, Sliceable auto const& suffix) {
     if (slice.len() < suffix.len())
         return Match::NO;
 

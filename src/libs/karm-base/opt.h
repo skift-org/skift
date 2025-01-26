@@ -29,23 +29,23 @@ struct [[nodiscard]] Opt {
         : _present(false), _empty() {}
 
     template <typename U = T>
-    always_inline constexpr Opt(U const &value)
+    always_inline constexpr Opt(U const& value)
         requires(not Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> and Meta::CopyConstructible<T, U>)
         : _present(true), _value(value) {}
 
     template <typename U = T>
-    always_inline constexpr Opt(U &&value)
+    always_inline constexpr Opt(U&& value)
         requires(not Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> and Meta::MoveConstructible<T, U>)
         : _present(true), _value(std::forward<U>(value)) {}
 
-    always_inline constexpr Opt(Opt const &other)
+    always_inline constexpr Opt(Opt const& other)
         requires(Meta::CopyConstructible<T>)
         : _present(other._present) {
         if (_present)
             std::construct_at(&_value, other.unwrap());
     }
 
-    always_inline constexpr Opt(Opt &&other)
+    always_inline constexpr Opt(Opt&& other)
         requires(Meta::MoveConstructible<T>)
         : _present(other._present) {
         if (_present)
@@ -53,7 +53,7 @@ struct [[nodiscard]] Opt {
     }
 
     template <typename U>
-    always_inline constexpr Opt(Opt<U> const &other)
+    always_inline constexpr Opt(Opt<U> const& other)
         requires(Meta::CopyConstructible<T, U>)
         : _present(other._present) {
         if (_present)
@@ -62,7 +62,7 @@ struct [[nodiscard]] Opt {
 
     template <typename U>
         requires(Meta::MoveConstructible<T, U>)
-    always_inline constexpr Opt(Opt<U> &&other)
+    always_inline constexpr Opt(Opt<U>&& other)
         : _present(other._present) {
         if (_present)
             std::construct_at(&_value, other.take());
@@ -72,14 +72,14 @@ struct [[nodiscard]] Opt {
         clear();
     }
 
-    always_inline constexpr Opt &operator=(None) {
+    always_inline constexpr Opt& operator=(None) {
         clear();
         return *this;
     }
 
     template <typename U = T>
         requires(not Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> and Meta::Convertible<U, T>)
-    always_inline constexpr Opt &operator=(U const &value) {
+    always_inline constexpr Opt& operator=(U const& value) {
         clear();
         _present = true;
         std::construct_at(&_value, value);
@@ -88,21 +88,21 @@ struct [[nodiscard]] Opt {
 
     template <typename U = T>
         requires(not Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> and Meta::MoveConstructible<T, U>)
-    always_inline constexpr Opt &operator=(U &&value) {
+    always_inline constexpr Opt& operator=(U&& value) {
         clear();
         _present = true;
         std::construct_at(&_value, std::move(value));
         return *this;
     }
 
-    always_inline constexpr Opt &operator=(Opt const &other)
+    always_inline constexpr Opt& operator=(Opt const& other)
         requires(Meta::CopyConstructible<T>)
     {
         *this = Opt(other);
         return *this;
     }
 
-    always_inline constexpr Opt &operator=(Opt &&other)
+    always_inline constexpr Opt& operator=(Opt&& other)
         requires(Meta::MoveConstructible<T>)
     {
         clear();
@@ -114,7 +114,7 @@ struct [[nodiscard]] Opt {
     }
 
     template <typename U = T>
-    always_inline constexpr Opt &operator=(Opt<U> const &other)
+    always_inline constexpr Opt& operator=(Opt<U> const& other)
         requires(Meta::CopyConstructible<T, U>)
     {
         *this = Opt(other);
@@ -122,7 +122,7 @@ struct [[nodiscard]] Opt {
     }
 
     template <typename U>
-    always_inline constexpr Opt &operator=(Opt<U> &&other)
+    always_inline constexpr Opt& operator=(Opt<U>&& other)
         requires(Meta::MoveConstructible<T, U>)
     {
         clear();
@@ -141,28 +141,28 @@ struct [[nodiscard]] Opt {
         return _present;
     }
 
-    always_inline constexpr T *operator->() lifetimebound {
+    always_inline constexpr T* operator->() lifetimebound {
         if (not _present) [[unlikely]]
             panic("unwrapping None");
 
         return &_value;
     }
 
-    always_inline constexpr T &operator*() lifetimebound {
+    always_inline constexpr T& operator*() lifetimebound {
         if (not _present) [[unlikely]]
             panic("unwrapping None");
 
         return _value;
     }
 
-    always_inline constexpr T const *operator->() const lifetimebound {
+    always_inline constexpr T const* operator->() const lifetimebound {
         if (not _present) [[unlikely]]
             panic("unwrapping None");
 
         return &_value;
     }
 
-    always_inline constexpr T const &operator*() const lifetimebound {
+    always_inline constexpr T const& operator*() const lifetimebound {
         if (not _present) [[unlikely]]
             panic("unwrapping None");
 
@@ -170,7 +170,7 @@ struct [[nodiscard]] Opt {
     }
 
     template <typename... Args>
-    always_inline constexpr T &emplace(Args &&...args) lifetimebound {
+    always_inline constexpr T& emplace(Args&&... args) lifetimebound {
         clear();
         _present = true;
         std::construct_at(&_value, std::forward<Args>(args)...);
@@ -188,19 +188,19 @@ struct [[nodiscard]] Opt {
         return NONE;
     }
 
-    always_inline constexpr T &unwrap(char const *msg = "unwraping none") lifetimebound {
+    always_inline constexpr T& unwrap(char const* msg = "unwraping none") lifetimebound {
         if (not _present) [[unlikely]]
             panic(msg);
         return _value;
     }
 
-    always_inline constexpr T const &unwrap(char const *msg = "unwraping none") const lifetimebound {
+    always_inline constexpr T const& unwrap(char const* msg = "unwraping none") const lifetimebound {
         if (not _present) [[unlikely]]
             panic(msg);
         return _value;
     }
 
-    always_inline constexpr T const &unwrapOr(T const &other) const lifetimebound {
+    always_inline constexpr T const& unwrapOr(T const& other) const lifetimebound {
         if (_present)
             return _value;
         return other;
@@ -218,7 +218,7 @@ struct [[nodiscard]] Opt {
         return f();
     }
 
-    always_inline constexpr T take(char const *msg = "unwraping none") {
+    always_inline constexpr T take(char const* msg = "unwraping none") {
         if (not _present) [[unlikely]]
             panic(msg);
         T v = std::move(_value);
@@ -242,7 +242,7 @@ struct [[nodiscard]] Opt {
 
     // call operator
     template <typename... Args>
-    always_inline constexpr auto operator()(Args &&...args) {
+    always_inline constexpr auto operator()(Args&&... args) {
         using OptRet = Opt<Meta::Ret<T, Args...>>;
 
         if constexpr (Meta::Same<void, Meta::Ret<T, Args...>>) {
@@ -264,7 +264,7 @@ struct [[nodiscard]] Opt {
 
     // call operator
     template <typename... Args>
-    always_inline constexpr auto operator()(Args &&...args) const {
+    always_inline constexpr auto operator()(Args&&... args) const {
         using OptRet = Opt<Meta::Ret<T, Args...>>;
 
         if constexpr (Meta::Same<void, Meta::Ret<T, Args...>>) {
@@ -297,7 +297,7 @@ struct [[nodiscard]] Opt {
 
     template <typename U>
         requires Meta::Equatable<T, U>
-    always_inline constexpr bool operator==(U const &other) const {
+    always_inline constexpr bool operator==(U const& other) const {
         if (_present)
             return _value == other;
         return false;
@@ -305,20 +305,20 @@ struct [[nodiscard]] Opt {
 
     template <typename U>
         requires Meta::Comparable<T, U>
-    always_inline constexpr std::partial_ordering operator<=>(U const &other) const {
+    always_inline constexpr std::partial_ordering operator<=>(U const& other) const {
         if (_present)
             return _value <=> other;
         return std::partial_ordering::unordered;
     }
 
-    always_inline constexpr bool operator==(Opt const &other) const {
+    always_inline constexpr bool operator==(Opt const& other) const {
         if constexpr (Meta::Equatable<T>)
             if (_present and other._present)
                 return _value == other._value;
         return not _present and not other._present;
     }
 
-    always_inline constexpr std::partial_ordering operator<=>(Opt const &other) const {
+    always_inline constexpr std::partial_ordering operator<=>(Opt const& other) const {
         if constexpr (Meta::Comparable<T>)
             if (_present and other._present)
                 return _value <=> other._value;

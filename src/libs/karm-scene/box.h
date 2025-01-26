@@ -19,12 +19,12 @@ struct Box : public Node {
         return _bound;
     }
 
-    void paint(Gfx::Canvas &ctx, Math::Rectf r, PaintOptions o) override {
+    void paint(Gfx::Canvas& ctx, Math::Rectf r, PaintOptions o) override {
         if (not r.colide(bound()))
             return;
 
         if (o.showBackgroundGraphics) {
-            for (auto &background : _backgrounds) {
+            for (auto& background : _backgrounds) {
                 ctx.beginPath();
                 auto radii = _borders.radii.reduceOverlap(_bound.size());
                 ctx.rect(_bound, radii);
@@ -35,7 +35,7 @@ struct Box : public Node {
         _borders.paint(ctx, _bound);
     }
 
-    void repr(Io::Emit &e) const override {
+    void repr(Io::Emit& e) const override {
         e("(box z:{} {} {} {})", zIndex, _bound, _borders.radii, _backgrounds);
     }
 };

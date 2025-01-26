@@ -13,7 +13,7 @@ Math::Rectf Path::bound() {
         return *_bound;
 
     Math::Rectf rect = {_verts[0], 0};
-    for (auto &p : _verts)
+    for (auto& p : _verts)
         rect = rect.mergeWith(p);
     _bound = rect;
     return rect;
@@ -376,7 +376,7 @@ void Path::ellipse(Math::Ellipsef ellipse) {
     close();
 }
 
-void Path::path(Math::Path const &path) {
+void Path::path(Math::Path const& path) {
     for (auto contour : path.iterContours()) {
         moveTo(first(contour));
         for (auto v : next(contour, 1)) {
@@ -390,14 +390,14 @@ void Path::path(Math::Path const &path) {
 
 // MARK: Svg -------------------------------------------------------------------
 
-Opt<Math::Vec2f> _nextVec2f(Io::SScan &s) {
+Opt<Math::Vec2f> _nextVec2f(Io::SScan& s) {
     return Math::Vec2f{
         try$(Io::atof(s)),
         try$(Io::atof(s)),
     };
 }
 
-Opt<Path::Op> Path::parseOp(Io::SScan &s, Rune opcode) {
+Opt<Path::Op> Path::parseOp(Io::SScan& s, Rune opcode) {
     Flags flags{};
     flags |= isAsciiLower(opcode) ? RELATIVE : DEFAULT;
     opcode = toAsciiLower(opcode);

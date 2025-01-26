@@ -250,8 +250,9 @@ void OverlayFilter::apply(MutPixels p) const {
 }
 
 void FilterChain::apply(MutPixels p) const {
-    filters.visit([&](auto &f) {
+    filters.visit([&](auto& f) {
         f->apply(p);
+        return true;
     });
 }
 

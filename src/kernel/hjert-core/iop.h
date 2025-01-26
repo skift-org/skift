@@ -11,7 +11,7 @@ struct Iop :
 
     Hal::PortRange _range;
 
-    static Res<Strong<Iop>> create(Hal::PortRange range);
+    static Res<Arc<Iop>> create(Hal::PortRange range);
 
     Iop(Hal::PortRange range);
 

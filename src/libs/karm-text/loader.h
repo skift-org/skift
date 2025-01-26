@@ -6,11 +6,11 @@
 
 namespace Karm::Text {
 
-Res<Strong<Fontface>> loadFontface(Sys::Mmap &&map);
+Res<Rc<Fontface>> loadFontface(Sys::Mmap&& map);
 
-Res<Strong<Fontface>> loadFontface(Mime::Url url);
+Res<Rc<Fontface>> loadFontface(Mime::Url url);
 
-Res<Strong<Fontface>> loadFontfaceOrFallback(Mime::Url url);
+Res<Rc<Fontface>> loadFontfaceOrFallback(Mime::Url url);
 
 Res<Font> loadFont(f64 size, Mime::Url url);
 

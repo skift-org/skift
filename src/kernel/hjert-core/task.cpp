@@ -7,13 +7,13 @@
 
 namespace Hjert::Core {
 
-Res<Strong<Task>> Task::create(
+Res<Arc<Task>> Task::create(
     Mode mode,
-    Opt<Strong<Space>> space,
-    Opt<Strong<Domain>> domain
+    Opt<Arc<Space>> space,
+    Opt<Arc<Domain>> domain
 ) {
     auto stack = try$(Stack::create());
-    auto task = makeStrong<Task>(mode, std::move(stack), space, domain);
+    auto task = makeArc<Task>(mode, std::move(stack), space, domain);
     return Ok(task);
 }
 
@@ -24,8 +24,8 @@ Task &Task::self() {
 Task::Task(
     Mode mode,
     Stack stack,
-    Opt<Strong<Space>> space,
-    Opt<Strong<Domain>> domain
+    Opt<Arc<Space>> space,
+    Opt<Arc<Domain>> domain
 )
     : _mode(mode),
       _stack(std::move(stack)),
@@ -78,7 +78,7 @@ void Task::crash() {
     );
 }
 
-State Task::eval(TimeStamp now) {
+State Task::eval(Instant now) {
     ObjectLockScope scope(*this);
 
     if (_ret())

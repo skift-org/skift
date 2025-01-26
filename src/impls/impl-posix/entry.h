@@ -3,12 +3,12 @@
 #include <karm-sys/chan.h>
 #include <karm-sys/context.h>
 
-void __panicHandler(Karm::PanicKind kind, char const *msg);
+void __panicHandler(Karm::PanicKind kind, char const* msg);
 
-int main(int argc, char const **argv) {
+int main(int argc, char const** argv) {
     Karm::registerPanicHandler(__panicHandler);
 
-    auto &ctx = Sys::globalContext();
+    auto& ctx = Sys::globalContext();
     ctx.add<Sys::ArgsHook>(argc, argv);
     Res<> code = Sys::run(entryPointAsync(ctx));
     if (not code) {

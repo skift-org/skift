@@ -29,7 +29,7 @@ struct Eased {
         return _target;
     }
 
-    void set(Node &n, T value) {
+    void set(Node& n, T value) {
         _value = value;
         _target = value;
         _elapsed = 0;
@@ -39,12 +39,12 @@ struct Eased {
         Ui::shouldAnimate(n);
     }
 
-    auto &delay(f64 delay) {
+    auto& delay(f64 delay) {
         _delay = delay;
         return *this;
     }
 
-    void animate(Node &n, T target, f64 duration = 1.0, Math::Easing easing = {}) {
+    void animate(Node& n, T target, f64 duration = 1.0, Math::Easing easing = {}) {
         if (Math::epsilonEq(_value, target, 0.01)) {
             _value = target;
             _target = target;
@@ -66,7 +66,7 @@ struct Eased {
         Ui::shouldAnimate(n);
     }
 
-    bool needRepaint(Node &n, App::Event &event) {
+    bool needRepaint(Node& n, App::Event& event) {
         if (not _animated)
             return false;
 
@@ -94,7 +94,7 @@ struct Eased {
         return true;
     }
 
-    void update(Node &n, App::Event &e) {
+    void update(Node& n, App::Event& e) {
         needRepaint(n, e);
     }
 
@@ -118,23 +118,23 @@ struct Eased2 {
 
     Eased2(Math::Vec2<T> v) : _x(v.x), _y(v.y) {}
 
-    void set(Node &n, Math::Vec2<T> v) {
+    void set(Node& n, Math::Vec2<T> v) {
         _x.set(n, v.x);
         _y.set(n, v.y);
     }
 
-    auto &delay(f64 delay) {
+    auto& delay(f64 delay) {
         _x.delay(delay);
         _y.delay(delay);
         return *this;
     }
 
-    void animate(Node &n, Math::Vec2<T> target, f64 duration = 1.0, Math::Easing easing = {}) {
+    void animate(Node& n, Math::Vec2<T> target, f64 duration = 1.0, Math::Easing easing = {}) {
         _x.animate(n, target.x, duration, easing);
         _y.animate(n, target.y, duration, easing);
     }
 
-    bool needRepaint(Node &n, App::Event &e) {
+    bool needRepaint(Node& n, App::Event& e) {
         bool sx = _x.needRepaint(n, e);
         bool sy = _y.needRepaint(n, e);
         return sx or sy;

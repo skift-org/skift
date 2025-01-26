@@ -32,7 +32,7 @@ struct Mime {
         return s.end();
     }
 
-    bool is(Mime const &other) const {
+    bool is(Mime const& other) const {
         return type() == other.type() and
                subtype() == other.subtype();
     }
@@ -41,21 +41,21 @@ struct Mime {
         return _buf;
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("{}", str());
     }
 
-    bool operator==(Mime const &) const = default;
+    bool operator==(Mime const&) const = default;
 };
 
 /// Try to sniff the mime type from a file extension.
 Opt<Mime> sniffSuffix(Str suffix);
 
 /// Guess an icon for a given mime type.
-Mdi::Icon iconFor(Mime const &mime);
+Mdi::Icon iconFor(Mime const& mime);
 
 } // namespace Karm::Mime
 
-inline auto operator""_mime(char const *buf, usize len) {
+inline auto operator""_mime(char const* buf, usize len) {
     return Karm::Mime::Mime(Str(buf, len));
 }

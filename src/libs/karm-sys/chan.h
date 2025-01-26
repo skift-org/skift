@@ -9,31 +9,31 @@
 namespace Karm::Sys {
 
 struct In : public Io::Reader {
-    Strong<Fd> _fd;
+    Rc<Fd> _fd;
 
-    In(Strong<Fd> fd)
+    In(Rc<Fd> fd)
         : _fd(fd) {}
 
     Res<usize> read(MutBytes bytes) override {
         return _fd->read(bytes);
     }
 
-    Strong<Fd> fd() {
+    Rc<Fd> fd() {
         return _fd;
     }
 };
 
 struct Out : public Io::TextWriterBase<> {
-    Strong<Fd> _fd;
+    Rc<Fd> _fd;
 
-    Out(Strong<Fd> fd)
+    Out(Rc<Fd> fd)
         : _fd(fd) {}
 
     Res<usize> write(Bytes bytes) override {
         return _fd->write(bytes);
     }
 
-    Strong<Fd> fd() {
+    Rc<Fd> fd() {
         return _fd;
     }
 
@@ -43,16 +43,16 @@ struct Out : public Io::TextWriterBase<> {
 };
 
 struct Err : public Io::TextWriterBase<> {
-    Strong<Fd> _fd;
+    Rc<Fd> _fd;
 
-    Err(Strong<Fd> fd)
+    Err(Rc<Fd> fd)
         : _fd(fd) {}
 
     Res<usize> write(Bytes bytes) override {
         return _fd->write(bytes);
     }
 
-    Strong<Fd> fd() {
+    Rc<Fd> fd() {
         return _fd;
     }
 
@@ -61,27 +61,27 @@ struct Err : public Io::TextWriterBase<> {
     }
 };
 
-In &in();
+In& in();
 
-Out &out();
+Out& out();
 
-Err &err();
+Err& err();
 
-inline void print(Str str = "", auto &&...args) {
+inline void print(Str str = "", auto&&... args) {
     (void)Io::format(out(), str, std::forward<decltype(args)>(args)...);
 }
 
-inline void err(Str str = "", auto &&...args) {
+inline void err(Str str = "", auto&&... args) {
     (void)Io::format(err(), str, std::forward<decltype(args)>(args)...);
 }
 
-inline void println(Str str = "", auto &&...args) {
+inline void println(Str str = "", auto&&... args) {
     (void)Io::format(out(), str, std::forward<decltype(args)>(args)...);
     (void)out().writeStr(Str{Sys::LINE_ENDING});
     (void)out().flush();
 }
 
-inline void errln(Str str = "", auto &&...args) {
+inline void errln(Str str = "", auto&&... args) {
     (void)Io::format(err(), str, std::forward<decltype(args)>(args)...);
     (void)err().writeStr(Str{Sys::LINE_ENDING});
     (void)err().flush();

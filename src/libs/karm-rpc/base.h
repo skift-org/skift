@@ -2,8 +2,8 @@
 
 #include <karm-async/promise.h>
 #include <karm-async/queue.h>
-#include <karm-base/cons.h>
 #include <karm-base/map.h>
+#include <karm-base/tuple.h>
 #include <karm-io/pack.h>
 #include <karm-logger/logger.h>
 
@@ -20,7 +20,7 @@ struct Port : public Distinct<u64, struct _PortTag> {
 
     using Distinct::Distinct;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         if (*this == INVALID)
             e("invalid");
         else if (*this == BUS)
@@ -42,7 +42,7 @@ struct Header {
     Port to;
     Meta::Id mid;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(header seq: {}, from: {}, to: {}, mid: {:016x})", seq, from, to, mid);
     }
 };
@@ -66,11 +66,11 @@ struct Message {
     Array<Sys::Handle, 16> _hnds;
     usize _hndsLen = 0;
 
-    Header &header() {
+    Header& header() {
         return _header;
     }
 
-    Header const &header() const {
+    Header const& header() const {
         return _header;
     }
 
@@ -92,7 +92,7 @@ struct Message {
     }
 
     template <typename T, typename... Args>
-    static Res<Message> packReq(Port to, u64 seq, Args &&...args) {
+    static Res<Message> packReq(Port to, u64 seq, Args&&... args) {
         T payload{std::forward<Args>(args)...};
 
         Message msg;
@@ -113,7 +113,7 @@ struct Message {
     }
 
     template <typename T, typename... Args>
-    Res<Message> packResp(Args &&...args) {
+    Res<Message> packResp(Args&&... args) {
         typename T::Response payload{std::forward<Args>(args)...};
 
         Message resp;
@@ -147,14 +147,14 @@ struct Message {
 // MARK: Primitive Operations --------------------------------------------------
 
 template <typename T, typename... Args>
-Res<> rpcSend(Sys::IpcConnection &con, Port to, u64 seq, Args &&...args) {
+Res<> rpcSend(Sys::IpcConnection& con, Port to, u64 seq, Args&&... args) {
     Message msg = Message::packReq<T>(to, seq, std::forward<Args>(args)...).take();
 
     try$(con.send(msg.bytes(), msg.handles()));
     return Ok();
 }
 
-static inline Async::Task<Message> rpcRecvAsync(Sys::IpcConnection &con) {
+static inline Async::Task<Message> rpcRecvAsync(Sys::IpcConnection& con) {
     Message msg;
     auto [bufLen, hndsLen] = co_trya$(con.recvAsync(msg._buf, msg._hnds));
     if (bufLen < sizeof(Header))
@@ -175,9 +175,9 @@ struct Endpoint : Meta::Pinned {
 
     Endpoint(Sys::IpcConnection con);
 
-    static Endpoint create(Sys::Context &ctx);
+    static Endpoint create(Sys::Context& ctx);
 
-    static Async::Task<> _receiverTask(Endpoint &self) {
+    static Async::Task<> _receiverTask(Endpoint& self) {
         while (true) {
             Message msg = co_trya$(rpcRecvAsync(self._con));
             auto header = msg._header;
@@ -192,7 +192,7 @@ struct Endpoint : Meta::Pinned {
     }
 
     template <typename T, typename... Args>
-    Res<> send(Port port, Args &&...args) {
+    Res<> send(Port port, Args&&... args) {
         return rpcSend<T>(_con, port, _seq++, std::forward<Args>(args)...);
     }
 
@@ -201,7 +201,7 @@ struct Endpoint : Meta::Pinned {
     }
 
     template <typename T>
-    Res<> resp(Message &msg, Res<typename T::Response> message) {
+    Res<> resp(Message& msg, Res<typename T::Response> message) {
         auto header = msg._header;
         if (not message)
             return rpcSend<Error>(_con, header.from, header.seq, message.none());
@@ -209,7 +209,7 @@ struct Endpoint : Meta::Pinned {
     }
 
     template <typename T, typename... Args>
-    Async::Task<typename T::Response> callAsync(Port port, Args &&...args) {
+    Async::Task<typename T::Response> callAsync(Port port, Args&&... args) {
         auto seq = _seq++;
         Async::_Promise<Message> promise;
         auto future = promise.future();
@@ -229,6 +229,6 @@ struct Endpoint : Meta::Pinned {
     }
 };
 
-Endpoint &globalEndpoint();
+Endpoint& globalEndpoint();
 
 } // namespace Karm::Rpc

@@ -7,10 +7,12 @@
 namespace Vaev::View {
 
 struct View : public Ui::View<View> {
-    Strong<Markup::Document> _dom;
+    Rc<Markup::Document> _dom;
+    ViewProps _props;
     Opt<Driver::RenderResult> _renderResult;
 
-    View(Strong<Markup::Document> dom) : _dom(dom) {}
+    View(Rc<Markup::Document> dom, ViewProps props)
+        : _dom(dom), _props(props) {}
 
     Style::Media _constructMedia(Math::Vec2i viewport) {
         return {
@@ -43,15 +45,21 @@ struct View : public Ui::View<View> {
             .forcedColors = Colors::NONE,
             .prefersColorScheme = Ui::darkMode ? ColorScheme::DARK : ColorScheme::LIGHT,
             .prefersReducedData = ReducedData::NO_PREFERENCE,
+
+            // NOTE: Deprecated Media Features
+            .deviceWidth = Px{viewport.width},
+            .deviceHeight = Px{viewport.height},
+            .deviceAspectRatio = viewport.width / (f64)viewport.height,
         };
     }
 
-    void reconcile(View &o) override {
+    void reconcile(View& o) override {
         _dom = o._dom;
+        _props = o._props;
         _renderResult = NONE;
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti rect) override {
+    void paint(Gfx::Canvas& g, Math::Recti rect) override {
         auto viewport = bound().size();
         if (not _renderResult) {
             auto media = _constructMedia(viewport);
@@ -67,6 +75,8 @@ struct View : public Ui::View<View> {
         g.clear(rect, Gfx::WHITE);
 
         paint->paint(g, rect.offset(-bound().xy).cast<f64>());
+        if (_props.wireframe)
+            Layout::wireframe(*frag, g);
 
         g.pop();
     }
@@ -88,8 +98,8 @@ struct View : public Ui::View<View> {
     }
 };
 
-Ui::Child view(Strong<Markup::Document> dom) {
-    return makeStrong<View>(dom);
+Ui::Child view(Rc<Markup::Document> dom, ViewProps props) {
+    return makeRc<View>(dom, props);
 }
 
 } // namespace Vaev::View

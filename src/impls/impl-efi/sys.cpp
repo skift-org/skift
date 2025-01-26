@@ -11,7 +11,7 @@
 
 namespace Karm::Sys::_Embed {
 
-static TimeStamp fromEfi(Efi::Time time) {
+static SystemTime fromEfi(Efi::Time time) {
     DateTime dt;
     dt.date.year = time.year;
     dt.date.month = time.month;
@@ -19,7 +19,7 @@ static TimeStamp fromEfi(Efi::Time time) {
     dt.time.hour = time.hour;
     dt.time.minute = time.minute;
     dt.time.second = time.second;
-    return dt.toTimeStamp();
+    return dt.toInstant();
 }
 
 struct ConOut : public Fd {
@@ -68,7 +68,7 @@ struct ConOut : public Fd {
         return Ok(0uz);
     }
 
-    Res<Strong<Fd>> dup() override {
+    Res<Rc<Fd>> dup() override {
         notImplemented();
     }
 
@@ -159,7 +159,7 @@ struct FileProto : public Fd {
         return Ok(0uz);
     }
 
-    Res<Strong<Fd>> dup() override {
+    Res<Rc<Fd>> dup() override {
         notImplemented();
     }
 
@@ -201,37 +201,37 @@ struct FileProto : public Fd {
     }
 };
 
-Res<Strong<Fd>> unpackFd(Io::PackScan &) {
+Res<Rc<Fd>> unpackFd(Io::PackScan &) {
     notImplemented();
 }
 
-Res<Strong<Fd>> createIn() {
-    return Ok(makeStrong<NullFd>());
+Res<Rc<Fd>> createIn() {
+    return Ok(makeRc<NullFd>());
 }
 
-Res<Strong<Fd>> createOut() {
-    return Ok(makeStrong<ConOut>(Efi::st()->conOut));
+Res<Rc<Fd>> createOut() {
+    return Ok(makeRc<ConOut>(Efi::st()->conOut));
 }
 
-Res<Strong<Fd>> createErr() {
-    return Ok(makeStrong<ConOut>(Efi::st()->stdErr));
+Res<Rc<Fd>> createErr() {
+    return Ok(makeRc<ConOut>(Efi::st()->stdErr));
 }
 
 // MARK: Sockets ---------------------------------------------------------------
 
-Res<Strong<Fd>> connectTcp(SocketAddr) {
+Res<Rc<Fd>> connectTcp(SocketAddr) {
     notImplemented();
 }
 
-Res<Strong<Fd>> listenTcp(SocketAddr) {
+Res<Rc<Fd>> listenTcp(SocketAddr) {
     notImplemented();
 }
 
-Res<Strong<Fd>> listenUdp(SocketAddr) {
+Res<Rc<Fd>> listenUdp(SocketAddr) {
     notImplemented();
 }
 
-Res<Strong<Fd>> listenIpc(Mime::Url) {
+Res<Rc<Fd>> listenIpc(Mime::Url) {
     notImplemented();
 }
 
@@ -294,7 +294,7 @@ static Res<Mime::Path> resolve(Mime::Url url) {
     }
 }
 
-Res<Strong<Fd>> openFile(Mime::Url const &url) {
+Res<Rc<Fd>> openFile(Mime::Url const &url) {
     static Efi::SimpleFileSystemProtocol *fileSystem = nullptr;
     if (not fileSystem) {
         fileSystem = try$(Efi::openProtocol<Efi::SimpleFileSystemProtocol>(Efi::li()->deviceHandle));
@@ -321,18 +321,18 @@ Res<Strong<Fd>> openFile(Mime::Url const &url) {
     auto utf16str = b.take();
 
     try$(rootDir->open(rootDir, &file, utf16str.buf(), EFI_FILE_MODE_READ, 0));
-    return Ok(makeStrong<FileProto>(file));
+    return Ok(makeRc<FileProto>(file));
 }
 
 Res<Vec<DirEntry>> readDir(Mime::Url const &) {
     return Error::notImplemented();
 }
 
-Res<Strong<Fd>> createFile(Mime::Url const &) {
+Res<Rc<Fd>> createFile(Mime::Url const &) {
     return Error::notImplemented();
 }
 
-Res<Strong<Fd>> openOrCreateFile(Mime::Url const &) {
+Res<Rc<Fd>> openOrCreateFile(Mime::Url const &) {
     return Error::notImplemented();
 }
 
@@ -350,7 +350,7 @@ Res<MmapResult> memMap(MmapOptions const &options) {
     return Ok(MmapResult{vaddr, vaddr, options.size});
 }
 
-Res<MmapResult> memMap(MmapOptions const &, Strong<Fd> fd) {
+Res<MmapResult> memMap(MmapOptions const &, Rc<Fd> fd) {
     usize vaddr = 0;
     usize fileSize = try$(Io::size(*fd));
 
@@ -383,24 +383,30 @@ Res<Stat> stat(Mime::Url const &) {
 
 // MARK: Time ------------------------------------------------------------------
 
-TimeStamp now() {
+SystemTime now() {
     Efi::Time t;
+
     Efi::rt()->getTime(&t, nullptr).unwrap();
 
-    Date date = {
-        t.day,
-        t.month,
-        t.year,
+    DateTime dt{
+        .date = {
+            .day = t.day,
+            .month = t.month,
+            .year = t.year,
+        },
+        .time = {
+            .second = t.second,
+            .minute = t.minute,
+            .hour = t.hour,
+        },
     };
 
-    Time time = {
-        t.hour,
-        t.minute,
-        t.second,
-    };
+    return dt.toInstant() + Duration::fromUSecs(t.nanosecond / 1000);
+}
 
-    return DateTime{date, time}.toTimeStamp() +
-           TimeSpan::fromUSecs(t.nanosecond / 1000);
+Instant instant() {
+    // HACK: It's supposed to be a monotonic clock, but we don't have one.
+    return Instant{now()._value};
 }
 
 // MARK: System Informations ---------------------------------------------------
@@ -437,7 +443,7 @@ Async::Task<> launchAsync(Sys::Intent) {
 
 // MARK: Process Managment -----------------------------------------------------
 
-Res<> sleep(TimeSpan) {
+Res<> sleep(Duration) {
     return Error::notImplemented();
 }
 

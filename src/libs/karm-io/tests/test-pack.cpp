@@ -4,7 +4,7 @@
 namespace Karm::Io::Tests {
 
 test$("pack-unpack") {
-    auto testCase = [&]<typename T>(T const &input) -> Res<> {
+    auto testCase = [&]<typename T>(T const& input) -> Res<> {
         Io::BufferWriter buf;
         Io::PackEmit e{buf};
 

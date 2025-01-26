@@ -5,14 +5,14 @@
 
 namespace Karm::Ui {
 
-void showDialog(Node &n, Child child) {
+void showDialog(Node& n, Child child) {
     bubble<ShowDialogEvent>(n, child);
 }
 
 struct CloseDialogEvent {
 };
 
-void closeDialog(Node &n) {
+void closeDialog(Node& n) {
     bubble<CloseDialogEvent>(n);
 }
 
@@ -52,12 +52,12 @@ struct DialogLayer : public LeafNode<DialogLayer> {
         _visibility.animate(*this, 0, 0.1);
     }
 
-    void reconcile(DialogLayer &o) override {
+    void reconcile(DialogLayer& o) override {
         _child = _child->reconcile(o._child).unwrapOr(_child);
         _child->attach(this);
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
         _child->paint(g, r);
 
         if (_visibility.value() > 0.001) {
@@ -80,7 +80,7 @@ struct DialogLayer : public LeafNode<DialogLayer> {
         }
     }
 
-    void event(App::Event &e) override {
+    void event(App::Event& e) override {
         if (_visibility.needRepaint(*this, e))
             Ui::shouldRepaint(*this);
 
@@ -102,7 +102,7 @@ struct DialogLayer : public LeafNode<DialogLayer> {
         }
     }
 
-    void bubble(App::Event &e) override {
+    void bubble(App::Event& e) override {
         if (auto se = e.is<ShowDialogEvent>()) {
             _showDialog(se->child);
             e.accept();
@@ -148,7 +148,7 @@ struct DialogLayer : public LeafNode<DialogLayer> {
 };
 
 Child dialogLayer(Child child) {
-    return makeStrong<DialogLayer>(child);
+    return makeRc<DialogLayer>(child);
 }
 
 } // namespace Karm::Ui

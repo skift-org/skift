@@ -15,7 +15,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
 
     auto system = co_try$(Bus::create(ctx));
 
-    co_try$(system->attach(makeStrong<System>()));
+    co_try$(system->attach(makeRc<System>()));
     co_try$(system->prepareService("grund-av"s));
     co_try$(system->prepareService("grund-conf"s));
     co_try$(system->prepareService("grund-device"s));
@@ -30,7 +30,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     for (auto &endpoint : system->_endpoints)
         co_try$(endpoint->activate(ctx));
 
-    co_return Sys::globalSched().wait(TimeStamp::endOfTime());
+    co_return Sys::globalSched().wait(Instant::endOfTime());
 }
 
 void __panicHandler(Karm::PanicKind kind, char const *msg);

@@ -14,7 +14,7 @@ using Rune = u32;
 static constexpr Rune REPLACEMENT = U'�';
 
 template <typename T>
-concept StaticEncoding = requires(T t, Rune &r, typename T::Unit u, Cursor<typename T::Unit> &c, MutCursor<typename T::Unit> &m) {
+concept StaticEncoding = requires(T t, Rune& r, typename T::Unit u, Cursor<typename T::Unit>& c, MutCursor<typename T::Unit>& m) {
     { T::unitLen(u) } -> Meta::Same<usize>;
     { T::runeLen(r) } -> Meta::Same<usize>;
     { T::decodeUnit(r, c) } -> Meta::Same<bool>;
@@ -32,13 +32,13 @@ struct _Multiple {
         _buf.emplace(_buf.len(), u);
     }
 
-    always_inline constexpr Unit &operator[](usize i) { return _buf[i]; }
+    always_inline constexpr Unit& operator[](usize i) { return _buf[i]; }
 
-    always_inline constexpr Unit const &operator[](usize i) const { return _buf[i]; }
+    always_inline constexpr Unit const& operator[](usize i) const { return _buf[i]; }
 
-    always_inline always_inline constexpr Unit *buf() { return _buf.buf(); }
+    always_inline always_inline constexpr Unit* buf() { return _buf.buf(); }
 
-    always_inline constexpr Unit const *buf() const { return _buf.buf(); }
+    always_inline constexpr Unit const* buf() const { return _buf.buf(); }
 
     always_inline constexpr usize len() const { return _buf.len(); }
 
@@ -65,13 +65,13 @@ struct _Single {
         return _buf;
     }
 
-    always_inline constexpr Unit &operator[](usize) { return _buf; }
+    always_inline constexpr Unit& operator[](usize) { return _buf; }
 
-    always_inline constexpr Unit const &operator[](usize) const { return _buf; }
+    always_inline constexpr Unit const& operator[](usize) const { return _buf; }
 
-    always_inline constexpr Unit *buf() { return &_buf; }
+    always_inline constexpr Unit* buf() { return &_buf; }
 
-    always_inline constexpr Unit const *buf() const { return &_buf; }
+    always_inline constexpr Unit const* buf() const { return &_buf; }
 
     always_inline constexpr usize len() const { return 1; }
 };
@@ -115,7 +115,7 @@ struct Utf8 {
             return 4;
     }
 
-    always_inline static bool decodeUnit(Rune &result, DecodeInput<Unit> auto &in) {
+    always_inline static bool decodeUnit(Rune& result, DecodeInput<Unit> auto& in) {
         if (in.rem() == 0) {
             result = U'�';
             return false;
@@ -147,7 +147,7 @@ struct Utf8 {
         return true;
     }
 
-    always_inline static bool encodeUnit(Rune c, EncodeOutput<Unit> auto &out) {
+    always_inline static bool encodeUnit(Rune c, EncodeOutput<Unit> auto& out) {
         if (unitLen(c) > out.rem()) [[unlikely]]
             panic("bad");
 
@@ -197,7 +197,7 @@ struct Utf16 {
             return 2;
     }
 
-    always_inline static bool decodeUnit(Rune &result, DecodeInput<Unit> auto &in) {
+    always_inline static bool decodeUnit(Rune& result, DecodeInput<Unit> auto& in) {
         Unit first = in.next();
 
         if (unitLen(first) > in.rem()) {
@@ -224,7 +224,7 @@ struct Utf16 {
         return true;
     }
 
-    always_inline static bool encodeUnit(Rune c, EncodeOutput<Unit> auto &out) {
+    always_inline static bool encodeUnit(Rune c, EncodeOutput<Unit> auto& out) {
         if (c <= 0xffff) {
             out.put(c);
             return true;
@@ -256,12 +256,12 @@ struct Utf32 {
         return 1;
     }
 
-    always_inline static bool decodeUnit(Rune &result, DecodeInput<Unit> auto &in) {
+    always_inline static bool decodeUnit(Rune& result, DecodeInput<Unit> auto& in) {
         result = in.next();
         return true;
     }
 
-    always_inline static bool encodeUnit(Rune c, EncodeOutput<Unit> auto &out) {
+    always_inline static bool encodeUnit(Rune c, EncodeOutput<Unit> auto& out) {
         out.put(c);
         return true;
     }
@@ -285,7 +285,7 @@ struct Ascii {
         return 1;
     }
 
-    always_inline static bool decodeUnit(Rune &result, DecodeInput<Unit> auto &in) {
+    always_inline static bool decodeUnit(Rune& result, DecodeInput<Unit> auto& in) {
         auto c = in.next();
         if (c >= 0) {
             result = c;
@@ -296,7 +296,7 @@ struct Ascii {
         }
     }
 
-    always_inline static bool encodeUnit(Rune c, EncodeOutput<Unit> auto &out) {
+    always_inline static bool encodeUnit(Rune c, EncodeOutput<Unit> auto& out) {
         if (c < 0) {
             out.put('?');
             return false;
@@ -326,13 +326,13 @@ struct EAscii {
         return 1;
     }
 
-    always_inline static bool decodeUnit(Rune &result, DecodeInput<Unit> auto &in) {
+    always_inline static bool decodeUnit(Rune& result, DecodeInput<Unit> auto& in) {
         Mapper mapper;
         result = mapper(in.next());
         return true;
     }
 
-    always_inline static bool encodeUnit(Rune c, EncodeOutput<Unit> auto &out) {
+    always_inline static bool encodeUnit(Rune c, EncodeOutput<Unit> auto& out) {
         Mapper mapper;
         for (usize i = 0; i <= 255; i++) {
             if (mapper(i) == c) {
@@ -455,12 +455,12 @@ template <StaticEncoding T>
 using One = typename T::One;
 
 template <StaticEncoding E>
-bool encodeOne(Rune rune, One<E> &one) {
+bool encodeOne(Rune rune, One<E>& one) {
     return E::encodeUnit(rune, one);
 }
 
 template <StaticEncoding E>
-bool encodeOne(One<E> &one, Rune &rune) {
+bool encodeOne(One<E>& one, Rune& rune) {
     return E::decodeUnit(rune, one);
 }
 

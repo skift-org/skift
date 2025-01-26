@@ -8,7 +8,7 @@ test$("strong-rc") {
         int x = 0;
     };
 
-    auto s = makeStrong<S>();
+    auto s = makeRc<S>();
 
     return Ok();
 }

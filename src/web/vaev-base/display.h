@@ -182,7 +182,7 @@ struct Display {
         return is(Type::INTERNAL) and _internal == internal;
     }
 
-    bool operator==(Display const &other) const {
+    bool operator==(Display const& other) const {
         if (_type != other._type)
             return false;
 
@@ -203,7 +203,7 @@ struct Display {
         return false;
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         switch (_type) {
         case Type::DEFAULT:
             e("(display inside: {}, outside: {}, item: {})", _inside, _outside, _item);

@@ -15,9 +15,9 @@ struct Channel :
 
     Ring<Hj::SentRecv> _sr;
     Ring<Byte> _bytes;
-    Ring<Strong<Object>> _caps;
+    Ring<Arc<Object>> _caps;
 
-    static Res<Strong<Channel>> create(usize bufCap = 4096, usize capsCap = 16);
+    static Res<Arc<Channel>> create(usize bufCap = 4096, usize capsCap = 16);
 
     Channel(usize bufCap, usize capsCap);
 

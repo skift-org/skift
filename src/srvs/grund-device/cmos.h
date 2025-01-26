@@ -1,6 +1,7 @@
 #pragma once
 
 #include <hal/io.h>
+#include <karm-base/time.h>
 
 #include "node.h"
 
@@ -35,9 +36,9 @@ struct Cmos : public Node {
         STATUS_D = 0xD,
     };
 
-    Strong<Hal::Io> _io;
+    Rc<Hal::Io> _io;
 
-    Cmos(Strong<Hal::Io> io);
+    Cmos(Rc<Hal::Io> io);
 
     Res<> init() override;
 
@@ -55,7 +56,7 @@ struct Rtc : public Device {
 
     Res<> init() override;
 
-    Res<TimeStamp> now();
+    Res<SystemTime> now();
 };
 
 } // namespace Grund::Device::Cmos

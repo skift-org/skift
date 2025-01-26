@@ -6,15 +6,15 @@
 #include "abi.h"
 #include "externs.h"
 
-void __panicHandler(Karm::PanicKind kind, char const *msg);
+void __panicHandler(Karm::PanicKind kind, char const* msg);
 
 extern "C" int wasm_export(wasm_main)(void) {
     Abi::Wasm::init();
     Karm::registerPanicHandler(__panicHandler);
 
-    char const *self = "wasm-app";
-    char const *argv[] = {self, nullptr};
-    auto &ctx = Sys::globalContext();
+    char const* self = "wasm-app";
+    char const* argv[] = {self, nullptr};
+    auto& ctx = Sys::globalContext();
     ctx.add<Sys::ArgsHook>(1, argv);
     Res<> code = Sys::run(entryPointAsync(ctx));
 

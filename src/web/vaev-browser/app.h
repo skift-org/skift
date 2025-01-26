@@ -5,6 +5,6 @@
 
 namespace Vaev::Browser {
 
-Ui::Child app(Mime::Url url, Res<Strong<Vaev::Markup::Document>> dom);
+Ui::Child app(Mime::Url url, Res<Rc<Vaev::Markup::Document>> dom);
 
 } // namespace Vaev::Browser

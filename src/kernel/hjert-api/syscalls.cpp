@@ -68,8 +68,8 @@ Res<> _syscall(Syscall s, Arg a0 = 0, Arg a1 = 0, Arg a2 = 0, Arg a3 = 0, Arg a4
 #    error "Unsupported architecture"
 #endif
 
-Res<> _now(TimeStamp *ts) {
-    return _syscall(Syscall::NOW, (Arg)ts);
+Res<> _now(Instant *i) {
+    return _syscall(Syscall::NOW, (Arg)i);
 }
 
 Res<> _log(char const *msg, usize len) {
@@ -136,7 +136,7 @@ Res<> _listen(Cap cap, Cap target, Flags<Sigs> set, Flags<Sigs> unset) {
     return _syscall(Syscall::LISTEN, cap.raw(), target.raw(), (Arg)set.val(), (Arg)unset.val());
 }
 
-Res<> _poll(Cap cap, Event *ev, usize evCap, usize *evLen, TimeStamp until) {
+Res<> _poll(Cap cap, Event *ev, usize evCap, usize *evLen, Instant until) {
     return _syscall(Syscall::POLL, cap.raw(), (Arg)ev, evCap, (usize)evLen, until.val());
 }
 

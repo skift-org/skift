@@ -14,17 +14,17 @@ struct StyleSheet {
     Vec<Rule> rules;
     Origin origin = Origin::AUTHOR;
 
-    void repr(Io::Emit &e) const;
+    void repr(Io::Emit& e) const;
 
-    static StyleSheet parse(Css::Sst const &sst, Origin origin = Origin::AUTHOR);
+    static StyleSheet parse(Css::Sst const& sst, Origin origin = Origin::AUTHOR);
 
-    static Style::StyleSheet parse(Io::SScan &s, Origin origin = Origin::AUTHOR) {
+    static Style::StyleSheet parse(Io::SScan& s, Origin origin = Origin::AUTHOR) {
         Css::Lexer lex{s};
         Css::Sst sst = consumeRuleList(lex, true);
         return parse(sst, origin);
     }
 
-    void add(Rule &&rule) {
+    void add(Rule&& rule) {
         rules.pushBack(std::move(rule));
     }
 };
@@ -32,9 +32,9 @@ struct StyleSheet {
 struct StyleBook {
     Vec<StyleSheet> styleSheets;
 
-    void repr(Io::Emit &e) const;
+    void repr(Io::Emit& e) const;
 
-    void add(StyleSheet &&sheet);
+    void add(StyleSheet&& sheet);
 };
 
 } // namespace Vaev::Style

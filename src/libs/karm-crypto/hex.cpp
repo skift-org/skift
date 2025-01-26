@@ -4,7 +4,7 @@
 
 namespace Karm::Crypto {
 
-Res<usize> hexEncode(Bytes bytes, Io::TextWriter &out) {
+Res<usize> hexEncode(Bytes bytes, Io::TextWriter& out) {
     usize written = 0;
     for (auto b : bytes) {
         written += try$(Io::format(out, "{02x}"s, b));

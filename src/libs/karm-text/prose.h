@@ -1,6 +1,5 @@
 #pragma once
 
-#include <karm-gfx/canvas.h>
 #include <karm-logger/logger.h>
 
 #include "font.h"
@@ -218,9 +217,7 @@ struct Prose : public Meta::Pinned {
 
     // MARK: Paint -------------------------------------------------------------
 
-    void paint(Gfx::Canvas &g);
-
-    void paintCaret(Gfx::Canvas &g, usize runeIndex, Gfx::Color color) const {
+    void paintCaret(Gfx::Canvas& g, usize runeIndex, Gfx::Color color) const {
         auto m = _style.font.metrics();
         auto baseline = queryPosition(runeIndex);
         auto cs = baseline - Math::Vec2f{0, m.ascend};
@@ -239,7 +236,7 @@ struct Prose : public Meta::Pinned {
 
     Lbc lbcAt(usize runeIndex) const {
         auto maybeLi = searchLowerBound(
-            _lines, [&](Line const &l) {
+            _lines, [&](Line const& l) {
                 return l.runeRange.start <=> runeIndex;
             }
         );
@@ -249,10 +246,10 @@ struct Prose : public Meta::Pinned {
 
         auto li = *maybeLi;
 
-        auto &line = _lines[li];
+        auto& line = _lines[li];
 
         auto maybeBi = searchLowerBound(
-            line.blocks(), [&](Block const &b) {
+            line.blocks(), [&](Block const& b) {
                 return b.runeRange.start <=> runeIndex;
             }
         );
@@ -262,10 +259,10 @@ struct Prose : public Meta::Pinned {
 
         auto bi = *maybeBi;
 
-        auto &block = line.blocks()[bi];
+        auto& block = line.blocks()[bi];
 
         auto maybeCi = searchLowerBound(
-            block.cells(), [&](Cell const &c) {
+            block.cells(), [&](Cell const& c) {
                 return c.runeRange.start <=> runeIndex;
             }
         );
@@ -291,23 +288,23 @@ struct Prose : public Meta::Pinned {
         if (isEmpty(_lines))
             return {};
 
-        auto &line = _lines[li];
+        auto& line = _lines[li];
 
         if (isEmpty(line.blocks()))
             return {0, line.baseline};
 
-        auto &block = line.blocks()[bi];
+        auto& block = line.blocks()[bi];
 
         if (isEmpty(block.cells()))
             return {block.pos, line.baseline};
 
         if (ci >= block.cells().len()) {
             // Handle the case where the rune is the last of the text
-            auto &cell = last(block.cells());
+            auto& cell = last(block.cells());
             return {block.pos + cell.pos + cell.adv, line.baseline};
         }
 
-        auto &cell = block.cells()[ci];
+        auto& cell = block.cells()[ci];
 
         return {block.pos + cell.pos, line.baseline};
     }

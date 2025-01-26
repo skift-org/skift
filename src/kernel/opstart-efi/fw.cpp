@@ -26,10 +26,10 @@ struct EfiPmm : public Hal::Pmm {
 
 static EfiPmm pmm{};
 
-Res<Strong<Hal::Vmm>> createVmm() {
+Res<Arc<Hal::Vmm>> createVmm() {
     usize upper = try$(pmm.allocRange(Hal::PAGE_SIZE, Hal::PmmFlags::NONE)).start;
     memset((void *)upper, 0, Hal::PAGE_SIZE);
-    return Ok(makeStrong<x86_64::Vmm<>>(pmm, (x86_64::Pml<4> *)upper));
+    return Ok(makeArc<x86_64::Vmm<>>(pmm, (x86_64::Pml<4> *)upper));
 }
 
 Res<> parseGop(Handover::Builder &builder) {

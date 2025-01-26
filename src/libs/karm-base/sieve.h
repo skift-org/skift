@@ -18,7 +18,7 @@ struct Sieve {
 
     usize _cap;
     Ll<Item> _ll{};
-    Item *_hand{};
+    Item* _hand{};
 
     Sieve(usize cap) : _cap(cap) {}
 
@@ -27,13 +27,13 @@ struct Sieve {
     }
 
     void clear() {
-        _ll.clearApply([](Item *item) {
+        _ll.clearApply([](Item* item) {
             delete item;
         });
     }
 
-    Item *_lookup(K const &key) {
-        auto *item = _ll.head();
+    Item* _lookup(K const& key) {
+        auto* item = _ll.head();
         while (item) {
             if (item->key == key)
                 return item;
@@ -43,7 +43,7 @@ struct Sieve {
     }
 
     void _evict() {
-        auto *item = _hand ?: _ll.tail();
+        auto* item = _hand ?: _ll.tail();
         while (item and item->visited) {
             item->visited = false;
             item = _ll.prev(item) ?: _ll.tail();
@@ -53,7 +53,7 @@ struct Sieve {
         delete item;
     }
 
-    V &access(K const &key, auto const &make) {
+    V& access(K const& key, auto const& make) {
         auto item = _lookup(key);
         if (item) {
             item->visited = true;
@@ -68,7 +68,7 @@ struct Sieve {
         return item->value;
     }
 
-    Opt<V> get(K const &key) {
+    Opt<V> get(K const& key) {
         auto item = _lookup(key);
         if (item) {
             item->visited = true;
@@ -77,7 +77,7 @@ struct Sieve {
         return NONE;
     }
 
-    bool has(K const &key) {
+    bool has(K const& key) {
         return _lookup(key) != nullptr;
     }
 

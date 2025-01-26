@@ -24,14 +24,14 @@ struct _Connection :
 struct Connection :
     public _Connection {
 
-    Strong<Sys::Fd> _fd;
+    Rc<Sys::Fd> _fd;
 
-    Connection(Strong<Sys::Fd> fd)
+    Connection(Rc<Sys::Fd> fd)
         : _fd(std::move(fd)) {}
 
-    Connection(Connection &&) = default;
+    Connection(Connection&&) = default;
 
-    Connection &operator=(Connection &&) = default;
+    Connection& operator=(Connection&&) = default;
 
     Res<usize> read(MutBytes buf) override {
         return _fd->read(buf);
@@ -57,16 +57,16 @@ struct Connection :
         return globalSched().flushAsync(_fd);
     }
 
-    Strong<Fd> fd() { return _fd; }
+    Rc<Fd> fd() { return _fd; }
 };
 
 template <typename C>
 struct _Listener :
     Meta::NoCopy {
 
-    Strong<Sys::Fd> _fd;
+    Rc<Sys::Fd> _fd;
 
-    _Listener(Strong<Sys::Fd> fd)
+    _Listener(Rc<Sys::Fd> fd)
         : _fd(std::move(fd)) {}
 
     Res<C> accept() {
@@ -79,7 +79,7 @@ struct _Listener :
         co_return Ok(C(std::move(fd), addr));
     }
 
-    Strong<Fd> fd() { return _fd; }
+    Rc<Fd> fd() { return _fd; }
 };
 
 // MARK: Udp Socket ------------------------------------------------------------
@@ -87,12 +87,12 @@ struct _Listener :
 struct UdpConnection :
     Meta::NoCopy {
 
-    Strong<Sys::Fd> _fd;
+    Rc<Sys::Fd> _fd;
     SocketAddr _addr;
 
     static Res<UdpConnection> listen(SocketAddr addr);
 
-    UdpConnection(Strong<Sys::Fd> fd, SocketAddr addr)
+    UdpConnection(Rc<Sys::Fd> fd, SocketAddr addr)
         : _fd(std::move(fd)), _addr(addr) {}
 
     Res<usize> send(Bytes buf, SocketAddr addr) {
@@ -104,9 +104,9 @@ struct UdpConnection :
         return globalSched().sendAsync(_fd, buf, {}, addr);
     }
 
-    Res<Cons<usize, SocketAddr>> recv(MutBytes buf) {
+    Res<Pair<usize, SocketAddr>> recv(MutBytes buf) {
         auto [nbytes, _, addr] = try$(_fd->recv(buf, {}));
-        return Ok<Cons<usize, SocketAddr>>(nbytes, addr);
+        return Ok<Pair<usize, SocketAddr>>(nbytes, addr);
     }
 
     auto recvAsync(MutBytes buf) {
@@ -123,7 +123,7 @@ struct TcpConnection :
 
     static Res<TcpConnection> connect(SocketAddr addr);
 
-    TcpConnection(Strong<Sys::Fd> fd, SocketAddr addr)
+    TcpConnection(Rc<Sys::Fd> fd, SocketAddr addr)
         : Connection(std::move(fd)), _addr(addr) {}
 
     SocketAddr addr() const {
@@ -138,7 +138,7 @@ struct TcpListener :
 
     static Res<TcpListener> listen(SocketAddr addr);
 
-    TcpListener(Strong<Sys::Fd> fd, SocketAddr addr)
+    TcpListener(Rc<Sys::Fd> fd, SocketAddr addr)
         : _Listener(std::move(fd)), _addr(addr) {}
 
     SocketAddr addr() const {
@@ -149,7 +149,7 @@ struct TcpListener :
 // MARK: Ipc Socket -----------------------------------------------------------
 
 struct IpcConnection {
-    Strong<Sys::Fd> _fd;
+    Rc<Sys::Fd> _fd;
     Opt<Mime::Url> _url;
 
     static constexpr usize MAX_BUF_SIZE = 4096;
@@ -157,7 +157,7 @@ struct IpcConnection {
 
     static Res<IpcConnection> connect(Mime::Url url);
 
-    IpcConnection(Strong<Sys::Fd> fd, Opt<Mime::Url> url)
+    IpcConnection(Rc<Sys::Fd> fd, Opt<Mime::Url> url)
         : _fd(std::move(fd)), _url(std::move(url)) {}
 
     Res<> send(Bytes buf, Slice<Handle> hnds) {
@@ -165,9 +165,9 @@ struct IpcConnection {
         return Ok();
     }
 
-    Res<Cons<usize>> recv(MutBytes buf, MutSlice<Handle> hnds) {
+    Res<Pair<usize>> recv(MutBytes buf, MutSlice<Handle> hnds) {
         auto [nbytes, nhnds, _] = try$(_fd->recv(buf, hnds));
-        return Ok<Cons<usize>>(nbytes, nhnds);
+        return Ok<Pair<usize>>(nbytes, nhnds);
     }
 
     Async::Task<> sendAsync(Bytes buf, Slice<Handle> hnds) {
@@ -175,19 +175,19 @@ struct IpcConnection {
         co_return Ok();
     }
 
-    Async::Task<Cons<usize>> recvAsync(MutBytes buf, MutSlice<Handle> hnds) {
+    Async::Task<Pair<usize>> recvAsync(MutBytes buf, MutSlice<Handle> hnds) {
         auto [nbytes, nhnds, _] = co_trya$(globalSched().recvAsync(_fd, buf, hnds));
-        co_return Ok<Cons<usize>>(nbytes, nhnds);
+        co_return Ok<Pair<usize>>(nbytes, nhnds);
     }
 };
 
 struct IpcListener {
-    Strong<Fd> _fd;
+    Rc<Fd> _fd;
     Opt<Mime::Url> _url;
 
     static Res<IpcListener> listen(Mime::Url url);
 
-    IpcListener(Strong<Sys::Fd> fd, Mime::Url url)
+    IpcListener(Rc<Sys::Fd> fd, Mime::Url url)
         : _fd(fd), _url(url) {}
 
     Res<IpcConnection> accept() {
@@ -200,7 +200,7 @@ struct IpcListener {
         co_return Ok(IpcConnection(std::move(fd), NONE));
     }
 
-    Strong<Fd> fd() { return _fd; }
+    Rc<Fd> fd() { return _fd; }
 };
 
 } // namespace Karm::Sys

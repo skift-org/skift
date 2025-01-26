@@ -20,7 +20,7 @@ struct LinearGradient {
         Gfx::Color color;
         Percent position;
 
-        void repr(Io::Emit &e) const {
+        void repr(Io::Emit& e) const {
             e("({} {})", color, position);
         }
     };
@@ -29,7 +29,7 @@ struct LinearGradient {
     ColorSpace colorSpace = ColorSpace::SRGB;
     Vec<Stop> stops;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(linear-gradient {} {} {}", angle, colorSpace, stops);
     }
 };
@@ -50,7 +50,7 @@ struct RadialGradient {
     ColorSpace colorSpace = ColorSpace::SRGB;
     Vec<LinearGradient::Stop> stops;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(radial-gradient {} {} {} {}", size, position, colorSpace, stops);
     }
 };
@@ -63,7 +63,7 @@ struct ConicGradient {
         Gfx::Color color;
         Angle angle;
 
-        void repr(Io::Emit &e) const {
+        void repr(Io::Emit& e) const {
             e("({} {})", color, angle);
         }
     };
@@ -73,7 +73,7 @@ struct ConicGradient {
     ColorSpace colorSpace = ColorSpace::SRGB;
     Vec<LinearGradient::Stop> stops;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(conic-gradient {} {} {} {}", angle, position, colorSpace, stops);
     }
 };
@@ -86,14 +86,14 @@ struct CrossFade {
         Box<Image> image;
         Percent opacity;
 
-        void repr(Io::Emit &e) const {
+        void repr(Io::Emit& e) const {
             e("({} {})", image, opacity);
         }
     };
 
     Vec<Layer> layers;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(cross-fade {}", layers);
     }
 };
@@ -106,14 +106,14 @@ struct Stripes {
         Gfx::Color color;
         Percent size;
 
-        void repr(Io::Emit &e) const {
+        void repr(Io::Emit& e) const {
             e("({} {})", color, size);
         }
     };
 
     Vec<Strip> stripes;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(stripes {}", stripes);
     }
 };
@@ -133,8 +133,8 @@ using _Image = Union<
 struct Image : public _Image {
     using _Image::_Image;
 
-    void repr(Io::Emit &e) const {
-        visit([&](auto const &i) {
+    void repr(Io::Emit& e) const {
+        visit([&](auto const& i) {
             e("{}", i);
         });
     }

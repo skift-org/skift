@@ -60,7 +60,7 @@ testAsync$("karm-cli-args-nested-command") {
         NONE,
     };
 
-    auto &subCmd = cmd.subCommand("sub"s);
+    auto& subCmd = cmd.subCommand("sub"s);
 
     Array<Str, 1> args = {"sub"s};
 

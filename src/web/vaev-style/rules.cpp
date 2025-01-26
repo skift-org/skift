@@ -8,11 +8,11 @@ static bool DEBUG_RULE = false;
 
 // MARK: StyleRule -------------------------------------------------------------
 
-bool StyleRule::match(Markup::Element const &el) const {
-    return selector.match(el);
+Opt<Spec> StyleRule::matchWithSpecificity(Markup::Element const& el) const {
+    return selector.matchWithSpecificity(el);
 }
 
-void StyleRule::repr(Io::Emit &e) const {
+void StyleRule::repr(Io::Emit& e) const {
     e("(style-rule");
     e.indent();
     e("\nselector: {}", selector);
@@ -20,7 +20,7 @@ void StyleRule::repr(Io::Emit &e) const {
         e.newline();
         e("props: [");
         e.indentNewline();
-        for (auto const &prop : props) {
+        for (auto const& prop : props) {
             e("{}\n", prop);
         }
         e.deindent();
@@ -30,7 +30,7 @@ void StyleRule::repr(Io::Emit &e) const {
     e(")");
 }
 
-StyleRule StyleRule::parse(Css::Sst const &sst, Origin origin) {
+StyleRule StyleRule::parse(Css::Sst const& sst, Origin origin) {
     if (sst != Css::Sst::RULE)
         panic("expected rule");
 
@@ -40,7 +40,7 @@ StyleRule StyleRule::parse(Css::Sst const &sst, Origin origin) {
     Style::StyleRule res;
 
     // Parse the selector.
-    auto &prefix = sst.prefix.unwrap();
+    auto& prefix = sst.prefix.unwrap();
     Cursor<Css::Sst> prefixContent = prefix->content;
     auto maybeSelector = Selector::parse(prefixContent);
     if (maybeSelector) {
@@ -51,7 +51,7 @@ StyleRule StyleRule::parse(Css::Sst const &sst, Origin origin) {
     }
 
     // Parse the properties.
-    for (auto const &item : sst.content) {
+    for (auto const& item : sst.content) {
         if (item == Css::Sst::DECL) {
             auto prop = parseDeclaration<StyleProp>(item);
             if (prop)
@@ -67,17 +67,17 @@ StyleRule StyleRule::parse(Css::Sst const &sst, Origin origin) {
 
 // MARK: ImportRule ------------------------------------------------------------
 
-void ImportRule::repr(Io::Emit &e) const {
+void ImportRule::repr(Io::Emit& e) const {
     e("(import-rule {})", url);
 }
 
-ImportRule ImportRule::parse(Css::Sst const &) {
+ImportRule ImportRule::parse(Css::Sst const&) {
     return {};
 }
 
 // MARK: MediaRule -------------------------------------------------------------
 
-void MediaRule::repr(Io::Emit &e) const {
+void MediaRule::repr(Io::Emit& e) const {
     e("(media-rule");
     e.indent();
     e("\nmedia: {}", media);
@@ -85,7 +85,7 @@ void MediaRule::repr(Io::Emit &e) const {
         e.newline();
         e("rules: [");
         e.indentNewline();
-        for (auto const &rule : rules) {
+        for (auto const& rule : rules) {
             e("{}\n", rule);
         }
         e.deindent();
@@ -93,11 +93,11 @@ void MediaRule::repr(Io::Emit &e) const {
     }
 }
 
-bool MediaRule::match(Media const &m) const {
+bool MediaRule::match(Media const& m) const {
     return media.match(m);
 }
 
-MediaRule MediaRule::parse(Css::Sst const &sst) {
+MediaRule MediaRule::parse(Css::Sst const& sst) {
     if (sst != Css::Sst::RULE)
         panic("expected rule");
 
@@ -107,12 +107,12 @@ MediaRule MediaRule::parse(Css::Sst const &sst) {
     Style::MediaRule res;
 
     // Parse the media query.
-    auto &prefix = sst.prefix.unwrap();
+    auto& prefix = sst.prefix.unwrap();
     Cursor<Css::Sst> prefixContent = prefix->content;
     res.media = parseMediaQuery(prefixContent);
 
     // Parse the rules.
-    for (auto const &item : sst.content) {
+    for (auto const& item : sst.content) {
         if (item == Css::Sst::RULE) {
             res.rules.pushBack(Rule::parse(item));
         } else {
@@ -125,23 +125,23 @@ MediaRule MediaRule::parse(Css::Sst const &sst) {
 
 // MARK: FontFaceRule ----------------------------------------------------------
 
-void FontFaceRule::repr(Io::Emit &e) const {
+void FontFaceRule::repr(Io::Emit& e) const {
     e("(font-face-rule {})", descs);
 }
 
-FontFaceRule FontFaceRule::parse(Css::Sst const &sst) {
+FontFaceRule FontFaceRule::parse(Css::Sst const& sst) {
     return {parseDeclarations<FontDesc>(sst, false)};
 }
 
 // MARK: Rule ------------------------------------------------------------------
 
-void Rule::repr(Io::Emit &e) const {
-    visit([&](auto const &r) {
+void Rule::repr(Io::Emit& e) const {
+    visit([&](auto const& r) {
         e("{}", r);
     });
 }
 
-Rule Rule::parse(Css::Sst const &sst, Origin origin) {
+Rule Rule::parse(Css::Sst const& sst, Origin origin) {
     if (sst != Css::Sst::RULE)
         panic("expected rule");
 

@@ -54,18 +54,18 @@ struct Radii {
     constexpr Radii(T a, T b, T c, T d, T e, T f, T g, T h)
         : a(a), b(b), c(c), d(d), e(e), f(f), g(g), h(h) {}
 
-    constexpr Radii(Radii const &other)
+    constexpr Radii(Radii const& other)
         : radii(other.radii) {}
 
-    constexpr Radii(Radii const &&other)
+    constexpr Radii(Radii const&& other)
         : radii(std::move(other.radii)) {}
 
-    constexpr Radii &operator=(Radii const &other) {
+    constexpr Radii& operator=(Radii const& other) {
         radii = other.radii;
         return *this;
     }
 
-    constexpr Radii &operator=(Radii &&other) {
+    constexpr Radii& operator=(Radii&& other) {
         radii = std::move(other.radii);
         return *this;
     }
@@ -87,7 +87,7 @@ struct Radii {
     }
 
     void all(T all) {
-        for (auto &radii : radii) {
+        for (auto& radii : radii) {
             radii = all;
         }
     }
@@ -97,11 +97,11 @@ struct Radii {
         auto scaleAll = [&](T factor) {
             if (factor >= 1)
                 return;
-            for (auto &radii : res.radii)
+            for (auto& radii : res.radii)
                 radii *= factor;
         };
 
-        for (auto &r : res.radii)
+        for (auto& r : res.radii)
             r = max(r, T{});
 
         auto sumTop = res.b + res.c;
@@ -164,7 +164,7 @@ struct Radii {
         };
     }
 
-    void repr(Io::Emit &_e) const {
+    void repr(Io::Emit& _e) const {
         if constexpr (Meta::Equatable<T>) {
             if (zero()) {
                 _e("(radii {})", a);

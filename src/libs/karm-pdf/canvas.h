@@ -9,27 +9,22 @@ namespace Karm::Pdf {
 struct Canvas : public Gfx::Canvas {
     Io::Emit _e;
     Math::Vec2f _mediaBox{};
-
     Math::Vec2f _p{};
 
     Canvas(Io::Emit e, Math::Vec2f mediaBox)
         : _e{e}, _mediaBox{mediaBox} {}
 
-    Math::Vec2f _toPdf(Math::Vec2f p) {
-        return {p.x, _mediaBox.y - p.y};
-    }
-
     Math::Vec2f _mapPoint(Math::Vec2f p, Math::Path::Flags flags) {
         if (flags & Math::Path::RELATIVE)
-            return _toPdf(p + _p);
-        return _toPdf(p);
+            return p + _p;
+        return p;
     }
 
     Math::Vec2f _mapPointAndUpdate(Math::Vec2f p, Math::Path::Flags flags) {
         if (flags & Math::Path::RELATIVE)
             p = p + _p;
         _p = p;
-        return _toPdf(p);
+        return p;
     }
 
     // MARK: Context Operations ------------------------------------------------
@@ -72,7 +67,7 @@ struct Canvas : public Gfx::Canvas {
 
     void rect(Math::Rectf rect, Math::Radiif radii = 0) override;
 
-    void path(Math::Path const &path) override;
+    void path(Math::Path const& path) override;
 
     void fill(Gfx::FillRule rule) override;
 
@@ -85,10 +80,6 @@ struct Canvas : public Gfx::Canvas {
     void clip(Gfx::FillRule rule) override;
 
     void apply(Gfx::Filter filter) override;
-
-    // MARK: Shape Operations --------------------------------------------------
-
-    void fill(Text::Font &font, Text::Glyph glyph, Math::Vec2f baseline) override;
 
     // MARK: Clear Operations --------------------------------------------------
 

@@ -16,7 +16,7 @@ Async::Task<> MockPrefs::saveAsync(String key, Json::Value value) {
     co_return Ok();
 }
 
-Prefs &globalPrefs() {
+Prefs& globalPrefs() {
     return _Embed::globalPrefs();
 }
 

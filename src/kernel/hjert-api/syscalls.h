@@ -4,7 +4,7 @@
 
 namespace Hj {
 
-Res<> _now(TimeStamp *ts);
+Res<> _now(Instant *i);
 
 Res<> _log(char const *msg, usize len);
 
@@ -38,6 +38,6 @@ Res<> _signal(Cap cap, Flags<Sigs> set, Flags<Sigs> unset);
 
 Res<> _listen(Cap cap, Cap target, Flags<Sigs> set, Flags<Sigs> unset);
 
-Res<> _poll(Cap cap, Event *ev, usize evCap, usize *evLen, TimeStamp until);
+Res<> _poll(Cap cap, Event *ev, usize evCap, usize *evLen, Instant until);
 
 } // namespace Hj

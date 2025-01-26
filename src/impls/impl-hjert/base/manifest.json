@@ -1,0 +1,17 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "impl-hjert.base",
+    "type": "lib",
+    "enableIf": {
+        "sys": [
+            "hjert"
+        ]
+    },
+    "requires": [
+        "abi",
+        "libheap"
+    ],
+    "provides": [
+        "karm-base-impl"
+    ]
+}

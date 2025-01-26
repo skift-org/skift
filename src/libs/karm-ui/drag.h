@@ -33,7 +33,7 @@ enum struct DismisDir {
 
 FlagsEnum$(DismisDir);
 
-using OnDismis = Func<void(Node &)>;
+using OnDismis = Func<void(Node&)>;
 
 Child dismisable(OnDismis onDismis, DismisDir dir, f64 threshold, Ui::Child child);
 

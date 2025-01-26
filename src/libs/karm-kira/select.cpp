@@ -10,7 +10,7 @@ namespace Karm::Kira {
 
 Ui::Child select(Ui::Child value, Ui::Slots slots) {
     return Ui::button(
-        [slots = std::move(slots)](auto &n) {
+        [slots = std::move(slots)](auto& n) {
             Ui::showPopover(
                 n,
                 n.bound().bottomStart(),
@@ -58,7 +58,7 @@ Ui::Child selectItem(Ui::OnPress onPress, String t) {
            Ui::insets({6, 6, 6, 10}) |
            Ui::minSize({Ui::UNCONSTRAINED, 28}) |
            Ui::button(
-               [onPress = std::move(onPress)](auto &n) {
+               [onPress = std::move(onPress)](auto& n) {
                    onPress(n);
                    Ui::closePopover(n);
                },

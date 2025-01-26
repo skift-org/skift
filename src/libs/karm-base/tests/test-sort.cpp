@@ -7,7 +7,7 @@ struct Foo {
     isize value;
     isize order;
 
-    auto operator<=>(Foo const &other) const {
+    auto operator<=>(Foo const& other) const {
         return order <=> other.order;
     }
 };

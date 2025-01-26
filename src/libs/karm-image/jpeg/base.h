@@ -113,12 +113,12 @@ enum Marker : Byte {
 // MARK: Reader/Writers --------------------------------------------------------
 
 struct BitWriter {
-    Io::BEmit &e;
+    Io::BEmit& e;
 
     u8 _buf = 0;
     u8 _len = 0;
 
-    always_inline BitWriter(Io::BEmit &e) : e(e) {}
+    always_inline BitWriter(Io::BEmit& e) : e(e) {}
 
     always_inline void writeBit(u8 bit) {
         _buf |= (bit & 1) << (7 - _len);
@@ -139,12 +139,12 @@ struct BitWriter {
 };
 
 struct BitReader {
-    Io::BScan &s;
+    Io::BScan& s;
 
     u8 _buf = 0;
     u8 _len = 0;
 
-    always_inline BitReader(Io::BScan &s) : s(s) {}
+    always_inline BitReader(Io::BScan& s) : s(s) {}
 
     always_inline void reset() {
         _buf = 0x0;
@@ -224,17 +224,17 @@ static inline Mcu mcuFetch(Gfx::Pixels pixels, usize mx, usize my, usize compone
 
 // MARK: Discrete Cosine Transform ---------------------------------------------
 
-void idct(Mcu &mcu);
+void idct(Mcu& mcu);
 
-void fdtc(Mcu &mcu);
+void fdtc(Mcu& mcu);
 
 // MARK: Quantization Tables ---------------------------------------------------
 
 using Quant = Array<usize, 64>;
 
-void quantize(Mcu &mcu, Quant const &quant);
+void quantize(Mcu& mcu, Quant const& quant);
 
-void dequantize(Mcu &mcu, Quant const &quant);
+void dequantize(Mcu& mcu, Quant const& quant);
 
 // MARK: Huffman Tables --------------------------------------------------------
 
@@ -243,11 +243,11 @@ struct Huff {
     Array<u8, 162> syms = {};
     Opt<Array<usize, 256>> _codes = {};
 
-    Array<usize, 256> const &codes();
+    Array<usize, 256> const& codes();
 
-    Res<Byte> next(BitReader &bs);
+    Res<Byte> next(BitReader& bs);
 
-    bool getCode(u8 symbol, usize &code, usize &codeLength);
+    bool getCode(u8 symbol, usize& code, usize& codeLength);
 };
 
 static inline usize bitLength(int v) {

@@ -24,7 +24,7 @@
 namespace Vaev::Style {
 
 struct Computed {
-    static Computed const &initial();
+    static Computed const& initial();
 
     Color color;
     Number opacity;
@@ -74,14 +74,14 @@ struct Computed {
     // https://drafts.csswg.org/css2/#z-index
     ZIndex zIndex = ZIndex::AUTO;
 
-    void inherit(Computed const &parent) {
+    void inherit(Computed const& parent) {
         color = parent.color;
         font = parent.font;
         text = parent.text;
         variables = parent.variables;
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(computed");
         e(" color: {}", color);
         e(" opacity: {}", opacity);

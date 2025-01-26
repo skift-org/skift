@@ -16,7 +16,7 @@ concept Hashable = requires(T t) {
 };
 
 template <Hashable T>
-Hash hash(T const &v) {
+Hash hash(T const& v) {
     return Hasher<T>::hash(v);
 }
 
@@ -31,7 +31,7 @@ template <>
 struct Hasher<Bytes> {
     static constexpr Hash hash(Bytes bytes) {
         Hash hash = 0;
-        for (auto &b : bytes)
+        for (auto& b : bytes)
             hash = (1000003 * hash) ^ b;
         hash ^= bytes.len();
         return hash;
@@ -40,9 +40,9 @@ struct Hasher<Bytes> {
 
 template <Sliceable T>
 struct Hasher<T> {
-    static constexpr Hash hash(T const &v) {
+    static constexpr Hash hash(T const& v) {
         Hash hash{0};
-        for (auto &e : v)
+        for (auto& e : v)
             hash = hash + ::hash(e);
         return hash;
     }
@@ -50,15 +50,15 @@ struct Hasher<T> {
 
 template <Meta::Integral T>
 struct Hasher<T> {
-    static constexpr Hash hash(T const &v) {
-        return Hasher<Bytes>::hash({reinterpret_cast<Byte const *>(&v), sizeof(v)});
+    static constexpr Hash hash(T const& v) {
+        return Hasher<Bytes>::hash({reinterpret_cast<Byte const*>(&v), sizeof(v)});
     }
 };
 
 template <Meta::Float T>
 struct Hasher<T> {
-    static constexpr Hash hash(T const &v) {
-        return Hasher<Bytes>::hash({reinterpret_cast<Byte const *>(&v), sizeof(v)});
+    static constexpr Hash hash(T const& v) {
+        return Hasher<Bytes>::hash({reinterpret_cast<Byte const*>(&v), sizeof(v)});
     }
 };
 

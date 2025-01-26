@@ -6,7 +6,7 @@
 namespace Hideo::Shell {
 
 void MockLauncher::launch(State &s) {
-    auto instance = makeStrong<MockInstance>(
+    auto instance = makeRc<MockInstance>(
         icon,
         name,
         ramp

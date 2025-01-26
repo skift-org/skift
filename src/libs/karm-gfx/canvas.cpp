@@ -1,5 +1,5 @@
 #include <karm-text/font.h>
-#include <karm-text/run.h>
+#include <karm-text/prose.h>
 
 #include "canvas.h"
 
@@ -92,21 +92,21 @@ void Canvas::fill(Math::Ellipsef e) {
     fill();
 }
 
-void Canvas::stroke(Math::Path const &p) {
+void Canvas::stroke(Math::Path const& p) {
     // dummy implementation for backends that don't support this operation
     beginPath();
     path(p);
     stroke();
 }
 
-void Canvas::fill(Math::Path const &p, FillRule rule) {
+void Canvas::fill(Math::Path const& p, FillRule rule) {
     // dummy implementation for backends that don't support this operation
     beginPath();
     path(p);
     fill(rule);
 }
 
-void Canvas::fill(Text::Font &font, Text::Glyph glyph, Math::Vec2f baseline) {
+void Canvas::fill(Text::Font& font, Text::Glyph glyph, Math::Vec2f baseline) {
     push();
     beginPath();
     origin(baseline);
@@ -116,10 +116,27 @@ void Canvas::fill(Text::Font &font, Text::Glyph glyph, Math::Vec2f baseline) {
     pop();
 }
 
-void Canvas::fill(Text::Font &font, Text::Run const &run, Math::Vec2f baseline) {
+void Canvas::fill(Text::Prose& prose) {
     push();
-    for (auto &cell : run._cells)
-        fill(font, cell.glyph, baseline + Math::Vec2f{cell.xpos, 0});
+
+    if (prose._style.color)
+        fillStyle(*prose._style.color);
+
+    for (auto const& line : prose._lines) {
+        for (auto& block : line.blocks()) {
+            for (auto& cell : block.cells()) {
+                if (cell.span and cell.span->color) {
+                    push();
+                    fillStyle(*cell.span->color);
+                    fill(prose._style.font, cell.glyph, {block.pos + cell.pos, line.baseline});
+                    pop();
+                } else {
+                    fill(prose._style.font, cell.glyph, {block.pos + cell.pos, line.baseline});
+                }
+            }
+        }
+    }
+
     pop();
 }
 
@@ -147,7 +164,7 @@ void Canvas::apply(Filter filter, Math::Ellipsef region) {
     apply(filter);
 }
 
-void Canvas::apply(Filter filter, Math::Path const &region) {
+void Canvas::apply(Filter filter, Math::Path const& region) {
     beginPath();
     path(region);
     apply(filter);

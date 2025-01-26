@@ -21,9 +21,9 @@ enum struct Hint {
 
 struct Node;
 
-using Child = Strong<Node>;
+using Child = Rc<Node>;
 using Children = Vec<Child>;
-using Visitor = Func<void(Node &)>;
+using Visitor = Func<void(Node&)>;
 
 // MARK: Node ------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ struct Node : public App::Dispatch {
 
     virtual Opt<Child> reconcile(Child other) { return other; }
 
-    virtual void paint(Gfx::Canvas &, Math::Recti) {}
+    virtual void paint(Gfx::Canvas&, Math::Recti) {}
 
     virtual void layout(Math::Recti) {}
 
@@ -58,14 +58,14 @@ struct Node : public App::Dispatch {
 
     virtual Math::Recti bound() { panic("bound() not implemented"); }
 
-    virtual Node *parent() { return nullptr; }
+    virtual Node* parent() { return nullptr; }
 
-    virtual void attach(Node *) {}
+    virtual void attach(Node*) {}
 
-    virtual void detach(Node *) {}
+    virtual void detach(Node*) {}
 };
 
-inline auto key(Hashable auto const &key) {
+inline auto key(Hashable auto const& key) {
     return [key](Child child) {
         child->_key = hash(key);
         return child;
@@ -73,7 +73,7 @@ inline auto key(Hashable auto const &key) {
 }
 
 template <typename T>
-concept Decorator = requires(T &t, Child &c) {
+concept Decorator = requires(T& t, Child& c) {
     { t(c) } -> Meta::Same<Child>;
 };
 
@@ -81,7 +81,7 @@ always_inline Child operator|(Child child, Decorator auto decorator) {
     return decorator(child);
 }
 
-always_inline Child &operator|=(Child &child, Decorator auto decorator) {
+always_inline Child& operator|=(Child& child, Decorator auto decorator) {
     return child = decorator(child);
 }
 
@@ -95,9 +95,9 @@ always_inline auto operator|(Decorator auto decorator, Decorator auto decorator2
 
 template <typename Crtp>
 struct LeafNode : public Node {
-    Node *_parent = nullptr;
+    Node* _parent = nullptr;
 
-    virtual void reconcile(Crtp &) {}
+    virtual void reconcile(Crtp&) {}
 
     Opt<Child> reconcile(Child other) override {
         // NOTE: Nodes should never be part of a state, to
@@ -118,23 +118,23 @@ struct LeafNode : public Node {
         return NONE;
     }
 
-    void bubble(App::Event &e) override {
+    void bubble(App::Event& e) override {
         if (_parent and not e.accepted())
             _parent->bubble(e);
     }
 
-    void event(App::Event &) override {
+    void event(App::Event&) override {
     }
 
-    Node *parent() override {
+    Node* parent() override {
         return _parent;
     }
 
-    void attach(Node *parent) override {
+    void attach(Node* parent) override {
         _parent = parent;
     }
 
-    void detach(Node *parent) override {
+    void detach(Node* parent) override {
         if (_parent == parent)
             _parent = nullptr;
     }
@@ -150,28 +150,28 @@ struct GroupNode : public LeafNode<Crtp> {
     GroupNode() = default;
 
     GroupNode(Children children) : _children(children) {
-        for (auto &c : _children) {
+        for (auto& c : _children) {
             c->attach(this);
         }
     }
 
     ~GroupNode() {
-        for (auto &c : _children) {
+        for (auto& c : _children) {
             c->detach(this);
         }
     }
 
-    Children &children() {
+    Children& children() {
         return _children;
     }
 
-    Children const &children() const {
+    Children const& children() const {
         return _children;
     }
 
-    void reconcile(Crtp &o) override {
-        auto &us = children();
-        auto &them = o.children();
+    void reconcile(Crtp& o) override {
+        auto& us = children();
+        auto& them = o.children();
 
         for (usize i = 0; i < them.len(); i++) {
             if (i < us.len()) {
@@ -185,8 +185,8 @@ struct GroupNode : public LeafNode<Crtp> {
         us.trunc(them.len());
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
-        for (auto &child : children()) {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
+        for (auto& child : children()) {
             if (not child->bound().colide(r))
                 continue;
 
@@ -194,11 +194,11 @@ struct GroupNode : public LeafNode<Crtp> {
         }
     }
 
-    void event(App::Event &e) override {
+    void event(App::Event& e) override {
         if (e.accepted())
             return;
 
-        for (auto &child : children()) {
+        for (auto& child : children()) {
             child->event(e);
             if (e.accepted())
                 return;
@@ -208,7 +208,7 @@ struct GroupNode : public LeafNode<Crtp> {
     void layout(Math::Recti r) override {
         _bound = r;
 
-        for (auto &child : children())
+        for (auto& child : children())
             child->layout(r);
     }
 
@@ -231,25 +231,25 @@ struct ProxyNode : public LeafNode<Crtp> {
         _child->detach(this);
     }
 
-    Node &child() {
+    Node& child() {
         return *_child;
     }
 
-    Node const &child() const {
+    Node const& child() const {
         return *_child;
     }
 
-    void reconcile(Crtp &o) override {
+    void reconcile(Crtp& o) override {
         _child = _child->reconcile(o._child).unwrapOr(_child);
         _child->attach(this);
         LeafNode<Crtp>::reconcile(o);
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
         child().paint(g, r);
     }
 
-    void event(App::Event &e) override {
+    void event(App::Event& e) override {
         if (e.accepted())
             return;
 

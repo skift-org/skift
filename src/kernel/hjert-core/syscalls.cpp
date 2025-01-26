@@ -17,7 +17,7 @@ namespace Hjert::Core {
 
 static constexpr bool DEBUG_SYSCALLS = false;
 
-Res<> doNow(Task &self, User<TimeStamp> ts) {
+Res<> doNow(Task &self, User<Instant> ts) {
     return ts.store(self.space(), globalSched()._stamp);
 }
 
@@ -49,10 +49,10 @@ Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
 
     auto obj = try$(props.visit(
         Visitor{
-            [&](Hj::DomainProps &) -> Res<Strong<Object>> {
+            [&](Hj::DomainProps &) -> Res<Arc<Object>> {
                 return Ok(try$(Domain::create()));
             },
-            [&](Hj::TaskProps &props) -> Res<Strong<Object>> {
+            [&](Hj::TaskProps &props) -> Res<Arc<Object>> {
                 try$(self.ensure(Hj::Pledge::TASK));
 
                 auto dom = props.domain.isRoot()
@@ -70,12 +70,12 @@ Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
 
                 return Ok(obj);
             },
-            [&](Hj::SpaceProps &) -> Res<Strong<Object>> {
+            [&](Hj::SpaceProps &) -> Res<Arc<Object>> {
                 try$(self.ensure(Hj::Pledge::MEM));
 
                 return Ok(try$(Space::create()));
             },
-            [&](Hj::VmoProps &props) -> Res<Strong<Object>> {
+            [&](Hj::VmoProps &props) -> Res<Arc<Object>> {
                 try$(self.ensure(Hj::Pledge::MEM));
 
                 bool isDma = (props.flags & Hj::VmoFlags::DMA) == Hj::VmoFlags::DMA;
@@ -91,18 +91,18 @@ Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
 
                 return Ok(try$(Vmo::alloc(props.len, props.flags)));
             },
-            [&](Hj::IopProps &props) -> Res<Strong<Object>> {
+            [&](Hj::IopProps &props) -> Res<Arc<Object>> {
                 try$(self.ensure(Hj::Pledge::HW));
                 return Ok(try$(Iop::create({props.base, props.len})));
             },
-            [&](Hj::ChannelProps &props) -> Res<Strong<Object>> {
+            [&](Hj::ChannelProps &props) -> Res<Arc<Object>> {
                 return Ok(try$(Channel::create(props.bufCap, props.capsCap)));
             },
-            [&](Hj::IrqProps &props) -> Res<Strong<Object>> {
+            [&](Hj::IrqProps &props) -> Res<Arc<Object>> {
                 try$(self.ensure(Hj::Pledge::HW));
                 return Ok(try$(Irq::create(props.irq)));
             },
-            [&](Hj::ListenerProps &) -> Res<Strong<Object>> {
+            [&](Hj::ListenerProps &) -> Res<Arc<Object>> {
                 return Ok(try$(Listener::create()));
             },
         }
@@ -237,13 +237,13 @@ Res<> doListen(Task &self, Hj::Cap cap, Hj::Cap target, Flags<Hj::Sigs> set, Fla
     return obj->listen(target, targetObj, set, unset);
 }
 
-Res<> doPoll(Task &self, Hj::Cap cap, UserSlice<MutSlice<Hj::Event>> events, User<usize> evLen, TimeStamp until) {
+Res<> doPoll(Task &self, Hj::Cap cap, UserSlice<MutSlice<Hj::Event>> events, User<usize> evLen, Instant until) {
     auto obj = try$(self.domain().get<Listener>(cap));
 
     try$(self.block([&] {
         auto events = obj->pollEvents();
         if (events.len() > 0)
-            return TimeStamp::epoch();
+            return Instant::epoch();
         return until;
     }));
 

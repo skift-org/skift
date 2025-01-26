@@ -89,7 +89,7 @@ struct Name : public Io::BChunk {
         return {};
     }
 
-    String string(Record const &r) const {
+    String string(Record const& r) const {
         if (not r.isUnicode())
             return ""s;
 

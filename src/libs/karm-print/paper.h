@@ -28,7 +28,7 @@ struct PaperStock {
         return {name, height, width};
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(paper {} {}x{})", name, width, height);
     }
 };
@@ -117,8 +117,8 @@ static constexpr Array SERIES = {
 };
 
 static inline Res<PaperStock> findPaperStock(Str name) {
-    for (auto const &series : SERIES) {
-        for (auto const &stock : series.stocks) {
+    for (auto const& series : SERIES) {
+        for (auto const& stock : series.stocks) {
             if (eqCi(stock.name, name))
                 return Ok(stock);
         }
@@ -149,7 +149,7 @@ struct Margins {
         return this->named == named;
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("{}", named);
     }
 };

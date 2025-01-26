@@ -212,20 +212,20 @@ Sys::SocketAddr fromSockAddr(struct sockaddr_in sockaddr) {
     return addr;
 }
 
-Sys::Stat fromStat(struct stat const &buf) {
+Sys::Stat fromStat(struct stat const& buf) {
     Sys::Stat stat{};
     Sys::Type type = Sys::Type::FILE;
     if (S_ISDIR(buf.st_mode))
         type = Sys::Type::DIR;
     stat.type = type;
     stat.size = (usize)buf.st_size;
-    stat.accessTime = TimeStamp::epoch() + TimeSpan::fromSecs(buf.st_atime);
-    stat.modifyTime = TimeStamp::epoch() + TimeSpan::fromSecs(buf.st_mtime);
-    stat.changeTime = TimeStamp::epoch() + TimeSpan::fromSecs(buf.st_ctime);
+    stat.accessTime = SystemTime::epoch() + Duration::fromSecs(buf.st_atime);
+    stat.modifyTime = SystemTime::epoch() + Duration::fromSecs(buf.st_mtime);
+    stat.changeTime = SystemTime::epoch() + Duration::fromSecs(buf.st_ctime);
     return stat;
 }
 
-struct timespec toTimespec(TimeStamp ts) {
+struct timespec toTimespec(SystemTime ts) {
     struct timespec pts;
     if (ts.isEndOfTime()) {
         pts.tv_sec = Limits<long>::MAX;
@@ -238,7 +238,7 @@ struct timespec toTimespec(TimeStamp ts) {
     return pts;
 }
 
-struct timespec toTimespec(TimeSpan ts) {
+struct timespec toTimespec(Duration ts) {
     struct timespec pts;
     if (ts.isInfinite()) {
         pts.tv_sec = Limits<long>::MAX;
@@ -251,21 +251,31 @@ struct timespec toTimespec(TimeSpan ts) {
     return pts;
 }
 
-Res<Str> repoRoot() {
-    auto *maybeRepo = getenv("CK_BUILDDIR");
+Res<Tuple<Str, RepoType>> repoRoot() {
+    auto* maybeRepo = getenv("CK_BUILDDIR");
+    if (maybeRepo) {
+        return Ok(Tuple<Str, RepoType>{
+            Str::fromNullterminated(maybeRepo),
+            RepoType::CUTEKIT,
+        });
+    }
 
-    if (not maybeRepo)
-        maybeRepo = getenv("SKIFT_BUNDLES");
+    maybeRepo = getenv("SKIFT_BUNDLES");
+    if (maybeRepo) {
+        return Ok(Tuple<Str, RepoType>{
+            Str::fromNullterminated(maybeRepo),
+            RepoType::CUTEKIT,
+        });
+    }
 
-#ifdef __ck_prefix__
-    if (not maybeRepo)
-        maybeRepo = __ck_prefix__;
+#ifdef __ck_prefix_value
+    return Ok(Tuple<Str, RepoType>{
+        stringify$(__ck_prefix_value) ""s,
+        RepoType::PREFIX,
+    });
 #endif
 
-    if (not maybeRepo)
-        return Error::notFound("SKIFT_BUNDLES not set");
-
-    return Ok(Str::fromNullterminated(maybeRepo));
+    return Error::notFound("SKIFT_BUNDLES not set");
 }
 
 } // namespace Posix

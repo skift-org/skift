@@ -11,12 +11,12 @@ struct Radio : public Ui::View<Radio> {
         : _value(value), _onChange(std::move(onChange)) {
     }
 
-    void reconcile(Radio &o) override {
+    void reconcile(Radio& o) override {
         _value = o._value;
         _onChange = std::move(o._onChange);
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti) override {
+    void paint(Gfx::Canvas& g, Math::Recti) override {
         g.push();
         if (_value) {
             g.fillStyle(_mouseListener.isHover() ? Ui::ACCENT600 : Ui::ACCENT700);
@@ -41,7 +41,7 @@ struct Radio : public Ui::View<Radio> {
         g.pop();
     }
 
-    void event(App::Event &e) override {
+    void event(App::Event& e) override {
         if (_mouseListener.listen(*this, e)) {
             _value = not _value;
             _onChange(*this, _value);
@@ -54,7 +54,7 @@ struct Radio : public Ui::View<Radio> {
 };
 
 Ui::Child radio(bool value, Ui::OnChange<bool> onChange) {
-    return makeStrong<Radio>(value, std::move(onChange));
+    return makeRc<Radio>(value, std::move(onChange));
 }
 
 } // namespace Karm::Kira

@@ -9,7 +9,7 @@ namespace Karm::Print {
 struct ImagePrinter : public FilePrinter {
     static constexpr isize GAPS = 16;
 
-    Vec<Strong<Gfx::Surface>> _pages;
+    Vec<Rc<Gfx::Surface>> _pages;
     Opt<Gfx::CpuCanvas> _canvas;
     f64 _density;
     Image::Saver _saver;
@@ -18,7 +18,7 @@ struct ImagePrinter : public FilePrinter {
         : _density(density),
           _saver(saver) {}
 
-    Gfx::Canvas &beginPage(PaperStock paper) override {
+    Gfx::Canvas& beginPage(PaperStock paper) override {
         _pages.emplaceBack(Gfx::Surface::alloc(paper.size().cast<isize>() * _density, Gfx::RGBA8888));
 
         if (_canvas)
@@ -31,13 +31,13 @@ struct ImagePrinter : public FilePrinter {
         return *_canvas;
     }
 
-    Strong<Gfx::Surface> _mergedImages() {
+    Rc<Gfx::Surface> _mergedImages() {
         if (_pages.len() == 0)
             return Gfx::Surface::alloc(GAPS, Gfx::RGBA8888);
 
         isize finalHeight =
             iter(_pages)
-                .map([](auto &page) {
+                .map([](auto& page) {
                     return page->height() + GAPS;
                 })
                 .sum();
@@ -45,7 +45,7 @@ struct ImagePrinter : public FilePrinter {
 
         isize finalWidth =
             iter(_pages)
-                .map([](auto &page) {
+                .map([](auto& page) {
                     return page->width();
                 })
                 .max()
@@ -63,7 +63,7 @@ struct ImagePrinter : public FilePrinter {
         finalCanvas.clear(Gfx::BLACK);
 
         isize ypos{0};
-        for (auto &page : _pages) {
+        for (auto& page : _pages) {
             finalCanvas.blit(
                 page->bound(),
                 page->bound().offset({0, ypos}),
@@ -77,7 +77,7 @@ struct ImagePrinter : public FilePrinter {
         return finalImage;
     }
 
-    Res<> write(Io::Writer &w) override {
+    Res<> write(Io::Writer& w) override {
         return Image::save(
             _mergedImages()->pixels(),
             w,

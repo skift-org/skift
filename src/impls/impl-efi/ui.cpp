@@ -8,13 +8,13 @@ struct EfiHost :
     public Host {
     Efi::SimpleTextInputProtocol *_stip = nullptr;
     Gfx::MutPixels _front;
-    Strong<Gfx::Surface> _back;
+    Rc<Gfx::Surface> _back;
 
     EfiHost(
         Child root,
         Efi::SimpleTextInputProtocol *stip,
         Gfx::MutPixels front,
-        Strong<Gfx::Surface> back
+        Rc<Gfx::Surface> back
     )
         : Host(root),
           _stip(stip),
@@ -32,7 +32,7 @@ struct EfiHost :
             Gfx::blitUnsafe(_front.clip(d), mutPixels());
     }
 
-    Res<> wait(TimeStamp) override {
+    Res<> wait(Instant) override {
         usize eventIdx = {};
         Efi::bs()->waitForEvent(1, &_stip->waitForKey, &eventIdx).unwrap();
         Efi::Key key = {};
@@ -47,7 +47,7 @@ struct EfiHost :
     }
 };
 
-Res<Strong<Host>> makeHost(Child root) {
+Res<Rc<Host>> makeHost(Child root) {
     auto *stip = try$(Efi::locateProtocol<Efi::SimpleTextInputProtocol>());
     auto *gop = try$(Efi::locateProtocol<Efi::GraphicsOutputProtocol>());
     auto *mode = gop->mode;
@@ -62,10 +62,10 @@ Res<Strong<Host>> makeHost(Child root) {
 
     auto back = Gfx::Surface::alloc({front.width(), front.height()}, Gfx::BGRA8888);
 
-    return Ok(makeStrong<EfiHost>(root, stip, front, back));
+    return Ok(makeRc<EfiHost>(root, stip, front, back));
 }
 
-Async::Task<> runAsync(Sys::Context&,Child) {
+Async::Task<> runAsync(Sys::Context &, Child) {
     notImplemented();
 }
 

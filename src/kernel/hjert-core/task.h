@@ -11,7 +11,7 @@ struct Space;
 struct Domain;
 struct Context;
 
-using Blocker = Func<TimeStamp()>;
+using Blocker = Func<Instant()>;
 
 enum State {
     RUNNABLE,
@@ -26,18 +26,18 @@ struct Task :
     Stack _stack;
     Opt<Box<Context>> _ctx;
 
-    Opt<Strong<Space>> _space;
-    Opt<Strong<Domain>> _domain;
+    Opt<Arc<Space>> _space;
+    Opt<Arc<Domain>> _domain;
     Opt<Blocker> _block;
 
     Flags<Hj::Pledge> _pledges = Hj::Pledge::ALL;
 
-    TimeStamp _sliceEnd = 0;
+    Instant _sliceEnd = 0;
 
-    static Res<Strong<Task>> create(
+    static Res<Arc<Task>> create(
         Mode mode,
-        Opt<Strong<Space>> space = NONE,
-        Opt<Strong<Domain>> domain = NONE
+        Opt<Arc<Space>> space = NONE,
+        Opt<Arc<Domain>> domain = NONE
     );
 
     static Task &self();
@@ -45,8 +45,8 @@ struct Task :
     Task(
         Mode mode,
         Stack stack,
-        Opt<Strong<Space>> space,
-        Opt<Strong<Domain>> domain
+        Opt<Arc<Space>> space,
+        Opt<Arc<Domain>> domain
     );
 
     Stack &stack() { return _stack; }
@@ -75,9 +75,9 @@ struct Task :
 
     void crash();
 
-    State eval(TimeStamp now);
+    State eval(Instant now);
 
-    void end(TimeStamp now);
+    void end(Instant now);
 
     void save(Arch::Frame const &frame);
 

@@ -2,12 +2,12 @@
 
 namespace Karm::Text {
 
-Res<Strong<TtfFontface>> TtfFontface::load(Sys::Mmap &&mmap) {
+Res<Rc<TtfFontface>> TtfFontface::load(Sys::Mmap&& mmap) {
     auto ttf = try$(Ttf::Parser::init(mmap.bytes()));
-    return Ok(makeStrong<TtfFontface>(std::move(mmap), ttf));
+    return Ok(makeRc<TtfFontface>(std::move(mmap), ttf));
 }
 
-TtfFontface::TtfFontface(Sys::Mmap &&mmap, Ttf::Parser parser)
+TtfFontface::TtfFontface(Sys::Mmap&& mmap, Ttf::Parser parser)
     : _mmap(std::move(mmap)),
       _parser(std::move(parser)) {
     _unitPerEm = _parser.unitPerEm();
@@ -76,7 +76,7 @@ f64 TtfFontface::kern(Glyph prev, Glyph curr) {
     return k;
 }
 
-void TtfFontface::contour(Gfx::Canvas &g, Glyph glyph) const {
+void TtfFontface::contour(Gfx::Canvas& g, Glyph glyph) const {
     g.scale(1.0 / _unitPerEm);
     _parser.glyphContour(g, glyph);
 }

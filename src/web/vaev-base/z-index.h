@@ -24,7 +24,7 @@ struct ZIndex {
         return not auto_ and this->value == value;
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         if (auto_) {
             e("auto");
         } else {

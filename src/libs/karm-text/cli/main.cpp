@@ -5,7 +5,7 @@
 #include <karm-text/loader.h>
 #include <karm-text/ttf.h>
 
-static void _dumpGpos(Ttf::Gpos const &gpos) {
+static void _dumpGpos(Ttf::Gpos const& gpos) {
     Sys::println("GPOS table:");
     if (not gpos.present()) {
         Sys::println("  not present");
@@ -38,7 +38,7 @@ static void _dumpGpos(Ttf::Gpos const &gpos) {
     Sys::println("  LookupList (len:{})", gpos.lookupList().len());
 }
 
-static void _dumpName(Ttf::Name const &name) {
+static void _dumpName(Ttf::Name const& name) {
     Sys::println("Name table:");
     if (not name.present()) {
         Sys::println("  not present");
@@ -53,8 +53,8 @@ static void _dumpName(Ttf::Name const &name) {
     }
 }
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
-    auto &args = useArgs(ctx);
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
+    auto& args = useArgs(ctx);
 
     if (args.len() < 1)
         co_return Error::invalidInput("Usage: karm-text.cli <verb> <args...>");

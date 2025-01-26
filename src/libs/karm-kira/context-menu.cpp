@@ -15,12 +15,12 @@ struct ContextMenu : public Ui::ProxyNode<ContextMenu> {
           _menu(std::move(menu)) {
     }
 
-    void reconcile(ContextMenu &o) override {
+    void reconcile(ContextMenu& o) override {
         Ui::ProxyNode<ContextMenu>::reconcile(o);
         _menu = std::move(o._menu);
     }
 
-    void event(App::Event &event) override {
+    void event(App::Event& event) override {
         Ui::ProxyNode<ContextMenu>::event(event);
 
         if (event.accepted())
@@ -38,7 +38,7 @@ struct ContextMenu : public Ui::ProxyNode<ContextMenu> {
 };
 
 Ui::Child contextMenu(Ui::Child child, Ui::Slot menu) {
-    return makeStrong<ContextMenu>(child, std::move(menu));
+    return makeRc<ContextMenu>(child, std::move(menu));
 }
 
 Ui::Child contextMenuContent(Ui::Children children) {
@@ -67,7 +67,7 @@ Ui::Child contextMenuItem(Ui::OnPress onPress, Opt<Mdi::Icon> i, Str t) {
            Ui::insets({6, 6, 6, 10}) |
            Ui::minSize({Ui::UNCONSTRAINED, 36}) |
            Ui::button(
-               [onPress = std::move(onPress)](auto &n) {
+               [onPress = std::move(onPress)](auto& n) {
                    onPress(n);
                    Ui::closePopover(n);
                },
@@ -86,7 +86,7 @@ Ui::Child contextMenuCheck(Ui::OnPress onPress, bool checked, Str t) {
            Ui::insets({6, 6, 6, 10}) |
            Ui::minSize({Ui::UNCONSTRAINED, 36}) |
            Ui::button(
-               [onPress = std::move(onPress)](auto &n) {
+               [onPress = std::move(onPress)](auto& n) {
                    onPress(n);
                    Ui::closePopover(n);
                },
@@ -106,7 +106,7 @@ Ui::Child contextMenuDock(Ui::Children children) {
 
 Ui::Child contextMenuIcon(Ui::OnPress onPress, Mdi::Icon i) {
     if (onPress) {
-        onPress = [onPress = std::move(onPress)](auto &n) {
+        onPress = [onPress = std::move(onPress)](auto& n) {
             onPress(n);
             Ui::closePopover(n);
         };

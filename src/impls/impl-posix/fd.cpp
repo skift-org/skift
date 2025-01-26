@@ -60,24 +60,24 @@ Res<usize> Fd::flush() {
     return Ok(0uz);
 }
 
-Res<Strong<Sys::Fd>> Fd::dup() {
+Res<Rc<Sys::Fd>> Fd::dup() {
     isize duped = ::dup(_raw);
 
     if (duped < 0)
         return Posix::fromLastErrno();
 
-    return Ok(makeStrong<Fd>(duped));
+    return Ok(makeRc<Fd>(duped));
 }
 
 Res<Sys::_Accepted> Fd::accept() {
     struct sockaddr_in addr_;
     socklen_t len = sizeof(addr_);
-    isize fd = ::accept(_raw, (struct sockaddr *)&addr_, &len);
+    isize fd = ::accept(_raw, (struct sockaddr*)&addr_, &len);
     if (fd < 0)
         return Posix::fromLastErrno();
 
     return Ok<Sys::_Accepted>(
-        makeStrong<Fd>(fd),
+        makeRc<Fd>(fd),
         Posix::fromSockAddr(addr_)
     );
 }
@@ -95,7 +95,7 @@ Res<Sys::_Sent> Fd::send(Bytes bytes, Slice<Sys::Handle> hnds, Sys::SocketAddr a
         notImplemented();
 
     struct sockaddr_in addr_ = Posix::toSockAddr(addr);
-    isize result = ::sendto(_raw, bytes.buf(), sizeOf(bytes), 0, (struct sockaddr *)&addr_, sizeof(addr_));
+    isize result = ::sendto(_raw, bytes.buf(), sizeOf(bytes), 0, (struct sockaddr*)&addr_, sizeof(addr_));
 
     if (result < 0)
         return Posix::fromLastErrno();
@@ -106,7 +106,7 @@ Res<Sys::_Sent> Fd::send(Bytes bytes, Slice<Sys::Handle> hnds, Sys::SocketAddr a
 Res<Sys::_Received> Fd::recv(MutBytes bytes, MutSlice<Sys::Handle>) {
     struct sockaddr_in addr_;
     socklen_t len = sizeof(addr_);
-    isize result = ::recvfrom(_raw, bytes.buf(), sizeOf(bytes), 0, (struct sockaddr *)&addr_, &len);
+    isize result = ::recvfrom(_raw, bytes.buf(), sizeOf(bytes), 0, (struct sockaddr*)&addr_, &len);
 
     if (result < 0)
         return Posix::fromLastErrno();
@@ -118,7 +118,7 @@ Res<Sys::_Received> Fd::recv(MutBytes bytes, MutSlice<Sys::Handle>) {
     );
 }
 
-Res<> Fd::pack(Io::PackEmit &e) {
+Res<> Fd::pack(Io::PackEmit& e) {
     e.give(handle());
     return Ok();
 }

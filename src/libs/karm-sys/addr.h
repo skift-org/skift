@@ -35,7 +35,7 @@ union Ip4 {
 
     static SocketAddr localhost(u16 port);
 
-    static Res<Ip4> parse(Io::SScan &s) {
+    static Res<Ip4> parse(Io::SScan& s) {
         auto addr = unspecified();
 
         for (auto i = 0; i < 4; ++i) {
@@ -62,11 +62,11 @@ union Ip4 {
         return parse(s);
     }
 
-    std::strong_ordering operator<=>(Ip4 const &other) const {
+    std::strong_ordering operator<=>(Ip4 const& other) const {
         return _raw <=> other._raw;
     }
 
-    bool operator==(Ip4 const &other) const {
+    bool operator==(Ip4 const& other) const {
         return _raw == other._raw;
     }
 };
@@ -98,7 +98,7 @@ union Ip6 {
 
     static SocketAddr localhost(u16 port);
 
-    static Res<Ip6> parse(Io::SScan &s) {
+    static Res<Ip6> parse(Io::SScan& s) {
         auto addr = unspecified();
 
         for (auto i = 0; i < 8; i++) {
@@ -119,11 +119,11 @@ union Ip6 {
         return parse(s);
     }
 
-    std::strong_ordering operator<=>(Ip6 const &b) const {
+    std::strong_ordering operator<=>(Ip6 const& b) const {
         return _raw <=> b._raw;
     }
 
-    bool operator==(Ip6 const &b) const {
+    bool operator==(Ip6 const& b) const {
         return _raw == b._raw;
     }
 };
@@ -131,7 +131,7 @@ union Ip6 {
 struct Ip : public Union<Ip4, Ip6> {
     using Union<Ip4, Ip6>::Union;
 
-    static Res<Ip> parse(Io::SScan &s) {
+    static Res<Ip> parse(Io::SScan& s) {
         auto saved = s;
         auto maybeV6 = Ip6::parse(s);
 
@@ -160,7 +160,7 @@ struct SocketAddr {
     SocketAddr(Ip addr, u16 port)
         : addr(addr), port(port) {}
 
-    static Res<SocketAddr> parse(Io::SScan &s) {
+    static Res<SocketAddr> parse(Io::SScan& s) {
         auto addr = try$(Ip::parse(s));
 
         if (not s.skip(':')) {
@@ -176,9 +176,9 @@ struct SocketAddr {
         return Ok(SocketAddr(addr, port));
     }
 
-    auto operator<=>(SocketAddr const &) const = default;
+    auto operator<=>(SocketAddr const&) const = default;
 
-    bool operator==(SocketAddr const &) const = default;
+    bool operator==(SocketAddr const&) const = default;
 };
 
 inline SocketAddr Ip4::unspecified(u16 port) {
@@ -201,21 +201,21 @@ inline SocketAddr Ip6::localhost(u16 port) {
 
 template <>
 struct Karm::Io::Formatter<Karm::Sys::Ip4> {
-    Res<usize> format(Io::TextWriter &writer, Karm::Sys::Ip4 addr) {
+    Res<usize> format(Io::TextWriter& writer, Karm::Sys::Ip4 addr) {
         return Io::format(writer, "{}.{}.{}.{}", addr.a, addr.b, addr.c, addr.d);
     }
 };
 
 template <>
 struct Karm::Io::Formatter<Karm::Sys::Ip6> {
-    Res<usize> format(Io::TextWriter &writer, Karm::Sys::Ip6 addr) {
+    Res<usize> format(Io::TextWriter& writer, Karm::Sys::Ip6 addr) {
         return Io::format(writer, "{}:{}:{}:{}:{}:{}:{}:{}", addr.a, addr.b, addr.c, addr.d, addr.e, addr.f, addr.g, addr.h);
     }
 };
 
 template <>
 struct Karm::Io::Formatter<Karm::Sys::Ip> {
-    Res<usize> format(Io::TextWriter &writer, Karm::Sys::Ip addr) {
+    Res<usize> format(Io::TextWriter& writer, Karm::Sys::Ip addr) {
         return addr.visit([&](auto addr) {
             return Io::format(writer, "{}", addr);
         });
@@ -224,7 +224,7 @@ struct Karm::Io::Formatter<Karm::Sys::Ip> {
 
 template <>
 struct Karm::Io::Formatter<Karm::Sys::SocketAddr> {
-    Res<usize> format(Io::TextWriter &writer, Karm::Sys::SocketAddr addr) {
+    Res<usize> format(Io::TextWriter& writer, Karm::Sys::SocketAddr addr) {
         return Io::format(writer, "{}:{}", addr.addr, addr.port);
     }
 };

@@ -15,10 +15,6 @@ using PhysicalPixel = Distinct<i32, struct _PhysicalPixel>;
 /// Represents a logical pixel in the CSS coordinate system.
 using Px = Math::i24f8;
 
-constexpr Px operator""_px(unsigned long long val) {
-    return Px(val);
-}
-
 using RectPx = Math::Rect<Px>;
 
 using Vec2Px = Math::Vec2<Px>;
@@ -134,19 +130,23 @@ struct Length {
         return not isAbsolute();
     }
 
-    constexpr bool operator==(Length const &other) const {
+    constexpr bool operator==(Length const& other) const {
         return _val == other._val and _unit == other._unit;
     }
 
-    constexpr std::partial_ordering operator<=>(Length const &other) const {
+    constexpr std::partial_ordering operator<=>(Length const& other) const {
         if (_unit != other._unit)
             return std::partial_ordering::unordered;
         return _val <=> other._val;
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("{}{}", _val, _unit);
     }
 };
 
 } // namespace Vaev
+
+constexpr Vaev::Px operator""_px(unsigned long long val) {
+    return Vaev::Px(val);
+}

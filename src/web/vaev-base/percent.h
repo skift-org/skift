@@ -35,7 +35,7 @@ struct PercentOr {
         : _type(Type::VALUE), _value(value) {
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         if (_type == Type::PERCENT) {
             e("{}", _percent);
         } else {
@@ -47,7 +47,7 @@ struct PercentOr {
         return _type == type;
     }
 
-    constexpr bool operator==(PercentOr const &other) const {
+    constexpr bool operator==(PercentOr const& other) const {
         if (_type != other._type)
             return false;
 
@@ -78,7 +78,7 @@ struct PercentOr {
 
 template <>
 struct Karm::Io::Repr<Vaev::Percent> {
-    static void repr(Io::Emit &e, Vaev::Percent const &v) {
+    static void repr(Io::Emit& e, Vaev::Percent const& v) {
         e("{}%", v.value());
     }
 };

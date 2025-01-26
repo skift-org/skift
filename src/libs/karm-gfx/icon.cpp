@@ -2,7 +2,7 @@
 
 namespace Karm::Gfx {
 
-void Icon::fill(Gfx::Canvas &g, Math::Vec2i pos) const {
+void Icon::fill(Gfx::Canvas& g, Math::Vec2i pos) const {
     g.push();
     g.beginPath();
     g.origin(pos.cast<f64>());
@@ -13,7 +13,7 @@ void Icon::fill(Gfx::Canvas &g, Math::Vec2i pos) const {
     g.pop();
 }
 
-void Icon::stroke(Gfx::Canvas &g, Math::Vec2i pos) const {
+void Icon::stroke(Gfx::Canvas& g, Math::Vec2i pos) const {
 
     g.push();
     g.beginPath();

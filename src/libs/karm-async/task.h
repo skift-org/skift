@@ -18,7 +18,7 @@ struct [[nodiscard]] _Task {
     using Inner = T;
 
     struct promise_type {
-        Continuation<T> *_resume = nullptr;
+        Continuation<T>* _resume = nullptr;
         Cfp _cfp = Cfp::INDETERMINATE;
 
         _Task get_return_object() {
@@ -34,7 +34,7 @@ struct [[nodiscard]] _Task {
         }
 
         template <typename U>
-        void return_value(U &&value) {
+        void return_value(U&& value) {
             _resume->value.emplace(std::forward<U>(value));
         }
 
@@ -44,7 +44,7 @@ struct [[nodiscard]] _Task {
 
         auto final_suspend() noexcept {
             struct Awaiter {
-                promise_type *_promise;
+                promise_type* _promise;
 
                 bool await_ready() noexcept {
                     return false;
@@ -70,14 +70,14 @@ struct [[nodiscard]] _Task {
     _Task(std::coroutine_handle<promise_type> coro = nullptr)
         : _coro{coro} {}
 
-    _Task(_Task const &other) = delete;
+    _Task(_Task const& other) = delete;
 
-    _Task(_Task &&other)
+    _Task(_Task&& other)
         : _coro(std::exchange(other._coro, nullptr)) {}
 
-    _Task &operator=(_Task const &other) = delete;
+    _Task& operator=(_Task const& other) = delete;
 
-    _Task &operator=(_Task &&other) {
+    _Task& operator=(_Task&& other) {
         std::swap(_coro, other._coro);
         return *this;
     }
@@ -100,7 +100,7 @@ struct [[nodiscard]] _Task {
 
             bool start() {
                 auto coro = _t._coro;
-                promise_type &prom = coro.promise();
+                promise_type& prom = coro.promise();
                 prom._resume = this;
 
                 coro.resume();

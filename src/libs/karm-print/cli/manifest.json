@@ -5,6 +5,7 @@
     "description": "Printer testing tool",
     "requires": [
         "karm-sys",
+        "karm-text",
         "karm-print"
     ]
 }

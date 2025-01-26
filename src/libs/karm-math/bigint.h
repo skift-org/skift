@@ -11,38 +11,38 @@ namespace Karm::Math {
 
 struct UBig;
 
-void _add(UBig &lhs, usize rhs);
+void _add(UBig& lhs, usize rhs);
 
-void _add(UBig &lhs, UBig const &rhs);
+void _add(UBig& lhs, UBig const& rhs);
 
 enum struct [[nodiscard]] SubResult {
     OK,
     UNDERFLOW,
 };
 
-SubResult _sub(UBig &lhs, usize rhs);
+SubResult _sub(UBig& lhs, usize rhs);
 
-SubResult _sub(UBig &lhs, UBig const &rhs);
+SubResult _sub(UBig& lhs, UBig const& rhs);
 
-void _shl(UBig &lhs, usize bits);
+void _shl(UBig& lhs, usize bits);
 
-void _shr(UBig &lhs, usize bits);
+void _shr(UBig& lhs, usize bits);
 
-void _binNot(UBig &lhs);
+void _binNot(UBig& lhs);
 
-void _binOr(UBig &lhs, UBig const &rhs);
+void _binOr(UBig& lhs, UBig const& rhs);
 
-void _binAnd(UBig &lhs, UBig const &rhs);
+void _binAnd(UBig& lhs, UBig const& rhs);
 
-void _binXor(UBig &lhs, UBig const &rhs);
+void _binXor(UBig& lhs, UBig const& rhs);
 
-void _mul(UBig &lhs, UBig const &rhs);
+void _mul(UBig& lhs, UBig const& rhs);
 
-void _div(UBig const &numerator, UBig const &denominator, UBig &quotient, UBig &remainder);
+void _div(UBig const& numerator, UBig const& denominator, UBig& quotient, UBig& remainder);
 
-void _gcd(UBig const &lhs, UBig const &rhs, UBig &gcd);
+void _gcd(UBig const& lhs, UBig const& rhs, UBig& gcd);
 
-void _pow(UBig const &base, UBig const &exp, UBig &res);
+void _pow(UBig const& base, UBig const& exp, UBig& res);
 
 struct UBig {
     Vec<usize> _value;
@@ -54,7 +54,7 @@ struct UBig {
             _value.pushBack(value);
     }
 
-    UBig &operator=(usize value) {
+    UBig& operator=(usize value) {
         _value.clear();
         if (value != 0)
             _value.pushBack(value);
@@ -91,19 +91,19 @@ struct UBig {
         return res;
     }
 
-    UBig operator|(UBig const &rhs) const {
+    UBig operator|(UBig const& rhs) const {
         UBig res = *this;
         _binOr(res, rhs);
         return res;
     }
 
-    UBig operator&(UBig const &rhs) const {
+    UBig operator&(UBig const& rhs) const {
         UBig res = *this;
         _binAnd(res, rhs);
         return res;
     }
 
-    UBig operator^(UBig const &rhs) const {
+    UBig operator^(UBig const& rhs) const {
         UBig res = *this;
         _binXor(res, rhs);
         return res;
@@ -121,14 +121,14 @@ struct UBig {
         return res;
     }
 
-    UBig operator+(UBig const &rhs) const {
+    UBig operator+(UBig const& rhs) const {
         UBig res = *this;
         _add(res, rhs);
         res._trim();
         return res;
     }
 
-    UBig operator-(UBig const &rhs) const {
+    UBig operator-(UBig const& rhs) const {
         UBig res = *this;
         // FIXME: we ignore underflow here
         (void)_sub(res, rhs);
@@ -136,59 +136,59 @@ struct UBig {
         return res;
     }
 
-    UBig operator*(UBig const &rhs) const {
+    UBig operator*(UBig const& rhs) const {
         UBig res = *this;
         _mul(res, rhs);
         res._trim();
         return res;
     }
 
-    UBig operator/(UBig const &rhs) const {
+    UBig operator/(UBig const& rhs) const {
         UBig res, remainder;
         _div(*this, rhs, res, remainder);
         res._trim();
         return res;
     }
 
-    UBig operator%(UBig const &rhs) const {
+    UBig operator%(UBig const& rhs) const {
         UBig quotient, res;
         _div(*this, rhs, quotient, res);
         res._trim();
         return res;
     }
 
-    UBig &operator|=(UBig const &rhs) {
+    UBig& operator|=(UBig const& rhs) {
         _binOr(*this, rhs);
         return *this;
     }
 
-    UBig &operator&=(UBig const &rhs) {
+    UBig& operator&=(UBig const& rhs) {
         _binAnd(*this, rhs);
         return *this;
     }
 
-    UBig &operator^=(UBig const &rhs) {
+    UBig& operator^=(UBig const& rhs) {
         _binXor(*this, rhs);
         return *this;
     }
 
-    UBig &operator<<=(usize bits) {
+    UBig& operator<<=(usize bits) {
         _shl(*this, bits);
         return *this;
     }
 
-    UBig &operator>>=(usize bits) {
+    UBig& operator>>=(usize bits) {
         _shr(*this, bits);
         return *this;
     }
 
-    UBig &operator++() {
+    UBig& operator++() {
         _add(*this, 1);
         _trim();
         return *this;
     }
 
-    UBig &operator--() {
+    UBig& operator--() {
         // FIXME: we ignore underflow here
         (void)_sub(*this, 1);
         _trim();
@@ -210,26 +210,26 @@ struct UBig {
         return res;
     }
 
-    UBig &operator+=(UBig const &rhs) {
+    UBig& operator+=(UBig const& rhs) {
         _add(*this, rhs);
         _trim();
         return *this;
     }
 
-    UBig &operator-=(UBig const &rhs) {
+    UBig& operator-=(UBig const& rhs) {
         // FIXME: we ignore underflow here
         (void)_sub(*this, rhs);
         _trim();
         return *this;
     }
 
-    UBig &operator*=(UBig const &rhs) {
+    UBig& operator*=(UBig const& rhs) {
         _mul(*this, rhs);
         _trim();
         return *this;
     }
 
-    UBig &operator/=(UBig const &rhs) {
+    UBig& operator/=(UBig const& rhs) {
         UBig quotient, remainder;
         _div(*this, rhs, quotient, remainder);
         *this = quotient;
@@ -237,7 +237,7 @@ struct UBig {
         return *this;
     }
 
-    UBig &operator%=(UBig const &rhs) {
+    UBig& operator%=(UBig const& rhs) {
         UBig quotient, remainder;
         _div(*this, rhs, quotient, remainder);
         *this = remainder;
@@ -254,7 +254,7 @@ struct UBig {
         return res;
     }
 
-    std::strong_ordering operator<=>(UBig const &rhs) const {
+    std::strong_ordering operator<=>(UBig const& rhs) const {
         if (_len() != rhs._len())
             return _len() <=> rhs._len();
         for (usize i = _len(); i-- > 0;) {
@@ -274,7 +274,7 @@ struct UBig {
         return _value[0] <=> rhs;
     }
 
-    bool operator==(UBig const &rhs) const {
+    bool operator==(UBig const& rhs) const {
         return _len() == rhs._len() and _value == rhs._value;
     }
 
@@ -288,19 +288,19 @@ struct UBig {
 
 struct IBig;
 
-void _add(IBig &lhs, usize rhs);
+void _add(IBig& lhs, usize rhs);
 
-void _add(IBig &lhs, IBig const &rhs);
+void _add(IBig& lhs, IBig const& rhs);
 
-void _sub(IBig &lhs, usize rhs);
+void _sub(IBig& lhs, usize rhs);
 
-void _sub(IBig &lhs, IBig const &rhs);
+void _sub(IBig& lhs, IBig const& rhs);
 
-void _mul(IBig &lhs, IBig const &rhs);
+void _mul(IBig& lhs, IBig const& rhs);
 
-void _div(IBig const &numerator, IBig const &denominator, IBig &quotient, IBig &remainder);
+void _div(IBig const& numerator, IBig const& denominator, IBig& quotient, IBig& remainder);
 
-void _pow(IBig const &base, UBig const &exp, IBig &res);
+void _pow(IBig const& base, UBig const& exp, IBig& res);
 
 enum struct Sign {
     POSITIVE,
@@ -324,7 +324,7 @@ struct IBig {
     explicit IBig(usize value, Sign sign = Sign::POSITIVE)
         : _value(value), _sign(value == 0 ? Sign::POSITIVE : sign) {}
 
-    IBig &operator=(usize value) {
+    IBig& operator=(usize value) {
         _value = value;
         _sign = Sign::POSITIVE;
         return *this;
@@ -334,13 +334,13 @@ struct IBig {
         : _value(static_cast<usize>(value < 0 ? -value : value)),
           _sign(value < 0 ? Sign::NEGATIVE : Sign::POSITIVE) {}
 
-    IBig &operator=(isize value) {
+    IBig& operator=(isize value) {
         _value = static_cast<usize>(value < 0 ? -value : value);
         _sign = value < 0 ? Sign::NEGATIVE : Sign::POSITIVE;
         return *this;
     }
 
-    explicit IBig(UBig const &big, Sign sign = Sign::POSITIVE)
+    explicit IBig(UBig const& big, Sign sign = Sign::POSITIVE)
         : _value(big), _sign(big == 0 ? Sign::POSITIVE : sign) {}
 
     bool negative() const {
@@ -355,11 +355,11 @@ struct IBig {
         return _sign;
     }
 
-    UBig &value() {
+    UBig& value() {
         return _value;
     }
 
-    UBig const &value() const {
+    UBig const& value() const {
         return _value;
     }
 
@@ -387,48 +387,48 @@ struct IBig {
         };
     }
 
-    IBig operator+(IBig const &rhs) const {
+    IBig operator+(IBig const& rhs) const {
         IBig res = *this;
         _add(res, rhs);
         res._trim();
         return res;
     }
 
-    IBig operator-(IBig const &rhs) const {
+    IBig operator-(IBig const& rhs) const {
         IBig res = *this;
         _sub(res, rhs);
         res._trim();
         return res;
     }
 
-    IBig operator*(IBig const &rhs) const {
+    IBig operator*(IBig const& rhs) const {
         IBig res = *this;
         _mul(res, rhs);
         res._trim();
         return res;
     }
 
-    IBig operator/(IBig const &rhs) const {
+    IBig operator/(IBig const& rhs) const {
         IBig res, remainder;
         _div(*this, rhs, res, remainder);
         res._trim();
         return res;
     }
 
-    IBig operator%(IBig const &rhs) const {
+    IBig operator%(IBig const& rhs) const {
         IBig quotient, res;
         _div(*this, rhs, quotient, res);
         res._trim();
         return res;
     }
 
-    IBig &operator++() {
+    IBig& operator++() {
         _add(*this, 1);
         _trim();
         return *this;
     }
 
-    IBig &operator--() {
+    IBig& operator--() {
         _sub(*this, 1);
         _trim();
         return *this;
@@ -448,25 +448,25 @@ struct IBig {
         return res;
     }
 
-    IBig &operator+=(IBig const &rhs) {
+    IBig& operator+=(IBig const& rhs) {
         _add(*this, rhs);
         _trim();
         return *this;
     }
 
-    IBig &operator-=(IBig const &rhs) {
+    IBig& operator-=(IBig const& rhs) {
         _sub(*this, rhs);
         _trim();
         return *this;
     }
 
-    IBig &operator*=(IBig const &rhs) {
+    IBig& operator*=(IBig const& rhs) {
         _mul(*this, rhs);
         _trim();
         return *this;
     }
 
-    IBig &operator/=(IBig const &rhs) {
+    IBig& operator/=(IBig const& rhs) {
         IBig res, remainder;
         _div(*this, rhs, res, remainder);
         *this = res;
@@ -475,7 +475,7 @@ struct IBig {
         return *this;
     }
 
-    IBig &operator%=(IBig const &rhs) {
+    IBig& operator%=(IBig const& rhs) {
         IBig quotient, res;
         _div(*this, rhs, quotient, res);
         *this = res;
@@ -484,7 +484,7 @@ struct IBig {
         return *this;
     }
 
-    std::strong_ordering operator<=>(IBig const &rhs) const {
+    std::strong_ordering operator<=>(IBig const& rhs) const {
         if (_sign != rhs._sign)
             return _sign == Sign::NEGATIVE
                        ? std::strong_ordering::less
@@ -513,7 +513,7 @@ struct IBig {
         return static_cast<usize>(rhs < 0 ? -rhs : rhs) <=> _value._value[0];
     }
 
-    bool operator==(IBig const &rhs) const {
+    bool operator==(IBig const& rhs) const {
         return _sign == rhs._sign and _value == rhs._value;
     }
 
@@ -532,17 +532,17 @@ struct IBig {
 
 struct BigFrac;
 
-void _fromF64(BigFrac &frac, f64 value);
+void _fromF64(BigFrac& frac, f64 value);
 
-void _add(BigFrac &lhs, BigFrac const &rhs);
+void _add(BigFrac& lhs, BigFrac const& rhs);
 
-void _sub(BigFrac &lhs, BigFrac const &rhs);
+void _sub(BigFrac& lhs, BigFrac const& rhs);
 
-void _mul(BigFrac &lhs, BigFrac const &rhs);
+void _mul(BigFrac& lhs, BigFrac const& rhs);
 
-void _div(BigFrac &lhs, BigFrac const &rhs);
+void _div(BigFrac& lhs, BigFrac const& rhs);
 
-void _mod(BigFrac &lhs, BigFrac const &rhs);
+void _mod(BigFrac& lhs, BigFrac const& rhs);
 
 struct BigFrac {
     IBig _num;
@@ -568,7 +568,7 @@ struct BigFrac {
     explicit BigFrac(usize value)
         : _num(value), _den(1uz) {}
 
-    BigFrac &operator=(usize value) {
+    BigFrac& operator=(usize value) {
         _num = value;
         _den = 1uz;
         return *this;
@@ -577,7 +577,7 @@ struct BigFrac {
     explicit BigFrac(isize value)
         : _num(value), _den(1uz) {}
 
-    BigFrac &operator=(isize value) {
+    BigFrac& operator=(isize value) {
         _num = value;
         _den = 1uz;
         return *this;
@@ -586,31 +586,31 @@ struct BigFrac {
     explicit BigFrac(isize num, usize den)
         : _num(num), _den(den) {}
 
-    explicit BigFrac(IBig const &num, UBig const &den)
+    explicit BigFrac(IBig const& num, UBig const& den)
         : _num(num), _den(den) {}
 
     explicit BigFrac(f64 value) {
         _fromF64(*this, value);
     }
 
-    BigFrac &operator=(f64 value) {
+    BigFrac& operator=(f64 value) {
         _fromF64(*this, value);
         return *this;
     }
 
-    IBig &num() {
+    IBig& num() {
         return _num;
     }
 
-    IBig const &num() const {
+    IBig const& num() const {
         return _num;
     }
 
-    UBig &den() {
+    UBig& den() {
         return _den;
     }
 
-    UBig const &den() const {
+    UBig const& den() const {
         return _den;
     }
 
@@ -618,59 +618,59 @@ struct BigFrac {
         return BigFrac{-_num, _den};
     }
 
-    BigFrac operator+(BigFrac const &rhs) const {
+    BigFrac operator+(BigFrac const& rhs) const {
         BigFrac res = *this;
         _add(res, rhs);
         res._reduce();
         return res;
     }
 
-    BigFrac operator-(BigFrac const &rhs) const {
+    BigFrac operator-(BigFrac const& rhs) const {
         BigFrac res = *this;
         _sub(res, rhs);
         res._reduce();
         return res;
     }
 
-    BigFrac operator*(BigFrac const &rhs) const {
+    BigFrac operator*(BigFrac const& rhs) const {
         BigFrac res = *this;
         _mul(res, rhs);
         res._reduce();
         return res;
     }
 
-    BigFrac operator/(BigFrac const &rhs) const {
+    BigFrac operator/(BigFrac const& rhs) const {
         BigFrac res = *this;
         _div(res, rhs);
         res._reduce();
         return res;
     }
 
-    BigFrac &operator+=(BigFrac const &rhs) {
+    BigFrac& operator+=(BigFrac const& rhs) {
         _add(*this, rhs);
         _reduce();
         return *this;
     }
 
-    BigFrac &operator-=(BigFrac const &rhs) {
+    BigFrac& operator-=(BigFrac const& rhs) {
         _sub(*this, rhs);
         _reduce();
         return *this;
     }
 
-    BigFrac &operator*=(BigFrac const &rhs) {
+    BigFrac& operator*=(BigFrac const& rhs) {
         _mul(*this, rhs);
         _reduce();
         return *this;
     }
 
-    BigFrac &operator/=(BigFrac const &rhs) {
+    BigFrac& operator/=(BigFrac const& rhs) {
         _div(*this, rhs);
         _reduce();
         return *this;
     }
 
-    std::strong_ordering operator<=>(BigFrac const &rhs) const {
+    std::strong_ordering operator<=>(BigFrac const& rhs) const {
         auto cmp = *this - rhs;
         if (cmp._num == 0uz)
             return std::strong_ordering::equal;
@@ -681,7 +681,7 @@ struct BigFrac {
         return std::strong_ordering::greater;
     }
 
-    bool operator==(BigFrac const &rhs) const {
+    bool operator==(BigFrac const& rhs) const {
         return _num == rhs._num and _den == rhs._den;
     }
 };

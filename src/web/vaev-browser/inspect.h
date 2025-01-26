@@ -7,20 +7,20 @@
 namespace Vaev::Browser {
 
 struct ExpandNode {
-    Strong<Markup::Node> node;
+    Rc<Markup::Node> node;
 };
 
 struct SelectNode {
-    Strong<Markup::Node> node;
+    Rc<Markup::Node> node;
 };
 
 using InspectorAction = Union<ExpandNode, SelectNode>;
 
 struct InspectState {
-    Map<Strong<Markup::Node>, bool> expandedNodes = {};
-    Opt<Strong<Markup::Node>> selectedNode = NONE;
+    Map<Rc<Markup::Node>, bool> expandedNodes = {};
+    Opt<Rc<Markup::Node>> selectedNode = NONE;
 
-    void apply(InspectorAction &a) {
+    void apply(InspectorAction& a) {
         a.visit(Visitor{
             [&](ExpandNode e) {
                 if (expandedNodes.has(e.node))
@@ -37,6 +37,6 @@ struct InspectState {
     }
 };
 
-Ui::Child inspect(Strong<Vaev::Markup::Document> dom, InspectState const &s, Ui::Action<InspectorAction> action);
+Ui::Child inspect(Rc<Vaev::Markup::Document> dom, InspectState const& s, Ui::Action<InspectorAction> action);
 
 } // namespace Vaev::Browser

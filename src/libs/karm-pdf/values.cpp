@@ -2,12 +2,12 @@
 
 namespace Karm::Pdf {
 
-void Value::write(Io::Emit &e) const {
+void Value::write(Io::Emit& e) const {
     visit(Visitor{
         [&](None) {
             e("null");
         },
-        [&](Ref const &ref) {
+        [&](Ref const& ref) {
             e("{} {} R", ref.num, ref.gen);
         },
         [&](bool b) {
@@ -22,13 +22,13 @@ void Value::write(Io::Emit &e) const {
         [&](f64 f) {
             e("{}", f);
         },
-        [&](String const &s) {
+        [&](String const& s) {
             e("({})", s);
         },
-        [&](Name const &n) {
+        [&](Name const& n) {
             e("/{}", n.str());
         },
-        [&](Array const &a) {
+        [&](Array const& a) {
             e('[');
             for (usize i = 0; i < a.len(); ++i) {
                 if (i > 0) {
@@ -38,9 +38,9 @@ void Value::write(Io::Emit &e) const {
             }
             e(']');
         },
-        [&](Dict const &d) {
+        [&](Dict const& d) {
             e("<<\n");
-            for (auto const &[k, v] : d.iter()) {
+            for (auto const& [k, v] : d.iter()) {
                 e('/');
                 e(k);
                 e(' ');
@@ -49,7 +49,7 @@ void Value::write(Io::Emit &e) const {
             }
             e(">>");
         },
-        [&](Stream const &s) {
+        [&](Stream const& s) {
             Value{s.dict}.write(e);
             e("stream\n");
             (void)e.flush();
@@ -59,13 +59,13 @@ void Value::write(Io::Emit &e) const {
     });
 }
 
-void File::write(Io::Emit &e) const {
+void File::write(Io::Emit& e) const {
     e("%{}\n", header);
     e("%Powered By Karm PDF 🐢🏳️‍⚧️🦔\n", header);
 
     XRef xref;
 
-    for (auto const &[k, v] : body.iter()) {
+    for (auto const& [k, v] : body.iter()) {
         xref.add(e.total(), k.gen);
         e("{} {} obj\n", k.num, k.gen);
         v.write(e);
@@ -85,10 +85,10 @@ void File::write(Io::Emit &e) const {
     e("%%EOF");
 }
 
-void XRef::write(Io::Emit &e) const {
+void XRef::write(Io::Emit& e) const {
     e("0 {}\n", entries.len() + 1);
     for (usize i = 0; i < entries.len(); ++i) {
-        auto const &entry = entries[i];
+        auto const& entry = entries[i];
         if (entry.used) {
             e("{:010} {:05} n\n", entry.offset, entry.gen);
         }

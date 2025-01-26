@@ -6,7 +6,6 @@
         "cpp-excluded": true
     },
     "requires": [
-        "vaev-xml",
         "karm-test"
     ],
     "injects": [

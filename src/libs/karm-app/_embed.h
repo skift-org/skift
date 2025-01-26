@@ -8,6 +8,6 @@ struct Prefs;
 
 namespace Karm::App::_Embed {
 
-Prefs &globalPrefs();
+Prefs& globalPrefs();
 
 } // namespace Karm::App::_Embed

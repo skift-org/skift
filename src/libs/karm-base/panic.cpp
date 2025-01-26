@@ -8,7 +8,7 @@ void registerPanicHandler(PanicHandler handler) {
     panicHandler = handler;
 }
 
-void _panic(PanicKind kind, char const *msg) {
+void _panic(PanicKind kind, char const* msg) {
     if (panicHandler)
         panicHandler(kind, msg);
     else

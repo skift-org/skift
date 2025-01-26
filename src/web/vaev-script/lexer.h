@@ -178,17 +178,17 @@ struct Token {
         }
     }
 
-    void repr(Io::Emit &e) const;
+    void repr(Io::Emit& e) const;
 };
 
 struct Lexer {
-    Io::SScan &_scan;
+    Io::SScan& _scan;
 
-    Lexer(Io::SScan &scan)
+    Lexer(Io::SScan& scan)
         : _scan(scan) {
     }
 
-    Token _next(Io::SScan &scan) const;
+    Token _next(Io::SScan& scan) const;
 
     Token next() {
         return _next(_scan);

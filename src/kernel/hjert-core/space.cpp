@@ -6,11 +6,11 @@
 
 namespace Hjert::Core {
 
-Res<Strong<Space>> Space::create() {
-    return Ok(makeStrong<Space>(try$(Arch::createVmm())));
+Res<Arc<Space>> Space::create() {
+    return Ok(makeArc<Space>(try$(Arch::createVmm())));
 }
 
-Space::Space(Strong<Hal::Vmm> vmm) : _vmm(vmm) {
+Space::Space(Arc<Hal::Vmm> vmm) : _vmm(vmm) {
 #ifdef __ck_bits_64__
     _ranges.add({Hal::PAGE_SIZE, 0x800000000000});
 #else
@@ -57,7 +57,7 @@ Res<> Space::_validate(Hal::VmmRange vrange) {
     return Error::invalidInput("bad address");
 }
 
-Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Strong<Vmo> vmo, usize off, Hj::MapFlags flags) {
+Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Arc<Vmo> vmo, usize off, Hj::MapFlags flags) {
     ObjectLockScope scope(*this);
 
     try$(vrange.ensureAligned(Hal::PAGE_SIZE));

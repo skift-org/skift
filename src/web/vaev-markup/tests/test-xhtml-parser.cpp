@@ -6,34 +6,31 @@ namespace Vaev::Markup::Tests {
 test$("parse-empty-document") {
     auto s = Io::SScan(""s);
     XmlParser p{};
-    expect$(not p.parse(s, Vaev::HTML)); // An empty document is invalid
+    expect$(not p._parseElement(s, Vaev::HTML)); // An empty document is invalid
     return Ok();
 }
 
 test$("parse-open-close-tag") {
     auto s = Io::SScan("<html></html>");
     XmlParser p{};
-    auto doc = try$(p.parse(s, Vaev::HTML));
-    expect$(doc->hasChildren());
-    auto first = doc->firstChild();
-    expect$(first->nodeType() == NodeType::ELEMENT);
-    expect$(try$(first.cast<Element>())->tagName == Html::HTML);
+    auto root = try$(p._parseElement(s, Vaev::HTML));
+    expect$(root->nodeType() == NodeType::ELEMENT);
+    expect$(try$(root.cast<Element>())->tagName == Html::HTML);
     return Ok();
 }
 
 test$("parse-empty-tag") {
     auto s = Io::SScan("<html/>");
     XmlParser p{};
-    try$(p.parse(s, Vaev::HTML));
+    try$(p._parseElement(s, Vaev::HTML));
     return Ok();
 }
 
 test$("parse-attr") {
     auto s = Io::SScan("<html lang=\"en\"/>");
     XmlParser p{};
-    auto doc = try$(p.parse(s, Vaev::HTML));
-    auto first = doc->firstChild();
-    auto el = try$(first.cast<Element>());
+    auto root = try$(p._parseElement(s, Vaev::HTML));
+    auto el = try$(root.cast<Element>());
     expect$(el->hasAttribute(Html::LANG_ATTR));
     expect$(el->getAttribute(Html::LANG_ATTR) == "en");
     return Ok();
@@ -42,9 +39,8 @@ test$("parse-attr") {
 test$("parse-text") {
     auto s = Io::SScan("<html>text</html>");
     XmlParser p{};
-    auto doc = try$(p.parse(s, Vaev::HTML));
-    auto first = doc->firstChild();
-    auto el = try$(first.cast<Element>());
+    auto root = try$(p._parseElement(s, Vaev::HTML));
+    auto el = try$(root.cast<Element>());
     expect$(el->hasChildren());
     auto text = el->firstChild();
     expect$(text->nodeType() == NodeType::TEXT);
@@ -55,9 +51,8 @@ test$("parse-text") {
 test$("parse-text-before-tag") {
     auto s = Io::SScan("<html>text<div/></html>");
     XmlParser p{};
-    auto doc = try$(p.parse(s, Vaev::HTML));
-    auto first = doc->firstChild();
-    auto el = try$(first.cast<Element>());
+    auto root = try$(p._parseElement(s, Vaev::HTML));
+    auto el = try$(root.cast<Element>());
     expect$(el->hasChildren());
     auto text = el->firstChild();
     expect$(text->nodeType() == NodeType::TEXT);
@@ -71,9 +66,8 @@ test$("parse-text-before-tag") {
 test$("parse-text-after-tag") {
     auto s = Io::SScan("<html><div/>text</html>");
     XmlParser p{};
-    auto doc = try$(p.parse(s, Vaev::HTML));
-    auto first = doc->firstChild();
-    auto el = try$(first.cast<Element>());
+    auto root = try$(p._parseElement(s, Vaev::HTML));
+    auto el = try$(root.cast<Element>());
     expect$(el->hasChildren());
     auto div = el->firstChild();
     expect$(div->nodeType() == NodeType::ELEMENT);
@@ -87,9 +81,8 @@ test$("parse-text-after-tag") {
 test$("parse-text-between-tags") {
     auto s = Io::SScan("<html><div/>text<div/></html>");
     XmlParser p{};
-    auto doc = try$(p.parse(s, Vaev::HTML));
-    auto first = doc->firstChild();
-    auto el = try$(first.cast<Element>());
+    auto root = try$(p._parseElement(s, Vaev::HTML));
+    auto el = try$(root.cast<Element>());
     expect$(el->hasChildren());
     auto div1 = el->firstChild();
     expect$(div1->nodeType() == NodeType::ELEMENT);
@@ -106,9 +99,8 @@ test$("parse-text-between-tags") {
 test$("parse-text-between-tags-and-before") {
     auto s = Io::SScan("<html>test2<div>text</div></html>");
     XmlParser p{};
-    auto doc = try$(p.parse(s, Vaev::HTML));
-    auto first = doc->firstChild();
-    auto el = try$(first.cast<Element>());
+    auto root = try$(p._parseElement(s, Vaev::HTML));
+    auto el = try$(root.cast<Element>());
     expect$(el->hasChildren());
 
     auto text1 = el->firstChild();
@@ -129,9 +121,8 @@ test$("parse-text-between-tags-and-before") {
 test$("parse-nested-tags") {
     auto s = Io::SScan("<html><head></head><body></body></html>");
     XmlParser p{};
-    auto doc = try$(p.parse(s, Vaev::HTML));
-    auto first = doc->firstChild();
-    auto el = try$(first.cast<Element>());
+    auto root = try$(p._parseElement(s, Vaev::HTML));
+    auto el = try$(root.cast<Element>());
     expect$(el->hasChildren());
     auto head = el->firstChild();
     expect$(head->nodeType() == NodeType::ELEMENT);
@@ -145,9 +136,8 @@ test$("parse-nested-tags") {
 test$("parse-comment") {
     auto s = Io::SScan("<html><!-- comment --></html>");
     XmlParser p{};
-    auto doc = try$(p.parse(s, Vaev::HTML));
-    auto first = doc->firstChild();
-    auto el = try$(first.cast<Element>());
+    auto root = try$(p._parseElement(s, Vaev::HTML));
+    auto el = try$(root.cast<Element>());
     expect$(el->hasChildren());
     auto comment = el->firstChild();
     expect$(comment->nodeType() == NodeType::COMMENT);
@@ -158,10 +148,40 @@ test$("parse-comment") {
 test$("parse-doctype") {
     auto s = Io::SScan("<!DOCTYPE html><html></html>");
     XmlParser p{};
-    auto doc = try$(p.parse(s, Vaev::HTML));
-    auto first = doc->firstChild();
+    auto dom = makeRc<Markup::Document>(Mime::Url());
+    try$(p.parse(s, Vaev::HTML, *dom));
+    auto first = dom->firstChild();
     auto doctype = try$(first.cast<DocumentType>());
     expect$(doctype->name == "html");
+    return Ok();
+}
+
+test$("parse-title") {
+    auto s = Io::SScan("<title>the title</title>");
+    XmlParser p{};
+    auto dom = makeRc<Markup::Document>(Mime::Url());
+    try$(p.parse(s, Vaev::HTML, *dom));
+    expect$(dom->title() == "the title");
+    return Ok();
+}
+
+test$("parse-comment-with-gt-symb") {
+    auto s = Io::SScan(
+        "<title>im a title!</title>"
+        "<!-- a b <meta> c d -->"
+    );
+    XmlParser p{};
+    auto dom = makeRc<Markup::Document>(Mime::Url());
+    try$(p.parse(s, Vaev::HTML, *dom));
+
+    expect$(dom->hasChildren());
+    auto title = dom->firstChild();
+    expect$(title->nodeType() == NodeType::ELEMENT);
+
+    auto comment = title->nextSibling();
+    expect$(comment->nodeType() == NodeType::COMMENT);
+    expect$(try$(comment.cast<Comment>())->data == " a b <meta> c d ");
+
     return Ok();
 }
 

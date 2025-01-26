@@ -43,7 +43,7 @@ struct Limit : public Reader {
     usize _limit;
     usize _read;
 
-    Limit(Readable &&reader, usize limit)
+    Limit(Readable&& reader, usize limit)
         : _reader(std::forward<Readable>(reader)),
           _limit(limit) {}
 
@@ -89,7 +89,7 @@ struct WriterSlice : public Writer, public Seeker {
 };
 
 template <SeekableWritable Writable>
-inline Res<Slice<Writable>> makeSlice(Writable &&writer, usize size) {
+inline Res<Slice<Writable>> makeSlice(Writable&& writer, usize size) {
     auto start = try$(writer.tell());
     auto end = start + size;
 
@@ -172,11 +172,11 @@ struct BufferWriter : public Writer, public Flusher {
 };
 
 struct BitReader {
-    Reader &_reader;
+    Reader& _reader;
     u8 _bits{};
     u8 _len{};
 
-    BitReader(Reader &reader)
+    BitReader(Reader& reader)
         : _reader(reader) {
     }
 

@@ -12,7 +12,7 @@ Res<BundleInfo> currentBundle() {
 Res<Vec<BundleInfo>> installedBundles() {
     Vec<BundleInfo> bundles;
     auto ids = try$(_Embed::installedBundles());
-    for (auto &id : ids) {
+    for (auto& id : ids) {
         bundles.pushBack({id});
     }
     return Ok(bundles);

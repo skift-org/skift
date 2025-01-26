@@ -61,39 +61,39 @@ struct Value {
     Value(bool b)
         : _store(b) {}
 
-    Value &operator=(None) {
+    Value& operator=(None) {
         _store = NONE;
         return *this;
     }
 
-    Value &operator=(Array v) {
+    Value& operator=(Array v) {
         _store = v;
         return *this;
     }
 
-    Value &operator=(Object m) {
+    Value& operator=(Object m) {
         _store = m;
         return *this;
     }
 
-    Value &operator=(String s) {
+    Value& operator=(String s) {
         _store = s;
         return *this;
     }
 
-    Value &operator=(Integer d) {
+    Value& operator=(Integer d) {
         _store = d;
         return *this;
     }
 
 #ifndef __ck_freestanding__
-    Value &operator=(Number d) {
+    Value& operator=(Number d) {
         _store = d;
         return *this;
     }
 #endif
 
-    Value &operator=(bool b) {
+    Value& operator=(bool b) {
         _store = b;
         return *this;
     }
@@ -128,19 +128,19 @@ struct Value {
         return _store.is<bool>();
     }
 
-    Array &asArray() {
+    Array& asArray() {
         return _store.unwrap<Array>();
     }
 
-    Array const &asArray() const {
+    Array const& asArray() const {
         return _store.unwrap<Array>();
     }
 
-    Object &asObject() {
+    Object& asObject() {
         return _store.unwrap<Object>();
     }
 
-    Object const &asObject() const {
+    Object const& asObject() const {
         return _store.unwrap<Object>();
     }
 
@@ -291,7 +291,7 @@ struct Value {
     void clear() {
         _store.visit(
             Visitor{
-                [](auto &v) {
+                [](auto& v) {
                     v = {};
                 }
             }
@@ -313,20 +313,20 @@ struct Value {
     }
 
     template <Meta::Equatable<_Store> T>
-    bool operator==(T const &other) const {
+    bool operator==(T const& other) const {
         return _store == other;
     }
 };
 
-Res<> stringify(Io::Emit &emit, Value const &v);
+Res<> stringify(Io::Emit& emit, Value const& v);
 
-Res<String> stringify(Value const &v);
+Res<String> stringify(Value const& v);
 
 } // namespace Karm::Json
 
 template <>
 struct Karm::Io::Formatter<Karm::Json::Value> {
-    Res<usize> format(Io::TextWriter &writer, Karm::Json::Value value) {
+    Res<usize> format(Io::TextWriter& writer, Karm::Json::Value value) {
         Io::Emit emit{writer};
         try$(Karm::Json::stringify(emit, value));
         return Ok(emit.total());

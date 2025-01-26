@@ -51,7 +51,7 @@ struct Size {
         return this->type == type;
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         switch (type) {
         case Type::NONE:
             e("none");
@@ -90,7 +90,7 @@ struct SizingProps {
     Size minWidth, minHeight;
     Size maxWidth, maxHeight;
 
-    Size &size(Axis axis) {
+    Size& size(Axis axis) {
         return axis == Axis::HORIZONTAL ? width : height;
     }
 
@@ -98,7 +98,7 @@ struct SizingProps {
         return axis == Axis::HORIZONTAL ? width : height;
     }
 
-    Size &minSize(Axis axis) {
+    Size& minSize(Axis axis) {
         return axis == Axis::HORIZONTAL ? minWidth : minHeight;
     }
 
@@ -106,7 +106,7 @@ struct SizingProps {
         return axis == Axis::HORIZONTAL ? minWidth : minHeight;
     }
 
-    Size &maxSize(Axis axis) {
+    Size& maxSize(Axis axis) {
         return axis == Axis::HORIZONTAL ? maxWidth : maxHeight;
     }
 
@@ -114,7 +114,7 @@ struct SizingProps {
         return axis == Axis::HORIZONTAL ? maxWidth : maxHeight;
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(sizing");
         e(" boxSizing={}", boxSizing);
         e(" width={}", width);

@@ -33,17 +33,17 @@ namespace Karm {
         using U = ::Karm::Meta::UnderlyingType<T>; \
         return not(U) a;                           \
     }                                              \
-    inline T &operator|=(T &a, T b) {              \
+    inline T& operator|=(T& a, T b) {              \
         using U = ::Karm::Meta::UnderlyingType<T>; \
-        return (T &)((U &)a |= (U)b);              \
+        return (T&)((U&)a |= (U)b);                \
     }                                              \
-    inline T &operator&=(T &a, T b) {              \
+    inline T& operator&=(T& a, T b) {              \
         using U = ::Karm::Meta::UnderlyingType<T>; \
-        return (T &)((U &)a &= (U)b);              \
+        return (T&)((U&)a &= (U)b);                \
     }                                              \
-    inline T &operator^=(T &a, T b) {              \
+    inline T& operator^=(T& a, T b) {              \
         using U = ::Karm::Meta::UnderlyingType<T>; \
-        return (T &)((U &)a ^= (U)b);              \
+        return (T&)((U&)a ^= (U)b);                \
     }
 
 // MARK: Try -------------------------------------------------------------------

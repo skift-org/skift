@@ -50,10 +50,10 @@ struct CpuCanvas : public Canvas {
     Pixels pixels() const;
 
     // Get the current scope.
-    Scope &current();
+    Scope& current();
 
     // Get the current scope.
-    Scope const &current() const;
+    Scope const& current() const;
 
     // MARK: Context Operations ------------------------------------------------
 
@@ -99,7 +99,7 @@ struct CpuCanvas : public Canvas {
 
     void rect(Math::Rectf rect, Math::Radiif radii) override;
 
-    void path(Math::Path const &path) override;
+    void path(Math::Path const& path) override;
 
     void ellipse(Math::Ellipsef ellipse) override;
 
@@ -117,11 +117,11 @@ struct CpuCanvas : public Canvas {
 
     void clip(Math::Rectf rect) override;
 
-    void stroke(Math::Path const &path) override;
+    void stroke(Math::Path const& path) override;
 
-    void fill(Math::Path const &path, FillRule rule = FillRule::NONZERO) override;
+    void fill(Math::Path const& path, FillRule rule = FillRule::NONZERO) override;
 
-    void fill(Text::Font &font, Text::Glyph glyph, Math::Vec2f baseline) override;
+    void fill(Text::Font& font, Text::Glyph glyph, Math::Vec2f baseline) override;
 
     // MARK: Clear Operations --------------------------------------------------
 

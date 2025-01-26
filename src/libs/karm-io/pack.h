@@ -47,12 +47,12 @@ template <typename T>
 struct Packer;
 
 template <typename T>
-static Res<> pack(PackEmit &e, T const &val) {
+static Res<> pack(PackEmit& e, T const& val) {
     return Packer<T>::pack(e, val);
 }
 
 template <typename T>
-static Res<T> unpack(PackScan &s) {
+static Res<T> unpack(PackScan& s) {
     return Packer<T>::unpack(s);
 }
 
@@ -60,12 +60,12 @@ static Res<T> unpack(PackScan &s) {
 
 template <Meta::TrivialyCopyable T>
 struct Packer<T> {
-    static Res<> pack(PackEmit &e, T const &val) {
+    static Res<> pack(PackEmit& e, T const& val) {
         e.writeFrom(val);
         return Ok();
     }
 
-    static Res<T> unpack(PackScan &s) {
+    static Res<T> unpack(PackScan& s) {
         T res;
         s.readTo(&res);
         return Ok(res);
@@ -76,25 +76,25 @@ struct Packer<T> {
 
 template <>
 struct Packer<None> {
-    static Res<> pack(BEmit &, None const &) {
+    static Res<> pack(BEmit&, None const&) {
         return Ok();
     }
 
-    static Res<None> unpack(PackScan &) {
+    static Res<None> unpack(PackScan&) {
         return NONE;
     }
 };
 
 template <typename T>
 struct Packer<Opt<T>> {
-    static Res<> pack(PackEmit &e, Opt<T> const &val) {
+    static Res<> pack(PackEmit& e, Opt<T> const& val) {
         e.writeU8le(val.has());
         if (val.has())
             try$(pack(e, val.unwrap()));
         return Ok();
     }
 
-    static Res<Opt<T>> unpack(PackScan &s) {
+    static Res<Opt<T>> unpack(PackScan& s) {
         bool has = s.nextU8le();
         if (not has)
             return Ok<Opt<T>>(NONE);
@@ -104,18 +104,18 @@ struct Packer<Opt<T>> {
 
 template <typename... Ts>
 struct Packer<Union<Ts...>> {
-    static Res<> pack(PackEmit &e, Union<Ts...> const &val) {
+    static Res<> pack(PackEmit& e, Union<Ts...> const& val) {
         try$(Io::pack<u8>(e, val.index()));
-        return val.visit([&]<typename T>(T const &v) {
+        return val.visit([&]<typename T>(T const& v) {
             try$(Io::pack<T>(e, v));
         });
     }
 
-    static Res<Union<Ts...>> unpack(PackScan &s) {
+    static Res<Union<Ts...>> unpack(PackScan& s) {
         auto index = try$(Io::unpack<u8>(s));
         if (index >= sizeof...(Ts))
             return Error::invalidData("invalid union index");
-        return Meta::indexCast<Ts...>(index, nullptr, [&]<typename T>(T *) -> Res<Union<Ts...>> {
+        return Meta::indexCast<Ts...>(index, nullptr, [&]<typename T>(T*) -> Res<Union<Ts...>> {
             return Io::unpack<T>(s);
         });
     }
@@ -130,11 +130,11 @@ struct Packer<Error> {
     //       This should be fine from a technical standpoint since the code
     //       don't care about the message, but the user does though.
 
-    static Res<> pack(PackEmit &e, Error const &val) {
+    static Res<> pack(PackEmit& e, Error const& val) {
         return Io::pack(e, (u32)val.code());
     }
 
-    static Res<Error> unpack(PackScan &s) {
+    static Res<Error> unpack(PackScan& s) {
         auto code = (Error::Code)try$(Io::unpack<u32>(s));
         return Ok(Error{code, nullptr});
     }
@@ -142,14 +142,14 @@ struct Packer<Error> {
 
 template <typename T, typename E>
 struct Packer<Res<T, E>> {
-    static Res<> pack(PackEmit &e, Res<T, E> const &val) {
+    static Res<> pack(PackEmit& e, Res<T, E> const& val) {
         e.writeU8le(val.has());
         if (val.has())
             return Io::pack(e, val.unwrap());
         return Io::pack(e, val.none());
     }
 
-    static Res<Res<T, E>> unpack(PackScan &s) {
+    static Res<Res<T, E>> unpack(PackScan& s) {
         bool has = s.nextU8le();
         if (has) {
             auto res = Ok<T>(try$(Io::unpack<T>(s)));
@@ -163,9 +163,9 @@ struct Packer<Res<T, E>> {
 template <Meta::Agregate T>
     requires(not Meta::TrivialyCopyable<T>)
 struct Packer<T> {
-    static Res<> pack(PackEmit &e, T const &val) {
+    static Res<> pack(PackEmit& e, T const& val) {
         return Meta::visit(
-            [&](auto &&...fields) {
+            [&](auto&&... fields) {
                 Res<> res = Ok();
                 ([&] {
                     res ? res = Io::pack(e, fields) : res;
@@ -177,11 +177,11 @@ struct Packer<T> {
         );
     }
 
-    static Res<T> unpack(PackScan &s) {
+    static Res<T> unpack(PackScan& s) {
         T object;
         Opt<Error> err = NONE;
         Meta::visit(
-            [&](auto &&...fields) {
+            [&](auto&&... fields) {
                 ([&] {
                     auto res = Io::unpack<Meta::RemoveConstVolatileRef<decltype(fields)>>(s);
                     if (not res) {
@@ -206,15 +206,15 @@ struct Packer<T> {
 
 template <typename T>
 struct Packer<Vec<T>> {
-    static Res<> pack(PackEmit &e, Vec<T> const &val) {
+    static Res<> pack(PackEmit& e, Vec<T> const& val) {
         e.writeU64le(val.len());
-        for (auto &i : val) {
+        for (auto& i : val) {
             try$(Io::pack(e, i));
         }
         return Ok();
     }
 
-    static Res<Vec<T>> unpack(PackScan &s) {
+    static Res<Vec<T>> unpack(PackScan& s) {
         auto len = s.nextU64le();
         Vec<T> res{len};
         for (usize i = 0; i < len; i++) {
@@ -228,13 +228,13 @@ struct Packer<Vec<T>> {
 
 template <StaticEncoding E>
 struct Packer<_String<E>> {
-    static Res<> pack(PackEmit &e, _String<E> const &val) {
+    static Res<> pack(PackEmit& e, _String<E> const& val) {
         e.writeU64le(val.len());
         e.writeStr(val);
         return Ok();
     }
 
-    static Res<String> unpack(PackScan &s) {
+    static Res<String> unpack(PackScan& s) {
         return Ok(s.nextStr(s.nextU64le()));
     }
 };
@@ -242,15 +242,15 @@ struct Packer<_String<E>> {
 // MARK: Tuple -----------------------------------------------------------------
 
 template <typename Car, typename Cdr>
-struct Packer<Cons<Car, Cdr>> {
-    static Res<> pack(PackEmit &e, Cons<Car, Cdr> const &val) {
-        Io::pack(e, val.car);
-        Io::pack(e, val.cdr);
+struct Packer<Pair<Car, Cdr>> {
+    static Res<> pack(PackEmit& e, Pair<Car, Cdr> const& val) {
+        Io::pack(e, val.v0);
+        Io::pack(e, val.v1);
         return Ok();
     }
 
-    static Res<Cons<Car, Cdr>> unpack(PackScan &s) {
-        Cons res = {
+    static Res<Pair<Car, Cdr>> unpack(PackScan& s) {
+        Pair res = {
             try$(Io::unpack<Car>(s)),
             try$(Io::unpack<Cdr>(s)),
         };
@@ -260,15 +260,15 @@ struct Packer<Cons<Car, Cdr>> {
 
 template <typename... Ts>
 struct Packer<Tuple<Ts...>> {
-    static Res<> pack(PackEmit &e, Tuple<Ts...> const &val) {
-        return val.visit([&](auto const &f) {
+    static Res<> pack(PackEmit& e, Tuple<Ts...> const& val) {
+        return val.visit([&](auto const& f) {
             return Io::pack(e, f);
         });
     }
 
-    static Res<Tuple<Ts...>> unpack(PackScan &s) {
+    static Res<Tuple<Ts...>> unpack(PackScan& s) {
         Tuple<Ts...> res;
-        try$(res.visit([&]<typename T>(T &f) -> Res<> {
+        try$(res.visit([&]<typename T>(T& f) -> Res<> {
             f = try$(Io::unpack<T>(s));
             return Ok();
         }));
@@ -280,13 +280,13 @@ struct Packer<Tuple<Ts...>> {
 
 template <typename T>
 struct Packer<Math::Vec2<T>> {
-    static Res<> pack(PackEmit &e, Math::Vec2<T> const &val) {
+    static Res<> pack(PackEmit& e, Math::Vec2<T> const& val) {
         try$(Io::pack(e, val.x));
         try$(Io::pack(e, val.y));
         return Ok();
     }
 
-    static Res<Math::Vec2<T>> unpack(PackScan &s) {
+    static Res<Math::Vec2<T>> unpack(PackScan& s) {
         return Ok(Math::Vec2<T>{
             try$(Io::unpack<T>(s)),
             try$(Io::unpack<T>(s)),

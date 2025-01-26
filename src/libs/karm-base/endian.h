@@ -18,7 +18,7 @@ struct [[gnu::packed]] Be {
     }
 
     always_inline constexpr Bytes bytes() const {
-        return Bytes((Byte const *)&_value, sizeof(T));
+        return Bytes((Byte const*)&_value, sizeof(T));
     }
 
     always_inline constexpr T value() const {
@@ -41,7 +41,7 @@ struct [[gnu::packed]] Le {
     }
 
     always_inline constexpr Bytes bytes() const {
-        return Bytes((Byte const *)&_value, sizeof(T));
+        return Bytes((Byte const*)&_value, sizeof(T));
     }
 
     always_inline constexpr T value() const {

@@ -9,7 +9,7 @@
 namespace Karm {
 
 struct [[nodiscard]] CriticalScope :
-    Meta::Pinned {
+    private Meta::Pinned {
 
     CriticalScope() {
         _Embed::enterCritical();
@@ -21,7 +21,7 @@ struct [[nodiscard]] CriticalScope :
 };
 
 struct Lock :
-    Meta::Pinned {
+    private Meta::Pinned {
 
     Atomic<bool> _lock{};
 
@@ -54,7 +54,9 @@ struct Lock :
     }
 };
 
-struct NoLock : Meta::Pinned {
+struct NoLock :
+    private Meta::Pinned {
+
     bool tryAcquire() {
         return true;
     }
@@ -66,7 +68,7 @@ struct NoLock : Meta::Pinned {
 
 template <typename T>
 concept Lockable =
-    requires(T &lockable) {
+    requires(T& lockable) {
         lockable.tryAcquire();
         lockable.acquire();
         lockable.release();
@@ -74,10 +76,11 @@ concept Lockable =
 
 template <Lockable L = Lock>
 struct [[nodiscard]] LockScope :
-    Meta::Pinned {
-    L &_lock;
+    private Meta::Pinned {
 
-    LockScope(L &lock)
+    L& _lock;
+
+    LockScope(L& lock)
         : _lock(lock) {
         _lock.acquire();
     }
@@ -88,7 +91,7 @@ struct [[nodiscard]] LockScope :
 };
 
 template <Lockable L>
-LockScope(L &) -> LockScope<L>;
+LockScope(L&) -> LockScope<L>;
 
 template <typename T, Lockable L = Lock>
 struct LockProtected {
@@ -98,7 +101,7 @@ struct LockProtected {
     LockProtected() = default;
 
     template <typename... Args>
-    LockProtected(Args &&...args)
+    LockProtected(Args&&... args)
         : _value(std::forward<Args>(args)...) {}
 
     auto with(auto f) {
@@ -108,9 +111,11 @@ struct LockProtected {
 };
 
 template <typename T, Lockable L = Lock>
-LockProtected(T, L &) -> LockProtected<T, L>;
+LockProtected(T, L&) -> LockProtected<T, L>;
 
-struct RwLock : Meta::Pinned {
+struct RwLock :
+    Meta::Pinned {
+
     Lock _lock;
     Atomic<isize> _pendings{};
     isize _readers{};
@@ -180,10 +185,12 @@ struct RwLock : Meta::Pinned {
     }
 };
 
-struct [[nodiscard]] ReadLockScope : Meta::Pinned {
-    RwLock &_lock;
+struct [[nodiscard]] ReadLockScope :
+    Meta::Pinned {
 
-    ReadLockScope(RwLock &lock)
+    RwLock& _lock;
+
+    ReadLockScope(RwLock& lock)
         : _lock(lock) {
         _lock.acquireRead();
     }
@@ -193,10 +200,12 @@ struct [[nodiscard]] ReadLockScope : Meta::Pinned {
     }
 };
 
-struct [[nodiscard]] WriteLockScope : Meta::Pinned {
-    RwLock &_lock;
+struct [[nodiscard]] WriteLockScope :
+    Meta::Pinned {
 
-    WriteLockScope(RwLock &lock)
+    RwLock& _lock;
+
+    WriteLockScope(RwLock& lock)
         : _lock(lock) {
         _lock.acquireWrite();
     }

@@ -14,7 +14,7 @@ struct Hmtx : public Io::BChunk {
         isize lsb;
     };
 
-    Metrics metrics(isize glyphId, Hhea const &hhea) const {
+    Metrics metrics(isize glyphId, Hhea const& hhea) const {
         if (glyphId < hhea.numberOfHMetrics()) {
             auto s = begin().skip(glyphId * 4);
             return {s.nextU16be(), s.nextI16be()};

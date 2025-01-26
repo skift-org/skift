@@ -12,7 +12,7 @@ template <typename T>
 static inline Ui::Child slider(T value, Range<T> range, Ui::OnChange<T> onChange, Mdi::Icon icon, Str text) {
     return slider(
         (value - range.start) / (f64)(range.end() - range.start),
-        [=](Ui::Node &n, f64 v) {
+        [=](Ui::Node& n, f64 v) {
             onChange(n, range.start + v * (range.end() - range.start));
         },
         icon,

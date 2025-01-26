@@ -33,7 +33,7 @@ struct SlideIn : public ProxyNode<SlideIn> {
         return lerp(outside(), Math::Vec2f{}, _slide.value()).cast<isize>();
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
         g.push();
 
         g.clip(bound());
@@ -45,7 +45,7 @@ struct SlideIn : public ProxyNode<SlideIn> {
         g.pop();
     }
 
-    void event(App::Event &e) override {
+    void event(App::Event& e) override {
         if (_slide.needRepaint(*this, e)) {
             auto repaintBound =
                 bound().clipTo(
@@ -58,14 +58,14 @@ struct SlideIn : public ProxyNode<SlideIn> {
         Ui::ProxyNode<SlideIn>::event(e);
     }
 
-    void attach(Node *parent) override {
+    void attach(Node* parent) override {
         Ui::ProxyNode<SlideIn>::attach(parent);
         _slide.animate(*this, 1.0, 0.25, Math::Easing::cubicOut);
     }
 };
 
 Child slideIn(SlideFrom from, Ui::Child child) {
-    return makeStrong<SlideIn>(from, std::move(child));
+    return makeRc<SlideIn>(from, std::move(child));
 }
 
 // MARK: Scale In --------------------------------------------------------------
@@ -81,7 +81,7 @@ struct ScaleIn : public ProxyNode<ScaleIn> {
         return Math::Vec2f{0.9} + Math::Vec2f{_scale.value() * 0.1};
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
         g.push();
         g.clip(bound());
         g.origin(bound().center().cast<f64>());
@@ -91,7 +91,7 @@ struct ScaleIn : public ProxyNode<ScaleIn> {
         g.pop();
     }
 
-    void event(App::Event &e) override {
+    void event(App::Event& e) override {
         if (_scale.needRepaint(*this, e)) {
             Ui::shouldRepaint(*this, bound());
         }
@@ -99,14 +99,14 @@ struct ScaleIn : public ProxyNode<ScaleIn> {
         Ui::ProxyNode<ScaleIn>::event(e);
     }
 
-    void attach(Node *parent) override {
+    void attach(Node* parent) override {
         Ui::ProxyNode<ScaleIn>::attach(parent);
         _scale.animate(*this, 1.0, 0.25, Math::Easing::cubicOut);
     }
 };
 
 Child scaleIn(Child child) {
-    return makeStrong<ScaleIn>(std::move(child));
+    return makeRc<ScaleIn>(std::move(child));
 }
 
 // MARK: Carousel --------------------------------------------------------------
@@ -120,7 +120,7 @@ struct Carousel : public GroupNode<Carousel> {
         : GroupNode(children), _selected(selected), _flow(flow) {
     }
 
-    void reconcile(Carousel &o) override {
+    void reconcile(Carousel& o) override {
         GroupNode::reconcile(o);
         if (_selected != o._selected) {
             _selected = o._selected;
@@ -135,18 +135,18 @@ struct Carousel : public GroupNode<Carousel> {
         };
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
         g.push();
         g.clip(bound());
         auto anim = translation();
         g.origin(anim.cast<f64>());
-        for (auto &child : children()) {
+        for (auto& child : children()) {
             child->paint(g, r);
         }
         g.pop();
     }
 
-    void event(App::Event &e) override {
+    void event(App::Event& e) override {
         if (_slide.needRepaint(*this, e)) {
             Ui::shouldRepaint(*this, bound());
         }
@@ -156,7 +156,7 @@ struct Carousel : public GroupNode<Carousel> {
 
     void layout(Math::Recti r) override {
         _bound = r;
-        for (auto &child : children()) {
+        for (auto& child : children()) {
             child->layout(r);
             r = r.offset({r.width, 0});
         }
@@ -164,7 +164,7 @@ struct Carousel : public GroupNode<Carousel> {
 };
 
 Child carousel(usize selected, Children children, Math::Flow flow) {
-    return makeStrong<Carousel>(selected, std::move(children), flow);
+    return makeRc<Carousel>(selected, std::move(children), flow);
 }
 
 } // namespace Karm::Ui

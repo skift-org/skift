@@ -6,7 +6,7 @@ namespace Karm::Mime {
 
 // MARK: Path ------------------------------------------------------------------
 
-Path Path::parse(Io::SScan &s, bool inUrl, bool stopAtWhitespace) {
+Path Path::parse(Io::SScan& s, bool inUrl, bool stopAtWhitespace) {
     Path path;
 
     if (s.skip(SEP)) {
@@ -68,7 +68,7 @@ Str Path::basename() const {
     return last(_parts);
 }
 
-Path Path::join(Path const &other) const {
+Path Path::join(Path const& other) const {
     if (other.rooted) {
         return other;
     }
@@ -92,7 +92,7 @@ Path Path::parent(usize n) const {
     return path;
 }
 
-bool Path::isParentOf(Path const &other) const {
+bool Path::isParentOf(Path const& other) const {
     if (len() > other.len())
         return false;
 
@@ -104,7 +104,7 @@ bool Path::isParentOf(Path const &other) const {
     return true;
 }
 
-Res<usize> Path::write(Io::TextWriter &writer) const {
+Res<usize> Path::write(Io::TextWriter& writer) const {
     usize written = 0;
 
     if (not rooted and len() == 0)

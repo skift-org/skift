@@ -41,7 +41,7 @@ struct Node :
     Meta::Pinned {
 
     MutCursor<Node> _parent = nullptr;
-    Vec<Strong<Node>> _children;
+    Vec<Rc<Node>> _children;
 
     virtual ~Node() = default;
 
@@ -51,25 +51,25 @@ struct Node :
     MutCursor<T> is() {
         if (nodeType() != T::TYPE)
             return nullptr;
-        return static_cast<T *>(this);
+        return static_cast<T*>(this);
     }
 
     template <typename T>
     Cursor<T> is() const {
         if (nodeType() != T::TYPE)
             return nullptr;
-        return static_cast<T const *>(this);
+        return static_cast<T const*>(this);
     }
 
     // MARK: Parent
 
-    Node &parentNode() {
+    Node& parentNode() {
         if (not _parent)
             panic("node has no parent");
         return *_parent;
     }
 
-    Node const &parentNode() const {
+    Node const& parentNode() const {
         if (not _parent)
             panic("node has no parent");
         return *_parent;
@@ -98,37 +98,37 @@ struct Node :
         return _children.len() > 0;
     }
 
-    Strong<Node> firstChild() {
+    Rc<Node> firstChild() {
         if (not _children.len())
             panic("node has no children");
         return first(_children);
     }
 
-    Strong<Node> lastChild() {
+    Rc<Node> lastChild() {
         if (not _children.len())
             panic("node has no children");
         return last(_children);
     }
 
-    void appendChild(Strong<Node> child) {
+    void appendChild(Rc<Node> child) {
         child->_detachParent();
         _children.pushBack(child);
         child->_parent = this;
     }
 
-    void removeChild(Strong<Node> child) {
+    void removeChild(Rc<Node> child) {
         if (child->_parent != this)
             panic("node is not a child");
         child->_detachParent();
     }
 
-    Slice<Strong<Node>> children() const {
+    Slice<Rc<Node>> children() const {
         return _children;
     }
 
     // MARK: Siblings
 
-    Strong<Node> previousSibling() const {
+    Rc<Node> previousSibling() const {
         usize index = _parentIndex();
         return parentNode()._children[index - 1];
     }
@@ -137,7 +137,7 @@ struct Node :
         return _parentIndex() > 0;
     }
 
-    Strong<Node> nextSibling() const {
+    Rc<Node> nextSibling() const {
         usize index = _parentIndex();
         return parentNode()._children[index + 1];
     }
@@ -148,10 +148,10 @@ struct Node :
 
     // MARK: Iter
 
-    Iter iterDepthFirst(this auto &self, auto f) {
+    Iter iterDepthFirst(this auto& self, auto f) {
         if (f(self) == Iter::BREAK)
             return Iter::BREAK;
-        for (auto &child : self._children) {
+        for (auto& child : self._children) {
             if (child->iterDepthFirst(f) == Iter::BREAK)
                 return Iter::BREAK;
         }
@@ -160,14 +160,14 @@ struct Node :
 
     // MARK: Repr
 
-    virtual void _repr(Io::Emit &) const {}
+    virtual void _repr(Io::Emit&) const {}
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("({}", nodeType());
         _repr(e);
         if (_children.len() > 0) {
             e.indentNewline();
-            for (auto &child : _children) {
+            for (auto& child : _children) {
                 child->repr(e);
             }
             e.deindent();
@@ -177,11 +177,11 @@ struct Node :
 
     // MARK: Operators
 
-    bool operator==(Node const &other) const {
+    bool operator==(Node const& other) const {
         return this == &other;
     }
 
-    auto operator<=>(Node const &other) const {
+    auto operator<=>(Node const& other) const {
         return this <=> &other;
     }
 };
@@ -211,7 +211,7 @@ struct Document : public Node {
 
     String title() const;
 
-    Mime::Url const &url() const {
+    Mime::Url const& url() const {
         return _url;
     }
 };
@@ -236,7 +236,7 @@ struct DocumentType : public Node {
         return TYPE;
     }
 
-    void _repr(Io::Emit &e) const override {
+    void _repr(Io::Emit& e) const override {
         e(" name={#} publicId={#} systemId={#}", this->name, this->publicId, this->systemId);
     }
 };
@@ -251,7 +251,7 @@ struct CharacterData : public Node {
         : data(data) {
     }
 
-    void appendData(String const &data) {
+    void appendData(String const& data) {
         // HACK: This is not efficient and pretty slow,
         //       but it's good enough for now.
         StringBuilder sb;
@@ -269,7 +269,7 @@ struct CharacterData : public Node {
         this->data = sb.take();
     }
 
-    void _repr(Io::Emit &e) const override {
+    void _repr(Io::Emit& e) const override {
         e(" data={#}", this->data);
     }
 };
@@ -303,7 +303,7 @@ struct Attr : public Node {
         return NodeType::ATTRIBUTE;
     }
 
-    void _repr(Io::Emit &e) const override {
+    void _repr(Io::Emit& e) const override {
         e(" localName={}:{} value={#}", name.ns.name(), name.name(), value);
     }
 };
@@ -367,7 +367,7 @@ struct Element : public Node {
 
     TagName tagName;
     // NOSPEC: Should be a NamedNodeMap
-    Map<AttrName, Strong<Attr>> attributes;
+    Map<AttrName, Rc<Attr>> attributes;
     TokenList classList;
 
     Element(TagName tagName)
@@ -386,18 +386,18 @@ struct Element : public Node {
         if (_children.len() > 1)
             panic("textContent is not implemented for elements with multiple children");
 
-        auto const &child = *_children[0];
+        auto const& child = *_children[0];
         if (auto text = child.is<Text>())
             return text->data;
 
         panic("textContent is not implemented for elements with children other than text nodes");
     }
 
-    void _repr(Io::Emit &e) const override {
+    void _repr(Io::Emit& e) const override {
         e(" tagName={#}", this->tagName);
         if (this->attributes.len()) {
             e.indentNewline();
-            for (auto const &[name, attr] : this->attributes.iter()) {
+            for (auto const& [name, attr] : this->attributes.iter()) {
                 attr->repr(e);
             }
             e.deindent();
@@ -411,7 +411,7 @@ struct Element : public Node {
             }
             return;
         }
-        auto attr = makeStrong<Attr>(name, value);
+        auto attr = makeRc<Attr>(name, value);
         this->attributes.put(name, attr);
     }
 

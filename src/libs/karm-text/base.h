@@ -7,7 +7,7 @@
 
 namespace Karm::Text {
 
-struct Run;
+struct Prose;
 
 struct Font;
 
@@ -17,9 +17,9 @@ struct Glyph {
 
     static Glyph const TOFU;
 
-    bool operator==(Glyph const &other) const = default;
+    bool operator==(Glyph const& other) const = default;
 
-    auto operator<=>(Glyph const &other) const = default;
+    auto operator<=>(Glyph const& other) const = default;
 };
 
 constexpr Glyph Glyph::TOFU{0, 0};
@@ -52,7 +52,7 @@ struct FontWeight : public Distinct<u16, struct _FontWeightTag> {
 
     static FontWeight const NO_MATCH;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         if (value() <= 100)
             e("THIN");
         else if (value() <= 200)
@@ -113,7 +113,7 @@ struct FontStretch : public Distinct<u16, struct _FontStretchTag> {
 
     static FontStretch const NO_MATCH;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         if (value() <= 100)
             e("ULTRA_CONDENSED");
         else if (value() <= 200)
@@ -196,7 +196,7 @@ struct FontAttrs {
     FontStyle style = FontStyle::NORMAL;
     Monospace monospace = Monospace::NO;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e.ln("family: {#}", family);
         e.ln("weight: {}", weight);
         e.ln("stretch: {}", stretch);
@@ -211,7 +211,7 @@ struct FontAttrs {
                monospace == Monospace::NO;
     }
 
-    auto operator<=>(FontAttrs const &other) const {
+    auto operator<=>(FontAttrs const& other) const {
         // NOTE: Comparaison order is important
 
         auto ordr = family <=> other.family;

@@ -5,6 +5,7 @@
     "description": "Print documents and images.",
     "requires": [
         "karm-pdf",
-        "karm-scene"
+        "karm-scene",
+        "karm-image"
     ]
 }

@@ -27,19 +27,19 @@ struct Resolver {
     Viewport viewport = {.small = {800_px, 600_px}}; /// Viewport of the current box
     Axis boxAxis = Axis::HORIZONTAL;                 /// Inline axis of the current box
 
-    static Resolver from(Tree const &tree, Box const &box);
+    static Resolver from(Tree const& tree, Box const& box);
 
-    Resolver inherit(Resolver const &resolver);
+    Resolver inherit(Resolver const& resolver);
 
-    Px _resolveFontRelative(Length value);
+    Px _resolveFontRelative(Length const& value);
 
-    Px resolve(Length value);
+    Px resolve(Length const& value);
 
-    Px resolve(PercentOr<Length> value, Px relative);
+    Px resolve(PercentOr<Length> const& value, Px relative);
 
-    Px resolve(Width value, Px relative);
+    Px resolve(Width const& value, Px relative);
 
-    Px resolve(FontSize value);
+    Px resolve(FontSize const& value);
 
     // MARK: Eval --------------------------------------------------------------
 
@@ -60,7 +60,7 @@ struct Resolver {
     }
 
     template <typename T, typename... Args>
-    auto resolve(CalcValue<T> const &value, Args... args) -> Resolved<T> {
+    auto resolve(CalcValue<T> const& value, Args... args) -> Resolved<T> {
         if (value.type == CalcValue<T>::OpType::FIXED) {
             return resolve(value.lhs.template unwrap<T>(), args...);
         } else if (value.type == CalcValue<T>::OpType::SINGLE) {
@@ -68,16 +68,16 @@ struct Resolver {
             return resolve(value.lhs.template unwrap<T>(), args...);
         } else if (value.type == CalcValue<T>::OpType::CALC) {
             auto resolveUnion = Visitor{
-                [&](T const &v) {
+                [&](T const& v) {
                     return resolve<T>(v, args...);
                 },
-                [&](CalcValue<T>::Leaf const &v) {
+                [&](CalcValue<T>::Leaf const& v) {
                     return resolve<T>(*v, args...);
                 },
-                [&](Number const &v) {
+                [&](Number const& v) {
                     return Math::i24f8{v};
                 },
-                [&](None const &) -> Resolved<T> {
+                [&](None const&) -> Resolved<T> {
                     panic("invalid value in calc expression");
                 }
             };
@@ -95,16 +95,16 @@ struct Resolver {
 
 // MARK: Resolve during layout -------------------------------------------------
 
-Px resolve(Tree const &tree, Box const &box, Length value);
+Px resolve(Tree const& tree, Box const& box, Length const& value);
 
-Px resolve(Tree const &tree, Box const &box, PercentOr<Length> value, Px relative);
+Px resolve(Tree const& tree, Box const& box, PercentOr<Length> const& value, Px relative);
 
-Px resolve(Tree const &tree, Box const &box, Width value, Px relative);
+Px resolve(Tree const& tree, Box const& box, Width const& value, Px relative);
 
-Px resolve(Tree const &tree, Box const &box, FontSize value);
+Px resolve(Tree const& tree, Box const& box, FontSize const& value);
 
 template <typename T, typename... Args>
-static inline auto resolve(Tree const &tree, Box const &box, CalcValue<T> const &value, Args... args) -> Resolved<T> {
+static inline auto resolve(Tree const& tree, Box const& box, CalcValue<T> const& value, Args... args) -> Resolved<T> {
     return Resolver::from(tree, box).resolve(value, args...);
 }
 

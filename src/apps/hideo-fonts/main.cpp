@@ -13,7 +13,7 @@ namespace Hideo::Fonts {
 struct State {
     Text::FontBook fontBook;
     Opt<String> fontFamily = NONE;
-    Opt<Strong<Text::Fontface>> fontFace = NONE;
+    Opt<Rc<Text::Fontface>> fontFace = NONE;
 
     State(Text::FontBook fontBook) : fontBook(fontBook) {}
 
@@ -29,7 +29,7 @@ struct SelectFamily {
 };
 
 struct SelectFace {
-    Strong<Text::Fontface> id;
+    Rc<Text::Fontface> id;
 };
 
 using Action = Union<GoBack, SelectFamily, SelectFace>;
@@ -120,7 +120,7 @@ Ui::Child fontfaceTags(Text::FontAttrs const &attrs) {
     return Ui::hflow(4, children);
 }
 
-Ui::Child familyItem(State const &, Strong<Text::Fontface> fontface) {
+Ui::Child familyItem(State const &, Rc<Text::Fontface> fontface) {
     auto attrs = fontface->attrs();
 
     Text::Font font{
@@ -159,7 +159,7 @@ Ui::Child familyContent(State const &s) {
 
 // MARK: Fontface --------------------------------------------------------------
 
-Ui::Child pangrams(Strong<Text::Fontface> fontface) {
+Ui::Child pangrams(Rc<Text::Fontface> fontface) {
     f64 size = 12;
     Ui::Children children;
 

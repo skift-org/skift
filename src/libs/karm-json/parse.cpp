@@ -5,9 +5,9 @@
 
 namespace Karm::Json {
 
-Res<Value> parse(Io::SScan &s);
+Res<Value> parse(Io::SScan& s);
 
-Res<String> parseStr(Io::SScan &s) {
+Res<String> parseStr(Io::SScan& s) {
     if (not s.skip('"'))
         return Error::invalidData("expected '\"'");
 
@@ -61,7 +61,7 @@ Res<String> parseStr(Io::SScan &s) {
     return Error::invalidData("expected '\"'");
 }
 
-Res<Object> parseObject(Io::SScan &s) {
+Res<Object> parseObject(Io::SScan& s) {
     Object m;
     if (not s.skip('{')) {
         return Error::invalidData("expected '{'");
@@ -94,7 +94,7 @@ Res<Object> parseObject(Io::SScan &s) {
     }
 }
 
-Res<Array> parseArray(Io::SScan &s) {
+Res<Array> parseArray(Io::SScan& s) {
     Array v;
     if (not s.skip('['))
         return Error::invalidData("expected '['");
@@ -120,7 +120,7 @@ Res<Array> parseArray(Io::SScan &s) {
 
 static auto const RE_NUMBER_START = '-'_re | Re::digit();
 
-Res<usize> parseDigits(Io::SScan &s) {
+Res<usize> parseDigits(Io::SScan& s) {
     if (s.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -136,7 +136,7 @@ Res<usize> parseDigits(Io::SScan &s) {
     return Ok(digits);
 }
 
-Res<f64> parseDecimal(Io::SScan &s) {
+Res<f64> parseDecimal(Io::SScan& s) {
     if (s.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -153,7 +153,7 @@ Res<f64> parseDecimal(Io::SScan &s) {
     return Ok(fpart);
 }
 
-Res<isize> parseInteger(Io::SScan &s) {
+Res<isize> parseInteger(Io::SScan& s) {
     bool sign = false;
 
     if (s.skip('-'))
@@ -176,7 +176,7 @@ Res<isize> parseInteger(Io::SScan &s) {
     return Ok(sign ? -ipart : ipart);
 }
 
-Res<Value> parseNumber(Io::SScan &s) {
+Res<Value> parseNumber(Io::SScan& s) {
     isize ipart = try$(parseInteger(s));
 
     if (s.match(Re::single('.', 'e', 'E')) == Match::NO)
@@ -210,7 +210,7 @@ Res<Value> parseNumber(Io::SScan &s) {
 #endif
 }
 
-Res<Value> parse(Io::SScan &s) {
+Res<Value> parse(Io::SScan& s) {
     s.eat(Re::space());
 
     if (s.ended()) {

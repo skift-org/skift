@@ -52,7 +52,7 @@ struct Action {
 
     Action(_Op op, Rune rune = 0) : op(op), rune(rune) {}
 
-    static Opt<Action> fromEvent(App::Event &e);
+    static Opt<Action> fromEvent(App::Event& e);
 };
 
 struct Model {
@@ -111,9 +111,9 @@ struct Model {
 
     // MARK: Operations
 
-    void _do(Record &r);
+    void _do(Record& r);
 
-    void _undo(Record &r);
+    void _undo(Record& r);
 
     void _push(Op op, usize pos, Rune rune);
 
@@ -227,10 +227,10 @@ struct Model {
 
     void flush();
 
-    void reduce(Action const &a);
+    void reduce(Action const& a);
 
     bool dirty() const {
-        for (auto &r : _records)
+        for (auto& r : _records)
             if (r.op == INSERT or r.op == DELETE)
                 return true;
         return false;

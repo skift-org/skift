@@ -9,7 +9,7 @@ namespace Ttf {
 struct Loca : public Io::BChunk {
     static constexpr Str SIG = "loca";
 
-    usize glyfOffset(isize glyphId, Head const &head) const {
+    usize glyfOffset(isize glyphId, Head const& head) const {
         auto s = begin();
         auto format = head.locaFormat();
         if (format == 0) {

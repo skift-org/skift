@@ -30,18 +30,18 @@ union Ellipse {
 
     constexpr Ellipse(Vec2<T> center, Vec2<T> radii) : center(center), radii(radii) {}
 
-    constexpr Ellipse(Ellipse const &other)
+    constexpr Ellipse(Ellipse const& other)
         : _els{other._els} {}
 
-    constexpr Ellipse(Ellipse &&other)
+    constexpr Ellipse(Ellipse&& other)
         : _els{std::move(other._els)} {}
 
-    constexpr Ellipse &operator=(Ellipse const &other) {
+    constexpr Ellipse& operator=(Ellipse const& other) {
         _els = other._els;
         return *this;
     }
 
-    constexpr Ellipse &operator=(Ellipse &&other) {
+    constexpr Ellipse& operator=(Ellipse&& other) {
         _els = std::move(other._els);
         return *this;
     }
@@ -63,7 +63,7 @@ union Ellipse {
         return center.hasNan() or radii.hasNan();
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(ellipse {} {} {} {})", cx, cy, rx, ry);
     }
 

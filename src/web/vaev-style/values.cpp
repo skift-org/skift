@@ -16,7 +16,7 @@ namespace Vaev::Style {
 // https://drafts.csswg.org/css-align-3/#propdef-justify-items
 // https://drafts.csswg.org/css-align-3/#propdef-align-items
 
-Res<Align> ValueParser<Align>::parse(Cursor<Css::Sst> &c) {
+Res<Align> ValueParser<Align>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -88,7 +88,7 @@ static Res<Angle::Unit> _parseAngleUnit(Str unit) {
         return Error::invalidData("unknown length unit");
 }
 
-Res<Angle> ValueParser<Angle>::parse(Cursor<Css::Sst> &c) {
+Res<Angle> ValueParser<Angle>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -104,14 +104,14 @@ Res<Angle> ValueParser<Angle>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: Boolean
 // https://drafts.csswg.org/mediaqueries/#grid
-Res<bool> ValueParser<bool>::parse(Cursor<Css::Sst> &c) {
+Res<bool> ValueParser<bool>::parse(Cursor<Css::Sst>& c) {
     auto val = try$(parseValue<Integer>(c));
     return Ok(val > 0);
 }
 
 // MARK: Border-Style
 // https://www.w3.org/TR/CSS22/box.html#border-style-properties
-Res<Gfx::BorderStyle> ValueParser<Gfx::BorderStyle>::parse(Cursor<Css::Sst> &c) {
+Res<Gfx::BorderStyle> ValueParser<Gfx::BorderStyle>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of property");
 
@@ -140,7 +140,7 @@ Res<Gfx::BorderStyle> ValueParser<Gfx::BorderStyle>::parse(Cursor<Css::Sst> &c) 
 
 // MARK: BorderCollapse
 // https://www.w3.org/TR/CSS22/tables.html#propdef-border-collapse
-Res<BorderCollapse> ValueParser<BorderCollapse>::parse(Cursor<Css::Sst> &c) {
+Res<BorderCollapse> ValueParser<BorderCollapse>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -155,7 +155,7 @@ Res<BorderCollapse> ValueParser<BorderCollapse>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: BorderSpacing
 // https://www.w3.org/TR/CSS22/tables.html#propdef-border-spacing
-Res<BorderSpacing> ValueParser<BorderSpacing>::parse(Cursor<Css::Sst> &c) {
+Res<BorderSpacing> ValueParser<BorderSpacing>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -178,7 +178,7 @@ Res<BorderSpacing> ValueParser<BorderSpacing>::parse(Cursor<Css::Sst> &c) {
 // MARK: BreakAfter & BreakBefore
 // https://www.w3.org/TR/css-break-3/#propdef-break-after
 // https://www.w3.org/TR/css-break-3/#propdef-break-before
-Res<BreakBetween> ValueParser<BreakBetween>::parse(Cursor<Css::Sst> &c) {
+Res<BreakBetween> ValueParser<BreakBetween>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -213,7 +213,7 @@ Res<BreakBetween> ValueParser<BreakBetween>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: BreakInside
 // https://www.w3.org/TR/css-break-3/#break-within
-Res<BreakInside> ValueParser<BreakInside>::parse(Cursor<Css::Sst> &c) {
+Res<BreakInside> ValueParser<BreakInside>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -235,7 +235,7 @@ Res<BreakInside> ValueParser<BreakInside>::parse(Cursor<Css::Sst> &c) {
 // MARK: Color
 // https://drafts.csswg.org/css-color
 
-static Res<Gfx::Color> _parseHexColor(Io::SScan &s) {
+static Res<Gfx::Color> _parseHexColor(Io::SScan& s) {
     if (s.next() != '#')
         panic("expected '#'");
 
@@ -274,7 +274,7 @@ static Res<Gfx::Color> _parseHexColor(Io::SScan &s) {
     }
 }
 
-static Res<Gfx::Color> _parseFuncColor(Css::Sst const &s) {
+static Res<Gfx::Color> _parseFuncColor(Css::Sst const& s) {
     if (s.prefix == Css::Token::function("rgb(")) {
         Cursor<Css::Sst> scan = s.content;
 
@@ -325,7 +325,7 @@ static Res<Gfx::Color> _parseFuncColor(Css::Sst const &s) {
     }
 }
 
-Res<Color> ValueParser<Color>::parse(Cursor<Css::Sst> &c) {
+Res<Color> ValueParser<Color>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -368,7 +368,7 @@ Res<Color> ValueParser<Color>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: Color Gamut
 // https://drafts.csswg.org/mediaqueries/#color-gamut
-Res<ColorGamut> ValueParser<ColorGamut>::parse(Cursor<Css::Sst> &c) {
+Res<ColorGamut> ValueParser<ColorGamut>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -385,7 +385,7 @@ Res<ColorGamut> ValueParser<ColorGamut>::parse(Cursor<Css::Sst> &c) {
 // MARK: Display
 // https://drafts.csswg.org/css-display-3/#propdef-display
 
-static Res<Display> _parseLegacyDisplay(Cursor<Css::Sst> &c) {
+static Res<Display> _parseLegacyDisplay(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -404,7 +404,7 @@ static Res<Display> _parseLegacyDisplay(Cursor<Css::Sst> &c) {
 
 // MARK: TableLayout
 // https://www.w3.org/TR/CSS21/tables.html#propdef-table-layout
-Res<TableLayout> ValueParser<TableLayout>::parse(Cursor<Css::Sst> &c) {
+Res<TableLayout> ValueParser<TableLayout>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -419,7 +419,7 @@ Res<TableLayout> ValueParser<TableLayout>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: CaptionSide
 // https://www.w3.org/TR/CSS21/tables.html#caption-position
-Res<CaptionSide> ValueParser<CaptionSide>::parse(Cursor<Css::Sst> &c) {
+Res<CaptionSide> ValueParser<CaptionSide>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -432,7 +432,7 @@ Res<CaptionSide> ValueParser<CaptionSide>::parse(Cursor<Css::Sst> &c) {
     return Error::invalidData("expected caption side value");
 }
 
-static Res<Display::Outside> _parseOutsideDisplay(Cursor<Css::Sst> &c) {
+static Res<Display::Outside> _parseOutsideDisplay(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -447,7 +447,7 @@ static Res<Display::Outside> _parseOutsideDisplay(Cursor<Css::Sst> &c) {
     return Error::invalidData("expected outside value");
 }
 
-static Res<Display::Inside> _parseInsideDisplay(Cursor<Css::Sst> &c) {
+static Res<Display::Inside> _parseInsideDisplay(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -470,7 +470,7 @@ static Res<Display::Inside> _parseInsideDisplay(Cursor<Css::Sst> &c) {
     return Error::invalidData("expected inside value");
 }
 
-static Res<Display> _parseInternalDisplay(Cursor<Css::Sst> &c) {
+static Res<Display> _parseInternalDisplay(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -503,7 +503,7 @@ static Res<Display> _parseInternalDisplay(Cursor<Css::Sst> &c) {
     return Error::invalidData("expected internal value");
 }
 
-static Res<Display> _parseBoxDisplay(Cursor<Css::Sst> &c) {
+static Res<Display> _parseBoxDisplay(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -516,7 +516,7 @@ static Res<Display> _parseBoxDisplay(Cursor<Css::Sst> &c) {
     return Error::invalidData("expected box value");
 }
 
-Res<Display> ValueParser<Display>::parse(Cursor<Css::Sst> &c) {
+Res<Display> ValueParser<Display>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -547,7 +547,7 @@ Res<Display> ValueParser<Display>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: FlexDirection
 // https://drafts.csswg.org/css-flexbox-1/#flex-direction-property
-Res<FlexDirection> ValueParser<FlexDirection>::parse(Cursor<Css::Sst> &c) {
+Res<FlexDirection> ValueParser<FlexDirection>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -565,7 +565,7 @@ Res<FlexDirection> ValueParser<FlexDirection>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: FlexWrap
 // https://drafts.csswg.org/css-flexbox-1/#flex-wrap-property
-Res<FlexWrap> ValueParser<FlexWrap>::parse(Cursor<Css::Sst> &c) {
+Res<FlexWrap> ValueParser<FlexWrap>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -581,7 +581,7 @@ Res<FlexWrap> ValueParser<FlexWrap>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: FlexBasis
 // https://drafts.csswg.org/css-flexbox-1/#flex-basis-property
-Res<FlexBasis> ValueParser<FlexBasis>::parse(Cursor<Css::Sst> &c) {
+Res<FlexBasis> ValueParser<FlexBasis>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -594,7 +594,7 @@ Res<FlexBasis> ValueParser<FlexBasis>::parse(Cursor<Css::Sst> &c) {
 // MARK: FontSize
 // https://www.w3.org/TR/css-fonts-4/#font-size-prop
 
-Res<FontSize> ValueParser<FontSize>::parse(Cursor<Css::Sst> &c) {
+Res<FontSize> ValueParser<FontSize>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -623,7 +623,7 @@ Res<FontSize> ValueParser<FontSize>::parse(Cursor<Css::Sst> &c) {
 // MARK: FontStyle
 // https://drafts.csswg.org/css-fonts-4/#propdef-font-style
 
-Res<FontStyle> ValueParser<FontStyle>::parse(Cursor<Css::Sst> &c) {
+Res<FontStyle> ValueParser<FontStyle>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -645,7 +645,7 @@ Res<FontStyle> ValueParser<FontStyle>::parse(Cursor<Css::Sst> &c) {
 // MARK: FontWeight
 // https://www.w3.org/TR/css-fonts-4/#font-weight-absolute-values
 
-Res<FontWeight> ValueParser<FontWeight>::parse(Cursor<Css::Sst> &c) {
+Res<FontWeight> ValueParser<FontWeight>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -664,7 +664,7 @@ Res<FontWeight> ValueParser<FontWeight>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: FontWidth
 // https://www.w3.org/TR/css-fonts-4/#propdef-font-width
-Res<FontWidth> ValueParser<FontWidth>::parse(Cursor<Css::Sst> &c) {
+Res<FontWidth> ValueParser<FontWidth>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -694,7 +694,7 @@ Res<FontWidth> ValueParser<FontWidth>::parse(Cursor<Css::Sst> &c) {
 // MARK: Clear & Float
 //
 
-Res<Float> ValueParser<Float>::parse(Cursor<Css::Sst> &c) {
+Res<Float> ValueParser<Float>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -713,7 +713,7 @@ Res<Float> ValueParser<Float>::parse(Cursor<Css::Sst> &c) {
     return Error::invalidData("expected float");
 }
 
-Res<Clear> ValueParser<Clear>::parse(Cursor<Css::Sst> &c) {
+Res<Clear> ValueParser<Clear>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -736,7 +736,7 @@ Res<Clear> ValueParser<Clear>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: Hover
 // https://drafts.csswg.org/mediaqueries/#hover
-Res<Hover> ValueParser<Hover>::parse(Cursor<Css::Sst> &c) {
+Res<Hover> ValueParser<Hover>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -750,7 +750,7 @@ Res<Hover> ValueParser<Hover>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: Integer
 // https://drafts.csswg.org/css-values/#integers
-Res<Integer> ValueParser<Integer>::parse(Cursor<Css::Sst> &c) {
+Res<Integer> ValueParser<Integer>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -777,7 +777,7 @@ static Res<Length::Unit> _parseLengthUnit(Str unit) {
     return Error::invalidData("unknown length unit");
 }
 
-Res<Length> ValueParser<Length>::parse(Cursor<Css::Sst> &c) {
+Res<Length> ValueParser<Length>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -798,7 +798,7 @@ Res<Length> ValueParser<Length>::parse(Cursor<Css::Sst> &c) {
 // MARL: MarginWidth
 // https://drafts.csswg.org/css-values/#margin-width
 
-Res<Width> ValueParser<Width>::parse(Cursor<Css::Sst> &c) {
+Res<Width> ValueParser<Width>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -813,7 +813,7 @@ Res<Width> ValueParser<Width>::parse(Cursor<Css::Sst> &c) {
 // MARK: MediaType
 // https://drafts.csswg.org/mediaqueries/#media-types
 
-Res<MediaType> ValueParser<MediaType>::parse(Cursor<Css::Sst> &c) {
+Res<MediaType> ValueParser<MediaType>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -839,7 +839,7 @@ Res<MediaType> ValueParser<MediaType>::parse(Cursor<Css::Sst> &c) {
         "aural",
     };
 
-    for (auto const &item : OTHER) {
+    for (auto const& item : OTHER) {
         if (c.skip(Css::Token::ident(item)))
             return Ok(MediaType::OTHER);
     }
@@ -849,7 +849,7 @@ Res<MediaType> ValueParser<MediaType>::parse(Cursor<Css::Sst> &c) {
 // MARK: Number
 // https://drafts.csswg.org/css-values/#numbers
 
-Res<Number> ValueParser<Number>::parse(Cursor<Css::Sst> &c) {
+Res<Number> ValueParser<Number>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -864,7 +864,7 @@ Res<Number> ValueParser<Number>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: Orientation
 // https://drafts.csswg.org/mediaqueries/#orientation
-Res<Print::Orientation> ValueParser<Print::Orientation>::parse(Cursor<Css::Sst> &c) {
+Res<Print::Orientation> ValueParser<Print::Orientation>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -878,7 +878,7 @@ Res<Print::Orientation> ValueParser<Print::Orientation>::parse(Cursor<Css::Sst> 
 
 // MARK: Overflow
 // https://www.w3.org/TR/css-overflow/#overflow-control
-Res<Overflow> ValueParser<Overflow>::parse(Cursor<Css::Sst> &c) {
+Res<Overflow> ValueParser<Overflow>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -899,7 +899,7 @@ Res<Overflow> ValueParser<Overflow>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: OverflowBlock
 // https://drafts.csswg.org/mediaqueries/#mf-overflow-block
-Res<OverflowBlock> ValueParser<OverflowBlock>::parse(Cursor<Css::Sst> &c) {
+Res<OverflowBlock> ValueParser<OverflowBlock>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -915,7 +915,7 @@ Res<OverflowBlock> ValueParser<OverflowBlock>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: OverflowInline
 // https://drafts.csswg.org/mediaqueries/#mf-overflow-inline
-Res<OverflowInline> ValueParser<OverflowInline>::parse(Cursor<Css::Sst> &c) {
+Res<OverflowInline> ValueParser<OverflowInline>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -930,7 +930,7 @@ Res<OverflowInline> ValueParser<OverflowInline>::parse(Cursor<Css::Sst> &c) {
 // MARK: Percentage
 // https://drafts.csswg.org/css-values/#percentages
 
-Res<Percent> ValueParser<Percent>::parse(Cursor<Css::Sst> &c) {
+Res<Percent> ValueParser<Percent>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -945,7 +945,7 @@ Res<Percent> ValueParser<Percent>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: Pointer
 // https://drafts.csswg.org/mediaqueries/#pointer
-Res<Pointer> ValueParser<Pointer>::parse(Cursor<Css::Sst> &c) {
+Res<Pointer> ValueParser<Pointer>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -961,7 +961,7 @@ Res<Pointer> ValueParser<Pointer>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: Position
 // https://drafts.csswg.org/css-position-3/#propdef-position
-Res<Position> ValueParser<Position>::parse(Cursor<Css::Sst> &c) {
+Res<Position> ValueParser<Position>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -993,7 +993,7 @@ static Res<Resolution::Unit> _parseResolutionUnit(Str unit) {
         return Error::invalidData("unknown resolution unit");
 }
 
-Res<Resolution> ValueParser<Resolution>::parse(Cursor<Css::Sst> &c) {
+Res<Resolution> ValueParser<Resolution>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -1009,7 +1009,7 @@ Res<Resolution> ValueParser<Resolution>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: Scan
 // https://drafts.csswg.org/mediaqueries/#scan
-Res<Scan> ValueParser<Scan>::parse(Cursor<Css::Sst> &c) {
+Res<Scan> ValueParser<Scan>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -1024,7 +1024,7 @@ Res<Scan> ValueParser<Scan>::parse(Cursor<Css::Sst> &c) {
 // MARK: Size
 // https://drafts.csswg.org/css-sizing-4/#sizing-values
 
-Res<Size> ValueParser<Size>::parse(Cursor<Css::Sst> &c) {
+Res<Size> ValueParser<Size>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -1051,7 +1051,7 @@ Res<Size> ValueParser<Size>::parse(Cursor<Css::Sst> &c) {
 // MARK: String
 // https://drafts.csswg.org/css-values/#strings
 
-Res<String> ValueParser<String>::parse(Cursor<Css::Sst> &c) {
+Res<String> ValueParser<String>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -1076,7 +1076,7 @@ Res<String> ValueParser<String>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: Update
 // https://drafts.csswg.org/mediaqueries/#update
-Res<Update> ValueParser<Update>::parse(Cursor<Css::Sst> &c) {
+Res<Update> ValueParser<Update>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -1092,7 +1092,7 @@ Res<Update> ValueParser<Update>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: ReducedMotion
 // https://drafts.csswg.org/mediaqueries/#reduced-motion
-Res<ReducedMotion> ValueParser<ReducedMotion>::parse(Cursor<Css::Sst> &c) {
+Res<ReducedMotion> ValueParser<ReducedMotion>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -1106,7 +1106,7 @@ Res<ReducedMotion> ValueParser<ReducedMotion>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: ReducedTransparency
 // https://drafts.csswg.org/mediaqueries/#reduced-transparency
-Res<ReducedTransparency> ValueParser<ReducedTransparency>::parse(Cursor<Css::Sst> &c) {
+Res<ReducedTransparency> ValueParser<ReducedTransparency>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -1120,7 +1120,7 @@ Res<ReducedTransparency> ValueParser<ReducedTransparency>::parse(Cursor<Css::Sst
 
 // MARK: Contrast
 // https://drafts.csswg.org/mediaqueries/#contrast
-Res<Contrast> ValueParser<Contrast>::parse(Cursor<Css::Sst> &c) {
+Res<Contrast> ValueParser<Contrast>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -1134,7 +1134,7 @@ Res<Contrast> ValueParser<Contrast>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: Colors
 // https://drafts.csswg.org/mediaqueries/#forced-colors
-Res<Colors> ValueParser<Colors>::parse(Cursor<Css::Sst> &c) {
+Res<Colors> ValueParser<Colors>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -1148,7 +1148,7 @@ Res<Colors> ValueParser<Colors>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: ColorScheme
 // https://drafts.csswg.org/mediaqueries/#color-scheme
-Res<ColorScheme> ValueParser<ColorScheme>::parse(Cursor<Css::Sst> &c) {
+Res<ColorScheme> ValueParser<ColorScheme>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -1162,7 +1162,7 @@ Res<ColorScheme> ValueParser<ColorScheme>::parse(Cursor<Css::Sst> &c) {
 
 // MARK: ReducedData
 // https://drafts.csswg.org/mediaqueries/#reduced-data
-Res<ReducedData> ValueParser<ReducedData>::parse(Cursor<Css::Sst> &c) {
+Res<ReducedData> ValueParser<ReducedData>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -1177,7 +1177,7 @@ Res<ReducedData> ValueParser<ReducedData>::parse(Cursor<Css::Sst> &c) {
 // MARK: ZIndex
 // https://drafts.csswg.org/css2/#z-index
 
-Res<ZIndex> ValueParser<ZIndex>::parse(Cursor<Css::Sst> &c) {
+Res<ZIndex> ValueParser<ZIndex>::parse(Cursor<Css::Sst>& c) {
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 

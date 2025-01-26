@@ -4,6 +4,7 @@
     "type": "lib",
     "description": "Base data types and functions",
     "requires": [
+        "karm-base-impl",
         "karm-meta",
         "stdc-math",
         "stdc-ansi",

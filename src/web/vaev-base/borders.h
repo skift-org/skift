@@ -39,7 +39,7 @@ struct Border {
     Gfx::BorderStyle style;
     Color color = Color::CURRENT;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("{}-{}-{}", width, style, color);
     }
 };
@@ -76,7 +76,7 @@ struct BorderProps {
         }
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(border");
         e(" top={}", top);
         e(" start={}", start);

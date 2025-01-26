@@ -5,7 +5,7 @@
 
 namespace Karm::Sys {
 
-Sched &globalSched() {
+Sched& globalSched() {
     return _Embed::globalSched();
 }
 

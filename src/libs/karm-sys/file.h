@@ -15,10 +15,10 @@ struct _File :
     public Io::Flusher,
     Meta::NoCopy {
 
-    Strong<Fd> _fd;
+    Rc<Fd> _fd;
     Mime::Url _url;
 
-    _File(Strong<Fd> fd, Mime::Url url)
+    _File(Rc<Fd> fd, Mime::Url url)
         : _fd(fd), _url(url) {}
 
     Res<usize> seek(Io::Seek seek) override {
@@ -29,7 +29,7 @@ struct _File :
         return _fd->flush();
     }
 
-    auto flushAsync(auto &sched = globalSched()) {
+    auto flushAsync(auto& sched = globalSched()) {
         return sched.flushAsync(_fd);
     }
 
@@ -37,7 +37,7 @@ struct _File :
         return _fd->stat();
     }
 
-    Strong<Fd> fd() {
+    Rc<Fd> fd() {
         return _fd;
     }
 };
@@ -52,7 +52,7 @@ struct FileReader :
         return _fd->read(bytes);
     }
 
-    auto readAsync(MutBytes bytes, auto &sched = globalSched()) {
+    auto readAsync(MutBytes bytes, auto& sched = globalSched()) {
         return sched.readAsync(_fd, bytes);
     }
 };
@@ -67,7 +67,7 @@ struct FileWriter :
         return _fd->write(bytes);
     }
 
-    auto writeAsync(Bytes bytes, auto &sched = globalSched()) {
+    auto writeAsync(Bytes bytes, auto& sched = globalSched()) {
         return sched.writeAsync(_fd, bytes);
     }
 };
@@ -87,7 +87,7 @@ struct File :
 };
 
 /// Read the entire file as a UTF-8 string.
-static inline Res<String> readAllUtf8(Mime::Url const &url) {
+static inline Res<String> readAllUtf8(Mime::Url const& url) {
     auto file = try$(Sys::File::open(url));
     return Io::readAllUtf8(file);
 }

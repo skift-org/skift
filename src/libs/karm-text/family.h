@@ -20,7 +20,7 @@ struct FontAdjust {
 struct FontFamily : public Fontface {
     struct Member {
         FontAdjust adjust;
-        Strong<Fontface> face;
+        Rc<Fontface> face;
         Opt<Ranges<Range<Rune>>> ranges;
     };
 
@@ -30,24 +30,24 @@ struct FontFamily : public Fontface {
     FontFamily(Vec<Member> members) : _members(std::move(members)) {}
 
     struct Builder : Meta::NoCopy {
-        FontBook const &book;
+        FontBook const& book;
         Vec<Member> members = {};
         FontAdjust adjust = {};
 
-        Builder(FontBook const &book) : book(book) {}
+        Builder(FontBook const& book) : book(book) {}
 
-        Builder &add(FontQuery query);
+        Builder& add(FontQuery query);
 
-        Builder &withAdjust(FontAdjust adjust);
+        Builder& withAdjust(FontAdjust adjust);
 
-        Builder &adjustAll(FontAdjust adjust);
+        Builder& adjustAll(FontAdjust adjust);
 
-        Builder &withRange(Range<Rune> range);
+        Builder& withRange(Range<Rune> range);
 
-        Strong<FontFamily> bake();
+        Rc<FontFamily> bake();
     };
 
-    static Builder make(FontBook const &book);
+    static Builder make(FontBook const& book);
 
     FontMetrics metrics() const override;
 
@@ -59,7 +59,7 @@ struct FontFamily : public Fontface {
 
     f64 kern(Glyph prev, Glyph curr) override;
 
-    void contour(Gfx::Canvas &g, Glyph glyph) const override;
+    void contour(Gfx::Canvas& g, Glyph glyph) const override;
 };
 
 } // namespace Karm::Text

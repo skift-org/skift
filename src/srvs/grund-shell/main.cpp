@@ -18,11 +18,11 @@ namespace Grund::Shell {
 
 struct Root : public Ui::ProxyNode<Root> {
     Vec<Math::Recti> _dirty;
-    Strong<Gfx::CpuSurface> _frontbuffer;
-    Strong<Gfx::Surface> _backbuffer;
+    Rc<Gfx::CpuSurface> _frontbuffer;
+    Rc<Gfx::Surface> _backbuffer;
     bool _shouldLayout{};
 
-    Root(Ui::Child child, Strong<Gfx::CpuSurface> frontbuffer)
+    Root(Ui::Child child, Rc<Gfx::CpuSurface> frontbuffer)
         : Ui::ProxyNode<Root>(std::move(child)),
           _frontbuffer(std::move(frontbuffer)),
           _backbuffer(Gfx::Surface::alloc(_frontbuffer->bound().size(), Gfx::BGRA8888)) {
@@ -49,9 +49,9 @@ struct Root : public Ui::ProxyNode<Root> {
     Async::Task<> run() {
         _shouldLayout = true;
 
-        TimeStamp lastFrame = Sys::now();
+        auto lastFrame = Sys::instant();
         while (true) {
-            auto frameStart = Sys::now();
+            auto frameStart = Sys::instant();
             while (lastFrame < frameStart) {
                 auto e = App::makeEvent<Node::AnimateEvent>(Ui::FRAME_TIME);
                 event(*e);
@@ -134,14 +134,14 @@ Async::Task<> servAsync(Sys::Context &ctx) {
         .background = co_try$(Image::loadOrFallback("bundle://hideo-shell/wallpapers/winter.qoi"_url)),
         .noti = {},
         .launchers = {
-            makeStrong<Hideo::Shell::MockLauncher>(Mdi::CALCULATOR, "Calculator (Mocked)"s, Gfx::ORANGE_RAMP),
-            makeStrong<Grund::Shell::ServiceLauncher>(Mdi::CALCULATOR, "Calculator (Real)"s, Gfx::ORANGE_RAMP, "hideo-calculator.main"s),
+            makeRc<Hideo::Shell::MockLauncher>(Mdi::CALCULATOR, "Calculator (Mocked)"s, Gfx::ORANGE_RAMP),
+            makeRc<Grund::Shell::ServiceLauncher>(Mdi::CALCULATOR, "Calculator (Real)"s, Gfx::ORANGE_RAMP, "hideo-calculator.main"s),
         },
         .instances = {}
     };
 
     auto endpoint = Rpc::Endpoint::create(ctx);
-    auto root = makeStrong<Root>(
+    auto root = makeRc<Root>(
         Hideo::Shell::app(std::move(state)) | inputTranslator,
         co_try$(Framebuffer::open(ctx))
     );
@@ -163,7 +163,7 @@ Async::Task<> servAsync(Sys::Context &ctx) {
         } else if (msg.is<Api::CreateInstance>()) {
             auto call = msg.unpack<Api::CreateInstance>().unwrap();
             logDebug("create instance {}", call.size);
-            auto instance = makeStrong<ServiceInstance>();
+            auto instance = makeRc<ServiceInstance>();
             instance->bound = {100, call.size};
             Hideo::Shell::Model::event(*root, Hideo::Shell::AddInstance{instance});
             (void)msg.packResp<Api::CreateInstance>(0uz);

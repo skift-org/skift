@@ -347,10 +347,10 @@ struct GridStyle {
         };
     }
 
-    static GridStyle simpleFixed(Cons<isize, isize> rows, Cons<isize, isize> columns, Math::Vec2i gaps = {}) {
+    static GridStyle simpleFixed(Pair<isize, isize> rows, Pair<isize, isize> columns, Math::Vec2i gaps = {}) {
         return GridStyle{
-            GridUnit::fixed(rows.cdr).repeated(rows.car),
-            GridUnit::fixed(columns.cdr).repeated(columns.car),
+            GridUnit::fixed(rows.v1).repeated(rows.v0),
+            GridUnit::fixed(columns.v1).repeated(columns.v0),
             gaps,
             Math::Flow::LEFT_TO_RIGHT,
             Math::Align::FILL,

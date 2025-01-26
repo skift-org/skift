@@ -70,7 +70,7 @@ union Tri2 {
         return Orien::COLLINEAR;
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(tri {} {} {})", a, b, c);
     }
 

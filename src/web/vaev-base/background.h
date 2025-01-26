@@ -55,7 +55,7 @@ struct BackgroundPosition {
         : horizontalAnchor(horizontalAnchor), horizontal(horizontal), verticalAnchor(verticalAnchor), vertical(vertical) {
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         switch (horizontalAnchor) {
         case HorizontalAnchor::LEFT:
             e("left");
@@ -109,7 +109,7 @@ struct BackgroundRepeat {
         : _val(static_cast<u8>(val)) {
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         if (_val == NO) {
             e("no-repeat");
         } else if (_val == REPEAT) {
@@ -129,7 +129,7 @@ struct BackgroundLayer {
     BackgroundPosition position;
     BackgroundRepeat repeat;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(background");
         e(" image={}", image);
         e(" attachment={}", attachment);
@@ -143,7 +143,7 @@ struct BackgroundProps {
     Color color;
     Vec<BackgroundLayer> layers = {};
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(background");
         e(" color={}", color);
         e(" layers={}", layers);

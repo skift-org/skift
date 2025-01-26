@@ -22,12 +22,17 @@ struct sockaddr_in toSockAddr(Sys::SocketAddr addr);
 
 Sys::SocketAddr fromSockAddr(struct sockaddr_in sockaddr);
 
-Sys::Stat fromStat(struct stat const &buf);
+Sys::Stat fromStat(struct stat const& buf);
 
-struct timespec toTimespec(TimeStamp ts);
+struct timespec toTimespec(SystemTime ts);
 
-struct timespec toTimespec(TimeSpan ts);
+struct timespec toTimespec(Duration ts);
 
-Res<Str> repoRoot();
+enum struct RepoType {
+    CUTEKIT,
+    PREFIX
+};
+
+Res<Tuple<Str, RepoType>> repoRoot();
 
 } // namespace Posix

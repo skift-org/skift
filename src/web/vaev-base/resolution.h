@@ -85,15 +85,15 @@ struct Resolution {
         }
     }
 
-    constexpr bool operator==(Resolution const &other) const {
+    constexpr bool operator==(Resolution const& other) const {
         return _val == other._val and _unit == other._unit;
     }
 
-    std::partial_ordering operator<=>(Resolution const &other) const {
+    std::partial_ordering operator<=>(Resolution const& other) const {
         return toDpi() <=> other.toDpi();
     }
 
-    constexpr void repr(Io::Emit &e) const {
+    constexpr void repr(Io::Emit& e) const {
         switch (_unit) {
         case Unit::DPI:
             e("{}dpi", _val);

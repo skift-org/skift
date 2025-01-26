@@ -17,7 +17,7 @@ struct Toggle : public Ui::View<Toggle> {
         _anim.set(*this, _value ? 1.0 : 0.0);
     }
 
-    void reconcile(Toggle &o) override {
+    void reconcile(Toggle& o) override {
         if (_value != o._value) {
             _anim.animate(*this, _value ? 1.0 : 0.0, 0.1);
         }
@@ -25,7 +25,7 @@ struct Toggle : public Ui::View<Toggle> {
         _onChange = std::move(o._onChange);
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti) override {
+    void paint(Gfx::Canvas& g, Math::Recti) override {
         g.push();
 
         Math::Recti thumb = {
@@ -60,7 +60,7 @@ struct Toggle : public Ui::View<Toggle> {
         g.pop();
     }
 
-    void event(App::Event &e) override {
+    void event(App::Event& e) override {
         if (_anim.needRepaint(*this, e))
             Ui::shouldRepaint(*this);
 
@@ -77,7 +77,7 @@ struct Toggle : public Ui::View<Toggle> {
 };
 
 Ui::Child toggle(bool value, Ui::OnChange<bool> onChange) {
-    return makeStrong<Toggle>(value, std::move(onChange));
+    return makeRc<Toggle>(value, std::move(onChange));
 }
 
 } // namespace Karm::Kira

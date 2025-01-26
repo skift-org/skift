@@ -8,11 +8,11 @@ static bool DEBUG_PAGE = false;
 
 // MARK: Page Selector ----------------------------------------------------------
 
-bool PageSelector::match(Page const &page) const {
+bool PageSelector::match(Page const& page) const {
     if (name and page.name != name)
         return false;
 
-    for (auto const &pseudo : pseudos) {
+    for (auto const& pseudo : pseudos) {
         switch (pseudo) {
         case PagePseudo::FIRST:
             if (not page.number)
@@ -36,11 +36,11 @@ bool PageSelector::match(Page const &page) const {
     return true;
 }
 
-void PageSelector::repr(Io::Emit &e) const {
+void PageSelector::repr(Io::Emit& e) const {
     e("({} pseudos: {})", name, pseudos);
 }
 
-PageSelector PageSelector::parse(Cursor<Css::Sst> &c) {
+PageSelector PageSelector::parse(Cursor<Css::Sst>& c) {
     PageSelector res;
 
     if (c.peek() == Css::Token::IDENT) {
@@ -50,7 +50,7 @@ PageSelector PageSelector::parse(Cursor<Css::Sst> &c) {
     return res;
 }
 
-Vec<PageSelector> PageSelector::parseList(Cursor<Css::Sst> &c) {
+Vec<PageSelector> PageSelector::parseList(Cursor<Css::Sst>& c) {
     Vec<PageSelector> res;
 
     eatWhitespace(c);
@@ -64,13 +64,13 @@ Vec<PageSelector> PageSelector::parseList(Cursor<Css::Sst> &c) {
 
 // MARK: Page Margin Rule ------------------------------------------------------
 
-void PageAreaRule::apply(Style::Computed &c) const {
-    for (auto const &prop : props) {
+void PageAreaRule::apply(Style::Computed& c) const {
+    for (auto const& prop : props) {
         prop.apply(c, c);
     }
 }
 
-void PageAreaRule::repr(Io::Emit &e) const {
+void PageAreaRule::repr(Io::Emit& e) const {
     e("(page-margin-rule\nmargin: {}\nprops: {})", area, props);
 }
 
@@ -88,12 +88,12 @@ static Opt<PageArea> _parsePageArea(Css::Token tok) {
     return NONE;
 }
 
-Opt<PageAreaRule> PageAreaRule::parse(Css::Sst const &sst) {
+Opt<PageAreaRule> PageAreaRule::parse(Css::Sst const& sst) {
     PageAreaRule res;
 
     res.area = try$(_parsePageArea(sst.token));
 
-    for (auto const &item : sst.content) {
+    for (auto const& item : sst.content) {
         if (item == Css::Sst::DECL) {
             auto prop = parseDeclaration<StyleProp>(item);
             if (prop)
@@ -108,11 +108,11 @@ Opt<PageAreaRule> PageAreaRule::parse(Css::Sst const &sst) {
 
 // MARK: Page Rule -------------------------------------------------------------
 
-bool PageRule::match(Page const &page) const {
+bool PageRule::match(Page const& page) const {
     if (selectors.len() == 0)
         return true;
 
-    for (auto &s : selectors) {
+    for (auto& s : selectors) {
         if (s.match(page))
             return true;
     }
@@ -120,22 +120,22 @@ bool PageRule::match(Page const &page) const {
     return false;
 }
 
-void PageRule::apply(PageComputedStyle &c) const {
-    for (auto const &prop : props) {
+void PageRule::apply(PageComputedStyle& c) const {
+    for (auto const& prop : props) {
         prop.apply(*c.style, *c.style);
     }
 
-    for (auto const &area : areas) {
+    for (auto const& area : areas) {
         auto computed = c.area(area.area);
         area.apply(*computed);
     }
 }
 
-void PageRule::repr(Io::Emit &e) const {
+void PageRule::repr(Io::Emit& e) const {
     e("(page-rule\nselectors: {}\nprops: {}\nmargins: {})", selectors, props, areas);
 }
 
-PageRule PageRule::parse(Css::Sst const &sst) {
+PageRule PageRule::parse(Css::Sst const& sst) {
     if (sst != Css::Sst::RULE)
         panic("expected rule");
 
@@ -145,12 +145,12 @@ PageRule PageRule::parse(Css::Sst const &sst) {
     PageRule res;
 
     // Parse the selector
-    auto &prefix = sst.prefix.unwrap();
+    auto& prefix = sst.prefix.unwrap();
     Cursor<Css::Sst> prefixContent = prefix->content;
     res.selectors = PageSelector::parseList(prefixContent);
 
     // Parse the properties.
-    for (auto const &item : sst.content) {
+    for (auto const& item : sst.content) {
         if (item == Css::Sst::DECL) {
             auto prop = parseDeclaration<StyleProp>(item);
             if (prop)

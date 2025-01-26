@@ -22,20 +22,20 @@ Sched &globalSched() {
     return *_sched;
 }
 
-Sched::Sched(Strong<Task> boot)
+Sched::Sched(Arc<Task> boot)
     : _tasks{boot},
       _prev(boot),
       _curr(boot),
       _idle(boot) {
 }
 
-Res<> Sched::enqueue(Strong<Task> task) {
+Res<> Sched::enqueue(Arc<Task> task) {
     LockScope scope(_lock);
     _tasks.pushBack(std::move(task));
     return Ok();
 }
 
-void Sched::schedule(TimeSpan span) {
+void Sched::schedule(Duration span) {
     LockScope scope(_lock);
 
     _stamp += span;

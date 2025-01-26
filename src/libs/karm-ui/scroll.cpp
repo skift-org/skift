@@ -48,7 +48,7 @@ struct Scroll : public ProxyNode<Scroll> {
         return Math::Recti{bound().end() - SCROLL_BAR_WIDTH, bound().top(), SCROLL_BAR_WIDTH, bound().height};
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
         g.push();
         g.clip(_bound);
         g.origin(_scroll);
@@ -82,7 +82,7 @@ struct Scroll : public ProxyNode<Scroll> {
         g.pop();
     }
 
-    void event(App::Event &e) override {
+    void event(App::Event& e) override {
         if (_scrollOpacity.needRepaint(*this, e)) {
             if (canHScroll())
                 shouldRepaint(*parent(), hTrack());
@@ -130,7 +130,7 @@ struct Scroll : public ProxyNode<Scroll> {
         }
     }
 
-    void bubble(App::Event &e) override {
+    void bubble(App::Event& e) override {
         if (auto pe = e.is<Node::PaintEvent>()) {
             pe->bound.xy = pe->bound.xy + _scroll.cast<isize>();
             pe->bound = pe->bound.clipTo(bound());
@@ -179,15 +179,15 @@ struct Scroll : public ProxyNode<Scroll> {
 };
 
 Child vhscroll(Child child) {
-    return makeStrong<Scroll>(child, Math::Orien::BOTH);
+    return makeRc<Scroll>(child, Math::Orien::BOTH);
 }
 
 Child hscroll(Child child) {
-    return makeStrong<Scroll>(child, Math::Orien::HORIZONTAL);
+    return makeRc<Scroll>(child, Math::Orien::HORIZONTAL);
 }
 
 Child vscroll(Child child) {
-    return makeStrong<Scroll>(child, Math::Orien::VERTICAL);
+    return makeRc<Scroll>(child, Math::Orien::VERTICAL);
 }
 
 // MARK: Clip ------------------------------------------------------------------
@@ -201,7 +201,7 @@ struct Clip : public ProxyNode<Clip> {
     Clip(Child child, Math::Orien orient)
         : ProxyNode(child), _orient(orient) {}
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
         g.push();
         g.clip(_bound);
         child().paint(g, r);
@@ -242,15 +242,15 @@ struct Clip : public ProxyNode<Clip> {
 };
 
 Child vhclip(Child child) {
-    return makeStrong<Clip>(child, Math::Orien::BOTH);
+    return makeRc<Clip>(child, Math::Orien::BOTH);
 }
 
 Child hclip(Child child) {
-    return makeStrong<Clip>(child, Math::Orien::HORIZONTAL);
+    return makeRc<Clip>(child, Math::Orien::HORIZONTAL);
 }
 
 Child vclip(Child child) {
-    return makeStrong<Clip>(child, Math::Orien::VERTICAL);
+    return makeRc<Clip>(child, Math::Orien::VERTICAL);
 }
 
 } // namespace Karm::Ui

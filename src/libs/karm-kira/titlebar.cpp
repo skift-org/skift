@@ -14,7 +14,7 @@ namespace Karm::Kira {
 Ui::Child titlebarTitle(Mdi::Icon icon, String title, bool compact) {
     if (compact) {
         return Ui::button(
-            [=](Ui::Node &n) {
+            [=](Ui::Node& n) {
                 Ui::showDialog(n, Kr::aboutDialog(title));
             },
             Ui::ButtonStyle::subtle(),
@@ -23,7 +23,7 @@ Ui::Child titlebarTitle(Mdi::Icon icon, String title, bool compact) {
     }
 
     return Ui::button(
-        [=](auto &n) {
+        [=](auto& n) {
             Ui::showDialog(n, Kr::aboutDialog(title));
         },
         Ui::ButtonStyle::subtle(), icon, title

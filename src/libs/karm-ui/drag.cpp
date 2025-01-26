@@ -21,7 +21,7 @@ struct Dismisable :
           _dir(dir),
           _threshold(threshold) {}
 
-    void reconcile(Dismisable &o) override {
+    void reconcile(Dismisable& o) override {
         _onDismis = std::move(o._onDismis);
         _dir = o._dir;
         _threshold = o._threshold;
@@ -33,7 +33,7 @@ struct Dismisable :
         return _drag.value().cast<isize>();
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
         g.push();
 
         g.clip(bound());
@@ -44,7 +44,7 @@ struct Dismisable :
         g.pop();
     }
 
-    void event(App::Event &e) override {
+    void event(App::Event& e) override {
         if (auto me = e.is<App::MouseEvent>()) {
             me->pos = me->pos - drag();
             child().event(e);
@@ -68,7 +68,7 @@ struct Dismisable :
         }
     }
 
-    void bubble(App::Event &e) override {
+    void bubble(App::Event& e) override {
         if (auto de = e.is<DragEvent>()) {
             if (de->type == DragEvent::DRAG) {
                 auto d = _drag.target() + de->delta;
@@ -116,7 +116,7 @@ struct Dismisable :
 };
 
 Child dismisable(OnDismis onDismis, DismisDir dir, f64 threshold, Ui::Child child) {
-    return makeStrong<Dismisable>(std::move(onDismis), dir, threshold, std::move(child));
+    return makeRc<Dismisable>(std::move(onDismis), dir, threshold, std::move(child));
 }
 
 // MARK: Drag Region -----------------------------------------------------------
@@ -131,7 +131,7 @@ struct DragRegion : public ProxyNode<DragRegion> {
 
     using ProxyNode::ProxyNode;
 
-    void event(App::Event &event) override {
+    void event(App::Event& event) override {
         ProxyNode::event(event);
 
         if (event.accepted())
@@ -160,7 +160,7 @@ struct DragRegion : public ProxyNode<DragRegion> {
 };
 
 Child dragRegion(Child child, Math::Vec2i dir) {
-    return makeStrong<DragRegion>(child, dir);
+    return makeRc<DragRegion>(child, dir);
 }
 
 // MARK: Handle ----------------------------------------------------------------

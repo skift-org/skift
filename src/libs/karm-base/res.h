@@ -10,14 +10,14 @@ struct Ok {
     T inner;
 
     template <typename... Args>
-    always_inline constexpr Ok(Args &&...args)
+    always_inline constexpr Ok(Args&&... args)
         : inner(std::forward<Args>(args)...) {}
 
     always_inline explicit operator bool() const {
         return true;
     }
 
-    always_inline auto operator<=>(Ok const &) const
+    always_inline auto operator<=>(Ok const&) const
         requires Meta::Comparable<T>
     = default;
 
@@ -27,7 +27,7 @@ struct Ok {
 };
 
 template <typename... Args>
-Ok(Args &&...) -> Ok<Meta::RemoveConstVolatileRef<Args>...>;
+Ok(Args&&...) -> Ok<Meta::RemoveConstVolatileRef<Args>...>;
 
 template <typename V = None, typename E = Error>
 struct [[nodiscard]] Res {
@@ -35,10 +35,10 @@ struct [[nodiscard]] Res {
 
     Inner _inner;
 
-    always_inline constexpr Res(Ok<V> const &ok)
+    always_inline constexpr Res(Ok<V> const& ok)
         : _inner(ok) {}
 
-    always_inline constexpr Res(Ok<V> &&ok)
+    always_inline constexpr Res(Ok<V>&& ok)
         : _inner(std::move(ok)) {}
 
     template <typename U>
@@ -63,28 +63,28 @@ struct [[nodiscard]] Res {
         return _inner.template is<Ok<V>>();
     }
 
-    always_inline constexpr E const &none() const lifetimebound {
+    always_inline constexpr E const& none() const lifetimebound {
         if (not _inner.template is<E>()) [[unlikely]]
             panic("none() called on an ok");
 
         return _inner.template unwrap<E>();
     }
 
-    always_inline constexpr V &unwrap(char const *msg = "unwraping an error") lifetimebound {
+    always_inline constexpr V& unwrap(char const* msg = "unwraping an error") lifetimebound {
         if (not _inner.template is<Ok<V>>()) [[unlikely]]
             panic(msg);
 
         return _inner.template unwrap<Ok<V>>().inner;
     }
 
-    always_inline constexpr V const &unwrap(char const *msg = "unwraping an error") const lifetimebound {
+    always_inline constexpr V const& unwrap(char const* msg = "unwraping an error") const lifetimebound {
         if (not _inner.template is<Ok<V>>()) [[unlikely]]
             panic(msg);
 
         return _inner.template unwrap<Ok<V>>().inner;
     }
 
-    always_inline constexpr V const &unwrapOr(V const &other) const lifetimebound {
+    always_inline constexpr V const& unwrapOr(V const& other) const lifetimebound {
         if (_inner.template is<Ok<V>>())
             return _inner.template unwrap<Ok<V>>().inner;
         return other;
@@ -102,7 +102,7 @@ struct [[nodiscard]] Res {
         return f();
     }
 
-    always_inline constexpr V take(char const *msg = "take() called on an error") {
+    always_inline constexpr V take(char const* msg = "take() called on an error") {
         if (not _inner.template is<Ok<V>>()) [[unlikely]]
             panic(msg);
 
@@ -137,7 +137,7 @@ struct [[nodiscard]] Res {
         return _inner.template unwrap<E>();
     }
 
-    always_inline auto operator<=>(Res const &) const
+    always_inline auto operator<=>(Res const&) const
         requires Meta::Comparable<Inner>
     = default;
 

@@ -11,9 +11,9 @@ struct Backtrace {
         String file;
         usize line;
 
-        bool operator==(Frame const &other) const = default;
+        bool operator==(Frame const& other) const = default;
 
-        auto operator<=>(Frame const &other) const = default;
+        auto operator<=>(Frame const& other) const = default;
     };
 
     enum struct Status {
@@ -41,9 +41,9 @@ struct Backtrace {
         return _status;
     }
 
-    bool operator==(Backtrace const &other) const = default;
+    bool operator==(Backtrace const& other) const = default;
 
-    auto operator<=>(Backtrace const &other) const = default;
+    auto operator<=>(Backtrace const& other) const = default;
 };
 
 } // namespace Karm

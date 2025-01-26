@@ -2,7 +2,7 @@
 
 namespace Karm::Gfx {
 
-Color randomColor(Math::Rand &rand) {
+Color randomColor(Math::Rand& rand) {
     return COLORS[rand.nextInt(COLORS.len())];
 }
 

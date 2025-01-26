@@ -57,19 +57,19 @@ struct FontWidth {
         return _val;
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("{}", _val);
     }
 
-    bool operator==(FontWidth const &other) const {
+    bool operator==(FontWidth const& other) const {
         return _val == other._val;
     }
 
-    auto operator<=>(FontWidth const &other) const {
+    auto operator<=>(FontWidth const& other) const {
         return _val <=> other._val;
     }
 
-    Percent operator-(FontWidth const &other) const {
+    Percent operator-(FontWidth const& other) const {
         return _val - other._val;
     }
 
@@ -99,13 +99,13 @@ struct FontStyle {
     constexpr FontStyle(Angle angle)
         : val(OBLIQUE), obliqueAngle(angle) {}
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("{}", val);
         if (val == OBLIQUE)
             e(" {}", obliqueAngle);
     }
 
-    bool operator==(FontStyle const &other) const {
+    bool operator==(FontStyle const& other) const {
         return val == other.val and
                (val != OBLIQUE or obliqueAngle == other.obliqueAngle);
     }
@@ -150,11 +150,11 @@ struct FontWeight {
         : val(clamp(value, 1, 1000)) {
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("{}", val);
     }
 
-    bool operator==(FontWeight const &other) const {
+    bool operator==(FontWeight const& other) const {
         return val == other.val;
     }
 
@@ -162,11 +162,11 @@ struct FontWeight {
         return FontWeight(val + value);
     }
 
-    i16 operator-(FontWeight const &other) const {
+    i16 operator-(FontWeight const& other) const {
         return val - other.val;
     }
 
-    std::partial_ordering operator<=>(FontWeight const &other) const {
+    std::partial_ordering operator<=>(FontWeight const& other) const {
         if (isRelative() or other.isRelative())
             return std::partial_ordering::unordered;
         return val <=> other.val;
@@ -217,7 +217,7 @@ struct FontSize {
         return _value;
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         if (_named == LENGTH) {
             e("{}", _value);
         } else {
@@ -251,19 +251,19 @@ struct FontFeature {
         : tag(makeTag(tag)), val(static_cast<isize>(val)) {
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(font-feature {} {})", tag, val);
     }
 
-    bool operator==(FontFeature const &other) const {
+    bool operator==(FontFeature const& other) const {
         return tag == other.tag and val == other.val;
     }
 
-    bool operator==(FontTag const &other) const {
+    bool operator==(FontTag const& other) const {
         return tag == other;
     }
 
-    bool operator==(_Value const &other) const {
+    bool operator==(_Value const& other) const {
         return val == static_cast<isize>(other);
     }
 };
@@ -276,11 +276,11 @@ struct FontVariation {
         : tag(makeTag(tag)), val(val) {
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(font-variation {} {})", tag, val);
     }
 
-    bool operator==(FontTag const &other) const {
+    bool operator==(FontTag const& other) const {
         return tag == other;
     }
 };
@@ -289,7 +289,7 @@ struct FontSource {
     Mime::Url url;
     Opt<String> format;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(font-source {}", url);
         if (format)
             e(" format({})", *format);
@@ -304,7 +304,7 @@ struct FontProps {
     FontStyle style;
     FontSize size;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(font");
         e(" families={}", families);
         e(" weight={}", weight);

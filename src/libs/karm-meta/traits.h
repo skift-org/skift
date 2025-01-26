@@ -98,10 +98,10 @@ template <typename T>
 concept DefaultConstructible = Constructible<T>;
 
 template <typename T, typename U = T>
-concept CopyConstructible = Constructible<T, U const &>;
+concept CopyConstructible = Constructible<T, U const&>;
 
 template <typename T, typename U = T>
-concept MoveConstructible = Constructible<T, U &&>;
+concept MoveConstructible = Constructible<T, U&&>;
 
 template <typename From, typename To>
 concept Convertible = requires {
@@ -120,13 +120,13 @@ concept Same = _Same<T, U>;
 /// A type is comparable if it can be compared using the <=> operator.
 /// Comparable does not imply Equatable.
 template <typename T, typename U = T>
-concept Comparable = requires(T const &a, U const &b) {
+concept Comparable = requires(T const& a, U const& b) {
     { a <=> b } -> Same<decltype(a <=> b)>;
 };
 
 /// A type is equatable if it can be compared for equality.
 template <typename T, typename U = T>
-concept Equatable = requires(T const &a, U const &b) {
+concept Equatable = requires(T const& a, U const& b) {
     { a == b } -> Same<decltype(a == b)>;
 };
 

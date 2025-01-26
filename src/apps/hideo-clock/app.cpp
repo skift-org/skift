@@ -55,7 +55,7 @@ struct Clock : public Ui::View<Clock> {
 };
 
 Ui::Child clock(Time time) {
-    return makeStrong<Clock>(time);
+    return makeRc<Clock>(time);
 }
 
 // MARK: Alarm Page ------------------------------------------------------------
@@ -181,7 +181,7 @@ Ui::Child app() {
 Async::Task<> timerTask(Ui::Child app, Async::Ct ct) {
     while (not ct.canceled()) {
         Model::event<TimeTick>(*app);
-        co_trya$(Sys::globalSched().sleepAsync(Sys::now() + TimeSpan::fromSecs(1)));
+        co_trya$(Sys::globalSched().sleepAsync(Sys::instant() + Duration::fromSecs(1)));
     }
     co_return Ok();
 }

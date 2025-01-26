@@ -104,7 +104,7 @@ struct Cmd {
         return {CLEAR_LINE_BEFORE};
     }
 
-    void repr([[maybe_unused]] Io::Emit &e) const {
+    void repr([[maybe_unused]] Io::Emit& e) const {
 #ifdef __ck_sys_terminal_ansi__
         switch (_type) {
         case Cli::Cmd::SAVE:

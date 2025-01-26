@@ -35,18 +35,18 @@ union Quad {
         : ax(ax), ay(ay), bx(bx), by(by), cx(cx), cy(cy), dx(dx), dy(dy) {
     }
 
-    always_inline constexpr Quad(Quad const &other)
+    always_inline constexpr Quad(Quad const& other)
         : _els{other._els} {}
 
-    always_inline constexpr Quad(Quad &&other)
+    always_inline constexpr Quad(Quad&& other)
         : _els{std::move(other._els)} {}
 
-    always_inline constexpr Quad &operator=(Quad const &other) {
+    always_inline constexpr Quad& operator=(Quad const& other) {
         _els = other._els;
         return *this;
     }
 
-    always_inline constexpr Quad &operator=(Quad &&other) {
+    always_inline constexpr Quad& operator=(Quad&& other) {
         _els = std::move(other._els);
         return *this;
     }
@@ -89,7 +89,7 @@ union Quad {
         return res;
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(quad {} {} {} {})", a, b, c, d);
     }
 };

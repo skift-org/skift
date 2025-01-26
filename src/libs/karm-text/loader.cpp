@@ -7,17 +7,17 @@
 
 namespace Karm::Text {
 
-Res<Strong<Fontface>> loadFontface(Sys::Mmap &&map) {
+Res<Rc<Fontface>> loadFontface(Sys::Mmap&& map) {
     return Ok(try$(TtfFontface::load(std::move(map))));
 }
 
-Res<Strong<Fontface>> loadFontface(Mime::Url url) {
+Res<Rc<Fontface>> loadFontface(Mime::Url url) {
     auto file = try$(Sys::File::open(url));
     auto map = try$(Sys::mmap().map(file));
     return loadFontface(std::move(map));
 }
 
-Res<Strong<Fontface>> loadFontfaceOrFallback(Mime::Url url) {
+Res<Rc<Fontface>> loadFontfaceOrFallback(Mime::Url url) {
     if (auto result = loadFontface(url); result) {
         return result;
     }

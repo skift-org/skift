@@ -7,45 +7,45 @@ namespace Karm::Ui {
 
 // MARK: Text ------------------------------------------------------------------
 
-static Opt<Strong<Text::Fontface>> _regularFontface = NONE;
+static Opt<Rc<Text::Fontface>> _regularFontface = NONE;
 
-Strong<Text::Fontface> regularFontface() {
+Rc<Text::Fontface> regularFontface() {
     if (not _regularFontface) {
         _regularFontface = Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Regular.ttf"_url).unwrap();
     }
     return *_regularFontface;
 }
 
-static Opt<Strong<Text::Fontface>> _mediumFontface = NONE;
+static Opt<Rc<Text::Fontface>> _mediumFontface = NONE;
 
-Strong<Text::Fontface> mediumFontface() {
+Rc<Text::Fontface> mediumFontface() {
     if (not _mediumFontface) {
         _mediumFontface = Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Medium.ttf"_url).unwrap();
     }
     return *_mediumFontface;
 }
 
-static Opt<Strong<Text::Fontface>> _boldFontface = NONE;
+static Opt<Rc<Text::Fontface>> _boldFontface = NONE;
 
-Strong<Text::Fontface> boldFontface() {
+Rc<Text::Fontface> boldFontface() {
     if (not _boldFontface) {
         _boldFontface = Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Bold.ttf"_url).unwrap();
     }
     return *_boldFontface;
 }
 
-static Opt<Strong<Text::Fontface>> _italicFontface = NONE;
+static Opt<Rc<Text::Fontface>> _italicFontface = NONE;
 
-Strong<Text::Fontface> italicFontface() {
+Rc<Text::Fontface> italicFontface() {
     if (not _italicFontface) {
         _italicFontface = Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Italic.ttf"_url).unwrap();
     }
     return *_italicFontface;
 }
 
-static Opt<Strong<Text::Fontface>> _codeFontface = NONE;
+static Opt<Rc<Text::Fontface>> _codeFontface = NONE;
 
-Strong<Text::Fontface> codeFontface() {
+Rc<Text::Fontface> codeFontface() {
     if (not _codeFontface) {
         _codeFontface = Text::loadFontfaceOrFallback("bundle://fonts-fira-code/fonts/FiraCode-Regular.ttf"_url).unwrap();
     }
@@ -221,22 +221,22 @@ Text::ProseStyle TextStyles::codeSmall() {
 }
 
 struct Text : public View<Text> {
-    Strong<Karm::Text::Prose> _prose;
+    Rc<Karm::Text::Prose> _prose;
 
-    Text(Strong<Karm::Text::Prose> prose)
+    Text(Rc<Karm::Text::Prose> prose)
         : _prose(std::move(prose)) {}
 
     Text(::Text::ProseStyle style, Str text)
-        : _prose(makeStrong<Karm::Text::Prose>(style, text)) {}
+        : _prose(makeRc<Karm::Text::Prose>(style, text)) {}
 
-    void reconcile(Text &o) override {
+    void reconcile(Text& o) override {
         _prose = std::move(o._prose);
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti) override {
+    void paint(Gfx::Canvas& g, Math::Recti) override {
         g.push();
         g.origin(bound().xy.cast<f64>());
-        _prose->paint(g);
+        g.fill(*_prose);
         g.pop();
     }
 
@@ -252,15 +252,15 @@ struct Text : public View<Text> {
 };
 
 Child text(Karm::Text::ProseStyle style, Str text) {
-    return makeStrong<Text>(style, text);
+    return makeRc<Text>(style, text);
 }
 
 Child text(Str text) {
-    return makeStrong<Text>(TextStyles::labelMedium(), text);
+    return makeRc<Text>(TextStyles::labelMedium(), text);
 }
 
-Child text(Strong<Karm::Text::Prose> prose) {
-    return makeStrong<Text>(prose);
+Child text(Rc<Karm::Text::Prose> prose) {
+    return makeRc<Text>(prose);
 }
 
 // MARK: Icon ------------------------------------------------------------------
@@ -272,12 +272,12 @@ struct Icon : public View<Icon> {
     Icon(Gfx::Icon icon, Opt<Gfx::Color> color)
         : _icon(icon), _color(color) {}
 
-    void reconcile(Icon &o) override {
+    void reconcile(Icon& o) override {
         _icon = o._icon;
         _color = o._color;
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti) override {
+    void paint(Gfx::Canvas& g, Math::Recti) override {
         g.push();
         if (_color)
             g.fillStyle(_color.unwrap());
@@ -291,7 +291,7 @@ struct Icon : public View<Icon> {
 };
 
 Child icon(Gfx::Icon icon, Opt<Gfx::Color> color) {
-    return makeStrong<Icon>(icon, color);
+    return makeRc<Icon>(icon, color);
 }
 
 Child icon(Mdi::Icon i, f64 size, Opt<Gfx::Color> color) {
@@ -307,7 +307,7 @@ struct Image : public View<Image> {
     Image(Karm::Image::Picture image, Opt<Math::Radiif> radii = NONE)
         : _image(image), _radii(radii) {}
 
-    void paint(Gfx::Canvas &g, Math::Recti) override {
+    void paint(Gfx::Canvas& g, Math::Recti) override {
         g.push();
 
         if (_radii) {
@@ -326,11 +326,11 @@ struct Image : public View<Image> {
 };
 
 Child image(Karm::Image::Picture image) {
-    return makeStrong<Image>(image);
+    return makeRc<Image>(image);
 }
 
 Child image(Karm::Image::Picture image, Math::Radiif radii) {
-    return makeStrong<Image>(image, radii);
+    return makeRc<Image>(image, radii);
 }
 
 // MARK: Canvas ----------------------------------------------------------------
@@ -341,12 +341,12 @@ struct Canvas : public View<Canvas> {
     Canvas(OnPaint onPaint)
         : _onPaint(std::move(onPaint)) {}
 
-    void reconcile(Canvas &o) override {
+    void reconcile(Canvas& o) override {
         _onPaint = std::move(o._onPaint);
         View<Canvas>::reconcile(o);
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti) override {
+    void paint(Gfx::Canvas& g, Math::Recti) override {
         g.push();
         g.clip(_bound);
         g.origin(_bound.xy.cast<f64>());
@@ -362,23 +362,23 @@ struct Canvas : public View<Canvas> {
 };
 
 Child canvas(OnPaint onPaint) {
-    return makeStrong<Canvas>(std::move(onPaint));
+    return makeRc<Canvas>(std::move(onPaint));
 }
 
 struct SceneCanvas : public View<SceneCanvas> {
-    Strong<Scene::Node> _scene;
+    Rc<Scene::Node> _scene;
     Scene::PaintOptions _options;
 
-    SceneCanvas(Strong<Scene::Node> scene, Scene::PaintOptions options)
+    SceneCanvas(Rc<Scene::Node> scene, Scene::PaintOptions options)
         : _scene(std::move(scene)), _options(options) {}
 
-    void reconcile(SceneCanvas &o) override {
+    void reconcile(SceneCanvas& o) override {
         _scene = o._scene;
         _options = o._options;
         View<SceneCanvas>::reconcile(o);
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti rect) override {
+    void paint(Gfx::Canvas& g, Math::Recti rect) override {
         g.push();
         g.clip(_bound);
         g.origin(_bound.xy.cast<f64>());
@@ -404,8 +404,8 @@ struct SceneCanvas : public View<SceneCanvas> {
     }
 };
 
-Child canvas(Strong<Scene::Node> child, Scene::PaintOptions options) {
-    return makeStrong<SceneCanvas>(std::move(child), options);
+Child canvas(Rc<Scene::Node> child, Scene::PaintOptions options) {
+    return makeRc<SceneCanvas>(std::move(child), options);
 }
 
 // MARK: Filter ----------------------------------------------------------------
@@ -417,12 +417,12 @@ struct BackgroundFilter : public ProxyNode<BackgroundFilter> {
         : ProxyNode<BackgroundFilter>(std::move(child)),
           _filter(filter) {}
 
-    void reconcile(BackgroundFilter &o) override {
+    void reconcile(BackgroundFilter& o) override {
         _filter = o._filter;
         ProxyNode<BackgroundFilter>::reconcile(o);
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
         g.push();
         g.clip(bound());
         g.apply(_filter);
@@ -432,7 +432,7 @@ struct BackgroundFilter : public ProxyNode<BackgroundFilter> {
 };
 
 Child backgroundFilter(Gfx::Filter f, Child child) {
-    return makeStrong<BackgroundFilter>(f, std::move(child));
+    return makeRc<BackgroundFilter>(f, std::move(child));
 }
 
 struct ForegroundFilter : public ProxyNode<ForegroundFilter> {
@@ -442,12 +442,12 @@ struct ForegroundFilter : public ProxyNode<ForegroundFilter> {
         : ProxyNode<ForegroundFilter>(std::move(child)),
           _filter(filter) {}
 
-    void reconcile(ForegroundFilter &o) override {
+    void reconcile(ForegroundFilter& o) override {
         _filter = o._filter;
         ProxyNode<ForegroundFilter>::reconcile(o);
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
         ProxyNode<ForegroundFilter>::paint(g, r);
         g.push();
         g.clip(bound());
@@ -457,7 +457,7 @@ struct ForegroundFilter : public ProxyNode<ForegroundFilter> {
 };
 
 Child foregroundFilter(Gfx::Filter f, Child child) {
-    return makeStrong<ForegroundFilter>(f, std::move(child));
+    return makeRc<ForegroundFilter>(f, std::move(child));
 }
 
 } // namespace Karm::Ui

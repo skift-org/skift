@@ -55,7 +55,7 @@ struct TextProps {
     TextTransform transform = TextTransform::NONE;
     WhiteSpace whiteSpace = WhiteSpace::NORMAL;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(text");
         e(" align: {}", align);
         e(" transform: {}", transform);

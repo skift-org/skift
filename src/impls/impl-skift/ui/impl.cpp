@@ -4,7 +4,7 @@
 
 namespace Karm::Ui::_Embed {
 
-Res<Strong<Host>> makeHost(Child) {
+Res<Rc<Host>> makeHost(Child) {
     notImplemented();
 }
 
@@ -23,7 +23,7 @@ Async::Task<> runAsync(Sys::Context &ctx, Child root) {
     auto size = root->size({1024, 720}, Hint::MIN);
     auto surface = co_trya$(endpoint.callAsync<Grund::Shell::Api::CreateInstance>(shell, size));
 
-    auto host = makeStrong<Host>(std::move(root), endpoint, shell, surface);
+    auto host = makeRc<Host>(std::move(root), endpoint, shell, surface);
 
     while (true) {
         auto msg = co_trya$(endpoint.recvAsync());

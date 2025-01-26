@@ -6,22 +6,22 @@
 
 namespace Vaev::Layout {
 
-static void _buildNode(Style::Computer &c, Markup::Node const &node, Box &parent);
+static void _buildNode(Style::Computer& c, Markup::Node const& node, Box& parent);
 
 // MARK: Attributes ------------------------------------------------------------
 
-static Opt<Str> _parseStrAttr(Markup::Element const &el, AttrName name) {
+static Opt<Str> _parseStrAttr(Markup::Element const& el, AttrName name) {
     return el.getAttribute(name);
 }
 
-static Opt<usize> _parseUsizeAttr(Markup::Element const &el, AttrName name) {
+static Opt<usize> _parseUsizeAttr(Markup::Element const& el, AttrName name) {
     auto str = _parseStrAttr(el, name);
     if (not str)
         return NONE;
     return Io::atoi(str.unwrap());
 }
 
-static Attrs _parseDomAttr(Markup::Element const &el) {
+static Attrs _parseDomAttr(Markup::Element const& el) {
     Attrs attrs;
 
     // https://html.spec.whatwg.org/multipage/tables.html#the-col-element
@@ -52,11 +52,11 @@ static Attrs _parseDomAttr(Markup::Element const &el) {
 
 // MARK: Build Inline ----------------------------------------------------------
 
-static Opt<Strong<Karm::Text::Fontface>> _monospaceFontface = NONE;
-static Opt<Strong<Karm::Text::Fontface>> _regularFontface = NONE;
-static Opt<Strong<Karm::Text::Fontface>> _boldFontface = NONE;
+static Opt<Rc<Karm::Text::Fontface>> _monospaceFontface = NONE;
+static Opt<Rc<Karm::Text::Fontface>> _regularFontface = NONE;
+static Opt<Rc<Karm::Text::Fontface>> _boldFontface = NONE;
 
-static Strong<Karm::Text::Fontface> _lookupFontface(Style::Computed &style) {
+static Rc<Karm::Text::Fontface> _lookupFontface(Style::Computed& style) {
     if (contains(style.font->families, "monospace"s)) {
         if (not _monospaceFontface)
             _monospaceFontface = Karm::Text::loadFontfaceOrFallback("bundle://fonts-fira-code/fonts/FiraCode-Regular.ttf"_url).unwrap();
@@ -86,8 +86,8 @@ static Strong<Karm::Text::Fontface> _lookupFontface(Style::Computed &style) {
 
 auto RE_SEGMENT_BREAK = Re::single('\n', '\r', '\f', '\v');
 
-static void _buildRun(Style::Computer &, Markup::Text const &node, Box &parent) {
-    auto style = makeStrong<Style::Computed>(Style::Computed::initial());
+static void _buildRun(Style::Computer&, Markup::Text const& node, Box& parent) {
+    auto style = makeRc<Style::Computed>(Style::Computed::initial());
     style->inherit(*parent.style);
 
     auto fontFace = _lookupFontface(*style);
@@ -129,7 +129,7 @@ static void _buildRun(Style::Computer &, Markup::Text const &node, Box &parent) 
         break;
     }
 
-    auto prose = makeStrong<Text::Prose>(proseStyle);
+    auto prose = makeRc<Text::Prose>(proseStyle);
     auto whitespace = style->text->whiteSpace;
 
     while (not scan.ended()) {
@@ -180,13 +180,13 @@ static void _buildRun(Style::Computer &, Markup::Text const &node, Box &parent) 
 
 // MARK: Build Block -----------------------------------------------------------
 
-void _buildChildren(Style::Computer &c, Vec<Strong<Markup::Node>> const &children, Box &parent) {
-    for (auto &child : children) {
+void _buildChildren(Style::Computer& c, Vec<Rc<Markup::Node>> const& children, Box& parent) {
+    for (auto& child : children) {
         _buildNode(c, *child, parent);
     }
 }
 
-static void _buildBlock(Style::Computer &c, Strong<Style::Computed> style, Markup::Element const &el, Box &parent) {
+static void _buildBlock(Style::Computer& c, Rc<Style::Computed> style, Markup::Element const& el, Box& parent) {
     auto font = _lookupFontface(*style);
     Box box = {style, font};
     _buildChildren(c, el.children(), box);
@@ -196,7 +196,7 @@ static void _buildBlock(Style::Computer &c, Strong<Style::Computed> style, Marku
 
 // MARK: Build Replace ---------------------------------------------------------
 
-static void _buildImage(Style::Computer &c, Markup::Element const &el, Box &parent) {
+static void _buildImage(Style::Computer& c, Markup::Element const& el, Box& parent) {
     auto style = c.computeFor(*parent.style, el);
     auto font = _lookupFontface(*style);
 
@@ -208,7 +208,7 @@ static void _buildImage(Style::Computer &c, Markup::Element const &el, Box &pare
 
 // MARK: Build Table -----------------------------------------------------------
 
-static void _buildTableChildren(Style::Computer &c, Vec<Strong<Markup::Node>> const &children, Box &tableWrapperBox, Strong<Style::Computed> tableBoxStyle) {
+static void _buildTableChildren(Style::Computer& c, Vec<Rc<Markup::Node>> const& children, Box& tableWrapperBox, Rc<Style::Computed> tableBoxStyle) {
     Box tableBox{
         tableBoxStyle, tableWrapperBox.fontFace
     };
@@ -218,7 +218,7 @@ static void _buildTableChildren(Style::Computer &c, Vec<Strong<Markup::Node>> co
     bool captionsOnTop = tableBox.style->table->captionSide == CaptionSide::TOP;
 
     if (captionsOnTop) {
-        for (auto &child : children) {
+        for (auto& child : children) {
             if (auto el = child->is<Markup::Element>()) {
                 if (el->tagName == Html::CAPTION) {
                     _buildNode(c, *el, tableWrapperBox);
@@ -227,7 +227,7 @@ static void _buildTableChildren(Style::Computer &c, Vec<Strong<Markup::Node>> co
         }
     }
 
-    for (auto &child : children) {
+    for (auto& child : children) {
         if (auto el = child->is<Markup::Element>()) {
             if (el->tagName != Html::CAPTION) {
                 _buildNode(c, *el, tableBox);
@@ -237,7 +237,7 @@ static void _buildTableChildren(Style::Computer &c, Vec<Strong<Markup::Node>> co
     tableWrapperBox.add(std::move(tableBox));
 
     if (not captionsOnTop) {
-        for (auto &child : children) {
+        for (auto& child : children) {
             if (auto el = child->is<Markup::Element>()) {
                 if (el->tagName == Html::CAPTION) {
                     _buildNode(c, *el, tableWrapperBox);
@@ -247,10 +247,10 @@ static void _buildTableChildren(Style::Computer &c, Vec<Strong<Markup::Node>> co
     }
 }
 
-static void _buildTable(Style::Computer &c, Strong<Style::Computed> style, Markup::Element const &el, Box &parent) {
+static void _buildTable(Style::Computer& c, Rc<Style::Computed> style, Markup::Element const& el, Box& parent) {
     auto font = _lookupFontface(*style);
 
-    auto wrapperStyle = makeStrong<Style::Computed>(Style::Computed::initial());
+    auto wrapperStyle = makeRc<Style::Computed>(Style::Computed::initial());
     wrapperStyle->display = style->display;
     wrapperStyle->margin = style->margin;
 
@@ -263,7 +263,7 @@ static void _buildTable(Style::Computer &c, Strong<Style::Computed> style, Marku
 
 // MARK: Build -----------------------------------------------------------------
 
-static void _buildElement(Style::Computer &c, Markup::Element const &el, Box &parent) {
+static void _buildElement(Style::Computer& c, Markup::Element const& el, Box& parent) {
     if (el.tagName == Html::IMG) {
         _buildImage(c, el, parent);
         return;
@@ -285,7 +285,7 @@ static void _buildElement(Style::Computer &c, Markup::Element const &el, Box &pa
     }
 }
 
-static void _buildNode(Style::Computer &c, Markup::Node const &node, Box &parent) {
+static void _buildNode(Style::Computer& c, Markup::Node const& node, Box& parent) {
     if (auto el = node.is<Markup::Element>()) {
         _buildElement(c, *el, parent);
     } else if (auto text = node.is<Markup::Text>()) {
@@ -295,14 +295,14 @@ static void _buildNode(Style::Computer &c, Markup::Node const &node, Box &parent
     }
 }
 
-Box build(Style::Computer &c, Markup::Document const &doc) {
-    auto style = makeStrong<Style::Computed>(Style::Computed::initial());
+Box build(Style::Computer& c, Markup::Document const& doc) {
+    auto style = makeRc<Style::Computed>(Style::Computed::initial());
     Box root = {style, _lookupFontface(*style)};
     _buildNode(c, doc, root);
     return root;
 }
 
-Box buildForPseudoElement(Strong<Style::Computed> style) {
+Box buildForPseudoElement(Rc<Style::Computed> style) {
     auto fontFace = _lookupFontface(*style);
 
     // FIXME: We should pass this around from the top in order to properly resolve rems
@@ -318,7 +318,7 @@ Box buildForPseudoElement(Strong<Style::Computed> style) {
         .multiline = true,
     };
 
-    auto prose = makeStrong<Text::Prose>(proseStyle);
+    auto prose = makeRc<Text::Prose>(proseStyle);
     if (style->content) {
         prose->append(style->content.str());
         return {style, fontFace, prose};

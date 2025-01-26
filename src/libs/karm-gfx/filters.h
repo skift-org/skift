@@ -95,7 +95,7 @@ struct Filter;
 struct FilterChain {
     static constexpr auto NAME = "chain";
 
-    Cons<Box<Filter>> filters;
+    Pair<Box<Filter>> filters;
     void apply(MutPixels) const;
 };
 
@@ -115,7 +115,7 @@ struct Filter : public _Filters {
     using _Filters::_Filters;
 
     void apply(MutPixels s) const {
-        visit([&](auto const &filter) {
+        visit([&](auto const& filter) {
             filter.apply(s);
         });
     }

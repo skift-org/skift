@@ -20,9 +20,9 @@ struct Node {
     /// The bounding rectangle of the node
     virtual Math::Rectf bound() { return {}; }
 
-    virtual void paint(Gfx::Canvas &, Math::Rectf = Math::Rectf::MAX, PaintOptions = {}) {}
+    virtual void paint(Gfx::Canvas&, Math::Rectf = Math::Rectf::MAX, PaintOptions = {}) {}
 
-    virtual void repr(Io::Emit &e) const {
+    virtual void repr(Io::Emit& e) const {
         e("(node z:{})", zIndex);
     }
 };

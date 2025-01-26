@@ -19,7 +19,7 @@ struct HsvSquare : public Ui::View<HsvSquare> {
     HsvSquare(Gfx::Hsv value, Ui::OnChange<Gfx::Hsv> onChange)
         : _value{value}, _onChange{std::move(onChange)} {}
 
-    void reconcile(HsvSquare &o) override {
+    void reconcile(HsvSquare& o) override {
         _value = o._value;
         _onChange = std::move(o._onChange);
     }
@@ -55,7 +55,7 @@ struct HsvSquare : public Ui::View<HsvSquare> {
         return Gfx::hsvToRgb(sampleHsv(pos));
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti) override {
+    void paint(Gfx::Canvas& g, Math::Recti) override {
         g.push();
         g.clip(bound());
 
@@ -85,7 +85,7 @@ struct HsvSquare : public Ui::View<HsvSquare> {
         g.pop();
     }
 
-    void event(App::Event &e) override {
+    void event(App::Event& e) override {
         _mouseListener.listen(*this, e);
 
         if (_mouseListener.isPress() and e.is<App::MouseEvent>()) {
@@ -103,7 +103,7 @@ struct HsvSquare : public Ui::View<HsvSquare> {
 };
 
 Ui::Child hsvSquare(Gfx::Hsv value, Ui::OnChange<Gfx::Hsv> onChange) {
-    return makeStrong<HsvSquare>(value, std::move(onChange));
+    return makeRc<HsvSquare>(value, std::move(onChange));
 }
 
 static Ui::Child _sliderThumb(Gfx::Color color) {
@@ -136,7 +136,7 @@ Ui::Child hsvValueSlider(Gfx::Hsv hsv, Ui::OnChange<Gfx::Hsv> onChange) {
 
     return _sliderThumb(Gfx::hsvToRgb(hsv)) |
            Ui::end() |
-           Ui::slider(hsv.value, [hsv, onChange](auto &n, auto v) {
+           Ui::slider(hsv.value, [hsv, onChange](auto& n, auto v) {
                onChange(n, hsv.withValue(v));
            }) |
            Ui::box({
@@ -168,7 +168,7 @@ Ui::Child hsvSaturationSlider(Gfx::Hsv hsv, Ui::OnChange<Gfx::Hsv> onChange) {
 
     return _sliderThumb(Gfx::hsvToRgb(hsv.withValue(1))) |
            Ui::end() |
-           Ui::slider(hsv.saturation, [hsv, onChange](auto &n, auto v) {
+           Ui::slider(hsv.saturation, [hsv, onChange](auto& n, auto v) {
                onChange(n, hsv.withSaturation(v));
            }) |
            Ui::box({
@@ -184,7 +184,7 @@ Ui::Child hsvSaturationSlider(Gfx::Hsv hsv, Ui::OnChange<Gfx::Hsv> onChange) {
 Ui::Child hsvHueSlider(Gfx::Hsv hsv, Ui::OnChange<Gfx::Hsv> onChange) {
     return _sliderThumb(Gfx::hsvToRgb(hsv.withSaturation(1).withValue(1))) |
            Ui::end() |
-           Ui::slider(hsv.hue / 360, [hsv, onChange](auto &n, auto v) {
+           Ui::slider(hsv.hue / 360, [hsv, onChange](auto& n, auto v) {
                onChange(n, hsv.withHue(v * 360));
            }) |
            Ui::box({
@@ -221,7 +221,7 @@ struct UpdateHsv {
 
 using Action = Union<UpdatePage, UpdateHsv>;
 
-Ui::Task<Action> reduce(State &s, Action action) {
+Ui::Task<Action> reduce(State& s, Action action) {
     action.visit(Visitor{
         [&](UpdatePage update) {
             s.page = update.page;
@@ -247,7 +247,7 @@ Ui::Child colorPickerDialog() {
         {
             .hsv = Gfx::rgbToHsv(Gfx::BLUE),
         },
-        [](auto const &s) {
+        [](auto const& s) {
             auto c = Gfx::hsvToRgb(s.hsv);
 
             auto preview =
@@ -268,19 +268,19 @@ Ui::Child colorPickerDialog() {
                     preview,
                     Kr::hsvHueSlider(
                         s.hsv,
-                        [](auto &n, auto v) {
+                        [](auto& n, auto v) {
                             Model::bubble<UpdateHsv>(n, v);
                         }
                     ),
                     Kr::hsvSaturationSlider(
                         s.hsv,
-                        [](auto &n, auto v) {
+                        [](auto& n, auto v) {
                             Model::bubble<UpdateHsv>(n, v);
                         }
                     ),
                     Kr::hsvValueSlider(
                         s.hsv,
-                        [](auto &n, auto v) {
+                        [](auto& n, auto v) {
                             Model::bubble<UpdateHsv>(n, v);
                         }
                     )
@@ -323,7 +323,7 @@ Ui::Child colorInput(Gfx::Color color, Ui::OnChange<Gfx::Color>) {
            Ui::insets({6, 12, 6, 6}) |
            Ui::minSize({Ui::UNCONSTRAINED, 36}) |
            button(
-               [](auto &n) {
+               [](auto& n) {
                    Ui::showDialog(n, colorPickerDialog());
                },
                Ui::ButtonStyle::outline()

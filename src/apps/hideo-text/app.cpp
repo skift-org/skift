@@ -23,7 +23,7 @@ namespace Hideo::Text {
 struct State {
     Opt<Mime::Url> url;
     Opt<Error> error;
-    Strong<Karm::Text::Model> text;
+    Rc<Karm::Text::Model> text;
 };
 
 struct New {
@@ -43,7 +43,7 @@ Ui::Task<Action> reduce(State &s, Action a) {
         [&](New &) {
             s.url = NONE;
             s.error = NONE;
-            s.text = makeStrong<Karm::Text::Model>();
+            s.text = makeRc<Karm::Text::Model>();
         },
         [&](Save &) {
 
@@ -55,7 +55,7 @@ Ui::Task<Action> reduce(State &s, Action a) {
 
 using Model = Ui::Model<State, Action, reduce>;
 
-Ui::Child editor(Strong<Karm::Text::Model> text) {
+Ui::Child editor(Rc<Karm::Text::Model> text) {
     return Ui::input(text, [](Ui::Node &n, Action a) {
                Model::bubble(n, a);
            }) |
@@ -63,7 +63,7 @@ Ui::Child editor(Strong<Karm::Text::Model> text) {
 }
 
 Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
-    auto text = makeStrong<Karm::Text::Model>();
+    auto text = makeRc<Karm::Text::Model>();
     Opt<Error> error = NONE;
 
     if (str) {

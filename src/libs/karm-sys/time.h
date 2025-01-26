@@ -6,16 +6,20 @@
 
 namespace Karm::Sys {
 
-inline TimeStamp now() {
+inline SystemTime now() {
     return _Embed::now();
 }
 
-inline TimeSpan uptime() {
+inline Instant instant() {
+    return _Embed::instant();
+}
+
+inline Duration uptime() {
     return _Embed::uptime();
 }
 
 inline DateTime dateTime() {
-    return DateTime::fromTimeStamp(now());
+    return DateTime::fromInstant(now());
 }
 
 inline Date date() {

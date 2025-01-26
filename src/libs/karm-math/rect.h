@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-base/clamp.h>
-#include <karm-base/cons.h>
+#include <karm-base/tuple.h>
 
 #include "insets.h"
 #include "vec.h"
@@ -49,18 +49,18 @@ union Rect {
         : xy(), wh(wh) {
     }
 
-    constexpr Rect(Rect const &other)
+    constexpr Rect(Rect const& other)
         : _els{other._els} {}
 
-    constexpr Rect(Rect &&other)
+    constexpr Rect(Rect&& other)
         : _els{std::move(other._els)} {}
 
-    constexpr Rect &operator=(Rect const &other) {
+    constexpr Rect& operator=(Rect const& other) {
         _els = other._els;
         return *this;
     }
 
-    constexpr Rect &operator=(Rect &&other) {
+    constexpr Rect& operator=(Rect&& other) {
         _els = std::move(other._els);
         return *this;
     }
@@ -274,11 +274,11 @@ union Rect {
         return xy.hasNan() or wh.hasNan();
     }
 
-    always_inline constexpr Cons<Rect, Rect> hsplit(T v) const {
+    always_inline constexpr Pair<Rect, Rect> hsplit(T v) const {
         return {Rect{x, y, v, height}, Rect{x + v, y, width - v, height}};
     }
 
-    always_inline constexpr Cons<Rect, Rect> vsplit(T v) const {
+    always_inline constexpr Pair<Rect, Rect> vsplit(T v) const {
         return {Rect{x, y, width, v}, Rect{x, y + v, width, height - v}};
     }
 
@@ -316,7 +316,7 @@ union Rect {
         return width / height;
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(rect {} {} {} {})", x, y, width, height);
     }
 

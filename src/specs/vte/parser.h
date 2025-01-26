@@ -61,7 +61,7 @@ struct Parser {
     Vec<usize> _params;
     bool _hasIgnoreParams = false;
 
-    static Cons<Action, State> __transition(State s, usize c) {
+    static Pair<Action, State> __transition(State s, usize c) {
 #define STATE(FROM, START, END, ACTION, TO)           \
     if (s == State::FROM and START <= c and c <= END) \
         return {Action::ACTION, State::TO};
@@ -70,7 +70,7 @@ struct Parser {
         return {Action::NONE, State::NONE};
     }
 
-    Cons<Action, State> _transition(State s, usize c) {
+    Pair<Action, State> _transition(State s, usize c) {
         auto [action, toState] = __transition(s, c);
         if (action != Action::NONE or toState != State::NONE)
             return {action, toState};

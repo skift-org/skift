@@ -11,7 +11,7 @@ static inline typename S::Inner run(S s, auto wait) {
     Opt<typename S::Inner> ret;
 
     struct Receiver {
-        Opt<typename S::Inner> &_ret;
+        Opt<typename S::Inner>& _ret;
 
         void recv(InlineOrLater, typename S::Inner r) { _ret = r; }
     };
@@ -29,7 +29,7 @@ static inline typename S::Inner run(S s) {
     Opt<typename S::Inner> ret;
 
     struct Receiver {
-        Opt<typename S::Inner> &_ret;
+        Opt<typename S::Inner>& _ret;
 
         void recv(InlineOrLater, typename S::Inner r) { _ret = r; }
     };
@@ -48,7 +48,7 @@ static inline void detach(S s, Cb cb) {
     };
 
     struct Receiver {
-        _Holder *_h;
+        _Holder* _h;
 
         void recv(InlineOrLater, typename S::Inner r) {
             _h->finalize(std::move(r));

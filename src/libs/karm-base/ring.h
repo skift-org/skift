@@ -7,7 +7,7 @@ namespace Karm {
 
 template <typename T>
 struct Ring {
-    Manual<T> *_buf{};
+    Manual<T>* _buf{};
     usize _cap{};
     usize _len{};
     usize _head{};
@@ -20,14 +20,14 @@ struct Ring {
         _buf = new Manual<T>[cap];
     }
 
-    Ring(Ring const &other) {
+    Ring(Ring const& other) {
         _cap = other._cap;
         _buf = new Manual<T>[_cap];
         for (usize i = 0; i < other._len; i++)
             pushBack(other.peek(i));
     }
 
-    Ring(Ring &&other)
+    Ring(Ring&& other)
         : _buf(std::exchange(other._buf, nullptr)),
           _cap(std::exchange(other._cap, 0)),
           _len(std::exchange(other._len, 0)),
@@ -41,12 +41,12 @@ struct Ring {
         delete[] _buf;
     }
 
-    Ring &operator=(Ring const &other) {
+    Ring& operator=(Ring const& other) {
         *this = Ring(other);
         return *this;
     }
 
-    Ring &operator=(Ring &&other) {
+    Ring& operator=(Ring&& other) {
         std::swap(_buf, other._buf);
         std::swap(_cap, other._cap);
         std::swap(_len, other._len);
@@ -93,14 +93,14 @@ struct Ring {
         _len = 0;
     }
 
-    T &peek(usize index) {
+    T& peek(usize index) {
         if (index >= _len) [[unlikely]]
             panic("peek out of bounds");
 
         return _buf[(_tail + index) % _cap].unwrap();
     }
 
-    T const &peek(usize index) const {
+    T const& peek(usize index) const {
         if (index >= _len) [[unlikely]]
             panic("peek out of bounds");
 

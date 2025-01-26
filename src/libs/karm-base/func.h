@@ -21,7 +21,7 @@ struct Func<Out(In...)> {
     struct Wrap : _Wrap {
         F _f;
 
-        Wrap(F &&f) : _f(std::move(f)) {}
+        Wrap(F&& f) : _f(std::move(f)) {}
 
         Out operator()(In... in) const override { return _f(std::forward<In>(in)...); }
     };
@@ -71,7 +71,7 @@ struct Func<Out(In...)> {
     }
 
     template <typename F>
-    Func &operator=(F f) {
+    Func& operator=(F f) {
         _wrap = makeBox(Wrap<F>{std::move(f)});
         return *this;
     }
@@ -91,12 +91,12 @@ struct SharedFunc<Out(In...)> {
     struct Wrap : _Wrap {
         F _f;
 
-        Wrap(F &&f) : _f(std::move(f)) {}
+        Wrap(F&& f) : _f(std::move(f)) {}
 
         Out operator()(In... in) const override { return _f(std::forward<In>(in)...); }
     };
 
-    Strong<_Wrap> _wrap;
+    Rc<_Wrap> _wrap;
 
     SharedFunc() = delete;
 
@@ -105,17 +105,17 @@ struct SharedFunc<Out(In...)> {
 
     template <typename F>
     requires Meta::FuncPtr<F> and Meta::Callable<F, In...>
-    SharedFunc(F f) : _wrap(makeStrong<Wrap<F>>(std::move(f))) {}
+    SharedFunc(F f) : _wrap(makeRc<Wrap<F>>(std::move(f))) {}
 
     template <typename F>
     requires (Meta::RvalueRef<F &&> and not (Meta::FuncPtr<F>)) and Meta::Callable<F, In...>
-    SharedFunc(F &&f) : _wrap(makeStrong<Wrap<F>>(std::move(f))) {}
+    SharedFunc(F &&f) : _wrap(makeRc<Wrap<F>>(std::move(f))) {}
 
     template <typename F>
     requires Meta::FuncPtr<F>
     SharedFunc &operator=(F f)
     {
-        _wrap = makeStrong<Wrap<F>>(std::move(f));
+        _wrap = makeRc<Wrap<F>>(std::move(f));
         return *this;
     }
 
@@ -123,7 +123,7 @@ struct SharedFunc<Out(In...)> {
     requires (Meta::RvalueRef<F &&> and not (Meta::FuncPtr<F>))
     SharedFunc &operator=(F &&f)
     {
-        _wrap = makeStrong<Wrap<F>>(std::move(f));
+        _wrap = makeRc<Wrap<F>>(std::move(f));
         return *this;
     }
 
@@ -134,22 +134,22 @@ struct SharedFunc<Out(In...)> {
     }
 
     template <typename F>
-    SharedFunc &operator=(F f) {
-        _wrap = makeStrong(Wrap<F>{std::move(f)});
+    SharedFunc& operator=(F f) {
+        _wrap = makeRc(Wrap<F>{std::move(f)});
         return *this;
     }
 };
 
 template <typename... Args>
 auto bind(auto f, Args... args) {
-    return [f = std::move(f), args...](auto &&...in) {
+    return [f = std::move(f), args...](auto&&... in) {
         return f(args..., std::forward<decltype(in)>(in)...);
     };
 }
 
 template <typename... Args>
 auto rbind(auto f, Args... args) {
-    return [f = std::move(f), args...](auto &&...in) {
+    return [f = std::move(f), args...](auto&&... in) {
         return f(std::forward<decltype(in)>(in)..., args...);
     };
 }

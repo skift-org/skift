@@ -52,11 +52,11 @@ struct Time {
         }
     }
 
-    constexpr bool operator==(Time const &other) const {
+    constexpr bool operator==(Time const& other) const {
         return _val == other._val and _unit == other._unit;
     }
 
-    constexpr auto operator<=>(Time const &other) const {
+    constexpr auto operator<=>(Time const& other) const {
         return toSecond() <=> other.toSecond();
     }
 };

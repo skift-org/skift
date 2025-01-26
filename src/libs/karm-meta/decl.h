@@ -6,6 +6,6 @@ template <typename T>
 T declval();
 
 template <typename T>
-T &declref();
+T& declref();
 
 } // namespace Karm::Meta

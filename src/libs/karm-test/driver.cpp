@@ -19,7 +19,7 @@ constexpr auto NOTE = Cli::Style{Cli::GRAY_DARK}.bold();
 
 } // namespace
 
-void Driver::add(Test *test) {
+void Driver::add(Test* test) {
     _tests.pushBack(test);
 }
 
@@ -28,7 +28,7 @@ Async::Task<> Driver::runAllAsync() {
 
     Sys::errln("Running {} tests...\n", _tests.len());
 
-    for (auto *test : _tests) {
+    for (auto* test : _tests) {
         Sys::err(
             "Running {}: {}... ",
             test->_loc.file,
@@ -83,7 +83,7 @@ Async::Task<> Driver::runAllAsync() {
     co_return Ok();
 }
 
-Driver &driver() {
+Driver& driver() {
     static Opt<Driver> driver;
     if (not driver) {
         driver = Driver();

@@ -48,7 +48,7 @@ struct HtmlToken {
     bool forceQuirks{false};
     bool selfClosing{false};
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("({}", type);
         if (name)
             e(" name={}", name);
@@ -62,7 +62,7 @@ struct HtmlToken {
             e(" systemIdent={#}", systemIdent);
         if (attrs.len() > 0) {
             e.indentNewline();
-            for (auto &attr : attrs)
+            for (auto& attr : attrs)
                 e("({} {#})", attr.name, attr.value);
             e.deindent();
         }
@@ -76,7 +76,7 @@ struct HtmlToken {
 
 struct HtmlSink {
     virtual ~HtmlSink() = default;
-    virtual void accept(HtmlToken const &token) = 0;
+    virtual void accept(HtmlToken const& token) = 0;
 };
 
 struct HtmlLexer {
@@ -95,26 +95,29 @@ struct HtmlLexer {
 
     Opt<HtmlToken> _token;
     Opt<HtmlToken> _last;
-    HtmlSink *_sink = nullptr;
+    HtmlSink* _sink = nullptr;
 
     Rune _currChar = 0;
-    StringBuilder _builder;
+    StringBuilder _builder, _commentBuilder;
     StringBuilder _temp;
+    StringBuilder peekerForSingleState;
 
-    HtmlToken &_begin(HtmlToken::Type type) {
+    Opt<usize> matchedCharReferenceNoSemiColon;
+
+    HtmlToken& _begin(HtmlToken::Type type) {
         _token = HtmlToken{};
         _token->type = type;
         return *_token;
     }
 
-    HtmlToken &_ensure() {
+    HtmlToken& _ensure() {
         if (not _token)
             panic("unexpected-token");
         return *_token;
     }
 
-    HtmlToken &_ensure(HtmlToken::Type type) {
-        auto &token = _ensure();
+    HtmlToken& _ensure(HtmlToken::Type type) {
+        auto& token = _ensure();
         if (token.type != type)
             panic("unexpected-token");
         return token;
@@ -136,8 +139,8 @@ struct HtmlLexer {
         _ensure().attrs.emplaceBack();
     }
 
-    HtmlToken::Attr &_lastAttr() {
-        auto &token = _ensure();
+    HtmlToken::Attr& _lastAttr() {
+        auto& token = _ensure();
         if (token.attrs.len() == 0)
             panic("_beginAttribute miss match");
         return last(token.attrs);
@@ -161,10 +164,22 @@ struct HtmlLexer {
     }
 
     void _flushCodePointsConsumedAsACharacterReference() {
-        debug("flushing code points consumed as a character reference");
+        for (auto codePoint : iterRunes(_temp.str())) {
+            if (_consumedAsPartOfAnAttribute()) {
+                _builder.append(codePoint);
+            } else {
+                _emit(codePoint);
+            }
+        }
     }
 
-    void bind(HtmlSink &sink) {
+    bool _consumedAsPartOfAnAttribute() {
+        return _returnState == State::ATTRIBUTE_VALUE_DOUBLE_QUOTED ||
+               _returnState == State::ATTRIBUTE_VALUE_SINGLE_QUOTED ||
+               _returnState == State::ATTRIBUTE_VALUE_UNQUOTED;
+    }
+
+    void bind(HtmlSink& sink) {
         if (_sink)
             panic("sink already bound");
         _sink = &sink;
@@ -213,61 +228,125 @@ struct HtmlParser : public HtmlSink {
 
     bool _scriptingEnabled = false;
     bool _framesetOk = true;
+    bool _fosterParenting = false;
 
     Mode _insertionMode = Mode::INITIAL;
     Mode _originalInsertionMode = Mode::INITIAL;
 
     HtmlLexer _lexer;
-    Strong<Document> _document;
-    Vec<Strong<Element>> _openElements;
-    Opt<Strong<Element>> _headElement;
-    Opt<Strong<Element>> _formElement;
+    Rc<Document> _document;
+    Vec<Rc<Element>> _openElements;
+    Opt<Rc<Element>> _headElement;
+    Opt<Rc<Element>> _formElement;
 
-    HtmlParser(Strong<Document> document)
+    Vec<HtmlToken> _pendingTableCharacterTokens;
+
+    HtmlParser(Rc<Document> document)
         : _document(document) {
         _lexer.bind(*this);
     }
 
     void _raise(Str msg = "parse-error");
 
-    // MARL: Utilities
+    // MARK: Utilities
 
-    bool _hasElementInScope(TagName tag) {
-        for (auto &el : _openElements)
+    // FIXME: remaining elements from https://html.spec.whatwg.org/#has-an-element-in-scope
+    static constexpr Array BASIC_SCOPE_DELIMITERS = {
+        Html::APPLET, Html::CAPTION, Html::HTML, Html::TABLE, Html::TD,
+        Html::TH, Html::MARQUEE, Html::OBJECT, Html::TEMPLATE
+    };
+
+    bool _hasElementInLambdaScope(TagName tag, Func<bool(TagName)> inScopeList) {
+        if (_openElements.len() == 0)
+            panic("html element should always be in scope");
+
+        for (usize i = _openElements.len() - 1; i >= 0; --i) {
+            auto& el = _openElements[i];
             if (el->tagName == tag)
                 return true;
-        return false;
+            else if (inScopeList(el->tagName))
+                return false;
+        }
+
+        unreachable();
+    }
+
+    // https://html.spec.whatwg.org/#has-an-element-in-scope
+    bool _hasElementInScope(TagName tag) {
+        return _hasElementInLambdaScope(tag, [](TagName tag) -> bool {
+            return contains(BASIC_SCOPE_DELIMITERS, tag);
+        });
+    }
+
+    // https://html.spec.whatwg.org/#has-an-element-in-button-scope
+    bool _hasElementInButtonScope(TagName tag) {
+        return _hasElementInLambdaScope(tag, [](TagName tag) -> bool {
+            return tag == Html::BUTTON or contains(BASIC_SCOPE_DELIMITERS, tag);
+        });
+    }
+
+    // https://html.spec.whatwg.org/#has-an-element-in-list-item-scope
+    bool _hasElementInListItemScope(TagName tag) {
+        return _hasElementInLambdaScope(tag, [](TagName tag) -> bool {
+            return tag == Html::OL or tag == Html::UL or contains(BASIC_SCOPE_DELIMITERS, tag);
+        });
+    }
+
+    // https://html.spec.whatwg.org/#has-an-element-in-table-scope
+    bool _hasElementInTableScope(TagName tag) {
+        return _hasElementInLambdaScope(tag, [](TagName tag) -> bool {
+            return tag == Html::HTML or tag == Html::TABLE or tag == Html::TEMPLATE;
+        });
+    }
+
+    // https://html.spec.whatwg.org/#has-an-element-in-select-scope
+    bool _hasElementInSelectScope(TagName tag) {
+        return _hasElementInLambdaScope(tag, [](TagName tag) -> bool {
+            return tag != Html::OPTGROUP and tag != Html::OPTION;
+        });
     }
 
     // MARK: Modes
 
-    void _handleInitialMode(HtmlToken const &t);
+    void _handleInitialMode(HtmlToken const& t);
 
-    void _handleBeforeHtml(HtmlToken const &t);
+    void _handleBeforeHtml(HtmlToken const& t);
 
-    void _handleBeforeHead(HtmlToken const &t);
+    void _handleBeforeHead(HtmlToken const& t);
 
-    void _handleInHead(HtmlToken const &t);
+    void _handleInHead(HtmlToken const& t);
 
-    void _handleInHeadNoScript(HtmlToken const &t);
+    void _handleInHeadNoScript(HtmlToken const& t);
 
-    void _handleAfterHead(HtmlToken const &t);
+    void _handleAfterHead(HtmlToken const& t);
 
-    void _handleInBody(HtmlToken const &t);
+    void _handleInBody(HtmlToken const& t);
 
-    void _handleText(HtmlToken const &t);
+    void _handleText(HtmlToken const& t);
 
-    void _handleAfterBody(HtmlToken const &t);
+    void _handleInTable(HtmlToken const& t);
+
+    void _handleInTableText(HtmlToken const& t);
+
+    void _handleInTableBody(HtmlToken const& t);
+
+    void _handleInTableRow(HtmlToken const& t);
+
+    void _handleInCell(HtmlToken const& t);
+
+    void _handleAfterBody(HtmlToken const& t);
 
     void _switchTo(Mode mode);
 
-    void _acceptIn(Mode mode, HtmlToken const &t);
+    void _acceptIn(Mode mode, HtmlToken const& t);
 
-    void accept(HtmlToken const &t) override;
+    void accept(HtmlToken const& t) override;
 
     void write(Str str) {
         for (auto r : iterRunes(str))
             _lexer.consume(r);
+        // NOTE: '\3' (End of Text) is used here as a placeholder so we are directed to the EOF case
+        _lexer.consume('\3', true);
     }
 };
 

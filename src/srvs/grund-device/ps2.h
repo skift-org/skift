@@ -61,13 +61,13 @@ enum struct Configs : u8 {
 FlagsEnum$(Configs);
 
 struct I8042 : public Node {
-    Strong<Hal::Io> _io;
+    Rc<Hal::Io> _io;
 
     using DataReg = Hal::Reg<u8, 0x0>;
     using StatusReg = Hal::Reg<u8, 0x4>;
     using CmdReg = Hal::Reg<u8, 0x4>;
 
-    I8042(Strong<Hal::Io> io)
+    I8042(Rc<Hal::Io> io)
         : _io(io) {}
 
     Hal::Io &io() {

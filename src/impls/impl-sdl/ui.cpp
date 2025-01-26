@@ -6,16 +6,16 @@
 
 namespace Karm::Ui::_Embed {
 
-static SDL_HitTestResult _hitTestCallback(SDL_Window *window, SDL_Point const *area, void *data);
+static SDL_HitTestResult _hitTestCallback(SDL_Window* window, SDL_Point const* area, void* data);
 
 struct SdlHost :
     public Host {
-    SDL_Window *_window{};
+    SDL_Window* _window{};
 
     Math::Vec2i _lastMousePos{};
     Math::Vec2i _lastScreenMousePos{};
 
-    SdlHost(Child root, SDL_Window *window)
+    SdlHost(Child root, SDL_Window* window)
         : Host(root), _window(window) {
     }
 
@@ -36,7 +36,7 @@ struct SdlHost :
     }
 
     Gfx::MutPixels mutPixels() override {
-        SDL_Surface *s = SDL_GetWindowSurface(_window);
+        SDL_Surface* s = SDL_GetWindowSurface(_window);
         if (not s)
             panic("Failed to get window surface");
 
@@ -296,7 +296,7 @@ struct SdlHost :
         return mod;
     }
 
-    static App::KeyboardEvent _fromSdlKeyboardEvent(SDL_KeyboardEvent const &sdl) {
+    static App::KeyboardEvent _fromSdlKeyboardEvent(SDL_KeyboardEvent const& sdl) {
         App::KeyboardEvent ev{};
         ev.key = _fromSdlKeycode(sdl.keysym.sym);
         ev.code = _fromSdlScancode(sdl.keysym.scancode);
@@ -304,10 +304,10 @@ struct SdlHost :
         return ev;
     }
 
-    SDL_Cursor *_cursor{};
+    SDL_Cursor* _cursor{};
     SDL_SystemCursor _systemCursor{};
 
-    void translate(SDL_Event const &sdlEvent) {
+    void translate(SDL_Event const& sdlEvent) {
         switch (sdlEvent.type) {
         case SDL_WINDOWEVENT:
             switch (sdlEvent.window.event) {
@@ -508,14 +508,14 @@ struct SdlHost :
         }
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
         g.push();
         g.scale(dpi());
         Host::paint(g, r);
         g.pop();
     }
 
-    Res<> wait(TimeStamp ts) override {
+    Res<> wait(Instant ts) override {
         // HACK: Since we don't have a lot of control onto how SDL wait for
         //       events we can't integrate it properly with our event loop
         //       To remedi this we will just cap how long we wait, this way
@@ -524,8 +524,8 @@ struct SdlHost :
         // NOTE: A better option would be to have SDL in a separeted thread
         //       and do the communication over an inter-thread channel but
         //       but this would require to make the Framework thread safe
-        auto delay = TimeSpan::fromMSecs((usize)(FRAME_TIME * 1000));
-        auto cappedWait = min(ts, Sys::now() + delay);
+        auto delay = Duration::fromMSecs((usize)(FRAME_TIME * 1000));
+        auto cappedWait = min(ts, Sys::instant() + delay);
         try$(Sys::globalSched().wait(cappedWait));
 
         SDL_Event e{};
@@ -534,7 +534,7 @@ struct SdlHost :
         return Ok();
     }
 
-    void bubble(App::Event &event) override {
+    void bubble(App::Event& event) override {
         if (auto e = event.is<DragEvent>()) {
             if (e->type == DragEvent::START) {
                 SDL_CaptureMouse(SDL_TRUE);
@@ -562,8 +562,8 @@ struct SdlHost :
     }
 };
 
-static SDL_HitTestResult _hitTestCallback(SDL_Window *window, SDL_Point const *area, void *data) {
-    SdlHost *host = (SdlHost *)data;
+static SDL_HitTestResult _hitTestCallback(SDL_Window* window, SDL_Point const* area, void* data) {
+    SdlHost* host = (SdlHost*)data;
     isize grabPadding = 6 * host->dpi();
     int width, height;
     SDL_GetWindowSize(window, &width, &height);
@@ -591,14 +591,14 @@ static SDL_HitTestResult _hitTestCallback(SDL_Window *window, SDL_Point const *a
     return SDL_HITTEST_NORMAL;
 }
 
-static Res<> _setWindowIcon(SDL_Window *window) {
+static Res<> _setWindowIcon(SDL_Window* window) {
     auto url = try$(Pkg::currentBundle()).url() / "images/icon.qoi"_path;
     auto defaultUrl = "bundle://karm-ui/images/icon.qoi"_url;
     auto image = Image::load(url).unwrapOrElse([&] {
         return Image::loadOrFallback(defaultUrl).take();
     });
 
-    auto *surface = SDL_CreateRGBSurface(0, image.width(), image.height(), 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+    auto* surface = SDL_CreateRGBSurface(0, image.width(), image.height(), 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
     if (not surface)
         return Error::other(SDL_GetError());
     Defer defer{[&] {
@@ -618,12 +618,12 @@ static Res<> _setWindowIcon(SDL_Window *window) {
     return Ok();
 }
 
-Res<Strong<Host>> makeHost(Child root) {
+Res<Rc<Host>> makeHost(Child root) {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 
     auto size = root->size({1024, 720}, Hint::MIN);
 
-    SDL_Window *window = SDL_CreateWindow(
+    SDL_Window* window = SDL_CreateWindow(
         "Application",
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
@@ -639,14 +639,14 @@ Res<Strong<Host>> makeHost(Child root) {
     if (not iconRes)
         logWarn("could not set window icon: {}", iconRes);
 
-    auto host = makeStrong<SdlHost>(root, window);
+    auto host = makeRc<SdlHost>(root, window);
 
-    SDL_SetWindowHitTest(window, _hitTestCallback, (void *)&host.unwrap());
+    SDL_SetWindowHitTest(window, _hitTestCallback, (void*)&host.unwrap());
 
     return Ok(host);
 }
 
-Async::Task<> runAsync(Sys::Context &, Child) {
+Async::Task<> runAsync(Sys::Context&, Child) {
     notImplemented();
 }
 

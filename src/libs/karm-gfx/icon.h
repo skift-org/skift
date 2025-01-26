@@ -26,9 +26,9 @@ struct Icon {
         return Str::fromNullterminated(_icon.path);
     }
 
-    void fill(Gfx::Canvas &g, Math::Vec2i pos) const;
+    void fill(Gfx::Canvas& g, Math::Vec2i pos) const;
 
-    void stroke(Gfx::Canvas &g, Math::Vec2i pos) const;
+    void stroke(Gfx::Canvas& g, Math::Vec2i pos) const;
 };
 
 } // namespace Karm::Gfx

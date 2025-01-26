@@ -1,9 +1,9 @@
 #pragma once
 
-#include "input_output.h"
+#include "base.h"
 
 namespace Vaev::Layout {
 
-Output gridLayout(Tree &tree, Box &box, Input input);
+Rc<FormatingContext> constructGridFormatingContext(Box& box);
 
 } // namespace Vaev::Layout

@@ -129,6 +129,11 @@ struct Media {
     //       the prefers-reduced-data feature
     // https://drafts.csswg.org/mediaqueries-5/#prefers-reduced-data
     ReducedData prefersReducedData;
+
+    // Appendix A: Deprecated Media Features
+    Px deviceWidth;
+    Px deviceHeight;
+    Number deviceAspectRatio;
 };
 
 // MARK: Media Features --------------------------------------------------------
@@ -155,7 +160,7 @@ struct RangeBound {
     T value = {};
     Type type = NONE;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e(
             "{}{}",
             value,
@@ -166,7 +171,7 @@ struct RangeBound {
     }
 };
 
-template <StrLit NAME, typename T, auto Media::*F>
+template <StrLit NAME, typename T, auto Media::* F>
 struct RangeFeature {
     using Bound = RangeBound<T>;
     using Inner = T;
@@ -201,7 +206,7 @@ struct RangeFeature {
         return result;
     }
 
-    bool match(Media const &media) const {
+    bool match(Media const& media) const {
         return match(media.*F);
     }
 
@@ -244,12 +249,12 @@ struct RangeFeature {
         }
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("{}: {} - {}", NAME, lower, upper);
     }
 };
 
-template <StrLit NAME, typename T, auto Media::*F>
+template <StrLit NAME, typename T, auto Media::* F>
 struct DiscreteFeature {
     using Inner = T;
 
@@ -279,11 +284,11 @@ struct DiscreteFeature {
         return actual == value;
     }
 
-    bool match(Media const &media) const {
+    bool match(Media const& media) const {
         return match(media.*F);
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("({}: {} {})", NAME, type, value);
     }
 };
@@ -302,11 +307,11 @@ using WidthFeature = RangeFeature<"width", Length, &Media::width>;
 /// https://drafts.csswg.org/mediaqueries/#height
 using HeightFeature = RangeFeature<"height", Length, &Media::height>;
 
-/// 4.3. Device Width: the device-width feature
+/// 4.3. Aspect-Ratio: the aspect-ratio feature
 /// https://drafts.csswg.org/mediaqueries/#aspect-ratio
 using AspectRatioFeature = RangeFeature<"aspect-ratio", Number, &Media::aspectRatio>;
 
-/// 4.4. Device Height: the device-height feature
+/// 4.4. Orientation: the orientation feature
 /// https://drafts.csswg.org/mediaqueries/#orientation
 using OrientationFeature = DiscreteFeature<"orientation", Print::Orientation, &Media::orientation>;
 
@@ -405,6 +410,11 @@ using PrefersColorSchemeFeature = DiscreteFeature<"prefers-color-scheme", ColorS
 // https://drafts.csswg.org/mediaqueries-5/#prefers-reduced-data
 using PrefersReducedDataFeature = DiscreteFeature<"prefers-reduced-data", ReducedData, &Media::prefersReducedData>;
 
+// Appendix A: Deprecated Media Features
+using DeviceWidthFeature = RangeFeature<"device-width", Length, &Media::deviceWidth>;
+using DeviceHeightFeature = RangeFeature<"device-height", Length, &Media::deviceHeight>;
+using DeviceAspectRatioFeature = RangeFeature<"device-aspect-ratio", Number, &Media::deviceAspectRatio>;
+
 // MARK: Media Feature ---------------------------------------------------------
 
 using _Feature = Union<
@@ -432,19 +442,22 @@ using _Feature = Union<
     PrefersContrastFeature,
     ForcedColorsFeature,
     PrefersColorSchemeFeature,
-    PrefersReducedDataFeature>;
+    PrefersReducedDataFeature,
+    DeviceWidthFeature,
+    DeviceHeightFeature,
+    DeviceAspectRatioFeature>;
 
 struct Feature : public _Feature {
     using _Feature::_Feature;
 
-    void repr(Io::Emit &e) const {
-        visit([&](auto const &feature) {
+    void repr(Io::Emit& e) const {
+        visit([&](auto const& feature) {
             e("{}", feature);
         });
     }
 
-    bool match(Media const &media) const {
-        return visit([&](auto const &feature) {
+    bool match(Media const& media) const {
+        return visit([&](auto const& feature) {
             return feature.match(media);
         });
     }
@@ -473,7 +486,7 @@ struct MediaQuery {
         Box<MediaQuery> lhs;
         Box<MediaQuery> rhs;
 
-        bool match(Media const &media) const {
+        bool match(Media const& media) const {
             switch (type) {
             case Type::AND:
                 return lhs->match(media) and rhs->match(media);
@@ -484,7 +497,7 @@ struct MediaQuery {
             }
         }
 
-        void repr(Io::Emit &e) const {
+        void repr(Io::Emit& e) const {
             e("({} {} {})", *lhs, type, *rhs);
         }
     };
@@ -500,7 +513,7 @@ struct MediaQuery {
         Type type;
         Box<MediaQuery> query;
 
-        bool match(Media const &media) const {
+        bool match(Media const& media) const {
             switch (type) {
             case Type::NOT:
                 return not query->match(media);
@@ -511,7 +524,7 @@ struct MediaQuery {
             }
         }
 
-        void repr(Io::Emit &e) const {
+        void repr(Io::Emit& e) const {
             e("({} {})", type, *query);
         }
     };
@@ -533,7 +546,7 @@ struct MediaQuery {
 
     MediaQuery(Feature feature) : _store(feature) {}
 
-    MediaQuery(Meta::Convertible<Feature> auto &&feature)
+    MediaQuery(Meta::Convertible<Feature> auto&& feature)
         : _store(Feature{
               std::forward<decltype(feature)>(feature),
           }) {}
@@ -567,9 +580,9 @@ struct MediaQuery {
         return MediaQuery{OR, lhs, rhs};
     }
 
-    bool match(Media const &media) const {
+    bool match(Media const& media) const {
         return _store.visit(Visitor{
-            [&](auto const &value) {
+            [&](auto const& value) {
                 return value.match(media);
             },
             [](None) {
@@ -578,9 +591,9 @@ struct MediaQuery {
         });
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         _store.visit(Visitor{
-            [&](auto const &value) {
+            [&](auto const& value) {
                 e("{}", value);
             },
             [&](None) {
@@ -592,6 +605,6 @@ struct MediaQuery {
 
 // MARK: Parser ----------------------------------------------------------------
 
-MediaQuery parseMediaQuery(Cursor<Css::Sst> &c);
+MediaQuery parseMediaQuery(Cursor<Css::Sst>& c);
 
 } // namespace Vaev::Style

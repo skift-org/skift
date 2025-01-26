@@ -31,24 +31,24 @@ struct _IndexCast;
 
 template <typename Data, typename T>
 struct _IndexCast<Data, T> {
-    always_inline static auto eval(usize, Data *ptr, auto func) {
+    always_inline static auto eval(usize, Data* ptr, auto func) {
         using U = CopyConst<Data, T>;
-        return func(*reinterpret_cast<U *>(ptr));
+        return func(*reinterpret_cast<U*>(ptr));
     }
 };
 
 template <typename Data, typename T, typename... Ts>
 struct _IndexCast<Data, T, Ts...> {
-    always_inline static auto eval(usize index, Data *ptr, auto func) {
+    always_inline static auto eval(usize index, Data* ptr, auto func) {
         using U = CopyConst<Data, T>;
 
-        return index == 0 ? func(*reinterpret_cast<U *>(ptr))
+        return index == 0 ? func(*reinterpret_cast<U*>(ptr))
                           : _IndexCast<Data, Ts...>::eval(index - 1, ptr, func);
     }
 };
 
 template <typename... Ts>
-always_inline static auto indexCast(usize index, auto *ptr, auto func) {
+always_inline static auto indexCast(usize index, auto* ptr, auto func) {
     return _IndexCast<RemoveRef<decltype(*ptr)>, Ts...>::eval(index, ptr, func);
 }
 

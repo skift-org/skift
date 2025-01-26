@@ -11,7 +11,7 @@ struct Listener :
 
     struct Listened {
         Hj::Cap cap;
-        Strong<Object> obj;
+        Arc<Object> obj;
 
         Flags<Hj::Sigs> set;
         Flags<Hj::Sigs> unset;
@@ -20,9 +20,9 @@ struct Listener :
     Vec<Listened> _listened;
     Vec<Hj::Event> _events;
 
-    static Res<Strong<Listener>> create();
+    static Res<Arc<Listener>> create();
 
-    Res<> listen(Hj::Cap cap, Strong<Object> obj, Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset);
+    Res<> listen(Hj::Cap cap, Arc<Object> obj, Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset);
 
     Slice<Hj::Event> pollEvents();
 

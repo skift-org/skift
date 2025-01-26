@@ -18,7 +18,7 @@ struct Set {
         State state = State::FREE;
     };
 
-    Slot *_slots = nullptr;
+    Slot* _slots = nullptr;
     usize _cap = 0;
     usize _len = 0;
 
@@ -41,7 +41,7 @@ struct Set {
             return;
         }
 
-        auto *oldSlots = _slots;
+        auto* oldSlots = _slots;
         usize oldCap = _cap;
 
         _slots = new Slot[desired];
@@ -66,7 +66,7 @@ struct Set {
         return (_len * 100) / _cap;
     }
 
-    void _put(T const &t) {
+    void _put(T const& t) {
         usize i = hash(t) % _cap;
         while (_slots[i].state != Slot::FREE) {
             if (_slots[i].unwrap() == t)
@@ -79,20 +79,20 @@ struct Set {
         _len++;
     }
 
-    void put(T const &t) {
+    void put(T const& t) {
         if (_usage() > 80)
             ensure(max(_cap * 2, 16uz));
 
         _put(t);
     }
 
-    Slot *_lookup(T const &t) const {
+    Slot* _lookup(T const& t) const {
         if (_len == 0)
             return nullptr;
 
         usize i = hash(t) % _cap;
         while (_slots[i].state != Slot::FREE) {
-            auto &s = _slots[i];
+            auto& s = _slots[i];
             if (s.state == Slot::USED and
                 s.unwrap() == t)
                 return &s;
@@ -101,12 +101,12 @@ struct Set {
         return nullptr;
     }
 
-    bool has(T const &t) const {
+    bool has(T const& t) const {
         return _lookup(t);
     }
 
-    void del(T const &t) {
-        auto *slot = _lookup(t);
+    void del(T const& t) {
+        auto* slot = _lookup(t);
         if (not slot)
             return;
 
@@ -129,7 +129,7 @@ struct Set {
     }
 
     auto iter() const {
-        return Iter{[&, i = 0uz] mutable -> T const * {
+        return Iter{[&, i = 0uz] mutable -> T const* {
             if (i == _cap)
                 return nullptr;
 
@@ -139,7 +139,7 @@ struct Set {
             if (i == _cap)
                 return nullptr;
 
-            auto *res = &_slots[i].unwrap();
+            auto* res = &_slots[i].unwrap();
             i++;
             return res;
         }};

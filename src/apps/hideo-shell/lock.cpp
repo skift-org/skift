@@ -7,9 +7,9 @@
 
 namespace Hideo::Shell {
 
-static Opt<Strong<Text::Fontface>> _blackFontface = NONE;
+static Opt<Rc<Text::Fontface>> _blackFontface = NONE;
 
-static Strong<Text::Fontface> blackFontface() {
+static Rc<Text::Fontface> blackFontface() {
     if (not _blackFontface) {
         _blackFontface = Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Bold.ttf"_url).unwrap();
     }

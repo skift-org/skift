@@ -59,7 +59,7 @@ static constexpr Array SUFFIXES2MIME = {
 };
 
 Opt<Mime> sniffSuffix(Str suffix) {
-    for (auto const &s : SUFFIXES2MIME) {
+    for (auto const& s : SUFFIXES2MIME) {
         if (s.suffix == suffix)
             return s.mime;
     }
@@ -99,10 +99,10 @@ static constexpr Array MIME2ICON = {
     Mime2Icon{"application", "x-msdownload", Mdi::COG_BOX},
 };
 
-Mdi::Icon iconFor(Mime const &mime) {
+Mdi::Icon iconFor(Mime const& mime) {
     Mdi::Icon icon = Mdi::FILE;
 
-    for (auto const &m : MIME2ICON) {
+    for (auto const& m : MIME2ICON) {
         if (m.type == mime.type() and m.subtype == mime.subtype())
             return m.icon;
 

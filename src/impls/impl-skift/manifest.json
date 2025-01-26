@@ -11,8 +11,7 @@
     "requires": [
         "crts",
         "abi",
-        "hjert-api",
-        "libheap"
+        "hjert-api"
     ],
     "provides": [
         "karm-logger-impl",

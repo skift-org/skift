@@ -69,13 +69,13 @@ struct Token {
         return type != NIL;
     }
 
-    void repr(Io::Emit &e) const;
+    void repr(Io::Emit& e) const;
 
     bool operator==(Type type) const {
         return this->type == type;
     }
 
-    bool operator==(Token const &other) const {
+    bool operator==(Token const& other) const {
         return type == other.type and data == other.data;
     }
 };
@@ -88,7 +88,7 @@ struct Lexer {
         _curr = _next(_scan);
     }
 
-    Lexer(Io::SScan const &scan)
+    Lexer(Io::SScan const& scan)
         : _scan(scan) {
         _curr = _next(_scan);
     }
@@ -97,9 +97,9 @@ struct Lexer {
         return _curr;
     }
 
-    Token _nextIdent(Io::SScan &) const;
+    Token _nextIdent(Io::SScan&) const;
 
-    Token _next(Io::SScan &) const;
+    Token _next(Io::SScan&) const;
 
     Token next() {
         auto res = _curr;

@@ -95,7 +95,7 @@ static inline CodeClass codeClass(Code code) {
     return static_cast<CodeClass>(value);
 }
 
-static inline Res<Code> parseCode(Io::SScan &s) {
+static inline Res<Code> parseCode(Io::SScan& s) {
     auto code = try$(atou(s));
     switch (code) {
 #define ITER(CODE, NAME) \
@@ -136,7 +136,7 @@ enum struct Method : u8 {
 #undef ITER
 };
 
-static inline Res<Method> parseMethod(Io::SScan &s) {
+static inline Res<Method> parseMethod(Io::SScan& s) {
 #define ITER(NAME)     \
     if (s.skip(#NAME)) \
         return Ok(Method::NAME);
@@ -160,7 +160,7 @@ struct Version {
     u8 major;
     u8 minor;
 
-    static Res<Version> parse(Io::SScan &s) {
+    static Res<Version> parse(Io::SScan& s) {
         if (not s.skip("HTTP/"))
             return Error::invalidData("Expected \"HTTP/\"");
         Version v;
@@ -174,7 +174,7 @@ struct Version {
 struct Header {
     Map<Str, Str> headers;
 
-    Res<> _parse(Io::SScan &s) {
+    Res<> _parse(Io::SScan& s) {
         while (not s.ended()) {
             Str key, value;
 
@@ -214,7 +214,7 @@ struct Request : public Header {
     Mime::Path path;
     Version version;
 
-    static Res<Request> parse(Io::SScan &s) {
+    static Res<Request> parse(Io::SScan& s) {
         Request req;
 
         req.method = try$(parseMethod(s));
@@ -245,7 +245,7 @@ struct Response : public Header {
     Version version;
     Code code;
 
-    static Res<Response> parse(Io::SScan &s) {
+    static Res<Response> parse(Io::SScan& s) {
         Response res;
 
         res.version = try$(Version::parse(s));
@@ -270,21 +270,21 @@ struct Response : public Header {
 
 template <>
 struct Karm::Io::Formatter<Karm::Net::Http::Code> {
-    Res<usize> format(Io::TextWriter &writer, Karm::Net::Http::Code code) {
+    Res<usize> format(Io::TextWriter& writer, Karm::Net::Http::Code code) {
         return writer.writeStr(Karm::Net::Http::toStr(code));
     }
 };
 
 template <>
 struct Karm::Io::Formatter<Karm::Net::Http::Method> {
-    Res<usize> format(Io::TextWriter &writer, Karm::Net::Http::Method method) {
+    Res<usize> format(Io::TextWriter& writer, Karm::Net::Http::Method method) {
         return writer.writeStr(Karm::Net::Http::toStr(method));
     }
 };
 
 template <>
 struct Karm::Io::Formatter<Karm::Net::Http::Version> {
-    Res<usize> format(Io::TextWriter &writer, Karm::Net::Http::Version version) {
+    Res<usize> format(Io::TextWriter& writer, Karm::Net::Http::Version version) {
         return Io::format(writer, "HTTP/{}.{}", version.major, version.minor);
     }
 };

@@ -171,7 +171,7 @@ test$("list-iter") {
     expectEq$(list[2], 3);
 
     int i = 0;
-    for (auto &el : list.iter()) {
+    for (auto& el : list.iter()) {
         expectEq$(el, i + 1);
         i++;
     }
@@ -193,7 +193,7 @@ test$("list-iter-rev") {
     expectEq$(list[2], 3);
 
     int i = 3;
-    for (auto &el : list.iterRev()) {
+    for (auto& el : list.iterRev()) {
         expectEq$(el, i);
         i--;
     }

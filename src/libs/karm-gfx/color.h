@@ -58,13 +58,13 @@ struct Color {
         }
     }
 
-    static constexpr auto RED_COMPONENT = [](auto &c) -> auto & {
+    static constexpr auto RED_COMPONENT = [](auto& c) -> auto& {
         return c.red;
     };
-    static constexpr auto GREEN_COMPONENT = [](auto &c) -> auto & {
+    static constexpr auto GREEN_COMPONENT = [](auto& c) -> auto& {
         return c.green;
     };
-    static constexpr auto BLUE_COMPONENT = [](auto &c) -> auto & {
+    static constexpr auto BLUE_COMPONENT = [](auto& c) -> auto& {
         return c.blue;
     };
 
@@ -128,12 +128,12 @@ struct Color {
         return *this;
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(color #{:02x}{:02x}{:02x}{:02x})", red, green, blue, alpha);
     }
 
-    auto operator<=>(Color const &other) const = default;
-    bool operator==(Color const &other) const = default;
+    auto operator<=>(Color const& other) const = default;
+    bool operator==(Color const& other) const = default;
 };
 
 struct Hsv {
@@ -151,11 +151,11 @@ struct Hsv {
         return {hue, saturation, value};
     }
 
-    auto operator<=>(Hsv const &other) const = default;
+    auto operator<=>(Hsv const& other) const = default;
 
-    bool operator==(Hsv const &other) const = default;
+    bool operator==(Hsv const& other) const = default;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(hsv {} {} {})", hue, saturation, value);
     }
 };
@@ -180,9 +180,9 @@ struct YCbCr {
         }
     }
 
-    always_inline auto operator<=>(YCbCr const &other) const = default;
+    always_inline auto operator<=>(YCbCr const& other) const = default;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(ycbcr {} {} {})", y, cb, cr);
     }
 };

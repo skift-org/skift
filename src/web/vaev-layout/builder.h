@@ -1,11 +1,11 @@
 #pragma once
 
-#include "box.h"
+#include "base.h"
 
 namespace Vaev::Layout {
 
-Box build(Style::Computer &c, Markup::Document const &doc);
+Box build(Style::Computer& c, Markup::Document const& doc);
 
-Box buildForPseudoElement(Strong<Style::Computed> style);
+Box buildForPseudoElement(Rc<Style::Computed> style);
 
 } // namespace Vaev::Layout

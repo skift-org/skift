@@ -9,43 +9,43 @@ namespace Karm::Ui {
 template <typename A>
 using Task = Opt<Async::_Task<Opt<A>>>;
 
-template <typename S, typename A, Task<A> (*R)(S &, A)>
+template <typename S, typename A, Task<A> (*R)(S&, A)>
 struct Model {
     using State = S;
     using Action = A;
     static constexpr auto reduce = R;
 
     template <typename X, typename... Args>
-    static Func<void(Node &)> bind(Args... args) {
+    static Func<void(Node&)> bind(Args... args) {
         return bindBubble<Action>(X{std::forward<Args>(args)...});
     }
 
     template <typename X>
-    static Func<void(Node &)> bind(X value) {
+    static Func<void(Node&)> bind(X value) {
         return bindBubble<Action>(value);
     }
 
     template <typename X, typename... Args>
-    static Opt<Func<void(Node &)>> bindIf(bool cond, Args... args) {
+    static Opt<Func<void(Node&)>> bindIf(bool cond, Args... args) {
         if (not cond)
             return NONE;
         return bindBubble<Action>(X{std::forward<Args>(args)...});
     }
 
     template <typename X>
-    static Opt<Func<void(Node &)>> bindIf(bool cond, X value) {
+    static Opt<Func<void(Node&)>> bindIf(bool cond, X value) {
         if (not cond)
             return NONE;
         return bindBubble<Action>(value);
     }
 
     template <typename X>
-    static void bubble(Node &n, X value = {}) {
+    static void bubble(Node& n, X value = {}) {
         Ui::bubble<Action>(n, Action{std::move(value)});
     }
 
     template <typename X>
-    static void event(Node &n, X value = {}) {
+    static void event(Node& n, X value = {}) {
         Ui::event<Action>(n, Action{std::move(value)});
     }
 };
@@ -58,11 +58,11 @@ struct Reducer :
     using Action = typename Model::Action;
 
     State _state;
-    Func<Child(State const &)> _build;
+    Func<Child(State const&)> _build;
     bool _rebuild = true;
     Opt<Child> _child;
 
-    Reducer(State state, Func<Child(State const &)> build)
+    Reducer(State state, Func<Child(State const&)> build)
         : _state(std::move(state)), _build(std::move(build)) {}
 
     ~Reducer() {
@@ -95,22 +95,22 @@ struct Reducer :
 
     // MARK: Node --------------------------------------------------------------
 
-    void reconcile(Reducer &o) override {
+    void reconcile(Reducer& o) override {
         _build = std::move(o._build);
         _rebuild = true;
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
         if (_rebuild)
             panic("paint() called on React node before build");
         (*_child)->paint(g, r);
     }
 
-    void event(App::Event &e) override {
+    void event(App::Event& e) override {
         if (auto a = e.is<Action>()) {
             auto task = Model::reduce(_state, *a);
             if (task != NONE) {
-                Async::detach(task.take(), [this](Opt<Action> const &a) {
+                Async::detach(task.take(), [this](Opt<Action> const& a) {
                     if (a)
                         Ui::bubble<Action>(*this, *a);
                 });
@@ -124,11 +124,11 @@ struct Reducer :
         }
     }
 
-    void bubble(App::Event &e) override {
+    void bubble(App::Event& e) override {
         if (auto a = e.is<Action>()) {
             auto task = Model::reduce(_state, *a);
             if (task != NONE) {
-                Async::detach(task.take(), [this](Opt<Action> const &a) {
+                Async::detach(task.take(), [this](Opt<Action> const& a) {
                     if (a)
                         Ui::bubble<Action>(*this, *a);
                 });
@@ -161,29 +161,29 @@ struct Reducer :
 template <typename Model>
 inline Child reducer(
     typename Model::State init,
-    Func<Child(typename Model::State const &)> build
+    Func<Child(typename Model::State const&)> build
 ) {
 
-    return makeStrong<Reducer<Model>>(std::move(init), std::move(build));
+    return makeRc<Reducer<Model>>(std::move(init), std::move(build));
 }
 
 template <typename Model>
-inline Child reducer(Func<Child(typename Model::State const &)> build) {
-    return makeStrong<Reducer<Model>>(typename Model::State{}, std::move(build));
+inline Child reducer(Func<Child(typename Model::State const&)> build) {
+    return makeRc<Reducer<Model>>(typename Model::State{}, std::move(build));
 }
 
 // MARK: State -----------------------------------------------------------------
 
 template <typename T>
 inline Child state(T init, auto build) {
-    auto reduce = [](T &s, T v) -> Task<T> {
+    auto reduce = [](T& s, T v) -> Task<T> {
         s = v;
         return NONE;
     };
 
     using M = Model<T, T, reduce>;
 
-    return reducer<M>(init, [build = std::move(build)](T const &state) {
+    return reducer<M>(init, [build = std::move(build)](T const& state) {
         return build(state, [](T t) {
             return bindBubble<T>(t);
         });
@@ -196,6 +196,6 @@ inline Child state(auto build) {
 }
 
 template <typename T>
-using Action = SharedFunc<void(Ui::Node &, T const &)>;
+using Action = SharedFunc<void(Ui::Node&, T const&)>;
 
 } // namespace Karm::Ui

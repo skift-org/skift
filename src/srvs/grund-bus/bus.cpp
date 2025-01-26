@@ -20,19 +20,19 @@ Res<> Endpoint::dispatch(Rpc::Message &msg) {
 
 // MARK: Service ---------------------------------------------------------------
 
-Res<Strong<Service>> Service::prepare(Sys::Context &, Str id) {
+Res<Rc<Service>> Service::prepare(Sys::Context &, Str id) {
     auto in = try$(Hj::Channel::create(Hj::Domain::self(), kib(16), 16));
     try$(in.label(Io::format("{}-in", id).unwrap()));
 
     auto out = try$(Hj::Channel::create(Hj::Domain::self(), kib(16), 16));
     try$(out.label(Io::format("{}-out", id).unwrap()));
 
-    auto ipc = makeStrong<Skift::IpcFd>(
+    auto ipc = makeRc<Skift::IpcFd>(
         std::move(in),
         std::move(out)
     );
 
-    return Ok(makeStrong<Service>(id, ipc));
+    return Ok(makeRc<Service>(id, ipc));
 }
 
 Res<> Service::activate(Sys::Context &ctx) {
@@ -176,8 +176,8 @@ Res<> System::send(Rpc::Message &msg) {
 
 // MARK: Bus -------------------------------------------------------------------
 
-Res<Strong<Bus>> Bus::create(Sys::Context &ctx) {
-    return Ok(makeStrong<Bus>(ctx));
+Res<Rc<Bus>> Bus::create(Sys::Context &ctx) {
+    return Ok(makeRc<Bus>(ctx));
 }
 
 Res<> Bus::prepareService(Str id) {
@@ -194,7 +194,7 @@ Res<> Bus::prepareActivateService(Str id) {
     return service->activate(_context);
 }
 
-Res<> Bus::attach(Strong<Endpoint> endpoint) {
+Res<> Bus::attach(Rc<Endpoint> endpoint) {
     endpoint->attach(*this);
     _endpoints.pushBack(endpoint);
     return Ok();

@@ -4,7 +4,7 @@ namespace Vaev::Css {
 
 // MARK: Sst -------------------------------------------------------------------
 
-void Sst::repr(Io::Emit &e) const {
+void Sst::repr(Io::Emit& e) const {
     if (type == TOKEN) {
         e("{}", token);
         return;
@@ -25,7 +25,7 @@ void Sst::repr(Io::Emit &e) const {
         e.newline();
         e("content=[");
         e.indentNewline();
-        for (auto &child : content) {
+        for (auto& child : content) {
             child.repr(e);
             e.newline();
         }
@@ -40,7 +40,7 @@ void Sst::repr(Io::Emit &e) const {
 // MARK: Parser ----------------------------------------------------------------
 
 // https://www.w3.org/TR/css-syntax-3/#consume-list-of-rules
-Content consumeRuleList(Lexer &lex, bool topLevel) {
+Content consumeRuleList(Lexer& lex, bool topLevel) {
     Content list{};
 
     while (true) {
@@ -80,7 +80,7 @@ Content consumeRuleList(Lexer &lex, bool topLevel) {
 }
 
 // https://www.w3.org/TR/css-syntax-3/#consume-at-rule
-Sst consumeAtRule(Lexer &lex) {
+Sst consumeAtRule(Lexer& lex) {
     Sst atRule{Sst::RULE};
     atRule.token = lex.next();
     Content prefix;
@@ -112,7 +112,7 @@ Sst consumeAtRule(Lexer &lex) {
 }
 
 // https://www.w3.org/TR/css-syntax-3/#consume-qualified-rule
-Opt<Sst> consumeRule(Lexer &lex) {
+Opt<Sst> consumeRule(Lexer& lex) {
     Sst rule{Sst::RULE};
     Content prefix;
 
@@ -141,7 +141,7 @@ Opt<Sst> consumeRule(Lexer &lex) {
 // NOSPEC: We unified the two functions into one for simplicity
 //         and added a check for the right curly bracket
 //         to avoid aving to parsing the input multiple times
-Content consumeDeclarationList(Lexer &lex, bool topLevel) {
+Content consumeDeclarationList(Lexer& lex, bool topLevel) {
     Content block;
 
     while (true) {
@@ -190,7 +190,7 @@ Content consumeDeclarationList(Lexer &lex, bool topLevel) {
     }
 }
 
-Content consumeDeclarationBlock(Lexer &lex) {
+Content consumeDeclarationBlock(Lexer& lex) {
     lex.next(); // consume left curly bracket
     auto res = consumeDeclarationList(lex);
     if (lex.peek() != Token::RIGHT_CURLY_BRACKET)
@@ -201,7 +201,7 @@ Content consumeDeclarationBlock(Lexer &lex) {
 }
 
 // https://www.w3.org/TR/css-syntax-3/#consume-declaration
-static void eatWhitespace(Lexer &lex) {
+static void eatWhitespace(Lexer& lex) {
     while (lex.peek() == Token::WHITESPACE and not lex.ended())
         lex.next();
 }
@@ -213,7 +213,7 @@ bool declarationAhead(Lexer lex) {
     return res and lex.peek() == Token::COLON;
 }
 
-Content consumeDeclarationValue(Lexer &lex) {
+Content consumeDeclarationValue(Lexer& lex) {
     Content value;
     // 3. While the next input token is a <whitespace-token>, consume the next input token.
     eatWhitespace(lex);
@@ -227,7 +227,7 @@ Content consumeDeclarationValue(Lexer &lex) {
     return value;
 }
 
-Opt<Sst> consumeDeclaration(Lexer &lex) {
+Opt<Sst> consumeDeclaration(Lexer& lex) {
     Sst decl{Sst::DECL};
     decl.token = lex.next();
 
@@ -250,7 +250,7 @@ Opt<Sst> consumeDeclaration(Lexer &lex) {
 }
 
 // https://www.w3.org/TR/css-syntax-3/#consume-component-value
-Sst consumeComponentValue(Lexer &lex) {
+Sst consumeComponentValue(Lexer& lex) {
     switch (lex.peek().type) {
     case Token::LEFT_SQUARE_BRACKET:
         return consumeBlock(lex, Token::RIGHT_SQUARE_BRACKET);
@@ -270,7 +270,7 @@ Sst consumeComponentValue(Lexer &lex) {
 }
 
 // https://www.w3.org/TR/css-syntax-3/#consume-a-simple-block
-Sst consumeBlock(Lexer &lex, Token::Type term) {
+Sst consumeBlock(Lexer& lex, Token::Type term) {
     Sst block = Sst::BLOCK;
     lex.next();
 
@@ -295,7 +295,7 @@ Sst consumeBlock(Lexer &lex, Token::Type term) {
 }
 
 // https://www.w3.org/TR/css-syntax-3/#consume-function
-Sst consumeFunc(Lexer &lex) {
+Sst consumeFunc(Lexer& lex) {
     Sst fn = Sst::FUNC;
     fn.prefix = lex.next();
 
@@ -318,7 +318,7 @@ Sst consumeFunc(Lexer &lex) {
 
 // NOSPEC specialized parser for selectors,
 // it's not used in the normal workflow but for testing purposes and querySelectors
-Content consumeSelector(Lexer &lex) {
+Content consumeSelector(Lexer& lex) {
     Content value;
 
     while ((lex.peek() != Token::END_OF_FILE and lex.peek() != Token::SEMICOLON and lex.peek() != Token::RIGHT_CURLY_BRACKET)) {

@@ -8,42 +8,43 @@ static constexpr bool DEBUG_SELECTORS = false;
 // MARK: Selector Specificity ---------------------------------------------------
 
 // https://www.w3.org/TR/selectors-3/#specificity
-Spec spec(Selector const &s) {
+Spec spec(Selector const& s) {
     return s.visit(Visitor{
-        [](Nfix const &n) {
+        [](Nfix const& n) {
+            // FIXME: missing other pseudo class selectors implemented as nfix
             if (n.type == Nfix::WHERE)
                 return Spec::ZERO;
 
             Spec sum = Spec::ZERO;
-            for (auto &inner : n.inners)
+            for (auto& inner : n.inners)
                 sum = sum + spec(inner);
             return sum;
         },
-        [](Infix const &i) {
+        [](Infix const& i) {
             return spec(*i.lhs) + spec(*i.rhs);
         },
-        [](UniversalSelector const &) {
+        [](UniversalSelector const&) {
             return Spec::ZERO;
         },
-        [](EmptySelector const &) {
+        [](EmptySelector const&) {
             return Spec::ZERO;
         },
-        [](IdSelector const &) {
+        [](IdSelector const&) {
             return Spec::A;
         },
-        [](TypeSelector const &) {
+        [](TypeSelector const&) {
             return Spec::C;
         },
-        [](ClassSelector const &) {
+        [](ClassSelector const&) {
             return Spec::B;
         },
-        [](Pseudo const &) {
-            return Spec::ZERO;
+        [](Pseudo const&) {
+            return Spec::B;
         },
-        [](AttributeSelector const &) {
-            return Spec::ZERO;
+        [](AttributeSelector const&) {
+            return Spec::B;
         },
-        [](auto const &s) {
+        [](auto const& s) {
             logWarnIf(DEBUG_SELECTORS, "unimplemented selector: {}", s);
             return Spec::ZERO;
         }
@@ -53,10 +54,10 @@ Spec spec(Selector const &s) {
 // MARK: Selector Matching -----------------------------------------------------
 
 // https://www.w3.org/TR/selectors-4/#descendant-combinators
-static bool _matchDescendant(Selector const &s, Markup::Element const &e) {
+static bool _matchDescendant(Selector const& s, Markup::Element const& e) {
     Cursor<Markup::Node> curr = &e;
     while (curr->hasParent()) {
-        auto &parent = curr->parentNode();
+        auto& parent = curr->parentNode();
         if (auto el = parent.is<Markup::Element>())
             if (s.match(*el))
                 return true;
@@ -66,18 +67,18 @@ static bool _matchDescendant(Selector const &s, Markup::Element const &e) {
 }
 
 // https://www.w3.org/TR/selectors-4/#child-combinators
-static bool _matchChild(Selector const &s, Markup::Element const &e) {
+static bool _matchChild(Selector const& s, Markup::Element const& e) {
     if (not e.hasParent())
         return false;
 
-    auto &parent = e.parentNode();
+    auto& parent = e.parentNode();
     if (auto el = parent.is<Markup::Element>())
         return s.match(*el);
     return false;
 }
 
 // https://www.w3.org/TR/selectors-4/#adjacent-sibling-combinators
-static bool _matchAdjacent(Selector const &s, Markup::Element const &e) {
+static bool _matchAdjacent(Selector const& s, Markup::Element const& e) {
     if (not e.hasPreviousSibling())
         return false;
 
@@ -88,7 +89,7 @@ static bool _matchAdjacent(Selector const &s, Markup::Element const &e) {
 }
 
 // https://www.w3.org/TR/selectors-4/#general-sibling-combinators
-static bool _matchSubsequent(Selector const &s, Markup::Element const &e) {
+static bool _matchSubsequent(Selector const& s, Markup::Element const& e) {
     Cursor<Markup::Node> curr = &e;
     while (curr->hasPreviousSibling()) {
         auto prev = curr->previousSibling();
@@ -100,7 +101,7 @@ static bool _matchSubsequent(Selector const &s, Markup::Element const &e) {
     return false;
 }
 
-static bool _match(Infix const &s, Markup::Element const &e) {
+static bool _match(Infix const& s, Markup::Element const& e) {
     if (not s.rhs->match(e))
         return false;
 
@@ -123,10 +124,10 @@ static bool _match(Infix const &s, Markup::Element const &e) {
     }
 }
 
-static bool _match(Nfix const &s, Markup::Element const &el) {
+static bool _match(Nfix const& s, Markup::Element const& el) {
     switch (s.type) {
     case Nfix::AND:
-        for (auto &inner : s.inners)
+        for (auto& inner : s.inners)
             if (not inner.match(el))
                 return false;
         return true;
@@ -137,7 +138,7 @@ static bool _match(Nfix const &s, Markup::Element const &el) {
     // 4.2. The Matches-Any Pseudo-class: :is()
     // https://www.w3.org/TR/selectors-4/#matchess
     case Nfix::OR:
-        for (auto &inner : s.inners)
+        for (auto& inner : s.inners)
             if (inner.match(el))
                 return true;
         return false;
@@ -156,29 +157,29 @@ static bool _match(Nfix const &s, Markup::Element const &el) {
 
 // 5.1. Type (tag name) selector
 // https://www.w3.org/TR/selectors-4/#type
-static bool _match(TypeSelector const &s, Markup::Element const &el) {
+static bool _match(TypeSelector const& s, Markup::Element const& el) {
     return el.tagName == s.type;
 }
 
-static bool _match(IdSelector const &s, Markup::Element const &el) {
+static bool _match(IdSelector const& s, Markup::Element const& el) {
     return el.id() == s.id;
 }
 
-static bool _match(ClassSelector const &s, Markup::Element const &el) {
+static bool _match(ClassSelector const& s, Markup::Element const& el) {
     return el.classList.contains(s.class_);
 }
 
 // 8.2. The Link History Pseudo-classes: :link and :visited
 // https://www.w3.org/TR/selectors-4/#link
 
-static bool _matchLink(Markup::Element const &el) {
+static bool _matchLink(Markup::Element const& el) {
     return el.tagName == Html::A and el.hasAttribute(Html::HREF_ATTR);
 }
 
 // 14.3.3. :first-child pseudo-class
 // https://www.w3.org/TR/selectors-4/#the-first-child-pseudo
 
-static bool _matchFirstChild(Markup::Element const &e) {
+static bool _matchFirstChild(Markup::Element const& e) {
     Cursor<Markup::Node> curr = &e;
     while (curr->hasPreviousSibling()) {
         auto prev = curr->previousSibling();
@@ -192,7 +193,7 @@ static bool _matchFirstChild(Markup::Element const &e) {
 // 14.3.4. :last-child pseudo-class
 // https://www.w3.org/TR/selectors-4/#the-last-child-pseudo
 
-static bool _matchLastChild(Markup::Element const &e) {
+static bool _matchLastChild(Markup::Element const& e) {
     Cursor<Markup::Node> curr = &e;
     while (curr->hasNextSibling()) {
         auto next = curr->nextSibling();
@@ -206,7 +207,7 @@ static bool _matchLastChild(Markup::Element const &e) {
 // 14.4.3. :first-of-type pseudo-class
 // https://www.w3.org/TR/selectors-4/#the-first-of-type-pseudo
 
-static bool _matchFirstOfType(Markup::Element const &e) {
+static bool _matchFirstOfType(Markup::Element const& e) {
     Cursor<Markup::Node> curr = &e;
     auto tag = e.tagName;
 
@@ -223,7 +224,7 @@ static bool _matchFirstOfType(Markup::Element const &e) {
 // 14.4.4. :last-of-type pseudo-class
 // https://www.w3.org/TR/selectors-4/#the-last-of-type-pseudo
 
-static bool _matchLastOfType(Markup::Element const &e) {
+static bool _matchLastOfType(Markup::Element const& e) {
     Cursor<Markup::Node> curr = &e;
     auto tag = e.tagName;
 
@@ -237,7 +238,7 @@ static bool _matchLastOfType(Markup::Element const &e) {
     return true;
 }
 
-static bool _match(Pseudo const &s, Markup::Element const &el) {
+static bool _match(Pseudo const& s, Markup::Element const& el) {
     switch (s.type) {
     case Pseudo::LINK:
         return _matchLink(el);
@@ -265,15 +266,15 @@ static bool _match(Pseudo const &s, Markup::Element const &el) {
 
 // 5.2. Universal selector
 // https://www.w3.org/TR/selectors-4/#the-universal-selector
-static bool _match(UniversalSelector const &, Markup::Element const &) {
+static bool _match(UniversalSelector const&, Markup::Element const&) {
     return true;
 }
 
 // MARK: Selector --------------------------------------------------------------
 
-bool Selector::match(Markup::Element const &el) const {
+bool Selector::match(Markup::Element const& el) const {
     return visit(
-        [&](auto const &s) {
+        [&](auto const& s) {
             if constexpr (requires { _match(s, el); })
                 return _match(s, el);
 
@@ -281,6 +282,25 @@ bool Selector::match(Markup::Element const &el) const {
             return false;
         }
     );
+}
+
+Opt<Spec> Selector::matchWithSpecificity(Markup::Element const& el) const {
+    return visit(Visitor{
+        [&](Nfix const& n) -> Opt<Spec> {
+            if (n.type == Nfix::OR) {
+                Opt<Spec> specificity;
+                for (auto& inner : n.inners) {
+                    if (inner.match(el))
+                        specificity = max(specificity, spec(inner));
+                }
+                return specificity;
+            }
+            return match(el) ? Opt<Spec>{spec(n)} : NONE;
+        },
+        [&](auto const& s) -> Opt<Spec> {
+            return match(el) ? Opt<Spec>{spec(s)} : NONE;
+        }
+    });
 }
 
 // MARK: Parser ----------------------------------------------------------------
@@ -366,7 +386,7 @@ static Selector _parseAttributeSelector(Slice<Css::Sst> content) {
 }
 
 // consume an Op Code
-static OpCode _peekOpCode(Cursor<Css::Sst> &cur) {
+static OpCode _peekOpCode(Cursor<Css::Sst>& cur) {
     if (cur.ended()) {
         return OpCode::NOP;
     }
@@ -439,10 +459,10 @@ static OpCode _peekOpCode(Cursor<Css::Sst> &cur) {
     }
 }
 
-static Res<Selector> _parseInfixExpr(Selector lhs, Cursor<Css::Sst> &cur, OpCode opCode = OpCode::NOP);
+static Res<Selector> _parseInfixExpr(Selector lhs, Cursor<Css::Sst>& cur, OpCode opCode = OpCode::NOP);
 
 // consume a selector element (everything  that has a lesser priority than the current OP)
-static Res<Selector> _parseSelectorElement(Cursor<Css::Sst> &cur, OpCode currentOp) {
+static Res<Selector> _parseSelectorElement(Cursor<Css::Sst>& cur, OpCode currentOp) {
     if (cur.ended()) {
         logErrorIf(DEBUG_SELECTORS, "ERROR : unterminated selector");
         return Error::invalidData("unterminated selector");
@@ -508,7 +528,7 @@ static Res<Selector> _parseSelectorElement(Cursor<Css::Sst> &cur, OpCode current
     return Ok(val);
 }
 
-static Res<Selector> _parseNfixExpr(Selector lhs, OpCode op, Cursor<Css::Sst> &cur) {
+static Res<Selector> _parseNfixExpr(Selector lhs, OpCode op, Cursor<Css::Sst>& cur) {
     Vec<Selector> selectors = {
         lhs,
         try$(_parseSelectorElement(cur, op)),
@@ -564,7 +584,7 @@ static Res<Selector> _parseNfixExpr(Selector lhs, OpCode op, Cursor<Css::Sst> &c
     }
 }
 
-static Res<Selector> _parseInfixExpr(Selector lhs, Cursor<Css::Sst> &cur, OpCode opCode) {
+static Res<Selector> _parseInfixExpr(Selector lhs, Cursor<Css::Sst>& cur, OpCode opCode) {
     if (opCode == OpCode::NOP)
         opCode = _peekOpCode(cur);
 
@@ -597,10 +617,9 @@ static Res<Selector> _parseInfixExpr(Selector lhs, Cursor<Css::Sst> &cur, OpCode
     }
 }
 
-Res<Selector> Selector::parse(Cursor<Css::Sst> &c) {
-    if (!c) {
+Res<Selector> Selector::parse(Cursor<Css::Sst>& c) {
+    if (not c)
         return Error::invalidData("expected selector");
-    }
 
     logDebugIf(DEBUG_SELECTORS, "PARSING SELECTOR : {}", c);
     Selector currentSelector = try$(_parseSelectorElement(c, OpCode::NOP));
@@ -611,7 +630,7 @@ Res<Selector> Selector::parse(Cursor<Css::Sst> &c) {
     return Ok(currentSelector);
 }
 
-Res<Selector> Selector::parse(Io::SScan &s) {
+Res<Selector> Selector::parse(Io::SScan& s) {
     Css::Lexer lex = s;
     auto val = consumeSelector(lex);
     Cursor<Css::Sst> c{val};

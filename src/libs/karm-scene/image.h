@@ -18,14 +18,14 @@ struct Image : public Node {
         return _bound;
     }
 
-    void paint(Gfx::Canvas &ctx, Math::Rectf r, PaintOptions) override {
+    void paint(Gfx::Canvas& ctx, Math::Rectf r, PaintOptions) override {
         if (not r.colide(bound()))
             return;
 
         ctx.blit(_bound.cast<isize>(), _picture.pixels());
     }
 
-    void repr(Io::Emit &e) const override {
+    void repr(Io::Emit& e) const override {
         e("(image z:{})", zIndex);
     }
 };

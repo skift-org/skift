@@ -14,7 +14,7 @@ template <typename T>
 struct Buf {
     using Inner = T;
 
-    Manual<T> *_buf{};
+    Manual<T>* _buf{};
     usize _cap{};
     usize _len{};
 
@@ -32,7 +32,7 @@ struct Buf {
         ensure(cap);
     }
 
-    Buf(Move, T *buf, usize len)
+    Buf(Move, T* buf, usize len)
         : _buf(buf),
           _cap(len),
           _len(len) {
@@ -46,7 +46,7 @@ struct Buf {
             _buf[i].ctor(std::move(other.begin()[i]));
     }
 
-    Buf(Sliceable<T> auto const &other) {
+    Buf(Sliceable<T> auto const& other) {
         ensure(other.len());
 
         _len = other.len();
@@ -54,7 +54,7 @@ struct Buf {
             _buf[i].ctor(other[i]);
     }
 
-    Buf(Buf const &other) {
+    Buf(Buf const& other) {
         ensure(other._len);
 
         _len = other._len;
@@ -62,7 +62,7 @@ struct Buf {
             _buf[i].ctor(other[i]);
     }
 
-    Buf(Buf &&other) {
+    Buf(Buf&& other) {
         std::swap(_buf, other._buf);
         std::swap(_cap, other._cap);
         std::swap(_len, other._len);
@@ -76,23 +76,23 @@ struct Buf {
         delete[] _buf;
     }
 
-    Buf &operator=(Buf const &other) {
+    Buf& operator=(Buf const& other) {
         *this = Buf(other);
         return *this;
     }
 
-    Buf &operator=(Buf &&other) {
+    Buf& operator=(Buf&& other) {
         std::swap(_buf, other._buf);
         std::swap(_cap, other._cap);
         std::swap(_len, other._len);
         return *this;
     }
 
-    constexpr T &operator[](usize i) lifetimebound {
+    constexpr T& operator[](usize i) lifetimebound {
         return _buf[i].unwrap();
     }
 
-    constexpr T const &operator[](usize i) const lifetimebound {
+    constexpr T const& operator[](usize i) const lifetimebound {
         return _buf[i].unwrap();
     }
 
@@ -108,7 +108,7 @@ struct Buf {
 
         usize newCap = max(_cap * 2, desired);
 
-        Manual<T> *tmp = new Manual<T>[newCap];
+        Manual<T>* tmp = new Manual<T>[newCap];
         for (usize i = 0; i < _len; i++) {
             tmp[i].ctor(_buf[i].take());
         }
@@ -122,7 +122,7 @@ struct Buf {
         if (_len == _cap)
             return;
 
-        Manual<T> *tmp = nullptr;
+        Manual<T>* tmp = nullptr;
 
         if (_len) {
             tmp = new Manual<T>[_len];
@@ -136,7 +136,7 @@ struct Buf {
     }
 
     template <typename... Args>
-    auto &emplace(usize index, Args &&...args) {
+    auto& emplace(usize index, Args&&... args) {
         ensure(_len + 1);
 
         for (usize i = _len; i > index; i--) {
@@ -148,7 +148,7 @@ struct Buf {
         return _buf[index].unwrap();
     }
 
-    void insert(usize index, T &&value) {
+    void insert(usize index, T&& value) {
         ensure(_len + 1);
 
         for (usize i = _len; i > index; i--) {
@@ -159,7 +159,7 @@ struct Buf {
         _len++;
     }
 
-    void replace(usize index, T &&value) {
+    void replace(usize index, T&& value) {
         if (index >= _len) {
             insert(index, std::move(value));
             return;
@@ -169,7 +169,7 @@ struct Buf {
         _buf[index].ctor(std::move(value));
     }
 
-    void insert(Copy, usize index, T const *first, usize count) {
+    void insert(Copy, usize index, T const* first, usize count) {
         ensure(_len + count);
 
         for (usize i = _len; i > index; i--) {
@@ -183,7 +183,7 @@ struct Buf {
         _len += count;
     }
 
-    void insert(Move, usize index, T *first, usize count) {
+    void insert(Move, usize index, T* first, usize count) {
         ensure(_len + count);
 
         for (usize i = _len; i > index; i--) {
@@ -247,8 +247,8 @@ struct Buf {
         _len = newLen;
     }
 
-    T *take() {
-        T *ret = buf();
+    T* take() {
+        T* ret = buf();
         _buf = nullptr;
         _cap = 0;
         _len = 0;
@@ -256,13 +256,13 @@ struct Buf {
         return ret;
     }
 
-    T *buf() lifetimebound {
+    T* buf() lifetimebound {
         if (_buf == nullptr)
             return nullptr;
         return &_buf->unwrap();
     }
 
-    T const *buf() const lifetimebound {
+    T const* buf() const lifetimebound {
         if (_buf == nullptr)
             return nullptr;
 
@@ -303,7 +303,7 @@ struct InlineBuf {
             panic("cap too large");
     }
 
-    InlineBuf(T const *buf, usize len) {
+    InlineBuf(T const* buf, usize len) {
         if (len > N) [[unlikely]]
             panic("len too large");
 
@@ -316,15 +316,15 @@ struct InlineBuf {
         : InlineBuf(other.begin(), other.size()) {
     }
 
-    InlineBuf(Sliceable<T> auto const &other)
+    InlineBuf(Sliceable<T> auto const& other)
         : InlineBuf(other.buf(), other.len()) {
     }
 
-    InlineBuf(InlineBuf const &other)
+    InlineBuf(InlineBuf const& other)
         : InlineBuf(other.buf(), other.len()) {
     }
 
-    InlineBuf(InlineBuf &&other) {
+    InlineBuf(InlineBuf&& other) {
         for (usize i = 0; i < N; i++) {
             _buf[i].ctor(std::move(other._buf[i].take()));
         }
@@ -338,12 +338,12 @@ struct InlineBuf {
         _len = 0;
     }
 
-    InlineBuf &operator=(InlineBuf const &other) {
+    InlineBuf& operator=(InlineBuf const& other) {
         *this = InlineBuf(other);
         return *this;
     }
 
-    InlineBuf &operator=(InlineBuf &&other) {
+    InlineBuf& operator=(InlineBuf&& other) {
         for (usize i = 0; i < min(_len, other._len); i++)
             buf()[i] = std::move(other.buf()[i]);
 
@@ -358,11 +358,11 @@ struct InlineBuf {
         return *this;
     }
 
-    constexpr T &operator[](usize i) lifetimebound {
+    constexpr T& operator[](usize i) lifetimebound {
         return _buf[i].unwrap();
     }
 
-    constexpr T const &operator[](usize i) const lifetimebound {
+    constexpr T const& operator[](usize i) const lifetimebound {
         return _buf[i].unwrap();
     }
 
@@ -376,7 +376,7 @@ struct InlineBuf {
     }
 
     template <typename... Args>
-    void emplace(usize index, Args &&...args) {
+    void emplace(usize index, Args&&... args) {
         if (_len == N) [[unlikely]]
             panic("cap too large");
 
@@ -388,7 +388,7 @@ struct InlineBuf {
         _len++;
     }
 
-    void insert(usize index, T &&value) {
+    void insert(usize index, T&& value) {
         if (_len == N) [[unlikely]]
             panic("cap too large");
 
@@ -400,7 +400,7 @@ struct InlineBuf {
         _len++;
     }
 
-    void insert(Copy, usize index, T *first, usize count) {
+    void insert(Copy, usize index, T* first, usize count) {
         if (_len + count > N) [[unlikely]]
             panic("cap too large");
 
@@ -415,7 +415,7 @@ struct InlineBuf {
         _len += count;
     }
 
-    void insert(Move, usize index, T *first, usize count) {
+    void insert(Move, usize index, T* first, usize count) {
         if (_len + count > N) [[unlikely]]
             panic("cap too large");
 
@@ -464,11 +464,11 @@ struct InlineBuf {
         _len = newLen;
     }
 
-    T *buf() lifetimebound {
+    T* buf() lifetimebound {
         return &_buf[0].unwrap();
     }
 
-    T const *buf() const lifetimebound {
+    T const* buf() const lifetimebound {
         return &_buf[0].unwrap();
     }
 
@@ -486,23 +486,23 @@ template <typename T>
 struct ViewBuf {
     using Inner = T;
 
-    Manual<T> *_buf{};
+    Manual<T>* _buf{};
     usize _cap{};
     usize _len{};
 
     ViewBuf() = default;
 
-    ViewBuf(Manual<T> *buf, usize cap)
+    ViewBuf(Manual<T>* buf, usize cap)
         : _buf(buf), _cap(cap) {
     }
 
-    ViewBuf(ViewBuf const &other) {
+    ViewBuf(ViewBuf const& other) {
         _cap = other._cap;
         _len = other._len;
         _buf = other._buf;
     }
 
-    ViewBuf(ViewBuf &&other) {
+    ViewBuf(ViewBuf&& other) {
         std::swap(_buf, other._buf);
         std::swap(_cap, other._cap);
         std::swap(_len, other._len);
@@ -510,23 +510,23 @@ struct ViewBuf {
 
     ~ViewBuf() {}
 
-    ViewBuf &operator=(ViewBuf const &other) {
+    ViewBuf& operator=(ViewBuf const& other) {
         *this = ViewBuf(other);
         return *this;
     }
 
-    ViewBuf &operator=(ViewBuf &&other) {
+    ViewBuf& operator=(ViewBuf&& other) {
         std::swap(_buf, other._buf);
         std::swap(_cap, other._cap);
         std::swap(_len, other._len);
         return *this;
     }
 
-    constexpr T &operator[](usize i) {
+    constexpr T& operator[](usize i) {
         return _buf[i].unwrap();
     }
 
-    constexpr T const &operator[](usize i) const {
+    constexpr T const& operator[](usize i) const {
         return _buf[i].unwrap();
     }
 
@@ -539,7 +539,7 @@ struct ViewBuf {
     }
 
     template <typename... Args>
-    void emplace(usize index, Args &&...args) {
+    void emplace(usize index, Args&&... args) {
         ensure(_len + 1);
 
         for (usize i = _len; i > index; i--) {
@@ -549,7 +549,7 @@ struct ViewBuf {
         _len++;
     }
 
-    void insert(usize index, T &&value) {
+    void insert(usize index, T&& value) {
         ensure(_len + 1);
 
         for (usize i = _len; i > index; i--) {
@@ -560,7 +560,7 @@ struct ViewBuf {
         _len++;
     }
 
-    void replace(usize index, T &&value) {
+    void replace(usize index, T&& value) {
         if (index >= _len) {
             insert(index, std::move(value));
             return;
@@ -570,7 +570,7 @@ struct ViewBuf {
         _buf[index].ctor(std::move(value));
     }
 
-    void insert(Copy, usize index, T *first, usize count) {
+    void insert(Copy, usize index, T* first, usize count) {
         ensure(_len + count);
 
         for (usize i = _len; i > index; i--) {
@@ -584,7 +584,7 @@ struct ViewBuf {
         _len += count;
     }
 
-    void insert(Move, usize index, T *first, usize count) {
+    void insert(Move, usize index, T* first, usize count) {
         ensure(_len + count);
 
         for (usize i = _len; i > index; i--) {
@@ -648,8 +648,8 @@ struct ViewBuf {
         _len = newLen;
     }
 
-    T *take() {
-        T *ret = buf();
+    T* take() {
+        T* ret = buf();
         _buf = nullptr;
         _cap = 0;
         _len = 0;
@@ -657,14 +657,14 @@ struct ViewBuf {
         return ret;
     }
 
-    T *buf() {
+    T* buf() {
         if (_buf == nullptr)
             return nullptr;
 
         return &_buf->unwrap();
     }
 
-    T const *buf() const {
+    T const* buf() const {
         if (_buf == nullptr)
             return nullptr;
 

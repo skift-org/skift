@@ -50,11 +50,11 @@ struct FontFamilyDesc {
 
     static String initial() { return "serif"s; }
 
-    void apply(FontFace &f) const {
+    void apply(FontFace& f) const {
         f.family = value;
     }
 
-    Res<> parse(Cursor<Css::Sst> &c) {
+    Res<> parse(Cursor<Css::Sst>& c) {
         if (c.peek() == Css::Token::STRING) {
             value = try$(parseValue<String>(c));
         } else if (c.peek() == Css::Token::IDENT) {
@@ -78,7 +78,7 @@ struct SrcDesc {
         return Vec<FontSource>{};
     }
 
-    void apply(FontFace &f) const {
+    void apply(FontFace& f) const {
         f.sources = value;
     }
 };
@@ -92,11 +92,11 @@ struct FontStyleDesc {
 
     static auto initial() { return FontStyle::NORMAL; }
 
-    void apply(FontFace &f) const {
+    void apply(FontFace& f) const {
         f.style = value;
     }
 
-    Res<> parse(Cursor<Css::Sst> &c) {
+    Res<> parse(Cursor<Css::Sst>& c) {
         if (c.skip(Css::Token::ident("auto"))) {
             value = NONE;
             return Ok();
@@ -128,11 +128,11 @@ struct FontWeightDesc {
 
     static auto initial() { return FontWeight::NORMAL; }
 
-    void apply(FontFace &f) const {
+    void apply(FontFace& f) const {
         f.weight = value;
     }
 
-    Res<> parse(Cursor<Css::Sst> &c) {
+    Res<> parse(Cursor<Css::Sst>& c) {
         if (c.skip(Css::Token::ident("auto"))) {
             value = NONE;
             return Ok();
@@ -161,11 +161,11 @@ struct FontWidthDesc {
 
     static Opt<Range<FontWidth>> initial() { return NONE; }
 
-    void apply(FontFace &f) const {
+    void apply(FontFace& f) const {
         f.width = value;
     }
 
-    Res<> parse(Cursor<Css::Sst> &c) {
+    Res<> parse(Cursor<Css::Sst>& c) {
         if (c.skip(Css::Token::ident("auto"))) {
             value = NONE;
             return Ok();
@@ -196,7 +196,7 @@ struct UnicodeRangeDesc {
         return Vec<Range<Rune>>{};
     }
 
-    void apply(FontFace &f) const {
+    void apply(FontFace& f) const {
         f.unicodeRange = value;
     }
 };
@@ -210,7 +210,7 @@ struct FontFeatureSettingsDesc {
 
     static Vec<FontFeature> initial() { return {}; }
 
-    void apply(FontFace &f) const {
+    void apply(FontFace& f) const {
         f.features = value;
     }
 };
@@ -224,7 +224,7 @@ struct FontVariationSettingsDesc {
 
     static Vec<FontVariation> initial() { return {}; }
 
-    void apply(FontFace &f) const {
+    void apply(FontFace& f) const {
         f.variations = value;
     }
 };
@@ -238,11 +238,11 @@ struct FontNamedInstanceDesc {
 
     static Opt<String> initial() { return NONE; }
 
-    void apply(FontFace &) const {
+    void apply(FontFace&) const {
         // TODO
     }
 
-    Res<> parse(Cursor<Css::Sst> &c) {
+    Res<> parse(Cursor<Css::Sst>& c) {
         if (c.skip(Css::Token::ident("auto"))) {
             value = NONE;
         } else {
@@ -262,11 +262,11 @@ struct FontDisplayDesc {
 
     static FontDisplay initial() { return FontDisplay::AUTO; }
 
-    void apply(FontFace &f) const {
+    void apply(FontFace& f) const {
         f.display = value;
     }
 
-    Res<> parse(Cursor<Css::Sst> &c) {
+    Res<> parse(Cursor<Css::Sst>& c) {
         if (c.skip(Css::Token::ident("auto"))) {
             value = FontDisplay::AUTO;
         } else if (c.skip(Css::Token::ident("block"))) {
@@ -296,11 +296,11 @@ struct AscentOverrideDesc {
     // NOTE: normal is NONE
     static Opt<Percent> initial() { return NONE; }
 
-    void apply(FontFace &f) const {
+    void apply(FontFace& f) const {
         f.ascentOverride = value;
     }
 
-    Res<> parse(Cursor<Css::Sst> &c) {
+    Res<> parse(Cursor<Css::Sst>& c) {
         if (c.skip(Css::Token::ident("normal"))) {
             value = NONE;
         } else {
@@ -321,11 +321,11 @@ struct DescentOverrideStyleProp {
     // NOTE: normal is NONE
     static Opt<Percent> initial() { return NONE; }
 
-    void apply(FontFace &f) const {
+    void apply(FontFace& f) const {
         f.descentOverride = value;
     }
 
-    Res<> parse(Cursor<Css::Sst> &c) {
+    Res<> parse(Cursor<Css::Sst>& c) {
         if (c.skip(Css::Token::ident("normal"))) {
             value = NONE;
         } else {
@@ -345,11 +345,11 @@ struct LineGapOverrideDesc {
 
     static Opt<Percent> initial() { return NONE; }
 
-    void apply(FontFace &f) const {
+    void apply(FontFace& f) const {
         f.lineGapOverride = value;
     }
 
-    Res<> parse(Cursor<Css::Sst> &c) {
+    Res<> parse(Cursor<Css::Sst>& c) {
         if (c.skip(Css::Token::ident("normal"))) {
             value = NONE;
         } else {
@@ -369,11 +369,11 @@ struct SizeAdjustDesc {
 
     static Percent initial() { return Percent{100}; }
 
-    void apply(FontFace &f) const {
+    void apply(FontFace& f) const {
         f.sizeAdjust = value;
     }
 
-    Res<> parse(Cursor<Css::Sst> &c) {
+    Res<> parse(Cursor<Css::Sst>& c) {
         value = try$(parseValue<Percent>(c));
         return Ok();
     }
@@ -406,11 +406,11 @@ struct FontDesc : public _FontDesc {
     using _FontDesc::_FontDesc;
 
     static constexpr Array LEGACY_ALIAS = {
-        Cons<Str>("font-stretch", "font-width"),
+        Pair<Str>("font-stretch", "font-width"),
     };
 
     static Str mapLegacyAlias(Str name) {
-        for (auto const &[from, to] : LEGACY_ALIAS) {
+        for (auto const& [from, to] : LEGACY_ALIAS) {
             if (from == name) [[unlikely]]
                 return to;
         }
@@ -419,20 +419,20 @@ struct FontDesc : public _FontDesc {
     }
 
     Str name() const {
-        return visit([](auto const &p) {
+        return visit([](auto const& p) {
             return p.name();
         });
     }
 
-    void apply(FontFace &f) const {
-        visit([&](auto const &p) {
+    void apply(FontFace& f) const {
+        visit([&](auto const& p) {
             p.apply(f);
         });
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("({}", name());
-        visit([&](auto const &p) {
+        visit([&](auto const& p) {
             e(" {}", p.value);
         });
         e(")");

@@ -19,7 +19,7 @@ static constexpr Array SPINNER = {
 };
 
 static inline Str spinner() {
-    auto time = Sys::time().toTimeSpan().toMSecs() / 80;
+    auto time = Sys::time().toDuration().toMSecs() / 80;
     return SPINNER[time % SPINNER.len()];
 }
 

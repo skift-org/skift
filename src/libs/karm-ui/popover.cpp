@@ -12,11 +12,11 @@ struct ShowPopoverEvent {
 
 struct ClosePopoverEvent {};
 
-void showPopover(Node &n, Math::Vec2i at, Child child) {
+void showPopover(Node& n, Math::Vec2i at, Child child) {
     bubble<ShowPopoverEvent>(n, at, child);
 }
 
-void closePopover(Node &n) {
+void closePopover(Node& n) {
     bubble<ClosePopoverEvent>(n);
 }
 
@@ -58,14 +58,14 @@ struct PopoverLayer : public ProxyNode<PopoverLayer> {
         return {pos, size};
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
         ProxyNode::paint(g, r);
 
         if (_popover)
             (*_popover)->paint(g, r);
     }
 
-    void event(App::Event &event) override {
+    void event(App::Event& event) override {
         if (event.accepted())
             return;
 
@@ -87,7 +87,7 @@ struct PopoverLayer : public ProxyNode<PopoverLayer> {
         }
     }
 
-    void bubble(App::Event &event) override {
+    void bubble(App::Event& event) override {
         if (auto e = event.is<ShowPopoverEvent>()) {
             _showPopover(e->child, e->at);
             event.accept();
@@ -125,7 +125,7 @@ struct PopoverLayer : public ProxyNode<PopoverLayer> {
 };
 
 Child popoverLayer(Child child) {
-    return makeStrong<PopoverLayer>(child);
+    return makeRc<PopoverLayer>(child);
 }
 
 } // namespace Karm::Ui

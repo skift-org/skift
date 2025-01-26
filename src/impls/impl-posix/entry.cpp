@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void __panicHandler(Karm::PanicKind kind, char const *msg) {
+void __panicHandler(Karm::PanicKind kind, char const* msg) {
     fprintf(stderr, "%s: %s\n", kind == Karm::PanicKind::PANIC ? "panic" : "debug", msg);
 
     // NOTE: We hare calling backinto the framework here, it might cause another

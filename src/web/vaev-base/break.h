@@ -48,7 +48,7 @@ struct BreakProps {
     Integer orphans = 2;
     Integer widows = 2;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(breaks");
         e(" before={}", before);
         e(" after={}", after);

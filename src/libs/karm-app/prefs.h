@@ -21,6 +21,6 @@ struct MockPrefs : public Prefs {
     Async::Task<> saveAsync(String key, Json::Value value) override;
 };
 
-Prefs &globalPrefs();
+Prefs& globalPrefs();
 
 } // namespace Karm::App

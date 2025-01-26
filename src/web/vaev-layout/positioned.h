@@ -1,9 +1,9 @@
 #pragma once
 
-#include "frag.h"
+#include "base.h"
 
 namespace Vaev::Layout {
 
-void layoutPositioned(Tree &tree, Frag &frag, RectPx containingBlock);
+void layoutPositioned(Tree& tree, Frag& frag, RectPx containingBlock);
 
 } // namespace Vaev::Layout

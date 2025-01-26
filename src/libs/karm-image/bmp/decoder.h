@@ -30,7 +30,7 @@ struct Decoder {
 
     usize _dataOffset;
 
-    Res<> _readHeader(Io::BScan &s);
+    Res<> _readHeader(Io::BScan& s);
 
     isize _width;
     isize _height;
@@ -52,19 +52,19 @@ struct Decoder {
 
     usize _numsColors;
 
-    Res<> _readInfoHeader(Io::BScan &s);
+    Res<> _readInfoHeader(Io::BScan& s);
 
     // MARK: Palette -----------------------------------------------------------
 
     Vec<Gfx::Color> _palette;
 
-    Res<> _readPalette(Io::BScan &s);
+    Res<> _readPalette(Io::BScan& s);
 
     // MARK: Pixels ------------------------------------------------------------
 
     Bytes _pixels;
 
-    Res<> _readPixels(Io::BScan &s);
+    Res<> _readPixels(Io::BScan& s);
 
     // MARK: Decoding ----------------------------------------------------------
 
@@ -72,7 +72,7 @@ struct Decoder {
 
     // MARK: Dumping -----------------------------------------------------------
 
-    void repr(Io::Emit &e);
+    void repr(Io::Emit& e);
 };
 
 } // namespace Bmp

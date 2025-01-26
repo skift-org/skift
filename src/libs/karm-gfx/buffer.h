@@ -9,13 +9,13 @@
 namespace Karm::Gfx {
 
 struct Rgba8888 {
-    always_inline static Color load(void const *pixel) {
-        u8 const *p = static_cast<u8 const *>(pixel);
+    always_inline static Color load(void const* pixel) {
+        u8 const* p = static_cast<u8 const*>(pixel);
         return Color::fromRgba(p[0], p[1], p[2], p[3]);
     }
 
-    always_inline static void store(void *pixel, Color color) {
-        u8 *p = static_cast<u8 *>(pixel);
+    always_inline static void store(void* pixel, Color color) {
+        u8* p = static_cast<u8*>(pixel);
         p[0] = color.red;
         p[1] = color.green;
         p[2] = color.blue;
@@ -30,13 +30,13 @@ struct Rgba8888 {
 [[gnu::used]] inline Rgba8888 RGBA8888;
 
 struct Bgra8888 {
-    always_inline static Color load(void const *pixel) {
-        u8 const *p = static_cast<u8 const *>(pixel);
+    always_inline static Color load(void const* pixel) {
+        u8 const* p = static_cast<u8 const*>(pixel);
         return Color::fromRgba(p[2], p[1], p[0], p[3]);
     }
 
-    always_inline static void store(void *pixel, Color color) {
-        u8 *p = static_cast<u8 *>(pixel);
+    always_inline static void store(void* pixel, Color color) {
+        u8* p = static_cast<u8*>(pixel);
         p[0] = color.blue;
         p[1] = color.green;
         p[2] = color.red;
@@ -55,13 +55,13 @@ using _Fmts = Union<Rgba8888, Bgra8888>;
 struct Fmt : public _Fmts {
     using _Fmts::_Fmts;
 
-    always_inline Color load(void const *pixel) const {
+    always_inline Color load(void const* pixel) const {
         return visit([&](auto f) {
             return f.load(pixel);
         });
     }
 
-    always_inline void store(void *pixel, Color color) const {
+    always_inline void store(void* pixel, Color color) const {
         visit([&](auto f) {
             f.store(pixel, color);
         });
@@ -76,7 +76,7 @@ struct Fmt : public _Fmts {
 
 template <bool MUT>
 struct _Pixels {
-    Meta::Cond<MUT, void *, void const *> _buf;
+    Meta::Cond<MUT, void*, void const*> _buf;
     Math::Vec2i _size;
     usize _stride;
     Fmt _fmt;
@@ -113,34 +113,34 @@ struct _Pixels {
         return _fmt;
     }
 
-    always_inline void const *scanline(usize y) const {
-        return static_cast<u8 const *>(_buf) + y * _stride;
+    always_inline void const* scanline(usize y) const {
+        return static_cast<u8 const*>(_buf) + y * _stride;
     }
 
-    always_inline void *scanline(usize y)
+    always_inline void* scanline(usize y)
         requires(MUT)
     {
-        return static_cast<u8 *>(_buf) + y * _stride;
+        return static_cast<u8*>(_buf) + y * _stride;
     }
 
-    always_inline void const *pixelUnsafe(Math::Vec2i pos) const {
-        return static_cast<u8 const *>(_buf) + pos.y * _stride + pos.x * _fmt.bpp();
+    always_inline void const* pixelUnsafe(Math::Vec2i pos) const {
+        return static_cast<u8 const*>(_buf) + pos.y * _stride + pos.x * _fmt.bpp();
     }
 
-    always_inline void *pixelUnsafe(Math::Vec2i pos)
+    always_inline void* pixelUnsafe(Math::Vec2i pos)
         requires(MUT)
     {
-        return static_cast<u8 *>(_buf) + pos.y * _stride + pos.x * _fmt.bpp();
+        return static_cast<u8*>(_buf) + pos.y * _stride + pos.x * _fmt.bpp();
     }
 
     always_inline Bytes bytes() const {
-        return {static_cast<Byte const *>(_buf), _stride * _size.y};
+        return {static_cast<Byte const*>(_buf), _stride * _size.y};
     }
 
     always_inline MutBytes mutBytes()
         requires(MUT)
     {
-        return {static_cast<Byte *>(_buf), _stride * _size.y};
+        return {static_cast<Byte*>(_buf), _stride * _size.y};
     }
 
     always_inline _Pixels<false> clip(Math::Recti rect) const {
@@ -248,8 +248,8 @@ struct Surface {
     usize _stride;
     Gfx::Fmt _fmt;
 
-    static Strong<Surface> alloc(Math::Vec2i size, Gfx::Fmt fmt = Gfx::RGBA8888) {
-        return makeStrong<Surface>(
+    static Rc<Surface> alloc(Math::Vec2i size, Gfx::Fmt fmt = Gfx::RGBA8888) {
+        return makeRc<Surface>(
             Buf<u8>::init(size.x * size.y * fmt.bpp()),
             size,
             size.x * fmt.bpp(),
@@ -257,7 +257,7 @@ struct Surface {
         );
     }
 
-    static Strong<Surface> fallback() {
+    static Rc<Surface> fallback() {
         auto img = alloc({2, 2}, Gfx::RGBA8888);
         img->mutPixels().clear(Gfx::Color::fromHex(0xFF00FF));
         return img;

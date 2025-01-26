@@ -16,8 +16,8 @@ inline auto dialogLayer() {
     };
 }
 
-void showDialog(Node &n, Child child);
+void showDialog(Node& n, Child child);
 
-void closeDialog(Node &n);
+void closeDialog(Node& n);
 
 } // namespace Karm::Ui

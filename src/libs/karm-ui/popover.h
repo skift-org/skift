@@ -12,8 +12,8 @@ inline auto popoverLayer() {
     };
 }
 
-void showPopover(Node &n, Math::Vec2i at, Child child);
+void showPopover(Node& n, Math::Vec2i at, Child child);
 
-void closePopover(Node &n);
+void closePopover(Node& n);
 
 } // namespace Karm::Ui

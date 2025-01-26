@@ -9,7 +9,7 @@ namespace Karm {
 using BitsRange = Range<usize, struct BitsRangeTag>;
 
 struct Bits {
-    u8 *_buf{};
+    u8* _buf{};
     usize _len{};
 
     Bits(MutSlice<u8> slice)

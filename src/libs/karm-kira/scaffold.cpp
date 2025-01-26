@@ -11,7 +11,7 @@
 
 namespace Karm::Kira {
 
-Ui::Child mobilescaffold(Scaffold::State const &s, Scaffold const &scaffold) {
+Ui::Child mobilescaffold(Scaffold::State const& s, Scaffold const& scaffold) {
     Ui::Children body;
 
     if (scaffold.midleTools)
@@ -61,7 +61,7 @@ Ui::Child mobilescaffold(Scaffold::State const &s, Scaffold const &scaffold) {
            Ui::popoverLayer();
 }
 
-Ui::Child desktopscaffold(Scaffold::State const &s, Scaffold const &scaffold) {
+Ui::Child desktopscaffold(Scaffold::State const& s, Scaffold const& scaffold) {
     Ui::Children body;
 
     if (not scaffold.compact)
@@ -138,7 +138,7 @@ Ui::Child scaffold(Scaffold scaffold) {
         .isMobile = isMobile,
     };
 
-    return Ui::reducer<Scaffold::Model>(state, [scaffold = std::move(scaffold)](Scaffold::State const &state) {
+    return Ui::reducer<Scaffold::Model>(state, [scaffold = std::move(scaffold)](Scaffold::State const& state) {
         return state.isMobile
                    ? mobilescaffold(state, scaffold)
                    : desktopscaffold(state, scaffold);

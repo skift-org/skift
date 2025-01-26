@@ -8,7 +8,7 @@ static bool DEBUG_PROPS = false;
 
 // MARK: DeferredProp ----------------------------------------------------------
 
-bool DeferredProp::_expandVariable(Cursor<Css::Sst> &c, Map<String, Css::Content> const &env, Css::Content &out) {
+bool DeferredProp::_expandVariable(Cursor<Css::Sst>& c, Map<String, Css::Content> const& env, Css::Content& out) {
     if (not(c->type == Css::Sst::FUNC and
             c->prefix == Css::Token::function("var(")))
         return false;
@@ -39,11 +39,11 @@ bool DeferredProp::_expandVariable(Cursor<Css::Sst> &c, Map<String, Css::Content
     return true;
 }
 
-bool DeferredProp::_expandFunction(Cursor<Css::Sst> &c, Map<String, Css::Content> const &env, Css::Content &out) {
+bool DeferredProp::_expandFunction(Cursor<Css::Sst>& c, Map<String, Css::Content> const& env, Css::Content& out) {
     if (c->type != Css::Sst::FUNC)
         return false;
 
-    auto &func = out.emplaceBack(Css::Sst::FUNC);
+    auto& func = out.emplaceBack(Css::Sst::FUNC);
     func.prefix = c->prefix;
     Cursor<Css::Sst> content = c->content;
     _expandContent(content, env, func.content);
@@ -51,7 +51,7 @@ bool DeferredProp::_expandFunction(Cursor<Css::Sst> &c, Map<String, Css::Content
     return true;
 }
 
-void DeferredProp::_expandContent(Cursor<Css::Sst> &c, Map<String, Css::Content> const &env, Css::Content &out) {
+void DeferredProp::_expandContent(Cursor<Css::Sst>& c, Map<String, Css::Content> const& env, Css::Content& out) {
     // NOTE: Hint that we will add all the remaining elements
     out.ensure(out.len() + c.rem());
 
@@ -65,7 +65,7 @@ void DeferredProp::_expandContent(Cursor<Css::Sst> &c, Map<String, Css::Content>
     }
 }
 
-void DeferredProp::apply(Computed const &parent, Computed &c) const {
+void DeferredProp::apply(Computed const& parent, Computed& c) const {
     Css::Sst decl{Css::Sst::DECL};
     decl.token = Css::Token::ident(propName);
     Cursor<Css::Sst> cursor = value;
@@ -82,7 +82,7 @@ void DeferredProp::apply(Computed const &parent, Computed &c) const {
 
 // MARK: DefaultedProp ---------------------------------------------------------
 
-void DefaultedProp::apply(Computed const &parent, Computed &c) const {
+void DefaultedProp::apply(Computed const& parent, Computed& c) const {
     if (value == Default::INITIAL) {
         StyleProp::any([&]<typename T>(Meta::Type<T>) {
             if (T::name() != propName)
@@ -114,27 +114,27 @@ void DefaultedProp::apply(Computed const &parent, Computed &c) const {
     }
 }
 
-void DefaultedProp::repr(Io::Emit &e) const {
+void DefaultedProp::repr(Io::Emit& e) const {
     e("(Defaulted {#} = {})", propName, value);
 }
 
 // MARK: Style Property  -------------------------------------------------------
 
 Str StyleProp::name() const {
-    return visit([](auto const &p) {
+    return visit([](auto const& p) {
         return p.name();
     });
 }
 
-void StyleProp::inherit(Computed const &parent, Computed &child) const {
-    visit([&](auto const &p) {
+void StyleProp::inherit(Computed const& parent, Computed& child) const {
+    visit([&](auto const& p) {
         if constexpr (requires { p.inherit(parent, child); })
             p.inherit(parent, child);
     });
 }
 
-void StyleProp::apply(Computed const &parent, Computed &c) const {
-    visit([&](auto const &p) {
+void StyleProp::apply(Computed const& parent, Computed& c) const {
+    visit([&](auto const& p) {
         if constexpr (requires { p.apply(c); })
             p.apply(c);
 
@@ -143,9 +143,9 @@ void StyleProp::apply(Computed const &parent, Computed &c) const {
     });
 }
 
-void StyleProp::repr(Io::Emit &e) const {
+void StyleProp::repr(Io::Emit& e) const {
     e("({}", name());
-    visit([&](auto const &p) {
+    visit([&](auto const& p) {
         e(" {#}", p.value);
         if (important == Important::YES)
             e(" !important");

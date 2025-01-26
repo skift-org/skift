@@ -22,7 +22,7 @@ static f32 const s5 = Math::cos(5.0 / 16.0 * Math::PI) / 2.0;
 static f32 const s6 = Math::cos(6.0 / 16.0 * Math::PI) / 2.0;
 static f32 const s7 = Math::cos(7.0 / 16.0 * Math::PI) / 2.0;
 
-void idct(Mcu &mcu) {
+void idct(Mcu& mcu) {
     for (usize i = 0; i < 8; ++i) {
         f32 g0 = mcu[0 * 8 + i] * s0;
         f32 g1 = mcu[4 * 8 + i] * s4;
@@ -160,7 +160,7 @@ void idct(Mcu &mcu) {
     }
 }
 
-void fdtc(Mcu &mcu) {
+void fdtc(Mcu& mcu) {
     for (usize i = 0; i < 8; ++i) {
         f32 a0 = mcu[0 * 8 + i];
         f32 a1 = mcu[1 * 8 + i];
@@ -316,13 +316,13 @@ void fdtc(Mcu &mcu) {
 
 // MARK: Quantization ----------------------------------------------------------
 
-void quantize(Mcu &mcu, Quant const &quant) {
+void quantize(Mcu& mcu, Quant const& quant) {
     for (usize i = 0; i < 64; ++i) {
         mcu[i] /= quant[i];
     }
 }
 
-void dequantize(Mcu &mcu, Quant const &quant) {
+void dequantize(Mcu& mcu, Quant const& quant) {
     for (usize i = 0; i < 64; ++i) {
         mcu[i] *= quant[i];
     }
@@ -330,7 +330,7 @@ void dequantize(Mcu &mcu, Quant const &quant) {
 
 // MARK: Huffman Tables --------------------------------------------------------
 
-Array<usize, 256> const &Huff::codes() {
+Array<usize, 256> const& Huff::codes() {
     if (not _codes) {
         _codes.emplace();
         usize code = 0;
@@ -345,7 +345,7 @@ Array<usize, 256> const &Huff::codes() {
     return *_codes;
 }
 
-Res<Byte> Huff::next(BitReader &bs) {
+Res<Byte> Huff::next(BitReader& bs) {
     usize code = 0;
     for (usize i = 0; i < 16; ++i) {
         code = (code << 1) | try$(bs.nextBit());
@@ -360,7 +360,7 @@ Res<Byte> Huff::next(BitReader &bs) {
     return Error::invalidData("invalid huffman code");
 }
 
-bool Huff::getCode(u8 symbol, usize &code, usize &codeLength) {
+bool Huff::getCode(u8 symbol, usize& code, usize& codeLength) {
     for (usize i = 0; i < 16; ++i) {
         for (usize j = offs[i]; j < offs[i + 1]; ++j) {
             if (symbol == syms[j]) {

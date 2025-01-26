@@ -36,18 +36,18 @@ union Curve {
     constexpr Curve(Vec2<T> a, Vec2<T> b, Vec2<T> c, Vec2<T> d)
         : a(a), b(b), c(c), d(d) {}
 
-    constexpr Curve(Curve const &other)
+    constexpr Curve(Curve const& other)
         : _els{other._els} {}
 
-    constexpr Curve(Curve &&other)
+    constexpr Curve(Curve&& other)
         : _els{std::move(other._els)} {}
 
-    constexpr Curve &operator=(Curve const &other) {
+    constexpr Curve& operator=(Curve const& other) {
         _els = other._els;
         return *this;
     }
 
-    constexpr Curve &operator=(Curve &&other) {
+    constexpr Curve& operator=(Curve&& other) {
         _els = std::move(other._els);
         return *this;
     }
@@ -204,7 +204,7 @@ union Curve {
         return res;
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(curve {} {} {} {})", a, b, c, d);
     }
 

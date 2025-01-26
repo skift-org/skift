@@ -1,7 +1,7 @@
 #pragma once
 
-#include <karm-base/cons.h>
 #include <karm-base/opt.h>
+#include <karm-base/tuple.h>
 #include <karm-io/bscan.h>
 #include <karm-logger/logger.h>
 
@@ -75,7 +75,7 @@ struct ScriptList : public Io::BChunk {
     }
 
     Res<ScriptTable> lookup(Str tag) {
-        for (auto const &script : iter()) {
+        for (auto const& script : iter()) {
             if (script.tag == tag) {
                 return Ok(script);
             }
@@ -188,7 +188,7 @@ struct ValueRecord {
         Y_ADVANCE_DEVICE = 1 << 7,
     };
 
-    static ValueRecord read(Io::BScan &s, u16 format) {
+    static ValueRecord read(Io::BScan& s, u16 format) {
         ValueRecord r = {};
 
         if (format & X_PLACEMENT)

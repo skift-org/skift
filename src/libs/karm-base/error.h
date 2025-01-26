@@ -63,24 +63,24 @@ struct [[nodiscard]] Error {
             _LEN,
     } _code;
 
-    char const *_msg = nullptr;
+    char const* _msg = nullptr;
 
     using enum Code;
 
 #define ITER(CODE, NAME) \
-    static constexpr Error NAME(char const *msg = "") { return Error(CODE, msg); }
+    static constexpr Error NAME(char const* msg = "") { return Error(CODE, msg); }
     FOREACH_ERROR(ITER)
 #undef ITER
 
     constexpr Error() : _code(Code::OTHER), _msg("unknown error") {}
 
-    constexpr Error(Code code, char const *msg) : _code(code), _msg(msg) {}
+    constexpr Error(Code code, char const* msg) : _code(code), _msg(msg) {}
 
     constexpr Code code() const { return _code; }
 
     constexpr Error none() const { return *this; }
 
-    constexpr char const *msg() const {
+    constexpr char const* msg() const {
         if (_msg != nullptr and strlen(_msg) > 0) {
             return _msg;
         }
@@ -96,11 +96,11 @@ struct [[nodiscard]] Error {
         }
     }
 
-    constexpr bool operator==(Error const &other) const {
+    constexpr bool operator==(Error const& other) const {
         return _code == other._code and cstrEq(_msg, other._msg);
     }
 
-    constexpr bool operator==(Code const &code) const {
+    constexpr bool operator==(Code const& code) const {
         return _code == code;
     }
 };

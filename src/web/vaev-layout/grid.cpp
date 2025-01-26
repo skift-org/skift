@@ -4,9 +4,8 @@
 
 namespace Vaev::Layout {
 
-Output gridLayout(Tree &tree, Box &box, Input input) {
-    // FIXME: Implement grid layout
-    return blockLayout(tree, box, input, 0, NONE);
+Rc<FormatingContext> constructGridFormatingContext(Box& box) {
+    return constructBlockFormatingContext(box);
 }
 
 } // namespace Vaev::Layout

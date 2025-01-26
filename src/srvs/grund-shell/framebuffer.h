@@ -8,7 +8,7 @@
 namespace Grund::Shell {
 
 struct Framebuffer : public Gfx::CpuSurface {
-    static Res<Strong<Framebuffer>> open(Sys::Context &ctx);
+    static Res<Rc<Framebuffer>> open(Sys::Context &ctx);
 
     Handover::Record _record;
     Hj::Mapped _map;

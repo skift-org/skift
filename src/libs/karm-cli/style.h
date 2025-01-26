@@ -111,7 +111,7 @@ struct Style {
         return *this;
     }
 
-    void repr([[maybe_unused]] Io::Emit &e) const {
+    void repr([[maybe_unused]] Io::Emit& e) const {
 
 #ifdef __ck_sys_terminal_ansi__
         if (_reset) {
@@ -176,7 +176,7 @@ struct Karm::Io::Formatter<Karm::Cli::Styled<T>> {
     Formatter<Karm::Cli::Style> _styleFmt{};
     Formatter<T> _innerFmt{};
 
-    void parse(Io::SScan &scan) {
+    void parse(Io::SScan& scan) {
         if constexpr (requires() {
                           _innerFmt.parse(scan);
                       }) {
@@ -184,7 +184,7 @@ struct Karm::Io::Formatter<Karm::Cli::Styled<T>> {
         }
     }
 
-    Res<usize> format(Io::TextWriter &writer, Karm::Cli::Styled<T> const &val) {
+    Res<usize> format(Io::TextWriter& writer, Karm::Cli::Styled<T> const& val) {
 #ifdef __ck_sys_terminal_ansi__
         return Ok(
             try$(_styleFmt.format(writer, val._color)) +

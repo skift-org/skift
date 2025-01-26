@@ -96,7 +96,7 @@
 				"dash": "draw",
 				"size": "m",
 				"font": "draw",
-				"text": "Strong<T>\n\nmakeStrong<T>()",
+				"text": "Rc<T>\n\nmakeRc<T>()",
 				"align": "middle",
 				"verticalAlign": "middle",
 				"growY": 0,

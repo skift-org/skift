@@ -15,5 +15,5 @@ We avoid using raw pointers at all costs. The following decision tree should hel
 - `Cursor<T>` - A pointer-like structure for iterating through elements with additional context or state information (e.g., current position in a stream).
 - `T` - The base type. Ownership and reference semantics are determined by the context in which it is used (e.g., passed by value or reference).
 - `Box<T>` - An owning smart pointer type that manages heap-allocated objects. Ensures single ownership and automatic deallocation when no longer needed.
-- `Strong<T>` - A type that enforces ownership semantics and resource safety, often used for unique, non-copyable resources. Provides strong exception safety guarantees.
+- `Rc<T>` - A type that enforces ownership semantics and resource safety, often used for unique, non-copyable resources. Provides strong exception safety guarantees.
 - `T*` - Raw pointer. Gateway to hell, don't use it unless you have a ***really*** good reason. (Hint: you don't)

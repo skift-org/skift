@@ -63,6 +63,6 @@ struct IpcFd : public Sys::NullFd {
     }
 };
 
-Res<Strong<Sys::Fd>> unpackFd(Io::PackScan &s);
+Res<Rc<Sys::Fd>> unpackFd(Io::PackScan &s);
 
 } // namespace Skift

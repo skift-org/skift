@@ -22,7 +22,7 @@ struct Queue {
     Queue() = default;
 
     template <typename... Ts>
-    void emplace(Ts &&...arg) {
+    void emplace(Ts&&... arg) {
         if (_listeners.empty()) {
             _buf.emplaceBack(std::forward<Ts>(arg)...);
             return;
@@ -44,10 +44,10 @@ struct Queue {
     struct _GetOperation : private _Listener {
         using _Listener::value;
 
-        Queue *_q;
+        Queue* _q;
         R _r;
 
-        _GetOperation(Queue *q, R r)
+        _GetOperation(Queue* q, R r)
             : _q{q}, _r{std::move(r)} {}
 
         bool start() {
@@ -70,7 +70,7 @@ struct Queue {
 
     struct _GetSender {
         using Inner = T;
-        Queue *_q;
+        Queue* _q;
 
         auto connect(Receiver<T> auto r) -> _GetOperation<decltype(r)> {
             return {_q, std::move(r)};

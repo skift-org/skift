@@ -6,8 +6,8 @@
 
 namespace Karm::Text {
 
-Strong<Fontface> Fontface::fallback() {
-    return makeStrong<VgaFontface>();
+Rc<Fontface> Fontface::fallback() {
+    return makeRc<VgaFontface>();
 }
 
 Font Font::fallback() {

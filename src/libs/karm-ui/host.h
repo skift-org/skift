@@ -36,7 +36,7 @@ struct Host : public Node {
 
     virtual void flip(Slice<Math::Recti> regions) = 0;
 
-    virtual Res<> wait(TimeStamp) = 0;
+    virtual Res<> wait(Instant) = 0;
 
     bool alive() {
         return not _res;
@@ -46,7 +46,7 @@ struct Host : public Node {
         return pixels().bound();
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
         g.push();
         g.clip(r);
         g.clear(r, GRAY950);
@@ -60,7 +60,7 @@ struct Host : public Node {
     void paint() {
         _g.begin(mutPixels());
 
-        for (auto &d : _dirty) {
+        for (auto& d : _dirty) {
             paint(_g, d);
         }
 
@@ -74,11 +74,11 @@ struct Host : public Node {
         _root->layout(r);
     }
 
-    void event(App::Event &event) override {
+    void event(App::Event& event) override {
         _root->event(event);
     }
 
-    void bubble(App::Event &event) override {
+    void bubble(App::Event& event) override {
         if (auto e = event.is<Node::PaintEvent>()) {
             _dirty.pushBack(e->bound);
             event.accept();
@@ -102,18 +102,18 @@ struct Host : public Node {
     Res<> run() {
         _shouldLayout = true;
 
-        auto lastFrame = Sys::now();
+        auto lastFrame = Sys::instant();
         auto nextFrame = lastFrame;
         bool nextFrameScheduled = false;
 
         auto scheduleFrame = [&] {
-            auto instant = Sys::now();
+            auto instant = Sys::instant();
 
             if (instant < nextFrame)
                 return false;
 
             while (nextFrame < instant)
-                nextFrame += TimeSpan::fromMSecs(FRAME_TIME * 1000);
+                nextFrame += Duration::fromMSecs(FRAME_TIME * 1000);
 
             lastFrame = nextFrame;
             nextFrameScheduled = true;
@@ -139,7 +139,7 @@ struct Host : public Node {
                 _dirty.clear();
             }
 
-            try$(wait(nextFrameScheduled ? nextFrame : TimeStamp::endOfTime()));
+            try$(wait(nextFrameScheduled ? nextFrame : Instant::endOfTime()));
             nextFrameScheduled = false;
         }
 

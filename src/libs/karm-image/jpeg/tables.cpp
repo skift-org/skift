@@ -70,9 +70,9 @@ Quant const QUANT_CbCr100 = {
     1, 1, 1, 1, 1, 1, 1, 1
 };
 
-Array<Quant const *, 3> const QUANT50 = {&QUANT_Y50, &QUANT_CbCr50, &QUANT_CbCr50};
-Array<Quant const *, 3> const QUANT75 = {&QUANT_Y75, &QUANT_CbCr75, &QUANT_CbCr75};
-Array<Quant const *, 3> const QUANT100 = {&QUANT_Y100, &QUANT_CbCr100, &QUANT_CbCr100};
+Array<Quant const*, 3> const QUANT50 = {&QUANT_Y50, &QUANT_CbCr50, &QUANT_CbCr50};
+Array<Quant const*, 3> const QUANT75 = {&QUANT_Y75, &QUANT_CbCr75, &QUANT_CbCr75};
+Array<Quant const*, 3> const QUANT100 = {&QUANT_Y100, &QUANT_CbCr100, &QUANT_CbCr100};
 
 // MARK: Huffman Tables --------------------------------------------------------
 
@@ -139,7 +139,7 @@ Huff HUFF_AC_CbCr = {
     },
 };
 
-Array<Huff *, 3> const HUFF_DC = {&HUFF_DC_Y, &HUFF_DC_CbCr, &HUFF_DC_CbCr};
-Array<Huff *, 3> const HUFF_AC = {&HUFF_AC_Y, &HUFF_AC_CbCr, &HUFF_AC_CbCr};
+Array<Huff*, 3> const HUFF_DC = {&HUFF_DC_Y, &HUFF_DC_CbCr, &HUFF_DC_CbCr};
+Array<Huff*, 3> const HUFF_AC = {&HUFF_AC_Y, &HUFF_AC_CbCr, &HUFF_AC_CbCr};
 
 } // namespace Jpeg

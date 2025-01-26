@@ -119,11 +119,11 @@ struct Ns {
         }
     }
 
-    constexpr bool operator==(Ns const &other) const {
+    constexpr bool operator==(Ns const& other) const {
         return _id == other._id;
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("{}", name());
     }
 };
@@ -190,9 +190,9 @@ struct TagName {
         }
     }
 
-    constexpr bool operator==(TagName const &other) const = default;
+    constexpr bool operator==(TagName const& other) const = default;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("{}", name());
     }
 };
@@ -254,9 +254,9 @@ struct AttrName {
         }
     }
 
-    constexpr bool operator==(AttrName const &other) const = default;
+    constexpr bool operator==(AttrName const& other) const = default;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("{}", name());
     }
 };

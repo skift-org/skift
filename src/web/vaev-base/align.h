@@ -65,7 +65,7 @@ struct [[gnu::packed]] Align {
 
     bool operator==(Keywords keyword) const { return this->keyword == keyword; }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("{} {}", prefix, keyword);
     }
 };
@@ -89,7 +89,7 @@ struct AlignProps {
     // https://drafts.csswg.org/css-align-3/#propdef-align-items
     Align alignItems;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(aligns");
         e(" alignContent={}", alignContent);
         e(" justifyContent={}", justifyContent);

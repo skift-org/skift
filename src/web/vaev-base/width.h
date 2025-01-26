@@ -29,7 +29,7 @@ struct Width {
         : type(Type::VALUE), value(length) {
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         if (type == Type::AUTO) {
             e("auto");
         } else {

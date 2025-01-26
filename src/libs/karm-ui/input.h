@@ -11,11 +11,11 @@ namespace Karm::Ui {
 template <typename T = None>
 using OnChange = Meta::Cond<
     Meta::Same<T, None>,
-    Opt<SharedFunc<void(Node &)>>,
-    Opt<SharedFunc<void(Node &, T value)>>>;
+    Opt<SharedFunc<void(Node&)>>,
+    Opt<SharedFunc<void(Node&, T value)>>>;
 
 template <typename T>
-[[gnu::used]] static auto IGNORE(Ui::Node &, T) {}
+[[gnu::used]] static auto IGNORE(Ui::Node&, T) {}
 
 // MARK: Button ----------------------------------------------------------------
 
@@ -49,7 +49,7 @@ struct MouseListener {
         return _pos;
     }
 
-    bool listen(Node &node, App::Event &event) {
+    bool listen(Node& node, App::Event& event) {
         bool result = false;
         MouseState state = _state;
 
@@ -125,9 +125,9 @@ struct ButtonStyle {
     ButtonStyle withMargin(Math::Insetsi insets) const;
 };
 
-using OnPress = Opt<Func<void(Node &)>>;
+using OnPress = Opt<Func<void(Node&)>>;
 
-[[gnu::used]] static auto NOP(Ui::Node &) {}
+[[gnu::used]] static auto NOP(Ui::Node&) {}
 
 Child button(OnPress onPress, ButtonStyle style, Child child);
 
@@ -159,11 +159,11 @@ Child button(OnPress onPress, Mdi::Icon i, Str t);
 
 // MARK: Input -----------------------------------------------------------------
 
-Child input(Text::ProseStyle style, Strong<Text::Model> text, OnChange<Text::Action> onChange);
+Child input(Text::ProseStyle style, Rc<Text::Model> text, OnChange<Text::Action> onChange);
 
 Child input(Text::ProseStyle, String text, OnChange<String> onChange);
 
-Child input(Strong<Text::Model> text, OnChange<Text::Action> onChange);
+Child input(Rc<Text::Model> text, OnChange<Text::Action> onChange);
 
 // MARK: Slider ----------------------------------------------------------------
 
@@ -177,7 +177,7 @@ static inline auto slider(f64 value, OnChange<f64> onChange) {
 
 // MARK: Intent ----------------------------------------------------------------
 
-using Filter = Func<void(Node &, App::Event &e)>;
+using Filter = Func<void(Node&, App::Event& e)>;
 
 Child intent(Filter map, Child child);
 

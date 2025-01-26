@@ -18,6 +18,9 @@ namespace Karm {
 template <typename... Ts>
 struct Tuple;
 
+template <typename T0, typename T1 = T0>
+using Pair = Tuple<T0, T1>;
+
 template <>
 struct Tuple<> {
     constexpr static usize len() {
@@ -84,6 +87,9 @@ struct Tuple<_T0> {
     constexpr U into() const {
         return U{v0};
     }
+
+    bool operator==(Tuple const&) const = default;
+    auto operator<=>(Tuple const&) const = default;
 };
 
 template <typename T0>
@@ -134,6 +140,9 @@ struct Tuple<_T0, _T1> {
     constexpr U into() const {
         return U{v0, v1};
     }
+
+    bool operator==(Tuple const&) const = default;
+    auto operator<=>(Tuple const&) const = default;
 };
 
 template <typename _T0, typename _T1>
@@ -195,6 +204,9 @@ struct Tuple<_T0, _T1, _T2> {
     constexpr U into() const {
         return U{v0, v1, v2};
     }
+
+    bool operator==(Tuple const&) const = default;
+    auto operator<=>(Tuple const&) const = default;
 };
 
 template <typename _T0, typename _T1, typename _T2>
@@ -267,6 +279,9 @@ struct Tuple<_T0, _T1, _T2, _T3> {
     constexpr U into() const {
         return U{v0, v1, v2, v3};
     }
+
+    bool operator==(Tuple const&) const = default;
+    auto operator<=>(Tuple const&) const = default;
 };
 
 template <typename _T0, typename _T1, typename _T2, typename _T3>
@@ -350,6 +365,9 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4> {
     constexpr U into() const {
         return U{v0, v1, v2, v3, v4};
     }
+
+    bool operator==(Tuple const&) const = default;
+    auto operator<=>(Tuple const&) const = default;
 };
 
 template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4>
@@ -444,6 +462,9 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5> {
     constexpr U into() const {
         return U{v0, v1, v2, v3, v4, v5};
     }
+
+    bool operator==(Tuple const&) const = default;
+    auto operator<=>(Tuple const&) const = default;
 };
 
 template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4, typename _T5>
@@ -549,6 +570,9 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6> {
     constexpr U into() const {
         return U{v0, v1, v2, v3, v4, v5, v6};
     }
+
+    bool operator==(Tuple const&) const = default;
+    auto operator<=>(Tuple const&) const = default;
 };
 
 template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4, typename _T5, typename _T6>
@@ -665,6 +689,9 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7> {
     constexpr U into() const {
         return U{v0, v1, v2, v3, v4, v5, v6, v7};
     }
+
+    bool operator==(Tuple const&) const = default;
+    auto operator<=>(Tuple const&) const = default;
 };
 
 template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4, typename _T5, typename _T6, typename _T7>

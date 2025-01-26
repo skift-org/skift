@@ -13,7 +13,7 @@ static inline Page PAGE_RICHTEXT{
     "Rich Text"s,
     "An area that displays text with various styles and formatting options.",
     [] {
-        auto prose = makeStrong<Text::Prose>(Ui::TextStyles::bodyMedium());
+        auto prose = makeRc<Text::Prose>(Ui::TextStyles::bodyMedium());
 
         prose->append("This is a simple text with no formatting.\n"s);
 

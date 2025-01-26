@@ -60,7 +60,7 @@ struct CalcValue {
         return type == type2;
     }
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         if (type == OpType::FIXED) {
             e("{}", lhs);
         } else if (type == OpType::SINGLE) {

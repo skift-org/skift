@@ -5,7 +5,7 @@
 
 namespace Karm::Sys {
 
-Res<Stat> stat(Mime::Url const &url) {
+Res<Stat> stat(Mime::Url const& url) {
     try$(ensureUnrestricted());
     return _Embed::stat(url);
 }

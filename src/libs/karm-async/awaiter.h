@@ -23,7 +23,7 @@ struct [[nodiscard]] Awaiter :
     using Continuation<typename S::Inner>::value;
 
     struct _Receiver {
-        Continuation<typename S::Inner> &_c;
+        Continuation<typename S::Inner>& _c;
 
         void recv(Inline, typename S::Inner t) {
             _c.value = std::move(t);

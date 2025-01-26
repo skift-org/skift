@@ -2,7 +2,7 @@
 
 namespace Tga {
 
-Res<> encode(Gfx::Pixels pixels, Io::BEmit &e) {
+Res<> encode(Gfx::Pixels pixels, Io::BEmit& e) {
     Tga::Header header = {};
     header.width = pixels.width();
     header.height = pixels.height();

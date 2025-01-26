@@ -192,7 +192,7 @@ struct Table : public Ui::View<Table> {
 };
 
 Ui::Child table(State const &s) {
-    return makeStrong<Table>(s);
+    return makeRc<Table>(s);
 }
 
 } // namespace Hideo::Spreadsheet

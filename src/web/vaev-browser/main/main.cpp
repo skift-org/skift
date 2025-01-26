@@ -4,7 +4,7 @@
 
 #include "../app.h"
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto args = Sys::useArgs(ctx);
     auto url = args.len()
                    ? co_try$(Mime::parseUrlOrPath(args[0]))

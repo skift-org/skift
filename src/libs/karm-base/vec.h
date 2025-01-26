@@ -17,13 +17,13 @@ struct _Vec {
 
     _Vec(std::initializer_list<T> other) : _buf(other) {}
 
-    _Vec(Sliceable<T> auto const &other) : _buf(other) {}
+    _Vec(Sliceable<T> auto const& other) : _buf(other) {}
 
     _Vec(S storage) : _buf(storage) {}
 
     // MARK: Collection
 
-    bool removeAll(Meta::Equatable<T> auto const &val) {
+    bool removeAll(Meta::Equatable<T> auto const& val) {
         bool changed = false;
 
         for (usize i = 1; i < _buf.len() + 1; i++) {
@@ -53,19 +53,19 @@ struct _Vec {
 
     // MARK: Random Access
 
-    void insert(usize index, T const &value) { _buf.insert(index, T(value)); }
+    void insert(usize index, T const& value) { _buf.insert(index, T(value)); }
 
-    void insert(usize index, T &&value) { _buf.insert(index, std::move(value)); }
+    void insert(usize index, T&& value) { _buf.insert(index, std::move(value)); }
 
-    void insertMany(usize index, Sliceable<T> auto const &other) {
-        for (auto &v : other) {
+    void insertMany(usize index, Sliceable<T> auto const& other) {
+        for (auto& v : other) {
             insert(index++, v);
         }
     }
 
-    void replace(usize index, T const &value) { _buf[index] = T(value); }
+    void replace(usize index, T const& value) { _buf[index] = T(value); }
 
-    void replace(usize index, T &&value) { _buf[index] = std::move(value); }
+    void replace(usize index, T&& value) { _buf[index] = std::move(value); }
 
     T removeAt(usize index) { return _buf.removeAt(index); }
 
@@ -83,17 +83,17 @@ struct _Vec {
 
     // MARK: Front Access
 
-    void pushFront(T const &value) { _buf.insert(0, T(value)); }
+    void pushFront(T const& value) { _buf.insert(0, T(value)); }
 
-    void pushFront(T &&value) { _buf.insert(0, std::move(value)); }
+    void pushFront(T&& value) { _buf.insert(0, std::move(value)); }
 
-    void pushFront(Sliceable<T> auto &other) {
-        for (auto &v : iterRev(other))
+    void pushFront(Sliceable<T> auto& other) {
+        for (auto& v : iterRev(other))
             pushFront(v);
     }
 
     template <typename... Args>
-    T &emplaceFront(Args &&...args) lifetimebound {
+    T& emplaceFront(Args&&... args) lifetimebound {
         return _buf.emplace(0, std::forward<Args>(args)...);
     }
 
@@ -101,17 +101,17 @@ struct _Vec {
 
     // MARK: Back Access
 
-    void pushBack(T const &value) { insert(len(), value); }
+    void pushBack(T const& value) { insert(len(), value); }
 
-    void pushBack(T &&value) { insert(len(), std::move(value)); }
+    void pushBack(T&& value) { insert(len(), std::move(value)); }
 
-    void pushBack(Sliceable<T> auto &other) {
-        for (auto &v : other)
+    void pushBack(Sliceable<T> auto& other) {
+        for (auto& v : other)
             pushBack(v);
     }
 
     template <typename... Args>
-    T &emplaceBack(Args &&...args) lifetimebound {
+    T& emplaceBack(Args&&... args) lifetimebound {
         return _buf.emplace(len(), std::forward<Args>(args)...);
     }
 
@@ -123,18 +123,18 @@ struct _Vec {
 
     constexpr usize len() const { return _buf.len(); }
 
-    constexpr T *buf() lifetimebound { return _buf.buf(); }
+    constexpr T* buf() lifetimebound { return _buf.buf(); }
 
-    constexpr T const *buf() const lifetimebound { return _buf.buf(); }
+    constexpr T const* buf() const lifetimebound { return _buf.buf(); }
 
-    constexpr T &operator[](usize i) lifetimebound {
+    constexpr T& operator[](usize i) lifetimebound {
         if (i >= len()) [[unlikely]]
             panic("index out of bounds");
 
         return _buf[i];
     }
 
-    constexpr T const &operator[](usize i) const lifetimebound {
+    constexpr T const& operator[](usize i) const lifetimebound {
         if (i >= len()) [[unlikely]]
             panic("index out of bounds");
 

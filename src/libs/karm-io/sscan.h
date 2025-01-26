@@ -16,7 +16,7 @@ struct _SScan;
 
 namespace Re {
 template <typename T>
-concept Expr = requires(T expr, Io::_SScan<Utf8> &scan) {
+concept Expr = requires(T expr, Io::_SScan<Utf8>& scan) {
     { expr(scan) } -> Meta::Same<bool>;
 };
 
@@ -91,7 +91,7 @@ struct _SScan {
         return r;
     }
 
-    auto &begin() {
+    auto& begin() {
         _begin = _cursor;
         return *this;
     }

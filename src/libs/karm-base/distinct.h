@@ -14,9 +14,9 @@ struct Distinct {
 
     always_inline constexpr T value() const { return _value; }
 
-    always_inline constexpr bool operator==(Distinct<T, Tag> const &other) const = default;
+    always_inline constexpr bool operator==(Distinct<T, Tag> const& other) const = default;
 
-    always_inline constexpr auto operator<=>(Distinct<T, Tag> const &other) const = default;
+    always_inline constexpr auto operator<=>(Distinct<T, Tag> const& other) const = default;
 
     always_inline constexpr Distinct<T, Tag> operator+(Distinct<T, Tag> other) const {
         return Distinct<T, Tag>(_value + other._value);
@@ -58,17 +58,17 @@ struct Distinct {
         return Distinct<T, Tag>(_value >> other._value);
     }
 
-    always_inline constexpr Distinct<T, Tag> &operator+=(Distinct<T, Tag> other) {
+    always_inline constexpr Distinct<T, Tag>& operator+=(Distinct<T, Tag> other) {
         _value += other._value;
         return *this;
     }
 
-    always_inline constexpr Distinct<T, Tag> &operator-=(Distinct<T, Tag> other) {
+    always_inline constexpr Distinct<T, Tag>& operator-=(Distinct<T, Tag> other) {
         _value -= other._value;
         return *this;
     }
 
-    always_inline constexpr Distinct<T, Tag> &operator++() {
+    always_inline constexpr Distinct<T, Tag>& operator++() {
         ++_value;
         return *this;
     }
@@ -79,7 +79,7 @@ struct Distinct {
         return copy;
     }
 
-    always_inline constexpr Distinct<T, Tag> &operator--() {
+    always_inline constexpr Distinct<T, Tag>& operator--() {
         --_value;
         return *this;
     }
@@ -90,42 +90,42 @@ struct Distinct {
         return copy;
     }
 
-    always_inline constexpr Distinct<T, Tag> &operator*=(Distinct<T, Tag> other) {
+    always_inline constexpr Distinct<T, Tag>& operator*=(Distinct<T, Tag> other) {
         _value *= other._value;
         return *this;
     }
 
-    always_inline constexpr Distinct<T, Tag> &operator/=(Distinct<T, Tag> other) {
+    always_inline constexpr Distinct<T, Tag>& operator/=(Distinct<T, Tag> other) {
         _value /= other._value;
         return *this;
     }
 
-    always_inline constexpr Distinct<T, Tag> &operator%=(Distinct<T, Tag> other) {
+    always_inline constexpr Distinct<T, Tag>& operator%=(Distinct<T, Tag> other) {
         _value %= other._value;
         return *this;
     }
 
-    always_inline constexpr Distinct<T, Tag> &operator&=(Distinct<T, Tag> other) {
+    always_inline constexpr Distinct<T, Tag>& operator&=(Distinct<T, Tag> other) {
         _value &= other._value;
         return *this;
     }
 
-    always_inline constexpr Distinct<T, Tag> &operator|=(Distinct<T, Tag> other) {
+    always_inline constexpr Distinct<T, Tag>& operator|=(Distinct<T, Tag> other) {
         _value |= other._value;
         return *this;
     }
 
-    always_inline constexpr Distinct<T, Tag> &operator^=(Distinct<T, Tag> other) {
+    always_inline constexpr Distinct<T, Tag>& operator^=(Distinct<T, Tag> other) {
         _value ^= other._value;
         return *this;
     }
 
-    always_inline constexpr Distinct<T, Tag> &operator<<=(Distinct<T, Tag> other) {
+    always_inline constexpr Distinct<T, Tag>& operator<<=(Distinct<T, Tag> other) {
         _value <<= other._value;
         return *this;
     }
 
-    always_inline constexpr Distinct<T, Tag> &operator>>=(Distinct<T, Tag> other) {
+    always_inline constexpr Distinct<T, Tag>& operator>>=(Distinct<T, Tag> other) {
         _value >>= other._value;
         return *this;
     }

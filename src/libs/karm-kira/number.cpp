@@ -10,7 +10,7 @@ namespace Karm::Kira {
 Ui::Child number(f64 value, Ui::OnChange<f64> onChange, f64 step) {
     return Ui::hflow(
                Ui::button(
-                   [onChange, value, step](auto &n) {
+                   [onChange, value, step](auto& n) {
                        onChange(n, value - step);
                    },
                    Ui::ButtonStyle::subtle(),
@@ -18,7 +18,7 @@ Ui::Child number(f64 value, Ui::OnChange<f64> onChange, f64 step) {
                ),
                Ui::labelMedium("{}", value) | Ui::insets({0, 4}) | Ui::center(),
                Ui::button(
-                   [onChange, value, step](auto &n) {
+                   [onChange, value, step](auto& n) {
                        onChange(n, value + step);
                    },
                    Ui::ButtonStyle::subtle(),

@@ -29,7 +29,7 @@ struct CpuRast {
 
     void _appendRange(irange range) {
         usize i = 0;
-        for (auto &r : _ranges) {
+        for (auto& r : _ranges) {
             if (r.overlaps(range)) {
                 auto merged = r.merge(range);
                 _ranges.removeAt(i);
@@ -48,7 +48,7 @@ struct CpuRast {
         _ranges.pushBack(range);
     }
 
-    void fill(Math::Polyf &poly, Math::Recti clip, FillRule fillRule, auto cb) {
+    void fill(Math::Polyf& poly, Math::Recti clip, FillRule fillRule, auto cb) {
         auto polyBound = poly.bound().grow(UNIT);
         auto clipBound = polyBound
                              .ceil()
@@ -64,7 +64,7 @@ struct CpuRast {
             for (f64 yy = y; yy < y + 1.0; yy += UNIT) {
                 _active.clear();
 
-                for (auto &edge : poly) {
+                for (auto& edge : poly) {
                     auto sample = yy + HALF_UNIT;
 
                     if (edge.bound().top() <= sample and sample < edge.bound().bottom()) {
@@ -78,7 +78,7 @@ struct CpuRast {
                 if (_active.len() == 0)
                     continue;
 
-                sort(_active, [](auto const &a, auto const &b) {
+                sort(_active, [](auto const& a, auto const& b) {
                     return a.x <=> b.x;
                 });
 

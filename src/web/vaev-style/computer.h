@@ -9,19 +9,19 @@ namespace Vaev::Style {
 
 struct Computer {
     Media _media;
-    StyleBook const &_styleBook;
+    StyleBook const& _styleBook;
 
-    using MatchingRules = Vec<Cursor<StyleRule>>;
+    using MatchingRules = Vec<Tuple<Cursor<StyleRule>, Spec>>;
 
-    void _evalRule(Rule const &rule, Markup::Element const &el, MatchingRules &matches);
+    void _evalRule(Rule const& rule, Markup::Element const& el, MatchingRules& matches);
 
-    void _evalRule(Rule const &rule, Page const &page, PageComputedStyle &c);
+    void _evalRule(Rule const& rule, Page const& page, PageComputedStyle& c);
 
-    Strong<Computed> _evalCascade(Computed const &parent, MatchingRules &matches);
+    Rc<Computed> _evalCascade(Computed const& parent, MatchingRules& matches);
 
-    Strong<Computed> computeFor(Computed const &parent, Markup::Element const &el);
+    Rc<Computed> computeFor(Computed const& parent, Markup::Element const& el);
 
-    Strong<PageComputedStyle> computeFor(Computed const &parent, Page const &page);
+    Rc<PageComputedStyle> computeFor(Computed const& parent, Page const& page);
 };
 
 } // namespace Vaev::Style

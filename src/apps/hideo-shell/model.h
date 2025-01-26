@@ -69,8 +69,8 @@ struct State : Meta::NoCopy {
 
     Image::Picture background;
     Vec<Noti> noti;
-    Vec<Strong<Launcher>> launchers;
-    Vec<Strong<Instance>> instances;
+    Vec<Rc<Launcher>> launchers;
+    Vec<Rc<Instance>> instances;
 };
 
 struct ToggleTablet {};
@@ -98,7 +98,7 @@ struct StartInstance {
 };
 
 struct AddInstance {
-    Strong<Instance> instance;
+    Rc<Instance> instance;
 };
 
 struct MoveInstance {

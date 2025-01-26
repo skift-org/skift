@@ -6,20 +6,20 @@ namespace Karm {
 
 using _TimeVal = u64;
 
-// MARK: TimeSpan and TimeStamp ------------------------------------------------
+// MARK: Duration and TimeStamp ------------------------------------------------
 
-struct TimeSpan {
+struct Duration {
     _TimeVal _value; // microseconds (us) aka 1/1,000,000th of a second
 
-    static constexpr TimeSpan zero() {
-        return TimeSpan{0};
+    static constexpr Duration zero() {
+        return Duration{0};
     }
 
-    static constexpr TimeSpan infinite() {
-        return TimeSpan{~0uz};
+    static constexpr Duration infinite() {
+        return Duration{~0uz};
     }
 
-    static constexpr TimeSpan fromUSecs(_TimeVal value) {
+    static constexpr Duration fromUSecs(_TimeVal value) {
         return {value};
     }
 
@@ -55,10 +55,10 @@ struct TimeSpan {
         return fromMonths(value * 12);
     }
 
-    constexpr TimeSpan()
+    constexpr Duration()
         : _value(0) {}
 
-    constexpr TimeSpan(_TimeVal value)
+    constexpr Duration(_TimeVal value)
         : _value(value) {}
 
     constexpr bool isInfinite() const {
@@ -101,21 +101,21 @@ struct TimeSpan {
         return toMonths() / 12;
     }
 
-    constexpr TimeSpan &operator+=(TimeSpan other) {
+    constexpr Duration& operator+=(Duration other) {
         _value += other._value;
         return *this;
     }
 
-    constexpr TimeSpan &operator-=(TimeSpan other) {
+    constexpr Duration& operator-=(Duration other) {
         _value -= other._value;
         return *this;
     }
 
-    constexpr TimeSpan operator+(TimeSpan other) const {
+    constexpr Duration operator+(Duration other) const {
         return _value + other._value;
     }
 
-    constexpr TimeSpan operator-(TimeSpan other) const {
+    constexpr Duration operator-(Duration other) const {
         return _value - other._value;
     }
 
@@ -123,77 +123,86 @@ struct TimeSpan {
         return _value;
     }
 
-    auto operator<=>(TimeSpan const &other) const = default;
-    bool operator==(TimeSpan const &other) const = default;
+    auto operator<=>(Duration const& other) const = default;
+    bool operator==(Duration const& other) const = default;
 };
 
-inline TimeSpan operator""_us(unsigned long long value) {
-    return TimeSpan::fromUSecs(value);
+inline Duration operator""_us(unsigned long long value) {
+    return Duration::fromUSecs(value);
 }
 
-inline TimeSpan operator""_ms(unsigned long long value) {
-    return TimeSpan::fromMSecs(value);
+inline Duration operator""_ms(unsigned long long value) {
+    return Duration::fromMSecs(value);
 }
 
-inline TimeSpan operator""_s(unsigned long long value) {
-    return TimeSpan::fromSecs(value);
+inline Duration operator""_s(unsigned long long value) {
+    return Duration::fromSecs(value);
 }
 
-inline TimeSpan operator""_m(unsigned long long value) {
-    return TimeSpan::fromMinutes(value);
+inline Duration operator""_m(unsigned long long value) {
+    return Duration::fromMinutes(value);
 }
 
-inline TimeSpan operator""_h(unsigned long long value) {
-    return TimeSpan::fromHours(value);
+inline Duration operator""_h(unsigned long long value) {
+    return Duration::fromHours(value);
 }
 
-inline TimeSpan operator""_d(unsigned long long value) {
-    return TimeSpan::fromDays(value);
+inline Duration operator""_d(unsigned long long value) {
+    return Duration::fromDays(value);
 }
 
-inline TimeSpan operator""_w(unsigned long long value) {
-    return TimeSpan::fromWeeks(value);
+inline Duration operator""_w(unsigned long long value) {
+    return Duration::fromWeeks(value);
 }
 
-inline TimeSpan operator""_M(unsigned long long value) {
-    return TimeSpan::fromMonths(value);
+inline Duration operator""_M(unsigned long long value) {
+    return Duration::fromMonths(value);
 }
 
-inline TimeSpan operator""_y(unsigned long long value) {
-    return TimeSpan::fromYears(value);
+inline Duration operator""_y(unsigned long long value) {
+    return Duration::fromYears(value);
 }
 
-struct TimeStamp {
+struct MonotonicClock {
+    static constexpr bool monotonic = true;
+};
+
+struct SystemClock {
+    static constexpr bool monotonic = false;
+};
+
+template <typename Clock>
+struct _Instant {
     _TimeVal _value{}; // microseconds (us) aka 1/1,000,000th of a second
 
     static constexpr _TimeVal END_OF_TIME = ~0uz;
 
-    static constexpr TimeStamp epoch() {
+    static constexpr _Instant epoch() {
         return {0};
     }
 
-    static constexpr TimeStamp endOfTime() {
+    static constexpr _Instant endOfTime() {
         return {END_OF_TIME};
     }
 
-    constexpr TimeStamp(_TimeVal value = 0)
+    constexpr _Instant(_TimeVal value = 0)
         : _value(value) {}
 
     constexpr bool isEndOfTime() const {
         return _value == END_OF_TIME;
     }
 
-    constexpr TimeStamp &operator+=(TimeSpan other) {
+    constexpr _Instant& operator+=(Duration other) {
         *this = *this + other;
         return *this;
     }
 
-    constexpr TimeStamp &operator-=(TimeSpan other) {
+    constexpr _Instant& operator-=(Duration other) {
         *this = *this - other;
         return *this;
     }
 
-    constexpr TimeStamp operator+(TimeSpan other) const {
+    constexpr _Instant operator+(Duration other) const {
         if (other.isInfinite()) {
             return endOfTime();
         }
@@ -203,16 +212,16 @@ struct TimeStamp {
         return _value + other._value;
     }
 
-    constexpr TimeStamp operator-(TimeSpan other) const {
+    constexpr _Instant operator-(Duration other) const {
         if (isEndOfTime()) {
             return *this;
         }
         return _value - other._value;
     }
 
-    constexpr TimeSpan operator-(TimeStamp other) const {
+    constexpr Duration operator-(_Instant other) const {
         if (isEndOfTime() or other.isEndOfTime()) {
-            return TimeSpan::infinite();
+            return Duration::infinite();
         }
         return _value - other._value;
     }
@@ -221,9 +230,13 @@ struct TimeStamp {
         return _value;
     }
 
-    auto operator<=>(TimeStamp const &) const = default;
-    bool operator==(TimeStamp const &) const = default;
+    auto operator<=>(_Instant const&) const = default;
+    bool operator==(_Instant const&) const = default;
 };
+
+using Instant = _Instant<MonotonicClock>;
+
+using SystemTime = _Instant<SystemClock>;
 
 // MARK: Time ------------------------------------------------------------------
 
@@ -232,20 +245,20 @@ struct Time {
     u8 minute;
     u8 hour;
 
-    static Time fromTimeSpan(TimeSpan span) {
+    static Time fromDuration(Duration span) {
         Time result;
         result.hour = span.toHours();
-        span -= TimeSpan::fromHours(result.hour);
+        span -= Duration::fromHours(result.hour);
         result.minute = span.toMinutes();
-        span -= TimeSpan::fromMinutes(result.minute);
+        span -= Duration::fromMinutes(result.minute);
         result.second = span.toSecs();
         return result;
     }
 
-    TimeSpan toTimeSpan() const {
-        return TimeSpan::fromSecs(second) +
-               TimeSpan::fromMinutes(minute) +
-               TimeSpan::fromHours(hour);
+    Duration toDuration() const {
+        return Duration::fromSecs(second) +
+               Duration::fromMinutes(minute) +
+               Duration::fromHours(hour);
     }
 };
 
@@ -260,7 +273,7 @@ struct Day {
         return _raw;
     }
 
-    auto operator<=>(Day const &) const = default;
+    auto operator<=>(Day const&) const = default;
 };
 
 #define FOREACH_MONTH(MONTH) \
@@ -328,7 +341,7 @@ struct Month {
         return _raw;
     }
 
-    auto operator<=>(Month const &) const = default;
+    auto operator<=>(Month const&) const = default;
 };
 
 struct Year {
@@ -379,7 +392,7 @@ struct Year {
         return _raw;
     }
 
-    auto operator<=>(Year const &) const = default;
+    auto operator<=>(Year const&) const = default;
 };
 
 // MARK: Date ------------------------------------------------------------------
@@ -437,7 +450,7 @@ struct DayOfWeek {
         }
     }
 
-    auto operator<=>(DayOfWeek const &) const = default;
+    auto operator<=>(DayOfWeek const&) const = default;
 };
 
 struct Date {
@@ -449,8 +462,8 @@ struct Date {
         return Date{0, Month::JANUARY, 1970};
     }
 
-    static Date fromTimeStamp(TimeStamp stamp) {
-        auto span = stamp - TimeStamp::epoch();
+    static Date fromInstant(SystemTime stamp) {
+        auto span = stamp - SystemTime::epoch();
         auto days = span.toDays();
 
         Year year{1970};
@@ -468,7 +481,7 @@ struct Date {
         return Date{days, month, year};
     }
 
-    TimeStamp toTimeStamp() const {
+    SystemTime toInstant() const {
         usize days{};
 
         for (isize y = 1970; y < isize(year); y++) {
@@ -481,26 +494,26 @@ struct Date {
 
         days += day;
 
-        return TimeStamp::epoch() + TimeSpan::fromDays(days);
+        return SystemTime::epoch() + Duration::fromDays(days);
     }
 
     /// Returns the day of the month, 0-based.
     u8 dayOfMonth() const {
         Date firstDay{0, month, year};
-        return (toTimeStamp() - firstDay.toTimeStamp()).toDays();
+        return (toInstant() - firstDay.toInstant()).toDays();
     }
 
     DayOfWeek dayOfWeek() const {
         Date firstJan{0, 0, year};
-        return DayOfWeek((toTimeStamp() - firstJan.toTimeStamp()).toDays() % 7);
+        return DayOfWeek((toInstant() - firstJan.toInstant()).toDays() % 7);
     }
 
     usize dayOfYear() const {
         Date firstJan{0, 0, year};
-        return (toTimeStamp() - firstJan.toTimeStamp()).toDays();
+        return (toInstant() - firstJan.toInstant()).toDays();
     }
 
-    auto operator<=>(Date const &) const = default;
+    auto operator<=>(Date const&) const = default;
 };
 
 // MARK: DateTime --------------------------------------------------------------
@@ -513,14 +526,14 @@ struct DateTime {
         return DateTime{Date::epoch(), {}};
     }
 
-    static DateTime fromTimeStamp(TimeStamp stamp) {
-        Date date = Date::fromTimeStamp(stamp);
-        Time time = Time::fromTimeSpan(stamp - date.toTimeStamp());
+    static DateTime fromInstant(SystemTime stamp) {
+        Date date = Date::fromInstant(stamp);
+        Time time = Time::fromDuration(stamp - date.toInstant());
         return {date, time};
     }
 
-    TimeStamp toTimeStamp() const {
-        return date.toTimeStamp() + time.toTimeSpan();
+    SystemTime toInstant() const {
+        return date.toInstant() + time.toDuration();
     }
 };
 

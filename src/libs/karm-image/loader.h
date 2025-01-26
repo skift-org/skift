@@ -6,7 +6,7 @@
 
 namespace Karm::Image {
 
-Res<Picture> load(Sys::Mmap &&map);
+Res<Picture> load(Sys::Mmap&& map);
 
 Res<Picture> load(Mime::Url url);
 

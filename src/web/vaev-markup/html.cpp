@@ -1,5 +1,5 @@
 #include <karm-base/array.h>
-#include <karm-base/cons.h>
+#include <karm-base/tuple.h>
 
 #include "html.h"
 
@@ -11,7 +11,7 @@ static constexpr bool DEBUG_HTML_PARSER = false;
 
 struct Entity {
     Str name;
-    Rune const *runes;
+    Rune const* runes;
 
     operator bool() {
         return runes != nullptr;
@@ -573,6 +573,7 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // then switch to the data state and emit the current tag token.
         // Otherwise, treat it as per the "anything else" entry below.
         else if (rune == '>' and _isAppropriateEndTagToken()) {
+            _builder.clear();
             _switchTo(State::DATA);
             _emit();
         }
@@ -1715,6 +1716,7 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // data state. Emit the current tag token.
         if (rune == '>') {
             _ensure().selfClosing = true;
+            _builder.clear();
             _switchTo(State::DATA);
             _emit();
         }
@@ -1744,7 +1746,7 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // U+003E GREATER-THAN SIGN (>)
         // Switch to the data state. Emit the current comment token.
         if (rune == '>') {
-            _ensure(HtmlToken::COMMENT).data = _builder.take();
+            _ensure(HtmlToken::COMMENT).data = _commentBuilder.take();
             _switchTo(State::DATA);
             _emit();
         }
@@ -1762,13 +1764,13 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // REPLACEMENT CHARACTER character to the comment token's data.
         else if (rune == 0) {
             _raise("unexpected-null-character");
-            _builder.append(0xFFFD);
+            _commentBuilder.append(0xFFFD);
         }
 
         // Anything else
         // Append the current input character to the comment token's data.
         else {
-            _builder.append(rune);
+            _commentBuilder.append(rune);
         }
 
         break;
@@ -1778,15 +1780,16 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // 13.2.5.42 MARK: Markup declaration open state
         // If the next few characters are:
 
-        _temp.append(rune);
+        peekerForSingleState.append(rune);
+
         // Two U+002D HYPHEN-MINUS characters (-)
         // Consume those two characters, create a comment token whose data
         // is the empty string, and switch to the comment start state.
-        if (auto r = startWith("--"s, _temp.str()); r != Match::NO) {
+        if (auto r = startWith("--"s, peekerForSingleState.str()); r != Match::NO) {
             if (r == Match::PARTIAL)
                 break;
 
-            _temp.clear();
+            peekerForSingleState.clear();
             _begin(HtmlToken::COMMENT);
             _switchTo(State::COMMENT_START);
         }
@@ -1794,11 +1797,11 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // ASCII case-insensitive match for the word "DOCTYPE"
         // Consume those characters and switch to the DOCTYPE state.
 
-        else if (auto r = startWith("DOCTYPE"s, _temp.str()); r != Match::NO) {
+        else if (auto r = startWith("DOCTYPE"s, peekerForSingleState.str()); r != Match::NO) {
             if (r == Match::PARTIAL)
                 break;
 
-            _temp.clear();
+            peekerForSingleState.clear();
             _switchTo(State::DOCTYPE);
         }
 
@@ -1810,12 +1813,12 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // error. Create a comment token whose data is the "[CDATA[" string.
         // Switch to the bogus comment state.
 
-        else if (auto r = startWith("[CDATA["s, _temp.str()); r != Match::NO) {
+        else if (auto r = startWith("[CDATA["s, peekerForSingleState.str()); r != Match::NO) {
             if (r == Match::PARTIAL)
                 break;
 
             // NOSPEC: This is in reallity more complicated
-            _temp.clear();
+            peekerForSingleState.clear();
             _switchTo(State::CDATA_SECTION);
         }
 
@@ -1824,7 +1827,7 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // comment token whose data is the empty string. Switch to the bogus
         // comment state (don't consume anything in the current state).
         else {
-            _temp.clear();
+            peekerForSingleState.clear();
             _raise("incorrectly-opened-comment");
             _begin(HtmlToken::COMMENT);
             _reconsumeIn(State::BOGUS_COMMENT, rune);
@@ -1875,6 +1878,7 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // the data state. Emit the current comment token.
         else if (rune == '>') {
             _raise("abrupt-closing-of-empty-comment");
+            _ensure(HtmlToken::COMMENT).data = _commentBuilder.take();
             _switchTo(State::DATA);
             _emit();
         }
@@ -1893,7 +1897,7 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // Append a U+002D HYPHEN-MINUS character (-) to the comment token's
         // data. Reconsume in the comment state.
         else {
-            _builder.append('-');
+            _commentBuilder.append('-');
             _reconsumeIn(State::COMMENT, rune);
         }
 
@@ -1908,7 +1912,7 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // Append the current input character to the comment token's data.
         // Switch to the comment less-than sign state.
         if (rune == '<') {
-            _builder.append(rune);
+            _commentBuilder.append(rune);
             _switchTo(State::COMMENT_LESS_THAN_SIGN);
         }
 
@@ -1923,7 +1927,7 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // REPLACEMENT CHARACTER character to the comment token's data.
         else if (rune == 0) {
             _raise("unexpected-null-character");
-            _builder.append(0xFFFD);
+            _commentBuilder.append(0xFFFD);
         }
 
         // EOF
@@ -1940,7 +1944,7 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // Anything else
         // Append the current input character to the comment token's data.
         else {
-            _builder.append(rune);
+            _commentBuilder.append(rune);
         }
 
         break;
@@ -1954,14 +1958,14 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // Append the current input character to the comment token's data.
         // Switch to the comment less-than sign bang state.
         if (rune == '!') {
-            _builder.append(rune);
+            _commentBuilder.append(rune);
             _switchTo(State::COMMENT_LESS_THAN_SIGN_BANG);
         }
 
         // U+003C LESS-THAN SIGN (<)
         // Append the current input character to the comment token's data.
         else if (rune == '<') {
-            _builder.append(rune);
+            _commentBuilder.append(rune);
         }
 
         // Anything else
@@ -2057,7 +2061,7 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // Append a U+002D HYPHEN-MINUS character (-) to the comment token's
         // data. Reconsume in the comment state.
         else {
-            _builder.append('-');
+            _commentBuilder.append('-');
             _reconsumeIn(State::COMMENT, rune);
         }
 
@@ -2071,6 +2075,7 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // U+003E GREATER-THAN SIGN (>)
         // Switch to the data state. Emit the current comment token.
         if (rune == '>') {
+            _ensure(HtmlToken::COMMENT).data = _commentBuilder.take();
             _switchTo(State::DATA);
             _emit();
         }
@@ -2085,7 +2090,7 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // Append a U+002D HYPHEN-MINUS character (-) to the comment token's
         // data.
         else if (rune == '-') {
-            _builder.append('-');
+            _commentBuilder.append('-');
         }
 
         // EOF
@@ -2102,8 +2107,8 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // Append two U+002D HYPHEN-MINUS characters (-) to the comment
         // token's data. Reconsume in the comment state.
         else {
-            _builder.append('-');
-            _builder.append('-');
+            _commentBuilder.append('-');
+            _commentBuilder.append('-');
             _reconsumeIn(State::COMMENT, rune);
         }
 
@@ -2119,9 +2124,9 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // EXCLAMATION MARK character (!) to the comment token's data.
         // Switch to the comment end dash state.
         if (rune == '-') {
-            _builder.append('-');
-            _builder.append('-');
-            _builder.append('!');
+            _commentBuilder.append('-');
+            _commentBuilder.append('-');
+            _commentBuilder.append('!');
             _switchTo(State::COMMENT_END_DASH);
         }
 
@@ -2149,9 +2154,9 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // EXCLAMATION MARK character (!) to the comment token's data.
         // Reconsume in the comment state.
         else {
-            _builder.append('-');
-            _builder.append('-');
-            _builder.append('!');
+            _commentBuilder.append('-');
+            _commentBuilder.append('-');
+            _commentBuilder.append('!');
             _reconsumeIn(State::COMMENT, rune);
         }
 
@@ -3198,7 +3203,6 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
     }
 
     case State::NAMED_CHARACTER_REFERENCE: {
-        notImplemented();
         // 13.2.5.73 MARK: Named character reference state
 
         // Consume the maximum number of characters possible, where the
@@ -3206,38 +3210,167 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // column of the named character references table. Append each
         // character to the temporary buffer when it's consumed.
 
-        // If there is a match
-        // If the character reference was consumed as part of an attribute,
-        // and the last character matched is not a U+003B SEMICOLON
-        // character (;), and the next input character is either a U+003D
-        // EQUALS SIGN character (=) or an ASCII alphanumeric, then, for
-        // historical reasons, flush code points consumed as a character
-        // reference and switch to the return state.
+        // NOTE: This state asks us to "Consume the maximum number of characters possible" but also to check the
+        // "next input character"; an extra implementation effort was made in order to be able to access
+        // the "next input character"
 
-        // Otherwise:
+        // NOTE: While the default and valid behaviour is for entities to end with semicolon (;), some entities have
+        // 2 names, one ending with semicolon and the other not.
+        // For these cases, even if we have a match, if it doesnt end with semi-colon, we will continue consuming
 
-        // If the last character matched is not a U+003B SEMICOLON character
-        // (;), then this is a missing-semicolon-after-character-reference
-        // parse error.
+        // NOTE: Some entities are prefix of others: "&not" is prefix of "&notinva;"; however, since ";" only appears if
+        // its the last char, it cant be that a string ending with it is also a prefix
 
-        // Set the temporary buffer to the empty string. Append one or two
-        // characters corresponding to the character reference name (as
-        // given by the second column of the named character references
-        // table) to the temporary buffer.
+        // NOTE: In this state, we only add alphanum chars to _temp
 
-        // Flush code points consumed as a character reference. Switch to
-        // the return state. Otherwise Flush code points consumed as a
-        // character reference. Switch to the ambiguous ampersand state. If
-        // the markup contains (not in an attribute) the string I'm &notit;
-        // I tell you, the character reference is parsed as "not", as in,
-        // I'm ¬it; I tell you (and this is a parse error). But if the
-        // markup was I'm &notin; I tell you, the character reference would
-        // be parsed as "notin;", resulting in I'm ∉ I tell you (and no
-        // parse error).
+        // NOTE: In case of matching just a prefix or not matching at all but having already consumed characters into
+        // _temp, it is ok to rely on _flushCodePointsConsumedAsACharacterReference for correctly dispatch the runes in
+        // _temp.
+        // In the case where there is no match at all, the next state is State::AMBIGUOUS_AMPERSAND which emits the
+        // consumed alphanum.
+        //      Eg. given the entity "&between;", the input "&betweem" will be emited as State::AMBIGUOUS_AMPERSAND
+        //      does
+        // For return states, attribute states add alphanum chars to their builder and data states emit alphanum
+        //      Eg. given the entities "&not" and "&notinva;", the input "&notinvd" matches "&not" and
+        //      flushes "invd" as the return state would
 
-        // However, if the markup contains the string I'm &notit; I tell you
-        // in an attribute, no character reference is parsed and string
-        // remains intact (and there is no parse error).
+        bool hasPartialMatch = false;
+
+        auto computeMatchState = [&](StringBuilder prefix) {
+            // TODO: (performance) consider sorting entities lexicographically and binary search or using a trie
+
+            prefix.append(rune);
+
+            auto target = prefix.str();
+
+            auto bestMatch = Match::NO;
+            for (auto& entity : ENTITIES) {
+                auto match = startWith(entity.name, target);
+
+                if (match == Match::PARTIAL)
+                    hasPartialMatch = true;
+
+                if (match == Match::YES)
+                    bestMatch = max(bestMatch, match);
+            };
+            return bestMatch;
+        };
+
+        auto matchStateWithNextInputChar = computeMatchState(_temp);
+
+        // NOTE: if rune==';', we are either having Match::YES or Match::NO, not partial
+        if (hasPartialMatch) {
+            _temp.append(rune);
+
+            if (matchStateWithNextInputChar == Match::YES)
+                matchedCharReferenceNoSemiColon = _temp.len();
+
+            break;
+        }
+
+        // If there is a match from before matchedCharReferenceNoSemiColon
+        if (matchStateWithNextInputChar == Match::NO and matchedCharReferenceNoSemiColon) {
+            // If the character reference was consumed as part of an attribute,
+            // and the last character matched is not a U+003B SEMICOLON
+            // character (;), and the next input character is either a U+003D
+            // EQUALS SIGN character (=) or an ASCII alphanumeric, then, for
+            // historical reasons, flush code points consumed as a character
+            // reference and switch to the return state.
+            if (
+                _consumedAsPartOfAnAttribute() and
+                (rune == '=' or isAsciiAlphaNum(rune))
+            ) {
+                _flushCodePointsConsumedAsACharacterReference();
+                _reconsumeIn(_returnState, rune);
+            } else {
+                // Otherwise:
+
+                // If the last character matched is not a U+003B SEMICOLON character
+                // (;), then this is a missing-semicolon-after-character-reference
+                // parse error.
+                _raise("missing-semicolon-after-character-reference");
+
+                // Set the temporary buffer to the empty string.
+                // Append one or two characters corresponding to the character reference name (as
+                // given by the second column of the named character references
+                // table) to the temporary buffer.
+
+                // NOTE: we should expand the entity but also re-add the not matched remaining characters
+                // to the _temp buffer
+
+                auto _tempWithUnexpandedEntity = _temp.str();
+                auto entityName = _Str<Utf8>(_tempWithUnexpandedEntity.begin(), matchedCharReferenceNoSemiColon.unwrap());
+
+                for (auto& entity : ENTITIES) {
+                    if (entityName == entity.name) {
+
+                        _temp.clear();
+                        _temp.append(Slice<Rune>::fromNullterminated(entity.runes));
+
+                        for (usize i = matchedCharReferenceNoSemiColon.unwrap(); i < _tempWithUnexpandedEntity.len(); ++i) {
+                            _temp.append(_tempWithUnexpandedEntity[i]);
+                        }
+                        break;
+                    }
+                }
+
+                // Flush code points consumed as a character reference. Switch to
+                // the return state.
+                matchedCharReferenceNoSemiColon = NONE;
+                _flushCodePointsConsumedAsACharacterReference();
+                _reconsumeIn(_returnState, rune);
+            }
+        }
+
+        else if (matchStateWithNextInputChar == Match::YES) {
+            // FIXME: consider run this assert only in DEBUG mode
+            if (rune != ';')
+                panic("A full entity match that is not a partial match must end with a semicolon");
+
+            _temp.append(rune);
+
+            // If the character reference was consumed as part of an attribute,
+            // and the last character matched is not a U+003B SEMICOLON
+            // character (;), and the next input character is either a U+003D
+            // EQUALS SIGN character (=) or an ASCII alphanumeric, then, for
+            // historical reasons, flush code points consumed as a character
+            // reference and switch to the return state.
+
+            // => This is impossible since the last matched char is a semicolon
+
+            // Otherwise:
+
+            // If the last character matched is not a U+003B SEMICOLON character
+            // (;), then this is a missing-semicolon-after-character-reference
+            // parse error.
+
+            // => This is impossible since the last matched char is a semicolon
+
+            // Set the temporary buffer to the empty string.
+            // Append one or two characters corresponding to the character reference name (as
+            // given by the second column of the named character references
+            // table) to the temporary buffer.
+            for (auto& entity : ENTITIES) {
+                if (_temp.str() == entity.name) {
+                    _temp.clear();
+                    _temp.append(Slice<Rune>::fromNullterminated(entity.runes));
+                    break;
+                }
+            }
+
+            // Flush code points consumed as a character reference. Switch to
+            // the return state.
+            matchedCharReferenceNoSemiColon = NONE;
+            _flushCodePointsConsumedAsACharacterReference();
+            _switchTo(_returnState);
+        }
+
+        else {
+            // Otherwise Flush code points consumed as a character reference.
+            // Switch to the ambiguous ampersand state.
+            _flushCodePointsConsumedAsACharacterReference();
+            _reconsumeIn(State::AMBIGUOUS_AMPERSAND, rune);
+        }
         break;
     }
 
@@ -3251,9 +3384,7 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // attribute's value. Otherwise, emit the current input character as
         // a character token.
         if (isAsciiAlphaNum(rune)) {
-            if (_returnState == State::ATTRIBUTE_VALUE_DOUBLE_QUOTED ||
-                _returnState == State::ATTRIBUTE_VALUE_SINGLE_QUOTED ||
-                _returnState == State::ATTRIBUTE_VALUE_UNQUOTED) {
+            if (_consumedAsPartOfAnAttribute()) {
                 _builder.append(rune);
             } else {
                 _emit(rune);
@@ -3496,38 +3627,38 @@ void HtmlLexer::consume(Rune rune, bool isEof) {
         // 0x9F	0x0178	LATIN CAPITAL LETTER Y WITH DIAERESIS (Ÿ)
 
         Array const CONV = {
-            Cons{0x80u, 0x20ACuz},
-            Cons{0x82u, 0x201Auz},
-            Cons{0x83u, 0x0192uz},
-            Cons{0x84u, 0x201Euz},
-            Cons{0x85u, 0x2026uz},
-            Cons{0x86u, 0x2020uz},
-            Cons{0x87u, 0x2021uz},
-            Cons{0x88u, 0x02C6uz},
-            Cons{0x89u, 0x2030uz},
-            Cons{0x8Au, 0x0160uz},
-            Cons{0x8Bu, 0x2039uz},
-            Cons{0x8Cu, 0x0152uz},
-            Cons{0x8Eu, 0x017Duz},
-            Cons{0x91u, 0x2018uz},
-            Cons{0x92u, 0x2019uz},
-            Cons{0x93u, 0x201Cuz},
-            Cons{0x94u, 0x201Duz},
-            Cons{0x95u, 0x2022uz},
-            Cons{0x96u, 0x2013uz},
-            Cons{0x97u, 0x2014uz},
-            Cons{0x98u, 0x02DCuz},
-            Cons{0x99u, 0x2122uz},
-            Cons{0x9Au, 0x0161uz},
-            Cons{0x9Bu, 0x203Auz},
-            Cons{0x9Cu, 0x0153uz},
-            Cons{0x9Eu, 0x017Euz},
-            Cons{0x9Fu, 0x0178uz},
+            Pair{0x80u, 0x20ACuz},
+            Pair{0x82u, 0x201Auz},
+            Pair{0x83u, 0x0192uz},
+            Pair{0x84u, 0x201Euz},
+            Pair{0x85u, 0x2026uz},
+            Pair{0x86u, 0x2020uz},
+            Pair{0x87u, 0x2021uz},
+            Pair{0x88u, 0x02C6uz},
+            Pair{0x89u, 0x2030uz},
+            Pair{0x8Au, 0x0160uz},
+            Pair{0x8Bu, 0x2039uz},
+            Pair{0x8Cu, 0x0152uz},
+            Pair{0x8Eu, 0x017Duz},
+            Pair{0x91u, 0x2018uz},
+            Pair{0x92u, 0x2019uz},
+            Pair{0x93u, 0x201Cuz},
+            Pair{0x94u, 0x201Duz},
+            Pair{0x95u, 0x2022uz},
+            Pair{0x96u, 0x2013uz},
+            Pair{0x97u, 0x2014uz},
+            Pair{0x98u, 0x02DCuz},
+            Pair{0x99u, 0x2122uz},
+            Pair{0x9Au, 0x0161uz},
+            Pair{0x9Bu, 0x203Auz},
+            Pair{0x9Cu, 0x0153uz},
+            Pair{0x9Eu, 0x017Euz},
+            Pair{0x9Fu, 0x0178uz},
         };
 
-        for (auto &conv : CONV)
-            if (conv.car == _currChar) {
-                _currChar = conv.cdr;
+        for (auto& conv : CONV)
+            if (conv.v0 == _currChar) {
+                _currChar = conv.v1;
                 break;
             }
 
@@ -3563,7 +3694,7 @@ void HtmlParser::_raise(Str msg) {
 // https://html.spec.whatwg.org/multipage/parsing.html#the-stack-of-open-elements
 
 // https://html.spec.whatwg.org/multipage/parsing.html#special
-bool isSpecial(TagName const &tag) {
+bool isSpecial(TagName const& tag) {
     static constexpr Array SPECIAL{
 #define SPECIAL(NAME) NAME,
 #include "defs/ns-html-special.inc"
@@ -3576,7 +3707,7 @@ bool isSpecial(TagName const &tag) {
 // 13.2.4.3 MARK: The list of active formatting elements
 // https://html.spec.whatwg.org/multipage/parsing.html#list-of-active-formatting-elements
 
-void reconstructActiveFormattingElements(HtmlParser &) {
+void reconstructActiveFormattingElements(HtmlParser&) {
     // TODO
 }
 
@@ -3584,7 +3715,7 @@ void reconstructActiveFormattingElements(HtmlParser &) {
 // https://html.spec.whatwg.org/multipage/parsing.html#tokenization
 
 // https://html.spec.whatwg.org/multipage/parsing.html#acknowledge-self-closing-flag
-void acknowledgeSelfClosingFlag(HtmlToken const &) {
+void acknowledgeSelfClosingFlag(HtmlToken const&) {
     logDebugIf(DEBUG_HTML_PARSER, "acknowledgeSelfClosingFlag not implemented");
 }
 
@@ -3595,15 +3726,15 @@ void acknowledgeSelfClosingFlag(HtmlToken const &) {
 // https://html.spec.whatwg.org/multipage/parsing.html#creating-and-inserting-nodes
 
 struct AdjustedInsertionLocation {
-    Strong<Element> parent;
+    Rc<Element> parent;
 
     // https://html.spec.whatwg.org/multipage/parsing.html#insert-an-element-at-the-adjusted-insertion-location
-    void insert(Strong<Node> node) {
+    void insert(Rc<Node> node) {
         // NOSPEC
         parent->appendChild(node);
     }
 
-    Opt<Strong<Node>> lastChild() {
+    Opt<Rc<Node>> lastChild() {
         // NOSPEC
         if (not parent->hasChildren())
             return NONE;
@@ -3612,7 +3743,7 @@ struct AdjustedInsertionLocation {
 };
 
 // https://html.spec.whatwg.org/multipage/parsing.html#appropriate-place-for-inserting-a-node
-AdjustedInsertionLocation apropriatePlaceForInsertingANode(HtmlParser &b, Opt<Strong<Element>> overrideTarget = NONE) {
+AdjustedInsertionLocation apropriatePlaceForInsertingANode(HtmlParser& b, Opt<Rc<Element>> overrideTarget = NONE) {
     // 1. If there was an override target specified, then let target be
     //    the override target.
     //
@@ -3664,7 +3795,7 @@ AdjustedInsertionLocation apropriatePlaceForInsertingANode(HtmlParser &b, Opt<St
 }
 
 // https://html.spec.whatwg.org/multipage/parsing.html#create-an-element-for-the-token
-Strong<Element> createElementFor(HtmlToken const &t, Ns ns) {
+Rc<Element> createElementFor(HtmlToken const& t, Ns ns) {
     // NOSPEC: Keep it simple for the POC
 
     // 1. If the active speculative HTML parser is not null, then return the
@@ -3710,10 +3841,10 @@ Strong<Element> createElementFor(HtmlToken const &t, Ns ns) {
     //    leave it unset.
     auto tag = TagName::make(t.name, ns);
     logDebugIf(DEBUG_HTML_PARSER, "Creating element: {} {}", t.name, tag);
-    auto el = makeStrong<Element>(tag);
+    auto el = makeRc<Element>(tag);
 
     // 10. Append each attribute in the given token to element.
-    for (auto &[name, value] : t.attrs) {
+    for (auto& [name, value] : t.attrs) {
         el->setAttribute(AttrName::make(name, ns), value);
     }
 
@@ -3752,7 +3883,7 @@ Strong<Element> createElementFor(HtmlToken const &t, Ns ns) {
 
 // https://html.spec.whatwg.org/multipage/parsing.html#insert-a-foreign-element
 
-static Strong<Element> insertAForeignElement(HtmlParser &b, HtmlToken const &t, Ns ns, bool onlyAddToElementStack = false) {
+static Rc<Element> insertAForeignElement(HtmlParser& b, HtmlToken const& t, Ns ns, bool onlyAddToElementStack = false) {
     // 1. Let the adjusted insertion location be the appropriate place for inserting a node.
     auto location = apropriatePlaceForInsertingANode(b);
 
@@ -3774,12 +3905,12 @@ static Strong<Element> insertAForeignElement(HtmlParser &b, HtmlToken const &t, 
 }
 
 // https://html.spec.whatwg.org/multipage/parsing.html#insert-an-html-element
-static Strong<Element> insertHtmlElement(HtmlParser &b, HtmlToken const &t) {
+static Rc<Element> insertHtmlElement(HtmlParser& b, HtmlToken const& t) {
     return insertAForeignElement(b, t, Vaev::HTML, false);
 }
 
 // https://html.spec.whatwg.org/multipage/parsing.html#insert-a-character
-static void insertACharacter(HtmlParser &b, Rune c) {
+static void insertACharacter(HtmlParser& b, Rune c) {
     // 2. Let the adjusted insertion location be the appropriate place for inserting a node.
     auto location = apropriatePlaceForInsertingANode(b);
 
@@ -3800,20 +3931,20 @@ static void insertACharacter(HtmlParser &b, Rune c) {
     //            adjusted insertion location finds itself, and insert the
     //            newly created node at the adjusted insertion location.
     else {
-        auto text = makeStrong<Text>(""s);
+        auto text = makeRc<Text>(""s);
         text->appendData(c);
 
         location.insert(text);
     }
 }
 
-static void insertACharacter(HtmlParser &b, HtmlToken const &t) {
+static void insertACharacter(HtmlParser& b, HtmlToken const& t) {
     // 1. Let data be the characters passed to the algorithm, or, if no characters were explicitly specified, the character of the character token being processed.
     insertACharacter(b, t.rune);
 }
 
 // https://html.spec.whatwg.org/multipage/parsing.html#insert-a-comment
-static void insertAComment(HtmlParser &b, HtmlToken const &t) {
+static void insertAComment(HtmlParser& b, HtmlToken const& t) {
     // 1. Let data be the data given in the comment token being processed.
 
     // 2. If position was specified, then let the adjusted insertion
@@ -3826,23 +3957,154 @@ static void insertAComment(HtmlParser &b, HtmlToken const &t) {
     // 3. Create a Comment node whose data attribute is set to data and
     //    whose node document is the same as that of the node in which
     //    the adjusted insertion location finds itself.
-    auto comment = makeStrong<Comment>(t.data);
+    auto comment = makeRc<Comment>(t.data);
 
     // 4. Insert the newly created node at the adjusted insertion location.
     location.insert(comment);
 }
 
+// https://html.spec.whatwg.org/multipage/parsing.html#reset-the-insertion-mode-appropriately
+static void resetTheInsertionModeAppropriately(HtmlParser& b) {
+    // 1. Let last be false.
+    bool _last = false;
+
+    // 2. Let node be the last node in the stack of open elements.
+    // 3. Loop: If node is the first node in the stack of open elements, then set last to true, and,
+    // if the parser was created as part of the HTML fragment parsing algorithm (fragment case),
+    // set node to the context element passed to that algorithm.
+
+    auto nodeIdx = b._openElements.len() - 1;
+    while (true) {
+        auto node = b._openElements[nodeIdx];
+
+        if (nodeIdx == 0)
+            _last = true;
+
+        // 4. If node is a select element, run these substeps:
+        if (node->tagName == Html::SELECT) {
+            // 4.1 If last is true, jump to the step below labeled done.
+            if (_last) {
+                b._switchTo(HtmlParser::Mode::IN_SELECT);
+                return;
+            }
+
+            // 4.2 Let ancestor be node.
+            auto ancestorIdx = b._openElements.len() - 1;
+
+            // 4.3 Loop: If ancestor is the first node in the stack of open elements, jump to the step below labeled done.
+            while (ancestorIdx != 0) {
+                // 4.4 Let ancestor be the node before ancestor in the stack of open elements.
+                ancestorIdx--;
+
+                // 4.5 If ancestor is a template node, jump to the step below labeled done.
+                if (b._openElements[ancestorIdx]->tagName == Html::SELECT)
+                    break;
+
+                // 4.6 If ancestor is a table node, switch the insertion mode to "in select in table" and return.
+                if (b._openElements[ancestorIdx]->tagName == Html::TABLE) {
+                    b._switchTo(HtmlParser::Mode::IN_SELECT_IN_TABLE);
+                    return;
+                }
+
+                // 4.7 Jump back to the step labeled loop.
+            }
+
+            // 4.8 Done: Switch the insertion mode to "in select" and return.]
+            b._switchTo(HtmlParser::Mode::IN_SELECT);
+            return;
+        }
+
+        // 5. If node is a td or th element and last is false, then switch the insertion mode to "in cell" and return.
+        if ((node->tagName == Html::TD or node->tagName == Html::TH) and not _last) {
+            b._switchTo(HtmlParser::Mode::IN_CELL);
+            return;
+        }
+
+        // 6. If node is a tr element, then switch the insertion mode to "in row" and return.
+        if (node->tagName == Html::TR) {
+            b._switchTo(HtmlParser::Mode::IN_ROW);
+            return;
+        }
+
+        // 7. If node is a tbody, thead, or tfoot element, then switch the insertion mode to "in table body" and return.
+        if (node->tagName == Html::TBODY or node->tagName == Html::THEAD or node->tagName == Html::TFOOT) {
+            b._switchTo(HtmlParser::Mode::IN_TABLE_BODY);
+            return;
+        }
+
+        // 8. If node is a caption element, then switch the insertion mode to "in caption" and return.
+        if (node->tagName == Html::CAPTION) {
+            b._switchTo(HtmlParser::Mode::IN_CAPTION);
+            return;
+        }
+
+        // 9. If node is a colgroup element, then switch the insertion mode to "in column group" and return.
+        if (node->tagName == Html::COLGROUP) {
+            b._switchTo(HtmlParser::Mode::IN_COLUMN_GROUP);
+            return;
+        }
+
+        // 10. If node is a table element, then switch the insertion mode to "in table" and return.
+        if (node->tagName == Html::TABLE) {
+            b._switchTo(HtmlParser::Mode::IN_TABLE);
+            return;
+        }
+
+        // 11. If node is a template element, then switch the insertion mode to the current template insertion mode and return.
+
+        // 12. If node is a head element and last is false, then switch the insertion mode to "in head" and return.
+        if (node->tagName == Html::HEAD and not _last) {
+            b._switchTo(HtmlParser::Mode::IN_HEAD);
+            return;
+        }
+
+        // 13. If node is a body element, then switch the insertion mode to "in body" and return.
+        if (node->tagName == Html::BODY) {
+            b._switchTo(HtmlParser::Mode::IN_BODY);
+            return;
+        }
+
+        // 14. If node is a frameset element, then switch the insertion mode to "in frameset" and return. (fragment case)
+        if (node->tagName == Html::FRAMESET) {
+            b._switchTo(HtmlParser::Mode::IN_FRAMESET);
+            return;
+        }
+
+        // 15. If node is an html element, run these substeps:
+        if (node->tagName == Html::HTML) {
+            // 15.1 If the head element pointer is null, switch the insertion mode to "before head" and return. (fragment case)
+            if (not b._headElement)
+                b._switchTo(HtmlParser::Mode::BEFORE_HEAD);
+
+            // 15.2 Otherwise, the head element pointer is not null, switch the insertion mode to "after head" and return.
+            else
+                b._switchTo(HtmlParser::Mode::AFTER_HEAD);
+
+            return;
+        }
+
+        // 16. If last is true, then switch the insertion mode to "in body" and return. (fragment case)
+        if (_last)
+            b._switchTo(HtmlParser::Mode::IN_BODY);
+
+        // 17. Let node now be the node before node in the stack of open elements.
+        nodeIdx--;
+
+        // 18. Return to the step labeled loop.
+    }
+}
+
 // 13.2.6.2 MARK: Parsing elements that contain only text
 // https://html.spec.whatwg.org/multipage/parsing.html#parsing-elements-that-contain-only-text
 
-static void parseRawTextElement(HtmlParser &b, HtmlToken const &t) {
+static void parseRawTextElement(HtmlParser& b, HtmlToken const& t) {
     insertHtmlElement(b, t);
     b._lexer._switchTo(HtmlLexer::RAWTEXT);
     b._originalInsertionMode = b._insertionMode;
     b._switchTo(HtmlParser::Mode::TEXT);
 }
 
-static void parseRcDataElement(HtmlParser &b, HtmlToken const &t) {
+static void parseRcDataElement(HtmlParser& b, HtmlToken const& t) {
     insertHtmlElement(b, t);
     b._lexer._switchTo(HtmlLexer::RCDATA);
     b._originalInsertionMode = b._insertionMode;
@@ -3855,9 +4117,9 @@ static constexpr Array IMPLIED_END_TAGS = {
     Html::DD, Html::DT, Html::LI, Html::OPTION, Html::OPTGROUP, Html::P, Html::RB, Html::RP, Html::RT, Html::RTC
 };
 
-static void generateImpliedEndTags(HtmlParser &b, Str except = ""s) {
+static void generateImpliedEndTags(HtmlParser& b, Opt<TagName> except = NONE) {
     while (contains(IMPLIED_END_TAGS, last(b._openElements)->tagName) and
-           last(b._openElements)->tagName.name() != except) {
+           last(b._openElements)->tagName != except) {
         b._openElements.popBack();
     }
 }
@@ -3867,12 +4129,12 @@ static void generateImpliedEndTags(HtmlParser &b, Str except = ""s) {
 // 13.2.6.4.1 MARK: The "initial" insertion mode
 // https://html.spec.whatwg.org/multipage/parsing.html#the-initial-insertion-mode
 
-static QuirkMode _whichQuirkMode(HtmlToken const &) {
+static QuirkMode _whichQuirkMode(HtmlToken const&) {
     // NOSPEC: We assume no quirk mode
     return QuirkMode::NO;
 }
 
-void HtmlParser::_handleInitialMode(HtmlToken const &t) {
+void HtmlParser::_handleInitialMode(HtmlToken const& t) {
     // A character token that is one of U+0009 CHARACTER TABULATION,
     // U+000A LINE FEED (LF), U+000C FORM FEED (FF),
     // U+000D CARRIAGE RETURN (CR), or U+0020 SPACE
@@ -3886,12 +4148,12 @@ void HtmlParser::_handleInitialMode(HtmlToken const &t) {
 
     // A comment token
     else if (t.type == HtmlToken::COMMENT) {
-        _document->appendChild(makeStrong<Comment>(t.data));
+        _document->appendChild(makeRc<Comment>(t.data));
     }
 
     // A DOCTYPE token
     else if (t.type == HtmlToken::DOCTYPE) {
-        _document->appendChild(makeStrong<DocumentType>(
+        _document->appendChild(makeRc<DocumentType>(
             t.name,
             t.publicIdent,
             t.systemIdent
@@ -3909,7 +4171,7 @@ void HtmlParser::_handleInitialMode(HtmlToken const &t) {
 
 // 13.2.6.4.2 MARK: The "before html" insertion mode
 // https://html.spec.whatwg.org/multipage/parsing.html#the-before-html-insertion-mode
-void HtmlParser::_handleBeforeHtml(HtmlToken const &t) {
+void HtmlParser::_handleBeforeHtml(HtmlToken const& t) {
     // A DOCTYPE token
     if (t.type == HtmlToken::DOCTYPE) {
         // ignore
@@ -3918,7 +4180,7 @@ void HtmlParser::_handleBeforeHtml(HtmlToken const &t) {
 
     // A comment token
     else if (t.type == HtmlToken::COMMENT) {
-        _document->appendChild(makeStrong<Comment>(t.data));
+        _document->appendChild(makeRc<Comment>(t.data));
     }
 
     // A character token that is one of U+0009 CHARACTER TABULATION,
@@ -3949,7 +4211,7 @@ void HtmlParser::_handleBeforeHtml(HtmlToken const &t) {
     // An end tag whose tag name is one of: "head", "body", "html", "br"
     // Anything else
     else {
-        auto el = makeStrong<Element>(Html::HTML);
+        auto el = makeRc<Element>(Html::HTML);
         _document->appendChild(el);
         _openElements.pushBack(el);
         _switchTo(Mode::BEFORE_HEAD);
@@ -3959,7 +4221,7 @@ void HtmlParser::_handleBeforeHtml(HtmlToken const &t) {
 
 // 13.2.6.4.3 MARK: The "before head" insertion mode
 // https://html.spec.whatwg.org/multipage/parsing.html#the-before-head-insertion-mode
-void HtmlParser::_handleBeforeHead(HtmlToken const &t) {
+void HtmlParser::_handleBeforeHead(HtmlToken const& t) {
     // A character token that is one of U+0009 CHARACTER TABULATION,
     // U+000A LINE FEED (LF), U+000C FORM FEED (FF),
     // U+000D CARRIAGE RETURN (CR), or U+0020 SPACE
@@ -4015,7 +4277,7 @@ void HtmlParser::_handleBeforeHead(HtmlToken const &t) {
 
 // 13.2.6.4.4 MARK: The "in head" insertion mode
 // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inhead
-void HtmlParser::_handleInHead(HtmlToken const &t) {
+void HtmlParser::_handleInHead(HtmlToken const& t) {
     auto anythingElse = [&] {
         _openElements.popBack();
         _switchTo(Mode::AFTER_HEAD);
@@ -4151,7 +4413,7 @@ void HtmlParser::_handleInHead(HtmlToken const &t) {
 
 // 13.2.6.4.5 MARK: The "in head noscript" insertion mode
 // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inheadnoscript
-void HtmlParser::_handleInHeadNoScript(HtmlToken const &t) {
+void HtmlParser::_handleInHeadNoScript(HtmlToken const& t) {
     auto anythingElse = [&] {
         _raise();
         _openElements.popBack();
@@ -4216,7 +4478,7 @@ void HtmlParser::_handleInHeadNoScript(HtmlToken const &t) {
 
 // 13.2.6.4.6 MARK: The "after head" insertion mode
 // https://html.spec.whatwg.org/multipage/parsing.html#the-after-head-insertion-mode
-void HtmlParser::_handleAfterHead(HtmlToken const &t) {
+void HtmlParser::_handleAfterHead(HtmlToken const& t) {
     auto anythingElse = [&] {
         HtmlToken bodyToken;
         bodyToken.type = HtmlToken::START_TAG;
@@ -4306,7 +4568,30 @@ void HtmlParser::_handleAfterHead(HtmlToken const &t) {
 
 // 13.2.6.4.7 MARK: The "in body" insertion mode
 // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inbody
-void HtmlParser::_handleInBody(HtmlToken const &t) {
+void HtmlParser::_handleInBody(HtmlToken const& t) {
+    auto closePElementIfInButtonScope = [&]() {
+        // https://html.spec.whatwg.org/#close-a-p-element
+        // If the stack of open elements has a p element in button scope, then close a p element.
+        if (_hasElementInButtonScope(Html::P)) {
+
+            // Generate implied end tags, except for p elements.
+            generateImpliedEndTags(*this, Html::P);
+
+            // If the current node is not a p element, then this is a parse error.
+            if (last(_openElements)->tagName != Html::P)
+                _raise();
+
+            // Pop elements from the stack of open elements until a p element has been popped from the stack.
+            while (_openElements.len() > 0) {
+                auto lastEl = last(_openElements);
+
+                _openElements.popBack();
+                if (lastEl->tagName == Html::P)
+                    break;
+            }
+        }
+    };
+
     // A character token that is U+0000 NULL
     if (t.type == HtmlToken::CHARACTER and t.rune == '\0') {
         _raise();
@@ -4351,8 +4636,9 @@ void HtmlParser::_handleInBody(HtmlToken const &t) {
 
     // TODO: An end-of-file token
 
-    // TODO: An end tag whose tag name is "body"
-    else if (t.type == HtmlToken::END_TAG and t.name == "body") {
+    // An end tag whose tag name is "body"
+    // An end tag whose tag name is "html"
+    else if (t.type == HtmlToken::END_TAG and (t.name == "body" or t.name == "html")) {
         // If the stack of open elements does not have a body element in
         // scope, this is a parse error; ignore the token.
         if (not _hasElementInScope(Html::BODY)) {
@@ -4361,23 +4647,49 @@ void HtmlParser::_handleInBody(HtmlToken const &t) {
         }
 
         // Otherwise, if there is a node in the stack of open elements that
-        // is not a implid end tag, then this is a parse error.
-        if (not contains(IMPLIED_END_TAGS, last(_openElements)->tagName)) {
-            _raise();
+        // is not an implied end tag or
+        // tbody element, a td element, a tfoot element, a th element, a thead element, a tr element, the body element, or the html
+        // then this is a parse error.
+        for (auto& el : _openElements) {
+            if (not contains(IMPLIED_END_TAGS, el->tagName) and
+                el->tagName != Html::TBODY and el->tagName != Html::TD and el->tagName != Html::TFOOT and
+                el->tagName != Html::TH and el->tagName != Html::THEAD and el->tagName != Html::TR and
+                el->tagName != Html::BODY and el->tagName != Html::HTML) {
+                _raise();
+                break;
+            }
         }
 
         // Switch the insertion mode to "after body".
         _switchTo(Mode::AFTER_BODY);
+
+        if (t.name == "html")
+            accept(t);
+
     }
 
-    // TODO: An end tag whose tag name is "html"
-
-    // TODO: A start tag whose tag name is one of:
+    // A start tag whose tag name is one of:
     // "address", "article", "aside", "blockquote", "center",
     // "details", "dialog", "dir", "div", "dl", "fieldset",
     // "figcaption", "figure", "footer", "header", "hgroup",
     // "main", "menu", "nav", "ol", "p", "search", "section",
     // "summary", "ul"
+    else if (
+        t.type == HtmlToken::START_TAG and
+        (t.name == "address" or t.name == "article" or t.name == "aside" or t.name == "blockquote" or
+         t.name == "center" or t.name == "details" or t.name == "dialog" or t.name == "dir" or
+         t.name == "div" or t.name == "dl" or t.name == "fieldset" or t.name == "figcaption" or
+         t.name == "figure" or t.name == "footer" or t.name == "header" or t.name == "hgroup" or
+         t.name == "main" or t.name == "menu" or t.name == "nav" or t.name == "ol" or
+         t.name == "p" or t.name == "search" or t.name == "section" or t.name == "summary" or t.name == "ul"
+        )
+    ) {
+        // If the stack of open elements has a p element in button scope, then close a p element.
+        closePElementIfInButtonScope();
+
+        // Insert an HTML element for the token.
+        insertHtmlElement(*this, t);
+    }
 
     // TODO: A start tag whose tag name is one of: "h1", "h2", "h3", "h4", "h5", "h6"
 
@@ -4408,7 +4720,7 @@ void HtmlParser::_handleInBody(HtmlToken const &t) {
             // If node is a dd element, then run these substeps:
             if (tag == Html::DD) {
                 // 1. Generate implied end tags, except for dd elements.
-                generateImpliedEndTags(*this, "dd");
+                generateImpliedEndTags(*this, Html::DD);
 
                 // 2. If the current node is not a dd element, then this is a parse error.
                 if (last(_openElements)->tagName != Html::DD) {
@@ -4427,7 +4739,7 @@ void HtmlParser::_handleInBody(HtmlToken const &t) {
 
             if (tag == Html::DT) {
                 // 1. Generate implied end tags, except for dt elements.
-                generateImpliedEndTags(*this, "dt");
+                generateImpliedEndTags(*this, Html::DT);
 
                 // 2. If the current node is not a dt element, then this is a parse error.
                 if (last(_openElements)->tagName != Html::DT) {
@@ -4490,12 +4802,53 @@ void HtmlParser::_handleInBody(HtmlToken const &t) {
     // TODO: An end tag token whose tag name is one of: "applet", "marquee", "object"
 
     // TODO: A start tag whose tag name is "table"
+    else if (t.type == HtmlToken::START_TAG and t.name == "table") {
+        // TODO: If the Document is not set to quirks mode,
+        // and the stack of open elements has a p element in button scope, then close a p element.
+
+        // Insert an HTML element for the token.
+        insertHtmlElement(*this, t);
+
+        // Set the frameset-ok flag to "not ok".
+        _framesetOk = false;
+
+        // Switch the insertion mode to "in table".
+        _switchTo(Mode::IN_TABLE);
+    }
 
     // TODO: An end tag whose tag name is "br"
 
     // TODO: A start tag whose tag name is one of: "area", "br", "embed", "img", "keygen", "wbr"
 
     // TODO: A start tag whose tag name is "input"
+    else if (t.type == HtmlToken::START_TAG and t.name == "input") {
+        // TODO: Reconstruct the active formatting elements, if any.
+
+        // Insert an HTML element for the token. Immediately pop the current node off the stack of open elements.
+        insertHtmlElement(*this, t);
+        _openElements.popBack();
+
+        // TODO: Acknowledge the token's self-closing flag, if it is set.
+
+        // If the token does not have an attribute with the name "type",
+        // or if it does, but that attribute's value is not an ASCII case-insensitive match for the string "hidden",
+        bool hasHiddenAsTypeAttrValue = false;
+        for (auto& [name, value] : t.attrs) {
+            if (name == "type") {
+                // TODO: ASCII case-insensitive match
+                if (value == "hidden") {
+                    hasHiddenAsTypeAttrValue = true;
+                }
+
+                break;
+            }
+        }
+
+        if (not hasHiddenAsTypeAttrValue) {
+            //  then: set the frameset-ok flag to "not ok".
+            _framesetOk = false;
+        }
+    }
 
     // TODO: A start tag whose tag name is one of: "param", "source", "track"
 
@@ -4542,7 +4895,7 @@ void HtmlParser::_handleInBody(HtmlToken const &t) {
             // 2. Loop: If node is an HTML element with the same tag name as the token, then:
             if (node->tagName.name() == t.name) {
                 // 1. Generate implied end tags, except for HTML elements with the same tag name as the token.
-                generateImpliedEndTags(*this, t.name);
+                generateImpliedEndTags(*this, node->tagName);
 
                 // 2. If node is not the current node, then this is a parse error.
                 if (node != last(_openElements))
@@ -4571,7 +4924,7 @@ void HtmlParser::_handleInBody(HtmlToken const &t) {
 
 // 13.2.6.4.8 MARK: The "text" insertion mode
 // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-incdata
-void HtmlParser::_handleText(HtmlToken const &t) {
+void HtmlParser::_handleText(HtmlToken const& t) {
     // A character token
     if (t.type == HtmlToken::CHARACTER) {
         insertACharacter(
@@ -4605,9 +4958,644 @@ void HtmlParser::_handleText(HtmlToken const &t) {
     // FIXME: Implement the rest of the rules
 }
 
+static void _inTableModeAnythingElse(HtmlParser& b, HtmlToken const& t) {
+    // Parse error.
+    b._raise();
+
+    // Enable foster parenting,
+    b._fosterParenting = true;
+
+    // process the token using the rules for the "in body" insertion mode,
+    b._acceptIn(HtmlParser::Mode::IN_BODY, t);
+
+    // and then disable foster parenting.
+    b._fosterParenting = false;
+}
+
+// 13.2.6.4.9 MARK: The "in table" insertion mode
+// https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intable
+void HtmlParser::_handleInTable(HtmlToken const& t) {
+    auto _clearTheStackBackToATableContext = [&]() {
+        while (last(_openElements)->tagName != Html::TABLE and
+               last(_openElements)->tagName != Html::TEMPLATE and
+               last(_openElements)->tagName != Html::HTML) {
+
+            _openElements.popBack();
+        }
+    };
+
+    // A character token, if the current node is table, tbody, template, tfoot, thead, or tr element
+    if (t.type == HtmlToken::CHARACTER and
+        (last(_openElements)->tagName == Html::TABLE or last(_openElements)->tagName == Html::TBODY or
+         last(_openElements)->tagName == Html::TEMPLATE or last(_openElements)->tagName == Html::TFOOT or
+         last(_openElements)->tagName == Html::THEAD or last(_openElements)->tagName == Html::TR
+        )) {
+        // Let the pending table character tokens be an empty list of tokens.
+        _pendingTableCharacterTokens.clear();
+
+        // Let the original insertion mode be the current insertion mode.
+        _originalInsertionMode = _insertionMode;
+
+        // Switch the insertion mode to "in table text" and reprocess the token.
+        _switchTo(Mode::IN_TABLE_TEXT);
+        accept(t);
+    }
+
+    // A comment token
+    else if (t.type == HtmlToken::COMMENT) {
+        // Insert a comment.
+        insertAComment(*this, t);
+    }
+
+    // A DOCTYPE token
+    else if (t.type == HtmlToken::DOCTYPE) {
+        // Parse error. Ignore the token.
+        _raise();
+    }
+
+    // A start tag whose tag name is "caption"
+    else if (t.type == HtmlToken::START_TAG and t.name == "caption") {
+        // Clear the stack back to a table context. (See below.)
+        _clearTheStackBackToATableContext();
+
+        // TODO: Insert a marker at the end of the list of active formatting elements.
+
+        // Insert an HTML element for the token, then switch the insertion mode to "in caption".
+        insertHtmlElement(*this, t);
+        _switchTo(Mode::IN_CAPTION);
+    }
+
+    // A start tag whose tag name is "colgroup"
+    else if (t.type == HtmlToken::START_TAG and t.name == "colgroup") {
+        // Clear the stack back to a table context. (See below.)
+        _clearTheStackBackToATableContext();
+
+        // Insert an HTML element for the token, then switch the insertion mode to "in column group".
+        insertHtmlElement(*this, t);
+        _switchTo(Mode::IN_COLUMN_GROUP);
+    }
+
+    // A start tag whose tag name is "col"
+    else if (t.type == HtmlToken::START_TAG and t.name == "col") {
+        // Clear the stack back to a table context. (See below.)
+        _clearTheStackBackToATableContext();
+
+        // Insert an HTML element for a "colgroup" start tag token with no attributes, then switch the insertion mode to "in column group".
+        HtmlToken colGroupToken;
+        colGroupToken.type = HtmlToken::START_TAG;
+        colGroupToken.name = String{"colgroup"};
+        insertAForeignElement(*this, colGroupToken, Vaev::HTML);
+        _switchTo(Mode::IN_COLUMN_GROUP);
+
+        // Reprocess the current token.
+        accept(t);
+    }
+
+    // A start tag whose tag name is one of: "tbody", "tfoot", "thead"
+    else if (t.type == HtmlToken::START_TAG and
+             (t.name == "tbody" or t.name == "tfoot" or t.name == "thead")) {
+        // Clear the stack back to a table context. (See below.)
+        _clearTheStackBackToATableContext();
+
+        // Insert an HTML element for the token, then switch the insertion mode to "in table body".
+        insertHtmlElement(*this, t);
+        _switchTo(Mode::IN_TABLE_BODY);
+    }
+
+    // A start tag whose tag name is one of: "td", "th", "tr"
+    else if (t.type == HtmlToken::START_TAG and
+             (t.name == "td" or t.name == "th" or t.name == "tr")) {
+        // Clear the stack back to a table context. (See below.)
+        _clearTheStackBackToATableContext();
+
+        // Insert an HTML element for a "tbody" start tag token with no attributes, then switch the insertion mode to "in table body".
+        HtmlToken TableBodyToken;
+        TableBodyToken.type = HtmlToken::START_TAG;
+        TableBodyToken.name = "tbody"s;
+        insertAForeignElement(*this, TableBodyToken, Vaev::HTML);
+        _switchTo(Mode::IN_TABLE_BODY);
+
+        // Reprocess the current token.
+        accept(t);
+    }
+
+    // A start tag whose tag name is "table"
+    else if (t.type == HtmlToken::START_TAG and t.name == "table") {
+        // Parse error.
+        _raise();
+
+        // If the stack of open elements does not have a table element in table scope, ignore the token.
+        if (not _hasElementInTableScope(Html::TABLE))
+            return;
+
+        // Otherwise:
+
+        // Pop elements from this stack until a table element has been popped from the stack.
+        while (Karm::any(_openElements) and _openElements.popBack()->tagName != Html::TABLE) {
+            // do nothing
+        }
+
+        // Reset the insertion mode appropriately.
+        resetTheInsertionModeAppropriately(*this);
+
+        // Reprocess the token.
+        accept(t);
+    }
+
+    // An end tag whose tag name is "table"
+    else if (t.type == HtmlToken::END_TAG and t.name == "table") {
+        // If the stack of open elements does not have a table element in table scope, this is a parse error;
+        // ignore the token.
+        if (not _hasElementInTableScope(Html::TABLE)) {
+            _raise();
+            return;
+        }
+
+        // Pop elements from this stack until a table element has been popped from the stack.
+        while (Karm::any(_openElements) and _openElements.popBack()->tagName != Html::TABLE) {
+            // do nothing
+        }
+
+        // Reset the insertion mode appropriately.
+        resetTheInsertionModeAppropriately(*this);
+    }
+
+    // An end tag whose tag name is one of: "body", "caption", "col", "colgroup", "html", "tbody", "td", "tfoot", "th", "thead", "tr"
+    else if (t.type == HtmlToken::END_TAG and
+             (t.name == "body" or t.name == "caption" or t.name == "col" or
+              t.name == "colgroup" or t.name == "html" or t.name == "tbody" or
+              t.name == "td" or t.name == "tfoot" or t.name == "th" or
+              t.name == "thead" or t.name == "tr"
+             )) {
+        // Parse error. Ignore the token.
+        _raise();
+    }
+
+    // A start tag whose tag name is one of: "style", "script", "template"
+    else if (t.type == HtmlToken::START_TAG and
+             (t.name == "style" or t.name == "script" or t.name == "template")) {
+        // Process the token using the rules for the "in head" insertion mode.
+        _acceptIn(Mode::IN_HEAD, t);
+    }
+
+    // An end tag whose tag name is "template"
+    else if (t.type == HtmlToken::END_TAG and t.name == "template") {
+        // Process the token using the rules for the "in head" insertion mode.
+        _acceptIn(Mode::IN_HEAD, t);
+    }
+
+    // TODO: A start tag whose tag name is "input"
+    else if (t.type == HtmlToken::START_TAG and t.name == "input") {
+
+        // If the token does not have an attribute with the name "type",
+        // or if it does, but that attribute's value is not an ASCII case-insensitive match for the string "hidden",
+        bool hasHiddenAsTypeAttrValue = false;
+        for (auto& [name, value] : t.attrs) {
+            if (name == "type") {
+                // TODO: ASCII case-insensitive match
+                if (value == "hidden") {
+                    hasHiddenAsTypeAttrValue = true;
+                }
+
+                break;
+            }
+        }
+
+        // then: act as described in the "anything else" entry below.
+        if (hasHiddenAsTypeAttrValue) {
+            _inTableModeAnythingElse(*this, t);
+            return;
+        }
+
+        // Parse error.
+        _raise();
+
+        // Insert an HTML element for the token.
+        insertHtmlElement(*this, t);
+
+        // Pop that input element off the stack of open elements.
+        _openElements.popBack();
+
+        // TODO: Acknowledge the token's self-closing flag, if it is set.
+    }
+
+    // A start tag whose tag name is "form"
+    else if (t.type == HtmlToken::START_TAG and t.name == "form") {
+        // Parse error.
+        _raise();
+
+        // If there is a template element on the stack of open elements, or if the form element pointer is not null, ignore the token.
+        for (auto& el : _openElements) {
+            if (el->tagName == Html::TEMPLATE)
+                return;
+        }
+
+        if (not _formElement)
+            return;
+
+        // Insert an HTML element for the token, and set the form element pointer to point to the element created.
+        HtmlToken formToken;
+        formToken.type = HtmlToken::START_TAG;
+        formToken.name = "form"s;
+
+        _formElement = insertAForeignElement(*this, formToken, Vaev::HTML);
+
+        // Pop that form element off the stack of open elements.
+        _openElements.popBack();
+    }
+
+    // An end-of-file token
+    else if (t.type == HtmlToken::END_OF_FILE) {
+        // Process the token using the rules for the "in body" insertion mode.
+        _acceptIn(Mode::IN_BODY, t);
+    }
+
+    // Anything else
+    else {
+        _inTableModeAnythingElse(*this, t);
+    }
+}
+
+// 13.2.6.4.10 MARK: The "in table text" insertion mode
+// https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intabletext
+void HtmlParser::_handleInTableText(HtmlToken const& t) {
+
+    // A character token that is U+0000 NULL
+    if (t.type == HtmlToken::CHARACTER and t.rune == '\0') {
+        // Parse error. Ignore the token.
+        _raise();
+    }
+
+    // Any other character token
+    else if (t.type == HtmlToken::CHARACTER) {
+        // Append the character token to the pending table character tokens list.
+        _pendingTableCharacterTokens.pushBack(t);
+    }
+
+    else {
+        // If any of the tokens in the pending table character tokens list are character tokens that are not ASCII
+        // whitespace,
+        // then this is a parse error:
+        bool hasNonWhitespace = false;
+        for (auto const& token : _pendingTableCharacterTokens) {
+            if (token.rune != '\t' and token.rune != '\n' and
+                token.rune != '\f' and token.rune != '\r' and token.rune != ' ') {
+                hasNonWhitespace = true;
+                break;
+            }
+        }
+
+        if (hasNonWhitespace) {
+            // reprocess the character tokens in the pending table character tokens list using the rules given in
+            // the "anything else" entry in the "in table" insertion mode.
+            for (auto const& token : _pendingTableCharacterTokens) {
+                _inTableModeAnythingElse(*this, token);
+            }
+        } else {
+            // Otherwise, insert the characters given by the pending table character tokens list.
+            for (auto const& token : _pendingTableCharacterTokens) {
+                insertACharacter(*this, token);
+            }
+        }
+
+        // Switch the insertion mode to the original insertion mode and reprocess the token.
+        _switchTo(_originalInsertionMode);
+        accept(t);
+    }
+}
+
+// 13.2.6.4.13 MARK: The "in table body" insertion mode
+// https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intbody
+void HtmlParser::_handleInTableBody(HtmlToken const& t) {
+    auto _clearTheStackBackToATableBodyContext = [&]() {
+        while (last(_openElements)->tagName != Html::TBODY and
+               last(_openElements)->tagName != Html::TFOOT and
+               last(_openElements)->tagName != Html::THEAD and
+               last(_openElements)->tagName != Html::TEMPLATE and
+               last(_openElements)->tagName != Html::HTML) {
+
+            _openElements.popBack();
+        }
+    };
+
+    // A start tag whose tag name is "tr"
+    if (t.type == HtmlToken::START_TAG and t.name == "tr") {
+        // Clear the stack back to a table body context. (See below.)
+        _clearTheStackBackToATableBodyContext();
+
+        // Insert an HTML element for the token, then switch the insertion mode to "in row".
+        insertHtmlElement(*this, t);
+        _switchTo(Mode::IN_ROW);
+    }
+
+    // A start tag whose tag name is one of: "th", "td"
+    else if (t.type == HtmlToken::START_TAG and (t.name == "th" or t.name == "td")) {
+        _raise();
+
+        // Clear the stack back to a table body context. (See below.)
+        _clearTheStackBackToATableBodyContext();
+
+        // Insert an HTML element for a "tr" start tag token with no attributes, then switch the insertion mode to "in row".
+        HtmlToken tableRowToken;
+        tableRowToken.type = HtmlToken::START_TAG;
+        tableRowToken.name = "tr"s;
+        insertAForeignElement(*this, tableRowToken, Vaev::HTML);
+
+        _switchTo(Mode::IN_ROW);
+
+        accept(t);
+    }
+
+    else if (t.type == HtmlToken::END_TAG and (t.name == "tbody" or t.name == "tfoot" or t.name == "thead")) {
+        // If the stack of open elements does not have an element in table scope that is an HTML element with the same
+        // tag name as the token, this is a parse error; ignore the token.
+
+        if (not _hasElementInTableScope(TagName::make(t.name, Vaev::HTML))) {
+            _raise();
+            return;
+        }
+
+        // Clear the stack back to a table body context. (See below.)
+        _clearTheStackBackToATableBodyContext();
+
+        // Pop the current node from the stack of open elements. Switch the insertion mode to "in table".
+        _openElements.popBack();
+        _switchTo(Mode::IN_TABLE);
+    }
+
+    else if ((t.type == HtmlToken::START_TAG and
+              (t.name == "caption" or t.name == "col" or t.name == "colgroup" or
+               t.name == "tbody" or t.name == "tfoot" or t.name == "thead"
+              )) or
+             (t.type == HtmlToken::END_TAG and t.name == "table"
+             )) {
+
+        // If the stack of open elements does not have a tbody, thead, or tfoot element in table scope,
+        // TODO: consider refactor so _hasElementInScope accepts list instead of single element
+        if (not _hasElementInTableScope(Html::TBODY) and
+            not _hasElementInTableScope(Html::THEAD) and
+            not _hasElementInTableScope(Html::TFOOT)) {
+            // this is a parse error; ignore the token.
+            _raise();
+            return;
+        }
+
+        // Otherwise:
+
+        // Clear the stack back to a table body context. (See below.)
+        _clearTheStackBackToATableBodyContext();
+
+        // Pop the current node from the stack of open elements. Switch the insertion mode to "in table".
+        _openElements.popBack();
+        _switchTo(Mode::IN_TABLE);
+
+        // Reprocess the token.
+        accept(t);
+    }
+
+    // An end tag whose tag name is one of: "body", "caption", "col", "colgroup", "html", "td", "th", "tr"
+    else if (t.type == HtmlToken::END_TAG and
+             (t.name == "body" or t.name == "caption" or t.name == "col" or
+              t.name == "colgroup" or t.name == "html" or
+              t.name == "td" or t.name == "th" or t.name == "tr"
+             )) {
+        // Parse error. Ignore the token.
+        _raise();
+    }
+
+    else {
+        // Process the token using the rules for the "in table" insertion mode.
+        _acceptIn(Mode::IN_TABLE, t);
+    }
+}
+
+// 13.2.6.4.14 MARK: The "in row" insertion mode
+// https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intr
+void HtmlParser::_handleInTableRow(HtmlToken const& t) {
+    auto _clearTheStackBackToATableRowContext = [&]() {
+        while (last(_openElements)->tagName != Html::TR and
+               last(_openElements)->tagName != Html::TEMPLATE and
+               last(_openElements)->tagName != Html::HTML) {
+
+            _openElements.popBack();
+        }
+    };
+
+    // A start tag whose tag name is one of: "th", "td"
+    if (t.type == HtmlToken::START_TAG and (t.name == "th" or t.name == "td")) {
+        // Clear the stack back to a table row context. (See below.)
+        _clearTheStackBackToATableRowContext();
+
+        // Insert an HTML element for the token, then switch the insertion mode to "in cell".
+        insertHtmlElement(*this, t);
+        _switchTo(Mode::IN_CELL);
+
+        // TODO: Insert a marker at the end of the list of active formatting elements.
+    }
+
+    // An end tag whose tag name is "tr"
+    else if (t.type == HtmlToken::END_TAG and t.name == "tr") {
+        if (not _hasElementInTableScope(Html::TR)) {
+            _raise();
+            return;
+        }
+
+        // Otherwise:
+
+        // Clear the stack back to a table row context. (See below.)
+        _clearTheStackBackToATableRowContext();
+
+        // Pop the current node (which will be a tr element) from the stack of open elements.
+        _openElements.popBack();
+
+        // Switch the insertion mode to "in table body".
+        _switchTo(Mode::IN_TABLE_BODY);
+    }
+
+    // A start tag whose tag name is one of: "caption", "col", "colgroup", "tbody", "tfoot", "thead", "tr"
+    // An end tag whose tag name is "table"
+    else if ((t.type == HtmlToken::START_TAG and
+              (t.name == "caption" or t.name == "col" or t.name == "colgroup" or
+               t.name == "tbody" or t.name == "tfoot" or t.name == "thead" or t.name == "tr"
+              )) or
+             (t.type == HtmlToken::END_TAG and t.name == "table"
+             )) {
+
+        // If the stack of open elements does not have a tr element in table scope,
+        if (not _hasElementInTableScope(Html::TR)) {
+            // this is a parse error; ignore the token.
+            _raise();
+            return;
+        }
+
+        // Otherwise:
+
+        // Clear the stack back to a table row context. (See below.)
+        _clearTheStackBackToATableRowContext();
+
+        // Pop the current node (which will be a tr element) from the stack of open elements.
+        _openElements.popBack();
+
+        // Switch the insertion mode to "in table body".
+        _switchTo(Mode::IN_TABLE_BODY);
+
+        // Reprocess the token.
+        accept(t);
+    }
+
+    // An end tag whose tag name is one of: "tbody", "tfoot", "thead"
+    else if (t.type == HtmlToken::END_TAG and (t.name == "tbody" or t.name == "tfoot" or t.name == "thead")) {
+        // If the stack of open elements does not have an element in table scope that is an HTML element with the same
+        // tag name as the token,
+
+        if (not _hasElementInTableScope(TagName::make(t.name, Vaev::HTML))) {
+            // this is a parse error; ignore the token.
+            _raise();
+            return;
+        }
+
+        // Clear the stack back to a table body context. (See below.)
+        _clearTheStackBackToATableRowContext();
+
+        // Pop the current node (which will be a tr element) from the stack of open elements.
+        _openElements.popBack();
+
+        // Switch the insertion mode to "in table body".
+        _switchTo(Mode::IN_TABLE_BODY);
+
+        // Reprocess the token.
+        accept(t);
+    }
+
+    // An end tag whose tag name is one of: "body", "caption", "col", "colgroup", "html", "td", "th"
+    else if (t.type == HtmlToken::END_TAG and
+             (t.name == "body" or t.name == "caption" or t.name == "col" or
+              t.name == "colgroup" or t.name == "html" or
+              t.name == "td" or t.name == "th"
+             )) {
+        // Parse error. Ignore the token.
+        _raise();
+    }
+
+    else {
+        // Process the token using the rules for the "in table" insertion mode.
+        _acceptIn(Mode::IN_TABLE, t);
+    }
+}
+
+// 13.2.6.4.15 MARK: The "in cell" insertion mode
+// https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intd
+void HtmlParser::_handleInCell(HtmlToken const& t) {
+    auto _closeTheCell = [&]() {
+        // Generate implied end tags.
+        generateImpliedEndTags(*this);
+
+        // If the current node is not now a td element or a th element, then this is a parse error.
+        if (last(_openElements)->tagName != Html::TD and last(_openElements)->tagName != Html::TR) {
+            _raise();
+        }
+
+        // Pop elements from the stack of open elements until a td element or a th element has been popped from the stack.
+        while (Karm::any(_openElements)) {
+            auto poppedEl = _openElements.popBack();
+            if (poppedEl == Html::TD or poppedEl == Html::TH)
+                break;
+        }
+
+        // TODO: Clear the list of active formatting elements up to the last marker.
+
+        // Switch the insertion mode to "in row".
+        _switchTo(Mode::IN_ROW);
+    };
+
+    // An end tag whose tag name is one of: "td", "th"
+    if (t.type == HtmlToken::END_TAG and (t.name == "td" or t.name == "th")) {
+        // If the stack of open elements does not have an element in table scope that is an HTML element with the same
+        // tag name as that of the token,
+        TagName tokenTagName{TagName::make(t.name, Vaev::HTML)};
+
+        if (not _hasElementInTableScope(tokenTagName)) {
+            // this is a parse error; ignore the token.
+            _raise();
+            return;
+        }
+
+        // Otherwise:
+
+        // Generate implied end tags.
+        generateImpliedEndTags(*this);
+
+        // Now, if the current node is not an HTML element with the same tag name as the token,
+        if (last(_openElements)->tagName != tokenTagName) {
+            // then this is a parse error.
+            _raise();
+        }
+
+        // Pop elements from the stack of open elements until an HTML element with the same tag name as
+        // the token has been popped from the stack.
+        while (Karm::any(_openElements) and _openElements.popBack()->tagName != tokenTagName) {
+            // do nothing
+        }
+
+        // TODO: Clear the list of active formatting elements up to the last marker.
+
+        // Switch the insertion mode to "in row".
+        _switchTo(Mode::IN_ROW);
+    }
+
+    // A start tag whose tag name is one of: "caption", "col", "colgroup", "tbody", "td", "tfoot", "th", "thead", "tr"
+    else if (t.type == HtmlToken::START_TAG and
+             (t.name == "caption" or t.name == "col" or t.name == "colgroup" or
+              t.name == "tbody" or t.name == "td" or t.name == "tfoot" or
+              t.name == "th" or t.name == "thead" or t.name == "tr"
+             )) {
+
+        // Assert: The stack of open elements has a td or th element in table scope.
+        if (not _hasElementInTableScope(Html::TD) and not _hasElementInTableScope(Html::TR)) {
+            _raise();
+            // FIXME: should this be a panic()?
+        }
+
+        // Close the cell (see below) and reprocess the token.
+        _closeTheCell();
+        accept(t);
+    }
+
+    // An end tag whose tag name is one of: "body", "caption", "col", "colgroup", "html"
+    else if (t.type == HtmlToken::END_TAG and
+             (t.name == "body" or t.name == "caption" or t.name == "col" or
+              t.name == "colgroup" or t.name == "html"
+             )) {
+        // Parse error. Ignore the token.
+        _raise();
+    }
+
+    // An end tag whose tag name is one of: "table", "tbody", "tfoot", "thead", "tr"
+    else if (t.type == HtmlToken::END_TAG and
+             (t.name == "table" or t.name == "tbody" or t.name == "tfoot" or t.name == "thead" or t.name == "tr")) {
+
+        // If the stack of open elements does not have an element in table scope that is an HTML element with the same
+        // tag name as the token,
+        if (not _hasElementInTableScope(TagName::make(t.name, Vaev::HTML))) {
+            // this is a parse error; ignore the token.
+            _raise();
+            return;
+        }
+
+        // Otherwise, close the cell (see below) and reprocess the token.
+        _closeTheCell();
+        accept(t);
+    }
+
+    else {
+        // Process the token using the rules for the "in body" insertion mode.
+        _acceptIn(Mode::IN_BODY, t);
+    }
+}
+
 // 3.2.6.4.22 MARK: The "after after body" insertion mode
 // https://html.spec.whatwg.org/multipage/parsing.html#the-after-after-body-insertion-mode
-void HtmlParser::_handleAfterBody(HtmlToken const &t) {
+void HtmlParser::_handleAfterBody(HtmlToken const& t) {
     // A comment token
     if (t.type == HtmlToken::COMMENT) {
         // Insert a comment.
@@ -4640,7 +5628,7 @@ void HtmlParser::_switchTo(Mode mode) {
     _insertionMode = mode;
 }
 
-void HtmlParser::_acceptIn(Mode mode, HtmlToken const &t) {
+void HtmlParser::_acceptIn(Mode mode, HtmlToken const& t) {
     logDebugIf(DEBUG_HTML_PARSER, "Parsing {} in {}", t, mode);
 
     switch (mode) {
@@ -4677,12 +5665,12 @@ void HtmlParser::_acceptIn(Mode mode, HtmlToken const &t) {
         _handleText(t);
         break;
 
-    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intable
     case Mode::IN_TABLE:
+        _handleInTable(t);
         break;
 
-    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intabletext
     case Mode::IN_TABLE_TEXT:
+        _handleInTableText(t);
         break;
 
     // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-incaption
@@ -4693,16 +5681,16 @@ void HtmlParser::_acceptIn(Mode mode, HtmlToken const &t) {
     case Mode::IN_COLUMN_GROUP:
         break;
 
-    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intablebody
     case Mode::IN_TABLE_BODY:
+        _handleInTableBody(t);
         break;
 
-    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inrow
     case Mode::IN_ROW:
+        _handleInTableRow(t);
         break;
 
-    // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-incell
     case Mode::IN_CELL:
+        _handleInCell(t);
         break;
 
     // TODO: https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inselect
@@ -4742,7 +5730,7 @@ void HtmlParser::_acceptIn(Mode mode, HtmlToken const &t) {
     }
 }
 
-void HtmlParser::accept(HtmlToken const &t) {
+void HtmlParser::accept(HtmlToken const& t) {
     _acceptIn(_insertionMode, t);
 }
 

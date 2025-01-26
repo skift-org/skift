@@ -5,8 +5,8 @@ namespace Vaev::Style::Tests {
 
 static Media const TEST_MEDIA = {
     .type = MediaType::SCREEN,
-    .width = Px(1920),
-    .height = Px(1080),
+    .width = 1920_px,
+    .height = 1080_px,
     .aspectRatio = 16.0 / 9.0,
     .orientation = Print::Orientation::LANDSCAPE,
 
@@ -32,6 +32,10 @@ static Media const TEST_MEDIA = {
     .forcedColors = Colors::NONE,
     .prefersColorScheme = ColorScheme::LIGHT,
     .prefersReducedData = ReducedData::REDUCE,
+
+    .deviceWidth = 1920_px,
+    .deviceHeight = 1080_px,
+    .deviceAspectRatio = 16.0 / 9.0,
 };
 
 test$("logical-and") {

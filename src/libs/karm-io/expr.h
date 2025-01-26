@@ -28,7 +28,7 @@ Match match(Expr auto expr, _Str<E> input) {
 
 /// Returns true if either of the expressions match pass as parameters
 inline constexpr Expr auto either(Expr auto... exprs) {
-    return [=](auto &scan) {
+    return [=](auto& scan) {
         return (exprs(scan) or ...);
     };
 }
@@ -41,7 +41,7 @@ inline constexpr Expr auto operator|(Expr auto a, Expr auto b) {
 /// The expressions are evaluated in order.
 /// If any expression fails, the scanner is rewound to the state before the first expression.
 inline constexpr Expr auto chain(Expr auto... exprs) {
-    return [=](auto &scan) {
+    return [=](auto& scan) {
         auto saved = scan;
         if ((exprs(scan) and ...))
             return true;
@@ -56,7 +56,7 @@ inline constexpr Expr auto operator&(Expr auto a, Expr auto b) {
 
 /// Inverts the result of the expression.
 inline constexpr Expr auto negate(Expr auto expr) {
-    return [=](auto &scan) {
+    return [=](auto& scan) {
         auto saved = scan;
         if (not expr(scan)) {
             if (scan.ended())
@@ -76,7 +76,7 @@ inline constexpr Expr auto operator~(Expr auto expr) {
 /// Consumes until the expression matches or the end of the input is reached.
 /// scanner is rewound to the last unmatched rune.
 inline constexpr Expr auto until(Expr auto expr) {
-    return [=](auto &scan) {
+    return [=](auto& scan) {
         auto saved = scan;
         while (not expr(scan) and not scan.ended()) {
             scan.next();
@@ -89,7 +89,7 @@ inline constexpr Expr auto until(Expr auto expr) {
 
 /// Consumes until the expression matches or the end of the input is reached.
 inline constexpr Expr auto untilAndConsume(Expr auto expr) {
-    return [=](auto &scan) {
+    return [=](auto& scan) {
         while (not expr(scan) and not scan.ended())
             scan.next();
         return true;
@@ -101,7 +101,7 @@ inline constexpr Expr auto untilAndConsume(Expr auto expr) {
 /// Try to match an expression `atLeast` times and and stops when `atMost` times
 /// is reached, return true if atLeast is reached otherwise rewind the scanner.
 inline constexpr Expr auto nOrN(usize atLeast, usize atMost, Expr auto expr) {
-    return [=](auto &scan) {
+    return [=](auto& scan) {
         usize count = 0;
         auto saved = scan;
         saved = scan;
@@ -156,8 +156,8 @@ inline constexpr Expr auto atMost(usize n, auto expr) {
 }
 
 /// Returns true if the expression matches exactly one time and saves the result.
-inline Expr auto token(Str &out, Expr auto expr) {
-    return [=, &out](auto &scan) {
+inline Expr auto token(Str& out, Expr auto expr) {
+    return [=, &out](auto& scan) {
         scan.begin();
         if (expr(scan)) {
             out = scan.end();
@@ -170,7 +170,7 @@ inline Expr auto token(Str &out, Expr auto expr) {
 /// If the expression matches, the callback is called with the matching scanner.
 /// The scanner is rewound to the state before the expression was matched.
 inline Expr auto trap(Expr auto expr, auto cb) {
-    return [=](auto &scan) {
+    return [=](auto& scan) {
         auto saved = scan;
         if (expr(scan)) {
             scan = saved;
@@ -185,13 +185,13 @@ inline Expr auto trap(Expr auto expr, auto cb) {
 
 /// Match nothing and return true.
 inline constexpr Expr auto nothing() {
-    return [](auto &) {
+    return [](auto&) {
         return true;
     };
 }
 
 inline constexpr Expr auto any() {
-    return [](auto &scan) {
+    return [](auto& scan) {
         scan.next();
         return true;
     };
@@ -199,14 +199,14 @@ inline constexpr Expr auto any() {
 
 /// Match the end of the input.
 inline constexpr Expr auto eof() {
-    return [](auto &scan) {
+    return [](auto& scan) {
         return scan.ended();
     };
 }
 
 /// Match a word and consume it.
 inline constexpr Expr auto word(Str word) {
-    return [=](auto &scan) {
+    return [=](auto& scan) {
         return scan.skip(word);
     };
 }
@@ -214,7 +214,7 @@ inline constexpr Expr auto word(Str word) {
 /// Match a single character and consume it.
 /// Multiple characters can be passed to match any of them.
 inline constexpr Expr auto single(auto... c) {
-    return [=](auto &scan) {
+    return [=](auto& scan) {
         if (((scan.peek() == (Rune)c) or ...)) {
             scan.next();
             return true;
@@ -225,7 +225,7 @@ inline constexpr Expr auto single(auto... c) {
 
 /// Match a single character against a ctype function and consume it.
 inline constexpr Expr auto ctype(CType auto ctype) {
-    return [=](auto &scan) {
+    return [=](auto& scan) {
         if (ctype(scan.peek())) {
             scan.next();
             return true;
@@ -236,7 +236,7 @@ inline constexpr Expr auto ctype(CType auto ctype) {
 
 /// Match a character range and consume it if it lies within the range.
 inline constexpr Expr auto range(Rune start, Rune end) {
-    return [=](auto &scan) {
+    return [=](auto& scan) {
         if (scan.peek() >= start and scan.peek() <= end) {
             scan.next();
             return true;
@@ -324,7 +324,7 @@ inline constexpr Expr auto optSeparator(Expr auto expr) {
 
 } // namespace Karm::Re
 
-inline constexpr Karm::Re::Expr auto operator""_re(char const *str, usize len) {
+inline constexpr Karm::Re::Expr auto operator""_re(char const* str, usize len) {
     return Karm::Re::word(Str{str, len});
 }
 

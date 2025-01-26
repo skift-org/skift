@@ -17,8 +17,8 @@ struct Canvas : Meta::NoCopy {
 
     Canvas() = default;
 
-    Canvas(Canvas &&) = default;
-    Canvas &operator=(Canvas &&) = default;
+    Canvas(Canvas&&) = default;
+    Canvas& operator=(Canvas&&) = default;
 
     virtual ~Canvas() = default;
 
@@ -96,7 +96,7 @@ struct Canvas : Meta::NoCopy {
     virtual void ellipse(Math::Ellipsef ellipse) = 0;
 
     // Add a path to the current path.
-    virtual void path(Math::Path const &path) = 0;
+    virtual void path(Math::Path const& path) = 0;
 
     // Fill the current path with the given fill.
     virtual void fill(FillRule rule = FillRule::NONZERO) = 0;
@@ -154,16 +154,16 @@ struct Canvas : Meta::NoCopy {
     virtual void fill(Math::Ellipsef e);
 
     // stroke a path
-    virtual void stroke(Math::Path const &p);
+    virtual void stroke(Math::Path const& p);
 
     // fill a path
-    virtual void fill(Math::Path const &p, FillRule rule = FillRule::NONZERO);
+    virtual void fill(Math::Path const& p, FillRule rule = FillRule::NONZERO);
 
     // Fill a single glyph of text
-    virtual void fill(Text::Font &font, Text::Glyph glyph, Math::Vec2f baseline);
+    virtual void fill(Text::Font& font, Text::Glyph glyph, Math::Vec2f baseline);
 
     // Fill a run of text
-    virtual void fill(Text::Font &font, Text::Run const &run, Math::Vec2f baseline);
+    virtual void fill(Text::Prose& prose);
 
     // MARK: Clear Operations --------------------------------------------------
 
@@ -206,7 +206,7 @@ struct Canvas : Meta::NoCopy {
     void apply(Filter filter, Math::Ellipsef region);
 
     // Apply a filter on the given region.
-    void apply(Filter filter, Math::Path const &region);
+    void apply(Filter filter, Math::Path const& region);
 };
 
 } // namespace Karm::Gfx

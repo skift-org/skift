@@ -19,7 +19,7 @@ struct Shape : public Node {
         return _path.bound();
     }
 
-    void paint(Gfx::Canvas &g, Math::Rectf r, PaintOptions) override {
+    void paint(Gfx::Canvas& g, Math::Rectf r, PaintOptions) override {
         if (not bound().colide(r))
             return;
 
@@ -32,7 +32,7 @@ struct Shape : public Node {
             g.stroke(*_stroke);
     }
 
-    void repr(Io::Emit &e) const override {
+    void repr(Io::Emit& e) const override {
         e("(shape z:{} {})", zIndex);
     }
 };

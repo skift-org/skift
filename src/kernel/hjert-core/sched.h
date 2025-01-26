@@ -11,19 +11,19 @@ namespace Hjert::Core {
 struct Task;
 
 struct Sched {
-    TimeStamp _stamp{};
+    Instant _stamp{};
     Lock _lock{};
 
-    Vec<Strong<Task>> _tasks;
-    Strong<Task> _prev;
-    Strong<Task> _curr;
-    Strong<Task> _idle;
+    Vec<Arc<Task>> _tasks;
+    Arc<Task> _prev;
+    Arc<Task> _curr;
+    Arc<Task> _idle;
 
-    Sched(Strong<Task> boot);
+    Sched(Arc<Task> boot);
 
-    Res<> enqueue(Strong<Task> task);
+    Res<> enqueue(Arc<Task> task);
 
-    void schedule(TimeSpan span);
+    void schedule(Duration span);
 };
 
 Res<> initSched(Handover::Payload &payload);

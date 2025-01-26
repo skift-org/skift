@@ -95,7 +95,7 @@ struct Iter {
     }
 
     constexpr auto sum() {
-        return reduce(Value{}, [](auto &a, auto &b) {
+        return reduce(Value{}, [](auto& a, auto& b) {
             return a + b;
         });
     }
@@ -261,7 +261,7 @@ struct Iter {
         Item curr;
         Iter iter;
 
-        constexpr auto &operator*() {
+        constexpr auto& operator*() {
             return *curr;
         }
 
@@ -284,19 +284,19 @@ struct Iter {
     }
 
     constexpr auto collect() {
-        forEach([&](auto const &...) {
+        forEach([&](auto const&...) {
         });
     }
 
     template <typename C>
-    constexpr auto collect(C &c) {
+    constexpr auto collect(C& c) {
         forEach([&](auto v) {
             c.pushBack(v);
         });
     }
 
     template <typename C>
-    constexpr auto collect(C &c, auto f) {
+    constexpr auto collect(C& c, auto f) {
         forEach([&](auto v) {
             c.pushBack(f(v));
         });
@@ -392,7 +392,7 @@ concept AtLen = requires(T t) {
     t.at(0);
 };
 
-constexpr auto iter(AtLen auto &o) {
+constexpr auto iter(AtLen auto& o) {
     return range(o.len())
         .map([&](auto i) mutable {
             return o.at(i);

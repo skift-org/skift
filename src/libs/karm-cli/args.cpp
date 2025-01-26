@@ -4,7 +4,7 @@ namespace Karm::Cli {
 
 // MARK: Tokenizer -------------------------------------------------------------
 
-void tokenize(Str arg, Vec<Token> &out) {
+void tokenize(Str arg, Vec<Token>& out) {
     if (arg == "--"s) {
         out.pushBack(Token::EXTRA);
     } else if (arg == "-"s) {
@@ -20,31 +20,31 @@ void tokenize(Str arg, Vec<Token> &out) {
     }
 }
 
-void tokenize(Slice<Str> args, Vec<Token> &out) {
-    for (auto &arg : args)
+void tokenize(Slice<Str> args, Vec<Token>& out) {
+    for (auto& arg : args)
         tokenize(arg, out);
 }
 
-void tokenize(int argc, char **argv, Vec<Token> &out) {
+void tokenize(int argc, char** argv, Vec<Token>& out) {
     for (int i = 0; i < argc; ++i)
         tokenize(Str::fromNullterminated(argv[i]), out);
 }
 
 // MARK: Values ----------------------------------------------------------------
 
-void ValueParser<bool>::usage(Io::Emit &e) {
+void ValueParser<bool>::usage(Io::Emit& e) {
     e("true|false");
 }
 
-Res<bool> ValueParser<bool>::parse(Cursor<Token> &) {
+Res<bool> ValueParser<bool>::parse(Cursor<Token>&) {
     return Ok(true);
 }
 
-void ValueParser<isize>::usage(Io::Emit &e) {
+void ValueParser<isize>::usage(Io::Emit& e) {
     e("integer");
 }
 
-Res<isize> ValueParser<isize>::parse(Cursor<Token> &c) {
+Res<isize> ValueParser<isize>::parse(Cursor<Token>& c) {
     if (c.ended() or c->kind != Token::OPERAND)
         return Error::other("missing value");
 
@@ -57,11 +57,11 @@ Res<isize> ValueParser<isize>::parse(Cursor<Token> &c) {
     return Ok(result.unwrap());
 }
 
-void ValueParser<Str>::usage(Io::Emit &e) {
+void ValueParser<Str>::usage(Io::Emit& e) {
     e("string");
 }
 
-Res<Str> ValueParser<Str>::parse(Cursor<Token> &c) {
+Res<Str> ValueParser<Str>::parse(Cursor<Token>& c) {
     if (c.ended() or c->kind != Token::OPERAND)
         return Error::other("missing value");
 

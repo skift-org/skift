@@ -6,6 +6,6 @@
 
 namespace Vaev::Driver {
 
-Vec<Print::Page> print(Markup::Document const &dom, Print::Settings const &settings);
+Vec<Print::Page> print(Markup::Document const& dom, Print::Settings const& settings);
 
 } // namespace Vaev::Driver

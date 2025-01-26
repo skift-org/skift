@@ -20,7 +20,7 @@ struct LineHeight {
 
     LineHeight(Number value) : _value(value) {}
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("{}", _value);
     }
 };

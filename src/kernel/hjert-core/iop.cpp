@@ -4,8 +4,8 @@
 
 namespace Hjert::Core {
 
-Res<Strong<Iop>> Iop::create(Hal::PortRange range) {
-    return Ok(makeStrong<Iop>(range));
+Res<Arc<Iop>> Iop::create(Hal::PortRange range) {
+    return Ok(makeArc<Iop>(range));
 }
 
 Iop::Iop(Hal::PortRange range)

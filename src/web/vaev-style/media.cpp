@@ -5,7 +5,7 @@
 
 namespace Vaev::Style {
 
-static Cons<Style::RangePrefix, Str> _explodeFeatureName(Io::SScan s) {
+static Pair<Style::RangePrefix, Str> _explodeFeatureName(Io::SScan s) {
     if (s.skip("min-"))
         return {Style::RangePrefix::MIN, s.remStr()};
     else if (s.skip("max-"))
@@ -14,7 +14,7 @@ static Cons<Style::RangePrefix, Str> _explodeFeatureName(Io::SScan s) {
         return {Style::RangePrefix::EXACT, s.remStr()};
 }
 
-static Style::Feature _parseMediaFeature(Cursor<Css::Sst> &c) {
+static Style::Feature _parseMediaFeature(Cursor<Css::Sst>& c) {
     if (c.ended()) {
         logWarn("unexpected end of input");
         return Style::TypeFeature{MediaType::OTHER};
@@ -60,9 +60,9 @@ static Style::Feature _parseMediaFeature(Cursor<Css::Sst> &c) {
     return prop.take();
 }
 
-Style::MediaQuery _parseMediaQueryInfix(Cursor<Css::Sst> &c);
+Style::MediaQuery _parseMediaQueryInfix(Cursor<Css::Sst>& c);
 
-Style::MediaQuery _parseMediaQueryLeaf(Cursor<Css::Sst> &c) {
+Style::MediaQuery _parseMediaQueryLeaf(Cursor<Css::Sst>& c) {
     if (c.skip(Css::Token::ident("not"))) {
         return Style::MediaQuery::negate(_parseMediaQueryInfix(c));
     } else if (c.skip(Css::Token::ident("only"))) {
@@ -76,7 +76,7 @@ Style::MediaQuery _parseMediaQueryLeaf(Cursor<Css::Sst> &c) {
         return _parseMediaFeature(c);
 }
 
-Style::MediaQuery _parseMediaQueryInfix(Cursor<Css::Sst> &c) {
+Style::MediaQuery _parseMediaQueryInfix(Cursor<Css::Sst>& c) {
     auto lhs = _parseMediaQueryLeaf(c);
     while (not c.ended()) {
         if (c.skip(Css::Token::ident("and"))) {
@@ -90,7 +90,7 @@ Style::MediaQuery _parseMediaQueryInfix(Cursor<Css::Sst> &c) {
     return lhs;
 }
 
-Style::MediaQuery parseMediaQuery(Cursor<Css::Sst> &c) {
+Style::MediaQuery parseMediaQuery(Cursor<Css::Sst>& c) {
     eatWhitespace(c);
     Style::MediaQuery lhs = _parseMediaQueryInfix(c);
     eatWhitespace(c);

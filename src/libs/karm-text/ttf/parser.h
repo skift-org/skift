@@ -57,7 +57,7 @@ struct Parser {
     Post _post;
     Os2 _os2;
 
-    static Res<Cmap::Table> chooseCmap(Parser &font) {
+    static Res<Cmap::Table> chooseCmap(Parser& font) {
         Opt<Cmap::Table> bestCmap = NONE;
         isize bestScore = 0;
 
@@ -76,7 +76,7 @@ struct Parser {
         };
 
         for (auto table : font._cmap.iterTables()) {
-            for (auto &knowCmap : knowCmaps) {
+            for (auto& knowCmap : knowCmaps) {
                 if (knowCmap.platformId == table.platformId and
                     knowCmap.encodingId == table.encodingId and
                     knowCmap.type == table.type and
@@ -227,10 +227,10 @@ struct Parser {
         if (not positioning)
             return 0;
 
-        return positioning.unwrap().car.xAdvance;
+        return positioning.unwrap().v0.xAdvance;
     }
 
-    void glyphContour(Gfx::Canvas &g, Text::Glyph glyph) const {
+    void glyphContour(Gfx::Canvas& g, Text::Glyph glyph) const {
         auto glyfOffset = _loca.glyfOffset(glyph.index, _head);
 
         if (glyfOffset == _loca.glyfOffset(glyph.index + 1, _head))

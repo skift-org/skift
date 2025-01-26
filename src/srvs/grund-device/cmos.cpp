@@ -6,13 +6,13 @@ namespace Grund::Device::Cmos {
 
 // MARK: CMOS ------------------------------------------------------------------
 
-Cmos::Cmos(Strong<Hal::Io> io)
+Cmos::Cmos(Rc<Hal::Io> io)
     : _io(std::move(io)) {}
 
 Res<> Cmos::init() {
     logInfo("cmos: initializing...");
 
-    try$(attach(makeStrong<Rtc>(*this)));
+    try$(attach(makeRc<Rtc>(*this)));
 
     return Ok();
 }
@@ -48,14 +48,14 @@ Res<> Rtc::init() {
 
     // NOTE: The RTC does not need to be initialized but
     //       we can still do some sanity checks
-    auto dt = DateTime::fromTimeStamp(try$(this->now()));
+    auto dt = DateTime::fromInstant(try$(this->now()));
     logInfo("cmos: rtc date: {}", dt);
     if (dt.date.year < Year{2024})
         logWarn("cmos: rtc out of date, make sure to set the correct date");
     return Ok();
 }
 
-Res<TimeStamp> Rtc::now() {
+Res<SystemTime> Rtc::now() {
     try$(cmos().waitUpdate());
 
     DateTime dt;
@@ -66,7 +66,7 @@ Res<TimeStamp> Rtc::now() {
     dt.date.month = fomBcd(try$(cmos().read(Cmos::MONTH))) - 1;
     dt.date.year = fomBcd(try$(cmos().read(Cmos::YEAR))) + 2000;
 
-    return Ok(dt.toTimeStamp());
+    return Ok(dt.toInstant());
 }
 
 } // namespace Grund::Device::Cmos

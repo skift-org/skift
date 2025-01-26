@@ -28,7 +28,7 @@ enum struct BorderCollapse {
 struct BorderSpacing {
     Length horizontal, vertical;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("({}, {})", horizontal, vertical);
     }
 };
@@ -39,7 +39,7 @@ struct TableProps {
     BorderSpacing spacing = {0_px, 0_px};
     BorderCollapse collapse = BorderCollapse::SEPARATE;
 
-    void repr(Io::Emit &e) const {
+    void repr(Io::Emit& e) const {
         e("(table");
         e(" tableLayout={}", tableLayout);
         e(" captionSide={}", captionSide);

@@ -24,7 +24,7 @@ inline bool colidesWith(Record record, Record other) {
     return rangeOf(record).overlaps(rangeOf(other));
 }
 
-inline Cons<Record, Record> split(Record record, Record other) {
+inline Pair<Record, Record> split(Record record, Record other) {
     auto [lower, upper] = rangeOf(record).split(rangeOf(other));
     Record lowerRecord = record;
     Record upperRecord = record;

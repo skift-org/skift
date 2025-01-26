@@ -14,11 +14,11 @@ struct Service {
 
 struct Context :
     Meta::Pinned {
-    Vec<Strong<Service>> _srvs;
+    Vec<Rc<Service>> _srvs;
 
     template <typename T>
-    T &use() {
-        for (auto &hook : _srvs)
+    T& use() {
+        for (auto& hook : _srvs)
             if (hook.is<T>())
                 return hook.unwrap<T>();
 
@@ -26,20 +26,20 @@ struct Context :
     }
 
     template <typename T, typename... Args>
-    void add(Args &&...args) {
-        _srvs.pushBack(makeStrong<T>(std::forward<Args>(args)...));
+    void add(Args&&... args) {
+        _srvs.pushBack(makeRc<T>(std::forward<Args>(args)...));
     }
 };
 
-Context &globalContext();
+Context& globalContext();
 
 struct ArgsHook :
     public Service {
 
     usize _argc;
-    char const **_argv;
+    char const** _argv;
 
-    ArgsHook(usize argc, char const **argv)
+    ArgsHook(usize argc, char const** argv)
         : _argc(argc), _argv(argv) {}
 
     Str self() const {
@@ -64,10 +64,10 @@ struct ArgsHook :
     }
 };
 
-inline auto &useArgs(Context &ctx = globalContext()) {
+inline auto& useArgs(Context& ctx = globalContext()) {
     return ctx.use<ArgsHook>();
 }
 
 } // namespace Karm::Sys
 
-Async::Task<> entryPointAsync(Sys::Context &);
+Async::Task<> entryPointAsync(Sys::Context&);

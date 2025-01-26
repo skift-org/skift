@@ -101,7 +101,7 @@ struct Header {
     }
 
     Bytes bytes() const {
-        return {(Byte const *)this, sizeof(*this)};
+        return {(Byte const*)this, sizeof(*this)};
     }
 };
 
@@ -115,11 +115,11 @@ struct Answer {
     String name;
     Type type;
     Class class_;
-    TimeSpan ttl;
+    Duration ttl;
     Buf<Byte> data;
 };
 
-Res<> encodeName(Io::BEmit &e, Str name) {
+Res<> encodeName(Io::BEmit& e, Str name) {
     for (auto part : iterSplit(name, '.')) {
         e.writeU8be(part.len());
         e.writeStr(part);
@@ -128,7 +128,7 @@ Res<> encodeName(Io::BEmit &e, Str name) {
     return Ok();
 }
 
-Res<usize> decodeName(Cursor<Byte> const start, Cursor<Byte> curr, StringBuilder &out) {
+Res<usize> decodeName(Cursor<Byte> const start, Cursor<Byte> curr, StringBuilder& out) {
     usize len = 0;
     while (not curr.ended()) {
         auto b = curr.next();
@@ -191,19 +191,19 @@ struct Packet {
         return hdr;
     }
 
-    static Res<Buf<Byte>> encode(Packet const &p) {
+    static Res<Buf<Byte>> encode(Packet const& p) {
         Io::BufferWriter buf;
         Io::BEmit e(buf);
 
         e.writeBytes(p.header().bytes());
 
-        for (auto &q : p._qs) {
+        for (auto& q : p._qs) {
             try$(encodeName(e, q.name));
             e.writeU16be(q.type);
             e.writeU16be(q.class_);
         }
 
-        for (auto &a : p._ans) {
+        for (auto& a : p._ans) {
             try$(encodeName(e, a.name));
             e.writeU16be(a.type);
             e.writeU16be(a.class_);
@@ -225,7 +225,7 @@ struct Packet {
         s.readTo(&hdr);
 
         Packet pkt{hdr.id, (Flags)hdr.flags.value()};
-        Vec<Question> &qs = pkt._qs;
+        Vec<Question>& qs = pkt._qs;
         for (auto i = 0; i < hdr.qdcount; i++) {
             StringBuilder name;
             s.skip(try$(decodeName(buf, s.remBytes(), name)));
@@ -239,7 +239,7 @@ struct Packet {
             qs.pushBack(std::move(q));
         }
 
-        Vec<Answer> &ans = pkt._ans;
+        Vec<Answer>& ans = pkt._ans;
         for (auto i = 0; i < hdr.ancount; i++) {
             StringBuilder name;
             s.skip(try$(decodeName(buf, s.remBytes(), name)));
@@ -248,7 +248,7 @@ struct Packet {
             a.name = name.take();
             a.type = (Type)s.nextU16be();
             a.class_ = (Class)s.nextU16be();
-            a.ttl = TimeSpan::fromSecs(s.nextU32be());
+            a.ttl = Duration::fromSecs(s.nextU32be());
             auto len = s.nextU16be();
             a.data = s.nextBytes(len);
 

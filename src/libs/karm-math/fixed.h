@@ -96,7 +96,7 @@ struct _Fixed {
         return cast<U>();
     }
 
-    constexpr _Fixed &operator++() {
+    constexpr _Fixed& operator++() {
         _val = saturatingAdd<T>(_val, _DENO);
         return *this;
     }
@@ -107,7 +107,7 @@ struct _Fixed {
         return f;
     }
 
-    constexpr _Fixed &operator--() {
+    constexpr _Fixed& operator--() {
         _val = saturatingSub<T>(_val, _DENO);
         return *this;
     }
@@ -126,15 +126,15 @@ struct _Fixed {
         return fromRaw(-_val);
     }
 
-    constexpr _Fixed operator+(_Fixed const &rhs) const {
+    constexpr _Fixed operator+(_Fixed const& rhs) const {
         return fromRaw(saturatingAdd<T>(_val, rhs._val));
     }
 
-    constexpr _Fixed operator-(_Fixed const &rhs) const {
+    constexpr _Fixed operator-(_Fixed const& rhs) const {
         return fromRaw(saturatingSub<T>(_val, rhs._val));
     }
 
-    constexpr _Fixed operator*(_Fixed const &rhs) const {
+    constexpr _Fixed operator*(_Fixed const& rhs) const {
         isize val = _val;
         val *= rhs._val;
 
@@ -150,36 +150,36 @@ struct _Fixed {
         return fromRaw(ival);
     }
 
-    constexpr _Fixed loosyDiv(_Fixed const &rhs) const {
+    constexpr _Fixed loosyDiv(_Fixed const& rhs) const {
         isize val = _val;
         val <<= _FRAC;
         val /= rhs._val;
         return fromRaw(clampTo<T>(val));
     }
 
-    constexpr _Frac<_Fixed> operator/(_Fixed const &rhs) const;
+    constexpr _Frac<_Fixed> operator/(_Fixed const& rhs) const;
 
-    constexpr _Fixed operator/(_Frac<_Fixed> const &rhs) const;
+    constexpr _Fixed operator/(_Frac<_Fixed> const& rhs) const;
 
-    constexpr _Fixed &operator+=(_Fixed const &rhs) {
+    constexpr _Fixed& operator+=(_Fixed const& rhs) {
         return *this = *this + rhs;
     }
 
-    constexpr _Fixed &operator-=(_Fixed const &rhs) {
+    constexpr _Fixed& operator-=(_Fixed const& rhs) {
         return *this = *this - rhs;
     }
 
-    constexpr _Fixed &operator*=(_Fixed const &rhs) {
+    constexpr _Fixed& operator*=(_Fixed const& rhs) {
         return *this = *this * rhs;
     }
 
-    constexpr _Frac<_Fixed> &operator/=(_Fixed const &rhs) {
+    constexpr _Frac<_Fixed>& operator/=(_Fixed const& rhs) {
         return *this = *this / rhs;
     }
 
-    constexpr bool operator==(_Fixed const &rhs) const = default;
+    constexpr bool operator==(_Fixed const& rhs) const = default;
 
-    constexpr std::strong_ordering operator<=>(_Fixed const &rhs) const = default;
+    constexpr std::strong_ordering operator<=>(_Fixed const& rhs) const = default;
 };
 
 template <typename T>
@@ -200,12 +200,12 @@ struct _Frac {
 };
 
 template <Meta::SignedIntegral T, usize F>
-constexpr _Frac<_Fixed<T, F>> _Fixed<T, F>::operator/(_Fixed<T, F> const &rhs) const {
+constexpr _Frac<_Fixed<T, F>> _Fixed<T, F>::operator/(_Fixed<T, F> const& rhs) const {
     return _Frac<_Fixed<T, F>>{fromRaw(_val), rhs};
 }
 
 template <Meta::SignedIntegral T, usize F>
-constexpr _Fixed<T, F> _Fixed<T, F>::operator/(_Frac<_Fixed<T, F>> const &rhs) const {
+constexpr _Fixed<T, F> _Fixed<T, F>::operator/(_Frac<_Fixed<T, F>> const& rhs) const {
     return fromRaw(saturatingDiv(_val, rhs._num) * rhs._deno);
 }
 
@@ -225,14 +225,14 @@ struct Karm::Limits<Math::_Fixed<T, F>> {
 
 template <Meta::SignedIntegral T, usize F>
 struct Karm::Io::Formatter<Math::_Fixed<T, F>> {
-    Res<usize> format(Io::TextWriter &writer, Math::_Fixed<T, F> const &val) {
+    Res<usize> format(Io::TextWriter& writer, Math::_Fixed<T, F> const& val) {
         return Io::format(writer, "{}", val.template cast<f64>());
     }
 };
 
 template <typename T>
 struct Karm::Io::Formatter<Math::_Frac<T>> {
-    Res<usize> format(Io::TextWriter &writer, Math::_Frac<T> const &val) {
+    Res<usize> format(Io::TextWriter& writer, Math::_Frac<T> const& val) {
         return Io::format(writer, "{}/{}", val._num, val._deno);
     }
 };

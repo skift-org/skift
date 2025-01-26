@@ -17,11 +17,11 @@ using Encoding = Ascii;
 #endif
 
 #ifdef __ck_sys_line_ending_lf__
-constexpr char const *LINE_ENDING = "\n";
+constexpr char const* LINE_ENDING = "\n";
 #    define EMBED_SYS_LINE_ENDING "\n"
 #    define EMBED_SYS_LINE_ENDING_L L"\n"
 #elifdef __ck_sys_line_ending_crlf__
-constexpr char const *LINE_ENDING = "\r\n";
+constexpr char const* LINE_ENDING = "\r\n";
 #    define EMBED_SYS_LINE_ENDING "\r\n"
 #    define EMBED_SYS_LINE_ENDING_L L"\r\n"
 #else
@@ -29,11 +29,11 @@ constexpr char const *LINE_ENDING = "\r\n";
 #endif
 
 #ifdef __ck_sys_path_separator_slash__
-constexpr char const *PATH_SEPARATOR = "/";
+constexpr char const* PATH_SEPARATOR = "/";
 #    define EMBED_SYS_PATH_SEPARATOR "/"
 #    define EMBED_SYS_PATH_SEPARATOR_L L"/"
 #elifdef __ck_sys_path_separator_backslash__
-constexpr char const *PATH_SEPARATOR = "\\";
+constexpr char const* PATH_SEPARATOR = "\\";
 #    define EMBED_SYS_PATH_SEPARATOR "\\"
 #    define EMBED_SYS_PATH_SEPARATOR_L L"\\"
 #else

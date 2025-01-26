@@ -11,20 +11,20 @@ struct Space : public BaseObject<Space, Hj::Type::SPACE> {
     struct Map {
         Hal::VmmRange vrange;
         usize off;
-        Strong<Vmo> vmo;
+        Arc<Vmo> vmo;
 
         Hal::PmmRange prange() {
             return vmo->range().slice(off, vrange.size);
         }
     };
 
-    Strong<Hal::Vmm> _vmm;
+    Arc<Hal::Vmm> _vmm;
     Ranges<Hal::VmmRange> _ranges;
     Vec<Map> _maps;
 
-    static Res<Strong<Space>> create();
+    static Res<Arc<Space>> create();
 
-    Space(Strong<Hal::Vmm> vmm);
+    Space(Arc<Hal::Vmm> vmm);
 
     ~Space() override;
 
@@ -34,7 +34,7 @@ struct Space : public BaseObject<Space, Hj::Type::SPACE> {
 
     Res<> _validate(Hal::VmmRange vrange);
 
-    Res<Hal::VmmRange> map(Hal::VmmRange vrange, Strong<Vmo> vmo, usize off, Hj::MapFlags flags);
+    Res<Hal::VmmRange> map(Hal::VmmRange vrange, Arc<Vmo> vmo, usize off, Hj::MapFlags flags);
 
     Res<> unmap(Hal::VmmRange vrange);
 

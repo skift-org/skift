@@ -4,7 +4,7 @@
 #include <karm-sys/file.h>
 #include <vaev-script/lexer.h>
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto args = Sys::useArgs(ctx);
 
     if (args.len() != 2) {

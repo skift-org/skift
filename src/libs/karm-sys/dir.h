@@ -27,9 +27,9 @@ struct Dir {
 
     static Res<Dir> openOrCreate(Mime::Url url);
 
-    auto const &entries() const { return _entries; }
+    auto const& entries() const { return _entries; }
 
-    auto const &path() const { return _url; }
+    auto const& path() const { return _url; }
 };
 
 } // namespace Karm::Sys

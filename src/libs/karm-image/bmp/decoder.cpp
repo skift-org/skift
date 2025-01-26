@@ -17,7 +17,7 @@ Res<Decoder> Decoder::init(Bytes slice) {
     return Ok(dec);
 }
 
-Res<> Decoder::_readHeader(Io::BScan &s) {
+Res<> Decoder::_readHeader(Io::BScan& s) {
     if (s.rem() < 54) {
         return Error::invalidData("image too small");
     }
@@ -30,7 +30,7 @@ Res<> Decoder::_readHeader(Io::BScan &s) {
     return Ok();
 }
 
-Res<> Decoder::_readInfoHeader(Io::BScan &s) {
+Res<> Decoder::_readInfoHeader(Io::BScan& s) {
     auto start = s.tell();
     auto size = s.nextU32le(); // header size
     if (size < 40) {
@@ -67,7 +67,7 @@ Res<> Decoder::_readInfoHeader(Io::BScan &s) {
     return Ok();
 }
 
-Res<> Decoder::_readPalette(Io::BScan &s) {
+Res<> Decoder::_readPalette(Io::BScan& s) {
     for (usize i = 0; i < _numsColors; ++i) {
         auto b = s.nextU8le();
         auto g = s.nextU8le();
@@ -81,7 +81,7 @@ Res<> Decoder::_readPalette(Io::BScan &s) {
     return Ok();
 }
 
-Res<> Decoder::_readPixels(Io::BScan &s) {
+Res<> Decoder::_readPixels(Io::BScan& s) {
     s.seek(_dataOffset);
     _pixels = s.remBytes();
     return Ok();
@@ -151,7 +151,7 @@ Res<> Decoder::decode(Gfx::MutPixels pixels) {
     return Ok();
 }
 
-void Decoder::repr(Io::Emit &e) {
+void Decoder::repr(Io::Emit& e) {
     e("BMP image");
     e.indentNewline();
 

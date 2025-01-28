@@ -11,7 +11,7 @@
         },
         "cute-engineering/ce-mdi": {
             "git": "https://github.com/cute-engineering/ce-mdi.git",
-            "tag": "v0.2.0"
+            "tag": "v0.3.0"
         },
         "cute-engineering/ce-libc": {
             "git": "https://github.com/cute-engineering/ce-libc.git",
@@ -27,7 +27,7 @@
         },
         "cute-engineering/ce-targets": {
             "git": "https://github.com/cute-engineering/ce-targets.git",
-            "tag": "v0.1.1"
+            "tag": "v0.2.0"
         },
         "sdl2": {
             "description": "A cross-platform development library designed to provide low level access to hardware",

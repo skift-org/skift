@@ -19,15 +19,15 @@
         "cc": {
             "cmd": "{shell.latest('clang')}",
             "args": [
-                "-target",
-                "x86_64-none-elf"
+                "--target=x86_64-none-elf"
             ]
         },
         "cxx": {
             "cmd": "{shell.latest('clang++')}",
             "args": [
-                "-target",
-                "x86_64-none-elf"
+                "--target=x86_64-none-elf",
+                "-fno-exceptions",
+                "-fno-rtti"
             ]
         },
         "ld": {

@@ -18,7 +18,7 @@ Resolver Resolver::from(Tree const& tree, Box const& box) {
 Resolver Resolver::inherit(Resolver const& resolver) {
     Resolver copy = resolver;
     copy.boxFont = NONE;
-    copy.parentFontSize = resolver.boxFont->fontsize;
+    copy.parentFontSize = resolver.boxFont.unwrap().fontsize;
     return copy;
 }
 
@@ -31,40 +31,40 @@ Px Resolver::_resolveFontRelative(Length const& value) {
     switch (value.unit()) {
 
     case Length::EM:
-        return Px::fromFloatNearest(value.val() * boxFont->fontSize());
+        return Px::fromFloatNearest(value.val() * boxFont.unwrap().fontSize());
 
     case Length::REM:
-        return Px::fromFloatNearest(value.val() * rootFont->fontSize());
+        return Px::fromFloatNearest(value.val() * rootFont.unwrap().fontSize());
 
     case Length::EX:
-        return Px::fromFloatNearest(value.val() * boxFont->xHeight());
+        return Px::fromFloatNearest(value.val() * boxFont.unwrap().xHeight());
 
     case Length::REX:
-        return Px::fromFloatNearest(value.val() * rootFont->xHeight());
+        return Px::fromFloatNearest(value.val() * rootFont.unwrap().xHeight());
 
     case Length::CAP:
-        return Px::fromFloatNearest(value.val() * boxFont->capHeight());
+        return Px::fromFloatNearest(value.val() * boxFont.unwrap().capHeight());
 
     case Length::RCAP:
-        return Px::fromFloatNearest(value.val() * rootFont->capHeight());
+        return Px::fromFloatNearest(value.val() * rootFont.unwrap().capHeight());
 
     case Length::CH:
-        return Px::fromFloatNearest(value.val() * boxFont->zeroAdvance());
+        return Px::fromFloatNearest(value.val() * boxFont.unwrap().zeroAdvance());
 
     case Length::RCH:
-        return Px::fromFloatNearest(value.val() * rootFont->zeroAdvance());
+        return Px::fromFloatNearest(value.val() * rootFont.unwrap().zeroAdvance());
 
     case Length::IC:
-        return Px::fromFloatNearest(value.val() * boxFont->zeroAdvance());
+        return Px::fromFloatNearest(value.val() * boxFont.unwrap().zeroAdvance());
 
     case Length::RIC:
-        return Px::fromFloatNearest(value.val() * rootFont->zeroAdvance());
+        return Px::fromFloatNearest(value.val() * rootFont.unwrap().zeroAdvance());
 
     case Length::LH:
-        return Px::fromFloatNearest(value.val() * boxFont->lineHeight());
+        return Px::fromFloatNearest(value.val() * boxFont.unwrap().lineHeight());
 
     case Length::RLH:
-        return Px::fromFloatNearest(value.val() * rootFont->lineHeight());
+        return Px::fromFloatNearest(value.val() * rootFont.unwrap().lineHeight());
 
     default:
         panic("expected font-relative unit");

@@ -292,7 +292,7 @@ Vec<Print::Page> print(Markup::Document const& dom, Print::Settings const& setti
 
     Layout::Breakpoint prevBreakpoint{
         .endIdx = 0,
-        .advanceCase = Layout::Breakpoint::ADVANCE_CASE::ADVANCE_WITHOUT_CHILDREN
+        .advance = Layout::Breakpoint::Advance::WITHOUT_CHILDREN
     };
     Layout::Breakpoint currBreakpoint;
 
@@ -350,7 +350,7 @@ Vec<Print::Page> print(Markup::Document const& dom, Print::Settings const& setti
         );
 
         currBreakpoint = outDiscovery.completelyLaidOut
-                             ? Layout::Breakpoint::buildClassB(1, false)
+                             ? Layout::Breakpoint::classB(1, false)
                              : outDiscovery.breakpoint.unwrap();
 
         contentTree.fc.leaveDiscovery();

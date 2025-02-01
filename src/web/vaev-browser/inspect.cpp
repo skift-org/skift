@@ -54,7 +54,7 @@ Ui::Child itemHeader(Rc<Markup::Node> n, Ui::Action<InspectorAction> a, bool exp
     } else if (n.is<Markup::DocumentType>()) {
         return Ui::codeMedium("#document-type");
     } else if (auto tx = n.is<Markup::Text>()) {
-        return Ui::codeMedium("{#}", tx->data);
+        return Ui::codeMedium("{#}", tx->data());
     } else if (auto el = n.is<Markup::Element>()) {
         if (el->children().len()) {
             return Ui::hflow(
@@ -73,7 +73,7 @@ Ui::Child itemHeader(Rc<Markup::Node> n, Ui::Action<InspectorAction> a, bool exp
             return elementStartTag(*el, false);
         }
     } else if (auto c = n.is<Markup::Comment>()) {
-        return Ui::codeMedium(Gfx::GREEN, "<!-- {} -->", c->data);
+        return Ui::codeMedium(Gfx::GREEN, "<!-- {} -->", c->data());
     } else {
         unreachable();
     }

@@ -15,7 +15,7 @@ void maybeProcessChildBreakpoint(Fragmentainer& fc, Breakpoint& currentBreakpoin
     // breakpoint inside child (from this blocks perspective)
     // BREAK CLASS X (recursive case)
     currentBreakpoint.overrideIfBetter(
-        Breakpoint::buildFromChild(
+        Breakpoint::fromChild(
             std::move(maybeChildBreakpoint.unwrap()),
             childIndex + 1,
             currBoxIsBreakAvoid
@@ -49,7 +49,7 @@ Res<None, Output> processBreakpointsAfterChild(Fragmentainer& fc, Breakpoint& cu
             (not isLastChild and parentBox.children()[childIndex + 1].style->break_->before == BreakBetween::AVOID);
 
         currentBreakpoint.overrideIfBetter(
-            Breakpoint::buildClassB(
+            Breakpoint::classB(
                 childIndex + 1,
                 breakIsAvoided
             )
@@ -61,7 +61,7 @@ Res<None, Output> processBreakpointsAfterChild(Fragmentainer& fc, Breakpoint& cu
         return Output{
             .size = currentBoxSize,
             .completelyLaidOut = false,
-            .breakpoint = Breakpoint::buildForced(
+            .breakpoint = Breakpoint::forced(
                 childIndex + 1
             )
         };
@@ -76,7 +76,7 @@ Res<None, Output> processBreakpointsBeforeChild(usize endAt, Vec2Px currentSize,
         return Output{
             .size = currentSize,
             .completelyLaidOut = false,
-            .breakpoint = Breakpoint::buildForced(endAt)
+            .breakpoint = Breakpoint::forced(endAt)
         };
     }
 
@@ -100,7 +100,7 @@ Output fragmentEmptyBox(Tree& tree, Input input) {
             return Output{
                 .size = {},
                 .completelyLaidOut = false,
-                .breakpoint = Breakpoint::buildOverflow()
+                .breakpoint = Breakpoint::overflow()
             };
         }
     } else {

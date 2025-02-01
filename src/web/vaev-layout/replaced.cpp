@@ -20,7 +20,7 @@ struct ReplacedFormatingContext : public FormatingContext {
             return {
                 .size = {},
                 .completelyLaidOut = false,
-                .breakpoint = Breakpoint::buildOverflow()
+                .breakpoint = Breakpoint::overflow()
             };
         }
 

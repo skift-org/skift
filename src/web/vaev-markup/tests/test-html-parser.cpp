@@ -81,7 +81,7 @@ test$("parse-text") {
 
     auto text = body->firstChild();
     expect$(text->nodeType() == NodeType::TEXT);
-    expect$(try$(text.cast<Text>())->data == "text");
+    expect$(try$(text.cast<Text>()).unwrap().data() == "text");
 
     return Ok();
 }
@@ -109,7 +109,7 @@ test$("parse-title") {
     expect$(title->hasChildren());
 
     auto text = try$(title->firstChild().cast<Text>());
-    expect$(text->data == "the title");
+    expect$(text.unwrap().data() == "the title");
 
     return Ok();
 }
@@ -136,7 +136,7 @@ test$("parse-comment-with-gt-symb") {
 
     auto comment = title->nextSibling();
     expect$(comment->nodeType() == NodeType::COMMENT);
-    expect$(try$(comment.cast<Comment>())->data == " a b <meta> c d ");
+    expect$(try$(comment.cast<Comment>()).unwrap().data() == " a b <meta> c d ");
 
     return Ok();
 }
@@ -166,7 +166,7 @@ test$("parse-p-after-comment") {
     expect$(p->tagName == Html::P);
 
     auto text = try$(p->firstChild().cast<Text>());
-    expect$(text->data == "im a p");
+    expect$(text.unwrap().data() == "im a p");
 
     return Ok();
 }
@@ -211,7 +211,7 @@ test$("parse-char-referece-as-text") {
     auto text = body->firstChild();
     expect$(text->nodeType() == NodeType::TEXT);
 
-    expect$(try$(text.cast<Text>())->data == "im there§Á§&seca;&secaÁim also there");
+    expect$(try$(text.cast<Text>()).unwrap().data() == "im there§Á§&seca;&secaÁim also there");
 
     return Ok();
 }
@@ -270,7 +270,7 @@ test$("parse-char-referece-spec-example") {
 
         auto text1 = div1->firstChild();
         expect$(text1->nodeType() == NodeType::TEXT);
-        expect$(try$(text1.cast<Text>())->data == "I'm ¬it; I tell you");
+        expect$(try$(text1.cast<Text>()).unwrap().data() == "I'm ¬it; I tell you");
     }
     {
         auto div2 = try$(body->firstChild()->nextSibling().cast<Element>());
@@ -280,7 +280,7 @@ test$("parse-char-referece-spec-example") {
         auto text2 = div2->firstChild();
         expect$(text2->nodeType() == NodeType::TEXT);
 
-        expect$(try$(text2.cast<Text>())->data == "I'm ∉ I tell you");
+        expect$(try$(text2.cast<Text>()).unwrap().data() == "I'm ∉ I tell you");
     }
     {
         auto head = try$(html->firstChild().cast<Element>());
@@ -383,7 +383,7 @@ test$("parse-table-element") {
 
     auto text = headerCell->firstChild();
     expect$(text->nodeType() == NodeType::TEXT);
-    expect$(try$(text.cast<Text>())->data == "hi");
+    expect$(try$(text.cast<Text>()).unwrap().data() == "hi");
 
     return Ok();
 }
@@ -423,7 +423,7 @@ test$("parse-table-element-create-body-tr-scope") {
 
     auto text = header->firstChild();
     expect$(text->nodeType() == NodeType::TEXT);
-    expect$(try$(text.cast<Text>())->data == "hi");
+    expect$(try$(text.cast<Text>()).unwrap().data() == "hi");
 
     return Ok();
 }

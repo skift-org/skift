@@ -66,6 +66,10 @@ test$("fmt-signed-number") {
     try$(testCase("499602d2", 1234567890, "x"));
     try$(testCase("-499602d2", -1234567890, "x"));
 
+    try$(testCase("0000", 0, "04"));
+    try$(testCase("0001", 1, "04"));
+    try$(testCase("1000", 1000, "04"));
+
     return Ok();
 }
 

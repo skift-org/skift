@@ -5,6 +5,39 @@
 
 namespace Karm::Io {
 
+// MARK: Format ----------------------------------------------------------------
+
+Res<usize> _format(Io::TextWriter& writer, Str format, _Args& args) {
+    Io::SScan scan{format};
+    usize written = 0;
+    usize index = 0;
+
+    while (not scan.ended()) {
+        Rune c = scan.next();
+
+        if (c == '{') {
+            scan.skip(':');
+            scan.begin();
+            while (scan.peek() != '}') {
+                scan.next();
+            }
+            scan.next();
+            Io::SScan inner{scan.end()};
+            written += try$(args.format(inner, writer, index));
+            index++;
+        } else if (c == '\n') {
+            // normalize newlines
+            written += try$(writer.writeStr(Str{Sys::LINE_ENDING}));
+        } else {
+            written += try$(writer.writeRune(c));
+        }
+    }
+
+    return Ok(written);
+};
+
+// MARK: Change case -----------------------------------------------------------
+
 static auto const RE_SEP =
     Re::single(' ', '\t', '.', '_', '/', '-');
 
@@ -298,6 +331,152 @@ Res<String> changeCase(Str str, Case toCase) {
     default:
         return toDefaultCase(str);
     }
+}
+
+// MARK: Number formatting -----------------------------------------------------
+
+Str NumberFormatter::formatPrefix() {
+    if (base == 16)
+        return "0x";
+
+    if (base == 8)
+        return "0o";
+
+    if (base == 2)
+        return "0b";
+
+    return "";
+}
+
+void NumberFormatter::parse(Str str) {
+    Io::SScan scan{str};
+    parse(scan);
+}
+
+void NumberFormatter::parse(Io::SScan& scan) {
+    if (scan.skip('#'))
+        prefix = true;
+
+    if (scan.skip('0'))
+        fillChar = '0';
+
+    width = atoi(scan).unwrapOr(0);
+
+    if (scan.ended())
+        return;
+
+    Rune c = scan.next();
+    switch (c) {
+    case 'b':
+        base = 2;
+        break;
+
+    case 'o':
+        base = 8;
+        break;
+
+    case 'd':
+        base = 10;
+        break;
+
+    case 'x':
+        base = 16;
+        break;
+
+    case 'p':
+        prefix = true;
+        base = 16;
+        fillChar = '0';
+        width = sizeof(usize) * 2;
+        break;
+
+    case 'c':
+        isChar = true;
+        break;
+
+    default:
+        break;
+    }
+}
+
+Res<usize> NumberFormatter::formatUnsigned(Io::TextWriter& writer, usize val) {
+    auto digit = [](usize v) {
+        if (v < 10)
+            return '0' + v;
+        return 'a' + (v - 10);
+    };
+
+    InlineVec<char, 128> buf;
+
+    do {
+        buf.pushBack(digit(val % base));
+        val /= base;
+    } while (val != 0 and buf.len() < buf.cap());
+
+    while (width > buf.len())
+        buf.pushBack(fillChar);
+
+    reverse(mutSub(buf));
+
+    usize written = 0;
+    if (prefix)
+        written += try$(writer.writeStr(formatPrefix()));
+    written += try$(writer.writeStr(Str{buf}));
+
+    return Ok(written);
+}
+
+Res<usize> NumberFormatter::formatSigned(Io::TextWriter& writer, isize val) {
+    usize written = 0;
+    if (val < 0) {
+        written += try$(writer.writeRune('-'));
+        val = -val;
+    }
+    written += try$(formatUnsigned(writer, val));
+    return Ok(written);
+}
+
+Res<usize> NumberFormatter::formatRune(Io::TextWriter& writer, Rune val) {
+    if (not prefix)
+        return writer.writeRune(val);
+
+    if (val == '\'')
+        return writer.writeStr("\\'"s);
+
+    if (val == '\"')
+        return writer.writeStr("\\\""s);
+
+    if (val == '\?')
+        return writer.writeStr("\\?"s);
+
+    if (val == '\\')
+        return writer.writeStr("\\\\"s);
+
+    if (val == '\a')
+        return writer.writeStr("\\a"s);
+
+    if (val == '\b')
+        return writer.writeStr("\\b"s);
+
+    if (val == '\f')
+        return writer.writeStr("\\f"s);
+
+    if (val == '\n')
+        return writer.writeStr("\\n"s);
+
+    if (val == '\r')
+        return writer.writeStr("\\r"s);
+
+    if (val == '\t')
+        return writer.writeStr("\\t"s);
+
+    if (val == '\v')
+        return writer.writeStr("\\v"s);
+
+    if (not isAsciiPrint(val))
+        return Io::format(writer, "\\u{x}", val);
+
+    return writer.writeRune(val);
 }
 
 } // namespace Karm::Io

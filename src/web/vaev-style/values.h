@@ -92,7 +92,7 @@ struct ValueParser<CalcValue<T>> {
 
         if (c.peek() == Css::Sst::FUNC) {
             auto const& prefix = c.peek().prefix;
-            auto prefixToken = prefix->unwrap().token;
+            auto prefixToken = prefix.unwrap()->token;
             if (prefixToken.data == "calc(") {
                 Cursor<Css::Sst> content = c.peek().content;
                 auto lhs = try$(parseVal(content));

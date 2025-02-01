@@ -110,16 +110,19 @@ struct TableFormatingContext : public FormatingContext {
 
     // TODO: amount of footers and headers
     // footers will be the last rows of the grid; same for headers?
-    usize numOfHeaderRows = 0, numOfFooterRows = 0;
+    usize numOfHeaderRows = 0;
+    usize numOfFooterRows = 0;
 
-    struct {
-        usize width;
+    struct BorderGrid {
+        usize width = 0;
         Vec<InsetsPx> borders;
 
         InsetsPx& get(usize i, usize j) {
             return borders[i * width + j];
         }
-    } bordersGrid;
+    };
+
+    BorderGrid bordersGrid;
 
     // https://html.spec.whatwg.org/multipage/tables.html#algorithm-for-growing-downward-growing-cells
     void growDownwardGrowingCells() {
@@ -430,7 +433,7 @@ struct TableFormatingContext : public FormatingContext {
     // MARK: Fixed Table Layout ------------------------------------------------------------------------
     // https://www.w3.org/TR/CSS22/tables.html#fixed-table-layout
 
-    void computeFixedColWidths(Tree& tree, Box& box, Input& input) {
+    void computeFixedColWidths(Tree& tree, Box& box, Px availableXSpace) {
         // NOTE: Percentages for 'width' and 'height' on the table (box)
         //       are calculated relative to the containing block of the
         //       table wrapper box, not the table wrapper box itself.
@@ -442,7 +445,7 @@ struct TableFormatingContext : public FormatingContext {
         tableUsedWidth =
             box.style->sizing->width == Size::AUTO
                 ? 0_px
-                : resolve(tree, box, box.style->sizing->width.value, input.availableSpace.x) -
+                : resolve(tree, box, box.style->sizing->width.value, availableXSpace) -
                       boxBorder.horizontal(); // NOTE: maybe remove this after borderbox param is clearer
 
         auto [columnBorders, sumBorders] = getColumnBorders();
@@ -574,7 +577,6 @@ struct TableFormatingContext : public FormatingContext {
     }
 
     void computeAutoWidthOfCellsSpanN(Tree& tree, Vec<Px>& minColWidth, Vec<Px>& maxColWidth, Px tableWidth) {
-
         for (usize i = 0; i < grid.size.y; ++i) {
             for (usize j = 0; j < grid.size.x; ++j) {
                 auto cell = grid.get(j, i);
@@ -588,7 +590,9 @@ struct TableFormatingContext : public FormatingContext {
 
                 auto [cellMinWidth, cellMaxWidth] = getCellMinMaxAutoWidth(tree, *cell.box, cell, tableWidth);
 
-                Px currSumMinColWidth{0}, currSumMaxColWidth{0};
+                Px currSumMinColWidth{0};
+                Px currSumMaxColWidth{0};
+
                 for (usize k = 0; k < colSpan; ++k) {
                     currSumMinColWidth += minColWidth[j + k];
                     currSumMaxColWidth += maxColWidth[j + k];
@@ -668,7 +672,7 @@ struct TableFormatingContext : public FormatingContext {
 
     // https://www.w3.org/TR/CSS22/tables.html#auto-table-layout
 
-    void computeAutoColWidths(Tree& tree, Box& box, Input& input) {
+    void computeAutoColWidths(Tree& tree, Box& box, Px capmin, Px availableXSpace, Px containingBlockX) {
         // FIXME: This is a rough approximation of the algorithm.
         //        We need to distinguish between percentage-based and fixed lengths:
         //         - Percentage-based sizes are fixed and cannot have extra space distributed to them.
@@ -679,11 +683,10 @@ struct TableFormatingContext : public FormatingContext {
         //        https://www.w3.org/TR/css-tables-3/#intrinsic-percentage-width-of-a-column-based-on-cells-of-span-up-to-1
         //        We will need a way to retrieve the percentage value, which is also not yet implemented.
 
-        Px capmin = input.capmin.unwrap();
         if (box.style->sizing->width != Size::AUTO) {
             auto [minWithoutPerc, maxWithoutPerc] = computeMinMaxAutoWidths(tree, grid.size.x, 0_px);
 
-            Px tableComputedWidth = resolve(tree, box, box.style->sizing->width.value, input.availableSpace.x);
+            Px tableComputedWidth = resolve(tree, box, box.style->sizing->width.value, availableXSpace);
             tableUsedWidth = max(capmin, tableComputedWidth);
 
             auto sumMinWithoutPerc = iter(minWithoutPerc).sum();
@@ -699,7 +702,9 @@ struct TableFormatingContext : public FormatingContext {
             Vec<Px>& distWOPToUse = sumMaxWithoutPerc < tableUsedWidth ? maxWithoutPerc : minWithoutPerc;
             Vec<Px>& distWPToUse = sumMaxWithoutPerc < tableUsedWidth ? maxWithPerc : minWithPerc;
 
-            auto sumWithPerc = iter(distWPToUse).sum(), sumWithoutPerc = iter(distWOPToUse).sum();
+            auto sumWithPerc = iter(distWPToUse).sum();
+            auto sumWithoutPerc = iter(distWOPToUse).sum();
+
             if (sumWithPerc > tableUsedWidth) {
                 Px totalDiff = sumWithPerc - sumWithoutPerc;
                 Px allowedGrowth = tableUsedWidth - sumWithoutPerc;
@@ -720,10 +725,12 @@ struct TableFormatingContext : public FormatingContext {
             }
         } else {
             auto [minColWidth, maxColWidth] = computeMinMaxAutoWidths(tree, grid.size.x, 0_px);
-            auto sumMaxColWidths = iter(maxColWidth).sum(), sumMinColWidths = iter(minColWidth).sum();
+            auto sumMaxColWidths = iter(maxColWidth).sum();
+            auto sumMinColWidths = iter(minColWidth).sum();
+
             // TODO: Specs doesnt say if we should distribute extra width over columns;
             //       also would it be over min or max columns?
-            if (min(sumMaxColWidths, capmin) < input.containingBlock.x) {
+            if (min(sumMaxColWidths, capmin) < containingBlockX) {
                 colWidth = maxColWidth;
                 tableUsedWidth = max(sumMaxColWidths, capmin);
             } else {
@@ -832,7 +839,20 @@ struct TableFormatingContext : public FormatingContext {
     Math::Vec2u dataRowsInterval;
     Vec<Px> startPositionOfRow;
 
-    void build(Tree& tree, Box& box, Input input) {
+    struct CacheParametersFromInput {
+        Px availableXSpace;
+        Px containingBlockX;
+        Px capmin;
+
+        CacheParametersFromInput(Input const& i)
+            : availableXSpace(i.availableSpace.x),
+              containingBlockX(i.containingBlock.x),
+              capmin(i.capmin.unwrap()) {}
+
+        bool operator==(CacheParametersFromInput const& c) const = default;
+    };
+
+    void build(Tree& tree, Box& box) override {
         boxBorder = computeBorders(tree, box);
         spacing = {
             resolve(tree, box, box.style->table->spacing.horizontal),
@@ -845,6 +865,13 @@ struct TableFormatingContext : public FormatingContext {
         rowHelper = buildAxisHelper(rows, rowGroups, grid.size.y);
         colHelper = buildAxisHelper(cols, colGroups, grid.size.x);
 
+        startPositionOfRow.clear();
+        startPositionOfRow.resize(grid.size.y, 0_px);
+
+        dataRowsInterval = {numOfHeaderRows, grid.size.y - numOfFooterRows - 1};
+    }
+
+    void computeWidthAndHeight(Tree& tree, Box& box, CacheParametersFromInput& input) {
         // NOTE: When "table-layout: fixed" is set but "width: auto", the specs suggest
         //       that the UA can use the fixed layout after computing the width
         //      (see https://www.w3.org/TR/CSS22/visudet.html#blockwidth).
@@ -855,16 +882,17 @@ struct TableFormatingContext : public FormatingContext {
             box.style->sizing->width == Size::AUTO;
 
         if (shouldRunAutoAlgorithm)
-            computeAutoColWidths(tree, box, input);
+            computeAutoColWidths(
+                tree, box, input.capmin,
+                input.availableXSpace, input.containingBlockX
+            );
         else
-            computeFixedColWidths(tree, box, input);
+            computeFixedColWidths(tree, box, input.availableXSpace);
 
         computeRowHeights(tree);
 
         colWidthPref = PrefixSum<Px>{colWidth};
         rowHeightPref = PrefixSum<Px>{rowHeight};
-
-        dataRowsInterval = {numOfHeaderRows, grid.size.y - numOfFooterRows - 1};
 
         tableBoxSize = Vec2Px{
             iter(colWidth).sum() + spacing.x * Px{grid.size.x + 1},
@@ -885,8 +913,6 @@ struct TableFormatingContext : public FormatingContext {
                     spacing.y * Px{numOfHeaderRows + 1},
             };
         }
-
-        startPositionOfRow = Buf<Px>::init(grid.size.y, 0_px);
     }
 
     Tuple<Output, Px> layoutCell(Tree& tree, Input& input, TableCell& cell, MutCursor<Box> cellBox, usize startFrag, usize i, usize j, Px currPositionX, usize breakpointIndexOffset) {
@@ -948,7 +974,7 @@ struct TableFormatingContext : public FormatingContext {
 
         if (tree.fc.isDiscoveryMode()) {
             if (cellBox->style->break_->inside == BreakInside::AVOID) {
-                outputCell.breakpoint->applyAvoid();
+                outputCell.breakpoint.unwrap().withAppeal(Breakpoint::Appeal::AVOID);
             }
         }
 
@@ -1062,7 +1088,7 @@ struct TableFormatingContext : public FormatingContext {
 
         if (forcedBreakAfterCurrRow or forcedBreakBeforeNextRow or
             forcedBreakAfterCurrRowGroup or forcedBreakBeforeNextRowGroup) {
-            currentBreakpoint = Breakpoint::buildForced(i + 1);
+            currentBreakpoint = Breakpoint::forced(i + 1);
             return false;
         }
 
@@ -1085,7 +1111,7 @@ struct TableFormatingContext : public FormatingContext {
         if (rowIsFreelyFragmentable) {
             // breakpoint inside of row, take in consideration ALL breakpoints
             // should stay in this row next fragmentation
-            currentBreakpoint.overrideIfBetter(Breakpoint::buildFromChildren(
+            currentBreakpoint.overrideIfBetter(Breakpoint::fromChildren(
                 outputRow.breakpoints,
                 i + 1,
                 avoidBreakInsideRow or avoidBreakInsideRowGroup or avoidBreakInsideTable,
@@ -1107,7 +1133,7 @@ struct TableFormatingContext : public FormatingContext {
                     outputRow.breakpoints[j] = NONE;
             }
 
-            currentBreakpoint.overrideIfBetter(Breakpoint::buildFromChildren(
+            currentBreakpoint.overrideIfBetter(Breakpoint::fromChildren(
                 outputRow.breakpoints,
                 i + 1,
                 avoidBreakInsideRow or avoidBreakInsideRowGroup or avoidBreakInsideTable,
@@ -1117,7 +1143,7 @@ struct TableFormatingContext : public FormatingContext {
         } else {
 
             // no cells are being split
-            currentBreakpoint.overrideIfBetter(Breakpoint::buildClassB(
+            currentBreakpoint.overrideIfBetter(Breakpoint::classB(
                 i + 1,
                 avoidBreakInsideTable
             ));
@@ -1192,15 +1218,18 @@ struct TableFormatingContext : public FormatingContext {
         return {startAt, stopAt};
     }
 
-    Output run(Tree& tree, Box& box, Input input, usize startAtTable, Opt<usize> stopAtTable) {
+    Opt<CacheParametersFromInput> lastInput;
+
+    Output run(Tree& tree, Box& box, Input input, usize startAtTable, Opt<usize> stopAtTable) override {
         // TODO: - vertical and horizontal alignment
         //       - borders collapse
         // TODO: in every row, at least one cell must be an anchor, or else this row is 'skipable'
 
-        // HACK: Quick reset for formating context reuse.
-        //       Proper reset logic to be implemented in a future commit.
-        *this = {};
-        build(tree, box, input);
+        CacheParametersFromInput inputCacheParameters{input};
+        if (lastInput != inputCacheParameters) {
+            lastInput = inputCacheParameters;
+            computeWidthAndHeight(tree, box, lastInput.unwrap());
+        }
 
         // if shouldRepeatHeaderAndFooter, header and footer are never alone in the fragmentainer and we wont set
         // breakpoints on them;
@@ -1210,7 +1239,8 @@ struct TableFormatingContext : public FormatingContext {
             max(headerSize.y, footerSize.y) * 4_px <= tree.fc.size().y and
             headerSize.y + footerSize.y * 2_px <= tree.fc.size().y;
 
-        Px currPositionX{input.position.x}, currPositionY{input.position.y};
+        Px currPositionX{input.position.x};
+        Px currPositionY{input.position.y};
         Px startingPositionY = currPositionY;
         currPositionY += spacing.y;
 

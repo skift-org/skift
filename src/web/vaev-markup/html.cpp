@@ -3938,11 +3938,6 @@ static void insertACharacter(HtmlParser& b, Rune c) {
     }
 }
 
-static void insertACharacter(HtmlParser& b, HtmlToken const& t) {
-    // 1. Let data be the characters passed to the algorithm, or, if no characters were explicitly specified, the character of the character token being processed.
-    insertACharacter(b, t.rune);
-}
-
 // https://html.spec.whatwg.org/multipage/parsing.html#insert-a-comment
 static void insertAComment(HtmlParser& b, HtmlToken const& t) {
     // 1. Let data be the data given in the comment token being processed.
@@ -4292,7 +4287,7 @@ void HtmlParser::_handleInHead(HtmlToken const& t) {
          t.rune == '\n' or
          t.rune == '\f' or
          t.rune == ' ')) {
-        insertACharacter(*this, t);
+        insertACharacter(*this, t.rune);
     }
 
     // A comment token
@@ -4605,13 +4600,13 @@ void HtmlParser::_handleInBody(HtmlToken const& t) {
     //   - U+0020 SPACE
     else if (t.type == HtmlToken::CHARACTER and (t.rune == '\t' or t.rune == '\n' or t.rune == '\f' or t.rune == '\r' or t.rune == ' ')) {
         reconstructActiveFormattingElements(*this);
-        insertACharacter(*this, t);
+        insertACharacter(*this, t.rune);
     }
 
     // Any other character token
     else if (t.type == HtmlToken::CHARACTER) {
         reconstructActiveFormattingElements(*this);
-        insertACharacter(*this, t);
+        insertACharacter(*this, t.rune);
         _framesetOk = false;
     }
 
@@ -5254,7 +5249,7 @@ void HtmlParser::_handleInTableText(HtmlToken const& t) {
         } else {
             // Otherwise, insert the characters given by the pending table character tokens list.
             for (auto const& token : _pendingTableCharacterTokens) {
-                insertACharacter(*this, token);
+                insertACharacter(*this, token.rune);
             }
         }
 

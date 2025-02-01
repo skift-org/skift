@@ -44,7 +44,7 @@ test$("parse-text") {
     expect$(el->hasChildren());
     auto text = el->firstChild();
     expect$(text->nodeType() == NodeType::TEXT);
-    expect$(try$(text.cast<Text>())->data == "text");
+    expect$(try$(text.cast<Text>()).unwrap().data() == "text");
     return Ok();
 }
 
@@ -56,7 +56,7 @@ test$("parse-text-before-tag") {
     expect$(el->hasChildren());
     auto text = el->firstChild();
     expect$(text->nodeType() == NodeType::TEXT);
-    expect$(try$(text.cast<Text>())->data == "text");
+    expect$(try$(text.cast<Text>()).unwrap().data() == "text");
     auto div = text->nextSibling();
     expect$(div->nodeType() == NodeType::ELEMENT);
     expect$(try$(div.cast<Element>())->tagName == Html::DIV);
@@ -74,7 +74,7 @@ test$("parse-text-after-tag") {
     expect$(try$(div.cast<Element>())->tagName == Html::DIV);
     auto text = div->nextSibling();
     expect$(text->nodeType() == NodeType::TEXT);
-    expect$(try$(text.cast<Text>())->data == "text");
+    expect$(try$(text.cast<Text>()).unwrap().data() == "text");
     return Ok();
 }
 
@@ -89,7 +89,7 @@ test$("parse-text-between-tags") {
     expect$(try$(div1.cast<Element>())->tagName == Html::DIV);
     auto text = div1->nextSibling();
     expect$(text->nodeType() == NodeType::TEXT);
-    expect$(try$(text.cast<Text>())->data == "text");
+    expect$(try$(text.cast<Text>()).unwrap().data() == "text");
     auto div2 = text->nextSibling();
     expect$(div2->nodeType() == NodeType::ELEMENT);
     expect$(try$(div2.cast<Element>())->tagName == Html::DIV);
@@ -105,7 +105,7 @@ test$("parse-text-between-tags-and-before") {
 
     auto text1 = el->firstChild();
     expect$(text1->nodeType() == NodeType::TEXT);
-    expectEq$(try$(text1.cast<Text>())->data, "test2");
+    expectEq$(try$(text1.cast<Text>()).unwrap().data(), "test2");
 
     auto div = text1->nextSibling();
     expect$(div->nodeType() == NodeType::ELEMENT);
@@ -113,7 +113,7 @@ test$("parse-text-between-tags-and-before") {
 
     auto text2 = div->firstChild();
     expect$(text2->nodeType() == NodeType::TEXT);
-    expectEq$(try$(text2.cast<Text>())->data, "text");
+    expectEq$(try$(text2.cast<Text>()).unwrap().data(), "text");
 
     return Ok();
 }
@@ -141,7 +141,7 @@ test$("parse-comment") {
     expect$(el->hasChildren());
     auto comment = el->firstChild();
     expect$(comment->nodeType() == NodeType::COMMENT);
-    expect$(try$(comment.cast<Comment>())->data == " comment ");
+    expect$(try$(comment.cast<Comment>()).unwrap().data() == " comment ");
     return Ok();
 }
 
@@ -180,7 +180,7 @@ test$("parse-comment-with-gt-symb") {
 
     auto comment = title->nextSibling();
     expect$(comment->nodeType() == NodeType::COMMENT);
-    expect$(try$(comment.cast<Comment>())->data == " a b <meta> c d ");
+    expect$(try$(comment.cast<Comment>()).unwrap().data() == " a b <meta> c d ");
 
     return Ok();
 }

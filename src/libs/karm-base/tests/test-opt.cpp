@@ -58,4 +58,16 @@ test$("opt-take") {
     return Ok();
 }
 
+test$("opt-equal") {
+    Opt<int> opt = NONE;
+    expectEq$(opt, NONE);
+    expectNe$(opt, 42);
+
+    opt = 42;
+    expectEq$(opt, 42);
+    expectNe$(opt, NONE);
+
+    return Ok();
+}
+
 } // namespace Karm::Base::Tests

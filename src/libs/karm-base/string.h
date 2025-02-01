@@ -108,12 +108,12 @@ struct _String {
 
     static constexpr Array<Unit, 1> _EMPTY = {0};
 
-    Unit const* _buf = nullptr;
+    Unit* _buf = nullptr;
     usize _len = 0;
 
     constexpr _String() = default;
 
-    always_inline _String(Move, Unit const* buf, usize len)
+    always_inline _String(Move, Unit* buf, usize len)
         : _buf(buf),
           _len(len) {
     }
@@ -276,6 +276,10 @@ struct _StringBuilder {
     _StringBuilder(usize cap = 16)
         : _buf(cap) {}
 
+    _StringBuilder(String&& str)
+        : _buf(MOVE, std::exchange(str._buf, nullptr), std::exchange(str._len, 0)) {
+    }
+
     void ensure(usize cap) {
         // NOTE: This way client code don't have to take
         //       the null-terminator into account
@@ -304,7 +308,7 @@ struct _StringBuilder {
         return _buf.size();
     }
 
-    _Str<E> str() lifetimebound {
+    _Str<E> str() const lifetimebound {
         return _buf;
     }
 

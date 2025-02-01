@@ -91,7 +91,7 @@ static void _buildRun(Style::Computer&, Markup::Text const& node, Box& parent) {
     style->inherit(*parent.style);
 
     auto fontFace = _lookupFontface(*style);
-    Io::SScan scan{node.data};
+    Io::SScan scan{node.data()};
     scan.eat(Re::space());
     if (scan.ended())
         return;

@@ -74,54 +74,13 @@ struct Computed {
     // https://drafts.csswg.org/css2/#z-index
     ZIndex zIndex = ZIndex::AUTO;
 
-    void inherit(Computed const& parent) {
-        color = parent.color;
-        font = parent.font;
-        text = parent.text;
-        variables = parent.variables;
-    }
+    void inherit(Computed const& parent);
 
-    void repr(Io::Emit& e) const {
-        e("(computed");
-        e(" color: {}", color);
-        e(" opacity: {}", opacity);
-        e(" aligns: {}", aligns);
-        e(" gaps: {}", gaps);
-        e(" backgrounds: {}", backgrounds);
-        e(" borders: {}", borders);
-        e(" margin: {}", margin);
-        e(" padding: {}", padding);
-        e(" sizing: {}", sizing);
-        e(" overflows: {}", overflows);
-        e(" position: {}", position);
-        e(" offsets: {}", offsets);
-        e(" writingMode: {}", writingMode);
-        e(" direction: {}", direction);
-        e(" display: {}", display);
-        e(" order: {}", order);
-        e(" visibility: {}", visibility);
-        e(" table: {}", table);
-        e(" font: {}", font);
-        e(" text: {}", text);
-        e(" flex: {}", flex);
-        e(" break: {}", break_);
-        e(" float: {}", float_);
-        e(" clear: {}", clear);
-        e(" zIndex: {}", zIndex);
-        e(" variables: {}", variables);
-        e(")");
-    }
+    void repr(Io::Emit& e) const;
 
-    void setCustomProp(Str varName, Css::Content value) {
-        variables.cow().put(varName, value);
-    }
+    void setCustomProp(Str varName, Css::Content value);
 
-    Css::Content getCustomProp(Str varName) const {
-        auto value = variables->access(varName);
-        if (value)
-            return *value;
-        return {};
-    }
+    Css::Content getCustomProp(Str varName) const;
 };
 
 } // namespace Vaev::Style

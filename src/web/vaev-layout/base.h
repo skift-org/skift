@@ -64,64 +64,41 @@ struct Fragmentainer {
 
 // TODO: consider adding classification for breakpoints, what would make appeal computing easier and less error prone
 struct Breakpoint {
-
-    usize endIdx = 0;
-
-    enum struct Appeal : usize {
+    enum struct Appeal : u8 {
         EMPTY = 0,
         OVERFLOW = 1,
         AVOID = 2,
         CLASS_B = 3,
         FORCED = 4,
-        MAX = Limits<usize>::MAX
+        MAX = Limits<u8>::MAX
     };
+
+    enum struct Advance {
+        DONT, // keeping children
+        WITH_CHILDREN,
+        WITHOUT_CHILDREN
+    };
+
+    usize endIdx = 0;
     Appeal appeal = Appeal::EMPTY;
-
     Vec<Opt<Breakpoint>> children = {};
+    Advance advance;
 
-    enum struct ADVANCE_CASE {
-        NOT_ADVANCE, // keeping children
-        ADVANCE_WITH_CHILDREN,
-        ADVANCE_WITHOUT_CHILDREN
-    } advanceCase;
-
-    void overrideIfBetter(Breakpoint&& BPWithMoreContent) {
-        // in case of overflows, we need the earliest breakpoint possible
-        if (appeal == Appeal::OVERFLOW and BPWithMoreContent.appeal == Appeal::OVERFLOW)
-            return;
-
-        if (appeal <= BPWithMoreContent.appeal)
-            *this = std::move(BPWithMoreContent);
-    }
-
-    void repr(Io::Emit& e) const {
-        e("(end: {} appeal: {} advance case: {}", endIdx, appeal, advanceCase);
-        if (children.len() == 0)
-            e("; no child)");
-        else
-            e("; children : {})", children);
-    }
-
-    static Breakpoint buildForced(usize endIdx) {
-        return Breakpoint{
+    static Breakpoint forced(usize endIdx) {
+        return {
             .endIdx = endIdx,
             // since this is a FORCED break, it will have maximum appeal
             .appeal = Appeal::FORCED,
-            .advanceCase = ADVANCE_CASE::ADVANCE_WITHOUT_CHILDREN,
+            .advance = Advance::WITHOUT_CHILDREN,
         };
     }
 
-    // NOTE: a bit inconsistent with the rest of the API
-    void applyAvoid() {
-        appeal = Appeal::AVOID;
-    }
-
-    static Breakpoint buildFromChild(Breakpoint&& childBreakpoint, usize endIdx, bool isAvoid) {
+    static Breakpoint fromChild(Breakpoint&& childBreakpoint, usize endIdx, bool isAvoid) {
         Breakpoint b{
             .endIdx = endIdx,
             .appeal = childBreakpoint.appeal,
             .children = {std::move(childBreakpoint)},
-            .advanceCase = ADVANCE_CASE::NOT_ADVANCE,
+            .advance = Advance::DONT,
         };
 
         if (isAvoid)
@@ -130,12 +107,11 @@ struct Breakpoint {
         return b;
     }
 
-    static Breakpoint buildFromChildren(Vec<Opt<Breakpoint>> childrenBreakpoints, usize endIdx, bool isAvoid, bool advance) {
+    static Breakpoint fromChildren(Vec<Opt<Breakpoint>> childrenBreakpoints, usize endIdx, bool isAvoid, bool advance) {
         Appeal appeal = Appeal::MAX;
         for (auto& breakpoint : childrenBreakpoints) {
             if (not breakpoint)
                 continue;
-
             appeal = min(appeal, breakpoint.unwrap().appeal);
         }
 
@@ -146,7 +122,7 @@ struct Breakpoint {
             .endIdx = endIdx,
             .appeal = appeal,
             .children = {std::move(childrenBreakpoints)},
-            .advanceCase = advance ? ADVANCE_CASE::ADVANCE_WITH_CHILDREN : ADVANCE_CASE::NOT_ADVANCE
+            .advance = advance ? Advance::WITH_CHILDREN : Advance::DONT
         };
 
         if (isAvoid)
@@ -155,23 +131,45 @@ struct Breakpoint {
         return b;
     }
 
-    static Breakpoint buildClassB(usize endIdx, bool isAvoid) {
+    static Breakpoint classB(usize endIdx, bool isAvoid) {
         Breakpoint b{
             .endIdx = endIdx,
             .appeal = isAvoid ? Appeal::AVOID : Appeal::CLASS_B,
-            .advanceCase = ADVANCE_CASE::ADVANCE_WITHOUT_CHILDREN
+            .advance = Advance::WITHOUT_CHILDREN
         };
 
         return b;
     }
 
-    static Breakpoint buildOverflow() {
+    static Breakpoint overflow() {
         // this is a placeholder breakpoint and should be overriden
         return {
             .endIdx = 0,
             .appeal = Appeal::OVERFLOW,
-            .advanceCase = ADVANCE_CASE::NOT_ADVANCE
+            .advance = Advance::DONT
         };
+    }
+
+    Breakpoint& withAppeal(Appeal a) {
+        appeal = a;
+        return *this;
+    }
+
+    void overrideIfBetter(Breakpoint&& other) {
+        // in case of overflows, we need the earliest breakpoint possible
+        if (appeal == Appeal::OVERFLOW and other.appeal == Appeal::OVERFLOW)
+            return;
+
+        if (appeal <= other.appeal)
+            *this = std::move(other);
+    }
+
+    void repr(Io::Emit& e) const {
+        e("(end: {} appeal: {} advance case: {}", endIdx, appeal, advance);
+        if (children.len() == 0)
+            e("; no child)");
+        else
+            e("; children : {})", children);
     }
 };
 
@@ -190,7 +188,7 @@ struct BreakpointTraverser {
     MutCursor<Breakpoint> traversePrev(usize i, usize j) {
         if (prevIteration and prevIteration->children.len() > 0 and
             (i + 1 == prevIteration->endIdx or
-             (prevIteration->advanceCase == Breakpoint::ADVANCE_CASE::ADVANCE_WITH_CHILDREN and i == prevIteration->endIdx)
+             (prevIteration->advance == Breakpoint::Advance::WITH_CHILDREN and i == prevIteration->endIdx)
             )) {
             if (prevIteration->children[j])
                 return &prevIteration->children[j].unwrap();
@@ -220,7 +218,7 @@ struct BreakpointTraverser {
     Opt<usize> getStart() {
         if (prevIteration == nullptr)
             return NONE;
-        return prevIteration->endIdx - (prevIteration->advanceCase == Breakpoint::ADVANCE_CASE::NOT_ADVANCE);
+        return prevIteration->endIdx - (prevIteration->advance == Breakpoint::Advance::DONT);
     }
 
     Opt<usize> getEnd() {
@@ -466,6 +464,7 @@ struct Output {
 struct FormatingContext {
     virtual ~FormatingContext() = default;
 
+    virtual void build(Tree&, Box&) {};
     virtual Output run(Tree& tree, Box& box, Input input, usize startAt, Opt<usize> stopAt) = 0;
 };
 

@@ -36,5 +36,6 @@ struct Manual {
 
 static_assert(Meta::Trivial<Manual<isize>>);
 static_assert(sizeof(Manual<isize>) == sizeof(isize));
+static_assert(alignof(Manual<isize>) == alignof(isize));
 
 } // namespace Karm

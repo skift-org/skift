@@ -245,32 +245,28 @@ struct DocumentType : public Node {
 
 // https://dom.spec.whatwg.org/#interface-characterdata
 struct CharacterData : public Node {
-    String data;
+    StringBuilder _data;
+
+    CharacterData() = default;
 
     CharacterData(String data)
-        : data(data) {
+        : _data(std::move(data)) {
     }
 
-    void appendData(String const& data) {
-        // HACK: This is not efficient and pretty slow,
-        //       but it's good enough for now.
-        StringBuilder sb;
-        sb.append(this->data);
-        sb.append(data);
-        this->data = sb.take();
+    void appendData(String const& s) {
+        _data.append(s);
     }
 
     void appendData(Rune rune) {
-        // HACK: This is not efficient and pretty slow,
-        //       but it's good enough for now.
-        StringBuilder sb;
-        sb.append(this->data);
-        sb.append(rune);
-        this->data = sb.take();
+        _data.append(rune);
+    }
+
+    Str data() const {
+        return _data.str();
     }
 
     void _repr(Io::Emit& e) const override {
-        e(" data={#}", this->data);
+        e(" data={#}", data());
     }
 };
 
@@ -388,7 +384,7 @@ struct Element : public Node {
 
         auto const& child = *_children[0];
         if (auto text = child.is<Text>())
-            return text->data;
+            return text->data();
 
         panic("textContent is not implemented for elements with children other than text nodes");
     }

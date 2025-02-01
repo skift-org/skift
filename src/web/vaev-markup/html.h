@@ -39,12 +39,12 @@ struct HtmlToken {
     };
 
     Type type = NIL;
-    String name;
+    String name = ""s;
     Rune rune = '\0';
-    String data;
-    String publicIdent;
-    String systemIdent;
-    Vec<Attr> attrs;
+    String data = ""s;
+    String publicIdent = ""s;
+    String systemIdent = ""s;
+    Vec<Attr> attrs = {};
     bool forceQuirks{false};
     bool selfClosing{false};
 
@@ -105,8 +105,7 @@ struct HtmlLexer {
     Opt<usize> matchedCharReferenceNoSemiColon;
 
     HtmlToken& _begin(HtmlToken::Type type) {
-        _token = HtmlToken{};
-        _token->type = type;
+        _token = HtmlToken{.type = type};
         return *_token;
     }
 
@@ -160,7 +159,7 @@ struct HtmlLexer {
     bool _isAppropriateEndTagToken() {
         if (not _last or not _token)
             return false;
-        return _last->name == _token->name;
+        return _last.unwrap().name == _token.unwrap().name;
     }
 
     void _flushCodePointsConsumedAsACharacterReference() {

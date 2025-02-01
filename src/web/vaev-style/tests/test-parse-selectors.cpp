@@ -276,6 +276,22 @@ test$("vaev-style-parse-pseudo-selectors") {
         })
     );
 
+    expectEq$(
+        try$(Selector::parse("div::not(.foo)")),
+        Selector::and_({
+            TypeSelector{Html::DIV},
+            Selector::not_(ClassSelector{"foo"s})
+        })
+    );
+
+    expectEq$(
+        try$(Selector::parse("div::not(.foo, .bar)")),
+        Selector::and_({
+            TypeSelector{Html::DIV},
+            Selector::not_(Selector::or_({ClassSelector{"foo"s},ClassSelector{"bar"s}}))
+        })
+    );
+
     return Ok();
 }
 

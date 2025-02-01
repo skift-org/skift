@@ -33,7 +33,7 @@ struct Buf {
     }
 
     Buf(Move, T* buf, usize len)
-        : _buf(buf),
+        : _buf(reinterpret_cast<Manual<T>*>(buf)),
           _cap(len),
           _len(len) {
     }

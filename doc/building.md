@@ -55,26 +55,26 @@ This guide provides instructions for building skiftOS from source.
    
     [![Checks (Darwin)](https://github.com/skift-org/skift/actions/workflows/check-darwin.yml/badge.svg)](https://github.com/skift-org/skift/actions/workflows/check-darwin.yml)
 
-4. **Set Up Build Environment:**
+3. **Set Up Build Environment:**
 
     ```sh
     ./skift.sh tools setup
     ```
     > **🛈 Note**<br> On Ubuntu, this step also installs dependencies.
 
-5. **Verify Setup:**
+4. **Verify Setup:**
 
    ```sh
    ./skift.sh tools doctor
    ```
 
-6. **Download Dependencies:**
+5. **Download Dependencies:**
 
    ```sh
    ./skift.sh model install
    ```
 
-7. **Build and Run:**
+6. **Build and Run:**
 
     - In Virtual Machine:
         ```sh

@@ -24,7 +24,7 @@ struct Sched :
 
     virtual Async::Task<usize> writeAsync(Rc<Fd>, Bytes) = 0;
 
-    virtual Async::Task<usize> flushAsync(Rc<Fd>) = 0;
+    virtual Async::Task<> flushAsync(Rc<Fd>) = 0;
 
     virtual Async::Task<_Accepted> acceptAsync(Rc<Fd>) = 0;
 

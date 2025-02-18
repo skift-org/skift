@@ -10,7 +10,9 @@ Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::DRAW,
         .title = "Canvas"s,
-        .body = slot$(Ui::empty()),
+        .body = [] {
+            return Ui::empty();
+        },
     });
 }
 

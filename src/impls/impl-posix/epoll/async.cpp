@@ -44,7 +44,7 @@ struct EpollSched : public Sys::Sched {
         co_return Ok(co_try$(fd->write(buf)));
     }
 
-    Async::Task<usize> flushAsync(Rc<Fd> fd) override {
+    Async::Task<> flushAsync(Rc<Fd> fd) override {
         co_trya$(waitFor({.events = EPOLLOUT | EPOLLET, .data = {}}, fd->handle().value()));
         co_return Ok(co_try$(fd->flush()));
     }

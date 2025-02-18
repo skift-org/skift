@@ -94,9 +94,9 @@ struct MutMmap :
         : _paddr(paddr), _buf(buf), _size(size), _owned(owned) {
     }
 
-    Res<usize> flush() override {
+    Res<> flush() override {
         try$(_Embed::memFlush(_buf, _size));
-        return Ok(_size);
+        return Ok();
     }
 
     MutMmap(MutMmap&& other) {

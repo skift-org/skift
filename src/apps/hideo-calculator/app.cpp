@@ -102,10 +102,12 @@ Ui::Child app() {
             .icon = Mdi::CALCULATOR,
             .title = "Calculator"s,
             .titlebar = Kr::TitlebarStyle::DIALOG,
-            .body = slot$(Ui::vflow(
-                screen(state) | Ui::dragRegion(),
-                keypad(state) | Ui::grow()
-            )),
+            .body = [&] {
+                return Ui::vflow(
+                    screen(state) | Ui::dragRegion(),
+                    keypad(state) | Ui::grow()
+                );
+            },
             .size = {300, 332},
         });
     });

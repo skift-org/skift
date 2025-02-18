@@ -2,6 +2,41 @@
 
 namespace Karm::Pdf {
 
+void Name::write(Io::Emit& e) const {
+    e("/{}", str());
+}
+
+void Array::write(Io::Emit& e) const {
+    e('[');
+    for (usize i = 0; i < len(); ++i) {
+        if (i > 0) {
+            e(' ');
+        }
+        buf()[i].write(e);
+    }
+    e(']');
+}
+
+void Dict::write(Io::Emit& e) const {
+    e("<<\n");
+    for (auto const& [k, v] : iter()) {
+        e('/');
+        e(k);
+        e(' ');
+        v.write(e);
+        e('\n');
+    }
+    e(">>");
+}
+
+void Stream::write(Io::Emit& e) const {
+    dict.write(e);
+    e("stream\n");
+    (void)e.flush();
+    (void)e.write(data);
+    e("\nendstream\n");
+}
+
 void Value::write(Io::Emit& e) const {
     visit(Visitor{
         [&](None) {
@@ -25,68 +60,46 @@ void Value::write(Io::Emit& e) const {
         [&](String const& s) {
             e("({})", s);
         },
-        [&](Name const& n) {
-            e("/{}", n.str());
-        },
-        [&](Array const& a) {
-            e('[');
-            for (usize i = 0; i < a.len(); ++i) {
-                if (i > 0) {
-                    e(' ');
-                }
-                a[i].write(e);
-            }
-            e(']');
-        },
-        [&](Dict const& d) {
-            e("<<\n");
-            for (auto const& [k, v] : d.iter()) {
-                e('/');
-                e(k);
-                e(' ');
-                v.write(e);
-                e('\n');
-            }
-            e(">>");
-        },
-        [&](Stream const& s) {
-            Value{s.dict}.write(e);
-            e("stream\n");
-            (void)e.flush();
-            (void)e.write(s.data);
-            e("\nendstream\n");
+        [&](auto const& v) {
+            v.write(e);
         }
     });
 }
 
-void File::write(Io::Emit& e) const {
+Res<> File::write(Io::Writer& w) const {
+    Io::Count count{w};
+    Io::TextEncoder<> enc{w};
+    Io::Emit e{enc};
     e("%{}\n", header);
     e("%Powered By Karm PDF 🐢🏳️‍⚧️🦔\n", header);
 
     XRef xref;
 
     for (auto const& [k, v] : body.iter()) {
-        xref.add(e.total(), k.gen);
+        try$(e.flush());
+        xref.add(try$(Io::tell(count)), k.gen);
         e("{} {} obj\n", k.num, k.gen);
         v.write(e);
         e("\nendobj\n");
     }
 
-    (void)e.flush();
-    auto startxref = e.total();
+    try$(e.flush());
+    auto startxref = try$(Io::tell(count));
     e("xref\n");
     xref.write(e);
 
     e("trailer\n");
-    Value{trailer}.write(e);
+    trailer.write(e);
 
     e("startxref\n");
     e("{}\n", startxref);
     e("%%EOF");
+
+    return Ok();
 }
 
 void XRef::write(Io::Emit& e) const {
-    e("0 {}\n", entries.len() + 1);
+    e("1 {}\n", entries.len());
     for (usize i = 0; i < entries.len(); ++i) {
         auto const& entry = entries[i];
         if (entry.used) {

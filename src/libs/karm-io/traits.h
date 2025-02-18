@@ -25,7 +25,7 @@ concept Seekable = requires(T& seeker, Seek seek) {
 
 template <typename T>
 concept Flushable = requires(T& flusher) {
-    { flusher.flush() } -> Meta::Same<Res<usize>>;
+    { flusher.flush() } -> Meta::Same<Res<>>;
 };
 
 template <typename T>
@@ -67,59 +67,9 @@ static_assert(Seekable<Seeker>);
 struct Flusher {
     virtual ~Flusher() = default;
 
-    virtual Res<usize> flush() = 0;
+    virtual Res<> flush() = 0;
 };
 
 static_assert(Flushable<Flusher>);
-
-struct TextWriter :
-    public Writer,
-    public Flusher {
-    using Writer::write;
-
-    template <StaticEncoding E>
-    Res<usize> writeStr(_Str<E> str) {
-        usize written = 0;
-        for (auto rune : iterRunes(str)) {
-            written += try$(writeRune(rune));
-        }
-        return Ok(written);
-    }
-
-    virtual Res<usize> writeRune(Rune rune) = 0;
-
-    Res<usize> flush() override {
-        return Ok(0uz);
-    }
-};
-
-template <StaticEncoding E = typename Sys::Encoding>
-struct TextWriterBase :
-    public TextWriter {
-
-    using Writer::write;
-
-    Res<usize> writeRune(Rune rune) override {
-        typename E::One one;
-        if (not E::encodeUnit(rune, one)) {
-            return Ok(0uz);
-        }
-        return write(bytes(one));
-    }
-};
-
-template <StaticEncoding E = typename Sys::Encoding>
-struct TextEncoder :
-    public TextWriterBase<E> {
-
-    Io::Writer& _writer;
-
-    TextEncoder(Io::Writer& writer)
-        : _writer(writer) {}
-
-    Res<usize> write(Bytes bytes) override {
-        return _writer.write(bytes);
-    }
-};
 
 } // namespace Karm::Io

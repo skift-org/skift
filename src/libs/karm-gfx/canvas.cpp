@@ -128,10 +128,10 @@ void Canvas::fill(Text::Prose& prose) {
                 if (cell.span and cell.span->color) {
                     push();
                     fillStyle(*cell.span->color);
-                    fill(prose._style.font, cell.glyph, {block.pos + cell.pos, line.baseline});
+                    fill(prose._style.font, cell.glyph, Vec2Au{block.pos + cell.pos, line.baseline}.cast<f64>());
                     pop();
                 } else {
-                    fill(prose._style.font, cell.glyph, {block.pos + cell.pos, line.baseline});
+                    fill(prose._style.font, cell.glyph, Vec2Au{block.pos + cell.pos, line.baseline}.cast<f64>());
                 }
             }
         }

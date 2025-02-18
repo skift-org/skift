@@ -50,7 +50,7 @@ Ui::Child pageContent(State const& state) {
                        : alert(
                              state,
                              "Can't access this location"s,
-                             Io::toStr(dir.none()).unwrap()
+                             Io::toStr(dir.none())
                          );
 
     return listing | Ui::grow();
@@ -61,15 +61,29 @@ Ui::Child app() {
         return Kr::scaffold({
             .icon = Mdi::FOLDER,
             .title = "Files"s,
-            .startTools = slots$(
-                goBackTool(s),
-                goForwardTool(s),
-                goParentTool(s)
-            ),
-            .midleTools = slots$(breadcrumb(s) | Ui::grow()),
-            .endTools = slots$(moreTool(s)),
-            .sidebar = slot$(sidebar(s)),
-            .body = slot$(pageContent(s)),
+            .startTools = [&] -> Ui::Children {
+                return {
+                    goBackTool(s),
+                    goForwardTool(s),
+                    goParentTool(s),
+                };
+            },
+            .middleTools = [&] -> Ui::Children {
+                return {
+                    breadcrumb(s) | Ui::grow(),
+                };
+            },
+            .endTools = [&] -> Ui::Children {
+                return {
+                    moreTool(s),
+                };
+            },
+            .sidebar = [&] {
+                return sidebar(s);
+            },
+            .body = [&] {
+                return pageContent(s);
+            },
         });
     });
 }

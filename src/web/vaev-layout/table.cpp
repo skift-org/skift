@@ -73,9 +73,9 @@ struct TableGrid {
 template <typename T>
 struct PrefixSum {
 
-    Vec<Px> pref = {};
+    Vec<Au> pref = {};
 
-    PrefixSum(Vec<Px> v = {}) : pref(v) {
+    PrefixSum(Vec<Au> v = {}) : pref(v) {
         for (usize i = 1; i < pref.len(); ++i)
             pref[i] = pref[i - 1] + pref[i];
     }
@@ -115,9 +115,9 @@ struct TableFormatingContext : public FormatingContext {
 
     struct BorderGrid {
         usize width = 0;
-        Vec<InsetsPx> borders;
+        Vec<InsetsAu> borders;
 
-        InsetsPx& get(usize i, usize j) {
+        InsetsAu& get(usize i, usize j) {
             return borders[i * width + j];
         }
     };
@@ -401,16 +401,16 @@ struct TableFormatingContext : public FormatingContext {
     }
 
     // https://www.w3.org/TR/CSS22/tables.html#borders
-    Tuple<Vec<Px>, Px> getColumnBorders() {
+    Tuple<Vec<Au>, Au> getColumnBorders() {
         // NOTE: Borders are only defined for cells and Table Box
         //       Rows, columns, row groups, and column groups cannot have borders
         //       (i.e., user agents must ignore the border properties for those elements).
 
-        Vec<Px> borders;
-        Px sumBorders{0};
+        Vec<Au> borders;
+        Au sumBorders{0};
 
         for (usize j = 0; j < grid.size.x; ++j) {
-            Px columnBorder{0};
+            Au columnBorder{0};
 
             for (usize i = 0; i < grid.size.y; ++i) {
                 auto cell = grid.get(j, i);
@@ -427,13 +427,13 @@ struct TableFormatingContext : public FormatingContext {
         return {borders, sumBorders};
     }
 
-    Vec<Px> colWidth;
-    Px tableUsedWidth;
+    Vec<Au> colWidth;
+    Au tableUsedWidth;
 
     // MARK: Fixed Table Layout ------------------------------------------------------------------------
     // https://www.w3.org/TR/CSS22/tables.html#fixed-table-layout
 
-    void computeFixedColWidths(Tree& tree, Box& box, Px availableXSpace) {
+    void computeFixedColWidths(Tree& tree, Box& box, Au availableXSpace) {
         // NOTE: Percentages for 'width' and 'height' on the table (box)
         //       are calculated relative to the containing block of the
         //       table wrapper box, not the table wrapper box itself.
@@ -444,15 +444,15 @@ struct TableFormatingContext : public FormatingContext {
 
         tableUsedWidth =
             box.style->sizing->width == Size::AUTO
-                ? 0_px
+                ? 0_au
                 : resolve(tree, box, box.style->sizing->width.value, availableXSpace) -
                       boxBorder.horizontal(); // NOTE: maybe remove this after borderbox param is clearer
 
         auto [columnBorders, sumBorders] = getColumnBorders();
 
-        Px fixedWidthToAccount = Px{grid.size.x + 1} * spacing.x;
+        Au fixedWidthToAccount = Au{grid.size.x + 1} * spacing.x;
 
-        Vec<Opt<Px>> colWidthOrNone{};
+        Vec<Opt<Au>> colWidthOrNone{};
         colWidthOrNone.resize(grid.size.x);
         for (auto& col : cols) {
 
@@ -486,11 +486,11 @@ struct TableFormatingContext : public FormatingContext {
                 //        but should we subtract the already computed from
                 //        cellWidth before division?
                 if (colWidthOrNone[x] == NONE)
-                    colWidthOrNone[x] = cellWidth / Px{colSpan};
+                    colWidthOrNone[x] = cellWidth / Au{colSpan};
             }
         }
 
-        Px sumColsWidths{0};
+        Au sumColsWidths{0};
         usize emptyCols{0};
         for (usize i = 0; i < grid.size.x; ++i) {
             if (colWidthOrNone[i])
@@ -501,13 +501,13 @@ struct TableFormatingContext : public FormatingContext {
 
         if (emptyCols > 0) {
             if (sumColsWidths < tableUsedWidth - fixedWidthToAccount) {
-                Px toDistribute = (tableUsedWidth - fixedWidthToAccount - sumColsWidths) / Px{emptyCols};
+                Au toDistribute = (tableUsedWidth - fixedWidthToAccount - sumColsWidths) / Au{emptyCols};
                 for (auto& w : colWidthOrNone)
                     if (w == NONE)
                         w = toDistribute;
             }
         } else if (sumColsWidths < tableUsedWidth - fixedWidthToAccount) {
-            Px toDistribute = (tableUsedWidth - fixedWidthToAccount - sumColsWidths);
+            Au toDistribute = (tableUsedWidth - fixedWidthToAccount - sumColsWidths);
             for (auto& w : colWidthOrNone) {
                 w = w.unwrap() + (toDistribute * w.unwrap()) / sumColsWidths;
             }
@@ -515,13 +515,13 @@ struct TableFormatingContext : public FormatingContext {
 
         colWidth.ensure(colWidthOrNone.len());
         for (usize i = 0; i < grid.size.x; ++i) {
-            auto finalColWidth = colWidthOrNone[i].unwrapOr(0_px);
+            auto finalColWidth = colWidthOrNone[i].unwrapOr(0_au);
             colWidth.pushBack(finalColWidth);
         }
     }
 
     // MARK: Auto Table Layout -------------------------------------------------
-    Pair<Px> getCellMinMaxAutoWidth(Tree& tree, Box& box, TableCell& cell, Px tableComputedWidth) {
+    Pair<Au> getCellMinMaxAutoWidth(Tree& tree, Box& box, TableCell& cell, Au tableComputedWidth) {
         auto cellMinOutput = computeIntrinsicSize(
             tree,
             box,
@@ -556,7 +556,7 @@ struct TableFormatingContext : public FormatingContext {
         return {cellMinWidth, cellMaxWidth};
     };
 
-    void computeAutoWidthOfCellsSpan1(Tree& tree, Vec<Px>& minColWidth, Vec<Px>& maxColWidth, Px tableWidth) {
+    void computeAutoWidthOfCellsSpan1(Tree& tree, Vec<Au>& minColWidth, Vec<Au>& maxColWidth, Au tableWidth) {
         for (usize i = 0; i < grid.size.y; ++i) {
             for (usize j = 0; j < grid.size.x; ++j) {
                 auto cell = grid.get(j, i);
@@ -576,7 +576,7 @@ struct TableFormatingContext : public FormatingContext {
         }
     }
 
-    void computeAutoWidthOfCellsSpanN(Tree& tree, Vec<Px>& minColWidth, Vec<Px>& maxColWidth, Px tableWidth) {
+    void computeAutoWidthOfCellsSpanN(Tree& tree, Vec<Au>& minColWidth, Vec<Au>& maxColWidth, Au tableWidth) {
         for (usize i = 0; i < grid.size.y; ++i) {
             for (usize j = 0; j < grid.size.x; ++j) {
                 auto cell = grid.get(j, i);
@@ -590,8 +590,8 @@ struct TableFormatingContext : public FormatingContext {
 
                 auto [cellMinWidth, cellMaxWidth] = getCellMinMaxAutoWidth(tree, *cell.box, cell, tableWidth);
 
-                Px currSumMinColWidth{0};
-                Px currSumMaxColWidth{0};
+                Au currSumMinColWidth{0};
+                Au currSumMaxColWidth{0};
 
                 for (usize k = 0; k < colSpan; ++k) {
                     currSumMinColWidth += minColWidth[j + k];
@@ -599,14 +599,14 @@ struct TableFormatingContext : public FormatingContext {
                 }
 
                 if (cellMinWidth > currSumMinColWidth) {
-                    auto cellMinWidthContribution = (cellMinWidth - currSumMinColWidth) / Px{colSpan};
+                    auto cellMinWidthContribution = (cellMinWidth - currSumMinColWidth) / Au{colSpan};
                     for (usize k = 0; k < colSpan; ++k) {
                         minColWidth[j + k] += cellMinWidthContribution;
                     }
                 }
 
                 if (cellMaxWidth > currSumMaxColWidth) {
-                    auto cellMaxWidthContribution = (cellMaxWidth - currSumMaxColWidth) / Px{colSpan};
+                    auto cellMaxWidthContribution = (cellMaxWidth - currSumMaxColWidth) / Au{colSpan};
                     for (usize k = 0; k < colSpan; ++k) {
                         maxColWidth[j + k] += cellMaxWidthContribution;
                     }
@@ -615,14 +615,14 @@ struct TableFormatingContext : public FormatingContext {
         }
     }
 
-    void computeAutoWidthOfColGroups(Tree& tree, Vec<Px>& minColWidth, Px tableWidth) {
+    void computeAutoWidthOfColGroups(Tree& tree, Vec<Au>& minColWidth, Au tableWidth) {
         for (auto& group : colGroups) {
 
             auto columnGroupWidth = group.el.style->sizing->width;
             if (columnGroupWidth == Size::AUTO)
                 continue;
 
-            Px currSumOfGroupWidth{0};
+            Au currSumOfGroupWidth{0};
             for (usize x = group.start; x <= group.end; ++x) {
                 currSumOfGroupWidth += minColWidth[x];
             }
@@ -631,14 +631,14 @@ struct TableFormatingContext : public FormatingContext {
             if (currSumOfGroupWidth >= columnGroupWidthValue)
                 continue;
 
-            Px toDistribute = (columnGroupWidthValue - currSumOfGroupWidth) / Px{group.end - group.start + 1};
+            Au toDistribute = (columnGroupWidthValue - currSumOfGroupWidth) / Au{group.end - group.start + 1};
             for (usize x = group.start; x <= group.end; ++x) {
                 minColWidth[x] += toDistribute;
             }
         }
     }
 
-    void computeAutoWidthOfCols(Tree& tree, Vec<Px>& minColWidth, Vec<Px>& maxColWidth, Px tableWidth) {
+    void computeAutoWidthOfCols(Tree& tree, Vec<Au>& minColWidth, Vec<Au>& maxColWidth, Au tableWidth) {
         for (auto& [start, end, el] : cols) {
             auto width = el.style->sizing->width;
 
@@ -655,11 +655,11 @@ struct TableFormatingContext : public FormatingContext {
         }
     }
 
-    Pair<Vec<Px>> computeMinMaxAutoWidths(Tree& tree, usize size, Px tableWidth) {
-        Vec<Px> minColWidth{};
+    Pair<Vec<Au>> computeMinMaxAutoWidths(Tree& tree, usize size, Au tableWidth) {
+        Vec<Au> minColWidth{};
         minColWidth.resize(size);
 
-        Vec<Px> maxColWidth{};
+        Vec<Au> maxColWidth{};
         maxColWidth.resize(size);
 
         computeAutoWidthOfCellsSpan1(tree, minColWidth, maxColWidth, tableWidth);
@@ -672,7 +672,7 @@ struct TableFormatingContext : public FormatingContext {
 
     // https://www.w3.org/TR/CSS22/tables.html#auto-table-layout
 
-    void computeAutoColWidths(Tree& tree, Box& box, Px capmin, Px availableXSpace, Px containingBlockX) {
+    void computeAutoColWidths(Tree& tree, Box& box, Au capmin, Au availableXSpace, Au containingBlockX) {
         // FIXME: This is a rough approximation of the algorithm.
         //        We need to distinguish between percentage-based and fixed lengths:
         //         - Percentage-based sizes are fixed and cannot have extra space distributed to them.
@@ -684,9 +684,9 @@ struct TableFormatingContext : public FormatingContext {
         //        We will need a way to retrieve the percentage value, which is also not yet implemented.
 
         if (box.style->sizing->width != Size::AUTO) {
-            auto [minWithoutPerc, maxWithoutPerc] = computeMinMaxAutoWidths(tree, grid.size.x, 0_px);
+            auto [minWithoutPerc, maxWithoutPerc] = computeMinMaxAutoWidths(tree, grid.size.x, 0_au);
 
-            Px tableComputedWidth = resolve(tree, box, box.style->sizing->width.value, availableXSpace);
+            Au tableComputedWidth = resolve(tree, box, box.style->sizing->width.value, availableXSpace);
             tableUsedWidth = max(capmin, tableComputedWidth);
 
             auto sumMinWithoutPerc = iter(minWithoutPerc).sum();
@@ -699,20 +699,20 @@ struct TableFormatingContext : public FormatingContext {
             auto [minWithPerc, maxWithPerc] = computeMinMaxAutoWidths(tree, grid.size.x, tableComputedWidth);
 
             auto sumMaxWithoutPerc = iter(maxWithoutPerc).sum();
-            Vec<Px>& distWOPToUse = sumMaxWithoutPerc < tableUsedWidth ? maxWithoutPerc : minWithoutPerc;
-            Vec<Px>& distWPToUse = sumMaxWithoutPerc < tableUsedWidth ? maxWithPerc : minWithPerc;
+            Vec<Au>& distWOPToUse = sumMaxWithoutPerc < tableUsedWidth ? maxWithoutPerc : minWithoutPerc;
+            Vec<Au>& distWPToUse = sumMaxWithoutPerc < tableUsedWidth ? maxWithPerc : minWithPerc;
 
             auto sumWithPerc = iter(distWPToUse).sum();
             auto sumWithoutPerc = iter(distWOPToUse).sum();
 
             if (sumWithPerc > tableUsedWidth) {
-                Px totalDiff = sumWithPerc - sumWithoutPerc;
-                Px allowedGrowth = tableUsedWidth - sumWithoutPerc;
+                Au totalDiff = sumWithPerc - sumWithoutPerc;
+                Au allowedGrowth = tableUsedWidth - sumWithoutPerc;
 
                 // it should grow only (allowedGrowth / totalDiff)
                 for (usize j = 0; j < grid.size.x; ++j) {
                     if (distWPToUse[j] != distWOPToUse[j]) {
-                        Px diff = distWPToUse[j] - distWOPToUse[j];
+                        Au diff = distWPToUse[j] - distWOPToUse[j];
                         distWOPToUse[j] += (diff * allowedGrowth) / totalDiff;
                     }
                 }
@@ -724,7 +724,7 @@ struct TableFormatingContext : public FormatingContext {
                 colWidth = distWPToUse;
             }
         } else {
-            auto [minColWidth, maxColWidth] = computeMinMaxAutoWidths(tree, grid.size.x, 0_px);
+            auto [minColWidth, maxColWidth] = computeMinMaxAutoWidths(tree, grid.size.x, 0_au);
             auto sumMaxColWidths = iter(maxColWidth).sum();
             auto sumMinColWidths = iter(minColWidth).sum();
 
@@ -741,7 +741,7 @@ struct TableFormatingContext : public FormatingContext {
     }
 
     // https://www.w3.org/TR/CSS22/tables.html#height-layout
-    Vec<Px> rowHeight;
+    Vec<Au> rowHeight;
 
     void computeRowHeights(Tree& tree) {
         // NOTE: CSS 2.2 does not define how the height of table cells and
@@ -760,7 +760,7 @@ struct TableFormatingContext : public FormatingContext {
                 continue;
 
             for (usize y = row.start; y <= row.end; ++y) {
-                rowHeight[y] = resolve(tree, row.el, height.value, 0_px);
+                rowHeight[y] = resolve(tree, row.el, height.value, 0_au);
             }
         }
 
@@ -780,11 +780,11 @@ struct TableFormatingContext : public FormatingContext {
                         tree,
                         *cell.box,
                         cell.box->style->sizing->height.value,
-                        0_px
+                        0_au
                     );
 
                     for (usize k = 0; k < rowSpan; k++) {
-                        rowHeight[i + k] = max(rowHeight[i + k], Px{computedHeight / Px{rowSpan}});
+                        rowHeight[i + k] = max(rowHeight[i + k], Au{computedHeight / Au{rowSpan}});
                     }
                 }
 
@@ -798,13 +798,13 @@ struct TableFormatingContext : public FormatingContext {
                 );
 
                 for (usize k = 0; k < rowSpan; k++) {
-                    rowHeight[i + k] = max(rowHeight[i + k], Px{cellOutput.size.y / Px{rowSpan}});
+                    rowHeight[i + k] = max(rowHeight[i + k], Au{cellOutput.size.y / Au{rowSpan}});
                 }
             }
         }
 
         for (usize i = 0; i < grid.size.y; ++i) {
-            Px rowBorderHeight{0};
+            Au rowBorderHeight{0};
             for (usize j = 0; j < grid.size.x; ++j) {
                 auto cellVertBorder = bordersGrid.get(i, j).vertical();
                 rowBorderHeight = max(rowBorderHeight, cellVertBorder);
@@ -831,18 +831,18 @@ struct TableFormatingContext : public FormatingContext {
         return helper;
     };
 
-    InsetsPx boxBorder;
-    Vec2Px spacing;
-    Vec2Px tableBoxSize = {}, headerSize = {}, footerSize = {};
+    InsetsAu boxBorder;
+    Vec2Au spacing;
+    Vec2Au tableBoxSize = {}, headerSize = {}, footerSize = {};
     Vec<AxisHelper> rowHelper, colHelper;
-    PrefixSum<Px> colWidthPref, rowHeightPref;
+    PrefixSum<Au> colWidthPref, rowHeightPref;
     Math::Vec2u dataRowsInterval;
-    Vec<Px> startPositionOfRow;
+    Vec<Au> startPositionOfRow;
 
     struct CacheParametersFromInput {
-        Px availableXSpace;
-        Px containingBlockX;
-        Px capmin;
+        Au availableXSpace;
+        Au containingBlockX;
+        Au capmin;
 
         CacheParametersFromInput(Input const& i)
             : availableXSpace(i.availableSpace.x),
@@ -866,7 +866,7 @@ struct TableFormatingContext : public FormatingContext {
         colHelper = buildAxisHelper(cols, colGroups, grid.size.x);
 
         startPositionOfRow.clear();
-        startPositionOfRow.resize(grid.size.y, 0_px);
+        startPositionOfRow.resize(grid.size.y, 0_au);
 
         dataRowsInterval = {numOfHeaderRows, grid.size.y - numOfFooterRows - 1};
     }
@@ -891,31 +891,31 @@ struct TableFormatingContext : public FormatingContext {
 
         computeRowHeights(tree);
 
-        colWidthPref = PrefixSum<Px>{colWidth};
-        rowHeightPref = PrefixSum<Px>{rowHeight};
+        colWidthPref = PrefixSum<Au>{colWidth};
+        rowHeightPref = PrefixSum<Au>{rowHeight};
 
-        tableBoxSize = Vec2Px{
-            iter(colWidth).sum() + spacing.x * Px{grid.size.x + 1},
-            iter(rowHeight).sum() + spacing.y * Px{grid.size.y + 1},
+        tableBoxSize = Vec2Au{
+            iter(colWidth).sum() + spacing.x * Au{grid.size.x + 1},
+            iter(rowHeight).sum() + spacing.y * Au{grid.size.y + 1},
         };
 
         if (numOfHeaderRows) {
-            headerSize = Vec2Px{
+            headerSize = Vec2Au{
                 tableBoxSize.x,
-                rowHeightPref.query(0, numOfHeaderRows - 1) + spacing.y * Px{numOfHeaderRows + 1},
+                rowHeightPref.query(0, numOfHeaderRows - 1) + spacing.y * Au{numOfHeaderRows + 1},
             };
         }
 
         if (numOfFooterRows) {
-            footerSize = Vec2Px{
+            footerSize = Vec2Au{
                 tableBoxSize.x,
                 rowHeightPref.query(grid.size.y - numOfFooterRows, grid.size.y - 1) +
-                    spacing.y * Px{numOfHeaderRows + 1},
+                    spacing.y * Au{numOfHeaderRows + 1},
             };
         }
     }
 
-    Tuple<Output, Px> layoutCell(Tree& tree, Input& input, TableCell& cell, MutCursor<Box> cellBox, usize startFrag, usize i, usize j, Px currPositionX, usize breakpointIndexOffset) {
+    Tuple<Output, Au> layoutCell(Tree& tree, Input& input, TableCell& cell, MutCursor<Box> cellBox, usize startFrag, usize i, usize j, Au currPositionX, usize breakpointIndexOffset) {
 
         // breakpoint traversing for a cell that started in the previous fragmentainer is not trivial
         // since it started in the previous fragmentainer, its breakpoint must be of type ADVANCE_WITH_CHILDREN and thus
@@ -940,13 +940,13 @@ struct TableFormatingContext : public FormatingContext {
         // - its size cant be the one computed in the build phase, thus is NONE
         auto rowSpan = cell.box->attrs.rowSpan;
         bool boxStartedInPrevFragment = tree.fc.allowBreak() and breakpointsForCell.prevIteration;
-        Px startPositionY = startPositionOfRow[boxStartedInPrevFragment ? startFrag : cell.anchorIdx.y];
+        Au startPositionY = startPositionOfRow[boxStartedInPrevFragment ? startFrag : cell.anchorIdx.y];
 
-        Opt<Px> verticalSize;
+        Opt<Au> verticalSize;
         if (not boxStartedInPrevFragment) {
             verticalSize =
                 rowHeightPref.query(cell.anchorIdx.y, cell.anchorIdx.y + rowSpan - 1) +
-                spacing.y * Px{rowSpan - 1};
+                spacing.y * Au{rowSpan - 1};
         }
 
         // TODO: In CSS 2.2, the height of a cell box is the minimum
@@ -963,7 +963,7 @@ struct TableFormatingContext : public FormatingContext {
             {
                 .fragment = input.fragment,
                 .knownSize = {
-                    colWidthPref.query(j, j + colSpan - 1) + spacing.x * Px{colSpan - 1},
+                    colWidthPref.query(j, j + colSpan - 1) + spacing.x * Au{colSpan - 1},
                     verticalSize,
                 },
                 .position = {currPositionX, startPositionY},
@@ -985,7 +985,7 @@ struct TableFormatingContext : public FormatingContext {
     }
 
     struct RowOutput {
-        Px sizeY = 0_px;
+        Au sizeY = 0_au;
 
         bool allBottomsAndCompletelyLaidOut = true;
         bool someBottomsUncompleteLaidOut = false;
@@ -994,7 +994,7 @@ struct TableFormatingContext : public FormatingContext {
         Vec<bool> isBottom = {};
     };
 
-    RowOutput layoutRow(Tree& tree, Input input, usize startFrag, usize i, Vec2Px currPosition, bool isBreakpointedRow, usize breakpointIndexOffset = 0) {
+    RowOutput layoutRow(Tree& tree, Input input, usize startFrag, usize i, Vec2Au currPosition, bool isBreakpointedRow, usize breakpointIndexOffset = 0) {
         startPositionOfRow[i] = currPosition.y;
 
         RowOutput outputRow;
@@ -1036,7 +1036,7 @@ struct TableFormatingContext : public FormatingContext {
     }
 
     // https://www.w3.org/TR/css-tables-3/#freely-fragmentable
-    bool isFreelyFragmentableRow(usize i, Vec2Px fragmentainerSize) {
+    bool isFreelyFragmentableRow(usize i, Vec2Au fragmentainerSize) {
         /*
         NOT freely fragmentable if (AND):
         - if the cells spanning the row do not span any subsequent row
@@ -1056,7 +1056,7 @@ struct TableFormatingContext : public FormatingContext {
         }
 
         return not isSelfContainedRow or
-               rowHeight[i] * 2_px > min(fragmentainerSize.x, fragmentainerSize.y);
+               rowHeight[i] * 2_au > min(fragmentainerSize.x, fragmentainerSize.y);
     }
 
     bool handlePossibleForcedBreakpointAfterRow(Breakpoint& currentBreakpoint, bool allBottomsAndCompletelyLaidOut, bool isLastRow, usize i) {
@@ -1095,7 +1095,7 @@ struct TableFormatingContext : public FormatingContext {
         return true;
     }
 
-    bool handleUnforcedBreakpointsInsideAndAfterRow(Box& box, Breakpoint& currentBreakpoint, RowOutput outputRow, usize i, Vec2Px fragmentainerSize) {
+    bool handleUnforcedBreakpointsInsideAndAfterRow(Box& box, Breakpoint& currentBreakpoint, RowOutput outputRow, usize i, Vec2Au fragmentainerSize) {
         bool rowIsFreelyFragmentable = isFreelyFragmentableRow(i, fragmentainerSize);
 
         bool avoidBreakInsideTable = box.style->break_->inside == BreakInside::AVOID;
@@ -1152,7 +1152,7 @@ struct TableFormatingContext : public FormatingContext {
         return true;
     }
 
-    Tuple<bool, Opt<Breakpoint>> layoutRows(Tree& tree, Box& box, Input input, usize startAt, usize stopAt, Px currPositionX, Px& currPositionY, bool shouldRepeatHeaderAndFooter) {
+    Tuple<bool, Opt<Breakpoint>> layoutRows(Tree& tree, Box& box, Input input, usize startAt, usize stopAt, Au currPositionX, Au& currPositionY, bool shouldRepeatHeaderAndFooter) {
         bool completelyLaidOut = false;
         Opt<Breakpoint> rowBreakpoint = NONE;
 
@@ -1168,7 +1168,7 @@ struct TableFormatingContext : public FormatingContext {
             auto rowOutput = layoutRow(
                 tree, input, startAt,
                 i,
-                Vec2Px{currPositionX, currPositionY},
+                Vec2Au{currPositionX, currPositionY},
                 i + 1 == stopAt,
                 shouldRepeatHeaderAndFooter ? dataRowsInterval.x : 0
             );
@@ -1190,13 +1190,13 @@ struct TableFormatingContext : public FormatingContext {
         return {completelyLaidOut, rowBreakpoint};
     }
 
-    void layoutHeaderFooterRows(Tree& tree, Input input, usize startFrag, Px currPositionX, Px& currPositionY, usize start, usize len) {
+    void layoutHeaderFooterRows(Tree& tree, Input input, usize startFrag, Au currPositionX, Au& currPositionY, usize start, usize len) {
         for (usize i = 0; i < len; i++) {
             auto _ = layoutRow(
                 tree,
                 input.withBreakpointTraverser(BreakpointTraverser()),
                 startFrag, start + i,
-                Vec2Px{currPositionX, currPositionY}, false
+                Vec2Au{currPositionX, currPositionY}, false
             );
             currPositionY += rowHeight[i] + spacing.y;
         }
@@ -1236,12 +1236,12 @@ struct TableFormatingContext : public FormatingContext {
         // otherwise, they only appear once, might be alone in the fragmentainer and can be broken into pages
         bool shouldRepeatHeaderAndFooter =
             tree.fc.allowBreak() and
-            max(headerSize.y, footerSize.y) * 4_px <= tree.fc.size().y and
-            headerSize.y + footerSize.y * 2_px <= tree.fc.size().y;
+            max(headerSize.y, footerSize.y) * 4_au <= tree.fc.size().y and
+            headerSize.y + footerSize.y * 2_au <= tree.fc.size().y;
 
-        Px currPositionX{input.position.x};
-        Px currPositionY{input.position.y};
-        Px startingPositionY = currPositionY;
+        Au currPositionX{input.position.x};
+        Au currPositionY{input.position.y};
+        Au startingPositionY = currPositionY;
         currPositionY += spacing.y;
 
         auto [startAt, stopAt] = computeLayoutIntervals(

@@ -4,6 +4,7 @@
 #include <karm-pdf/values.h>
 
 #include "file-printer.h"
+#include "karm-print/pdf-font-printer.h"
 
 namespace Karm::Print {
 
@@ -15,10 +16,11 @@ struct PdfPage {
 struct PdfPrinter : public FilePrinter {
     Vec<PdfPage> _pages;
     Opt<Pdf::Canvas> _canvas;
+    Pdf::FontManager fontManager;
 
     Gfx::Canvas& beginPage(PaperStock paper) override {
         auto& page = _pages.emplaceBack(paper);
-        _canvas = Pdf::Canvas{page.data, paper.size()};
+        _canvas = Pdf::Canvas{page.data, paper.size(), &fontManager};
 
         // NOTE: PDF has the coordinate system origin at the bottom left corner.
         //       But we want to have it at the top left corner.
@@ -38,10 +40,31 @@ struct PdfPrinter : public FilePrinter {
         Pdf::Array pagesKids;
         Pdf::Ref pagesRef = alloc.alloc();
 
+        // Fonts
+        Map<usize, Pdf::Ref> fontManagerId2FontObjRef;
+        for (auto& [_, value] : fontManager.mapping._els) {
+            auto& [id, fontFace] = value;
+
+            TrueTypeFontAdapter ttfAdapter{
+                fontFace.cast<Text::TtfFontface>().unwrap(),
+                alloc
+            };
+
+            auto fontRef = ttfAdapter.addToFile(file);
+            fontManagerId2FontObjRef.put(id, fontRef);
+        }
+
         // Page
         for (auto& p : _pages) {
             Pdf::Ref pageRef = alloc.alloc();
             Pdf::Ref contentsRef = alloc.alloc();
+
+            // FIXME: adding all fonts for now on each page; later, we will need to filter by page
+            Pdf::Dict pageFontsDict;
+            for (auto& [managerId, objRef] : fontManagerId2FontObjRef._els) {
+                auto formattedName = Io::format("F{}", managerId);
+                pageFontsDict.put(formattedName.str(), objRef);
+            }
 
             file.add(
                 pageRef,
@@ -59,6 +82,14 @@ struct PdfPrinter : public FilePrinter {
                         "Contents"s,
                         contentsRef,
                     },
+                    {
+                        "Resources"s,
+                        Pdf::Dict{
+                            {"Font"s,
+                             pageFontsDict
+                            },
+                        },
+                    }
                 }
             );
 
@@ -100,19 +131,16 @@ struct PdfPrinter : public FilePrinter {
             {"Root"s, catalogRef},
         };
 
+        // Sorting object by their refs, so they are printed in order
+        sort(file.body._els, [](auto& a, auto& b) {
+            return a.v0.num <=> b.v0.num;
+        });
+
         return file;
     }
 
-    void write(Io::Emit& e) {
-        pdf().write(e);
-    }
-
     Res<> write(Io::Writer& w) override {
-        Io::TextEncoder<> encoder{w};
-        Io::Emit e{encoder};
-        write(e);
-        try$(e.flush());
-        return Ok();
+        return pdf().write(w);
     }
 };
 

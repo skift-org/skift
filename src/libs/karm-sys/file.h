@@ -25,7 +25,7 @@ struct _File :
         return _fd->seek(seek);
     }
 
-    Res<usize> flush() override {
+    Res<> flush() override {
         return _fd->flush();
     }
 

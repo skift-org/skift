@@ -65,25 +65,25 @@ struct PopoverLayer : public ProxyNode<PopoverLayer> {
             (*_popover)->paint(g, r);
     }
 
-    void event(App::Event& event) override {
-        if (event.accepted())
+    void event(App::Event& e) override {
+        if (e.accepted())
             return;
 
-        bool allowToGoDown = event.is<ShowDialogEvent>();
+        bool allowToGoDown = e.is<ShowDialogEvent>();
 
         if (_popover and not allowToGoDown) {
-            (*_popover)->event(event);
+            (*_popover)->event(e);
 
-            if (event.accepted())
+            if (e.accepted())
                 return;
 
-            auto e = event.is<App::MouseEvent>();
-            if (e and e->type == App::MouseEvent::PRESS) {
+            auto me = e.is<App::MouseEvent>();
+            if (me and me->type == App::MouseEvent::PRESS) {
                 _closePopover();
-                event.accept();
+                e.accept();
             }
         } else {
-            ProxyNode::event(event);
+            ProxyNode::event(e);
         }
     }
 

@@ -21,15 +21,27 @@ struct Ref {
 
 struct Name : public String {
     using String::String;
+
+    void write(Io::Emit& e) const;
 };
 
-using Array = Vec<Value>;
+struct Array : public Vec<Value> {
+    using Vec<Value>::Vec;
 
-using Dict = Map<Name, Value>;
+    void write(Io::Emit& e) const;
+};
+
+struct Dict : public Map<Name, Value> {
+    using Map<Name, Value>::Map;
+
+    void write(Io::Emit& e) const;
+};
 
 struct Stream {
     Dict dict;
     Buf<Byte> data;
+
+    void write(Io::Emit& e) const;
 };
 
 using _Value = Union<
@@ -61,7 +73,7 @@ struct File {
         return ref;
     }
 
-    void write(Io::Emit& e) const;
+    Res<> write(Io::Writer& e) const;
 };
 
 struct XRef {

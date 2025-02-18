@@ -493,6 +493,30 @@ always_inline constexpr bool contains(T const& slice, Meta::Equatable<U> auto co
     return indexOf(slice, needle).has();
 }
 
+always_inline constexpr bool contains(Sliceable auto const& slice, Sliceable auto const& needle)
+    requires Meta::Equatable<decltype(slice[0]), decltype(needle[0])>
+{
+    if (needle.len() == 0)
+        return true;
+
+    if (slice.len() < needle.len())
+        return false;
+
+    for (usize i = 0; i < slice.len() - needle.len() + 1; i++) {
+        bool found = true;
+        for (usize j = 0; j < needle.len(); j++) {
+            if (slice[i + j] != needle[j]) {
+                found = false;
+                break;
+            }
+        }
+        if (found)
+            return true;
+    }
+
+    return false;
+}
+
 template <Sliceable T, typename U = T::Inner>
 always_inline constexpr Opt<usize> lastIndexOf(T const& slice, Meta::Equatable<U> auto const& needle) {
     for (usize i = slice.len(); i > 0; i--)

@@ -2,7 +2,7 @@
 
 namespace Karm::Json {
 
-Res<> stringify(Io::Emit& emit, Value const& v) {
+Res<> unparse(Io::Emit& emit, Value const& v) {
     return v.visit(
         Visitor{
             [&](None) -> Res<> {
@@ -15,7 +15,7 @@ Res<> stringify(Io::Emit& emit, Value const& v) {
                     if (i > 0) {
                         emit(',');
                     }
-                    try$(stringify(emit, v[i]));
+                    try$(unparse(emit, v[i]));
                 }
                 emit(']');
 
@@ -33,7 +33,7 @@ Res<> stringify(Io::Emit& emit, Value const& v) {
                     emit('"');
                     emit(kv.v0);
                     emit("\":");
-                    try$(stringify(emit, kv.v1));
+                    try$(unparse(emit, kv.v1));
                 }
                 emit('}');
                 return Ok();
@@ -82,10 +82,10 @@ Res<> stringify(Io::Emit& emit, Value const& v) {
     );
 }
 
-Res<String> stringify(Value const& v) {
+Res<String> unparse(Value const& v) {
     Io::StringWriter sw;
     Io::Emit emit{sw};
-    try$(stringify(emit, v));
+    try$(unparse(emit, v));
     return Ok(sw.take());
 }
 

@@ -7,7 +7,7 @@ namespace Karm::Io::Tests {
 
 template <typename T>
 Res<> testCase(Str expected, T const& value, Str format = "") {
-    auto str = try$(toStr(value, format));
+    auto str = toStr(value, format);
     if (str != expected) {
         logError("expected: {}, got: {}", expected, str);
         return Error::invalidData("value does not match expected");
@@ -69,6 +69,16 @@ test$("fmt-signed-number") {
     try$(testCase("0000", 0, "04"));
     try$(testCase("0001", 1, "04"));
     try$(testCase("1000", 1000, "04"));
+
+    return Ok();
+}
+
+test$("fmt-float-number") {
+    try$(testCase("3", 3.001, ".00"));
+    try$(testCase("3", 3.001, ".1"));
+    try$(testCase("3.1", 3.1, ".1"));
+    try$(testCase("3.0", 3.001, ".01"));
+    try$(testCase("1.9", 1.99999999999, ".1"));
 
     return Ok();
 }
@@ -201,7 +211,7 @@ test$("fmt-string") {
 
 // MARK: Format Tuple ----------------------------------------------------------
 
-test$("fmt-cons") {
+test$("fmt-pair") {
     try$(testCase("{1, 2}", Pair{1, 2}));
     return Ok();
 }

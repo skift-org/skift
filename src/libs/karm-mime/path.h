@@ -45,7 +45,7 @@ struct Path {
 
     bool isParentOf(Path const& other) const;
 
-    Res<usize> write(Io::TextWriter& writer) const;
+    Res<> unparse(Io::TextWriter& writer) const;
 
     String str() const;
 
@@ -89,7 +89,7 @@ inline auto operator/(Karm::Mime::Path const& path, Str other) {
 
 template <>
 struct Karm::Io::Formatter<Karm::Mime::Path> {
-    Res<usize> format(Io::TextWriter& writer, Karm::Mime::Path const& path) {
-        return path.write(writer);
+    Res<> format(Io::TextWriter& writer, Karm::Mime::Path const& path) {
+        return path.unparse(writer);
     }
 };

@@ -30,7 +30,7 @@ struct Fd : Meta::NoCopy {
 
     virtual Res<usize> seek(Io::Seek) = 0;
 
-    virtual Res<usize> flush() = 0;
+    virtual Res<> flush() = 0;
 
     virtual Res<Rc<Fd>> dup() = 0;
 
@@ -58,7 +58,7 @@ struct NullFd : public Fd {
 
     Res<usize> seek(Io::Seek) override;
 
-    Res<usize> flush() override;
+    Res<> flush() override;
 
     Res<Rc<Fd>> dup() override;
 

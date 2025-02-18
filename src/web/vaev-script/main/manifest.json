@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "vaev-script.main",
+    "type": "exe",
+    "description": "ECMAScript engine testing tool",
+    "requires": [
+        "karm-sys",
+        "vaev-script"
+    ]
+}

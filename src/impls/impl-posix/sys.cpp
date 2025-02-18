@@ -390,7 +390,7 @@ Res<> populate(SysInfo& infos) {
         return Posix::fromLastErrno();
 
     infos.sysName = "Posix"s;
-    infos.sysVersion = try$(Io::format("{}", _POSIX_VERSION));
+    infos.sysVersion = Io::format("{}", _POSIX_VERSION);
 
     infos.kernelName = Str::fromNullterminated(uts.sysname, sizeof(uts.sysname));
     infos.kernelVersion = Str::fromNullterminated(uts.release, sizeof(uts.release));

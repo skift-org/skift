@@ -4,12 +4,11 @@
 
 namespace Karm::Crypto {
 
-Res<usize> hexEncode(Bytes bytes, Io::TextWriter& out) {
-    usize written = 0;
+Res<> hexEncode(Bytes bytes, Io::TextWriter& out) {
     for (auto b : bytes) {
-        written += try$(Io::format(out, "{02x}"s, b));
+        try$(Io::format(out, "{02x}"s, b));
     }
-    return Ok(written);
+    return Ok();
 }
 
 Res<String> hexEncode(Bytes bytes) {

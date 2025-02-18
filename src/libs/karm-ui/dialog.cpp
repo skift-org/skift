@@ -71,7 +71,8 @@ struct DialogLayer : public LeafNode<DialogLayer> {
             g.push();
             // change the orgin to the center of the screen
             g.translate(bound().center().cast<f64>());
-            g.scale(Math::lerp(0.9, 1, _visibility.value()));
+            auto scale = Math::lerp(0.9, 1.0, _visibility.value());
+            g.scale(scale);
             g.translate(-bound().center().cast<f64>());
 
             (*_dialog)->paint(g, r);
@@ -81,6 +82,9 @@ struct DialogLayer : public LeafNode<DialogLayer> {
     }
 
     void event(App::Event& e) override {
+        if (e.accepted())
+            return;
+
         if (_visibility.needRepaint(*this, e))
             Ui::shouldRepaint(*this);
 

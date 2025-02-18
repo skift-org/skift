@@ -7,7 +7,10 @@
 #include <karm-ui/view.h>
 #include <mdi/chevron-down.h>
 #include <mdi/chevron-right.h>
-#include <vaev-markup/dom.h>
+#include <vaev-dom/comment.h>
+#include <vaev-dom/document-type.h>
+#include <vaev-dom/document.h>
+#include <vaev-dom/element.h>
 #include <vaev-style/styles.h>
 
 #include "inspect.h"
@@ -34,54 +37,53 @@ auto idented(isize ident) {
     };
 }
 
-Ui::Child elementStartTag(Markup::Element const& el, bool expanded) {
+Ui::Child elementStartTag(Dom::Element const& el, bool expanded) {
     return Ui::text(
         Ui::TextStyles::codeSmall().withColor(Ui::ACCENT500),
         expanded ? "<{}>" : "<{}> … </{}>", el.tagName, el.tagName
     );
 }
 
-Ui::Child elementEndTag(Markup::Element const& el) {
+Ui::Child elementEndTag(Dom::Element const& el) {
     return Ui::text(
         Ui::TextStyles::codeSmall().withColor(Ui::ACCENT500),
         "</{}>", el.tagName
     );
 }
 
-Ui::Child itemHeader(Rc<Markup::Node> n, Ui::Action<InspectorAction> a, bool expanded) {
-    if (n.is<Markup::Document>()) {
+Ui::Child itemHeader(Gc::Ref<Dom::Node> n, Ui::Action<InspectorAction> a, bool expanded) {
+    if (n->is<Dom::Document>()) {
         return Ui::codeMedium("#document");
-    } else if (n.is<Markup::DocumentType>()) {
+    } else if (n->is<Dom::DocumentType>()) {
         return Ui::codeMedium("#document-type");
-    } else if (auto tx = n.is<Markup::Text>()) {
+    } else if (auto tx = n->is<Dom::Text>()) {
         return Ui::codeMedium("{#}", tx->data());
-    } else if (auto el = n.is<Markup::Element>()) {
-        if (el->children().len()) {
-            return Ui::hflow(
-                Ui::icon(
-                    expanded ? Mdi::CHEVRON_DOWN : Mdi::CHEVRON_RIGHT
-                ) |
-                    Ui::button(
-                        [n, a](auto& btn) {
-                            a(btn, ExpandNode{n});
-                        },
-                        Ui::ButtonStyle::subtle()
-                    ),
-                elementStartTag(*el, expanded)
-            );
-        } else {
+    } else if (auto el = n->is<Dom::Element>()) {
+        if (not el->hasChildren())
             return elementStartTag(*el, false);
-        }
-    } else if (auto c = n.is<Markup::Comment>()) {
+
+        return Ui::hflow(
+            Ui::icon(
+                expanded ? Mdi::CHEVRON_DOWN : Mdi::CHEVRON_RIGHT
+            ) |
+                Ui::button(
+                    [n, a](auto& btn) {
+                        a(btn, ExpandNode{n});
+                    },
+                    Ui::ButtonStyle::subtle()
+                ),
+            elementStartTag(*el, expanded)
+        );
+    } else if (auto c = n->is<Dom::Comment>()) {
         return Ui::codeMedium(Gfx::GREEN, "<!-- {} -->", c->data());
     } else {
         unreachable();
     }
 }
 
-Ui::Child itemFooter(Rc<Markup::Node> n, isize ident) {
-    if (auto el = n.is<Markup::Element>())
-        return Ui::hflow(n->children().len() ? guide() : Ui::empty(), elementEndTag(*el)) | idented(ident);
+Ui::Child itemFooter(Gc::Ref<Dom::Node> n, isize ident) {
+    if (auto el = n->is<Dom::Element>())
+        return Ui::hflow(n->countChildren() ? guide() : Ui::empty(), elementEndTag(*el)) | idented(ident);
     return Ui::empty();
 }
 
@@ -102,7 +104,7 @@ Ui::ButtonStyle selected() {
     };
 }
 
-Ui::Child item(Rc<Markup::Node> n, InspectState const& s, Ui::Action<InspectorAction> a, bool expanded, isize ident) {
+Ui::Child item(Gc::Ref<Dom::Node> n, InspectState const& s, Ui::Action<InspectorAction> a, bool expanded, isize ident) {
     auto style = s.selectedNode == n ? selected() : Ui::ButtonStyle::subtle().withRadii(0);
     return Ui::button(
         [n, a](auto& btn) {
@@ -113,13 +115,13 @@ Ui::Child item(Rc<Markup::Node> n, InspectState const& s, Ui::Action<InspectorAc
     );
 }
 
-Ui::Child node(Rc<Markup::Node> n, InspectState const& s, Ui::Action<InspectorAction> a, isize ident = 0) {
-    bool expanded = n.is<Markup::Document>() or s.expandedNodes.has(n);
+Ui::Child node(Gc::Ref<Dom::Node> n, InspectState const& s, Ui::Action<InspectorAction> a, isize ident = 0) {
+    bool expanded = n->is<Dom::Document>() or s.expandedNodes.has(n);
     Ui::Children children{item(n, s, a, expanded, ident)};
 
     if (expanded) {
-        for (auto& c : n->children()) {
-            children.pushBack(node(c, s, a, n.is<Markup::Document>() ? 0 : ident + 1));
+        for (auto child = n->firstChild(); child; child = child->nextSibling()) {
+            children.pushBack(node(child.upgrade(), s, a, n->is<Dom::Document>() ? 0 : ident + 1));
         }
         children.pushBack(itemFooter(n, ident));
     }
@@ -143,7 +145,7 @@ Ui::Child computedStyles() {
            Ui::pinSize(128);
 }
 
-Ui::Child inspect(Rc<Vaev::Markup::Document> n, InspectState const& s, Ui::Action<InspectorAction> a) {
+Ui::Child inspect(Gc::Ref<Vaev::Dom::Document> n, InspectState const& s, Ui::Action<InspectorAction> a) {
     return Ui::vflow(
         node(n, s, a) | Ui::vscroll() | Ui::grow(),
         computedStyles() | Kr::resizable(Kr::ResizeHandle::TOP, {128}, NONE)

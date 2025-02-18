@@ -82,27 +82,39 @@ Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
             return Kr::scaffold({
                 .icon = Mdi::TEXT,
                 .title = "Text"s,
-                .startTools = slots$(
-                    Ui::button(Model::bind<New>(), Ui::ButtonStyle::subtle(), Mdi::FILE),
-                    Ui::button(
-                        [](auto& n) {
-                            Ui::showDialog(n, Files::openFileDialog());
-                        },
-                        Ui::ButtonStyle::subtle(), Mdi::FOLDER
-                    ),
-                    Ui::button(
-                        Model::bindIf(s.text->dirty(), Save{}),
-                        Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE
-                    ),
-                    Ui::button(
-                        Model::bindIf(s.text->dirty(), Save{true}), Ui::ButtonStyle::subtle(),
-                        Mdi::CONTENT_SAVE_PLUS
-                    )
-                ),
-                .endTools = slots$(
-                    Ui::button(Model::bindIf<Karm::Text::Action>(s.text->canUndo(), Karm::Text::Action::UNDO), Ui::ButtonStyle::subtle(), Mdi::UNDO),
-                    Ui::button(Model::bindIf<Karm::Text::Action>(s.text->canRedo(), Karm::Text::Action::REDO), Ui::ButtonStyle::subtle(), Mdi::REDO)
-                ),
+                .startTools = [&] -> Ui::Children {
+                    return {
+                        Ui::button(Model::bind<New>(), Ui::ButtonStyle::subtle(), Mdi::FILE),
+                        Ui::button(
+                            [](auto& n) {
+                                Ui::showDialog(n, Files::openFileDialog());
+                            },
+                            Ui::ButtonStyle::subtle(), Mdi::FOLDER
+                        ),
+                        Ui::button(
+                            Model::bindIf(s.text->dirty(), Save{}),
+                            Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE
+                        ),
+                        Ui::button(
+                            Model::bindIf(s.text->dirty(), Save{true}), Ui::ButtonStyle::subtle(),
+                            Mdi::CONTENT_SAVE_PLUS
+                        ),
+                    };
+                },
+                .endTools = [&] -> Ui::Children {
+                    return {
+                        Ui::button(
+                            Model::bindIf<Karm::Text::Action>(s.text->canUndo(), Karm::Text::Action::UNDO),
+                            Ui::ButtonStyle::subtle(),
+                            Mdi::UNDO
+                        ),
+                        Ui::button(
+                            Model::bindIf<Karm::Text::Action>(s.text->canRedo(), Karm::Text::Action::REDO),
+                            Ui::ButtonStyle::subtle(),
+                            Mdi::REDO
+                        )
+                    };
+                },
                 .body = [=] {
                     return Ui::vflow(
                         Ui::hflow(
@@ -115,7 +127,7 @@ Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
                         Ui::separator(),
 
                         s.error
-                            ? Kr::errorPage(Mdi::ALERT_DECAGRAM, "Unable to load text"s, Io::toStr(s.error).unwrap()) | Ui::grow()
+                            ? Kr::errorPage(Mdi::ALERT_DECAGRAM, "Unable to load text"s, Io::toStr(s.error)) | Ui::grow()
                             : editor(s.text),
                         Ui::separator(),
                         Ui::hflow(

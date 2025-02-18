@@ -4,11 +4,11 @@
 
 namespace Vaev::Layout {
 
-InsetsPx computeMargins(Tree& tree, Box& box, Input input);
+InsetsAu computeMargins(Tree& tree, Box& box, Input input);
 
-InsetsPx computeBorders(Tree& tree, Box& box);
+InsetsAu computeBorders(Tree& tree, Box& box);
 
-Vec2Px computeIntrinsicSize(Tree& tree, Box& box, IntrinsicSize intrinsic, Vec2Px containingBlock);
+Vec2Au computeIntrinsicSize(Tree& tree, Box& box, IntrinsicSize intrinsic, Vec2Au containingBlock);
 
 Output layout(Tree& tree, Box& box, Input input);
 

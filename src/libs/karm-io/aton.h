@@ -30,10 +30,8 @@ static inline Opt<u8> _nextDigit(_SScan<E>& s, AtoxOptions options = {}) {
         return NONE;
 
     auto d = _parseDigit(s.peek(), options);
-
     if (d)
         s.next();
-
     return d;
 }
 
@@ -62,7 +60,7 @@ static inline Opt<isize> atoi(_SScan<E>& s, AtoxOptions options = {}) {
     bool isNum = false;
     isize result = 0;
 
-    if (s.peek(0) == '-' and _parseDigit(s.peek(1), options)) {
+    if (s.rem() >= 2 and s.peek(0) == '-' and _parseDigit(s.peek(1), options)) {
         isNeg = true;
         isNum = true;
         s.next();
@@ -70,9 +68,8 @@ static inline Opt<isize> atoi(_SScan<E>& s, AtoxOptions options = {}) {
 
     while (not s.ended()) {
         auto maybeDigit = _nextDigit(s, options);
-        if (not maybeDigit) {
+        if (not maybeDigit)
             break;
-        }
         isNum = true;
         result = result * options.base + maybeDigit.unwrap();
     }

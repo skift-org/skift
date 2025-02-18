@@ -2,6 +2,7 @@
 
 #include "manual.h"
 #include "panic.h"
+#include "slice.h"
 
 namespace Karm {
 
@@ -69,7 +70,7 @@ struct Ring {
             panic("pop on empty ring");
 
         T value = _buf[_head].take();
-        _head = (_head - 1) % _cap;
+        _head = (_head + (_cap - 1)) % _cap;
         _len--;
         return value;
     }
@@ -135,6 +136,17 @@ struct Ring {
 
     usize rem() const {
         return _cap - _len;
+    }
+
+    bool operator==(Sliceable<T> auto const& other) const {
+        if (len() != other.len())
+            return false;
+
+        for (usize i = 0; i < len(); ++i)
+            if (peek(i) != other[i])
+                return false;
+
+        return true;
     }
 };
 

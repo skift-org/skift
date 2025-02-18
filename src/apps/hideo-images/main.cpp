@@ -12,15 +12,15 @@ namespace Hideo::Images {
 Ui::Child app(State initial) {
     return Ui::reducer<Model>(
         initial,
-        [](auto const& state) {
+        [](auto const& s) {
             return Kr::scaffold({
                 .icon = Mdi::IMAGE,
                 .title = "Images"s,
-                .body = slot$(
-                    state.isEditor
-                        ? editor(state)
-                        : viewer(state)
-                ),
+                .body = [&] {
+                    return s.isEditor
+                               ? editor(s)
+                               : viewer(s);
+                },
             });
         }
     );

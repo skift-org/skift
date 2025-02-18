@@ -235,6 +235,7 @@ struct Command {
 
     Option<bool> _help = flag('h', "help"s, "Show this help message and exit."s);
     Option<bool> _usage = flag('u', "usage"s, "Show usage message and exit."s);
+    Option<bool> _version = flag('v', "version"s, "Show version information and exit."s);
 
     bool _invoked = false;
 
@@ -252,6 +253,7 @@ struct Command {
           callbackAsync(std::move(callbackAsync)) {
         options.pushBack(_help);
         options.pushBack(_usage);
+        options.pushBack(_version);
     }
 
     Command& subCommand(
@@ -441,6 +443,13 @@ struct Command {
             Io::Emit e{Sys::out()};
             _showUsage(e);
             e.newline();
+            co_try$(e.flush());
+            co_return Ok();
+        }
+
+        if (_version) {
+            Io::Emit e{Sys::out()};
+            e("{} {}\n", longName, stringify$(__ck_version_value) ""s);
             co_try$(e.flush());
             co_return Ok();
         }

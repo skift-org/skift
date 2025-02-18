@@ -9,11 +9,12 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto url = args.len()
                    ? co_try$(Mime::parseUrlOrPath(args[0]))
                    : "about:start"_url;
+    Gc::Heap heap;
 
-    auto dom = Vaev::Driver::fetchDocument(url);
+    auto dom = Vaev::Driver::fetchDocument(heap, url);
 
     co_return Ui::runApp(
         ctx,
-        Vaev::Browser::app(url, dom)
+        Vaev::Browser::app(heap, url, dom)
     );
 }

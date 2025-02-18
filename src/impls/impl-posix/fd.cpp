@@ -55,9 +55,9 @@ Res<usize> Fd::seek(Io::Seek seek) {
     return Ok(static_cast<usize>(offset));
 }
 
-Res<usize> Fd::flush() {
+Res<> Fd::flush() {
     // NOTE: No-op
-    return Ok(0uz);
+    return Ok();
 }
 
 Res<Rc<Sys::Fd>> Fd::dup() {

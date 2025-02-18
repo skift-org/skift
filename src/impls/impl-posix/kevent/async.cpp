@@ -86,7 +86,7 @@ struct DarwinSched :
         co_return Ok(co_try$(fd->write(buf)));
     }
 
-    Async::Task<usize> flushAsync(Rc<Fd> fd) override {
+    Async::Task<> flushAsync(Rc<Fd> fd) override {
         co_trya$(waitFor({
             .ident = fd->handle().value(),
             .filter = EVFILT_WRITE,

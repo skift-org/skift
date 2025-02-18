@@ -36,7 +36,7 @@ FontAttrs TtfFontface::attrs() const {
         if (_parser._post.isFixedPitch())
             attrs.monospace = Monospace::YES;
 
-        if (_parser._post.isItalic())
+        if (_parser._post.italicAngle() != 0)
             attrs.style = FontStyle::ITALIC;
     }
 

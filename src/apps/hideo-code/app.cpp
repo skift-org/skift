@@ -10,7 +10,9 @@ Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::CODE_BRACES,
         .title = "Code"s,
-        .body = slot$(Ui::empty()),
+        .body = [] {
+            return Ui::empty();
+        },
     });
 }
 

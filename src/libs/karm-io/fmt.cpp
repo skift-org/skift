@@ -1,5 +1,7 @@
 #include <karm-io/expr.h>
+#include <karm-math/funcs.h>
 
+#include "aton.h"
 #include "emit.h"
 #include "fmt.h"
 
@@ -7,9 +9,8 @@ namespace Karm::Io {
 
 // MARK: Format ----------------------------------------------------------------
 
-Res<usize> _format(Io::TextWriter& writer, Str format, _Args& args) {
+Res<> _format(Io::TextWriter& writer, Str format, _Args& args) {
     Io::SScan scan{format};
-    usize written = 0;
     usize index = 0;
 
     while (not scan.ended()) {
@@ -23,17 +24,17 @@ Res<usize> _format(Io::TextWriter& writer, Str format, _Args& args) {
             }
             scan.next();
             Io::SScan inner{scan.end()};
-            written += try$(args.format(inner, writer, index));
+            try$(args.format(inner, writer, index));
             index++;
         } else if (c == '\n') {
             // normalize newlines
-            written += try$(writer.writeStr(Str{Sys::LINE_ENDING}));
+            try$(writer.writeStr(Str{Sys::LINE_ENDING}));
         } else {
-            written += try$(writer.writeRune(c));
+            try$(writer.writeRune(c));
         }
     }
 
-    return Ok(written);
+    return Ok();
 };
 
 // MARK: Change case -----------------------------------------------------------
@@ -55,19 +56,19 @@ Res<usize> _changeCase(SScan& s, Io::TextWriter& w, CaseFn fn) {
         if (s.eat(RE_SEP)) {
             auto sep = fn(' ', si, wi);
             if (sep)
-                written += try$(w.writeRune(sep));
+                try$(w.writeRune(sep));
             wi = 0;
             wasLower = false;
         } else {
             if (wasLower and isAsciiUpper(s.peek())) {
                 auto sep = fn(' ', si, wi);
                 if (sep)
-                    written += try$(w.writeRune(sep));
+                    try$(w.writeRune(sep));
                 wi = 0;
             }
 
             wasLower = isAsciiLower(s.peek()) and isAsciiAlpha(s.peek());
-            written += try$(w.writeRune(fn(s.next(), si, wi)));
+            try$(w.writeRune(fn(s.next(), si, wi)));
             si++;
             wi++;
         }
@@ -353,19 +354,24 @@ void NumberFormatter::parse(Str str) {
     parse(scan);
 }
 
-void NumberFormatter::parse(Io::SScan& scan) {
-    if (scan.skip('#'))
+void NumberFormatter::parse(Io::SScan& s) {
+    if (s.skip('#'))
         prefix = true;
 
-    if (scan.skip('0'))
+    if (s.skip('0'))
         fillChar = '0';
 
-    width = atoi(scan).unwrapOr(0);
+    width = atoi(s).unwrapOr(0);
 
-    if (scan.ended())
+    if (s.skip('.')) {
+        if (s.skip('0'))
+            trailingZeros = true;
+        precision = atoi(s).unwrapOrDefault(6);
+    }
+
+    if (s.ended())
         return;
-
-    Rune c = scan.next();
+    Rune c = s.next();
     switch (c) {
     case 'b':
         base = 2;
@@ -399,7 +405,7 @@ void NumberFormatter::parse(Io::SScan& scan) {
     }
 }
 
-Res<usize> NumberFormatter::formatUnsigned(Io::TextWriter& writer, usize val) {
+Res<> NumberFormatter::formatUnsigned(Io::TextWriter& writer, usize val) {
     auto digit = [](usize v) {
         if (v < 10)
             return '0' + v;
@@ -418,25 +424,40 @@ Res<usize> NumberFormatter::formatUnsigned(Io::TextWriter& writer, usize val) {
 
     reverse(mutSub(buf));
 
-    usize written = 0;
     if (prefix)
-        written += try$(writer.writeStr(formatPrefix()));
-    written += try$(writer.writeStr(Str{buf}));
+        try$(writer.writeStr(formatPrefix()));
+    try$(writer.writeStr(Str{buf}));
 
-    return Ok(written);
+    return Ok();
 }
 
-Res<usize> NumberFormatter::formatSigned(Io::TextWriter& writer, isize val) {
-    usize written = 0;
+Res<> NumberFormatter::formatSigned(Io::TextWriter& writer, isize val) {
     if (val < 0) {
-        written += try$(writer.writeRune('-'));
+        try$(writer.writeRune('-'));
         val = -val;
     }
-    written += try$(formatUnsigned(writer, val));
-    return Ok(written);
+    try$(formatUnsigned(writer, val));
+    return Ok();
 }
 
-Res<usize> NumberFormatter::formatRune(Io::TextWriter& writer, Rune val) {
+#ifndef __ck_freestanding__
+Res<> NumberFormatter::formatFloat(Io::TextWriter& writer, f64 val) {
+    NumberFormatter formatter;
+    isize ipart = (isize)val;
+    try$(formatter.formatSigned(writer, ipart));
+    f64 fpart = val - (f64)ipart;
+    u64 ifpart = (u64)(fpart * Math::pow(10, precision));
+    if ((ifpart != 0 or trailingZeros) and precision > 0) {
+        try$(writer.writeRune('.'));
+        formatter.width = precision;
+        formatter.fillChar = '0';
+        try$(formatter.formatUnsigned(writer, ifpart));
+    }
+    return Ok();
+}
+#endif
+
+Res<> NumberFormatter::formatRune(Io::TextWriter& writer, Rune val) {
     if (not prefix)
         return writer.writeRune(val);
 

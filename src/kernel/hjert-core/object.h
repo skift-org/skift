@@ -56,7 +56,7 @@ struct [[nodiscard]] ObjectLockScope : public LockScope<Lock> {
 
 template <Meta::Derive<Hjert::Core::Object> T>
 struct Karm::Io::Formatter<T> {
-    Res<usize> format(Io::TextWriter& writer, Hjert::Core::Object const& obj) {
+    Res<> format(Io::TextWriter& writer, Hjert::Core::Object const& obj) {
         return Io::format(writer, "{}({}, '{}')", Io::toPascalCase(Hj::toStr(obj.type())).unwrap(), obj.id(), obj.label());
     }
 };

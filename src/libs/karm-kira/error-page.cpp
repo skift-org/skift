@@ -37,13 +37,14 @@ Ui::Child errorPageContent(Ui::Children children) {
 }
 
 Ui::Child errorPageFooter(Ui::Children children) {
-    return Ui::hflow(16, children) | Ui::insets({8, 0, 0, 0});
+    return Ui::hflow(16, children) |
+           Ui::insets({8, 0, 0, 0});
 }
 
 Ui::Child errorPage(Mdi::Icon icon, String text, String body) {
     return errorPageContent({
-        errorPageTitle(icon, text),
-        errorPageSubTitle("An error occurred."s),
+        errorPageTitle(icon, "An error occurred."s),
+        errorPageSubTitle(text),
         errorPageBody(body),
     });
 }

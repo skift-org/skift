@@ -35,7 +35,7 @@ Ui::Child lock(State const& state) {
                          16,
                      },
                  },
-                 dateTime.unwrap()),
+                 dateTime),
         Ui::text({
                      .font = Text::Font{
                          blackFontface(),

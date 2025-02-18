@@ -64,7 +64,7 @@ struct TlsConnection : public Sys::_Connection {
         return _conn.write(buf);
     }
 
-    Res<usize> flush() override {
+    Res<> flush() override {
         return _conn.flush();
     }
 
@@ -76,7 +76,7 @@ struct TlsConnection : public Sys::_Connection {
         return _conn.writeAsync(buf);
     }
 
-    Async::Task<usize> flushAsync() override {
+    Async::Task<> flushAsync() override {
         return _conn.flushAsync();
     }
 };

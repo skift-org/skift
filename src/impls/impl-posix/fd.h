@@ -20,7 +20,7 @@ struct Fd : public Sys::Fd {
 
     Res<usize> seek(Io::Seek seek) override;
 
-    Res<usize> flush() override;
+    Res<> flush() override;
 
     Res<Rc<Sys::Fd>> dup() override;
 

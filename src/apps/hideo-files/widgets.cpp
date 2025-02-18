@@ -107,7 +107,7 @@ Ui::Child directorEntry(Sys::DirEntry const& entry, bool odd) {
                    : Mime::iconFor(Mime::sniffSuffix(Mime::suffixOf(entry.name)).unwrapOr("file"s)),
                entry.name
            ) |
-           Kr::contextMenu(slot$(directoryContextMenu()));
+           Kr::contextMenu(directoryContextMenu);
 }
 
 Ui::Child directoryListing(State const& s, Sys::Dir const& dir) {
@@ -301,7 +301,7 @@ Ui::Child openFileDialog() {
                      : alert(
                            d,
                            "Can't access this location"s,
-                           Io::toStr(maybeDir.none()).unwrap()
+                           Io::toStr(maybeDir.none())
                        )
                 ) | Ui::pinSize({400, 260}),
                 Ui::separator(),

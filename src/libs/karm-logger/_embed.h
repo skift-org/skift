@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-io/traits.h>
+#include <karm-io/text.h>
 
 namespace Karm::Logger::_Embed {
 

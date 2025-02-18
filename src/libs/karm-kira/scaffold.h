@@ -13,7 +13,7 @@ struct Scaffold : Meta::NoCopy {
     Kr::TitlebarStyle titlebar = Kr::TitlebarStyle::DEFAULT;
 
     Opt<Ui::Slots> startTools = NONE;
-    Opt<Ui::Slots> midleTools = NONE;
+    Opt<Ui::Slots> middleTools = NONE;
     Opt<Ui::Slots> endTools = NONE;
     Opt<Ui::Slot> sidebar = NONE;
     Ui::Slot body;

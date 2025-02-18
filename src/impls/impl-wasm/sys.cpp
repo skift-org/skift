@@ -34,7 +34,7 @@ struct JSConsole : public Sys::Fd {
         notImplemented();
     }
 
-    Res<usize> flush() override {
+    Res<> flush() override {
         switch (_proto) {
         case LOG:
             embedConsoleLog(_buf.bytes().buf(), _buf.bytes().len());

@@ -28,6 +28,9 @@ struct Seek {
         return Seek{Whence::END, offset};
     }
 
+    Seek(Whence whence, isize offset = 0)
+        : whence(whence), offset(offset) {}
+
     constexpr usize apply(usize current, usize size) const {
         switch (whence) {
         case Whence::BEGIN:
@@ -39,6 +42,10 @@ struct Seek {
         case Whence::END:
             return size - offset;
         }
+    }
+
+    bool operator==(Whence const& other) const {
+        return whence == other;
     }
 };
 

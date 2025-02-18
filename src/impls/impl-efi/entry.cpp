@@ -3,7 +3,7 @@
 #include <karm-base/string.h>
 #include <karm-io/traits.h>
 
-struct DebugOut : public Io::TextWriterBase<> {
+struct DebugOut : public Io::TextEncoderBase<> {
     Res<usize> write(Bytes bytes) override {
         usize writen{};
         Array<u16, 129> buf{};

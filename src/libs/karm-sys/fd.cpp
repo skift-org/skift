@@ -20,8 +20,8 @@ Res<usize> NullFd::seek(Io::Seek) {
     return Ok(0uz);
 }
 
-Res<usize> NullFd::flush() {
-    return Ok(0uz);
+Res<> NullFd::flush() {
+    return Ok();
 }
 
 Res<Rc<Fd>> NullFd::dup() {

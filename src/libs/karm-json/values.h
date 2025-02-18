@@ -160,11 +160,11 @@ struct Value {
                     return s;
                 },
                 [](Integer i) -> String {
-                    return Io::format("{}", i).unwrap();
+                    return Io::format("{}", i);
                 },
 #ifndef __ck_freestanding__
                 [](Number d) -> String {
-                    return Io::format("{}", d).unwrap();
+                    return Io::format("{}", d);
                 },
 #endif
                 [](bool b) -> String {
@@ -318,17 +318,17 @@ struct Value {
     }
 };
 
-Res<> stringify(Io::Emit& emit, Value const& v);
+Res<> unparse(Io::Emit& emit, Value const& v);
 
-Res<String> stringify(Value const& v);
+Res<String> unparse(Value const& v);
 
 } // namespace Karm::Json
 
 template <>
 struct Karm::Io::Formatter<Karm::Json::Value> {
-    Res<usize> format(Io::TextWriter& writer, Karm::Json::Value value) {
+    Res<> format(Io::TextWriter& writer, Karm::Json::Value value) {
         Io::Emit emit{writer};
-        try$(Karm::Json::stringify(emit, value));
-        return Ok(emit.total());
+        try$(Karm::Json::unparse(emit, value));
+        return Ok();
     }
 };

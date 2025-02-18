@@ -14,13 +14,13 @@ namespace Vaev::Layout {
 // https://www.w3.org/TR/css-break-3/#fragmentainer
 // https://www.w3.org/TR/css-break-3/#fragmentation-context
 struct Fragmentainer {
-    Vec2Px _size;
+    Vec2Au _size;
     bool _isDiscoveryMode = false; //< Are we looking for suitable breakpoints?
     usize _monolithicCount = 0;    //< How deep we are in a monolithic box
 
-    Fragmentainer(Vec2Px currSize = Vec2Px::MAX) : _size(currSize) {}
+    Fragmentainer(Vec2Au currSize = Vec2Au::MAX) : _size(currSize) {}
 
-    Vec2Px size() const { return _size; }
+    Vec2Au size() const { return _size; }
 
     void enterDiscovery() { _isDiscoveryMode = true; }
 
@@ -43,19 +43,19 @@ struct Fragmentainer {
     }
 
     bool hasInfiniteDimensions() {
-        return _size == Vec2Px::MAX;
+        return _size == Vec2Au::MAX;
     }
 
     bool allowBreak() {
         return not hasInfiniteDimensions() and _monolithicCount == 0;
     }
 
-    bool acceptsFit(Px verticalPosition, Px verticalSize, Px pendingVerticalSizes) {
+    bool acceptsFit(Au verticalPosition, Au verticalSize, Au pendingVerticalSizes) {
         // TODO: consider apply this check only when in discovery mode
         return verticalPosition + verticalSize + pendingVerticalSizes <= _size.y;
     }
 
-    Px leftVerticalSpace(Px verticalPosition, Px pendingVerticalSizes) {
+    Au leftVerticalSpace(Au verticalPosition, Au pendingVerticalSizes) {
         return _size.y - verticalPosition - pendingVerticalSizes;
     }
 };
@@ -272,11 +272,11 @@ struct Box : public Meta::NoCopy {
 struct Viewport {
     Resolution dpi = Resolution::fromDpi(96);
     // https://drafts.csswg.org/css-values/#small-viewport-size
-    RectPx small;
+    RectAu small;
     // https://drafts.csswg.org/css-values/#large-viewport-size
-    RectPx large = small;
+    RectAu large = small;
     // https://drafts.csswg.org/css-values/#dynamic-viewport-size
-    RectPx dynamic = small;
+    RectAu dynamic = small;
 };
 
 struct Tree {
@@ -288,31 +288,31 @@ struct Tree {
 // MARK: Fragment --------------------------------------------------------------
 
 struct Metrics {
-    InsetsPx padding{};
-    InsetsPx borders{};
-    Vec2Px position; //< Position relative to the content box of the containing block
-    Vec2Px borderSize;
-    InsetsPx margin{};
-    RadiiPx radii{};
+    InsetsAu padding{};
+    InsetsAu borders{};
+    Vec2Au position; //< Position relative to the content box of the containing block
+    Vec2Au borderSize;
+    InsetsAu margin{};
+    RadiiAu radii{};
 
     void repr(Io::Emit& e) const {
         e("(layout paddings: {} borders: {} position: {} borderSize: {} margin: {} radii: {})",
           padding, borders, position, borderSize, margin, radii);
     }
 
-    RectPx borderBox() const {
-        return RectPx{position, borderSize};
+    RectAu borderBox() const {
+        return RectAu{position, borderSize};
     }
 
-    RectPx paddingBox() const {
+    RectAu paddingBox() const {
         return borderBox().shrink(borders);
     }
 
-    RectPx contentBox() const {
+    RectAu contentBox() const {
         return paddingBox().shrink(padding);
     }
 
-    RectPx marginBox() const {
+    RectAu marginBox() const {
         return borderBox().grow(margin);
     }
 };
@@ -331,7 +331,7 @@ struct Frag {
     }
 
     /// Offset the position of this fragment and its subtree.
-    void offset(Vec2Px d) {
+    void offset(Vec2Au d) {
         metrics.position = metrics.position + d;
         for (auto& c : children)
             c.offset(d);
@@ -361,19 +361,19 @@ struct Input {
     /// Parent fragment where the layout will be attached.
     MutCursor<Frag> fragment = nullptr;
     IntrinsicSize intrinsic = IntrinsicSize::AUTO;
-    Math::Vec2<Opt<Px>> knownSize = {};
-    Vec2Px position = {};
-    Vec2Px availableSpace = {};
-    Vec2Px containingBlock = {};
+    Math::Vec2<Opt<Au>> knownSize = {};
+    Vec2Au position = {};
+    Vec2Au availableSpace = {};
+    Vec2Au containingBlock = {};
 
     BreakpointTraverser breakpointTraverser = {};
 
     // To be used between table wrapper and table box
-    Opt<Px> capmin = NONE;
+    Opt<Au> capmin = NONE;
 
     // TODO: instead of stringing this around, maybe change this (and check method of fragmentainer) to a
     // "availableSpaceInFragmentainer" parameter
-    Px pendingVerticalSizes = {};
+    Au pendingVerticalSizes = {};
 
     Input withFragment(MutCursor<Frag> f) const {
         auto copy = *this;
@@ -387,25 +387,25 @@ struct Input {
         return copy;
     }
 
-    Input withKnownSize(Math::Vec2<Opt<Px>> size) const {
+    Input withKnownSize(Math::Vec2<Opt<Au>> size) const {
         auto copy = *this;
         copy.knownSize = size;
         return copy;
     }
 
-    Input withPosition(Vec2Px pos) const {
+    Input withPosition(Vec2Au pos) const {
         auto copy = *this;
         copy.position = pos;
         return copy;
     }
 
-    Input withAvailableSpace(Vec2Px space) const {
+    Input withAvailableSpace(Vec2Au space) const {
         auto copy = *this;
         copy.availableSpace = space;
         return copy;
     }
 
-    Input withContainingBlock(Vec2Px block) const {
+    Input withContainingBlock(Vec2Au block) const {
         auto copy = *this;
         copy.containingBlock = block;
         return copy;
@@ -417,7 +417,7 @@ struct Input {
         return copy;
     }
 
-    Input addPendingVerticalSize(Px newPendingVerticalSize) const {
+    Input addPendingVerticalSize(Au newPendingVerticalSize) const {
         auto copy = *this;
         copy.pendingVerticalSizes += newPendingVerticalSize;
         return copy;
@@ -429,7 +429,7 @@ struct Output {
     // - endchild constraint or
     // - not overflowing fragmentainer or
     // - forced break
-    Vec2Px size;
+    Vec2Au size;
 
     // was the box subtree laid out until the end?
     // - discovery mode: until the very end of the box
@@ -443,18 +443,18 @@ struct Output {
     // only to be used in discovery mode
     Opt<Breakpoint> breakpoint = NONE;
 
-    static Output fromSize(Vec2Px size) {
+    static Output fromSize(Vec2Au size) {
         return {
             .size = size,
             .completelyLaidOut = true
         };
     }
 
-    Px width() const {
+    Au width() const {
         return size.x;
     }
 
-    Px height() const {
+    Au height() const {
         return size.y;
     }
 };

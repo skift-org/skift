@@ -10,7 +10,9 @@ Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::FORMAT_LIST_BULLETED,
         .title = "Notes"s,
-        .body = slot$(Ui::empty()),
+        .body = [] {
+            return Ui::empty();
+        },
     });
 }
 

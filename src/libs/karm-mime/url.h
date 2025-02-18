@@ -42,7 +42,7 @@ struct Url {
 
     bool isParentOf(Url const& other) const;
 
-    Res<usize> write(Io::TextWriter& writer) const;
+    Res<> unparse(Io::TextWriter& writer) const;
 
     String str() const;
 
@@ -75,7 +75,7 @@ inline auto operator/(Karm::Mime::Url const& url, Karm::Mime::Path const& path) 
 
 template <>
 struct Karm::Io::Formatter<Karm::Mime::Url> {
-    Res<usize> format(Io::TextWriter& writer, Karm::Mime::Url const& url) {
-        return url.write(writer);
+    Res<> format(Io::TextWriter& writer, Karm::Mime::Url const& url) {
+        return url.unparse(writer);
     }
 };

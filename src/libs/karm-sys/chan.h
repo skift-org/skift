@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-io/fmt.h>
-#include <karm-io/traits.h>
+#include <karm-io/text.h>
 #include <karm-sys/_embed.h>
 
 #include "fd.h"
@@ -23,7 +23,7 @@ struct In : public Io::Reader {
     }
 };
 
-struct Out : public Io::TextWriterBase<> {
+struct Out : public Io::TextEncoderBase<> {
     Rc<Fd> _fd;
 
     Out(Rc<Fd> fd)
@@ -37,12 +37,12 @@ struct Out : public Io::TextWriterBase<> {
         return _fd;
     }
 
-    Res<usize> flush() override {
+    Res<> flush() override {
         return _fd->flush();
     }
 };
 
-struct Err : public Io::TextWriterBase<> {
+struct Err : public Io::TextEncoderBase<> {
     Rc<Fd> _fd;
 
     Err(Rc<Fd> fd)
@@ -56,7 +56,7 @@ struct Err : public Io::TextWriterBase<> {
         return _fd;
     }
 
-    Res<usize> flush() override {
+    Res<> flush() override {
         return _fd->flush();
     }
 };

@@ -15,10 +15,10 @@ Computed const& Computed::initial() {
     return computed;
 }
 
-void Computer::_evalRule(Rule const& rule, Markup::Element const& el, MatchingRules& matches) {
+void Computer::_evalRule(Rule const& rule, Gc::Ref<Dom::Element> el, MatchingRules& matches) {
     rule.visit(Visitor{
         [&](StyleRule const& r) {
-            if (auto specificity = r.matchWithSpecificity(el))
+            if (auto specificity = r.match(el))
                 matches.pushBack({&r, specificity.unwrap()});
         },
         [&](MediaRule const& r) {
@@ -91,7 +91,7 @@ Rc<Computed> Computer::_evalCascade(Computed const& parent, MatchingRules& match
 }
 
 // https://drafts.csswg.org/css-cascade/#cascade-origin
-Rc<Computed> Computer::computeFor(Computed const& parent, Markup::Element const& el) {
+Rc<Computed> Computer::computeFor(Computed const& parent, Gc::Ref<Dom::Element> el) {
     MatchingRules matchingRules;
 
     // Collect matching styles rules
@@ -100,7 +100,7 @@ Rc<Computed> Computer::computeFor(Computed const& parent, Markup::Element const&
             _evalRule(rule, el, matchingRules);
 
     // Get the style attribute if any
-    auto styleAttr = el.getAttribute(Html::STYLE_ATTR);
+    auto styleAttr = el->getAttribute(Html::STYLE_ATTR);
 
     StyleRule styleRule{
         .props = parseDeclarations<StyleProp>(styleAttr ? *styleAttr : ""),

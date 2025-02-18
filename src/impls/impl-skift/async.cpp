@@ -37,7 +37,7 @@ struct HjertSched : public Sys::Sched {
         co_return Error::notImplemented("not implemented");
     }
 
-    virtual Async::Task<usize> flushAsync(Rc<Fd>) {
+    virtual Async::Task<> flushAsync(Rc<Fd>) {
         co_return Error::notImplemented("not implemented");
     }
 

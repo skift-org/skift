@@ -92,9 +92,8 @@ struct ScaleIn : public ProxyNode<ScaleIn> {
     }
 
     void event(App::Event& e) override {
-        if (_scale.needRepaint(*this, e)) {
+        if (_scale.needRepaint(*this, e))
             Ui::shouldRepaint(*this, bound());
-        }
 
         Ui::ProxyNode<ScaleIn>::event(e);
     }

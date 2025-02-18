@@ -10,7 +10,9 @@ Ui::Child game() {
     return Kr::scaffold({
         .icon = Mdi::MINE,
         .title = "Mines"s,
-        .body = slot$(Ui::empty()),
+        .body = [] {
+            return Ui::empty();
+        },
     });
 }
 

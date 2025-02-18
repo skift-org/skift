@@ -9,15 +9,15 @@ struct InlineFormatingContext : public FormatingContext {
 
         auto inlineSize = input.knownSize.x.unwrapOrElse([&] {
             if (input.intrinsic == IntrinsicSize::MIN_CONTENT) {
-                return 0_px;
+                return 0_au;
             } else if (input.intrinsic == IntrinsicSize::MAX_CONTENT) {
-                return Limits<Px>::MAX;
+                return Limits<Au>::MAX;
             } else {
                 return input.availableSpace.x;
             }
         });
 
-        auto size = prose.layout(inlineSize.cast<f64>()).cast<Px>();
+        auto size = prose.layout(inlineSize);
 
         if (tree.fc.allowBreak() and not tree.fc.acceptsFit(
                                          input.position.y,

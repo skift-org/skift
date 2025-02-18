@@ -34,8 +34,12 @@ Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::BASKET,
         .title = "Apps"s,
-        .sidebar = slot$(sidebar()),
-        .body = slot$(pageContent() | Ui::grow()),
+        .sidebar = [] {
+            return sidebar();
+        },
+        .body = [] {
+            return pageContent() | Ui::grow();
+        },
     });
 }
 

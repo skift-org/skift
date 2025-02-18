@@ -75,7 +75,9 @@ Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::PLAY_CIRCLE,
         .title = "Media Player"s,
-        .body = slot$(player()),
+        .body = [] {
+            return player();
+        },
     });
 }
 

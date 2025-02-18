@@ -70,13 +70,19 @@ Ui::Child app() {
         return Kr::scaffold({
             .icon = Mdi::COG,
             .title = "Settings"s,
-            .startTools = slots$(
-                Ui::button(Model::bindIf<GoBack>(s.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
-                Ui::button(Model::bindIf<GoForward>(s.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
-                Ui::button(Model::bind<GoTo>(Page::HOME), Ui::ButtonStyle::subtle(), Mdi::HOME)
-            ),
-            .sidebar = slot$(sidebar(s)),
-            .body = slot$(pageContent(s) | Ui::grow()),
+            .startTools = [&] -> Ui::Children {
+                return {
+                    Ui::button(Model::bindIf<GoBack>(s.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
+                    Ui::button(Model::bindIf<GoForward>(s.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
+                    Ui::button(Model::bind<GoTo>(Page::HOME), Ui::ButtonStyle::subtle(), Mdi::HOME),
+                };
+            },
+            .sidebar = [&] {
+                return sidebar(s);
+            },
+            .body = [&] {
+                return pageContent(s) | Ui::grow();
+            },
         });
     });
 }

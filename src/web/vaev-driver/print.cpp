@@ -12,10 +12,10 @@
 
 namespace Vaev::Driver {
 
-static void _paintMargins(Style::PageComputedStyle& pageStyle, RectPx pageRect, RectPx pageContent, Scene::Stack& stack) {
+static void _paintMargins(Style::PageComputedStyle& pageStyle, RectAu pageRect, RectAu pageContent, Scene::Stack& stack) {
     // MARK: Top Left Corner ---------------------------------------------------
 
-    auto topLeftMarginCornerRect = RectPx::fromTwoPoint(
+    auto topLeftMarginCornerRect = RectAu::fromTwoPoint(
         pageRect.topStart(),
         pageContent.topStart()
     );
@@ -27,7 +27,7 @@ static void _paintMargins(Style::PageComputedStyle& pageStyle, RectPx pageRect, 
     auto [_, topLeftMarginCornerFrag] = Layout::layoutCreateFragment(
         topLeftMarginCornerTree,
         {
-            .knownSize = topLeftMarginCornerRect.size().cast<Opt<Px>>(),
+            .knownSize = topLeftMarginCornerRect.size().cast<Opt<Au>>(),
             .position = topLeftMarginCornerRect.topStart(),
             .availableSpace = topLeftMarginCornerRect.size(),
             .containingBlock = topLeftMarginCornerRect.size(),
@@ -37,7 +37,7 @@ static void _paintMargins(Style::PageComputedStyle& pageStyle, RectPx pageRect, 
 
     // MARK: Top Right Corner --------------------------------------------------
 
-    auto topRightMarginCornerRect = RectPx::fromTwoPoint(
+    auto topRightMarginCornerRect = RectAu::fromTwoPoint(
         pageRect.topEnd(),
         pageContent.topEnd()
     );
@@ -49,7 +49,7 @@ static void _paintMargins(Style::PageComputedStyle& pageStyle, RectPx pageRect, 
     auto [_, topRightMarginCornerFrag] = Layout::layoutCreateFragment(
         topRightMarginCornerTree,
         {
-            .knownSize = topRightMarginCornerRect.size().cast<Opt<Px>>(),
+            .knownSize = topRightMarginCornerRect.size().cast<Opt<Au>>(),
             .position = topRightMarginCornerRect.topStart(),
             .availableSpace = topRightMarginCornerRect.size(),
             .containingBlock = topRightMarginCornerRect.size(),
@@ -59,7 +59,7 @@ static void _paintMargins(Style::PageComputedStyle& pageStyle, RectPx pageRect, 
 
     // MARK: Bottom Left Corner ------------------------------------------------
 
-    auto bottomLeftMarginCornerRect = RectPx::fromTwoPoint(
+    auto bottomLeftMarginCornerRect = RectAu::fromTwoPoint(
         pageRect.bottomStart(),
         pageContent.bottomStart()
     );
@@ -71,7 +71,7 @@ static void _paintMargins(Style::PageComputedStyle& pageStyle, RectPx pageRect, 
     auto [_, bottomLeftMarginCornerFrag] = Layout::layoutCreateFragment(
         bottomLeftMarginCornerTree,
         {
-            .knownSize = bottomLeftMarginCornerRect.size().cast<Opt<Px>>(),
+            .knownSize = bottomLeftMarginCornerRect.size().cast<Opt<Au>>(),
             .position = bottomLeftMarginCornerRect.topStart(),
             .availableSpace = bottomLeftMarginCornerRect.size(),
             .containingBlock = bottomLeftMarginCornerRect.size(),
@@ -81,7 +81,7 @@ static void _paintMargins(Style::PageComputedStyle& pageStyle, RectPx pageRect, 
 
     // MARK: Bottom Right Corner -----------------------------------------------
 
-    auto bottomRightMarginCornerRect = RectPx::fromTwoPoint(
+    auto bottomRightMarginCornerRect = RectAu::fromTwoPoint(
         pageRect.bottomEnd(),
         pageContent.bottomEnd()
     );
@@ -93,7 +93,7 @@ static void _paintMargins(Style::PageComputedStyle& pageStyle, RectPx pageRect, 
     auto [_, bottomRightMarginCornerFrag] = Layout::layoutCreateFragment(
         bottomRightMarginCornerTree,
         {
-            .knownSize = bottomRightMarginCornerRect.size().cast<Opt<Px>>(),
+            .knownSize = bottomRightMarginCornerRect.size().cast<Opt<Au>>(),
             .position = bottomRightMarginCornerRect.topStart(),
             .availableSpace = bottomRightMarginCornerRect.size(),
             .containingBlock = bottomRightMarginCornerRect.size(),
@@ -103,7 +103,7 @@ static void _paintMargins(Style::PageComputedStyle& pageStyle, RectPx pageRect, 
 
     // MARK: Top ---------------------------------------------------------------
 
-    auto topRect = RectPx::fromTwoPoint(
+    auto topRect = RectAu::fromTwoPoint(
         topLeftMarginCornerRect.topEnd(),
         topRightMarginCornerRect.bottomStart()
     );
@@ -121,7 +121,7 @@ static void _paintMargins(Style::PageComputedStyle& pageStyle, RectPx pageRect, 
     auto [_, topFrag] = Layout::layoutCreateFragment(
         topTree,
         {
-            .knownSize = topRect.size().cast<Opt<Px>>(),
+            .knownSize = topRect.size().cast<Opt<Au>>(),
             .position = topRect.topStart(),
             .availableSpace = topRect.size(),
             .containingBlock = topRect.size(),
@@ -131,7 +131,7 @@ static void _paintMargins(Style::PageComputedStyle& pageStyle, RectPx pageRect, 
 
     // MARK: Bottom ------------------------------------------------------------
 
-    auto bottomRect = RectPx::fromTwoPoint(
+    auto bottomRect = RectAu::fromTwoPoint(
         bottomLeftMarginCornerRect.topEnd(),
         bottomRightMarginCornerRect.bottomStart()
     );
@@ -149,7 +149,7 @@ static void _paintMargins(Style::PageComputedStyle& pageStyle, RectPx pageRect, 
     auto [_, bottomFrag] = Layout::layoutCreateFragment(
         bottomTree,
         {
-            .knownSize = bottomRect.size().cast<Opt<Px>>(),
+            .knownSize = bottomRect.size().cast<Opt<Au>>(),
             .position = bottomRect.topStart(),
             .availableSpace = bottomRect.size(),
             .containingBlock = bottomRect.size(),
@@ -159,7 +159,7 @@ static void _paintMargins(Style::PageComputedStyle& pageStyle, RectPx pageRect, 
     Layout::paint(bottomFrag, stack);
 
     // MARK: Left --------------------------------------------------------------
-    auto leftRect = RectPx::fromTwoPoint(
+    auto leftRect = RectAu::fromTwoPoint(
         topLeftMarginCornerRect.bottomEnd(),
         bottomLeftMarginCornerRect.topStart()
     );
@@ -177,7 +177,7 @@ static void _paintMargins(Style::PageComputedStyle& pageStyle, RectPx pageRect, 
     auto [_, leftFrag] = Layout::layoutCreateFragment(
         leftTree,
         {
-            .knownSize = leftRect.size().cast<Opt<Px>>(),
+            .knownSize = leftRect.size().cast<Opt<Au>>(),
             .position = leftRect.topStart(),
             .availableSpace = leftRect.size(),
             .containingBlock = leftRect.size(),
@@ -188,7 +188,7 @@ static void _paintMargins(Style::PageComputedStyle& pageStyle, RectPx pageRect, 
 
     // MARK: Right -------------------------------------------------------------
 
-    auto rightRect = RectPx::fromTwoPoint(
+    auto rightRect = RectAu::fromTwoPoint(
         topRightMarginCornerRect.bottomEnd(),
         bottomRightMarginCornerRect.topStart()
     );
@@ -206,7 +206,7 @@ static void _paintMargins(Style::PageComputedStyle& pageStyle, RectPx pageRect, 
     auto [_, rightFrag] = Layout::layoutCreateFragment(
         rightTree,
         {
-            .knownSize = rightRect.size().cast<Opt<Px>>(),
+            .knownSize = rightRect.size().cast<Opt<Au>>(),
             .position = rightRect.topStart(),
             .availableSpace = rightRect.size(),
             .containingBlock = rightRect.size(),
@@ -219,8 +219,8 @@ static void _paintMargins(Style::PageComputedStyle& pageStyle, RectPx pageRect, 
 static Style::Media _constructMedia(Print::Settings const& settings) {
     return {
         .type = MediaType::SCREEN,
-        .width = Px{settings.paper.width},
-        .height = Px{settings.paper.height},
+        .width = Au{settings.paper.width},
+        .height = Au{settings.paper.height},
         .aspectRatio = settings.paper.width / (f64)settings.paper.height,
         .orientation = settings.orientation,
 
@@ -249,13 +249,13 @@ static Style::Media _constructMedia(Print::Settings const& settings) {
         .prefersReducedData = ReducedData::NO_PREFERENCE,
 
         // NOTE: Deprecated Media Features
-        .deviceWidth = Px{settings.paper.width},
-        .deviceHeight = Px{settings.paper.height},
+        .deviceWidth = Au{settings.paper.width},
+        .deviceHeight = Au{settings.paper.height},
         .deviceAspectRatio = settings.paper.width / (f64)settings.paper.height,
     };
 }
 
-Vec<Print::Page> print(Markup::Document const& dom, Print::Settings const& settings) {
+Generator<Print::Page> print(Gc::Ref<Dom::Document> dom, Print::Settings const& settings) {
     auto media = _constructMedia(settings);
 
     Style::StyleBook stylebook;
@@ -276,13 +276,11 @@ Vec<Print::Page> print(Markup::Document const& dom, Print::Settings const& setti
 
     // MARK: Page and Margins --------------------------------------------------
 
-    Vec<Print::Page> pages;
-
     Style::Computed initialStyle = Style::Computed::initial();
     initialStyle.color = Gfx::BLACK;
-    initialStyle.setCustomProp("-vaev-url", {Css::Token::string(Io::format("\"{}\"", dom.url()).unwrap())});
-    initialStyle.setCustomProp("-vaev-title", {Css::Token::string(Io::format("\"{}\"", dom.title()).unwrap())});
-    initialStyle.setCustomProp("-vaev-datetime", {Css::Token::string(Io::format("\"{}\"", Sys::now()).unwrap())});
+    initialStyle.setCustomProp("-vaev-url", {Css::Token::string(Io::format("\"{}\"", dom->url()))});
+    initialStyle.setCustomProp("-vaev-title", {Css::Token::string(Io::format("\"{}\"", dom->title()))});
+    initialStyle.setCustomProp("-vaev-datetime", {Css::Token::string(Io::format("\"{}\"", Sys::now()))});
 
     // MARK: Page Content ------------------------------------------------------
 
@@ -296,21 +294,22 @@ Vec<Print::Page> print(Markup::Document const& dom, Print::Settings const& setti
     };
     Layout::Breakpoint currBreakpoint;
 
+    usize count = 0;
     while (true) {
         Layout::Resolver resolver{};
-        Style::Page page{.name = ""s, .number = pages.len(), .blank = false};
+        Style::Page page{.name = ""s, .number = count++, .blank = false};
 
         auto pageStyle = computer.computeFor(initialStyle, page);
-        RectPx pageRect{
-            media.width / Px{media.resolution.toDppx()},
-            media.height / Px{media.resolution.toDppx()}
+        RectAu pageRect{
+            media.width / Au{media.resolution.toDppx()},
+            media.height / Au{media.resolution.toDppx()}
         };
 
         auto pageSize = pageRect.size().cast<f64>();
 
         auto pageStack = makeRc<Scene::Stack>();
 
-        InsetsPx pageMargin = {};
+        InsetsAu pageMargin = {};
 
         if (settings.margins == Print::Margins::DEFAULT) {
             pageMargin = {
@@ -320,11 +319,11 @@ Vec<Print::Page> print(Markup::Document const& dom, Print::Settings const& setti
                 resolver.resolve(pageStyle->style->margin->start, pageRect.width),
             };
         } else if (settings.margins == Print::Margins::CUSTOM) {
-            pageMargin = settings.margins.custom.cast<Px>();
+            pageMargin = settings.margins.custom.cast<Au>();
         } else if (settings.margins == Print::Margins::MINIMUM) {
         }
 
-        RectPx pageContent = pageRect.shrink(pageMargin);
+        RectAu pageContent = pageRect.shrink(pageMargin);
 
         Layout::Viewport vp{
             .small = pageContent.size(),
@@ -363,15 +362,13 @@ Vec<Print::Page> print(Markup::Document const& dom, Print::Settings const& setti
         Layout::paint(fragment, *pageStack);
         pageStack->prepare();
 
-        pages.emplaceBack(settings.paper, makeRc<Scene::Transform>(pageStack, Math::Trans2f::makeScale(media.resolution.toDppx())));
+        co_yield Print::Page(settings.paper, makeRc<Scene::Transform>(pageStack, Math::Trans2f::makeScale(media.resolution.toDppx())));
 
         if (outReal.completelyLaidOut)
             break;
 
         std::swap(prevBreakpoint, currBreakpoint);
     }
-
-    return pages;
 }
 
 } // namespace Vaev::Driver

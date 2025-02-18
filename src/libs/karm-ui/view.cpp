@@ -241,12 +241,12 @@ struct Text : public View<Text> {
     }
 
     void layout(Math::Recti bound) override {
-        _prose->layout(bound.width);
+        _prose->layout(Au{bound.width});
         View<Text>::layout(bound);
     }
 
     Math::Vec2i size(Math::Vec2i s, Hint) override {
-        auto size = _prose->layout(s.width);
+        auto size = _prose->layout(Au{s.width});
         return size.ceil().cast<isize>();
     }
 };

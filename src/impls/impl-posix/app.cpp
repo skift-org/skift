@@ -25,7 +25,7 @@ struct XdgConfigPrefs : public Prefs {
         auto file = try$(Sys::File::create(_url));
         Io::TextEncoder<> enc{file};
         Io::Emit e{enc};
-        return Json::stringify(e, object);
+        return Json::unparse(e, object);
     }
 
     Async::Task<Json::Value> loadAsync(String key, Json::Value defaultValue) {

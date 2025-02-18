@@ -18,7 +18,7 @@ struct _Connection :
 
     virtual Async::Task<usize> writeAsync(Bytes buf) = 0;
 
-    virtual Async::Task<usize> flushAsync() = 0;
+    virtual Async::Task<> flushAsync() = 0;
 };
 
 struct Connection :
@@ -49,11 +49,11 @@ struct Connection :
         return globalSched().writeAsync(_fd, buf);
     }
 
-    Res<usize> flush() override {
+    Res<> flush() override {
         return _fd->flush();
     }
 
-    Async::Task<usize> flushAsync() override {
+    Async::Task<> flushAsync() override {
         return globalSched().flushAsync(_fd);
     }
 

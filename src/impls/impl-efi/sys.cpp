@@ -64,8 +64,8 @@ struct ConOut : public Fd {
         notImplemented();
     }
 
-    Res<usize> flush() override {
-        return Ok(0uz);
+    Res<> flush() override {
+        return Ok();
     }
 
     Res<Rc<Fd>> dup() override {
@@ -154,9 +154,9 @@ struct FileProto : public Fd {
         return Ok(pos);
     }
 
-    Res<usize> flush() override {
+    Res<> flush() override {
         try$(_proto->flush(_proto));
-        return Ok(0uz);
+        return Ok();
     }
 
     Res<Rc<Fd>> dup() override {

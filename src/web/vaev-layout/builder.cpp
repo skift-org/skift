@@ -6,22 +6,22 @@
 
 namespace Vaev::Layout {
 
-static void _buildNode(Style::Computer& c, Markup::Node const& node, Box& parent);
+static void _buildNode(Style::Computer& c, Gc::Ref<Dom::Node> node, Box& parent);
 
 // MARK: Attributes ------------------------------------------------------------
 
-static Opt<Str> _parseStrAttr(Markup::Element const& el, AttrName name) {
-    return el.getAttribute(name);
+static Opt<Str> _parseStrAttr(Gc::Ref<Dom::Element> el, AttrName name) {
+    return el->getAttribute(name);
 }
 
-static Opt<usize> _parseUsizeAttr(Markup::Element const& el, AttrName name) {
+static Opt<usize> _parseUsizeAttr(Gc::Ref<Dom::Element> el, AttrName name) {
     auto str = _parseStrAttr(el, name);
     if (not str)
         return NONE;
     return Io::atoi(str.unwrap());
 }
 
-static Attrs _parseDomAttr(Markup::Element const& el) {
+static Attrs _parseDomAttr(Gc::Ref<Dom::Element> el) {
     Attrs attrs;
 
     // https://html.spec.whatwg.org/multipage/tables.html#the-col-element
@@ -86,12 +86,12 @@ static Rc<Karm::Text::Fontface> _lookupFontface(Style::Computed& style) {
 
 auto RE_SEGMENT_BREAK = Re::single('\n', '\r', '\f', '\v');
 
-static void _buildRun(Style::Computer&, Markup::Text const& node, Box& parent) {
+static void _buildRun(Style::Computer&, Gc::Ref<Dom::Text> node, Box& parent) {
     auto style = makeRc<Style::Computed>(Style::Computed::initial());
     style->inherit(*parent.style);
 
     auto fontFace = _lookupFontface(*style);
-    Io::SScan scan{node.data()};
+    Io::SScan scan{node->data()};
     scan.eat(Re::space());
     if (scan.ended())
         return;
@@ -180,27 +180,27 @@ static void _buildRun(Style::Computer&, Markup::Text const& node, Box& parent) {
 
 // MARK: Build Block -----------------------------------------------------------
 
-void _buildChildren(Style::Computer& c, Vec<Rc<Markup::Node>> const& children, Box& parent) {
-    for (auto& child : children) {
+void _buildChildren(Style::Computer& c, Gc::Ref<Dom::Node> node, Box& parent) {
+    for (auto child = node->firstChild(); child; child = child->nextSibling()) {
         _buildNode(c, *child, parent);
     }
 }
 
-static void _buildBlock(Style::Computer& c, Rc<Style::Computed> style, Markup::Element const& el, Box& parent) {
+static void _buildBlock(Style::Computer& c, Rc<Style::Computed> style, Gc::Ref<Dom::Element> el, Box& parent) {
     auto font = _lookupFontface(*style);
     Box box = {style, font};
-    _buildChildren(c, el.children(), box);
+    _buildChildren(c, el, box);
     box.attrs = _parseDomAttr(el);
     parent.add(std::move(box));
 }
 
 // MARK: Build Replace ---------------------------------------------------------
 
-static void _buildImage(Style::Computer& c, Markup::Element const& el, Box& parent) {
+static void _buildImage(Style::Computer& c, Gc::Ref<Dom::Element> el, Box& parent) {
     auto style = c.computeFor(*parent.style, el);
     auto font = _lookupFontface(*style);
 
-    auto src = el.getAttribute(Html::SRC_ATTR).unwrapOr(""s);
+    auto src = el->getAttribute(Html::SRC_ATTR).unwrapOr(""s);
     auto url = Mime::Url::parse(src);
     auto img = Karm::Image::loadOrFallback(url).unwrap();
     parent.add({style, font, img});
@@ -208,7 +208,7 @@ static void _buildImage(Style::Computer& c, Markup::Element const& el, Box& pare
 
 // MARK: Build Table -----------------------------------------------------------
 
-static void _buildTableChildren(Style::Computer& c, Vec<Rc<Markup::Node>> const& children, Box& tableWrapperBox, Rc<Style::Computed> tableBoxStyle) {
+static void _buildTableChildren(Style::Computer& c, Gc::Ref<Dom::Node> node, Box& tableWrapperBox, Rc<Style::Computed> tableBoxStyle) {
     Box tableBox{
         tableBoxStyle, tableWrapperBox.fontFace
     };
@@ -218,8 +218,8 @@ static void _buildTableChildren(Style::Computer& c, Vec<Rc<Markup::Node>> const&
     bool captionsOnTop = tableBox.style->table->captionSide == CaptionSide::TOP;
 
     if (captionsOnTop) {
-        for (auto& child : children) {
-            if (auto el = child->is<Markup::Element>()) {
+        for (auto child = node->firstChild(); child; child = child->nextSibling()) {
+            if (auto el = child->is<Dom::Element>()) {
                 if (el->tagName == Html::CAPTION) {
                     _buildNode(c, *el, tableWrapperBox);
                 }
@@ -227,8 +227,8 @@ static void _buildTableChildren(Style::Computer& c, Vec<Rc<Markup::Node>> const&
         }
     }
 
-    for (auto& child : children) {
-        if (auto el = child->is<Markup::Element>()) {
+    for (auto child = node->firstChild(); child; child = child->nextSibling()) {
+        if (auto el = child->is<Dom::Element>()) {
             if (el->tagName != Html::CAPTION) {
                 _buildNode(c, *el, tableBox);
             }
@@ -237,8 +237,8 @@ static void _buildTableChildren(Style::Computer& c, Vec<Rc<Markup::Node>> const&
     tableWrapperBox.add(std::move(tableBox));
 
     if (not captionsOnTop) {
-        for (auto& child : children) {
-            if (auto el = child->is<Markup::Element>()) {
+        for (auto child = node->firstChild(); child; child = child->nextSibling()) {
+            if (auto el = child->is<Dom::Element>()) {
                 if (el->tagName == Html::CAPTION) {
                     _buildNode(c, *el, tableWrapperBox);
                 }
@@ -247,7 +247,7 @@ static void _buildTableChildren(Style::Computer& c, Vec<Rc<Markup::Node>> const&
     }
 }
 
-static void _buildTable(Style::Computer& c, Rc<Style::Computed> style, Markup::Element const& el, Box& parent) {
+static void _buildTable(Style::Computer& c, Rc<Style::Computed> style, Gc::Ref<Dom::Element> el, Box& parent) {
     auto font = _lookupFontface(*style);
 
     auto wrapperStyle = makeRc<Style::Computed>(Style::Computed::initial());
@@ -255,7 +255,7 @@ static void _buildTable(Style::Computer& c, Rc<Style::Computed> style, Markup::E
     wrapperStyle->margin = style->margin;
 
     Box wrapper = {wrapperStyle, font};
-    _buildTableChildren(c, el.children(), wrapper, style);
+    _buildTableChildren(c, el, wrapper, style);
     wrapper.attrs = _parseDomAttr(el);
 
     parent.add(std::move(wrapper));
@@ -263,8 +263,8 @@ static void _buildTable(Style::Computer& c, Rc<Style::Computed> style, Markup::E
 
 // MARK: Build -----------------------------------------------------------------
 
-static void _buildElement(Style::Computer& c, Markup::Element const& el, Box& parent) {
-    if (el.tagName == Html::IMG) {
+static void _buildElement(Style::Computer& c, Gc::Ref<Dom::Element> el, Box& parent) {
+    if (el->tagName == Html::IMG) {
         _buildImage(c, el, parent);
         return;
     }
@@ -277,7 +277,7 @@ static void _buildElement(Style::Computer& c, Markup::Element const& el, Box& pa
     if (display == Display::NONE) {
         // Do nothing
     } else if (display == Display::CONTENTS) {
-        _buildChildren(c, el.children(), parent);
+        _buildChildren(c, el, parent);
     } else if (display == Display::TABLE) {
         _buildTable(c, style, el, parent);
     } else {
@@ -285,17 +285,17 @@ static void _buildElement(Style::Computer& c, Markup::Element const& el, Box& pa
     }
 }
 
-static void _buildNode(Style::Computer& c, Markup::Node const& node, Box& parent) {
-    if (auto el = node.is<Markup::Element>()) {
+static void _buildNode(Style::Computer& c, Gc::Ref<Dom::Node> node, Box& parent) {
+    if (auto el = node->is<Dom::Element>()) {
         _buildElement(c, *el, parent);
-    } else if (auto text = node.is<Markup::Text>()) {
+    } else if (auto text = node->is<Dom::Text>()) {
         _buildRun(c, *text, parent);
-    } else if (auto doc = node.is<Markup::Document>()) {
-        _buildChildren(c, doc->children(), parent);
+    } else if (auto doc = node->is<Dom::Document>()) {
+        _buildChildren(c, *doc, parent);
     }
 }
 
-Box build(Style::Computer& c, Markup::Document const& doc) {
+Box build(Style::Computer& c, Gc::Ref<Dom::Document> doc) {
     auto style = makeRc<Style::Computed>(Style::Computed::initial());
     Box root = {style, _lookupFontface(*style)};
     _buildNode(c, doc, root);

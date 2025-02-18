@@ -1,10 +1,10 @@
 #pragma once
 
-#include <karm-io/traits.h>
+#include <karm-io/text.h>
 
 namespace Karm::Crypto {
 
-Res<usize> hexEncode(Bytes bytes, Io::TextWriter& out);
+Res<> hexEncode(Bytes bytes, Io::TextWriter& out);
 
 Res<String> hexEncode(Bytes bytes);
 

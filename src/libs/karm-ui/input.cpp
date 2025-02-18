@@ -321,12 +321,12 @@ struct Input : public View<Input> {
     }
 
     void layout(Math::Recti bound) override {
-        _ensureText().layout(bound.width);
+        _ensureText().layout(Au{bound.width});
         View<Input>::layout(bound);
     }
 
     Math::Vec2i size(Math::Vec2i s, Hint) override {
-        auto size = _ensureText().layout(s.width);
+        auto size = _ensureText().layout(Au{s.width});
         return size.ceil().cast<isize>();
     }
 };
@@ -407,12 +407,12 @@ struct SimpleInput : public View<SimpleInput> {
     }
 
     void layout(Math::Recti bound) override {
-        _ensureText().layout(bound.width);
+        _ensureText().layout(Au{bound.width});
         View<SimpleInput>::layout(bound);
     }
 
     Math::Vec2i size(Math::Vec2i s, Hint) override {
-        auto size = _ensureText().layout(s.width);
+        auto size = _ensureText().layout(Au{s.width});
         return size.ceil().cast<isize>();
     }
 };

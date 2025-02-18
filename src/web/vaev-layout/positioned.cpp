@@ -5,7 +5,7 @@
 
 namespace Vaev::Layout {
 
-void layoutPositioned(Tree& tree, Frag& frag, RectPx containingBlock) {
+void layoutPositioned(Tree& tree, Frag& frag, RectAu containingBlock) {
     auto& style = frag.style();
     auto& metrics = frag.metrics;
 
@@ -32,7 +32,7 @@ void layoutPositioned(Tree& tree, Frag& frag, RectPx containingBlock) {
             start = (origin.x + containingBlock.width) - resolve(tree, *frag.box, endOffset, containingBlock.width) - metrics.borderSize.width;
         }
 
-        Vec2Px newPositionOffset = Vec2Px{start, top} - metrics.position;
+        Vec2Au newPositionOffset = Vec2Au{start, top} - metrics.position;
         frag.offset(newPositionOffset);
 
         containingBlock = metrics.contentBox();

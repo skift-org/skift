@@ -4,7 +4,7 @@
 #include <handover/spec.h>
 #include <hjert-api/types.h>
 #include <karm-base/rc.h>
-#include <karm-io/traits.h>
+#include <karm-io/text.h>
 
 #include "context.h"
 

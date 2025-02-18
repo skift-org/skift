@@ -92,7 +92,7 @@ struct PageAreaRule {
 
     static Opt<PageAreaRule> parse(Css::Sst const& sst);
 
-    void apply(Style::Computed& c) const;
+    void apply(Computed& c) const;
 
     void repr(Io::Emit& e) const;
 };

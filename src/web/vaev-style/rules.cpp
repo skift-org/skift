@@ -1,7 +1,7 @@
 #include "rules.h"
 
 #include "decls.h"
-#include "selector-matching.h"
+#include "matcher.h"
 
 namespace Vaev::Style {
 
@@ -9,8 +9,8 @@ static bool DEBUG_RULE = false;
 
 // MARK: StyleRule -------------------------------------------------------------
 
-Opt<Spec> StyleRule::matchWithSpecificity(Markup::Element const& el) const {
-    return matchSelectorWithSpecificity(selector, el);
+Opt<Spec> StyleRule::match(Gc::Ref<Dom::Element> el) const {
+    return matchSelector(selector, el);
 }
 
 void StyleRule::repr(Io::Emit& e) const {
@@ -38,7 +38,7 @@ StyleRule StyleRule::parse(Css::Sst const& sst, Origin origin) {
     if (sst.prefix != Css::Sst::LIST)
         panic("expected list");
 
-    Style::StyleRule res;
+    StyleRule res;
 
     // Parse the selector.
     auto& prefix = sst.prefix.unwrap();
@@ -105,7 +105,7 @@ MediaRule MediaRule::parse(Css::Sst const& sst) {
     if (sst.prefix != Css::Sst::LIST)
         panic("expected list");
 
-    Style::MediaRule res;
+    MediaRule res;
 
     // Parse the media query.
     auto& prefix = sst.prefix.unwrap();

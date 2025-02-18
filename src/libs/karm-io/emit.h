@@ -7,10 +7,9 @@
 
 namespace Karm::Io {
 
-struct Emit : public Io::TextWriterBase<> {
+struct Emit : public Io::TextWriter {
     Io::TextWriter& _writer;
     usize _ident = 0;
-    usize _total = 0;
     Res<> _error = Ok();
     bool _newline = false;
 
@@ -18,7 +17,7 @@ struct Emit : public Io::TextWriterBase<> {
         : _writer(writer) {
     }
 
-    void _tryWrapper(Res<usize> result) {
+    void _tryWrapper(Res<> result) {
         if (not result)
             _error = result.none();
     }
@@ -52,36 +51,31 @@ struct Emit : public Io::TextWriterBase<> {
         _newline = true;
     }
 
-    Res<usize> _insertNewline() {
+    Res<> _insertNewline() {
         if (not _error)
             return _error.none();
-
-        usize written = try$(_writer.writeRune('\n'));
+        try$(_writer.writeRune('\n'));
         _newline = false;
         for (usize i = 0; i < _ident; i++)
-            written += try$(_writer.writeStr("    "s));
-        _total += written;
-        return Ok(written);
+            try$(_writer.writeStr("    "s));
+        return Ok();
     }
 
     virtual Res<usize> write(Bytes bytes) override {
         auto written = try$(_writer.write(bytes));
-        _total += written;
         return Ok(written);
     }
 
-    Res<usize> writeRune(Rune r) override {
+    Res<> writeRune(Rune r) override {
         if (r == '\n') {
             newline();
-            return Ok(0);
+            return Ok();
         }
 
-        usize written = 0;
         if (_newline)
-            written += try$(_insertNewline());
-        written += try$(_writer.writeRune(r));
-        _total += written;
-        return Ok(written);
+            try$(_insertNewline());
+
+        return _writer.writeRune(r);
     }
 
     void operator()(Rune r) {
@@ -97,8 +91,8 @@ struct Emit : public Io::TextWriterBase<> {
     }
 
     template <typename... Ts>
-    void operator()(Str format, Ts&&... ts) {
-        _tryWrapper(Io::format(*this, format, std::forward<Ts>(ts)...));
+    void operator()(Str fmt, Ts&&... ts) {
+        _tryWrapper(Io::format(*this, fmt, std::forward<Ts>(ts)...));
     }
 
     template <typename... Ts>
@@ -107,15 +101,11 @@ struct Emit : public Io::TextWriterBase<> {
         newline();
     }
 
-    usize total() {
-        return _total;
-    }
-
-    Res<usize> flush() override {
+    Res<> flush() override {
         try$(_error);
         if (_newline)
             try$(_insertNewline());
-        return Ok(_total);
+        return Ok();
     }
 };
 
@@ -137,7 +127,7 @@ void repr(Io::Emit& emit, T const& val) {
 
 template <Reprable T>
 struct Formatter<T> {
-    Res<usize> format(Io::TextWriter& writer, T const& val) {
+    Res<> format(Io::TextWriter& writer, T const& val) {
         Io::Emit emit{writer};
         repr(emit, val);
         return emit.flush();

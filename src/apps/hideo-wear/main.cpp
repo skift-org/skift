@@ -24,7 +24,7 @@ Ui::Child app() {
         16,
         Math::Align::CENTER,
         Ui::displayMedium("{02}:{02}", time.hour, time.minute),
-        Ui::titleMedium(dateTime.unwrap())
+        Ui::titleMedium(dateTime)
     );
 
     return clock |

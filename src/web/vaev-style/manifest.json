@@ -6,6 +6,6 @@
     "requires": [
         "vaev-base",
         "vaev-css",
-        "vaev-markup"
+        "vaev-dom"
     ]
 }

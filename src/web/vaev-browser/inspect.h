@@ -2,23 +2,23 @@
 
 #include <karm-ui/node.h>
 #include <karm-ui/reducer.h>
-#include <vaev-markup/dom.h>
+#include <vaev-dom/document.h>
 
 namespace Vaev::Browser {
 
 struct ExpandNode {
-    Rc<Markup::Node> node;
+    Gc::Ref<Dom::Node> node;
 };
 
 struct SelectNode {
-    Rc<Markup::Node> node;
+    Gc::Ref<Dom::Node> node;
 };
 
 using InspectorAction = Union<ExpandNode, SelectNode>;
 
 struct InspectState {
-    Map<Rc<Markup::Node>, bool> expandedNodes = {};
-    Opt<Rc<Markup::Node>> selectedNode = NONE;
+    Map<Gc::Ref<Dom::Node>, bool> expandedNodes = {};
+    Opt<Gc::Ref<Dom::Node>> selectedNode = NONE;
 
     void apply(InspectorAction& a) {
         a.visit(Visitor{
@@ -29,7 +29,7 @@ struct InspectState {
                     expandedNodes.put(e.node, true);
             },
             [&](SelectNode e) {
-                if (e.node->children())
+                if (e.node->hasChildren())
                     expandedNodes.put(e.node, true);
                 selectedNode = e.node;
             },
@@ -37,6 +37,6 @@ struct InspectState {
     }
 };
 
-Ui::Child inspect(Rc<Vaev::Markup::Document> dom, InspectState const& s, Ui::Action<InspectorAction> action);
+Ui::Child inspect(Gc::Ref<Vaev::Dom::Document> dom, InspectState const& s, Ui::Action<InspectorAction> action);
 
 } // namespace Vaev::Browser

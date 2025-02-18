@@ -10,7 +10,9 @@ Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::TEXT_BOX,
         .title = "Write"s,
-        .body = slot$(Ui::empty()),
+        .body = [] {
+            return Ui::empty();
+        },
     });
 }
 

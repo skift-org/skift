@@ -65,7 +65,7 @@ Res<> loadEntry(Entry const& entry) {
         auto blobFile = try$(Sys::File::open(blob.url));
         auto blobMem = try$(Sys::mmap().map(blobFile));
         auto blobRange = blobMem.prange();
-        auto propStr = try$(Json::stringify(blob.props));
+        auto propStr = try$(Json::unparse(blob.props));
 
         payload.add({
             .tag = Handover::FILE,

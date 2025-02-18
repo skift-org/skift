@@ -225,14 +225,14 @@ struct Karm::Limits<Math::_Fixed<T, F>> {
 
 template <Meta::SignedIntegral T, usize F>
 struct Karm::Io::Formatter<Math::_Fixed<T, F>> {
-    Res<usize> format(Io::TextWriter& writer, Math::_Fixed<T, F> const& val) {
+    Res<> format(Io::TextWriter& writer, Math::_Fixed<T, F> const& val) {
         return Io::format(writer, "{}", val.template cast<f64>());
     }
 };
 
 template <typename T>
 struct Karm::Io::Formatter<Math::_Frac<T>> {
-    Res<usize> format(Io::TextWriter& writer, Math::_Frac<T> const& val) {
+    Res<> format(Io::TextWriter& writer, Math::_Frac<T> const& val) {
         return Io::format(writer, "{}/{}", val._num, val._deno);
     }
 };

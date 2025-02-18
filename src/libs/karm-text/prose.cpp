@@ -61,17 +61,17 @@ void Prose::append(Slice<Rune> runes) {
 
 void Prose::_measureBlocks() {
     for (auto& block : _blocks) {
-        auto adv = 0.0f;
+        auto adv = 0_au;
         bool first = true;
         Glyph prev = Glyph::TOFU;
         for (auto& cell : block.cells()) {
             if (not first)
-                adv += _style.font.kern(prev, cell.glyph);
+                adv += Au{_style.font.kern(prev, cell.glyph)};
             else
                 first = false;
 
             cell.pos = adv;
-            cell.adv = _style.font.advance(cell.glyph);
+            cell.adv = Au{_style.font.advance(cell.glyph)};
             adv += cell.adv;
             prev = cell.glyph;
         }
@@ -79,12 +79,12 @@ void Prose::_measureBlocks() {
     }
 }
 
-void Prose::_wrapLines(f64 width) {
+void Prose::_wrapLines(Au width) {
     _lines.clear();
 
     Line line{this, {}, {}};
     bool first = true;
-    f64 adv = 0;
+    Au adv = 0_au;
     for (usize i = 0; i < _blocks.len(); i++) {
         auto& block = _blocks[i];
         if (adv + block.width > width and _style.wordwrap and _style.multiline and not first) {
@@ -99,7 +99,7 @@ void Prose::_wrapLines(f64 width) {
                     {block.runeRange.end(), 0},
                     {i + 1, 0},
                 };
-                adv = 0;
+                adv = 0_au;
             }
         } else {
             line.blockRange.size++;
@@ -112,7 +112,7 @@ void Prose::_wrapLines(f64 width) {
                     {block.runeRange.end(), 0},
                     {i + 1, 0},
                 };
-                adv = 0;
+                adv = 0_au;
             } else {
                 adv += block.width;
             }
@@ -123,24 +123,24 @@ void Prose::_wrapLines(f64 width) {
     _lines.pushBack(line);
 }
 
-f64 Prose::_layoutVerticaly() {
+Au Prose::_layoutVerticaly() {
     auto m = _style.font.metrics();
-    f64 baseline = m.linegap / 2;
+    Au baseline = Au{m.linegap / 2};
     for (auto& line : _lines) {
-        baseline += m.ascend;
+        baseline += Au{m.ascend};
         line.baseline = baseline;
-        baseline += m.linegap + m.descend;
+        baseline += Au{m.linegap + m.descend};
     }
-    return baseline - m.linegap / 2;
+    return baseline - Au{m.linegap / 2};
 }
 
-f64 Prose::_layoutHorizontaly(f64 width) {
-    f64 maxWidth = 0;
+Au Prose::_layoutHorizontaly(Au width) {
+    Au maxWidth = 0_au;
     for (auto& line : _lines) {
         if (not line.blockRange.any())
             continue;
 
-        f64 pos = 0;
+        Au pos = 0_au;
         for (auto& block : line.blocks()) {
             block.pos = pos;
             pos += block.width;
@@ -157,7 +157,7 @@ f64 Prose::_layoutHorizontaly(f64 width) {
 
         case TextAlign::CENTER:
             for (auto& block : line.blocks())
-                block.pos += free / 2;
+                block.pos += free / 2_au;
             break;
 
         case TextAlign::RIGHT:
@@ -170,7 +170,7 @@ f64 Prose::_layoutHorizontaly(f64 width) {
     return maxWidth;
 }
 
-Math::Vec2f Prose::layout(f64 width) {
+Vec2Au Prose::layout(Au width) {
     if (isEmpty(_blocks))
         return {};
 

@@ -14,7 +14,7 @@ struct Text : public Node {
         : _origin(origin), _prose(prose) {}
 
     Math::Rectf bound() override {
-        return {_origin, _prose->size()};
+        return {_origin, _prose->size().cast<f64>()};
     }
 
     void paint(Gfx::Canvas& g, Math::Rectf r, PaintOptions) override {

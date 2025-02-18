@@ -104,30 +104,28 @@ bool Path::isParentOf(Path const& other) const {
     return true;
 }
 
-Res<usize> Path::write(Io::TextWriter& writer) const {
-    usize written = 0;
-
+Res<> Path::unparse(Io::TextWriter& writer) const {
     if (not rooted and len() == 0)
-        written += try$(writer.writeRune('.'));
+        try$(writer.writeRune('.'));
 
     if (rooted and len() == 0)
-        written += try$(writer.writeRune(SEP));
+        try$(writer.writeRune(SEP));
 
     bool first = not rooted;
 
     for (auto part : iter()) {
         if (not first)
             try$(writer.writeRune(SEP));
-        written += try$(writer.writeStr(part.str()));
+        try$(writer.writeStr(part.str()));
         first = false;
     }
 
-    return Ok(written);
+    return Ok();
 }
 
 String Path::str() const {
     Io::StringWriter writer;
-    write(writer).unwrap();
+    unparse(writer).unwrap("unparse error");
     return writer.str();
 }
 

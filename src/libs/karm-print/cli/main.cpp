@@ -30,7 +30,7 @@ Async::Task<> entryPointAsync(Sys::Context&) {
     };
 
     prose.append("Hello, world!"s);
-    prose.layout(999);
+    prose.layout(Au{999});
     ctx.fill(prose);
 
     co_try$(printer->save("file:test.pdf"_url));

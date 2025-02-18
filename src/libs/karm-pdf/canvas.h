@@ -3,16 +3,34 @@
 #include <karm-gfx/canvas.h>
 #include <karm-io/emit.h>
 #include <karm-io/impls.h>
+#include <karm-text/font.h>
 
 namespace Karm::Pdf {
+
+struct FontManager {
+    // FIXME: using the address of the fontface since there is not comparison for the fontface obj
+    Map<_Cell<NoLock>*, Tuple<usize, Rc<Text::Fontface>>> mapping;
+
+    usize getFontId(Rc<Text::Fontface> font) {
+        auto addr = font._cell;
+        if (auto id = mapping.tryGet(addr))
+            return id.unwrap().v0;
+
+        auto id = mapping.len() + 1;
+        mapping.put(addr, {id, font});
+        return id;
+    }
+};
 
 struct Canvas : public Gfx::Canvas {
     Io::Emit _e;
     Math::Vec2f _mediaBox{};
     Math::Vec2f _p{};
 
-    Canvas(Io::Emit e, Math::Vec2f mediaBox)
-        : _e{e}, _mediaBox{mediaBox} {}
+    MutCursor<FontManager> _fontManager;
+
+    Canvas(Io::Emit e, Math::Vec2f mediaBox, MutCursor<FontManager> fontManager)
+        : _e{e}, _mediaBox{mediaBox}, _fontManager{fontManager} {}
 
     Math::Vec2f _mapPoint(Math::Vec2f p, Math::Path::Flags flags) {
         if (flags & Math::Path::RELATIVE)
@@ -70,6 +88,8 @@ struct Canvas : public Gfx::Canvas {
     void path(Math::Path const& path) override;
 
     void fill(Gfx::FillRule rule) override;
+
+    void fill(Text::Prose& prose) override;
 
     void fill(Gfx::Fill fill, Gfx::FillRule rule) override;
 

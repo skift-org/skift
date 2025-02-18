@@ -2,10 +2,10 @@
 
 #include <karm-print/page.h>
 #include <karm-print/printer.h>
-#include <vaev-markup/dom.h>
+#include <vaev-dom/document.h>
 
 namespace Vaev::Driver {
 
-Vec<Print::Page> print(Markup::Document const& dom, Print::Settings const& settings);
+Generator<Print::Page> print(Gc::Ref<Dom::Document> dom, Print::Settings const& settings);
 
 } // namespace Vaev::Driver

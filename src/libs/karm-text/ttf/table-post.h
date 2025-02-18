@@ -16,8 +16,8 @@ struct Post : public Io::BChunk {
         return get<IsFixedPitch>();
     }
 
-    bool isItalic() const {
-        return get<ItalicAngle>().value != 0z;
+    f64 italicAngle() const {
+        return get<ItalicAngle>().asF64();
     }
 };
 

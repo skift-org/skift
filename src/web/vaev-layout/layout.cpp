@@ -50,8 +50,8 @@ Output _contentLayout(Tree& tree, Box& box, Input input, usize startAt, Opt<usiz
     return box.formatingContext.unwrap()->run(tree, box, input, startAt, stopAt);
 }
 
-InsetsPx computeMargins(Tree& tree, Box& box, Input input) {
-    InsetsPx res;
+InsetsAu computeMargins(Tree& tree, Box& box, Input input) {
+    InsetsAu res;
     auto margin = box.style->margin;
 
     res.top = resolve(tree, box, margin->top, input.containingBlock.height);
@@ -62,8 +62,8 @@ InsetsPx computeMargins(Tree& tree, Box& box, Input input) {
     return res;
 }
 
-InsetsPx computeBorders(Tree& tree, Box& box) {
-    InsetsPx res;
+InsetsAu computeBorders(Tree& tree, Box& box) {
+    InsetsAu res;
     auto borders = box.style->borders;
 
     if (borders->top.style != Gfx::BorderStyle::NONE)
@@ -81,8 +81,8 @@ InsetsPx computeBorders(Tree& tree, Box& box) {
     return res;
 }
 
-static InsetsPx _computePaddings(Tree& tree, Box& box, Vec2Px containingBlock) {
-    InsetsPx res;
+static InsetsAu _computePaddings(Tree& tree, Box& box, Vec2Au containingBlock) {
+    InsetsAu res;
     auto padding = box.style->padding;
 
     res.top = resolve(tree, box, padding->top, containingBlock.height);
@@ -93,9 +93,9 @@ static InsetsPx _computePaddings(Tree& tree, Box& box, Vec2Px containingBlock) {
     return res;
 }
 
-static Math::Radii<Px> _computeRadii(Tree& tree, Box& box, Vec2Px size) {
+static Math::Radii<Au> _computeRadii(Tree& tree, Box& box, Vec2Au size) {
     auto radii = box.style->borders->radii;
-    Math::Radii<Px> res;
+    Math::Radii<Au> res;
 
     res.a = resolve(tree, box, radii.a, size.height);
     res.b = resolve(tree, box, radii.b, size.width);
@@ -109,7 +109,7 @@ static Math::Radii<Px> _computeRadii(Tree& tree, Box& box, Vec2Px size) {
     return res;
 }
 
-Vec2Px computeIntrinsicSize(Tree& tree, Box& box, IntrinsicSize intrinsic, Vec2Px containingBlock) {
+Vec2Au computeIntrinsicSize(Tree& tree, Box& box, IntrinsicSize intrinsic, Vec2Au containingBlock) {
     if (intrinsic == IntrinsicSize::AUTO) {
         panic("bad argument");
     }
@@ -130,13 +130,13 @@ Vec2Px computeIntrinsicSize(Tree& tree, Box& box, IntrinsicSize intrinsic, Vec2P
     return output.size + padding.all() + borders.all();
 }
 
-static Opt<Px> _computeSpecifiedSize(Tree& tree, Box& box, Size size, Vec2Px containingBlock, bool isWidth) {
+static Opt<Au> _computeSpecifiedSize(Tree& tree, Box& box, Size size, Vec2Au containingBlock, bool isWidth) {
     if (size == Size::MIN_CONTENT) {
         auto intrinsicSize = computeIntrinsicSize(tree, box, IntrinsicSize::MIN_CONTENT, containingBlock);
-        return isWidth ? Opt<Px>{intrinsicSize.x} : Opt<Px>{NONE};
+        return isWidth ? Opt<Au>{intrinsicSize.x} : Opt<Au>{NONE};
     } else if (size == Size::MAX_CONTENT) {
         auto intrinsicSize = computeIntrinsicSize(tree, box, IntrinsicSize::MAX_CONTENT, containingBlock);
-        return isWidth ? Opt<Px>{intrinsicSize.x} : Opt<Px>{NONE};
+        return isWidth ? Opt<Au>{intrinsicSize.x} : Opt<Au>{NONE};
     } else if (size == Size::FIT_CONTENT) {
         auto minIntrinsicSize = computeIntrinsicSize(tree, box, IntrinsicSize::MIN_CONTENT, containingBlock);
         auto maxIntrinsicSize = computeIntrinsicSize(tree, box, IntrinsicSize::MAX_CONTENT, containingBlock);
@@ -152,18 +152,18 @@ static Opt<Px> _computeSpecifiedSize(Tree& tree, Box& box, Size size, Vec2Px con
         return resolve(tree, box, size.value, isWidth ? containingBlock.x : containingBlock.y);
     } else {
         logWarn("unknown specified size: {}", size);
-        return 0_px;
+        return 0_au;
     }
 }
 
 static Res<None, Output> _shouldAbortFragmentingBeforeLayout(Fragmentainer& fc, Input input) {
     if (not fc.acceptsFit(
             input.position.y,
-            0_px,
+            0_au,
             input.pendingVerticalSizes
         ))
         return Output{
-            .size = Vec2Px{0_px, 0_px},
+            .size = Vec2Au{0_au, 0_au},
             .completelyLaidOut = false,
             .breakpoint = Breakpoint::overflow()
         };
@@ -203,7 +203,7 @@ Output layout(Tree& tree, Box& box, Input input) {
     }
 
     input.knownSize.width = input.knownSize.width.map([&](auto s) {
-        return max(0_px, s - padding.horizontal() - borders.horizontal());
+        return max(0_au, s - padding.horizontal() - borders.horizontal());
     });
 
     if (input.knownSize.height == NONE) {
@@ -212,11 +212,11 @@ Output layout(Tree& tree, Box& box, Input input) {
     }
 
     input.knownSize.height = input.knownSize.height.map([&](auto s) {
-        return max(0_px, s - padding.vertical() - borders.vertical());
+        return max(0_au, s - padding.vertical() - borders.vertical());
     });
 
-    input.availableSpace.height = max(0_px, input.availableSpace.height - padding.vertical() - borders.vertical());
-    input.availableSpace.width = max(0_px, input.availableSpace.width - padding.horizontal() - borders.horizontal());
+    input.availableSpace.height = max(0_au, input.availableSpace.height - padding.vertical() - borders.vertical());
+    input.availableSpace.width = max(0_au, input.availableSpace.width - padding.horizontal() - borders.horizontal());
 
     input.position = input.position + borders.topStart() + padding.topStart();
     input.pendingVerticalSizes += borders.bottom + padding.bottom;

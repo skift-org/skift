@@ -184,13 +184,12 @@ struct Karm::Io::Formatter<Karm::Cli::Styled<T>> {
         }
     }
 
-    Res<usize> format(Io::TextWriter& writer, Karm::Cli::Styled<T> const& val) {
+    Res<> format(Io::TextWriter& writer, Karm::Cli::Styled<T> const& val) {
 #ifdef __ck_sys_terminal_ansi__
-        return Ok(
-            try$(_styleFmt.format(writer, val._color)) +
-            try$(_innerFmt.format(writer, val._inner)) +
-            try$(writer.writeStr("\x1b[0m"s))
-        );
+        try$(_styleFmt.format(writer, val._color));
+        try$(_innerFmt.format(writer, val._inner));
+        try$(writer.writeStr("\x1b[0m"s));
+        return Ok();
 #else
         return _innerFmt.format(writer, val._inner);
 #endif

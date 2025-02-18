@@ -21,11 +21,11 @@ struct Media {
 
     /// 4.1. Width: the width feature
     /// https://drafts.csswg.org/mediaqueries/#width
-    Px width;
+    Au width;
 
     /// 4.2. Height: the height feature
     /// https://drafts.csswg.org/mediaqueries/#height
-    Px height;
+    Au height;
 
     /// 4.3. Device Width: the device-width feature
     /// https://drafts.csswg.org/mediaqueries/#aspect-ratio
@@ -131,8 +131,8 @@ struct Media {
     ReducedData prefersReducedData;
 
     // Appendix A: Deprecated Media Features
-    Px deviceWidth;
-    Px deviceHeight;
+    Au deviceWidth;
+    Au deviceHeight;
     Number deviceAspectRatio;
 };
 

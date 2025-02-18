@@ -104,8 +104,6 @@ Ui::Child sidebar(State const& s) {
     });
 }
 
-// MARK: Body ------------------------------------------------------------------
-
 // MARK: App -------------------------------------------------------------------
 
 Ui::Child app() {
@@ -113,8 +111,12 @@ Ui::Child app() {
         return Kr::scaffold({
             .icon = Mdi::VIEW_DASHBOARD,
             .title = "System Monitor"s,
-            .sidebar = slot$(sidebar(s)),
-            .body = slot$(Ui::empty()),
+            .sidebar = [&] {
+                return sidebar(s);
+            },
+            .body = [] {
+                return Ui::empty();
+            },
         });
     });
 }

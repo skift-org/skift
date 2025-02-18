@@ -5,7 +5,7 @@
 namespace Vaev::Layout {
 
 Resolver Resolver::from(Tree const& tree, Box const& box) {
-    Px fontSize{16};
+    Au fontSize{16};
 
     Resolver resolver;
     resolver.rootFont = Text::Font{tree.root.fontFace, fontSize.cast<f64>()};
@@ -22,56 +22,56 @@ Resolver Resolver::inherit(Resolver const& resolver) {
     return copy;
 }
 
-Px Resolver::_resolveFontRelative(Length const& value) {
+Au Resolver::_resolveFontRelative(Length const& value) {
     if (not boxFont or not rootFont) {
         logWarn("missing font information");
-        return 0_px;
+        return 0_au;
     }
 
     switch (value.unit()) {
 
     case Length::EM:
-        return Px::fromFloatNearest(value.val() * boxFont.unwrap().fontSize());
+        return Au::fromFloatNearest(value.val() * boxFont.unwrap().fontSize());
 
     case Length::REM:
-        return Px::fromFloatNearest(value.val() * rootFont.unwrap().fontSize());
+        return Au::fromFloatNearest(value.val() * rootFont.unwrap().fontSize());
 
     case Length::EX:
-        return Px::fromFloatNearest(value.val() * boxFont.unwrap().xHeight());
+        return Au::fromFloatNearest(value.val() * boxFont.unwrap().xHeight());
 
     case Length::REX:
-        return Px::fromFloatNearest(value.val() * rootFont.unwrap().xHeight());
+        return Au::fromFloatNearest(value.val() * rootFont.unwrap().xHeight());
 
     case Length::CAP:
-        return Px::fromFloatNearest(value.val() * boxFont.unwrap().capHeight());
+        return Au::fromFloatNearest(value.val() * boxFont.unwrap().capHeight());
 
     case Length::RCAP:
-        return Px::fromFloatNearest(value.val() * rootFont.unwrap().capHeight());
+        return Au::fromFloatNearest(value.val() * rootFont.unwrap().capHeight());
 
     case Length::CH:
-        return Px::fromFloatNearest(value.val() * boxFont.unwrap().zeroAdvance());
+        return Au::fromFloatNearest(value.val() * boxFont.unwrap().zeroAdvance());
 
     case Length::RCH:
-        return Px::fromFloatNearest(value.val() * rootFont.unwrap().zeroAdvance());
+        return Au::fromFloatNearest(value.val() * rootFont.unwrap().zeroAdvance());
 
     case Length::IC:
-        return Px::fromFloatNearest(value.val() * boxFont.unwrap().zeroAdvance());
+        return Au::fromFloatNearest(value.val() * boxFont.unwrap().zeroAdvance());
 
     case Length::RIC:
-        return Px::fromFloatNearest(value.val() * rootFont.unwrap().zeroAdvance());
+        return Au::fromFloatNearest(value.val() * rootFont.unwrap().zeroAdvance());
 
     case Length::LH:
-        return Px::fromFloatNearest(value.val() * boxFont.unwrap().lineHeight());
+        return Au::fromFloatNearest(value.val() * boxFont.unwrap().lineHeight());
 
     case Length::RLH:
-        return Px::fromFloatNearest(value.val() * rootFont.unwrap().lineHeight());
+        return Au::fromFloatNearest(value.val() * rootFont.unwrap().lineHeight());
 
     default:
         panic("expected font-relative unit");
     }
 }
 
-Px Resolver::resolve(Length const& value) {
+Au Resolver::resolve(Length const& value) {
     if (value.isFontRelative())
         return _resolveFontRelative(value);
     switch (value.unit()) {
@@ -83,48 +83,48 @@ Px Resolver::resolve(Length const& value) {
     // Equal to 1% of the width of current viewport.
     case Length::VW:
     case Length::LVW:
-        return Px::fromFloatNearest(value.val() * viewport.large.width.cast<f64>() / 100);
+        return Au::fromFloatNearest(value.val() * viewport.large.width.cast<f64>() / 100);
 
     case Length::SVW:
-        return Px::fromFloatNearest(value.val() * viewport.small.width.cast<f64>() / 100);
+        return Au::fromFloatNearest(value.val() * viewport.small.width.cast<f64>() / 100);
 
     case Length::DVW:
-        return Px::fromFloatNearest(value.val() * viewport.dynamic.width.cast<f64>() / 100);
+        return Au::fromFloatNearest(value.val() * viewport.dynamic.width.cast<f64>() / 100);
 
     // https://drafts.csswg.org/css-values/#vh
     // Equal to 1% of the height of current viewport.
     case Length::VH:
     case Length::LVH:
-        return Px::fromFloatNearest(value.val() * viewport.large.height.cast<f64>() / 100);
+        return Au::fromFloatNearest(value.val() * viewport.large.height.cast<f64>() / 100);
 
     case Length::SVH:
-        return Px::fromFloatNearest(value.val() * viewport.small.height.cast<f64>() / 100);
+        return Au::fromFloatNearest(value.val() * viewport.small.height.cast<f64>() / 100);
 
     case Length::DVH:
-        return Px::fromFloatNearest(value.val() * viewport.dynamic.height.cast<f64>() / 100);
+        return Au::fromFloatNearest(value.val() * viewport.dynamic.height.cast<f64>() / 100);
 
     // https://drafts.csswg.org/css-values/#vi
     // Equal to 1% of the size of the viewport in the box’s inline axis.
     case Length::VI:
     case Length::LVI:
         if (boxAxis == Axis::HORIZONTAL) {
-            return Px::fromFloatNearest(value.val() * viewport.large.width.cast<f64>() / 100);
+            return Au::fromFloatNearest(value.val() * viewport.large.width.cast<f64>() / 100);
         } else {
-            return Px::fromFloatNearest(value.val() * viewport.large.height.cast<f64>() / 100);
+            return Au::fromFloatNearest(value.val() * viewport.large.height.cast<f64>() / 100);
         }
 
     case Length::SVI:
         if (boxAxis == Axis::HORIZONTAL) {
-            return Px::fromFloatNearest(value.val() * viewport.small.width.cast<f64>() / 100);
+            return Au::fromFloatNearest(value.val() * viewport.small.width.cast<f64>() / 100);
         } else {
-            return Px::fromFloatNearest(value.val() * viewport.small.height.cast<f64>() / 100);
+            return Au::fromFloatNearest(value.val() * viewport.small.height.cast<f64>() / 100);
         }
 
     case Length::DVI:
         if (boxAxis == Axis::HORIZONTAL) {
-            return Px::fromFloatNearest(value.val() * viewport.dynamic.width.cast<f64>() / 100);
+            return Au::fromFloatNearest(value.val() * viewport.dynamic.width.cast<f64>() / 100);
         } else {
-            return Px::fromFloatNearest(value.val() * viewport.dynamic.height.cast<f64>() / 100);
+            return Au::fromFloatNearest(value.val() * viewport.dynamic.height.cast<f64>() / 100);
         }
 
     // https://drafts.csswg.org/css-values/#vb
@@ -132,23 +132,23 @@ Px Resolver::resolve(Length const& value) {
     case Length::VB:
     case Length::LVB:
         if (boxAxis.cross() == Axis::HORIZONTAL) {
-            return Px::fromFloatNearest(value.val() * viewport.large.width.cast<f64>() / 100);
+            return Au::fromFloatNearest(value.val() * viewport.large.width.cast<f64>() / 100);
         } else {
-            return Px::fromFloatNearest(value.val() * viewport.large.height.cast<f64>() / 100);
+            return Au::fromFloatNearest(value.val() * viewport.large.height.cast<f64>() / 100);
         }
 
     case Length::SVB:
         if (boxAxis.cross() == Axis::HORIZONTAL) {
-            return Px::fromFloatNearest(value.val() * viewport.small.width.cast<f64>() / 100);
+            return Au::fromFloatNearest(value.val() * viewport.small.width.cast<f64>() / 100);
         } else {
-            return Px::fromFloatNearest(value.val() * viewport.small.height.cast<f64>() / 100);
+            return Au::fromFloatNearest(value.val() * viewport.small.height.cast<f64>() / 100);
         }
 
     case Length::DVB:
         if (boxAxis.cross() == Axis::HORIZONTAL) {
-            return Px::fromFloatNearest(value.val() * viewport.dynamic.width.cast<f64>() / 100);
+            return Au::fromFloatNearest(value.val() * viewport.dynamic.width.cast<f64>() / 100);
         } else {
-            return Px::fromFloatNearest(value.val() * viewport.dynamic.height.cast<f64>() / 100);
+            return Au::fromFloatNearest(value.val() * viewport.dynamic.height.cast<f64>() / 100);
         }
 
     // https://drafts.csswg.org/css-values/#vmin
@@ -196,67 +196,67 @@ Px Resolver::resolve(Length const& value) {
     // Absolute
     // https://drafts.csswg.org/css-values/#absolute-lengths
     case Length::CM:
-        return Px::fromFloatNearest(value.val() * 96 / 2.54);
+        return Au::fromFloatNearest(value.val() * 96 / 2.54);
 
     case Length::MM:
-        return Px::fromFloatNearest(value.val() * 96 / 25.4);
+        return Au::fromFloatNearest(value.val() * 96 / 25.4);
 
     case Length::Q:
-        return Px::fromFloatNearest(value.val() * 96 / 101.6);
+        return Au::fromFloatNearest(value.val() * 96 / 101.6);
 
     case Length::IN:
-        return Px::fromFloatNearest(value.val() * 96);
+        return Au::fromFloatNearest(value.val() * 96);
 
     case Length::PT:
-        return Px::fromFloatNearest(value.val() * 96 / 72.0);
+        return Au::fromFloatNearest(value.val() * 96 / 72.0);
 
     case Length::PC:
-        return Px::fromFloatNearest(value.val() * 96 / 6.0);
+        return Au::fromFloatNearest(value.val() * 96 / 6.0);
 
     case Length::PX:
-        return Px::fromFloatNearest(value.val());
+        return Au::fromFloatNearest(value.val());
 
     default:
         panic("invalid length unit");
     }
 }
 
-Px Resolver::resolve(PercentOr<Length> const& value, Px relative) {
+Au Resolver::resolve(PercentOr<Length> const& value, Au relative) {
     if (value.resolved())
         return resolve(value.value());
-    return Px{relative.cast<f64>() * (value.percent().value() / 100.)};
+    return Au{relative.cast<f64>() * (value.percent().value() / 100.)};
 }
 
-Px Resolver::resolve(Width const& value, Px relative) {
+Au Resolver::resolve(Width const& value, Au relative) {
     if (value == Width::Type::AUTO)
-        return 0_px;
+        return 0_au;
     return resolve(value.value, relative);
 }
 
-Px Resolver::resolve(FontSize const& value) {
+Au Resolver::resolve(FontSize const& value) {
     switch (value.named()) {
     case FontSize::XX_SMALL:
-        return Px::fromFloatNearest(userFontSize * 0.5);
+        return Au::fromFloatNearest(userFontSize * 0.5);
     case FontSize::X_SMALL:
-        return Px::fromFloatNearest(userFontSize * 0.75);
+        return Au::fromFloatNearest(userFontSize * 0.75);
     case FontSize::SMALL:
-        return Px::fromFloatNearest(userFontSize * 0.875);
+        return Au::fromFloatNearest(userFontSize * 0.875);
     case FontSize::MEDIUM:
-        return Px::fromFloatNearest(userFontSize);
+        return Au::fromFloatNearest(userFontSize);
     case FontSize::LARGE:
-        return Px::fromFloatNearest(userFontSize * 1.125);
+        return Au::fromFloatNearest(userFontSize * 1.125);
     case FontSize::X_LARGE:
-        return Px::fromFloatNearest(userFontSize * 1.25);
+        return Au::fromFloatNearest(userFontSize * 1.25);
     case FontSize::XX_LARGE:
-        return Px::fromFloatNearest(userFontSize * 1.5);
+        return Au::fromFloatNearest(userFontSize * 1.5);
 
     case FontSize::LARGER:
-        return Px::fromFloatNearest(parentFontSize * 1.25);
+        return Au::fromFloatNearest(parentFontSize * 1.25);
     case FontSize::SMALLER:
-        return Px::fromFloatNearest(parentFontSize * 0.875);
+        return Au::fromFloatNearest(parentFontSize * 0.875);
 
     case FontSize::LENGTH:
-        return resolve(value.value(), Px{parentFontSize});
+        return resolve(value.value(), Au{parentFontSize});
 
     default:
         panic("unimplemented font size");
@@ -266,19 +266,19 @@ Px Resolver::resolve(FontSize const& value) {
 
 // MARK: Resolve during layout -------------------------------------------------
 
-Px resolve(Tree const& tree, Box const& box, Length const& value) {
+Au resolve(Tree const& tree, Box const& box, Length const& value) {
     return Resolver::from(tree, box).resolve(value);
 }
 
-Px resolve(Tree const& tree, Box const& box, PercentOr<Length> const& value, Px relative) {
+Au resolve(Tree const& tree, Box const& box, PercentOr<Length> const& value, Au relative) {
     return Resolver::from(tree, box).resolve(value, relative);
 }
 
-Px resolve(Tree const& tree, Box const& box, Width const& value, Px relative) {
+Au resolve(Tree const& tree, Box const& box, Width const& value, Au relative) {
     return Resolver::from(tree, box).resolve(value, relative);
 }
 
-Px resolve(Tree const& tree, Box const& box, FontSize const& value) {
+Au resolve(Tree const& tree, Box const& box, FontSize const& value) {
     return Resolver::from(tree, box).resolve(value);
 }
 

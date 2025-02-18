@@ -4,10 +4,10 @@ namespace Vaev::Layout {
 
 struct ReplacedFormatingContext : public FormatingContext {
     Output run(Tree& tree, Box& box, Input input, [[maybe_unused]] usize startAt, [[maybe_unused]] Opt<usize> stopAt) override {
-        Vec2Px size = {};
+        Vec2Au size = {};
 
         if (auto image = box.content.is<Karm::Image::Picture>()) {
-            size = image->bound().size().cast<Px>();
+            size = image->bound().size().cast<Au>();
         } else {
             panic("unsupported replaced content");
         }

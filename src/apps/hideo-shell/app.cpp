@@ -73,14 +73,13 @@ Ui::Child taskbar(State const& state) {
 
     auto [date, time] = state.dateTime;
     auto dateTime = Io::format(
-                        "{}. {} {}, {02}:{02}",
-                        Io::toCapitalCase(date.month.abbr()),
-                        date.dayOfMonth() + 1,
-                        date.year.val(),
-                        time.hour,
-                        time.minute
-    )
-                        .unwrap();
+        "{}. {} {}, {02}:{02}",
+        Io::toCapitalCase(date.month.abbr()),
+        date.dayOfMonth() + 1,
+        date.year.val(),
+        time.hour,
+        time.minute
+    );
     auto calButton = Ui::button(
         Model::bind<Activate>(Panel::NOTIS),
         Ui::ButtonStyle::subtle(),

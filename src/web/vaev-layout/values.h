@@ -24,22 +24,22 @@ struct Resolver {
 
     Opt<Text::Font> rootFont = NONE;                 /// Font of the root element
     Opt<Text::Font> boxFont = NONE;                  /// Font of the current box
-    Viewport viewport = {.small = {800_px, 600_px}}; /// Viewport of the current box
+    Viewport viewport = {.small = {800_au, 600_au}}; /// Viewport of the current box
     Axis boxAxis = Axis::HORIZONTAL;                 /// Inline axis of the current box
 
     static Resolver from(Tree const& tree, Box const& box);
 
     Resolver inherit(Resolver const& resolver);
 
-    Px _resolveFontRelative(Length const& value);
+    Au _resolveFontRelative(Length const& value);
 
-    Px resolve(Length const& value);
+    Au resolve(Length const& value);
 
-    Px resolve(PercentOr<Length> const& value, Px relative);
+    Au resolve(PercentOr<Length> const& value, Au relative);
 
-    Px resolve(Width const& value, Px relative);
+    Au resolve(Width const& value, Au relative);
 
-    Px resolve(FontSize const& value);
+    Au resolve(FontSize const& value);
 
     // MARK: Eval --------------------------------------------------------------
 
@@ -95,13 +95,13 @@ struct Resolver {
 
 // MARK: Resolve during layout -------------------------------------------------
 
-Px resolve(Tree const& tree, Box const& box, Length const& value);
+Au resolve(Tree const& tree, Box const& box, Length const& value);
 
-Px resolve(Tree const& tree, Box const& box, PercentOr<Length> const& value, Px relative);
+Au resolve(Tree const& tree, Box const& box, PercentOr<Length> const& value, Au relative);
 
-Px resolve(Tree const& tree, Box const& box, Width const& value, Px relative);
+Au resolve(Tree const& tree, Box const& box, Width const& value, Au relative);
 
-Px resolve(Tree const& tree, Box const& box, FontSize const& value);
+Au resolve(Tree const& tree, Box const& box, FontSize const& value);
 
 template <typename T, typename... Args>
 static inline auto resolve(Tree const& tree, Box const& box, CalcValue<T> const& value, Args... args) -> Resolved<T> {

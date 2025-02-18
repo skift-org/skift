@@ -399,4 +399,120 @@ constexpr auto iter(AtLen auto& o) {
         });
 }
 
+// MARK: Generator -------------------------------------------------------------
+
+template <typename T>
+struct Generator {
+    struct promise_type;
+
+    struct promise_type {
+        Opt<T> _value = NONE;
+
+        Generator get_return_object() {
+            return Generator(std::coroutine_handle<promise_type>::from_promise(*this));
+        }
+
+        std::suspend_always initial_suspend() { return {}; }
+
+        std::suspend_always final_suspend() noexcept { return {}; }
+
+        void unhandled_exception() {
+            panic("unhandled exception in coroutine");
+        }
+
+        template <Meta::Convertible<T> From>
+        std::suspend_always yield_value(From&& from) {
+            _value = std::forward<From>(from);
+            return {};
+        }
+
+        void return_void() {}
+    };
+
+    std::coroutine_handle<promise_type> _coro = nullptr;
+    bool _full = false;
+
+    Generator(std::coroutine_handle<promise_type> coro)
+        : _coro(coro) {}
+
+    Generator(Generator const& other) = delete;
+
+    Generator(Generator&& other)
+        : _coro(std::exchange(other._coro, nullptr)) {}
+
+    Generator& operator=(Generator const& other) = delete;
+
+    Generator& operator=(Generator&& other) {
+        std::swap(_coro, other._coro);
+        return *this;
+    }
+
+    ~Generator() {
+        if (_coro)
+            _coro.destroy();
+    }
+
+    void fill() {
+        if (not _full) {
+            _coro.resume();
+            _full = true;
+        }
+    }
+
+    explicit operator bool() {
+        fill();
+        return not _coro.done();
+    }
+
+    Opt<T> next() {
+        fill();
+        if (_coro.done())
+            return NONE;
+        _full = false;
+        return _coro.promise()._value.take();
+    }
+};
+
+// MARK: ForEach ---------------------------------------------------------------
+
+template <typename F>
+struct _ForEach {
+    F f;
+};
+
+template <typename F>
+inline void operator|(auto&& iter, _ForEach<F> forEach) {
+    while (auto value = iter.next())
+        forEach.f(*value);
+}
+
+template <typename F>
+static inline auto forEach(F f) {
+    return _ForEach<F>{f};
+}
+
+// MARK: Collect ---------------------------------------------------------------
+
+template <typename V>
+struct _Collect {
+};
+
+template <typename V>
+inline V operator|(auto&& iter, _Collect<V>) {
+    V v{};
+    while (auto value = iter.next())
+        v.pushBack(*value);
+    return v;
+}
+
+template <typename V>
+static inline auto collect() {
+    return _Collect<V>{};
+}
+
+static inline auto collect() {
+    return forEach([](auto const&...) {
+    });
+}
+
 } // namespace Karm

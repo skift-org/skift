@@ -2,6 +2,7 @@
 #include <karm-cli/cursor.h>
 #include <karm-cli/spinner.h>
 #include <karm-cli/style.h>
+#include <karm-gfx/buffer.h>
 #include <karm-sys/chan.h>
 #include <karm-sys/time.h>
 

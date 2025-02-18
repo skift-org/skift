@@ -9,7 +9,7 @@
         "karm-math",
         "karm-scene",
         "karm-text",
-        "vaev-markup",
+        "vaev-dom",
         "vaev-style"
     ]
 }

@@ -2,26 +2,9 @@
 
 #include <karm-base/distinct.h>
 #include <karm-io/emit.h>
-#include <karm-math/fixed.h>
-#include <karm-math/insets.h>
-#include <karm-math/radii.h>
-#include <karm-math/rect.h>
+#include <karm-math/au.h>
 
 namespace Vaev {
-
-/// Represents a physical pixel on the actual device screen.
-using PhysicalPixel = Distinct<i32, struct _PhysicalPixel>;
-
-/// Represents a logical pixel in the CSS coordinate system.
-using Px = Math::i24f8;
-
-using RectPx = Math::Rect<Px>;
-
-using Vec2Px = Math::Vec2<Px>;
-
-using InsetsPx = Math::Insets<Px>;
-
-using RadiiPx = Math::Radii<Px>;
 
 // 6. MARK: Distance Units: the <length> type
 // https://drafts.csswg.org/css-values/#lengths
@@ -37,7 +20,7 @@ struct Length {
 
     using enum Unit;
 
-    using Resolved = Px;
+    using Resolved = Au;
 
     f64 _val = 0;
     Unit _unit = Unit::PX;
@@ -55,7 +38,7 @@ struct Length {
     constexpr Length(f64 val, Unit unit)
         : _val(val), _unit(unit) {}
 
-    constexpr Length(Px val)
+    constexpr Length(Au val)
         : _val(val.cast<f64>()) {}
 
     constexpr bool isAbsolute() const {
@@ -146,7 +129,3 @@ struct Length {
 };
 
 } // namespace Vaev
-
-constexpr Vaev::Px operator""_px(unsigned long long val) {
-    return Vaev::Px(val);
-}

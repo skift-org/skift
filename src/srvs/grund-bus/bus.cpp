@@ -22,10 +22,10 @@ Res<> Endpoint::dispatch(Rpc::Message& msg) {
 
 Res<Rc<Service>> Service::prepare(Sys::Context&, Str id) {
     auto in = try$(Hj::Channel::create(Hj::Domain::self(), kib(16), 16));
-    try$(in.label(Io::format("{}-in", id).unwrap()));
+    try$(in.label(Io::format("{}-in", id)));
 
     auto out = try$(Hj::Channel::create(Hj::Domain::self(), kib(16), 16));
-    try$(out.label(Io::format("{}-out", id).unwrap()));
+    try$(out.label(Io::format("{}-out", id)));
 
     auto ipc = makeRc<Skift::IpcFd>(
         std::move(in),
@@ -39,7 +39,7 @@ Res<> Service::activate(Sys::Context& ctx) {
     logInfo("activating service '{}'...", _id);
 
     auto& handover = useHandover(ctx);
-    auto urlStr = try$(Io::format("bundle://{}/_bin", _id));
+    auto urlStr = Io::format("bundle://{}/_bin", _id);
     auto* elf = handover.fileByName(urlStr.buf());
     if (not elf) {
         logError("service not found: '{}'", _id);

@@ -1,11 +1,13 @@
 #pragma once
 
 #include <karm-base/clamp.h>
+#include <karm-base/ring.h>
 #include <karm-base/rune.h>
 #include <karm-base/string.h>
 #include <karm-base/tuple.h>
 
 #include "impls.h"
+#include "text.h"
 
 namespace Karm::Io {
 
@@ -112,6 +114,42 @@ inline Res<usize> copy(Readable auto& reader, Writable auto& writer, usize size)
         size -= read;
     }
     return Ok(result);
+}
+
+inline Res<Tuple<usize, bool>> readLine(Readable auto& reader, Writable auto& writer, Bytes delim) {
+    if (delim.len() > 16)
+        panic("delimiter string too large");
+
+    Byte b;
+    usize result = 0;
+    Ring<Byte> lastBytes{delim.len()};
+
+    while (true) {
+        auto read = try$(reader.read({&b, 1}));
+
+        if (read == 0)
+            return Ok(Tuple<usize, bool>{
+                result, false
+            });
+
+        result += read;
+
+        if (lastBytes.rem() == 0)
+            lastBytes.popFront();
+        lastBytes.pushBack(b);
+
+        auto written = try$(writer.write({&b, 1}));
+        if (written != read)
+            return Error::writeZero();
+
+        if (lastBytes == delim) {
+            result -= delim.len();
+            break;
+        }
+    }
+    return Ok(Tuple<usize, bool>{
+        result, true
+    });
 }
 
 } // namespace Karm::Io

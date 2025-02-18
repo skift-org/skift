@@ -35,7 +35,7 @@ static constexpr Level WARNING = {2, "warn ", Cli::YELLOW};
 static constexpr Level ERROR = {3, "error", Cli::RED};
 static constexpr Level FATAL = {4, "fatal", Cli::style(Cli::RED).bold()};
 
-inline void _catch(Res<usize> res) {
+inline void _catch(Res<> res) {
     if (res)
         return;
     debug("failed to write to logger");
@@ -59,75 +59,75 @@ inline void _log(Level level, Format fmt, Io::_Args& args) {
 }
 
 template <typename... Args>
-inline void logPrint(Format format, Args&&... va) {
+inline void logPrint(Format fmt, Args&&... va) {
     Io::Args<Args...> args{std::forward<Args>(va)...};
-    _log(PRINT, format, args);
+    _log(PRINT, fmt, args);
 }
 
 template <typename... Args>
-inline void logPrintIf(bool condition, Format format, Args&&... va) {
+inline void logPrintIf(bool condition, Format fmt, Args&&... va) {
     if (condition)
-        logPrint(format, std::forward<Args>(va)...);
+        logPrint(fmt, std::forward<Args>(va)...);
 }
 
 template <typename... Args>
-inline void logDebug(Format format, Args&&... va) {
+inline void logDebug(Format fmt, Args&&... va) {
     Io::Args<Args...> args{std::forward<Args>(va)...};
-    _log(DEBUG, format, args);
+    _log(DEBUG, fmt, args);
 }
 
 template <typename... Args>
-inline void logDebugIf(bool condition, Format format, Args&&... va) {
+inline void logDebugIf(bool condition, Format fmt, Args&&... va) {
     if (condition)
-        logDebug(format, std::forward<Args>(va)...);
+        logDebug(fmt, std::forward<Args>(va)...);
 }
 
 template <typename... Args>
-inline void logInfo(Format format, Args&&... va) {
+inline void logInfo(Format fmt, Args&&... va) {
     Io::Args<Args...> args{std::forward<Args>(va)...};
-    _log(INFO, format, args);
+    _log(INFO, fmt, args);
 }
 
 template <typename... Args>
-inline void logInfoIf(bool condition, Format format, Args&&... va) {
+inline void logInfoIf(bool condition, Format fmt, Args&&... va) {
     if (condition)
-        logInfo(format, std::forward<Args>(va)...);
+        logInfo(fmt, std::forward<Args>(va)...);
 }
 
 template <typename... Args>
-inline void yap(Format format, Args&&... va) {
+inline void yap(Format fmt, Args&&... va) {
     Io::Args<Args...> args{std::forward<Args>(va)...};
-    _log(YAP, format, args);
+    _log(YAP, fmt, args);
 }
 
 template <typename... Args>
-inline void logWarn(Format format, Args&&... va) {
+inline void logWarn(Format fmt, Args&&... va) {
     Io::Args<Args...> args{std::forward<Args>(va)...};
-    _log(WARNING, format, args);
+    _log(WARNING, fmt, args);
 }
 
 template <typename... Args>
-inline void logWarnIf(bool condition, Format format, Args&&... va) {
+inline void logWarnIf(bool condition, Format fmt, Args&&... va) {
     if (condition)
-        logWarn(format, std::forward<Args>(va)...);
+        logWarn(fmt, std::forward<Args>(va)...);
 }
 
 template <typename... Args>
-inline void logError(Format format, Args&&... va) {
+inline void logError(Format fmt, Args&&... va) {
     Io::Args<Args...> args{std::forward<Args>(va)...};
-    _log(ERROR, format, args);
+    _log(ERROR, fmt, args);
 }
 
 template <typename... Args>
-inline void logErrorIf(bool condition, Format format, Args&&... va) {
+inline void logErrorIf(bool condition, Format fmt, Args&&... va) {
     if (condition)
-        logError(format, std::forward<Args>(va)...);
+        logError(fmt, std::forward<Args>(va)...);
 }
 
 template <typename... Args>
-[[noreturn]] inline void logFatal(Format format, Args&&... va) {
+[[noreturn]] inline void logFatal(Format fmt, Args&&... va) {
     Io::Args<Args...> args{std::forward<Args>(va)...};
-    _log(FATAL, format, args);
+    _log(FATAL, fmt, args);
     panic("fatal error occured, see logs");
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-logger/logger.h>
+#include <karm-math/au.h>
 
 #include "font.h"
 
@@ -68,8 +69,8 @@ struct Prose : public Meta::Pinned {
 
         urange runeRange;
         Glyph glyph;
-        f64 pos = 0; //< Position of the glyph within the block
-        f64 adv = 0; //< Advance of the glyph
+        Au pos = 0_au; //< Position of the glyph within the block
+        Au adv = 0_au; //< Advance of the glyph
 
         MutSlice<Rune> runes() {
             return mutSub(prose->_runes, runeRange);
@@ -100,8 +101,8 @@ struct Prose : public Meta::Pinned {
         urange runeRange;
         urange cellRange;
 
-        f64 pos = 0; // Position of the block within the line
-        f64 width = 0;
+        Au pos = 0_au; // Position of the block within the line
+        Au width = 0_au;
 
         MutSlice<Cell> cells() {
             return mutSub(prose->_cells, cellRange);
@@ -133,8 +134,8 @@ struct Prose : public Meta::Pinned {
 
         urange runeRange;
         urange blockRange;
-        f64 baseline = 0; // Baseline of the line within the text
-        f64 width = 0;
+        Au baseline = 0_au; // Baseline of the line within the text
+        Au width = 0_au;
 
         Slice<Block> blocks() const {
             return sub(prose->_blocks, blockRange);
@@ -157,11 +158,11 @@ struct Prose : public Meta::Pinned {
     f64 _spaceWidth{};
     f64 _lineHeight{};
 
-    Math::Vec2f _size;
+    Vec2Au _size;
 
     Prose(ProseStyle style, Str str = "");
 
-    Math::Vec2f size() const {
+    Vec2Au size() const {
         return _size;
     }
 
@@ -207,21 +208,21 @@ struct Prose : public Meta::Pinned {
 
     void _measureBlocks();
 
-    void _wrapLines(f64 width);
+    void _wrapLines(Au width);
 
-    f64 _layoutVerticaly();
+    Au _layoutVerticaly();
 
-    f64 _layoutHorizontaly(f64 width);
+    Au _layoutHorizontaly(Au width);
 
-    Math::Vec2f layout(f64 width);
+    Vec2Au layout(Au width);
 
     // MARK: Paint -------------------------------------------------------------
 
     void paintCaret(Gfx::Canvas& g, usize runeIndex, Gfx::Color color) const {
         auto m = _style.font.metrics();
         auto baseline = queryPosition(runeIndex);
-        auto cs = baseline - Math::Vec2f{0, m.ascend};
-        auto ce = baseline + Math::Vec2f{0, m.descend};
+        auto cs = baseline.cast<f64>() - Math::Vec2f{0, m.ascend};
+        auto ce = baseline.cast<f64>() + Math::Vec2f{0, m.descend};
 
         g.beginPath();
         g.moveTo(cs);
@@ -282,7 +283,7 @@ struct Prose : public Meta::Pinned {
         return {li, bi, ci};
     }
 
-    Math::Vec2f queryPosition(usize runeIndex) const {
+    Vec2Au queryPosition(usize runeIndex) const {
         auto [li, bi, ci] = lbcAt(runeIndex);
 
         if (isEmpty(_lines))
@@ -291,7 +292,7 @@ struct Prose : public Meta::Pinned {
         auto& line = _lines[li];
 
         if (isEmpty(line.blocks()))
-            return {0, line.baseline};
+            return {0_au, line.baseline};
 
         auto& block = line.blocks()[bi];
 

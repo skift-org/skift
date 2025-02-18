@@ -1,4 +1,5 @@
 #include <karm-base/ctype.h>
+#include <karm-io/aton.h>
 
 #include "url.h"
 
@@ -82,38 +83,36 @@ bool Url::isParentOf(Url const& other) const {
     return same and path.isParentOf(other.path);
 }
 
-Res<usize> Url::write(Io::TextWriter& writer) const {
-    usize written = 0;
-
+Res<> Url::unparse(Io::TextWriter& writer) const {
     if (scheme.len() > 0)
-        written += try$(Io::format(writer, "{}:", scheme));
+        try$(Io::format(writer, "{}:", scheme));
 
     if (authority.len() > 0 or host.len() > 0)
-        written += try$(writer.writeStr("//"s));
+        try$(writer.writeStr("//"s));
 
     if (authority.len() > 0)
-        written += try$(Io::format(writer, "{}@", authority));
+        try$(Io::format(writer, "{}@", authority));
 
     if (host.len() > 0)
-        written += try$(writer.writeStr(host.str()));
+        try$(writer.writeStr(host.str()));
 
     if (port)
-        written += try$(Io::format(writer, ":{}", port.unwrap()));
+        try$(Io::format(writer, ":{}", port.unwrap()));
 
-    written += try$(path.write(writer));
+    try$(path.unparse(writer));
 
     if (query.len() > 0)
-        written += try$(Io::format(writer, "?{}", query));
+        try$(Io::format(writer, "?{}", query));
 
     if (fragment.len() > 0)
-        written += try$(Io::format(writer, "#{}", fragment));
+        try$(Io::format(writer, "#{}", fragment));
 
-    return Ok(written);
+    return Ok();
 }
 
 String Url::str() const {
     Io::StringWriter writer;
-    write(writer).unwrap();
+    unparse(writer).unwrap("unparse error");
     return writer.str();
 }
 

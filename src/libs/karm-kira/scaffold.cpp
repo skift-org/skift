@@ -14,8 +14,8 @@ namespace Karm::Kira {
 Ui::Child mobilescaffold(Scaffold::State const& s, Scaffold const& scaffold) {
     Ui::Children body;
 
-    if (scaffold.midleTools)
-        body.pushBack(toolbar(scaffold.midleTools().unwrap()));
+    if (scaffold.middleTools)
+        body.pushBack(toolbar(scaffold.middleTools().unwrap()));
 
     if (s.sidebarOpen and scaffold.sidebar) {
         body.pushBack(
@@ -86,9 +86,9 @@ Ui::Child desktopscaffold(Scaffold::State const& s, Scaffold const& scaffold) {
             hflow(4, scaffold.startTools().unwrap())
         );
 
-    if (scaffold.midleTools)
+    if (scaffold.middleTools)
         tools.pushBack(
-            hflow(4, scaffold.midleTools().unwrap()) | Ui::grow()
+            hflow(4, scaffold.middleTools().unwrap()) | Ui::grow()
         );
 
     else if (scaffold.endTools)

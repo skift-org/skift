@@ -2,7 +2,9 @@
 
 #include <karm-base/distinct.h>
 #include <karm-base/map.h>
+#include <karm-io/aton.h>
 #include <karm-io/fmt.h>
+#include <karm-io/funcs.h>
 #include <karm-mime/url.h>
 
 namespace Karm::Net::Http {
@@ -169,10 +171,19 @@ struct Version {
         v.minor = try$(atou(s));
         return Ok(v);
     }
+
+    Res<> unparse(Io::TextWriter& w) {
+        try$(Io::format(w, "HTTP/{}.{}", major, minor));
+        return Ok();
+    }
 };
 
 struct Header {
-    Map<Str, Str> headers;
+    Map<String, String> headers;
+
+    void add(Str const& key, Str value) {
+        headers.put(key, std::move(value));
+    }
 
     Res<> _parse(Io::SScan& s) {
         while (not s.ended()) {
@@ -196,14 +207,24 @@ struct Header {
                 ) &
                 RE_ENDLINE;
 
+            if (s.skip("\r\n"))
+                break;
+
             if (not s.skip(RE_KEY_VALUE))
                 return Error::invalidData("Expected header");
 
             headers.put(key, value);
-
-            if (s.skip("\r\n"))
-                break;
         }
+
+        return Ok();
+    }
+
+    Res<> _unparse(Io::TextWriter& w) {
+        for (auto& [key, value] : headers.iter()) {
+            try$(Io::format(w, "{}: {}\r\n", key, value));
+        }
+
+        try$(w.writeStr("\r\n"s));
 
         return Ok();
     }
@@ -239,6 +260,22 @@ struct Request : public Header {
 
         return Ok(req);
     }
+
+    Res<> unparse(Io::TextWriter& w) {
+        // Start line
+
+        path.rooted = true;
+        try$(Io::format(w, "{} {} ", toStr(method), path));
+        path.rooted = false;
+
+        try$(version.unparse(w));
+        try$(w.writeStr("\r\n"s));
+
+        // Headers and empty line
+        try$(_unparse(w));
+
+        return Ok();
+    }
 };
 
 struct Response : public Header {
@@ -264,27 +301,61 @@ struct Response : public Header {
 
         return Ok(res);
     }
+
+    static Res<Response> read(Io::Reader& r) {
+        Io::BufferWriter bw;
+        while (true) {
+            auto [read, reachedDelim] = try$(Io::readLine(
+                r, bw, bytes("\r\n"s)
+            ));
+
+            if (not reachedDelim)
+                return Error::invalidInput("input stream ended with incomplete http header");
+
+            if (read == 0)
+                break;
+        }
+
+        Io::SScan scan{bw.bytes().cast<char>()};
+        return parse(scan);
+    }
+
+    Res<Opt<Buf<Byte>>> readBody(Io::Reader& r) {
+        auto contentLengthValue = headers.tryGet("Content-Length"s);
+        if (not contentLengthValue)
+            return Ok(NONE);
+
+        auto contentLength = try$(Io::atou(contentLengthValue.unwrap().str()));
+
+        Io::BufferWriter bodyBytes;
+        auto read = try$(Io::copy(r, bodyBytes, contentLength));
+
+        if (read != contentLength)
+            return Error::invalidInput("read body size is different from Content-Length header value");
+
+        return Ok(bodyBytes.take());
+    }
 };
 
 } // namespace Karm::Net::Http
 
 template <>
 struct Karm::Io::Formatter<Karm::Net::Http::Code> {
-    Res<usize> format(Io::TextWriter& writer, Karm::Net::Http::Code code) {
+    Res<> format(Io::TextWriter& writer, Karm::Net::Http::Code code) {
         return writer.writeStr(Karm::Net::Http::toStr(code));
     }
 };
 
 template <>
 struct Karm::Io::Formatter<Karm::Net::Http::Method> {
-    Res<usize> format(Io::TextWriter& writer, Karm::Net::Http::Method method) {
+    Res<> format(Io::TextWriter& writer, Karm::Net::Http::Method method) {
         return writer.writeStr(Karm::Net::Http::toStr(method));
     }
 };
 
 template <>
 struct Karm::Io::Formatter<Karm::Net::Http::Version> {
-    Res<usize> format(Io::TextWriter& writer, Karm::Net::Http::Version version) {
+    Res<> format(Io::TextWriter& writer, Karm::Net::Http::Version version) {
         return Io::format(writer, "HTTP/{}.{}", version.major, version.minor);
     }
 };

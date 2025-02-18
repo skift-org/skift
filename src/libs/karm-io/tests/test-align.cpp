@@ -16,7 +16,7 @@ struct {
 
 test$("fmt-align") {
     for (auto [a, width, input, expected] : CASES) {
-        auto result = try$(format("{}", aligned(input, a, width)));
+        auto result = format("{}", aligned(input, a, width));
         // logInfo("input: {}, expected: {}, result: {}", input, expected, result);
         expectEq$(result, expected);
     }

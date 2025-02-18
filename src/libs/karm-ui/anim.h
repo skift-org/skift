@@ -66,22 +66,22 @@ struct Eased {
         Ui::shouldAnimate(n);
     }
 
-    bool needRepaint(Node& n, App::Event& event) {
+    bool needRepaint(Node& n, App::Event& e) {
         if (not _animated)
             return false;
 
-        auto e = event.is<Node::AnimateEvent>();
-        if (not e)
+        auto ae = e.is<Node::AnimateEvent>();
+        if (not ae)
             return false;
 
         Ui::shouldAnimate(n);
 
         if (_delay > 0) {
-            _delay -= e->dt;
+            _delay -= ae->dt;
             return false;
         }
 
-        _elapsed += e->dt;
+        _elapsed += ae->dt;
         if (_elapsed > _duration) {
             _elapsed = _duration;
             _value = _target;

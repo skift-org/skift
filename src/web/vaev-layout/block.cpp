@@ -23,7 +23,7 @@ void maybeProcessChildBreakpoint(Fragmentainer& fc, Breakpoint& currentBreakpoin
     );
 }
 
-Res<None, Output> processBreakpointsAfterChild(Fragmentainer& fc, Breakpoint& currentBreakpoint, Box& parentBox, usize childIndex, Vec2Px currentBoxSize, bool childCompletelyLaidOut) {
+Res<None, Output> processBreakpointsAfterChild(Fragmentainer& fc, Breakpoint& currentBreakpoint, Box& parentBox, usize childIndex, Vec2Au currentBoxSize, bool childCompletelyLaidOut) {
     if (not fc.isDiscoveryMode())
         return Ok(NONE);
 
@@ -70,7 +70,7 @@ Res<None, Output> processBreakpointsAfterChild(Fragmentainer& fc, Breakpoint& cu
     return Ok(NONE);
 }
 
-Res<None, Output> processBreakpointsBeforeChild(usize endAt, Vec2Px currentSize, bool forcedBreakBefore, usize startAt) {
+Res<None, Output> processBreakpointsBeforeChild(usize endAt, Vec2Au currentSize, bool forcedBreakBefore, usize startAt) {
     // FORCED BREAK
     if (forcedBreakBefore and not(startAt == endAt)) {
         return Output{
@@ -85,7 +85,7 @@ Res<None, Output> processBreakpointsBeforeChild(usize endAt, Vec2Px currentSize,
 
 Output fragmentEmptyBox(Tree& tree, Input input) {
     // put this here instead of in layout.py since we want to know if its the empty box case
-    Vec2Px knownSize{input.knownSize.x.unwrapOr(0_px), input.knownSize.y.unwrapOr(0_px)};
+    Vec2Au knownSize{input.knownSize.x.unwrapOr(0_au), input.knownSize.y.unwrapOr(0_au)};
     if (tree.fc.isDiscoveryMode()) {
         if (tree.fc.acceptsFit(
                 input.position.y,
@@ -105,7 +105,7 @@ Output fragmentEmptyBox(Tree& tree, Input input) {
         }
     } else {
         // FIXME: we should be breaking empty boxes using pixels or percentages, this behaviour is not compliant
-        Px verticalSpaceLeft = tree.fc.leftVerticalSpace(
+        Au verticalSpaceLeft = tree.fc.leftVerticalSpace(
             input.position.y, input.pendingVerticalSizes
         );
         return Output{
@@ -117,14 +117,14 @@ Output fragmentEmptyBox(Tree& tree, Input input) {
 
 // https://www.w3.org/TR/CSS22/visuren.html#normal-flow
 struct BlockFormatingContext : public FormatingContext {
-    Px _computeCapmin(Tree& tree, Box& box, Input input, Px inlineSize) {
-        Px capmin{};
+    Au _computeCapmin(Tree& tree, Box& box, Input input, Au inlineSize) {
+        Au capmin{};
         for (auto& c : box.children()) {
             if (c.style->display != Display::TABLE_BOX) {
                 auto margin = computeMargins(
                     tree, c,
                     {
-                        .containingBlock = {inlineSize, input.knownSize.y.unwrapOr(0_px)},
+                        .containingBlock = {inlineSize, input.knownSize.y.unwrapOr(0_au)},
                     }
                 );
 
@@ -143,8 +143,8 @@ struct BlockFormatingContext : public FormatingContext {
     }
 
     Output run(Tree& tree, Box& box, Input input, usize startAt, Opt<usize> stopAt) override {
-        Px blockSize = 0_px;
-        Px inlineSize = input.knownSize.width.unwrapOr(0_px);
+        Au blockSize = 0_au;
+        Au inlineSize = input.knownSize.width.unwrapOr(0_au);
 
         if (box.children().len() == 0) {
             return fragmentEmptyBox(tree, input);
@@ -167,7 +167,7 @@ struct BlockFormatingContext : public FormatingContext {
             try$(
                 processBreakpointsBeforeChild(
                     i,
-                    Vec2Px{inlineSize, blockSize},
+                    Vec2Au{inlineSize, blockSize},
                     c.style->break_->before == BreakBetween::PAGE,
                     startAt
                 )
@@ -180,15 +180,15 @@ struct BlockFormatingContext : public FormatingContext {
             Input childInput = {
                 .fragment = input.fragment,
                 .intrinsic = input.intrinsic,
-                .availableSpace = {input.availableSpace.x, 0_px},
-                .containingBlock = {inlineSize, input.knownSize.y.unwrapOr(0_px)},
+                .availableSpace = {input.availableSpace.x, 0_au},
+                .containingBlock = {inlineSize, input.knownSize.y.unwrapOr(0_au)},
                 .breakpointTraverser = input.breakpointTraverser.traverseInsideUsingIthChild(i),
                 .pendingVerticalSizes = input.pendingVerticalSizes,
             };
 
             auto margin = computeMargins(tree, c, childInput);
 
-            Opt<Px> childInlineSize = NONE;
+            Opt<Au> childInlineSize = NONE;
             if (c.style->sizing->width == Size::AUTO) {
                 childInlineSize = inlineSize - margin.horizontal();
             }
@@ -199,7 +199,7 @@ struct BlockFormatingContext : public FormatingContext {
                     childInput.knownSize.width = childInlineSize;
             }
 
-            childInput.position = input.position + Vec2Px{margin.start, blockSize};
+            childInput.position = input.position + Vec2Au{margin.start, blockSize};
 
             // HACK: Table Box mostly behaves like a block box, let's compute its capmin
             //       and avoid duplicating the layout code
@@ -229,7 +229,7 @@ struct BlockFormatingContext : public FormatingContext {
                 currentBreakpoint,
                 box,
                 i,
-                Vec2Px{inlineSize, blockSize},
+                Vec2Au{inlineSize, blockSize},
                 output.completelyLaidOut
             ));
 
@@ -241,7 +241,7 @@ struct BlockFormatingContext : public FormatingContext {
         }
 
         return {
-            .size = Vec2Px{inlineSize, blockSize},
+            .size = Vec2Au{inlineSize, blockSize},
             .completelyLaidOut = blockWasCompletelyLaidOut,
             .breakpoint = currentBreakpoint
         };

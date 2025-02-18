@@ -4,7 +4,7 @@
 #include "media.h"
 #include "origin.h"
 #include "page.h"
-#include "select.h"
+#include "selector.h"
 #include "styles.h"
 
 namespace Vaev::Style {
@@ -19,7 +19,7 @@ struct StyleRule {
 
     void repr(Io::Emit& e) const;
 
-    Opt<Spec> matchWithSpecificity(Markup::Element const& el) const;
+    Opt<Spec> match(Gc::Ref<Dom::Element> el) const;
 
     static StyleRule parse(Css::Sst const& sst, Origin origin = Origin::AUTHOR);
 };

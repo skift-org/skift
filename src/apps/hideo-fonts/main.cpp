@@ -106,15 +106,15 @@ Ui::Child fontfaceTags(Text::FontAttrs const& attrs) {
     }
 
     if (attrs.style != Text::FontStyle::NORMAL) {
-        children.pushBack(fontfaceTag(Io::toStr(attrs.style).unwrap()));
+        children.pushBack(fontfaceTag(Io::toStr(attrs.style)));
     }
 
     if (attrs.stretch != Text::FontStretch::NORMAL) {
-        children.pushBack(fontfaceTag(Io::toStr(attrs.stretch).unwrap()));
+        children.pushBack(fontfaceTag(Io::toStr(attrs.stretch)));
     }
 
     if (attrs.weight != Text::FontWeight::REGULAR) {
-        children.pushBack(fontfaceTag(Io::toStr(attrs.weight).unwrap()));
+        children.pushBack(fontfaceTag(Io::toStr(attrs.weight)));
     }
 
     return Ui::hflow(4, children);
@@ -208,8 +208,16 @@ Ui::Child app(Text::FontBook book) {
         return Kr::scaffold({
             .icon = Mdi::FORMAT_FONT,
             .title = "Fonts"s,
-            .startTools = slots$(Ui::button(Model::bindIf<GoBack>(s.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT)),
-            .body = slot$(appContent(s)),
+            .startTools = [&] -> Ui::Children {
+                return {Ui::button(
+                    Model::bindIf<GoBack>(s.canGoBack()),
+                    Ui::ButtonStyle::subtle(),
+                    Mdi::ARROW_LEFT
+                )};
+            },
+            .body = [&] {
+                return appContent(s);
+            },
         });
     });
 }

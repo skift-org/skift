@@ -5,8 +5,8 @@ namespace Vaev::Style::Tests {
 
 static Media const TEST_MEDIA = {
     .type = MediaType::SCREEN,
-    .width = 1920_px,
-    .height = 1080_px,
+    .width = 1920_au,
+    .height = 1080_au,
     .aspectRatio = 16.0 / 9.0,
     .orientation = Print::Orientation::LANDSCAPE,
 
@@ -33,8 +33,8 @@ static Media const TEST_MEDIA = {
     .prefersColorScheme = ColorScheme::LIGHT,
     .prefersReducedData = ReducedData::REDUCE,
 
-    .deviceWidth = 1920_px,
-    .deviceHeight = 1080_px,
+    .deviceWidth = 1920_au,
+    .deviceHeight = 1080_au,
     .deviceAspectRatio = 16.0 / 9.0,
 };
 
@@ -46,26 +46,26 @@ test$("feature-type") {
 }
 
 test$("feature-width") {
-    expect$(WidthFeature::min(1000_px)
+    expect$(WidthFeature::min(1000_au)
                 .match(TEST_MEDIA));
 
-    expect$(WidthFeature::max(2000_px)
+    expect$(WidthFeature::max(2000_au)
                 .match(TEST_MEDIA));
 
-    expect$(WidthFeature::exact(1920_px)
+    expect$(WidthFeature::exact(1920_au)
                 .match(TEST_MEDIA));
 
     return Ok();
 }
 
 test$("feature-height") {
-    expect$(HeightFeature::min(1000_px)
+    expect$(HeightFeature::min(1000_au)
                 .match(TEST_MEDIA));
 
-    expect$(HeightFeature::max(2000_px)
+    expect$(HeightFeature::max(2000_au)
                 .match(TEST_MEDIA));
 
-    expect$(HeightFeature::exact(1080_px)
+    expect$(HeightFeature::exact(1080_au)
                 .match(TEST_MEDIA));
 
     return Ok();
@@ -256,26 +256,26 @@ test$("feature-prefers-reduced-data") {
 }
 
 test$("feature-device-width") {
-    expect$(DeviceWidthFeature::min(1920_px)
+    expect$(DeviceWidthFeature::min(1920_au)
                 .match(TEST_MEDIA));
 
-    expect$(DeviceWidthFeature::max(1920_px)
+    expect$(DeviceWidthFeature::max(1920_au)
                 .match(TEST_MEDIA));
 
-    expect$(DeviceWidthFeature::exact(1920_px)
+    expect$(DeviceWidthFeature::exact(1920_au)
                 .match(TEST_MEDIA));
 
     return Ok();
 }
 
 test$("feature-device-height") {
-    expect$(DeviceHeightFeature::min(1080_px)
+    expect$(DeviceHeightFeature::min(1080_au)
                 .match(TEST_MEDIA));
 
-    expect$(DeviceHeightFeature::max(1080_px)
+    expect$(DeviceHeightFeature::max(1080_au)
                 .match(TEST_MEDIA));
 
-    expect$(DeviceHeightFeature::exact(1080_px)
+    expect$(DeviceHeightFeature::exact(1080_au)
                 .match(TEST_MEDIA));
 
     return Ok();

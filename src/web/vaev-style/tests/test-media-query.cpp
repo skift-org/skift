@@ -5,8 +5,8 @@ namespace Vaev::Style::Tests {
 
 static Media const TEST_MEDIA = {
     .type = MediaType::SCREEN,
-    .width = 1920_px,
-    .height = 1080_px,
+    .width = 1920_au,
+    .height = 1080_au,
     .aspectRatio = 16.0 / 9.0,
     .orientation = Print::Orientation::LANDSCAPE,
 
@@ -33,15 +33,15 @@ static Media const TEST_MEDIA = {
     .prefersColorScheme = ColorScheme::LIGHT,
     .prefersReducedData = ReducedData::REDUCE,
 
-    .deviceWidth = 1920_px,
-    .deviceHeight = 1080_px,
+    .deviceWidth = 1920_au,
+    .deviceHeight = 1080_au,
     .deviceAspectRatio = 16.0 / 9.0,
 };
 
 test$("logical-and") {
     auto query = MediaQuery::combineAnd(
         TypeFeature{MediaType::SCREEN},
-        WidthFeature::min(1920_px)
+        WidthFeature::min(1920_au)
     );
 
     expect$(query.match(TEST_MEDIA));
@@ -52,7 +52,7 @@ test$("logical-and") {
 test$("logical-or") {
     auto query = MediaQuery::combineOr(
         TypeFeature{MediaType::SCREEN},
-        WidthFeature::min(1920_px)
+        WidthFeature::min(1920_au)
     );
 
     expect$(query.match(TEST_MEDIA));

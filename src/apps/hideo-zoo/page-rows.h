@@ -36,36 +36,50 @@ static inline Page PAGE_ROWS{
             button,
             Ui::separator(),
             Kr::treeRow(
-                slot$(Ui::icon(Mdi::TOGGLE_SWITCH)), "Switches"s, NONE,
-                slots$(
-                    Kr::toggleRow(true, NONE, "Some property"s),
-                    Kr::toggleRow(true, NONE, "Some property"s),
-                    Kr::toggleRow(true, NONE, "Some property"s)
-                )
+                [&] -> Ui::Child {
+                    return Ui::icon(Mdi::TOGGLE_SWITCH);
+                },
+                "Switches"s,
+                NONE,
+                Ui::Slots{[&] -> Ui::Children {
+                    return {
+                        Kr::toggleRow(true, NONE, "Some property"s),
+                        Kr::toggleRow(true, NONE, "Some property"s),
+                        Kr::toggleRow(true, NONE, "Some property"s),
+                    };
+                }}
             ),
 
             Ui::separator(),
             Kr::treeRow(
-                slot$(Ui::icon(Mdi::CHECKBOX_MARKED)),
+                [&] -> Ui::Child {
+                    return Ui::icon(Mdi::CHECKBOX_MARKED);
+                },
                 "Checkboxs"s,
                 NONE,
-                slots$(
-                    Kr::checkboxRow(true, NONE, "Some property"s),
-                    Kr::checkboxRow(false, NONE, "Some property"s),
-                    Kr::checkboxRow(false, NONE, "Some property"s)
-                )
+                Ui::Slots{[&] -> Ui::Children {
+                    return {
+                        Kr::checkboxRow(true, NONE, "Some property"s),
+                        Kr::checkboxRow(false, NONE, "Some property"s),
+                        Kr::checkboxRow(false, NONE, "Some property"s),
+                    };
+                }}
             ),
 
             Ui::separator(),
             Kr::treeRow(
-                slot$(Ui::icon(Mdi::RADIOBOX_MARKED)),
+                [&] -> Ui::Child {
+                    return Ui::icon(Mdi::RADIOBOX_MARKED);
+                },
                 "Radios"s,
                 NONE,
-                slots$(
-                    Kr::radioRow(true, NONE, "Some property"s),
-                    Kr::radioRow(false, NONE, "Some property"s),
-                    Kr::radioRow(false, NONE, "Some property"s)
-                )
+                Ui::Slots{[&] -> Ui::Children {
+                    return {
+                        Kr::radioRow(true, NONE, "Some property"s),
+                        Kr::radioRow(false, NONE, "Some property"s),
+                        Kr::radioRow(false, NONE, "Some property"s)
+                    };
+                }}
             ),
             Ui::separator(),
             Kr::sliderRow(

@@ -71,4 +71,15 @@ test$("search-upper-bound") {
     return Ok();
 }
 
+test$("slice-contains") {
+    expect$(contains("Hello, world!"s, "world"s));
+    expect$(contains("Hello, world!"s, "world!"s));
+    expect$(contains("Hello, world!"s, "Hello"s));
+    expect$(contains("Hello, world!"s, "Hello, world!"s));
+    expectNot$(contains("Hello, world!"s, "Hello, world! "s));
+    expectNot$(contains("Hello, world!"s, "bruh"s));
+
+    return Ok();
+}
+
 } // namespace Karm::Base

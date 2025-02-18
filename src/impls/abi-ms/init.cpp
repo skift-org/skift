@@ -1,7 +1,7 @@
 // from https://wiki.osdev.org/Visual_C%2B%2B_Runtime
 
-typedef void(__cdecl *_PVFV)(void);
-typedef int(__cdecl *_PIFV)(void);
+typedef void(__cdecl* _PVFV)(void);
+typedef int(__cdecl* _PIFV)(void);
 
 // Linker puts constructors between these sections, and we use them to locate constructor pointers.
 #pragma section(".CRT$XIA", long, read)
@@ -24,7 +24,7 @@ extern __declspec(allocate(".CRT$XCA")) _PVFV __xc_a[];
 extern __declspec(allocate(".CRT$XCZ")) _PVFV __xc_z[]; // C++ initializers
 
 // Call C constructors
-static int _initterm_e(_PIFV *pfbegin, _PIFV *pfend) {
+static int _initterm_e(_PIFV* pfbegin, _PIFV* pfend) {
     int ret = 0;
 
     // walk the table of function pointers from the bottom up, until
@@ -42,7 +42,7 @@ static int _initterm_e(_PIFV *pfbegin, _PIFV *pfend) {
 }
 
 // Call C++ constructors
-static void _initterm(_PVFV *pfbegin, _PVFV *pfend) {
+static void _initterm(_PVFV* pfbegin, _PVFV* pfend) {
     // walk the table of function pointers from the bottom up, until
     // the end is encountered.  Do not skip the first entry.  The initial
     // value of pfbegin points to the first valid entry.  Do not try to

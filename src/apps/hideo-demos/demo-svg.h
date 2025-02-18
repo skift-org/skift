@@ -17,7 +17,7 @@ static inline Demo SVG_DEMO{
     "SVG rendering",
     [] {
         return Ui::canvas(
-            [](Gfx::Canvas &g, auto...) {
+            [](Gfx::Canvas& g, auto...) {
                 g.beginPath();
 
                 Math::Path p;

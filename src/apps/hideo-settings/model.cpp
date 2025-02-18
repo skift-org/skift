@@ -2,7 +2,7 @@
 
 namespace Hideo::Settings {
 
-Ui::Task<Action> reduce(State &s, Action action) {
+Ui::Task<Action> reduce(State& s, Action action) {
     action.visit(Visitor{
         [&](GoTo a) {
             if (s.page() == a.page)

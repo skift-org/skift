@@ -27,7 +27,7 @@ Ui::Child textButton(Ui::OnPress onPress, String t) {
     return textButton(std::move(onPress), Ui::ButtonStyle::regular(), t);
 }
 
-Ui::Child keypad(State const &state) {
+Ui::Child keypad(State const& state) {
     return Ui::insets(
         8,
         Ui::grid(
@@ -79,7 +79,7 @@ Ui::Child keypad(State const &state) {
     );
 }
 
-Ui::Child screen(State const &state) {
+Ui::Child screen(State const& state) {
     // auto debugExpr = Ui::text("op: {}, lhs: {}, rhs: {}", toFmt(state.op), state.lhs, state.rhs);
 
     auto currExpr =
@@ -97,7 +97,7 @@ Ui::Child screen(State const &state) {
 }
 
 Ui::Child app() {
-    return Ui::reducer<Model>([](State const &state) {
+    return Ui::reducer<Model>([](State const& state) {
         return Kr::scaffold({
             .icon = Mdi::CALCULATOR,
             .title = "Calculator"s,

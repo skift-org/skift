@@ -12,7 +12,7 @@ namespace Hideo::Images {
 Ui::Child app(State initial) {
     return Ui::reducer<Model>(
         initial,
-        [](auto const &state) {
+        [](auto const& state) {
             return Kr::scaffold({
                 .icon = Mdi::IMAGE,
                 .title = "Images"s,
@@ -28,8 +28,8 @@ Ui::Child app(State initial) {
 
 } // namespace Hideo::Images
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
-    auto &args = useArgs(ctx);
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
+    auto& args = useArgs(ctx);
     Res<Image::Picture> image = Error::invalidInput("No image provided");
 
     if (args.len()) {

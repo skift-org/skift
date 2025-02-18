@@ -9,15 +9,15 @@ Res<Rc<Host>> makeHost(Child) {
 }
 
 struct Host : public Ui::ProxyNode<Host> {
-    Rpc::Endpoint &_endpoint;
+    Rpc::Endpoint& _endpoint;
     Rpc::Port _shell;
     Grund::Shell::Api::Instance _instance;
 
-    Host(Child child, Rpc::Endpoint &endpoint, Rpc::Port shell, Grund::Shell::Api::Instance surface)
+    Host(Child child, Rpc::Endpoint& endpoint, Rpc::Port shell, Grund::Shell::Api::Instance surface)
         : Ui::ProxyNode<Host>(std::move(child)), _endpoint(endpoint), _shell(shell), _instance(surface) {}
 };
 
-Async::Task<> runAsync(Sys::Context &ctx, Child root) {
+Async::Task<> runAsync(Sys::Context& ctx, Child root) {
     auto endpoint = Rpc::Endpoint::create(ctx);
     auto shell = co_trya$(endpoint.callAsync<Grund::Bus::Api::Locate>(Rpc::Port::BUS, "grund-shell"s));
     auto size = root->size({1024, 720}, Hint::MIN);

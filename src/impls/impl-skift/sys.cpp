@@ -8,15 +8,15 @@
 
 namespace Karm::Sys::_Embed {
 
-Res<Rc<Sys::Fd>> unpackFd(Io::PackScan &s) {
+Res<Rc<Sys::Fd>> unpackFd(Io::PackScan& s) {
     return Skift::unpackFd(s);
 }
 
 // MARK: File I/O --------------------------------------------------------------
 
-Res<Rc<Sys::Fd>> openFile(Mime::Url const &url) {
+Res<Rc<Sys::Fd>> openFile(Mime::Url const& url) {
     auto urlStr = url.str();
-    auto *fileRecord = useHandover().fileByName(urlStr.buf());
+    auto* fileRecord = useHandover().fileByName(urlStr.buf());
     if (not fileRecord)
         return Error::invalidFilename();
     auto vmo = try$(Hj::Vmo::create(Hj::ROOT, fileRecord->start, fileRecord->size, Hj::VmoFlags::DMA));
@@ -25,11 +25,11 @@ Res<Rc<Sys::Fd>> openFile(Mime::Url const &url) {
     return Ok(makeRc<Skift::VmoFd>(std::move(vmo)));
 }
 
-Res<Rc<Sys::Fd>> createFile(Mime::Url const &) {
+Res<Rc<Sys::Fd>> createFile(Mime::Url const&) {
     notImplemented();
 }
 
-Res<Rc<Sys::Fd>> openOrCreateFile(Mime::Url const &) {
+Res<Rc<Sys::Fd>> openOrCreateFile(Mime::Url const&) {
     notImplemented();
 }
 
@@ -49,11 +49,11 @@ Res<Rc<Sys::Fd>> createErr() {
     return Ok(makeRc<Sys::NullFd>());
 }
 
-Res<Vec<Sys::DirEntry>> readDir(Mime::Url const &) {
+Res<Vec<Sys::DirEntry>> readDir(Mime::Url const&) {
     notImplemented();
 }
 
-Res<Stat> stat(Mime::Url const &) {
+Res<Stat> stat(Mime::Url const&) {
     notImplemented();
 }
 
@@ -103,16 +103,16 @@ Duration uptime() {
 
 // MARK: Memory Managment ------------------------------------------------------
 
-Res<Sys::MmapResult> memMap(Sys::MmapOptions const &) {
+Res<Sys::MmapResult> memMap(Sys::MmapOptions const&) {
     notImplemented();
 }
 
-Res<Sys::MmapResult> memMap(Sys::MmapOptions const &, Rc<Sys::Fd> fd) {
+Res<Sys::MmapResult> memMap(Sys::MmapOptions const&, Rc<Sys::Fd> fd) {
     auto vmoFd = fd.is<Skift::VmoFd>();
     if (not vmoFd)
         return Error::invalidInput("expected VmoFd");
 
-    auto &vmo = vmoFd->vmo();
+    auto& vmo = vmoFd->vmo();
     auto range = try$(Hj::Space::self().map(vmo, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
 
     return Ok(Sys::MmapResult{
@@ -122,33 +122,33 @@ Res<Sys::MmapResult> memMap(Sys::MmapOptions const &, Rc<Sys::Fd> fd) {
     });
 }
 
-Res<> memUnmap(void const *ptr, usize size) {
+Res<> memUnmap(void const* ptr, usize size) {
     return Hj::Space::self().unmap({(usize)ptr, size});
 }
 
-Res<> memFlush(void *, usize) {
+Res<> memFlush(void*, usize) {
     notImplemented();
 }
 
 // MARK: System Informations ---------------------------------------------------
 
-Res<> populate(Sys::SysInfo &) {
+Res<> populate(Sys::SysInfo&) {
     notImplemented();
 }
 
-Res<> populate(Sys::MemInfo &) {
+Res<> populate(Sys::MemInfo&) {
     notImplemented();
 }
 
-Res<> populate(Vec<Sys::CpuInfo> &) {
+Res<> populate(Vec<Sys::CpuInfo>&) {
     notImplemented();
 }
 
-Res<> populate(Sys::UserInfo &) {
+Res<> populate(Sys::UserInfo&) {
     notImplemented();
 }
 
-Res<> populate(Vec<Sys::UserInfo> &) {
+Res<> populate(Vec<Sys::UserInfo>&) {
     notImplemented();
 }
 

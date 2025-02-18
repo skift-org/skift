@@ -23,9 +23,9 @@ static SystemTime fromEfi(Efi::Time time) {
 }
 
 struct ConOut : public Fd {
-    Efi::SimpleTextOutputProtocol *_proto;
+    Efi::SimpleTextOutputProtocol* _proto;
 
-    ConOut(Efi::SimpleTextOutputProtocol *proto) : _proto(proto) {}
+    ConOut(Efi::SimpleTextOutputProtocol* proto) : _proto(proto) {}
 
     Handle handle() const override {
         return Handle{(usize)_proto};
@@ -88,15 +88,15 @@ struct ConOut : public Fd {
         notImplemented();
     }
 
-    Res<> pack(Io::PackEmit &) override {
+    Res<> pack(Io::PackEmit&) override {
         notImplemented();
     }
 };
 
 struct FileProto : public Fd {
-    Efi::FileProtocol *_proto = nullptr;
+    Efi::FileProtocol* _proto = nullptr;
 
-    FileProto(Efi::FileProtocol *proto) : _proto(proto) {}
+    FileProto(Efi::FileProtocol* proto) : _proto(proto) {}
 
     ~FileProto() {
         if (_proto) {
@@ -104,11 +104,11 @@ struct FileProto : public Fd {
         }
     }
 
-    FileProto(FileProto &&other) {
+    FileProto(FileProto&& other) {
         std::swap(_proto, other._proto);
     }
 
-    FileProto &operator=(FileProto &&other) {
+    FileProto& operator=(FileProto&& other) {
         std::swap(_proto, other._proto);
         return *this;
     }
@@ -140,7 +140,7 @@ struct FileProto : public Fd {
         Buf<u8> buf;
         buf.resize(bufSize, 0);
 
-        Efi::FileInfo *info = (Efi::FileInfo *)buf.buf();
+        Efi::FileInfo* info = (Efi::FileInfo*)buf.buf();
         try$(_proto->getInfo(_proto, &Efi::FileInfo::GUID, &bufSize, info));
 
         usize pos = seek.apply(current, info->fileSize);
@@ -168,7 +168,7 @@ struct FileProto : public Fd {
     }
 
     Res<Stat> stat() override {
-        Efi::FileInfo *info = nullptr;
+        Efi::FileInfo* info = nullptr;
         usize bufSize = 0;
         // NOTE: This is expectected to fail
         (void)_proto->getInfo(_proto, &Efi::FileInfo::GUID, &bufSize, nullptr);
@@ -176,7 +176,7 @@ struct FileProto : public Fd {
         Buf<u8> buf;
         buf.resize(bufSize, 0);
 
-        info = (Efi::FileInfo *)buf.buf();
+        info = (Efi::FileInfo*)buf.buf();
         try$(_proto->getInfo(_proto, &Efi::FileInfo::GUID, &bufSize, info));
 
         return Ok<Stat>(Stat{
@@ -196,12 +196,12 @@ struct FileProto : public Fd {
         notImplemented();
     }
 
-    Res<> pack(Io::PackEmit &) override {
+    Res<> pack(Io::PackEmit&) override {
         notImplemented();
     }
 };
 
-Res<Rc<Fd>> unpackFd(Io::PackScan &) {
+Res<Rc<Fd>> unpackFd(Io::PackScan&) {
     notImplemented();
 }
 
@@ -294,18 +294,18 @@ static Res<Mime::Path> resolve(Mime::Url url) {
     }
 }
 
-Res<Rc<Fd>> openFile(Mime::Url const &url) {
-    static Efi::SimpleFileSystemProtocol *fileSystem = nullptr;
+Res<Rc<Fd>> openFile(Mime::Url const& url) {
+    static Efi::SimpleFileSystemProtocol* fileSystem = nullptr;
     if (not fileSystem) {
         fileSystem = try$(Efi::openProtocol<Efi::SimpleFileSystemProtocol>(Efi::li()->deviceHandle));
     }
 
-    static Efi::FileProtocol *rootDir = nullptr;
+    static Efi::FileProtocol* rootDir = nullptr;
     if (not rootDir) {
         try$(fileSystem->openVolume(fileSystem, &rootDir));
     }
 
-    Efi::FileProtocol *file = nullptr;
+    Efi::FileProtocol* file = nullptr;
     auto resolved = try$(resolve(url)).str();
 
     _StringBuilder<Utf16> b;
@@ -324,19 +324,19 @@ Res<Rc<Fd>> openFile(Mime::Url const &url) {
     return Ok(makeRc<FileProto>(file));
 }
 
-Res<Vec<DirEntry>> readDir(Mime::Url const &) {
+Res<Vec<DirEntry>> readDir(Mime::Url const&) {
     return Error::notImplemented();
 }
 
-Res<Rc<Fd>> createFile(Mime::Url const &) {
+Res<Rc<Fd>> createFile(Mime::Url const&) {
     return Error::notImplemented();
 }
 
-Res<Rc<Fd>> openOrCreateFile(Mime::Url const &) {
+Res<Rc<Fd>> openOrCreateFile(Mime::Url const&) {
     return Error::notImplemented();
 }
 
-Res<MmapResult> memMap(MmapOptions const &options) {
+Res<MmapResult> memMap(MmapOptions const& options) {
     usize vaddr = 0;
 
     try$(Efi::bs()->allocatePages(
@@ -350,7 +350,7 @@ Res<MmapResult> memMap(MmapOptions const &options) {
     return Ok(MmapResult{vaddr, vaddr, options.size});
 }
 
-Res<MmapResult> memMap(MmapOptions const &, Rc<Fd> fd) {
+Res<MmapResult> memMap(MmapOptions const&, Rc<Fd> fd) {
     usize vaddr = 0;
     usize fileSize = try$(Io::size(*fd));
 
@@ -360,7 +360,7 @@ Res<MmapResult> memMap(MmapOptions const &, Rc<Fd> fd) {
         Hal::pageAlignUp(fileSize) / Hal::PAGE_SIZE, &vaddr
     ));
 
-    MutBytes bytes = {(Byte *)vaddr, fileSize};
+    MutBytes bytes = {(Byte*)vaddr, fileSize};
     Io::BufWriter writer{bytes};
     try$(Io::copy(*fd, writer));
 
@@ -368,16 +368,16 @@ Res<MmapResult> memMap(MmapOptions const &, Rc<Fd> fd) {
     return Ok(MmapResult{vaddr, vaddr, Hal::pageAlignUp(fileSize)});
 }
 
-Res<> memUnmap(void const *buf, usize size) {
+Res<> memUnmap(void const* buf, usize size) {
     try$(Efi::bs()->freePages((u64)buf, size / Hal::PAGE_SIZE));
     return Ok();
 }
 
-Res<> memFlush(void *, usize) {
+Res<> memFlush(void*, usize) {
     return Ok();
 }
 
-Res<Stat> stat(Mime::Url const &) {
+Res<Stat> stat(Mime::Url const&) {
     notImplemented();
 }
 
@@ -411,23 +411,23 @@ Instant instant() {
 
 // MARK: System Informations ---------------------------------------------------
 
-Res<> populate(SysInfo &) {
+Res<> populate(SysInfo&) {
     return Error::notImplemented();
 }
 
-Res<> populate(MemInfo &) {
+Res<> populate(MemInfo&) {
     return Error::notImplemented();
 }
 
-Res<> populate(Vec<CpuInfo> &) {
+Res<> populate(Vec<CpuInfo>&) {
     return Error::notImplemented();
 }
 
-Res<> populate(UserInfo &) {
+Res<> populate(UserInfo&) {
     return Error::notImplemented();
 }
 
-Res<> populate(Vec<UserInfo> &) {
+Res<> populate(Vec<UserInfo>&) {
     return Error::notImplemented();
 }
 

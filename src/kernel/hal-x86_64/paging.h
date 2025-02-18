@@ -51,8 +51,8 @@ struct [[gnu::packed]] Entry {
     }
 
     template <typename T>
-    T *as() {
-        return (T *)paddr();
+    T* as() {
+        return (T*)paddr();
     }
 
     usize paddr() const { return _raw & PADDR_MASK; }
@@ -77,9 +77,9 @@ struct [[gnu::packed]] Pml {
 
     Entry pages[LEN];
 
-    Entry &operator[](usize i) { return pages[i]; }
+    Entry& operator[](usize i) { return pages[i]; }
 
-    Entry const &operator[](usize i) const { return pages[i]; }
+    Entry const& operator[](usize i) const { return pages[i]; }
 
     usize virt2index(usize virt) const {
         return (virt >> (12 + (LEVEL - 1) * 9)) & 0x1ff;
@@ -100,7 +100,7 @@ struct [[gnu::packed]] Pml {
             return page.paddr() + (virt & 0x1ff);
         }
 
-        auto *pml = (Lower *)page.paddr();
+        auto* pml = (Lower*)page.paddr();
         return pml->virt2phys(virt);
     }
 

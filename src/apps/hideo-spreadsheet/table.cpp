@@ -6,18 +6,18 @@
 namespace Hideo::Spreadsheet {
 
 struct Table : public Ui::View<Table> {
-    State const *_state;
+    State const* _state;
     Math::Vec2i _scroll;
     Ui::MouseListener _mouseListener;
 
-    Table(State const &state)
+    Table(State const& state)
         : _state(&state) {}
 
-    void reconcile(Table &o) override {
+    void reconcile(Table& o) override {
         _state = o._state;
     }
 
-    Sheet const &sheet() {
+    Sheet const& sheet() {
         return _state->activeSheet();
     }
 
@@ -52,7 +52,7 @@ struct Table : public Ui::View<Table> {
 
     // MARK: Events ------------------------------------------------------------
 
-    void event(App::Event &event) override {
+    void event(App::Event& event) override {
         auto e = event.is<App::MouseEvent>();
         if (not e)
             return;
@@ -83,11 +83,11 @@ struct Table : public Ui::View<Table> {
 
     // MARK: Painting ----------------------------------------------------------
 
-    void paintCell(Gfx::Canvas &g, Cell const &, Math::Recti bound) {
+    void paintCell(Gfx::Canvas& g, Cell const&, Math::Recti bound) {
         g.rect(bound.cast<f64>());
     }
 
-    void paintColHeader(Gfx::Canvas &g, usize idx) {
+    void paintColHeader(Gfx::Canvas& g, usize idx) {
         auto col = sheet().cols[idx];
         auto bound = colHeaderBound(idx);
         auto sep = Math::Edgei{
@@ -102,7 +102,7 @@ struct Table : public Ui::View<Table> {
         g.plot(sep, Gfx::WHITE.withOpacity(0.05));
     }
 
-    void paintRowHeader(Gfx::Canvas &g, usize idx) {
+    void paintRowHeader(Gfx::Canvas& g, usize idx) {
         auto row = sheet().rows[idx];
         Math::Recti bound = {0, row.y, CELL_WIDTH, row.height};
         Math::Edgei sep = {
@@ -117,7 +117,7 @@ struct Table : public Ui::View<Table> {
         g.plot(sep, Gfx::WHITE.withOpacity(0.05));
     }
 
-    void paintSelection(Gfx::Canvas &g, Range r) {
+    void paintSelection(Gfx::Canvas& g, Range r) {
         auto start = cellBound(r.start.row, r.start.col);
         auto end = cellBound(r.end.row, r.end.col);
         auto all = start.mergeWith(end);
@@ -139,7 +139,7 @@ struct Table : public Ui::View<Table> {
         g.stroke();
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti) override {
+    void paint(Gfx::Canvas& g, Math::Recti) override {
         g.push();
         g.clip(bound());
         g.origin(bound().xy.cast<f64>());
@@ -191,7 +191,7 @@ struct Table : public Ui::View<Table> {
     }
 };
 
-Ui::Child table(State const &s) {
+Ui::Child table(State const& s) {
     return makeRc<Table>(s);
 }
 

@@ -8,7 +8,7 @@
 
 #include "fd.h"
 
-void __panicHandler(Karm::PanicKind kind, char const *msg) {
+void __panicHandler(Karm::PanicKind kind, char const* msg) {
     Hj::log(msg).unwrap();
 
     if (kind == Karm::PanicKind::PANIC) {
@@ -21,10 +21,10 @@ extern "C" [[gnu::weak]] void __entryPoint(usize rawHandover, usize rawIn, usize
     Abi::SysV::init();
     Karm::registerPanicHandler(__panicHandler);
 
-    auto &ctx = Sys::globalContext();
-    char const *argv[] = {"service", nullptr};
+    auto& ctx = Sys::globalContext();
+    char const* argv[] = {"service", nullptr};
     ctx.add<Sys::ArgsHook>(1, argv);
-    ctx.add<HandoverHook>((Handover::Payload *)rawHandover);
+    ctx.add<HandoverHook>((Handover::Payload*)rawHandover);
     auto fd = makeRc<Skift::IpcFd>(Hj::Cap{rawIn}, Hj::Cap{rawOut});
     ctx.add<ChannelHook>(Sys::IpcConnection{fd, ""_url});
 

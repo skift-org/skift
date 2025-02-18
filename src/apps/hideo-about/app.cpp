@@ -43,7 +43,7 @@ Ui::Child app() {
                 });
 
                 auto licenseBtn = Ui::button(
-                    [](auto &n) {
+                    [](auto& n) {
                         Ui::showDialog(n, Kr::licenseDialog());
                     },
                     Ui::ButtonStyle::outline(), Mdi::LICENSE, "License"

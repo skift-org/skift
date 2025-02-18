@@ -4,7 +4,7 @@
 
 #include "loader.h"
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
     logInfo("opstart " stringify$(__ck_version_value));
 
     logInfo("loading configs...");

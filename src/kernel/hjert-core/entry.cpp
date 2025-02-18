@@ -14,7 +14,7 @@
 
 namespace Hjert::Core {
 
-Res<> validateAndDump(u64 magic, Handover::Payload &payload) {
+Res<> validateAndDump(u64 magic, Handover::Payload& payload) {
     if (not Handover::valid(magic, payload)) {
         logInfo("entry: handover: invalid");
         return Error::invalidInput("Invalid handover payload");
@@ -25,7 +25,7 @@ Res<> validateAndDump(u64 magic, Handover::Payload &payload) {
 
     usize totalFree = 0;
     logInfo("entry: dumping handover records...");
-    for (auto const &record : payload) {
+    for (auto const& record : payload) {
         logInfo(
             " - {} {x}-{x} ({}kib)",
             record.name(),
@@ -39,8 +39,8 @@ Res<> validateAndDump(u64 magic, Handover::Payload &payload) {
         }
 
         if (record.tag == Handover::FILE) {
-            auto const *name = payload.stringAt(record.file.name);
-            auto const *props = payload.stringAt(record.file.meta);
+            auto const* name = payload.stringAt(record.file.name);
+            auto const* props = payload.stringAt(record.file.meta);
             logInfo("   - file: {:#}", name);
             logInfo("   - props: {:#}", props);
         }
@@ -51,8 +51,8 @@ Res<> validateAndDump(u64 magic, Handover::Payload &payload) {
     return Ok();
 }
 
-Res<> enterUserspace(Handover::Payload &payload) {
-    auto const *record = payload.fileByName("bundle://grund-bus/_bin");
+Res<> enterUserspace(Handover::Payload& payload) {
+    auto const* record = payload.fileByName("bundle://grund-bus/_bin");
     if (not record) {
         logInfo("entry: handover: no init file");
         return Error::invalidInput("No init file");
@@ -116,7 +116,7 @@ Res<> enterUserspace(Handover::Payload &payload) {
     return Ok();
 }
 
-Res<> init(u64 magic, Handover::Payload &payload) {
+Res<> init(u64 magic, Handover::Payload& payload) {
     try$(Arch::init(payload));
 
     logInfo("hjert " stringify$(__ck_version_value));
@@ -149,7 +149,7 @@ HandoverRequests$(
     Handover::requestFiles()
 );
 
-void __panicHandler(PanicKind kind, char const *buf) {
+void __panicHandler(PanicKind kind, char const* buf) {
     if (kind == PanicKind::PANIC) {
         (void)Io::format(Hjert::Arch::globalOut(), "PANIC: {}\n", buf);
         Hjert::Arch::stop();
@@ -159,7 +159,7 @@ void __panicHandler(PanicKind kind, char const *buf) {
     }
 }
 
-Res<> entryPoint(u64 magic, Handover::Payload &payload) {
+Res<> entryPoint(u64 magic, Handover::Payload& payload) {
     Karm::registerPanicHandler(__panicHandler);
     return Hjert::Core::init(magic, payload);
 }

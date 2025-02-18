@@ -10,11 +10,11 @@ namespace Grund::Device::Cmos {
 struct Cmos;
 
 struct Device : public Node {
-    Cmos &_cmos;
+    Cmos& _cmos;
 
-    Cmos &cmos() { return _cmos; }
+    Cmos& cmos() { return _cmos; }
 
-    Device(Cmos &cmos) : _cmos(cmos) {}
+    Device(Cmos& cmos) : _cmos(cmos) {}
 };
 
 // MARK: CMOS ------------------------------------------------------------------

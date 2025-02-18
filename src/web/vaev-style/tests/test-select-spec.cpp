@@ -1,6 +1,5 @@
 #include <karm-test/macros.h>
 #include <vaev-style/select.h>
-
 #include <vaev-style/selector-matching.h>
 
 namespace Vaev::Style::Tests {

@@ -7,9 +7,9 @@
 
 namespace Efi {
 
-using Handle = void *;
+using Handle = void*;
 
-using Event = void *;
+using Event = void*;
 
 using Status = usize;
 
@@ -96,14 +96,14 @@ enum : usize {
 
 template <typename... Args>
 struct [[gnu::packed]] Method {
-    Status (*func)(void *self, Args...);
+    Status (*func)(void* self, Args...);
 
-    Res<> operator()(void *self, Args... args) {
+    Res<> operator()(void* self, Args... args) {
         return fromStatus(func(self, args...));
     }
 };
 
-using DummyMethod = void *;
+using DummyMethod = void*;
 
 template <typename... Args>
 struct [[gnu::packed]] Function {
@@ -114,9 +114,9 @@ struct [[gnu::packed]] Function {
     }
 };
 
-using DummyFunction = void *;
+using DummyFunction = void*;
 
-static_assert(sizeof(Method<>) == sizeof(void *), "Method must be packed");
+static_assert(sizeof(Method<>) == sizeof(void*), "Method must be packed");
 
 // MARK: 4 System Table --------------------------------------------------------
 
@@ -144,29 +144,29 @@ struct ConfigurationTable {
     static constexpr Guid ACPI2_TABLE_GUID = {0x8868e871, 0xe4f1, 0x11d3, {0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81}};
 
     Guid vendorGuid;
-    void *table;
+    void* table;
 };
 
 struct SystemTable : public Table {
-    u16 *firmwareVendor;
+    u16* firmwareVendor;
     u32 firmwareRevision;
 
-    Handle *consoleInHandle;
-    SimpleTextInputProtocol *conIn;
+    Handle* consoleInHandle;
+    SimpleTextInputProtocol* conIn;
 
-    Handle *consoleOutHandle;
-    SimpleTextOutputProtocol *conOut;
+    Handle* consoleOutHandle;
+    SimpleTextOutputProtocol* conOut;
 
-    Handle *standardErrorHandle;
-    SimpleTextOutputProtocol *stdErr;
+    Handle* standardErrorHandle;
+    SimpleTextOutputProtocol* stdErr;
 
-    RuntimeService *runtime;
-    BootService *boot;
+    RuntimeService* runtime;
+    BootService* boot;
 
     usize nrConfigurationTables;
-    ConfigurationTable *configurationTable;
+    ConfigurationTable* configurationTable;
 
-    ConfigurationTable *lookupConfigurationTable(Guid const &guid) {
+    ConfigurationTable* lookupConfigurationTable(Guid const& guid) {
         for (usize i = 0; i < nrConfigurationTables; i++) {
             if (configurationTable[i].vendorGuid == guid) {
                 return &configurationTable[i];
@@ -226,16 +226,16 @@ struct BootService : public Table {
     DummyFunction lowerTpl;
 
     // Memory Services
-    Function<AllocateType, MemoryType, usize, usize *> allocatePages;
+    Function<AllocateType, MemoryType, usize, usize*> allocatePages;
     Function<usize, usize> freePages;
-    Function<usize *, MemoryDescriptor *, usize *, usize *, u32 *> getMemoryMap;
-    Function<MemoryType, usize, void **> allocatePool;
-    Function<void *> freePool;
+    Function<usize*, MemoryDescriptor*, usize*, usize*, u32*> getMemoryMap;
+    Function<MemoryType, usize, void**> allocatePool;
+    Function<void*> freePool;
 
     // Event & Timer Services
     DummyFunction createEvent;
     DummyFunction setTimer;
-    Function<usize, Event *, usize *> waitForEvent;
+    Function<usize, Event*, usize*> waitForEvent;
     DummyFunction signalEvent;
     DummyFunction closeEvent;
     DummyFunction checkEvent;
@@ -261,21 +261,21 @@ struct BootService : public Table {
     // Miscellaneous Services
     DummyFunction getNextMonotonicCount;
     DummyFunction stall;
-    Function<usize, u64, usize, u16 *> setWatchdogTimer;
+    Function<usize, u64, usize, u16*> setWatchdogTimer;
 
     // DriverSupport Services
     DummyFunction connectController;
     DummyFunction disconnectController;
 
     // Open and Close Protocol Services
-    Function<Handle, Guid const *, void **, Handle, Handle, u32> openProtocol;
-    Function<Handle, Guid const *, Handle, Handle> closeProtocol;
+    Function<Handle, Guid const*, void**, Handle, Handle, u32> openProtocol;
+    Function<Handle, Guid const*, Handle, Handle> closeProtocol;
     DummyFunction openProtocolInformation;
 
     // Library Services
     DummyFunction protocolsPerHandle;
     DummyFunction locateHandleBuffer;
-    Function<Guid const *, void *, void **> locateProtocol;
+    Function<Guid const*, void*, void**> locateProtocol;
     DummyFunction installMultipleProtocolInterfaces;
     DummyFunction uninstallMultipleProtocolInterfaces;
 
@@ -299,8 +299,8 @@ enum struct ResetType {
 
 struct RuntimeService : public Table {
     // Time Services
-    Function<Time *, TimeCapabilities *> getTime;
-    Function<Time *> setTime;
+    Function<Time*, TimeCapabilities*> getTime;
+    Function<Time*> setTime;
     DummyFunction getWakeupTime;
     DummyFunction setWakeupTime;
 
@@ -315,7 +315,7 @@ struct RuntimeService : public Table {
 
     // Miscellaneous Services
     DummyFunction getNextMonotonicCount;
-    Function<ResetType, Status, usize, void *> resetSystem;
+    Function<ResetType, Status, usize, void*> resetSystem;
 
     // UEFI 2.0 Capsule Services
     DummyFunction updateCapsule;
@@ -334,19 +334,19 @@ struct LoadedImageProtocol {
 
     u32 revision;
     Handle parentHandle;
-    SystemTable *st;
+    SystemTable* st;
 
     // Source location of the image
-    Handle *deviceHandle;
-    DevicePathProtocol *devicePath;
-    void *reserved;
+    Handle* deviceHandle;
+    DevicePathProtocol* devicePath;
+    void* reserved;
 
     // Image's load options
     u32 loadOptionsSize;
-    void *loadOptions;
+    void* loadOptions;
 
     // Location where image was loaded
-    void *imageBase;
+    void* imageBase;
     u64 imageSize;
     MemoryType imageCodeType;
     MemoryType imageDataType;
@@ -505,7 +505,7 @@ struct SimpleTextInputProtocol {
     static constexpr Guid GUID = Guid{0x387477c1, 0x69c7, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
 
     Method<bool> reset;
-    Method<Key *> readKeyStroke;
+    Method<Key*> readKeyStroke;
     Event waitForKey;
 };
 
@@ -546,15 +546,15 @@ struct SimpleTextOutputProtocol {
     static constexpr Guid GUID = Guid{0x387477c2, 0x69c7, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
 
     Method<bool> reset;
-    Method<u16 const *> outputString;
-    Method<u16 const *> testString;
-    Method<usize, usize *, usize *> queryMode;
+    Method<u16 const*> outputString;
+    Method<u16 const*> testString;
+    Method<usize, usize*, usize*> queryMode;
     Method<usize> setMode;
     Method<usize> setAttribute;
     Method<> clearScreen;
     Method<usize, usize> setCursorPosition;
     Method<bool> enableCursor;
-    SimpleTextOutputMode *mode;
+    SimpleTextOutputMode* mode;
 };
 
 // MARK: 12.9 Graphics Output Protocol -----------------------------------------
@@ -586,7 +586,7 @@ struct GraphicsOutputModeInformations {
 struct GraphicsOutputProtocolMode {
     u32 maxMode;
     u32 mode;
-    GraphicsOutputModeInformations *info;
+    GraphicsOutputModeInformations* info;
     usize sizeOfInfo;
     usize frameBufferBase;
     usize frameBufferSize;
@@ -595,10 +595,10 @@ struct GraphicsOutputProtocolMode {
 struct GraphicsOutputProtocol {
     static constexpr Guid GUID = Guid{0x9042a9de, 0x23dc, 0x4a38, {0x96, 0xfb, 0x7a, 0xde, 0xd0, 0x80, 0x51, 0x6a}};
 
-    Method<u32, usize *, GraphicsOutputProtocolMode **> queryMode;
+    Method<u32, usize*, GraphicsOutputProtocolMode**> queryMode;
     Method<usize> setMode;
     DummyMethod blt;
-    GraphicsOutputProtocolMode *mode;
+    GraphicsOutputProtocolMode* mode;
 };
 
 // MARK: 13.4 Simple File System Protocol --------------------------------------
@@ -609,7 +609,7 @@ struct SimpleFileSystemProtocol {
     static constexpr Guid GUID = Guid{0x0964e5b22, 0x6459, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
 
     u64 revision;
-    Method<FileProtocol **> openVolume;
+    Method<FileProtocol**> openVolume;
 };
 
 // MARK: 13.5 File Protocol ----------------------------------------------------
@@ -639,7 +639,7 @@ struct FileIoToken {
     Event Event;
     Status Status;
     usize BufferSize;
-    void *Buffer;
+    void* Buffer;
 };
 
 struct FileProtocol {
@@ -656,15 +656,15 @@ struct FileProtocol {
 #define EFI_FILE_DIRECTORY 0x0000000000000010
 #define EFI_FILE_ARCHIVE 0x0000000000000020
 #define EFI_FILE_VALID_ATTR 0x0000000000000037
-    Method<FileProtocol **, u16 const *, u64, u64> open;
+    Method<FileProtocol**, u16 const*, u64, u64> open;
     Method<> close;
     Method<> del;
-    Method<usize *, void *> read;
-    Method<usize *, void const *> write;
-    Method<u64 *> getPosition;
+    Method<usize*, void*> read;
+    Method<usize*, void const*> write;
+    Method<u64*> getPosition;
     Method<u64> setPosition;
-    Method<Guid const *, usize *, FileInfo *> getInfo;
-    Method<Guid const *, usize *, FileInfo *> setInfo;
+    Method<Guid const*, usize*, FileInfo*> getInfo;
+    Method<Guid const*, usize*, FileInfo*> setInfo;
     Method<> flush;
 };
 

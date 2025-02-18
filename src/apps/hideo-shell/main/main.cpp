@@ -18,7 +18,7 @@
 #include "../app.h"
 #include "../mock.h"
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto args = useArgs(ctx);
     bool isMobile = App::useFormFactor() == App::FormFactor::MOBILE;
 

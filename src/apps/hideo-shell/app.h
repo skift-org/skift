@@ -19,19 +19,19 @@ inline auto panel(Math::Vec2i size = {500, 400}) {
            });
 }
 
-Ui::Child background(State const &state);
+Ui::Child background(State const& state);
 
-Ui::Child lock(State const &state);
+Ui::Child lock(State const& state);
 
-Ui::Child appsPanel(State const &state);
+Ui::Child appsPanel(State const& state);
 
-Ui::Child appsFlyout(State const &state);
+Ui::Child appsFlyout(State const& state);
 
-Ui::Child sysPanel(State const &state);
+Ui::Child sysPanel(State const& state);
 
-Ui::Child notiPanel(State const &state);
+Ui::Child notiPanel(State const& state);
 
-Ui::Child sysFlyout(State const &state);
+Ui::Child sysFlyout(State const& state);
 
 Ui::Child powerDialog();
 

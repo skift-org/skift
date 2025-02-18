@@ -35,17 +35,17 @@ struct Save {
 
 using Action = Union<Karm::Text::Action, New, Save>;
 
-Ui::Task<Action> reduce(State &s, Action a) {
+Ui::Task<Action> reduce(State& s, Action a) {
     a.visit(::Visitor{
-        [&](Karm::Text::Action &t) {
+        [&](Karm::Text::Action& t) {
             s.text->reduce(t);
         },
-        [&](New &) {
+        [&](New&) {
             s.url = NONE;
             s.error = NONE;
             s.text = makeRc<Karm::Text::Model>();
         },
-        [&](Save &) {
+        [&](Save&) {
 
         },
     });
@@ -56,7 +56,7 @@ Ui::Task<Action> reduce(State &s, Action a) {
 using Model = Ui::Model<State, Action, reduce>;
 
 Ui::Child editor(Rc<Karm::Text::Model> text) {
-    return Ui::input(text, [](Ui::Node &n, Action a) {
+    return Ui::input(text, [](Ui::Node& n, Action a) {
                Model::bubble(n, a);
            }) |
            Ui::insets(16) | Ui::vscroll() | Ui::grow();
@@ -78,14 +78,14 @@ Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
             error,
             text,
         },
-        [](State const &s) {
+        [](State const& s) {
             return Kr::scaffold({
                 .icon = Mdi::TEXT,
                 .title = "Text"s,
                 .startTools = slots$(
                     Ui::button(Model::bind<New>(), Ui::ButtonStyle::subtle(), Mdi::FILE),
                     Ui::button(
-                        [](auto &n) {
+                        [](auto& n) {
                             Ui::showDialog(n, Files::openFileDialog());
                         },
                         Ui::ButtonStyle::subtle(), Mdi::FOLDER

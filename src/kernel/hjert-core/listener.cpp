@@ -11,7 +11,7 @@ Res<> Listener::listen(Hj::Cap cap, Arc<Object> obj, Flags<Hj::Sigs> set, Flags<
 
     for (usize i = 0; i < _listened.len(); ++i) {
         if (_listened[i].cap == cap) {
-            auto &listened = _listened[i];
+            auto& listened = _listened[i];
             listened.set = set;
             listened.unset = unset;
 
@@ -31,7 +31,7 @@ Slice<Hj::Event> Listener::pollEvents() {
     ObjectLockScope scope{*this};
     _events.clear();
 
-    for (auto &l : _listened) {
+    for (auto& l : _listened) {
         auto sigs = l.obj->poll();
         if (sigs & l.set) {
             _events.pushBack(Hj::Event{l.cap, sigs & l.set, true});

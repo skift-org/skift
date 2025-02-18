@@ -45,7 +45,7 @@ inline usize simdContextSize() {
     return 512;
 }
 
-inline void simdSaveContext(void *ptr) {
+inline void simdSaveContext(void* ptr) {
     if (Cpuid::hasXsave()) {
         xsave(ptr);
     } else {
@@ -53,7 +53,7 @@ inline void simdSaveContext(void *ptr) {
     }
 }
 
-inline void simdLoadContext(void *ptr) {
+inline void simdLoadContext(void* ptr) {
     if (Cpuid::hasXsave()) {
         xrstor(ptr);
     } else {
@@ -61,7 +61,7 @@ inline void simdLoadContext(void *ptr) {
     }
 }
 
-inline void simdInitContext(void *ptr) {
+inline void simdInitContext(void* ptr) {
     fninit();
     simdSaveContext(ptr);
 }

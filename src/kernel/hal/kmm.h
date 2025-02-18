@@ -14,21 +14,21 @@ struct KmmRange : public Range<usize, struct KmmRangeTag> {
     using Range::Range;
 
     Bytes bytes() const {
-        return Bytes{(Byte const *)start, size};
+        return Bytes{(Byte const*)start, size};
     }
 
     MutBytes mutBytes() {
-        return MutBytes{(Byte *)start, size};
+        return MutBytes{(Byte*)start, size};
     }
 
     template <typename T>
-    T *as() {
-        return (T *)start;
+    T* as() {
+        return (T*)start;
     }
 
     template <typename T>
-    T const *as() const {
-        return (T const *)start;
+    T const* as() const {
+        return (T const*)start;
     }
 };
 

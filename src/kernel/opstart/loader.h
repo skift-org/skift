@@ -9,13 +9,13 @@
 
 namespace Opstart {
 
-Res<Sys::File> openUrl(Mime::Url const &url);
+Res<Sys::File> openUrl(Mime::Url const& url);
 
 struct Blob {
     Mime::Url url;
     Json::Value props;
 
-    static Res<Blob> fromJson(Json::Value const &json) {
+    static Res<Blob> fromJson(Json::Value const& json) {
         if (json.isStr())
             return Ok(Blob{
                 .url = Mime::Url::parse(json.asStr()),
@@ -38,7 +38,7 @@ struct Entry {
     Blob kernel;
     Vec<Blob> blobs;
 
-    static Res<Entry> fromJson(Json::Value const &json) {
+    static Res<Entry> fromJson(Json::Value const& json) {
         if (not json.isObject())
             return Error::invalidInput("expected object");
 
@@ -57,7 +57,7 @@ struct Entry {
         entry.kernel = try$(Blob::fromJson(kernelJson));
 
         auto blobsJson = try$(json.get("blobs").take<Json::Array>());
-        for (auto const &blobJson : blobsJson) {
+        for (auto const& blobJson : blobsJson) {
             auto blob = try$(Blob::fromJson(blobJson));
             entry.blobs.pushBack(blob);
         }
@@ -71,7 +71,7 @@ struct Configs {
     Opt<String> subtitle;
     Vec<Entry> entries;
 
-    static Res<Configs> fromJson(Json::Value const &json) {
+    static Res<Configs> fromJson(Json::Value const& json) {
         if (not json.isObject()) {
             return Error::invalidInput("expected array");
         }
@@ -82,7 +82,7 @@ struct Configs {
         configs.subtitle = json.get("subtitle").take<String>();
 
         auto entriesJson = try$(json.get("entries").take<Json::Array>());
-        for (auto const &entryJson : entriesJson) {
+        for (auto const& entryJson : entriesJson) {
             auto entry = try$(Entry::fromJson(entryJson));
             configs.entries.pushBack(entry);
         }
@@ -91,8 +91,8 @@ struct Configs {
     }
 };
 
-Res<> showMenu(Sys::Context &ctx, Configs const &c);
+Res<> showMenu(Sys::Context& ctx, Configs const& c);
 
-Res<> loadEntry(Entry const &);
+Res<> loadEntry(Entry const&);
 
 } // namespace Opstart

@@ -28,13 +28,13 @@ static EfiPmm pmm{};
 
 Res<Arc<Hal::Vmm>> createVmm() {
     usize upper = try$(pmm.allocRange(Hal::PAGE_SIZE, Hal::PmmFlags::NONE)).start;
-    memset((void *)upper, 0, Hal::PAGE_SIZE);
-    return Ok(makeArc<x86_64::Vmm<>>(pmm, (x86_64::Pml<4> *)upper));
+    memset((void*)upper, 0, Hal::PAGE_SIZE);
+    return Ok(makeArc<x86_64::Vmm<>>(pmm, (x86_64::Pml<4>*)upper));
 }
 
-Res<> parseGop(Handover::Builder &builder) {
-    auto *gop = try$(Efi::locateProtocol<Efi::GraphicsOutputProtocol>());
-    auto *mode = gop->mode;
+Res<> parseGop(Handover::Builder& builder) {
+    auto* gop = try$(Efi::locateProtocol<Efi::GraphicsOutputProtocol>());
+    auto* mode = gop->mode;
 
     if (mode->info->pixelFormat != Efi::PixelFormat::BLUE_GREEN_RED_RESERVED8_BIT_PER_COLOR) {
         return Error::invalidInput("unsupported pixel format");
@@ -59,8 +59,8 @@ Res<> parseGop(Handover::Builder &builder) {
     return Ok();
 }
 
-Res<> parseAcpi(Handover::Builder &builder) {
-    auto *acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI_TABLE_GUID);
+Res<> parseAcpi(Handover::Builder& builder) {
+    auto* acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI_TABLE_GUID);
     if (not acpiTable)
         acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI2_TABLE_GUID);
 
@@ -72,7 +72,7 @@ Res<> parseAcpi(Handover::Builder &builder) {
     return Ok();
 }
 
-Res<> parseMemoryMap(Handover::Builder &builder) {
+Res<> parseMemoryMap(Handover::Builder& builder) {
     usize mmapSize = 0;
     usize key = 0;
     usize descSize = 0;
@@ -90,11 +90,11 @@ Res<> parseMemoryMap(Handover::Builder &builder) {
     mmapSize += 2 * descSize;
 
     auto buf = Buf<Byte>::init(mmapSize);
-    try$(Efi::bs()->getMemoryMap(&mmapSize, (Efi::MemoryDescriptor *)buf.buf(), &key, &descSize, &descVersion));
+    try$(Efi::bs()->getMemoryMap(&mmapSize, (Efi::MemoryDescriptor*)buf.buf(), &key, &descSize, &descVersion));
 
     usize descLen = mmapSize / descSize;
     for (usize i = 0; i < descLen; i++) {
-        auto &desc = *(Efi::MemoryDescriptor *)(buf.buf() + i * descSize);
+        auto& desc = *(Efi::MemoryDescriptor*)(buf.buf() + i * descSize);
 
         usize start = desc.physicalStart;
         usize size = desc.numberOfPages * Hal::PAGE_SIZE;
@@ -127,7 +127,7 @@ Res<> parseMemoryMap(Handover::Builder &builder) {
     return Ok();
 }
 
-Res<> finalizeHandover(Handover::Builder &builder) {
+Res<> finalizeHandover(Handover::Builder& builder) {
     try$(parseGop(builder));
     try$(parseAcpi(builder));
     try$(parseMemoryMap(builder));
@@ -145,7 +145,7 @@ Hal::PmmRange imageRange() {
 // Implemented in kernel-entry.s
 extern "C" void __enterKernel(usize entry, usize payload, usize stack, usize vmm);
 
-void enterKernel(usize entry, Handover::Payload &payload, usize stack, Hal::Vmm &vmm) {
+void enterKernel(usize entry, Handover::Payload& payload, usize stack, Hal::Vmm& vmm) {
     __enterKernel(entry, (usize)&payload + Handover::KERNEL_BASE, stack, vmm.root());
 }
 

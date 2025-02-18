@@ -27,7 +27,7 @@ Space::~Space() {
 
 Res<usize> Space::_lookup(Hal::VmmRange vrange) {
     for (usize i = 0; i < _maps.len(); i++) {
-        auto &map = _maps[i];
+        auto& map = _maps[i];
         if (map.vrange == vrange) {
             return Ok(i);
         }
@@ -38,7 +38,7 @@ Res<usize> Space::_lookup(Hal::VmmRange vrange) {
 
 Res<> Space::_ensureNotMapped(Hal::VmmRange vrange) {
     for (usize i = 0; i < _maps.len(); i++) {
-        auto &map = _maps[i];
+        auto& map = _maps[i];
         if (map.vrange.overlaps(vrange)) {
             return Error::invalidInput("already mapped");
         }
@@ -48,7 +48,7 @@ Res<> Space::_ensureNotMapped(Hal::VmmRange vrange) {
 }
 
 Res<> Space::_validate(Hal::VmmRange vrange) {
-    for (auto &map : _maps) {
+    for (auto& map : _maps) {
         if (map.vrange.contains(vrange)) {
             return Ok();
         }
@@ -96,7 +96,7 @@ Res<> Space::unmap(Hal::VmmRange vrange) {
     try$(vrange.ensureAligned(Hal::PAGE_SIZE));
 
     auto id = try$(_lookup(vrange));
-    auto &map = _maps[id];
+    auto& map = _maps[id];
 
     try$(_vmm->free(map.vrange));
     try$(_vmm->flush(map.vrange));
@@ -112,7 +112,7 @@ void Space::activate() {
 
 void Space::dump() {
     ObjectLockScope scope(*this);
-    for (auto &map : _maps) {
+    for (auto& map : _maps) {
         auto vrange = map.vrange;
         auto prange = map.prange();
         auto size = vrange.size / 1024;

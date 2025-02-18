@@ -11,7 +11,7 @@
 namespace Hideo::Counter {
 
 Ui::Child app() {
-    return Ui::reducer<Model>([](State const &s) {
+    return Ui::reducer<Model>([](State const& s) {
         return Kr::scaffold({
             .icon = Mdi::COUNTER,
             .title = "Counter"s,

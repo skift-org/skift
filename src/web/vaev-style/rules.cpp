@@ -1,6 +1,7 @@
 #include "rules.h"
-#include "selector-matching.h"
+
 #include "decls.h"
+#include "selector-matching.h"
 
 namespace Vaev::Style {
 
@@ -9,7 +10,7 @@ static bool DEBUG_RULE = false;
 // MARK: StyleRule -------------------------------------------------------------
 
 Opt<Spec> StyleRule::matchWithSpecificity(Markup::Element const& el) const {
-    return matchSelectorWithSpecificity(selector,el);
+    return matchSelectorWithSpecificity(selector, el);
 }
 
 void StyleRule::repr(Io::Emit& e) const {

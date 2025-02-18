@@ -17,11 +17,11 @@ namespace Hjert::Core {
 
 static constexpr bool DEBUG_SYSCALLS = false;
 
-Res<> doNow(Task &self, User<Instant> ts) {
+Res<> doNow(Task& self, User<Instant> ts) {
     return ts.store(self.space(), globalSched()._stamp);
 }
 
-Res<> doLog(Task &self, UserSlice<Str> msg) {
+Res<> doLog(Task& self, UserSlice<Str> msg) {
     try$(self.ensure(Hj::Pledge::LOG));
     return msg.with(self.space(), [&](Str str) -> Res<> {
         Logger::_Embed::loggerLock();
@@ -40,7 +40,7 @@ Res<> doLog(Task &self, UserSlice<Str> msg) {
     });
 }
 
-Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
+Res<> doCreate(Task& self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
     auto props = try$(p.load(self.space()));
 
     // Ensure that the index of the union is valid
@@ -49,10 +49,10 @@ Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
 
     auto obj = try$(props.visit(
         Visitor{
-            [&](Hj::DomainProps &) -> Res<Arc<Object>> {
+            [&](Hj::DomainProps&) -> Res<Arc<Object>> {
                 return Ok(try$(Domain::create()));
             },
-            [&](Hj::TaskProps &props) -> Res<Arc<Object>> {
+            [&](Hj::TaskProps& props) -> Res<Arc<Object>> {
                 try$(self.ensure(Hj::Pledge::TASK));
 
                 auto dom = props.domain.isRoot()
@@ -70,12 +70,12 @@ Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
 
                 return Ok(obj);
             },
-            [&](Hj::SpaceProps &) -> Res<Arc<Object>> {
+            [&](Hj::SpaceProps&) -> Res<Arc<Object>> {
                 try$(self.ensure(Hj::Pledge::MEM));
 
                 return Ok(try$(Space::create()));
             },
-            [&](Hj::VmoProps &props) -> Res<Arc<Object>> {
+            [&](Hj::VmoProps& props) -> Res<Arc<Object>> {
                 try$(self.ensure(Hj::Pledge::MEM));
 
                 bool isDma = (props.flags & Hj::VmoFlags::DMA) == Hj::VmoFlags::DMA;
@@ -91,18 +91,18 @@ Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
 
                 return Ok(try$(Vmo::alloc(props.len, props.flags)));
             },
-            [&](Hj::IopProps &props) -> Res<Arc<Object>> {
+            [&](Hj::IopProps& props) -> Res<Arc<Object>> {
                 try$(self.ensure(Hj::Pledge::HW));
                 return Ok(try$(Iop::create({props.base, props.len})));
             },
-            [&](Hj::ChannelProps &props) -> Res<Arc<Object>> {
+            [&](Hj::ChannelProps& props) -> Res<Arc<Object>> {
                 return Ok(try$(Channel::create(props.bufCap, props.capsCap)));
             },
-            [&](Hj::IrqProps &props) -> Res<Arc<Object>> {
+            [&](Hj::IrqProps& props) -> Res<Arc<Object>> {
                 try$(self.ensure(Hj::Pledge::HW));
                 return Ok(try$(Irq::create(props.irq)));
             },
-            [&](Hj::ListenerProps &) -> Res<Arc<Object>> {
+            [&](Hj::ListenerProps&) -> Res<Arc<Object>> {
                 return Ok(try$(Listener::create()));
             },
         }
@@ -111,7 +111,7 @@ Res<> doCreate(Task &self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
     return out.store(self.space(), try$(self.domain().add(dest, obj)));
 }
 
-Res<> doLabel(Task &self, Hj::Cap cap, UserSlice<Str> label) {
+Res<> doLabel(Task& self, Hj::Cap cap, UserSlice<Str> label) {
     return label.with(self.space(), [&](Str str) -> Res<> {
         if (cap.isRoot())
             self.label(str);
@@ -122,11 +122,11 @@ Res<> doLabel(Task &self, Hj::Cap cap, UserSlice<Str> label) {
     });
 }
 
-Res<> doDrop(Task &self, Hj::Cap cap) {
+Res<> doDrop(Task& self, Hj::Cap cap) {
     return self.domain().drop(cap);
 }
 
-Res<> doPledge(Task &self, Hj::Cap cap, Flags<Hj::Pledge> pledges) {
+Res<> doPledge(Task& self, Hj::Cap cap, Flags<Hj::Pledge> pledges) {
     if (cap.isRoot()) {
         return self.pledge(pledges);
     }
@@ -135,7 +135,7 @@ Res<> doPledge(Task &self, Hj::Cap cap, Flags<Hj::Pledge> pledges) {
     return obj->pledge(pledges);
 }
 
-Res<> doDup(Task &self, Hj::Cap dest, User<Hj::Cap> out, Hj::Cap cap) {
+Res<> doDup(Task& self, Hj::Cap dest, User<Hj::Cap> out, Hj::Cap cap) {
     if (cap.isRoot())
         return Error::invalidHandle("cannot duplicate root");
 
@@ -143,7 +143,7 @@ Res<> doDup(Task &self, Hj::Cap dest, User<Hj::Cap> out, Hj::Cap cap) {
     return out.store(self.space(), try$(self.domain().add(dest, obj)));
 }
 
-Res<> doStart(Task &self, Hj::Cap cap, usize ip, usize sp, User<Hj::Args const> args) {
+Res<> doStart(Task& self, Hj::Cap cap, usize ip, usize sp, User<Hj::Args const> args) {
     (void)args;
     auto obj = try$(self.domain().get<Task>(cap));
     try$(obj->ready(ip, sp, try$(args.load(self.space()))));
@@ -151,7 +151,7 @@ Res<> doStart(Task &self, Hj::Cap cap, usize ip, usize sp, User<Hj::Args const> 
     return Ok();
 }
 
-Res<> doMap(Task &self, Hj::Cap cap, User<usize> virt, Hj::Cap vmo, usize off, User<usize> len, Hj::MapFlags flags) {
+Res<> doMap(Task& self, Hj::Cap cap, User<usize> virt, Hj::Cap vmo, usize off, User<usize> len, Hj::MapFlags flags) {
     auto vmoObj = try$(self.domain().get<Vmo>(vmo));
     auto spaceObj = cap.isRoot()
                         ? try$(self._space)
@@ -170,7 +170,7 @@ Res<> doMap(Task &self, Hj::Cap cap, User<usize> virt, Hj::Cap vmo, usize off, U
     return Ok();
 }
 
-Res<> doUnmap(Task &self, Hj::Cap cap, usize virt, usize len) {
+Res<> doUnmap(Task& self, Hj::Cap cap, usize virt, usize len) {
     auto spaceObj = cap.isRoot()
                         ? try$(self._space)
                         : try$(self.domain().get<Space>(cap));
@@ -178,17 +178,17 @@ Res<> doUnmap(Task &self, Hj::Cap cap, usize virt, usize len) {
     return Ok();
 }
 
-Res<> doIn(Task &self, Hj::Cap cap, Hj::IoLen len, usize port, User<Hj::Arg> val) {
+Res<> doIn(Task& self, Hj::Cap cap, Hj::IoLen len, usize port, User<Hj::Arg> val) {
     auto obj = try$(self.domain().get<Iop>(cap));
     return val.store(self.space(), try$(obj->in(port, Hj::ioLen2Bytes(len))));
 }
 
-Res<> doOut(Task &self, Hj::Cap cap, Hj::IoLen len, usize port, Hj::Arg val) {
+Res<> doOut(Task& self, Hj::Cap cap, Hj::IoLen len, usize port, Hj::Arg val) {
     auto obj = try$(self.domain().get<Iop>(cap));
     return obj->out(port, Hj::ioLen2Bytes(len), val);
 }
 
-Res<> doSend(Task &self, Hj::Cap cap, UserSlice<Bytes> buf, UserSlice<Slice<Hj::Cap>> caps) {
+Res<> doSend(Task& self, Hj::Cap cap, UserSlice<Bytes> buf, UserSlice<Slice<Hj::Cap>> caps) {
     return with(
         self.space(),
         [&](auto buf, auto caps) -> Res<> {
@@ -200,7 +200,7 @@ Res<> doSend(Task &self, Hj::Cap cap, UserSlice<Bytes> buf, UserSlice<Slice<Hj::
     );
 }
 
-Res<> doRecv(Task &self, Hj::Cap cap, UserSlice<MutBytes> buf, User<Hj::Arg> bufLen, UserSlice<MutSlice<Hj::Cap>> caps, User<Hj::Arg> capLen) {
+Res<> doRecv(Task& self, Hj::Cap cap, UserSlice<MutBytes> buf, User<Hj::Arg> bufLen, UserSlice<MutSlice<Hj::Cap>> caps, User<Hj::Arg> capLen) {
     return with(
         self.space(),
         [&](auto buf, auto bufLen, auto caps, auto capLen) -> Res<> {
@@ -215,12 +215,12 @@ Res<> doRecv(Task &self, Hj::Cap cap, UserSlice<MutBytes> buf, User<Hj::Arg> buf
     );
 }
 
-Res<> doClose(Task &self, Hj::Cap cap) {
+Res<> doClose(Task& self, Hj::Cap cap) {
     auto obj = try$(self.domain().get<Channel>(cap));
     return obj->close();
 }
 
-Res<> doSignal(Task &self, Hj::Cap cap, Hj::Sigs set, Hj::Sigs unset) {
+Res<> doSignal(Task& self, Hj::Cap cap, Hj::Sigs set, Hj::Sigs unset) {
     if (cap.isRoot()) {
         self.signal(set, unset);
         return Ok();
@@ -231,13 +231,13 @@ Res<> doSignal(Task &self, Hj::Cap cap, Hj::Sigs set, Hj::Sigs unset) {
     return Ok();
 }
 
-Res<> doListen(Task &self, Hj::Cap cap, Hj::Cap target, Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset) {
+Res<> doListen(Task& self, Hj::Cap cap, Hj::Cap target, Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset) {
     auto obj = try$(self.domain().get<Listener>(cap));
     auto targetObj = try$(self.domain().get(target));
     return obj->listen(target, targetObj, set, unset);
 }
 
-Res<> doPoll(Task &self, Hj::Cap cap, UserSlice<MutSlice<Hj::Event>> events, User<usize> evLen, Instant until) {
+Res<> doPoll(Task& self, Hj::Cap cap, UserSlice<MutSlice<Hj::Event>> events, User<usize> evLen, Instant until) {
     auto obj = try$(self.domain().get<Listener>(cap));
 
     try$(self.block([&] {
@@ -261,7 +261,7 @@ Res<> doPoll(Task &self, Hj::Cap cap, UserSlice<MutSlice<Hj::Event>> events, Use
     return Ok();
 }
 
-Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
+Res<> dispatchSyscall(Task& self, Hj::Syscall id, Hj::Args args) {
     switch (id) {
     case Hj::Syscall::NOW:
         return doNow(self, args[0]);
@@ -338,7 +338,7 @@ Res<> dispatchSyscall(Task &self, Hj::Syscall id, Hj::Args args) {
 }
 
 Res<> doSyscall(Hj::Syscall syscall, Hj::Args args) {
-    auto &self = Task::self();
+    auto& self = Task::self();
     self.enter(Mode::SUPER);
 
     logDebugIf(DEBUG_SYSCALLS, "{}: Syscall {}({}) with params {:#x}", self, Hj::toStr(syscall), (Hj::Arg)syscall, args);

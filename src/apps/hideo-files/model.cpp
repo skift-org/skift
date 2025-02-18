@@ -5,7 +5,7 @@
 
 namespace Hideo::Files {
 
-Ui::Task<Action> reduce(State &s, Action a) {
+Ui::Task<Action> reduce(State& s, Action a) {
     a.visit(Visitor{
         [&](GoRoot) {
             reduce(s, GoTo{"file:/"_url}).unwrap();

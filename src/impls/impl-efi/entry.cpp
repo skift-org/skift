@@ -30,12 +30,12 @@ struct DebugOut : public Io::TextWriterBase<> {
     }
 };
 
-void __panicHandler(Karm::PanicKind kind, char const *msg) {
-    Efi::st()->conOut->outputString(Efi::st()->conOut, kind == Karm::PanicKind::PANIC ? (u16 const *)L"PANIC: " : (u16 const *)L"DEBUG: ").unwrap();
+void __panicHandler(Karm::PanicKind kind, char const* msg) {
+    Efi::st()->conOut->outputString(Efi::st()->conOut, kind == Karm::PanicKind::PANIC ? (u16 const*)L"PANIC: " : (u16 const*)L"DEBUG: ").unwrap();
 
     DebugOut out{};
     (void)out.writeStr(Str{msg});
-    Efi::st()->conOut->outputString(Efi::st()->conOut, (u16 const *)EMBED_SYS_LINE_ENDING_L).unwrap();
+    Efi::st()->conOut->outputString(Efi::st()->conOut, (u16 const*)EMBED_SYS_LINE_ENDING_L).unwrap();
 
     if (kind == Karm::PanicKind::PANIC) {
         (void)Efi::st()->runtime->resetSystem(

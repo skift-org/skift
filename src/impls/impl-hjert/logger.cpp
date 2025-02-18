@@ -15,7 +15,7 @@ void loggerUnlock() {
     _lock.release();
 }
 
-Io::TextWriter &loggerOut() {
+Io::TextWriter& loggerOut() {
     return Hjert::Arch::globalOut();
 }
 

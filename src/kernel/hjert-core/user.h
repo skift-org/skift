@@ -18,24 +18,24 @@ struct User {
         return Hal::VmmRange{_addr, sizeof(T)};
     }
 
-    Res<T> load(Space &space) {
+    Res<T> load(Space& space) {
         ObjectLockScope scope(space);
-        auto &v = *try$(_acquire(space));
+        auto& v = *try$(_acquire(space));
         return Ok(v);
     }
 
-    Res<> store(Space &space, T const &val) {
+    Res<> store(Space& space, T const& val) {
         ObjectLockScope scope(space);
-        auto &v = *try$(_acquire(space));
+        auto& v = *try$(_acquire(space));
         v = val;
         return Ok();
     }
 
-    Res<T *> _acquire(Space &space) {
+    Res<T*> _acquire(Space& space) {
         if (_addr == 0)
             return Error::invalidInput("null pointer");
         try$(space._validate(vrange()));
-        return Ok(reinterpret_cast<T *>(_addr));
+        return Ok(reinterpret_cast<T*>(_addr));
     }
 };
 
@@ -61,12 +61,12 @@ struct UserSlice {
         return _len;
     }
 
-    Res<> with(Space &space, auto f) {
+    Res<> with(Space& space, auto f) {
         ObjectLockScope scope(space);
         return f(try$(_acquire(space)));
     }
 
-    Res<Slice> _acquire(Space &space) {
+    Res<Slice> _acquire(Space& space) {
         if (_len == 0uz)
             return Ok(Slice{nullptr, 0uz});
 
@@ -74,19 +74,19 @@ struct UserSlice {
             return Error::invalidInput("null pointer");
 
         try$(space._validate(vrange()));
-        return Ok(Slice{reinterpret_cast<Inner *>(_addr), _len});
+        return Ok(Slice{reinterpret_cast<Inner*>(_addr), _len});
     }
 };
 
 template <typename... Args>
-static inline Res<> with(Space &space, auto f, Args &&...args) {
+static inline Res<> with(Space& space, auto f, Args&&... args) {
     ObjectLockScope scope(space);
     Tuple acquired{args._acquire(space)...};
-    try$(acquired.visit([](auto &a) -> Res<> {
+    try$(acquired.visit([](auto& a) -> Res<> {
         try$(a);
         return Ok();
     }));
-    return acquired.apply([&](auto &...args) -> Res<> {
+    return acquired.apply([&](auto&... args) -> Res<> {
         return f(args.unwrap()...);
     });
 }

@@ -21,11 +21,11 @@ struct Clock : public Ui::View<Clock> {
 
     Clock(Time time) : _time(time) {}
 
-    void reconcile(Clock &o) override {
+    void reconcile(Clock& o) override {
         _time = o._time;
     }
 
-    void _drawHand(Gfx::Canvas &g, f64 angle, f64 length, Gfx::Color color, f64 width) {
+    void _drawHand(Gfx::Canvas& g, f64 angle, f64 length, Gfx::Color color, f64 width) {
         g.push();
         g.beginPath();
         g.translate(bound().center().cast<f64>());
@@ -35,7 +35,7 @@ struct Clock : public Ui::View<Clock> {
         g.pop();
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti) override {
+    void paint(Gfx::Canvas& g, Math::Recti) override {
         auto size = bound().size().min();
 
         g.push();
@@ -88,7 +88,7 @@ Ui::Child alarmPage() {
 
 // MARK: Clock Page ------------------------------------------------------------
 
-Ui::Child clockPage(State const &s) {
+Ui::Child clockPage(State const& s) {
     auto time = s.dateTime.time;
 
     return Ui::vflow(
@@ -113,7 +113,7 @@ Ui::Child stopwatchPage() {
 
 // MARK: App -------------------------------------------------------------------
 
-Ui::Child appContent(State const &s) {
+Ui::Child appContent(State const& s) {
     switch (s.page) {
     case Page::ALARM:
         return alarmPage();
@@ -128,7 +128,7 @@ Ui::Child appContent(State const &s) {
 
 Ui::Child app() {
     return Ui::reducer<Model>(
-        [](State const &s) {
+        [](State const& s) {
             return Kr::scaffold({
                 .icon = Mdi::CLOCK,
                 .title = "Clock"s,

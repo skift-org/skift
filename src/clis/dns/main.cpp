@@ -1,8 +1,8 @@
 #include <karm-net/dns/dns.h>
 #include <karm-sys/entry.h>
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
-    auto &args = Sys::useArgs(ctx);
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
+    auto& args = Sys::useArgs(ctx);
     if (args.len() != 1) {
         Sys::println("usage: {} <domain>", args.self());
         co_return Error::invalidInput("invalid number of arguments");

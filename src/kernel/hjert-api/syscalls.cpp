@@ -68,19 +68,19 @@ Res<> _syscall(Syscall s, Arg a0 = 0, Arg a1 = 0, Arg a2 = 0, Arg a3 = 0, Arg a4
 #    error "Unsupported architecture"
 #endif
 
-Res<> _now(Instant *i) {
+Res<> _now(Instant* i) {
     return _syscall(Syscall::NOW, (Arg)i);
 }
 
-Res<> _log(char const *msg, usize len) {
+Res<> _log(char const* msg, usize len) {
     return _syscall(Syscall::LOG, (Arg)msg, len);
 }
 
-Res<> _create(Cap dest, Cap *cap, Props const *props) {
+Res<> _create(Cap dest, Cap* cap, Props const* props) {
     return _syscall(Syscall::CREATE, dest.raw(), (Arg)cap, (Arg)props);
 }
 
-Res<> _label(Cap cap, char const *label, usize len) {
+Res<> _label(Cap cap, char const* label, usize len) {
     return _syscall(Syscall::LABEL, cap.raw(), (Arg)label, len);
 }
 
@@ -92,15 +92,15 @@ Res<> _pledge(Cap cap, Flags<Pledge> pledges) {
     return _syscall(Syscall::PLEDGE, cap.raw(), (Arg)pledges.val());
 }
 
-Res<> _dup(Cap node, Cap *dst, Cap src) {
+Res<> _dup(Cap node, Cap* dst, Cap src) {
     return _syscall(Syscall::DUP, node.raw(), (Arg)dst, src.raw());
 }
 
-Res<> _start(Cap cap, usize ip, usize sp, Args const *args) {
+Res<> _start(Cap cap, usize ip, usize sp, Args const* args) {
     return _syscall(Syscall::START, cap.raw(), ip, sp, (Arg)args);
 }
 
-Res<> _map(Cap cap, usize *virt, Cap vmo, usize off, usize *len, MapFlags flags) {
+Res<> _map(Cap cap, usize* virt, Cap vmo, usize off, usize* len, MapFlags flags) {
     return _syscall(Syscall::MAP, cap.raw(), (Arg)virt, vmo.raw(), off, (Arg)len, (Arg)flags);
 }
 
@@ -108,7 +108,7 @@ Res<> _unmap(Cap cap, usize virt, usize len) {
     return _syscall(Syscall::UNMAP, cap.raw(), virt, len);
 }
 
-Res<> _in(Cap cap, IoLen len, usize port, Arg *val) {
+Res<> _in(Cap cap, IoLen len, usize port, Arg* val) {
     return _syscall(Syscall::IN, cap.raw(), (Arg)len, port, (Arg)val);
 }
 
@@ -116,11 +116,11 @@ Res<> _out(Cap cap, IoLen len, usize port, Arg val) {
     return _syscall(Syscall::OUT, cap.raw(), (Arg)len, port, val);
 }
 
-Res<> _send(Cap cap, Byte const *buf, usize bufLen, Cap const *caps, usize capLen) {
+Res<> _send(Cap cap, Byte const* buf, usize bufLen, Cap const* caps, usize capLen) {
     return _syscall(Syscall::SEND, cap.raw(), (Arg)buf, bufLen, (usize)caps, capLen);
 }
 
-Res<> _recv(Cap cap, Byte *buf, usize *bufLen, Cap *caps, usize *capLen) {
+Res<> _recv(Cap cap, Byte* buf, usize* bufLen, Cap* caps, usize* capLen) {
     return _syscall(Syscall::RECV, cap.raw(), (Arg)buf, (Arg)bufLen, (Arg)caps, (Arg)capLen);
 }
 
@@ -136,7 +136,7 @@ Res<> _listen(Cap cap, Cap target, Flags<Sigs> set, Flags<Sigs> unset) {
     return _syscall(Syscall::LISTEN, cap.raw(), target.raw(), (Arg)set.val(), (Arg)unset.val());
 }
 
-Res<> _poll(Cap cap, Event *ev, usize evCap, usize *evLen, Instant until) {
+Res<> _poll(Cap cap, Event* ev, usize evCap, usize* evLen, Instant until) {
     return _syscall(Syscall::POLL, cap.raw(), (Arg)ev, evCap, (usize)evLen, until.val());
 }
 

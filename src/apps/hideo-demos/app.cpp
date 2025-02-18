@@ -41,7 +41,7 @@ struct SwitchAction {
 
 using Action = Union<SwitchAction>;
 
-Ui::Task<Action> reduce(State &s, Action action) {
+Ui::Task<Action> reduce(State& s, Action action) {
     action.visit(
         [&](SwitchAction action) {
             s.current = action.index;
@@ -54,14 +54,14 @@ Ui::Task<Action> reduce(State &s, Action action) {
 using Model = Ui::Model<State, Action, reduce>;
 
 Ui::Child app() {
-    return Ui::reducer<Model>([](State const &s) {
+    return Ui::reducer<Model>([](State const& s) {
         return Kr::scaffold({
             .icon = Mdi::DUCK,
             .title = "Demos"s,
             .sidebar = [&] {
                 return Kr::sidenav(
                     iter(DEMOS)
-                        .mapi([&](Demo const *demo, usize index) {
+                        .mapi([&](Demo const* demo, usize index) {
                             return Kr::sidenavItem(
                                 index == s.current,
                                 Model::bind<SwitchAction>(index),

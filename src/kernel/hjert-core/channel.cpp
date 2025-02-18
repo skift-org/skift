@@ -33,7 +33,7 @@ void Channel::_updateSignalsUnlock() {
     );
 }
 
-Res<Hj::SentRecv> Channel::send(Domain &dom, Bytes bytes, Slice<Hj::Cap> caps) {
+Res<Hj::SentRecv> Channel::send(Domain& dom, Bytes bytes, Slice<Hj::Cap> caps) {
     ObjectLockScope scope{*this};
     try$(_ensureOpen());
 
@@ -68,7 +68,7 @@ Res<Hj::SentRecv> Channel::send(Domain &dom, Bytes bytes, Slice<Hj::Cap> caps) {
     return Ok<Hj::SentRecv>(bytes.len(), caps.len());
 }
 
-Res<Hj::SentRecv> Channel::recv(Domain &dom, MutBytes bytes, MutSlice<Hj::Cap> caps) {
+Res<Hj::SentRecv> Channel::recv(Domain& dom, MutBytes bytes, MutSlice<Hj::Cap> caps) {
     ObjectLockScope scope{*this};
     try$(_ensureOpen());
 
@@ -78,7 +78,7 @@ Res<Hj::SentRecv> Channel::recv(Domain &dom, MutBytes bytes, MutSlice<Hj::Cap> c
     if (_sr.len() == 0)
         return Error::wouldBlock("no messages available");
 
-    auto &[expectedBytes, expectedCaps] = _sr.peek(0);
+    auto& [expectedBytes, expectedCaps] = _sr.peek(0);
     if (bytes.len() < expectedBytes)
         return Error::invalidInput("not enough space for bytes");
 

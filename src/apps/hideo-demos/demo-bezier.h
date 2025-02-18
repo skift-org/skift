@@ -12,7 +12,7 @@
 
 namespace Hideo::Demos {
 
-static Ui::Task<Edit> reduce(Math::Curvef &curve, Edit e) {
+static Ui::Task<Edit> reduce(Math::Curvef& curve, Edit e) {
     curve._pts[e.index] = e.pos;
     return NONE;
 }
@@ -23,9 +23,9 @@ static inline Demo BEZIER_DEMO{
     "Curve editor",
     [] {
         using Model = Ui::Model<Math::Curvef, Edit, reduce>;
-        return Ui::reducer<Model>(Math::Curvef::linear(100, 300), [](Math::Curvef const &s) {
+        return Ui::reducer<Model>(Math::Curvef::linear(100, 300), [](Math::Curvef const& s) {
             auto canvas = Ui::canvas(
-                [=](Gfx::Canvas &g, Math::Vec2i) {
+                [=](Gfx::Canvas& g, Math::Vec2i) {
                     g.beginPath();
                     g.moveTo(s.a);
                     g.cubicTo(s.b, s.c, s.d);
@@ -93,7 +93,7 @@ static inline Demo BEZIER_DEMO{
                        Ui::bound() |
                        Ui::dragRegion() |
                        Ui::placed(Math::Recti::fromCenter(pos.cast<isize>(), {24, 24})) |
-                       Ui::intent([=](Ui::Node &n, App::Event &e) {
+                       Ui::intent([=](Ui::Node& n, App::Event& e) {
                            if (auto m = e.is<Ui::DragEvent>()) {
                                e.accept();
                                Model::bubble<Edit>(n, {index, pos + m->delta});

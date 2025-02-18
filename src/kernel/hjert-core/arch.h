@@ -22,17 +22,17 @@ namespace Hjert::Arch {
 
 struct Frame;
 
-Core::Cpu &globalCpu();
+Core::Cpu& globalCpu();
 
-Hal::Vmm &globalVmm();
+Hal::Vmm& globalVmm();
 
-Io::TextWriter &globalOut();
+Io::TextWriter& globalOut();
 
 Res<Box<Core::Context>> createContext(Core::Mode mode, usize ip, usize sp, usize ksp, Hj::Args args);
 
 Res<Arc<Hal::Vmm>> createVmm();
 
-Res<> init(Handover::Payload &);
+Res<> init(Handover::Payload&);
 
 [[noreturn]] void stop();
 

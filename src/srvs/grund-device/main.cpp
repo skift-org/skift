@@ -24,9 +24,9 @@ struct IsaRootBus : public Node {
 };
 
 struct RootBus : public Node {
-    Rpc::Endpoint &rpc;
+    Rpc::Endpoint& rpc;
 
-    RootBus(Rpc::Endpoint &rpc)
+    RootBus(Rpc::Endpoint& rpc)
         : rpc{rpc} {}
 
     Res<> init() override {
@@ -34,7 +34,7 @@ struct RootBus : public Node {
         return Ok();
     }
 
-    Res<> bubble(App::Event &e) override {
+    Res<> bubble(App::Event& e) override {
         if (auto me = e.is<App::MouseEvent>()) {
             try$(rpc.send<App::MouseEvent>(Rpc::Port::BROADCAST, *me));
             e.accept();
@@ -49,7 +49,7 @@ struct RootBus : public Node {
 
 } // namespace Grund::Device
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto endpoint = Rpc::Endpoint::create(ctx);
 
     logInfo("devices: building device tree...");

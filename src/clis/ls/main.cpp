@@ -9,10 +9,10 @@ struct Options {
     bool list = false;
 };
 
-Res<> ls(Mime::Url url, Options const &options) {
+Res<> ls(Mime::Url url, Options const& options) {
     auto dir = try$(Sys::Dir::open(url));
 
-    for (auto const &entry : dir.entries()) {
+    for (auto const& entry : dir.entries()) {
         if (not options.all and entry.name[0] == '.')
             continue;
 
@@ -28,8 +28,8 @@ Res<> ls(Mime::Url url, Options const &options) {
     return Ok();
 }
 
-Res<> ls(Slice<Str> paths, Options const &options) {
-    for (auto &path : paths) {
+Res<> ls(Slice<Str> paths, Options const& options) {
+    for (auto& path : paths) {
         if (paths.len() > 1)
             Sys::println("{}:", path);
         auto url = try$(Mime::parseUrlOrPath(path));
@@ -41,7 +41,7 @@ Res<> ls(Slice<Str> paths, Options const &options) {
 
 } // namespace Ls
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto allFlag = Cli::flag('a', "all"s, "Do not ignore entries starting with ."s);
     auto listFlag = Cli::flag('l', "list"s, "Use a long listing format."s);
     auto argsOperands = Cli::operand<Vec<Str>>("paths"s, "Directories to list."s);

@@ -14,7 +14,7 @@ static inline Page PAGE_NUMBER{
     "An input where the user selects a value by incrementing or decrementing.",
     [] {
         return Kr::number(
-                   100, [](auto &, ...) {
+                   100, [](auto&, ...) {
                    },
                    10
                ) |

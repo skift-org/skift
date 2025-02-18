@@ -10,13 +10,13 @@ namespace Grund::Device::Ps2 {
 struct I8042;
 
 struct Device : public Node {
-    I8042 &_ctrl;
+    I8042& _ctrl;
 
-    I8042 &ctrl() {
+    I8042& ctrl() {
         return _ctrl;
     }
 
-    Device(I8042 &ctrl)
+    Device(I8042& ctrl)
         : _ctrl(ctrl) {}
 
     virtual ~Device() = default;
@@ -70,7 +70,7 @@ struct I8042 : public Node {
     I8042(Rc<Hal::Io> io)
         : _io(io) {}
 
-    Hal::Io &io() {
+    Hal::Io& io() {
         return *_io;
     }
 
@@ -110,7 +110,7 @@ struct Keyboard : public Device {
 
     Res<> init() override;
 
-    Res<> event(App::Event &e) override;
+    Res<> event(App::Event& e) override;
 
     Res<> sendCmd(_Cmd cmd) {
         try$(ctrl().writeData(cmd));
@@ -140,7 +140,7 @@ struct Mouse : public Device {
 
     Res<> init() override;
 
-    Res<> event(App::Event &e) override;
+    Res<> event(App::Event& e) override;
 
     Res<> decode();
 

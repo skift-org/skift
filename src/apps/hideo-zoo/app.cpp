@@ -59,14 +59,14 @@ static Array PAGES = {
 };
 
 Ui::Child app() {
-    return Ui::reducer<Model>([](State const &s) {
+    return Ui::reducer<Model>([](State const& s) {
         return Kr::scaffold({
             .icon = Mdi::DUCK,
             .title = "Zoo"s,
             .sidebar = [&] {
                 return Kr::sidenav(
                     iter(PAGES)
-                        .mapi([&](Page const *page, usize index) {
+                        .mapi([&](Page const* page, usize index) {
                             return Kr::sidenavItem(
                                 index == s.page,
                                 Model::bind<Switch>(index),
@@ -78,7 +78,7 @@ Ui::Child app() {
                 );
             },
             .body = [&] {
-                auto &page = PAGES[s.page];
+                auto& page = PAGES[s.page];
                 return Ui::vflow(
                     Ui::vflow(
                         Ui::titleMedium(page->name),

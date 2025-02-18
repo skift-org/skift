@@ -82,9 +82,9 @@ struct Pmm : public Hal::Pmm {
 };
 
 struct Kmm : public Hal::Kmm {
-    Hal::Pmm &_pmm;
+    Hal::Pmm& _pmm;
 
-    Kmm(Hal::Pmm &pmm) : _pmm(pmm) {
+    Kmm(Hal::Pmm& pmm) : _pmm(pmm) {
     }
 
     Res<Hal::KmmRange> allocRange(usize size) override {
@@ -118,8 +118,8 @@ struct Kmm : public Hal::Kmm {
 static Opt<Pmm> _pmm = NONE;
 static Opt<Kmm> _kmm = NONE;
 
-Hal::PmmRange _findBitmapSpace(Handover::Payload &payload, usize bitmapSize) {
-    for (auto &record : payload) {
+Hal::PmmRange _findBitmapSpace(Handover::Payload& payload, usize bitmapSize) {
+    for (auto& record : payload) {
         if (record.tag != Handover::Tag::FREE)
             continue;
 
@@ -133,7 +133,7 @@ Hal::PmmRange _findBitmapSpace(Handover::Payload &payload, usize bitmapSize) {
     logFatal("mem: no usable memory for bitmap");
 }
 
-Res<> initMem(Handover::Payload &payload) {
+Res<> initMem(Handover::Payload& payload) {
     auto usableRange = payload.usableRange<Hal::PmmRange>();
 
     if (usableRange.empty()) {
@@ -157,7 +157,7 @@ Res<> initMem(Handover::Payload &payload) {
     _pmm.emplace(
         usableRange,
         MutSlice{
-            reinterpret_cast<u8 *>(pmmBits.start + Hal::UPPER_HALF),
+            reinterpret_cast<u8*>(pmmBits.start + Hal::UPPER_HALF),
             pmmBits.size,
         }
     );
@@ -165,7 +165,7 @@ Res<> initMem(Handover::Payload &payload) {
     _kmm.emplace(_pmm.unwrap());
 
     logInfo("mem: marking free memory as free...");
-    for (auto &record : payload) {
+    for (auto& record : payload) {
         if (record.tag == Handover::Tag::FREE) {
             logInfo("mem: free memory at {p} {p} ({}kib)", record.start, record.start + record.size, record.size / kib(1));
             try$(pmm().free({static_cast<usize>(record.start), static_cast<usize>(record.size)}));
@@ -214,13 +214,13 @@ Res<> initMem(Handover::Payload &payload) {
     return Ok();
 }
 
-Hal::Pmm &pmm() {
+Hal::Pmm& pmm() {
     if (not _pmm)
         logFatal("mem: pmm not initialized yet");
     return *_pmm;
 }
 
-Hal::Kmm &kmm() {
+Hal::Kmm& kmm() {
     if (not _kmm)
         logFatal("mem: heap not initialized yet");
     return *_kmm;

@@ -71,7 +71,7 @@ Ui::Child quickSetting(QuickSettingProps props) {
     return primary;
 }
 
-Ui::Child dateAndTime(State const &state) {
+Ui::Child dateAndTime(State const& state) {
     auto [date, time] = state.dateTime;
 
     return Ui::vflow(
@@ -87,7 +87,7 @@ Ui::Child dateAndTime(State const &state) {
            );
 }
 
-Ui::Child quickheader(State const &state) {
+Ui::Child quickheader(State const& state) {
     return Ui::hflow(
         dateAndTime(state),
         Ui::grow(NONE),
@@ -101,7 +101,7 @@ Ui::Child quickheader(State const &state) {
     );
 }
 
-Ui::Child quickTools(State const &) {
+Ui::Child quickTools(State const&) {
     return Ui::hflow(
         8,
         Ui::button(
@@ -110,7 +110,7 @@ Ui::Child quickTools(State const &) {
             Mdi::LOCK
         ),
         Ui::button(
-            [](auto &n) {
+            [](auto& n) {
                 Model::bubble(n, Activate{Panel::NIL});
                 Ui::showDialog(n, powerDialog());
             },
@@ -118,7 +118,7 @@ Ui::Child quickTools(State const &) {
         ),
         Ui::grow(NONE),
         Ui::button(
-            [](auto &n) {
+            [](auto& n) {
                 Model::bubble(n, Activate{Panel::NIL});
                 Ui::showDialog(n, Kr::aboutDialog("Shell"s));
             },
@@ -133,7 +133,7 @@ Ui::Child quickTools(State const &) {
     );
 }
 
-Ui::Child colapsedQuickSettings(State const &) {
+Ui::Child colapsedQuickSettings(State const&) {
     auto settings = Ui::grid(
         {
             .rows = Ui::GridUnit::fixed(46).repeated(2),
@@ -192,7 +192,7 @@ Mdi::Icon _iconForVolumeValue(f64 value) {
     }
 }
 
-Ui::Child expendedQuickSettings(State const &s) {
+Ui::Child expendedQuickSettings(State const& s) {
     auto settings = Ui::grid(
         {
             .rows = Ui::GridUnit::fixed(46).repeated(4),
@@ -250,14 +250,14 @@ Ui::Child expendedQuickSettings(State const &s) {
         8,
         Kr::slider(
             s.brightness,
-            [](auto &n, auto value) {
+            [](auto& n, auto value) {
                 Model::bubble(n, ChangeBrightness{value});
             },
             _iconForBrightnessValue(s.brightness), "Brightness"
         ),
         Kr::slider(
             s.volume,
-            [](auto &n, auto value) {
+            [](auto& n, auto value) {
                 Model::bubble(n, ChangeVolume{value});
             },
             _iconForVolumeValue(s.volume), "Volume"
@@ -266,13 +266,13 @@ Ui::Child expendedQuickSettings(State const &s) {
     );
 }
 
-Ui::Child quickSettings(State const &state) {
+Ui::Child quickSettings(State const& state) {
     if (state.isSysPanelColapsed)
         return colapsedQuickSettings(state);
     return expendedQuickSettings(state);
 }
 
-Ui::Child noti(Noti const &noti, usize i) {
+Ui::Child noti(Noti const& noti, usize i) {
     return Ui::vflow(
                8,
                Ui::hflow(
@@ -300,7 +300,7 @@ Ui::Child noti(Noti const &noti, usize i) {
            Ui::key(noti.id);
 }
 
-Ui::Child notifications(State const &state) {
+Ui::Child notifications(State const& state) {
     if (not state.noti.len()) {
         return Ui::text(Ui::TextStyles::labelMedium().withColor(Ui::GRAY400), "No notifications") |
                Ui::center();
@@ -315,12 +315,12 @@ Ui::Child notifications(State const &state) {
            Ui::vscroll();
 }
 
-Ui::Child sysPanel(State const &state) {
+Ui::Child sysPanel(State const& state) {
     return expendedQuickSettings(state) |
            panel({320, Ui::UNCONSTRAINED});
 }
 
-Ui::Child notiPanel(State const &state) {
+Ui::Child notiPanel(State const& state) {
     return Ui::vflow(
                8,
                Ui::labelMedium("Notifications") |
@@ -330,7 +330,7 @@ Ui::Child notiPanel(State const &state) {
            panel({500, 400});
 }
 
-Ui::Child sysFlyout(State const &state) {
+Ui::Child sysFlyout(State const& state) {
     auto box = Ui::box({
         .margin = {8, 8, 32, 8},
         .padding = {12, 12, 0, 12},

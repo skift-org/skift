@@ -6,13 +6,13 @@ namespace Karm::Ui::_Embed {
 
 struct EfiHost :
     public Host {
-    Efi::SimpleTextInputProtocol *_stip = nullptr;
+    Efi::SimpleTextInputProtocol* _stip = nullptr;
     Gfx::MutPixels _front;
     Rc<Gfx::Surface> _back;
 
     EfiHost(
         Child root,
-        Efi::SimpleTextInputProtocol *stip,
+        Efi::SimpleTextInputProtocol* stip,
         Gfx::MutPixels front,
         Rc<Gfx::Surface> back
     )
@@ -42,19 +42,19 @@ struct EfiHost :
         return Ok();
     }
 
-    void bubble(App::Event &e) override {
+    void bubble(App::Event& e) override {
         Host::bubble(e);
     }
 };
 
 Res<Rc<Host>> makeHost(Child root) {
-    auto *stip = try$(Efi::locateProtocol<Efi::SimpleTextInputProtocol>());
-    auto *gop = try$(Efi::locateProtocol<Efi::GraphicsOutputProtocol>());
-    auto *mode = gop->mode;
+    auto* stip = try$(Efi::locateProtocol<Efi::SimpleTextInputProtocol>());
+    auto* gop = try$(Efi::locateProtocol<Efi::GraphicsOutputProtocol>());
+    auto* mode = gop->mode;
 
     logInfo("efi: gop: {}x{}, {} stride, {} modes", mode->info->horizontalResolution, mode->info->verticalResolution, mode->info->pixelsPerScanLine * 4, mode->maxMode);
     Gfx::MutPixels front = {
-        (void *)mode->frameBufferBase,
+        (void*)mode->frameBufferBase,
         {(u16)mode->info->horizontalResolution, (u16)mode->info->verticalResolution},
         (u16)(mode->info->pixelsPerScanLine * 4),
         Gfx::BGRA8888,
@@ -65,7 +65,7 @@ Res<Rc<Host>> makeHost(Child root) {
     return Ok(makeRc<EfiHost>(root, stip, front, back));
 }
 
-Async::Task<> runAsync(Sys::Context &, Child) {
+Async::Task<> runAsync(Sys::Context&, Child) {
     notImplemented();
 }
 

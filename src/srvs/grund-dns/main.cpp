@@ -6,7 +6,7 @@
 
 namespace Grund::Dns {
 
-Async::Task<> serv(Sys::Context &ctx) {
+Async::Task<> serv(Sys::Context& ctx) {
     auto endpoint = Rpc::Endpoint::create(ctx);
 
     logDebug("sending nonsens to system");
@@ -26,6 +26,6 @@ Async::Task<> serv(Sys::Context &ctx) {
 
 } // namespace Grund::Dns
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
     return Grund::Dns::serv(ctx);
 }

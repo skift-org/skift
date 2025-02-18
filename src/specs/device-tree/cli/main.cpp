@@ -3,8 +3,8 @@
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
-    auto &args = useArgs(ctx);
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
+    auto& args = useArgs(ctx);
 
     if (args.len() == 0) {
         co_return Error::invalidInput("Usage: dtb-dump <dtb-file>");

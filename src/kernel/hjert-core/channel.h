@@ -25,9 +25,9 @@ struct Channel :
 
     void _updateSignalsUnlock();
 
-    Res<Hj::SentRecv> send(Domain &dom, Bytes bytes, Slice<Hj::Cap> caps);
+    Res<Hj::SentRecv> send(Domain& dom, Bytes bytes, Slice<Hj::Cap> caps);
 
-    Res<Hj::SentRecv> recv(Domain &dom, MutBytes bytes, MutSlice<Hj::Cap> caps);
+    Res<Hj::SentRecv> recv(Domain& dom, MutBytes bytes, MutSlice<Hj::Cap> caps);
 
     Res<> close();
 };

@@ -8,24 +8,24 @@ Node::Node() {
 }
 
 Node::~Node() {
-    for (auto &child : _children) {
+    for (auto& child : _children) {
         child->_parent = nullptr;
     }
 }
 
 Res<> Node::init() {
-    for (auto &child : _children) {
+    for (auto& child : _children) {
         try$(child->init());
     }
     return Ok();
 }
 
-Res<> Node::event(App::Event &e) {
+Res<> Node::event(App::Event& e) {
     if (e.accepted()) {
         return Ok();
     }
 
-    for (auto &child : _children) {
+    for (auto& child : _children) {
         try$(child->event(e));
 
         if (e.accepted()) {
@@ -36,7 +36,7 @@ Res<> Node::event(App::Event &e) {
     return Ok();
 }
 
-Res<> Node::bubble(App::Event &e) {
+Res<> Node::bubble(App::Event& e) {
     if (_parent and not e.accepted()) {
         try$(_parent->bubble(e));
     }

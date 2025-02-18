@@ -2,20 +2,20 @@
 
 namespace Hideo::Spreadsheet {
 
-Ui::Task<Action> reduce(State &s, Action a) {
+Ui::Task<Action> reduce(State& s, Action a) {
     a.visit(
         Visitor{
-            [&](UpdateSelection &u) {
+            [&](UpdateSelection& u) {
                 s.selection = u.range;
             },
-            [&](ToggleProperties &) {
+            [&](ToggleProperties&) {
                 s.propertiesVisible = not s.propertiesVisible;
             },
-            [&](SwitchSheet &u) {
+            [&](SwitchSheet& u) {
                 s.active = u.index;
                 s.selection = NONE;
             },
-            [&](auto &) {
+            [&](auto&) {
                 debug("Unhandled action");
             },
         }

@@ -16,7 +16,7 @@ static inline Page PAGE_ALERT{
     "A modal dialog that interrupts the user with important content and expects a response.",
     [] {
         return Ui::button(
-                   [](auto &n) {
+                   [](auto& n) {
                        Ui::showDialog(
                            n,
                            Kr::dialogContent({

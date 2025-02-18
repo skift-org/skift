@@ -3,7 +3,7 @@
 
 #include "../app.h"
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
     Async::Cancelation c;
     auto app = Hideo::Clock::app();
     Async::detach(Hideo::Clock::timerTask(app, c.token()));

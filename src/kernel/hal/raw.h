@@ -100,13 +100,13 @@ struct RawDmaIo : public Io {
             return Error::invalidInput("out of range");
 
         if (size == 1) {
-            return Ok(*((u8 volatile *)(addr)));
+            return Ok(*((u8 volatile*)(addr)));
         } else if (size == 2) {
-            return Ok(*((u16 volatile *)(addr)));
+            return Ok(*((u16 volatile*)(addr)));
         } else if (size == 4) {
-            return Ok(*((u32 volatile *)(addr)));
+            return Ok(*((u32 volatile*)(addr)));
         } else if (size == 8) {
-            return Ok(*((u64 volatile *)(addr)));
+            return Ok(*((u64 volatile*)(addr)));
         } else {
             return Error::invalidInput("unsupported size");
         }
@@ -118,13 +118,13 @@ struct RawDmaIo : public Io {
             return Error::invalidInput("out of range");
 
         if (size == 1) {
-            *((u8 volatile *)(addr)) = value;
+            *((u8 volatile*)(addr)) = value;
         } else if (size == 2) {
-            *((u16 volatile *)(addr)) = value;
+            *((u16 volatile*)(addr)) = value;
         } else if (size == 4) {
-            *((u32 volatile *)(addr)) = value;
+            *((u32 volatile*)(addr)) = value;
         } else if (size == 8) {
-            *((u64 volatile *)(addr)) = value;
+            *((u64 volatile*)(addr)) = value;
         } else {
             return Error::invalidInput("unsupported size");
         }
@@ -138,7 +138,7 @@ struct RawDmaIo : public Io {
             return Error::invalidInput("out of range");
 
         for (usize i = 0; i < buf.len(); i++) {
-            buf[i] = *((u8 volatile *)(addr + i));
+            buf[i] = *((u8 volatile*)(addr + i));
         }
 
         return Ok();
@@ -150,7 +150,7 @@ struct RawDmaIo : public Io {
             return Error::invalidInput("out of range");
 
         for (usize i = 0; i < buf.len(); i++) {
-            *((u8 volatile *)(addr + i)) = buf[i];
+            *((u8 volatile*)(addr + i)) = buf[i];
         }
 
         return Ok();

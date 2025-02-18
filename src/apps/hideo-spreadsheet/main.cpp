@@ -65,7 +65,7 @@ Ui::Child formula() {
            Ui::focusable();
 }
 
-Ui::Child toolbar(State const &state) {
+Ui::Child toolbar(State const& state) {
     return Kr::toolbar({
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FILE),
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FOLDER),
@@ -189,7 +189,7 @@ Ui::Child properties() {
     );
 }
 
-Ui::Child tabItem(State const &state, Sheet const &sheet, usize index) {
+Ui::Child tabItem(State const& state, Sheet const& sheet, usize index) {
     return Ui::button(
         Model::bind<SwitchSheet>(index),
         state.active == index
@@ -199,12 +199,12 @@ Ui::Child tabItem(State const &state, Sheet const &sheet, usize index) {
     );
 }
 
-Ui::Child tabs(State const &state) {
+Ui::Child tabs(State const& state) {
     return Ui::hflow(
         4,
         Ui::hflow(
             iter(state.book.sheets)
-                .mapi([&](auto const &s, usize i) {
+                .mapi([&](auto const& s, usize i) {
                     return tabItem(state, s, i);
                 })
                 .collect<Ui::Children>()
@@ -219,7 +219,7 @@ Ui::Child tabs(State const &state) {
 }
 
 Ui::Child app() {
-    return Ui::reducer<Model>({}, [](auto const &s) {
+    return Ui::reducer<Model>({}, [](auto const& s) {
         auto tb = Kr::titlebar(Mdi::TABLE, "Spreadsheet"s, tabs(s));
         auto body = table(s) | Ui::grow();
         if (s.propertiesVisible) {
@@ -237,6 +237,6 @@ Ui::Child app() {
 
 } // namespace Hideo::Spreadsheet
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
     co_return Ui::runApp(ctx, Hideo::Spreadsheet::app());
 }

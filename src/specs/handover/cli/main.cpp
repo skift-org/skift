@@ -4,8 +4,8 @@
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
-    auto &args = useArgs(ctx);
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
+    auto& args = useArgs(ctx);
 
     if (args.len() == 0) {
         co_return Error::invalidInput("Usage: handover-dump <elf-file>");
@@ -23,7 +23,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
                         .slice<Handover::Request>();
 
     Sys::println("Requests:");
-    for (auto const &request : requests) {
+    for (auto const& request : requests) {
         Sys::println(" - {}", request.name());
     }
 

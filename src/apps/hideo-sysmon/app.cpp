@@ -41,7 +41,7 @@ Ui::Child sidebarItem(bool selected, Ui::OnPress onPress, Gfx::Color color, Stri
            );
 }
 
-Ui::Child sidebar(State const &s) {
+Ui::Child sidebar(State const& s) {
     return Kr::sidenav({
         Kr::sidenavTitle("Software"s),
         Kr::sidenavItem(
@@ -109,7 +109,7 @@ Ui::Child sidebar(State const &s) {
 // MARK: App -------------------------------------------------------------------
 
 Ui::Child app() {
-    return Ui::reducer<Model>({}, [](State const &s) {
+    return Ui::reducer<Model>({}, [](State const& s) {
         return Kr::scaffold({
             .icon = Mdi::VIEW_DASHBOARD,
             .title = "System Monitor"s,

@@ -2,7 +2,7 @@
 
 namespace Hideo::Images {
 
-Ui::Task<Action> reduce(State &s, Action a) {
+Ui::Task<Action> reduce(State& s, Action a) {
     a.visit(Visitor{
         [&](Refresh) {
         },

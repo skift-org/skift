@@ -113,11 +113,11 @@ inline void wrxcr(u32 i, u64 value) {
                  : "memory");
 }
 
-inline void xsave(void *region) {
+inline void xsave(void* region) {
     asm volatile("xsave (%0)" ::"a"(region));
 }
 
-inline void xrstor(void const *region) {
+inline void xrstor(void const* region) {
     asm volatile("xrstor (%0)" ::"a"(region));
 }
 
@@ -125,11 +125,11 @@ inline void fninit(void) {
     asm volatile("fninit");
 }
 
-inline void fxsave(void *region) {
+inline void fxsave(void* region) {
     asm volatile("fxsave (%0)" ::"a"(region));
 }
 
-inline void fxrstor(void const *region) {
+inline void fxrstor(void const* region) {
     asm volatile("fxrstor (%0)" ::"a"(region));
 }
 

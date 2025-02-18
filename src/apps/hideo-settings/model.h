@@ -43,7 +43,7 @@ struct GoForward {};
 
 using Action = Union<GoTo, GoBack, GoForward>;
 
-Ui::Task<Action> reduce(State &, Action);
+Ui::Task<Action> reduce(State&, Action);
 
 using Model = Ui::Model<State, Action, reduce>;
 

@@ -16,7 +16,7 @@ static inline Demo MIXBOX_DEMO{
     "Pigment Acurate Color Mixing",
     [] {
         return Ui::canvas(
-            [](Gfx::Canvas &g, Math::Vec2i bound) {
+            [](Gfx::Canvas& g, Math::Vec2i bound) {
                 auto grad = Gfx::Gradient::linear();
                 for (f64 i = 0; i <= 100; i += 10)
                     grad.withStop(Mixbox::lerpColor(Gfx::YELLOW, Gfx::RED, i / 100.0), i / 100.0);

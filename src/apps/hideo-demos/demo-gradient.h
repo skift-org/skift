@@ -13,7 +13,7 @@ static inline Demo GRADIENT_DEMO{
     "Gradients rendering",
     [] {
         return Ui::canvas(
-            [](Gfx::Canvas &g, Math::Vec2i bound) {
+            [](Gfx::Canvas& g, Math::Vec2i bound) {
                 // Red, orange, yellow, green, blue, indigo, violet
                 auto colors = Gfx::Gradient::linear()
                                   .withColors(Gfx::RED, Gfx::ORANGE, Gfx::YELLOW, Gfx::GREEN, Gfx::BLUE, Gfx::INDIGO, Gfx::VIOLET)

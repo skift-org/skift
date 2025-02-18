@@ -9,7 +9,7 @@
 
 template <>
 struct Karm::Io::Formatter<Handover::Record> {
-    Res<usize> format(Io::TextWriter &writer, Handover::Record record) {
+    Res<usize> format(Io::TextWriter& writer, Handover::Record record) {
         return Io::format(writer, "Record({}, {x}-{x})", record.name(), record.start, record.end());
     }
 };
@@ -36,23 +36,23 @@ inline Pair<Record, Record> split(Record record, Record other) {
 }
 
 struct Builder {
-    void *_buf{};
+    void* _buf{};
     usize _size{};
-    char *_string{};
+    char* _string{};
     _Vec<ViewBuf<Record>> _records;
 
     Builder(MutSlice<Byte> slice)
         : _buf(slice.buf()),
           _size(slice.len()),
-          _string((char *)end(slice)),
-          _records(ViewBuf<Record>{(Manual<Record> *)payload().records, _size / sizeof(Record)}) {
+          _string((char*)end(slice)),
+          _records(ViewBuf<Record>{(Manual<Record>*)payload().records, _size / sizeof(Record)}) {
         payload() = {};
         payload().magic = COOLBOOT;
         payload().size = slice.len();
     }
 
-    Payload &payload() {
-        return *static_cast<Payload *>(_buf);
+    Payload& payload() {
+        return *static_cast<Payload*>(_buf);
     }
 
     void add(Record record) {
@@ -137,14 +137,14 @@ struct Builder {
         _string -= str.len() + 1;
         memcpy(_string, str.buf(), str.len());
         _string[str.len()] = '\0';
-        return _string - static_cast<char *>(_buf);
+        return _string - static_cast<char*>(_buf);
     }
 
     void agent(Str str) {
         payload().agent = add(str);
     }
 
-    Payload &finalize() {
+    Payload& finalize() {
         payload().len = _records.len();
         return payload();
     }

@@ -21,7 +21,7 @@ struct LoggerOut : public Io::TextWriterBase<> {
     }
 };
 
-Io::TextWriter &loggerOut() {
+Io::TextWriter& loggerOut() {
     static LoggerOut _loggerOut{};
     return _loggerOut;
 }

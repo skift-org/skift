@@ -2,7 +2,7 @@
 
 #include <karm-base/lock.h>
 
-extern "C" int __cxa_atexit(void (*)(void *), void *, void *) {
+extern "C" int __cxa_atexit(void (*)(void*), void*, void*) {
     return 0;
 }
 
@@ -42,21 +42,21 @@ static_assert(sizeof(Guard) == 3);
  * It returns 1 if the static variable should be initialized, 0 if it
  * should not be initialized.
  */
-extern "C" int __cxa_guard_acquire(u64 *guard) {
-    return reinterpret_cast<Guard *>(guard)->acquire();
+extern "C" int __cxa_guard_acquire(u64* guard) {
+    return reinterpret_cast<Guard*>(guard)->acquire();
 }
 
 /**
  * This function is called after the static variable is initialized.
  */
-extern "C" void __cxa_guard_release(u64 *guard) {
-    reinterpret_cast<Guard *>(guard)->release();
+extern "C" void __cxa_guard_release(u64* guard) {
+    reinterpret_cast<Guard*>(guard)->release();
 }
 
 /**
  * This function is called if the initialization of the static variable
  * throws an exception.
  */
-extern "C" void __cxa_guard_abort(u64 *guard) {
-    reinterpret_cast<Guard *>(guard)->abort();
+extern "C" void __cxa_guard_abort(u64* guard) {
+    reinterpret_cast<Guard*>(guard)->abort();
 }

@@ -6,34 +6,34 @@ namespace Efi {
 
 Handle imageHandle();
 
-SystemTable *st();
+SystemTable* st();
 
-BootService *bs();
+BootService* bs();
 
-RuntimeService *rt();
+RuntimeService* rt();
 
-Efi::LoadedImageProtocol *li();
+Efi::LoadedImageProtocol* li();
 
-void init(Handle handle, SystemTable *st);
+void init(Handle handle, SystemTable* st);
 
 template <typename P>
-inline Res<P *> openProtocol(Handle handle) {
-    P *result = nullptr;
+inline Res<P*> openProtocol(Handle handle) {
+    P* result = nullptr;
     Guid guid = P::GUID;
-    try$(bs()->openProtocol(handle, &guid, (void **)&result, imageHandle(), nullptr, EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL));
+    try$(bs()->openProtocol(handle, &guid, (void**)&result, imageHandle(), nullptr, EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL));
     return Ok(result);
 }
 
 template <typename P>
-inline Res<P *> openProtocol() {
+inline Res<P*> openProtocol() {
     return openProtocol<P>(imageHandle());
 }
 
 template <typename P>
-inline Res<P *> locateProtocol() {
-    P *result = nullptr;
+inline Res<P*> locateProtocol() {
+    P* result = nullptr;
     Guid guid = P::GUID;
-    try$(bs()->locateProtocol(&guid, nullptr, (void **)&result));
+    try$(bs()->locateProtocol(&guid, nullptr, (void**)&result));
     return Ok(result);
 }
 

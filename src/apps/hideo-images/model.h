@@ -7,7 +7,7 @@ namespace Hideo::Images {
 
 using Hist = Array<Math::Vec3f, 64>;
 
-static inline void computeHistogram(Hist &hist, Gfx::Pixels pixels) {
+static inline void computeHistogram(Hist& hist, Gfx::Pixels pixels) {
     f64 max = 0;
     hist = {};
 
@@ -23,7 +23,7 @@ static inline void computeHistogram(Hist &hist, Gfx::Pixels pixels) {
         }
     }
 
-    for (auto &h : hist) {
+    for (auto& h : hist) {
         h = h / max;
     }
 }
@@ -56,7 +56,7 @@ using Action = Union<
     ApplyFilter,
     SaveImage>;
 
-Ui::Task<Action> reduce(State &, Action);
+Ui::Task<Action> reduce(State&, Action);
 
 using Model = Ui::Model<State, Action, reduce>;
 

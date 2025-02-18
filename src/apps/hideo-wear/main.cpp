@@ -34,7 +34,7 @@ Ui::Child app() {
 
 } // namespace Hideo::Wear
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
     co_return Ui::runApp(
         ctx,
         Hideo::Wear::app()

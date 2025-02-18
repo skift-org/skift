@@ -31,7 +31,7 @@ static Ui::Child key(auto icon) {
     return Ui::button(Ui::NOP, Ui::titleMedium(icon) | Ui::center() | Ui::pinSize(32));
 }
 
-static Ui::Child keyboard(State const &k) {
+static Ui::Child keyboard(State const& k) {
     auto firstRow = Ui::hflow(
         8,
         key(k.shift ? "Q" : "q"),
@@ -102,7 +102,7 @@ static Ui::Child keyboard(State const &k) {
 }
 
 Ui::Child flyout() {
-    return Ui::reducer<Model>({}, [](auto &k) {
+    return Ui::reducer<Model>({}, [](auto& k) {
         return Ui::vflow(
                    Ui::separator(),
                    Ui::vflow(
@@ -127,7 +127,7 @@ Ui::Child flyout() {
     });
 }
 
-void show(Ui::Node &n) {
+void show(Ui::Node& n) {
     Ui::showDialog(n, flyout());
 }
 

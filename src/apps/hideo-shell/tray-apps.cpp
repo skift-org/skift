@@ -14,7 +14,7 @@
 
 namespace Hideo::Shell {
 
-Ui::Child appIcon(Mdi::Icon const &icon, Gfx::ColorRamp ramp, isize size = 22) {
+Ui::Child appIcon(Mdi::Icon const& icon, Gfx::ColorRamp ramp, isize size = 22) {
     return Ui::icon(icon, size) |
            Ui::insets(size / 2.75) |
            Ui::center() |
@@ -27,7 +27,7 @@ Ui::Child appIcon(Mdi::Icon const &icon, Gfx::ColorRamp ramp, isize size = 22) {
            });
 }
 
-Ui::Child appRow(Launcher const &manifest, usize i) {
+Ui::Child appRow(Launcher const& manifest, usize i) {
     return Ui::ButtonStyle::subtle(),
            Ui::hflow(
                12,
@@ -39,17 +39,17 @@ Ui::Child appRow(Launcher const &manifest, usize i) {
                Ui::button(Model::bind<StartInstance>(i), Ui::ButtonStyle::subtle());
 }
 
-Ui::Child appsList(State const &state) {
+Ui::Child appsList(State const& state) {
     return Ui::vflow(
         iter(state.launchers)
-            .mapi([](auto &man, usize i) {
+            .mapi([](auto& man, usize i) {
                 return appRow(*man, i);
             })
             .collect<Ui::Children>()
     );
 }
 
-Ui::Child appTile(Launcher const &manifest, usize i) {
+Ui::Child appTile(Launcher const& manifest, usize i) {
     return Ui::vflow(
                26,
                appIcon(manifest.icon, manifest.ramp, 26),
@@ -61,18 +61,18 @@ Ui::Child appTile(Launcher const &manifest, usize i) {
            );
 }
 
-Ui::Child appsGrid(State const &state) {
+Ui::Child appsGrid(State const& state) {
     return Ui::grid(
         Ui::GridStyle::simpleFixed({8, 64}, {4, 64}),
         iter(state.launchers)
-            .mapi([](auto &man, usize i) {
+            .mapi([](auto& man, usize i) {
                 return appTile(*man, i);
             })
             .collect<Ui::Children>()
     );
 }
 
-Ui::Child runningApp(Instance const &, usize i) {
+Ui::Child runningApp(Instance const&, usize i) {
     return Ui::stack(
                Ui::empty() |
                    Ui::bound() |
@@ -84,13 +84,13 @@ Ui::Child runningApp(Instance const &, usize i) {
            Ui::pinSize({120, 192});
 }
 
-Ui::Child runningApps(State const &state) {
+Ui::Child runningApps(State const& state) {
     if (state.instances.len() == 0)
         return Ui::empty(64);
     return Ui::hflow(
                8,
                iter(state.instances)
-                   .mapi([](auto &instance, usize i) {
+                   .mapi([](auto& instance, usize i) {
                        return runningApp(*instance, i);
                    })
                    .collect<Ui::Children>()
@@ -98,7 +98,7 @@ Ui::Child runningApps(State const &state) {
            Ui::center() | Ui::insets({64, 0, 16, 0});
 }
 
-Ui::Child apps(State const &state) {
+Ui::Child apps(State const& state) {
     return Ui::vflow(
         Ui::hflow(
             4,
@@ -127,11 +127,11 @@ Ui::Child apps(State const &state) {
     );
 }
 
-Ui::Child appsPanel(State const &state) {
+Ui::Child appsPanel(State const& state) {
     return apps(state) | panel();
 }
 
-Ui::Child appsFlyout(State const &state) {
+Ui::Child appsFlyout(State const& state) {
     return Ui::vflow(
         runningApps(state),
         Ui::vflow(

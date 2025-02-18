@@ -31,7 +31,7 @@ struct Root : public Ui::ProxyNode<Root> {
     void _repaint() {
         Gfx::CpuCanvas g;
         g.begin(*_backbuffer);
-        for (auto &r : _dirty) {
+        for (auto& r : _dirty) {
             g.push();
             g.clear(r, Ui::GRAY950);
             g.fillStyle(Ui::GRAY50);
@@ -78,7 +78,7 @@ struct Root : public Ui::ProxyNode<Root> {
     }
 
     void _damage(Math::Recti r) {
-        for (auto &d : _dirty) {
+        for (auto& d : _dirty) {
             if (d.colide(r)) {
                 d = d.mergeWith(r);
                 return;
@@ -88,7 +88,7 @@ struct Root : public Ui::ProxyNode<Root> {
         _dirty.pushBack(r);
     }
 
-    void bubble(App::Event &event) override {
+    void bubble(App::Event& event) override {
         if (auto e = event.is<Node::PaintEvent>()) {
             _damage(e->bound);
             event.accept();
@@ -122,12 +122,12 @@ struct ServiceLauncher : public Hideo::Shell::Launcher {
     ServiceLauncher(Mdi::Icon icon, String name, Gfx::ColorRamp ramp, String serviceId)
         : Launcher(icon, name, ramp), componentId(serviceId) {}
 
-    void launch(Hideo::Shell::State &) override {
+    void launch(Hideo::Shell::State&) override {
         Rpc::globalEndpoint().send<Bus::Api::Start>(Rpc::Port::BUS, componentId).unwrap();
     }
 };
 
-Async::Task<> servAsync(Sys::Context &ctx) {
+Async::Task<> servAsync(Sys::Context& ctx) {
     Hideo::Shell::State state = {
         .isMobile = false,
         .dateTime = Sys::dateTime(),
@@ -175,6 +175,6 @@ Async::Task<> servAsync(Sys::Context &ctx) {
 
 } // namespace Grund::Shell
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
     return Grund::Shell::servAsync(ctx);
 }

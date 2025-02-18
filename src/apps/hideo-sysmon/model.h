@@ -26,7 +26,7 @@ struct GoTo {
 
 using Action = Union<GoTo>;
 
-Ui::Task<Action> reduce(State &s, Action a);
+Ui::Task<Action> reduce(State& s, Action a);
 
 using Model = Ui::Model<State, Action, reduce>;
 

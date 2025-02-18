@@ -8,7 +8,7 @@
 
 using namespace Grund::Bus;
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
     co_try$(Hj::Task::self().label("grund-bus"));
 
     logInfo("skiftOS " stringify$(__ck_version_value));
@@ -27,22 +27,22 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     co_try$(system->prepareService("grund-seat"s));
     co_try$(system->prepareService("grund-shell"s));
 
-    for (auto &endpoint : system->_endpoints)
+    for (auto& endpoint : system->_endpoints)
         co_try$(endpoint->activate(ctx));
 
     co_return Sys::globalSched().wait(Instant::endOfTime());
 }
 
-void __panicHandler(Karm::PanicKind kind, char const *msg);
+void __panicHandler(Karm::PanicKind kind, char const* msg);
 
 extern "C" void __entryPoint(usize rawHandover) {
     Abi::SysV::init();
     Karm::registerPanicHandler(__panicHandler);
 
-    auto &ctx = Sys::globalContext();
-    char const *argv[] = {"grund-bus", nullptr};
+    auto& ctx = Sys::globalContext();
+    char const* argv[] = {"grund-bus", nullptr};
     ctx.add<Sys::ArgsHook>(1, argv);
-    ctx.add<HandoverHook>((Handover::Payload *)rawHandover);
+    ctx.add<HandoverHook>((Handover::Payload*)rawHandover);
 
     auto res = Sys::run(entryPointAsync(ctx));
 

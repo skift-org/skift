@@ -4,6 +4,6 @@
 
 namespace Hideo::Spreadsheet {
 
-Ui::Child table(State const &s);
+Ui::Child table(State const& s);
 
 } // namespace Hideo::Spreadsheet

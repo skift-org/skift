@@ -15,7 +15,7 @@
 
 namespace Hideo::Images {
 
-Ui::Child viewer(State const &state) {
+Ui::Child viewer(State const& state) {
     return Ui::vflow(
         viewerToolbar(state),
         viewerPreview(state) | Ui::grow(),
@@ -23,7 +23,7 @@ Ui::Child viewer(State const &state) {
     );
 }
 
-Ui::Child viewerPreview(State const &state) {
+Ui::Child viewerPreview(State const& state) {
     if (not state.image)
         return Kr::errorPage(Mdi::ALERT_DECAGRAM, "Unable to display this image."s, Str{state.image.none().msg()});
 
@@ -36,7 +36,7 @@ Ui::Child viewerPreview(State const &state) {
            Ui::fit();
 }
 
-Ui::Child viewerToolbar(State const &state) {
+Ui::Child viewerToolbar(State const& state) {
     return Kr::toolbar({
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::MAGNIFY_PLUS),
         Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::MAGNIFY_MINUS),
@@ -51,7 +51,7 @@ Ui::Child viewerToolbar(State const &state) {
     });
 }
 
-Ui::Child viewerControls(State const &) {
+Ui::Child viewerControls(State const&) {
     return Ui::hflow(
                Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
                Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT)

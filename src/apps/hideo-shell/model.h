@@ -32,7 +32,7 @@ struct Launcher {
 
     virtual ~Launcher() = default;
 
-    virtual void launch(State &) = 0;
+    virtual void launch(State&) = 0;
 };
 
 struct Instance {
@@ -141,7 +141,7 @@ using Action = Union<
     ToggleSysPanel,
     ToggleAppThumbnail>;
 
-Ui::Task<Action> reduce(State &, Action);
+Ui::Task<Action> reduce(State&, Action);
 
 using Model = Ui::Model<State, Action, reduce>;
 

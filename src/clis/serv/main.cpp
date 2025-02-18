@@ -9,7 +9,7 @@
 
 namespace Serv {
 
-Async::Task<> respondFile(Sys::_Connection &conn, Mime::Url const &url, Net::Http::Code code = Net::Http::Code::OK) {
+Async::Task<> respondFile(Sys::_Connection& conn, Mime::Url const& url, Net::Http::Code code = Net::Http::Code::OK) {
     auto contentType = Mime::sniffSuffix(url.path.suffix())
                            .unwrapOr("application/octet-stream"_mime);
     auto file = co_try$(Sys::File::open(url));
@@ -35,7 +35,7 @@ Async::Task<> respondFile(Sys::_Connection &conn, Mime::Url const &url, Net::Htt
     co_return Ok();
 }
 
-Async::Task<> respond404(Sys::_Connection &conn) {
+Async::Task<> respond404(Sys::_Connection& conn) {
     auto res = co_await respondFile(conn, "bundle://serv/public/404.html"_url, Net::Http::Code::NOT_FOUND);
     if (res)
         co_return Ok();
@@ -56,7 +56,7 @@ Async::Task<> respond404(Sys::_Connection &conn) {
     co_return Ok();
 }
 
-Async::Task<> handleRequest(Sys::_Connection &conn, Str request, Sys::SocketAddr addr) {
+Async::Task<> handleRequest(Sys::_Connection& conn, Str request, Sys::SocketAddr addr) {
     Io::SScan scan{request};
     auto req = co_try$(Net::Http::Request::parse(scan));
     auto url = "bundle://serv/public/"_url / req.path;
@@ -91,7 +91,7 @@ Async::Task<> handleConnection(Sys::TcpConnection stream) {
 
 } // namespace Serv
 
-Async::Task<> entryPointAsync(Sys::Context &) {
+Async::Task<> entryPointAsync(Sys::Context&) {
     auto listener = co_try$(Sys::TcpListener::listen(Sys::Ip4::localhost(8080)));
     logInfo("Serving on http://{}", listener.addr());
     while (true)

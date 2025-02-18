@@ -2,7 +2,7 @@
 
 namespace Hideo::Sysmon {
 
-Ui::Task<Action> reduce(State &s, Action a) {
+Ui::Task<Action> reduce(State& s, Action a) {
     if (auto goTo = a.is<GoTo>())
         s.tab = goTo->tab;
 

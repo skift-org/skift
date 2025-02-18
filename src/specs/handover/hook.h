@@ -5,12 +5,12 @@
 #include "spec.h"
 
 struct HandoverHook : public Sys::Service {
-    Handover::Payload *payload;
+    Handover::Payload* payload;
 
-    HandoverHook(Handover::Payload *payload)
+    HandoverHook(Handover::Payload* payload)
         : payload(payload) {}
 };
 
-inline Handover::Payload &useHandover(Sys::Context &ctx = Sys::globalContext()) {
+inline Handover::Payload& useHandover(Sys::Context& ctx = Sys::globalContext()) {
     return *ctx.use<HandoverHook>().payload;
 }

@@ -25,8 +25,8 @@
 
 namespace Hideo::Images {
 
-Ui::Child histogram(Hist const &hist) {
-    return Ui::canvas([hist](Gfx::Canvas &g, Math::Vec2i size) {
+Ui::Child histogram(Hist const& hist) {
+    return Ui::canvas([hist](Gfx::Canvas& g, Math::Vec2i size) {
         f64 xunit = size.x / ((f64)hist.len() - 1);
 
         auto point = [&](usize i, usize c) {
@@ -60,7 +60,7 @@ Ui::Child histogram(Hist const &hist) {
     });
 }
 
-Ui::Child editor(State const &state) {
+Ui::Child editor(State const& state) {
     return Ui::vflow(
         editorToolbar(state),
         histogram(state.hist) | Ui::pinSize(64),
@@ -69,7 +69,7 @@ Ui::Child editor(State const &state) {
     );
 }
 
-Ui::Child editorPreview(State const &state) {
+Ui::Child editorPreview(State const& state) {
     return Ui::image(state.image.unwrap()) |
            Ui::box({
                .borderWidth = 1,
@@ -80,7 +80,7 @@ Ui::Child editorPreview(State const &state) {
            Ui::fit();
 }
 
-Ui::Child editorToolbar(State const &) {
+Ui::Child editorToolbar(State const&) {
     return Kr::toolbar({
         Ui::grow(NONE),
 
@@ -152,25 +152,25 @@ Mdi::Icon editorFilterIcon() {
     return Mdi::AUTO_FIX;
 }
 
-Ui::Child editorFilterControls(Gfx::Filter const &filter) {
+Ui::Child editorFilterControls(Gfx::Filter const& filter) {
     return filter.visit(Visitor{
-        [](Gfx::Unfiltered const &) {
+        [](Gfx::Unfiltered const&) {
             return Ui::empty();
         },
-        [](Gfx::TintFilter const &) {
+        [](Gfx::TintFilter const&) {
             return Ui::empty();
         },
-        [](Gfx::OverlayFilter const &) {
+        [](Gfx::OverlayFilter const&) {
             return Ui::empty();
         },
-        [](Gfx::GrayscaleFilter const &) {
+        [](Gfx::GrayscaleFilter const&) {
             return Ui::empty();
         },
-        []<typename T>(T const &f) {
+        []<typename T>(T const& f) {
             return Kr::slider<decltype(f.amount)>(
                 f.amount,
                 T::RANGE,
-                [](auto &n, auto v) {
+                [](auto& n, auto v) {
                     Model::bubble(n, SetFilter{T{v}});
                 },
                 Mdi::DRAG_VERTICAL_VARIANT,
@@ -180,12 +180,12 @@ Ui::Child editorFilterControls(Gfx::Filter const &filter) {
     });
 }
 
-Ui::Child editorFilters(State const &s) {
+Ui::Child editorFilters(State const& s) {
     Ui::Children tiles;
     Gfx::Filter::any([&]<typename T>(Meta::Type<T>) {
         tiles.pushBack(
             editorFilterTile(
-                [](auto &n) {
+                [](auto& n) {
                     Model::bubble(n, SetFilter{T{}});
                 },
                 s.filter.is<T>() ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle(),
@@ -200,7 +200,7 @@ Ui::Child editorFilters(State const &s) {
     return Ui::hflow(8, tiles);
 }
 
-Ui::Child editorControls(State const &state) {
+Ui::Child editorControls(State const& state) {
     return vflow(
                4,
                editorFilterControls(state.filter),

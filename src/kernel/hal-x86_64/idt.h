@@ -34,13 +34,13 @@ struct [[gnu::packed]] Idt {
     Karm::Array<IdtEntry, LEN> entries{};
 };
 
-extern "C" void _idtLoad(void const *ptr);
+extern "C" void _idtLoad(void const* ptr);
 
 struct [[gnu::packed]] IdtDesc {
     u16 limit;
     u64 base;
 
-    IdtDesc(Idt const &base)
+    IdtDesc(Idt const& base)
         : limit(sizeof(Idt) - 1),
           base(reinterpret_cast<usize>(&base)) {}
 

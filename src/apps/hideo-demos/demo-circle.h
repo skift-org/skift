@@ -13,7 +13,7 @@ static inline Demo CIRCLE_DEMO{
     "Circles rendering",
     [] {
         return Ui::canvas(
-            [](Gfx::Canvas &g, Math::Vec2i size) {
+            [](Gfx::Canvas& g, Math::Vec2i size) {
                 Math::Rand rand{};
 
                 for (isize i = 0; i < 10; i++) {

@@ -17,7 +17,7 @@ Res<Arc<Task>> Task::create(
     return Ok(task);
 }
 
-Task &Task::self() {
+Task& Task::self() {
     return *globalSched()._curr;
 }
 
@@ -94,11 +94,11 @@ State Task::eval(Instant now) {
     return State::RUNNABLE;
 }
 
-void Task::save(Arch::Frame const &frame) {
+void Task::save(Arch::Frame const& frame) {
     (*_ctx)->save(frame);
 }
 
-void Task::load(Arch::Frame &frame) {
+void Task::load(Arch::Frame& frame) {
     if (_space)
         (*_space)->activate();
 

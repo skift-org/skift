@@ -3,7 +3,7 @@
 
 namespace Grund::Seat {
 
-Async::Task<> serv(Sys::Context &ctx) {
+Async::Task<> serv(Sys::Context& ctx) {
     auto endpoint = Rpc::Endpoint::create(ctx);
 
     logInfo("service started");
@@ -14,6 +14,6 @@ Async::Task<> serv(Sys::Context &ctx) {
 
 } // namespace Grund::Seat
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
     return Grund::Seat::serv(ctx);
 }

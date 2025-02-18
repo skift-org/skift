@@ -15,7 +15,7 @@
 
 namespace Hideo::Zoo {
 
-static void willShowMessage(Ui::Node &n) {
+static void willShowMessage(Ui::Node& n) {
     Ui::showDialog(n, Kr::alert("Message"s, "This is a message"s));
 }
 

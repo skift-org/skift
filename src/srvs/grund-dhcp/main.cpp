@@ -3,7 +3,7 @@
 
 namespace Grund::Dhcp {
 
-Async::Task<> serv(Sys::Context &ctx) {
+Async::Task<> serv(Sys::Context& ctx) {
     auto endpoint = Rpc::Endpoint::create(ctx);
 
     logInfo("service started");
@@ -15,6 +15,6 @@ Async::Task<> serv(Sys::Context &ctx) {
 
 } // namespace Grund::Dhcp
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
     return Grund::Dhcp::serv(ctx);
 }

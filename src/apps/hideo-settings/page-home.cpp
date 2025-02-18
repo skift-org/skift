@@ -26,7 +26,7 @@ Ui::Child tileButton(Ui::OnPress onPress, Mdi::Icon icon, String text) {
            Ui::button(std::move(onPress), Ui::ButtonStyle::secondary());
 }
 
-Ui::Child pageHome(State const &) {
+Ui::Child pageHome(State const&) {
     Ui::Children items = {
         tileButton(Model::bind<GoTo>(Page::ACCOUNT), Mdi::ACCOUNT, "Accounts"s),
         tileButton(Model::bind<GoTo>(Page::PERSONALIZATION), Mdi::PALETTE, "Personalization"s),

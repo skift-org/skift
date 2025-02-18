@@ -12,7 +12,7 @@ struct Pos {
     usize row;
     usize col;
 
-    auto operator<=>(Pos const &) const = default;
+    auto operator<=>(Pos const&) const = default;
 };
 
 enum struct Wheight {
@@ -82,13 +82,13 @@ struct Sheet {
 
     void recompute() {
         i32 y = 0;
-        for (auto &row : rows) {
+        for (auto& row : rows) {
             row.y = y;
             y += row.height;
         }
 
         i32 x = 0;
-        for (auto &col : cols) {
+        for (auto& col : cols) {
             col.x = x;
             x += col.width;
         }
@@ -103,7 +103,7 @@ struct Sheet {
     }
 
     Opt<usize> rowAt(i32 y) const {
-        return search(rows, [&](auto const &row) {
+        return search(rows, [&](auto const& row) {
             if (row.y <= y and y < row.y + row.height) {
                 return std::strong_ordering::equal;
             }
@@ -112,7 +112,7 @@ struct Sheet {
     }
 
     Opt<usize> colAt(i32 x) const {
-        return search(cols, [&](auto const &col) {
+        return search(cols, [&](auto const& col) {
             if (col.x <= x and x < col.x + col.width) {
                 return std::strong_ordering::equal;
             }
@@ -164,7 +164,7 @@ struct Range {
         return n.end.col - n.start.col + 1;
     }
 
-    auto operator<=>(Range const &) const = default;
+    auto operator<=>(Range const&) const = default;
 };
 
 struct Book {
@@ -186,11 +186,11 @@ struct State {
         activeSheet().recompute();
     }
 
-    Sheet &activeSheet() {
+    Sheet& activeSheet() {
         return book.sheets[active];
     }
 
-    Sheet const &activeSheet() const {
+    Sheet const& activeSheet() const {
         return book.sheets[active];
     }
 };
@@ -254,12 +254,12 @@ using Action = Union<
     ToggleProperties,
     SwitchSheet>;
 
-Ui::Task<Action> reduce(State &, Action);
+Ui::Task<Action> reduce(State&, Action);
 
 using Model = Ui::Model<State, Action, reduce>;
 
-Res<> save(Model const &model, Io::Writer &writer);
+Res<> save(Model const& model, Io::Writer& writer);
 
-Res<Model> load(Io::Reader &reader);
+Res<Model> load(Io::Reader& reader);
 
 } // namespace Hideo::Spreadsheet

@@ -13,14 +13,14 @@ static constexpr bool DEBUG_ELF = false;
 
 // MARK: Endpoint --------------------------------------------------------------
 
-Res<> Endpoint::dispatch(Rpc::Message &msg) {
+Res<> Endpoint::dispatch(Rpc::Message& msg) {
     msg.header().from = _port;
     return _bus->dispatch(msg);
 }
 
 // MARK: Service ---------------------------------------------------------------
 
-Res<Rc<Service>> Service::prepare(Sys::Context &, Str id) {
+Res<Rc<Service>> Service::prepare(Sys::Context&, Str id) {
     auto in = try$(Hj::Channel::create(Hj::Domain::self(), kib(16), 16));
     try$(in.label(Io::format("{}-in", id).unwrap()));
 
@@ -35,12 +35,12 @@ Res<Rc<Service>> Service::prepare(Sys::Context &, Str id) {
     return Ok(makeRc<Service>(id, ipc));
 }
 
-Res<> Service::activate(Sys::Context &ctx) {
+Res<> Service::activate(Sys::Context& ctx) {
     logInfo("activating service '{}'...", _id);
 
-    auto &handover = useHandover(ctx);
+    auto& handover = useHandover(ctx);
     auto urlStr = try$(Io::format("bundle://{}/_bin", _id));
-    auto *elf = handover.fileByName(urlStr.buf());
+    auto* elf = handover.fileByName(urlStr.buf());
     if (not elf) {
         logError("service not found: '{}'", _id);
         return Error::invalidFilename("service not found");
@@ -88,7 +88,7 @@ Res<> Service::activate(Sys::Context &ctx) {
     try$(task.label(_id));
 
     logInfoIf(DEBUG_TASK, "mapping handover...");
-    auto const *handoverRecord = handover.findTag(Handover::Tag::SELF);
+    auto const* handoverRecord = handover.findTag(Handover::Tag::SELF);
     auto handoverVmo = try$(Hj::Vmo::create(Hj::ROOT, handoverRecord->start, handoverRecord->size, Hj::VmoFlags::DMA));
     try$(handoverVmo.label("handover"));
     auto handoverVrange = try$(elfSpace.map(0, handoverVmo, 0, 0, Hj::MapFlags::READ));
@@ -132,14 +132,14 @@ Async::Task<> Service::runAsync() {
     }
 }
 
-Res<> Service::send(Rpc::Message &msg) {
+Res<> Service::send(Rpc::Message& msg) {
     return _con.send(
         msg.bytes(),
         msg.handles()
     );
 }
 
-bool Service::accept(Rpc::Message const &msg) {
+bool Service::accept(Rpc::Message const& msg) {
     return contains(_listen, msg.header().mid);
 }
 
@@ -153,10 +153,10 @@ Str System::id() const {
     return "grund-bus";
 }
 
-Res<> System::send(Rpc::Message &msg) {
+Res<> System::send(Rpc::Message& msg) {
     if (msg.is<Api::Locate>()) {
         auto locate = try$(msg.unpack<Api::Locate>());
-        for (auto &endpoint : _bus->_endpoints) {
+        for (auto& endpoint : _bus->_endpoints) {
             if (endpoint->id() == locate.id) {
                 auto resp = try$(msg.packResp<Api::Locate>(endpoint->port()));
                 try$(dispatch(resp));
@@ -176,7 +176,7 @@ Res<> System::send(Rpc::Message &msg) {
 
 // MARK: Bus -------------------------------------------------------------------
 
-Res<Rc<Bus>> Bus::create(Sys::Context &ctx) {
+Res<Rc<Bus>> Bus::create(Sys::Context& ctx) {
     return Ok(makeRc<Bus>(ctx));
 }
 
@@ -200,8 +200,8 @@ Res<> Bus::attach(Rc<Endpoint> endpoint) {
     return Ok();
 }
 
-void Bus::_broadcast(Rpc::Message &msg) {
-    for (auto &endpoint : _endpoints) {
+void Bus::_broadcast(Rpc::Message& msg) {
+    for (auto& endpoint : _endpoints) {
         if (msg.header().from != endpoint->port() and endpoint->accept(msg)) {
             auto res = endpoint->send(msg);
             if (not res)
@@ -210,13 +210,13 @@ void Bus::_broadcast(Rpc::Message &msg) {
     }
 }
 
-Res<> Bus::dispatch(Rpc::Message &msg) {
+Res<> Bus::dispatch(Rpc::Message& msg) {
     if (msg.header().to == Rpc::Port::BROADCAST) {
         _broadcast(msg);
         return Ok();
     }
 
-    for (auto &endpoint : _endpoints) {
+    for (auto& endpoint : _endpoints) {
         if (endpoint->port() == msg.header().to) {
             auto res = endpoint->send(msg);
             if (not res) {

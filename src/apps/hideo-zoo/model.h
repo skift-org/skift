@@ -22,7 +22,7 @@ struct Switch {
 
 using Action = Union<Switch>;
 
-Ui::Task<Action> reduce(State &s, Action action);
+Ui::Task<Action> reduce(State& s, Action action);
 
 using Model = Ui::Model<State, Action, reduce>;
 

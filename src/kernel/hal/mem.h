@@ -44,10 +44,10 @@ struct UpperHalfMapper {
 
 template <typename Owner, typename Range>
 struct Mem {
-    Owner *_owner = nullptr;
+    Owner* _owner = nullptr;
     Range _range = {};
 
-    Mem(Owner &owner, Range range)
+    Mem(Owner& owner, Range range)
         : _owner(&owner),
           _range(range) {}
 
@@ -56,16 +56,16 @@ struct Mem {
             _owner->free(_range).unwrap("Failed to free memory");
     }
 
-    Mem(Mem const &) = delete;
+    Mem(Mem const&) = delete;
 
-    Mem(Mem &&other)
+    Mem(Mem&& other)
         : _owner(std::exchange(other._owner, nullptr)),
           _range(std::exchange(other._range, {})) {
     }
 
-    Mem &operator=(Mem const &) = delete;
+    Mem& operator=(Mem const&) = delete;
 
-    Mem &operator=(Mem &&other) {
+    Mem& operator=(Mem&& other) {
         _owner = std::exchange(other._owner, nullptr);
         _range = std::exchange(other._range, {});
         return *this;

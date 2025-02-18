@@ -16,7 +16,7 @@ static Rc<Text::Fontface> blackFontface() {
     return *_blackFontface;
 }
 
-Ui::Child lock(State const &state) {
+Ui::Child lock(State const& state) {
     auto [date, time] = state.dateTime;
     auto dateTime = Io::format(
         // Mon, 28 Jul

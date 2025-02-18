@@ -16,10 +16,10 @@ static inline Page PAGE_PRINT_DIALOG{
     "Prompts the user to print a document.",
     [] {
         return Ui::button(
-                   [](auto &n) {
+                   [](auto& n) {
                        Ui::showDialog(
                            n,
-                           Kr::printDialog([](Print::Settings const &s) -> Vec<Print::Page> {
+                           Kr::printDialog([](Print::Settings const& s) -> Vec<Print::Page> {
                                return {
                                    {s.paper},
                                    {s.paper},

@@ -26,7 +26,7 @@ struct SelectAction {};
 
 using Action = Union<MoveSelectionAction, SelectAction>;
 
-static Ui::Task<Action> reduce(State &s, Action a) {
+static Ui::Task<Action> reduce(State& s, Action a) {
     a.visit(Visitor{
         [&](MoveSelectionAction a) {
             if (s.selected == 0 and a.delta < 0)
@@ -52,7 +52,7 @@ using Model = Ui::Model<State, Action, reduce>;
 
 // MARK: Views -----------------------------------------------------------------
 
-Ui::Child icon(Entry const &e) {
+Ui::Child icon(Entry const& e) {
     return e.icon.visit(Visitor{
         [&](Mdi::Icon i) {
             return Ui::icon(i, 64);
@@ -66,7 +66,7 @@ Ui::Child icon(Entry const &e) {
     });
 }
 
-Ui::Child entry(State const &s, Entry const &e, usize i) {
+Ui::Child entry(State const& s, Entry const& e, usize i) {
     auto style =
         s.selected == i
             ? Ui::ButtonStyle::regular()
@@ -86,11 +86,11 @@ Ui::Child entry(State const &s, Entry const &e, usize i) {
            Ui::button(Ui::NOP, style);
 }
 
-Ui::Child list(State const &s) {
+Ui::Child list(State const& s) {
 
     auto items =
         iter(s.configs.entries)
-            .mapi([&](Entry const &e, usize i) {
+            .mapi([&](Entry const& e, usize i) {
                 return entry(s, e, i);
             })
             .collect<Vec<Ui::Child>>();
@@ -108,7 +108,7 @@ Ui::Child alert(String title, String subtitle) {
            Ui::insets(64);
 }
 
-void intent(Ui::Node &n, App::Event &e) {
+void intent(Ui::Node& n, App::Event& e) {
     if (auto k = e.is<App::KeyboardEvent>()) {
         if (k->key == App::Key::LEFT) {
             Ui::bubble<Action>(n, MoveSelectionAction{-1});
@@ -123,7 +123,7 @@ void intent(Ui::Node &n, App::Event &e) {
     }
 }
 
-Ui::Child menu(Configs const &c) {
+Ui::Child menu(Configs const& c) {
     if (c.entries.len() == 0)
         return alert(
             "No entries found."s,
@@ -132,7 +132,7 @@ Ui::Child menu(Configs const &c) {
 
     return Ui::reducer<Model>(
         {c},
-        [](State const &s) {
+        [](State const& s) {
             if (s.error)
                 return alert(
                     "System startup failed."s,
@@ -164,7 +164,7 @@ Ui::Child menu(Configs const &c) {
     );
 }
 
-Res<> showMenu(Sys::Context &ctx, Configs const &c) {
+Res<> showMenu(Sys::Context& ctx, Configs const& c) {
     return Ui::runApp(ctx, Opstart::menu(c));
 }
 

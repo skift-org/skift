@@ -9,7 +9,7 @@ namespace Hjert::Core {
 
 static Opt<Sched> _sched;
 
-Res<> initSched(Handover::Payload &) {
+Res<> initSched(Handover::Payload&) {
     logInfo("sched: initializing...");
     auto bootTask = try$(Task::create(Mode::SUPER, try$(Space::create())));
     bootTask->label("entry");
@@ -18,7 +18,7 @@ Res<> initSched(Handover::Payload &) {
     return Ok();
 }
 
-Sched &globalSched() {
+Sched& globalSched() {
     return *_sched;
 }
 
@@ -47,7 +47,7 @@ void Sched::schedule(Duration span) {
     _idle->_sliceEnd = _stamp + 1;
 
     for (usize i = 0; i < _tasks.len(); ++i) {
-        auto &t = _tasks[i];
+        auto& t = _tasks[i];
         auto state = t->eval(_stamp);
         if (state == State::EXITED) {
             logInfo("{}: exited", *t);

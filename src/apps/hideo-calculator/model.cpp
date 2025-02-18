@@ -2,7 +2,7 @@
 
 namespace Hideo::Calculator {
 
-void doOperator(State &s, Operator op) {
+void doOperator(State& s, Operator op) {
     if (not s.hasRhs)
         s.op = op;
 
@@ -67,7 +67,7 @@ void doOperator(State &s, Operator op) {
     }
 }
 
-Ui::Task<Action> reduce(State &s, Action action) {
+Ui::Task<Action> reduce(State& s, Action action) {
     s.error = NONE;
 
     action.visit(Visitor{

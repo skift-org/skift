@@ -48,7 +48,7 @@ namespace Hideo::Files {
 
 // MARK: Common Widgets --------------------------------------------------------
 
-Ui::Child alert(State const &state, String title, String body) {
+Ui::Child alert(State const& state, String title, String body) {
     return Kr::errorPageContent({
         Kr::errorPageTitle(Mdi::ALERT_DECAGRAM, title),
         Kr::errorPageBody(body),
@@ -98,7 +98,7 @@ Ui::Child directoryContextMenu() {
     });
 }
 
-Ui::Child directorEntry(Sys::DirEntry const &entry, bool odd) {
+Ui::Child directorEntry(Sys::DirEntry const& entry, bool odd) {
     return Ui::button(
                Model::bind<Navigate>(entry.name),
                itemStyle(odd),
@@ -110,13 +110,13 @@ Ui::Child directorEntry(Sys::DirEntry const &entry, bool odd) {
            Kr::contextMenu(slot$(directoryContextMenu()));
 }
 
-Ui::Child directoryListing(State const &s, Sys::Dir const &dir) {
+Ui::Child directoryListing(State const& s, Sys::Dir const& dir) {
     if (dir.entries().len() == 0)
         return Ui::bodyMedium(Ui::GRAY500, "This directory is empty.") | Ui::center();
 
     Ui::Children children;
     bool odd = true;
-    for (auto const &entry : dir.entries()) {
+    for (auto const& entry : dir.entries()) {
         if (entry.hidden() and not s.showHidden)
             continue;
         children.pushBack(directorEntry(entry, odd));
@@ -159,7 +159,7 @@ Mdi::Icon iconForLocation(Str loc) {
     return Mdi::FOLDER;
 }
 
-Mdi::Icon iconForUrl(Mime::Url const &url) {
+Mdi::Icon iconForUrl(Mime::Url const& url) {
     if (url.scheme == "location")
         return iconForLocation(url.host);
 
@@ -169,7 +169,7 @@ Mdi::Icon iconForUrl(Mime::Url const &url) {
     return Mdi::LAPTOP;
 }
 
-String textForUrl(Mime::Url const &url) {
+String textForUrl(Mime::Url const& url) {
     if (url.scheme == "location")
         return Io::toTitleCase(url.host).unwrap();
 
@@ -179,7 +179,7 @@ String textForUrl(Mime::Url const &url) {
     return "This Device"s;
 }
 
-Ui::Child breadcrumbRoot(Mime::Url const &url) {
+Ui::Child breadcrumbRoot(Mime::Url const& url) {
     return Ui::button(
         Model::bind<GoRoot>(),
         Ui::ButtonStyle::text(),
@@ -192,13 +192,13 @@ Ui::Child breadcrumbRoot(Mime::Url const &url) {
     );
 }
 
-Ui::Child breadcrumb(State const &s) {
+Ui::Child breadcrumb(State const& s) {
     Ui::Children items;
     items.pushBack(breadcrumbRoot(s.currentUrl()));
     s
         .currentUrl()
         .iter()
-        .mapi([&](auto const &text, usize i) {
+        .mapi([&](auto const& text, usize i) {
             items.pushBack(breadcrumbItem(text, s.currentUrl().len() - i - 1));
             return true;
         })
@@ -221,7 +221,7 @@ Ui::Child breadcrumb(State const &s) {
            Ui::focusable();
 }
 
-Ui::Child goBackTool(State const &s) {
+Ui::Child goBackTool(State const& s) {
     return Ui::button(
         Model::bindIf<GoBack>(s.canGoBack()),
         Ui::ButtonStyle::subtle(),
@@ -229,7 +229,7 @@ Ui::Child goBackTool(State const &s) {
     );
 }
 
-Ui::Child goForwardTool(State const &s) {
+Ui::Child goForwardTool(State const& s) {
     return Ui::button(
         Model::bindIf<GoForward>(s.canGoForward()),
         Ui::ButtonStyle::subtle(),
@@ -237,7 +237,7 @@ Ui::Child goForwardTool(State const &s) {
     );
 }
 
-Ui::Child goParentTool(State const &s) {
+Ui::Child goParentTool(State const& s) {
     return Ui::button(
         Model::bindIf<GoParent>(s.canGoParent(), 1),
         Ui::ButtonStyle::subtle(),
@@ -253,7 +253,7 @@ Ui::Child refreshTool() {
     );
 }
 
-Ui::Child mainMenu([[maybe_unused]] State const &s) {
+Ui::Child mainMenu([[maybe_unused]] State const& s) {
     return Kr::contextMenuContent({
         Kr::contextMenuItem(
             Ui::NOP,
@@ -265,9 +265,9 @@ Ui::Child mainMenu([[maybe_unused]] State const &s) {
     });
 }
 
-Ui::Child moreTool(State const &s) {
+Ui::Child moreTool(State const& s) {
     return Ui::button(
-        [&](Ui::Node &n) {
+        [&](Ui::Node& n) {
             Ui::showPopover(n, n.bound().bottomEnd(), mainMenu(s));
         },
         Ui::ButtonStyle::subtle(),
@@ -275,7 +275,7 @@ Ui::Child moreTool(State const &s) {
     );
 }
 
-Ui::Child toolbar(State const &s) {
+Ui::Child toolbar(State const& s) {
     return Kr::toolbar({
         goBackTool(s),
         goForwardTool(s),
@@ -290,7 +290,7 @@ Ui::Child toolbar(State const &s) {
 Ui::Child openFileDialog() {
     return Ui::reducer<Model>(
         {"file:/"_url},
-        [](auto const &d) {
+        [](auto const& d) {
             auto maybeDir = Sys::Dir::open(d.currentUrl());
 
             return Kr::dialogContent({

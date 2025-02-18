@@ -34,7 +34,7 @@ struct SelectFace {
 
 using Action = Union<GoBack, SelectFamily, SelectFace>;
 
-Ui::Task<Action> reduce(State &s, Action a) {
+Ui::Task<Action> reduce(State& s, Action a) {
     a.visit(Visitor{
         [&](GoBack) {
             if (s.fontFace) {
@@ -60,8 +60,8 @@ static constexpr Str PANGRAM = "All beings born free, equal in dignity, rightsâ€
 
 // MARK: All Families ----------------------------------------------------------
 
-Ui::Child allFamiliesItem(State const &s, Str family) {
-    auto &fontBook = s.fontBook;
+Ui::Child allFamiliesItem(State const& s, Str family) {
+    auto& fontBook = s.fontBook;
     auto nStyle = s.fontBook.queryFamily(family).len();
     auto fontface = fontBook.queryClosest({.family = family}).unwrap();
 
@@ -80,11 +80,11 @@ Ui::Child allFamiliesItem(State const &s, Str family) {
            Ui::button(Model::bind<SelectFamily>(family), Ui::ButtonStyle::outline());
 }
 
-Ui::Child allFamiliesContent(State const &s) {
+Ui::Child allFamiliesContent(State const& s) {
     Ui::Children children;
-    auto &fontBook = s.fontBook;
+    auto& fontBook = s.fontBook;
     auto families = fontBook.families();
-    for (auto const &family : families) {
+    for (auto const& family : families) {
         children.pushBack(allFamiliesItem(s, family));
     }
 
@@ -99,7 +99,7 @@ Ui::Child fontfaceTag(Str str) {
     return Kr::badge(Ui::GRAY400, Io::toParamCase(str).unwrap());
 }
 
-Ui::Child fontfaceTags(Text::FontAttrs const &attrs) {
+Ui::Child fontfaceTags(Text::FontAttrs const& attrs) {
     Ui::Children children;
     if (attrs.monospace == Text::Monospace::YES) {
         children.pushBack(fontfaceTag("monospace"s));
@@ -120,7 +120,7 @@ Ui::Child fontfaceTags(Text::FontAttrs const &attrs) {
     return Ui::hflow(4, children);
 }
 
-Ui::Child familyItem(State const &, Rc<Text::Fontface> fontface) {
+Ui::Child familyItem(State const&, Rc<Text::Fontface> fontface) {
     auto attrs = fontface->attrs();
 
     Text::Font font{
@@ -139,14 +139,14 @@ Ui::Child familyItem(State const &, Rc<Text::Fontface> fontface) {
            Ui::button(Model::bind<SelectFace>(fontface), Ui::ButtonStyle::outline());
 }
 
-Ui::Child familyContent(State const &s) {
+Ui::Child familyContent(State const& s) {
     Ui::Children children;
-    auto &fontBook = s.fontBook;
+    auto& fontBook = s.fontBook;
     auto fontfaces = fontBook.queryFamily(s.fontFamily.unwrap());
 
     auto header = Ui::labelSmall(s.fontFamily.unwrap()) | Ui::insets({6, 16});
 
-    for (auto const &fontface : fontfaces) {
+    for (auto const& fontface : fontfaces) {
         children.pushBack(familyItem(s, fontface));
     }
 
@@ -177,7 +177,7 @@ Ui::Child pangrams(Rc<Text::Fontface> fontface) {
            Ui::vhscroll();
 }
 
-Ui::Child fontfaceContent(State const &s) {
+Ui::Child fontfaceContent(State const& s) {
     auto fontface = s.fontFace.unwrap();
     auto attrs = fontface->attrs();
 
@@ -193,7 +193,7 @@ Ui::Child fontfaceContent(State const &s) {
     );
 }
 
-Ui::Child appContent(State const &s) {
+Ui::Child appContent(State const& s) {
     if (s.fontFace) {
         return fontfaceContent(s);
     } else if (s.fontFamily) {
@@ -204,7 +204,7 @@ Ui::Child appContent(State const &s) {
 }
 
 Ui::Child app(Text::FontBook book) {
-    return Ui::reducer<Model>(book, [](State const &s) {
+    return Ui::reducer<Model>(book, [](State const& s) {
         return Kr::scaffold({
             .icon = Mdi::FORMAT_FONT,
             .title = "Fonts"s,
@@ -216,7 +216,7 @@ Ui::Child app(Text::FontBook book) {
 
 } // namespace Hideo::Fonts
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
     Text::FontBook book;
     co_try$(book.loadAll());
     co_return Ui::runApp(ctx, Hideo::Fonts::app(book));

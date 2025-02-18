@@ -3,6 +3,6 @@
 
 #include "../app.h"
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
     co_return Ui::runApp(ctx, Hideo::About::app());
 }

@@ -13,7 +13,7 @@ namespace Hideo::Camera {
 Ui::Child appContent() {
     auto viewport = Ui::stack(
         Ui::box({.backgroundFill = Gfx::BLUE400}, Ui::empty()),
-        Ui::canvas([](Gfx::Canvas &g, Math::Vec2i size) {
+        Ui::canvas([](Gfx::Canvas& g, Math::Vec2i size) {
             g.strokeStyle(Gfx::Stroke{
                 .fill = Gfx::WHITE.withOpacity(0.5),
                 .width = 1,

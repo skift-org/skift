@@ -77,7 +77,7 @@ struct Parser {
         return __transition(State::ANYWHERE, c);
     }
 
-    auto _doAction(Action action, Byte b, auto &sink) {
+    auto _doAction(Action action, Byte b, auto& sink) {
         switch (action) {
         case Action::PRINT:
         case Action::EXECUTE:
@@ -116,7 +116,7 @@ struct Parser {
                 if (_hasIgnoreParams)
                     break;
 
-                auto &curr = last(_params);
+                auto& curr = last(_params);
                 curr *= 10;
                 curr += (b - '0');
             }
@@ -139,7 +139,7 @@ struct Parser {
 
     Slice<usize> params() const { return _params; }
 
-    void injest(Byte b, auto &sink) {
+    void injest(Byte b, auto& sink) {
         auto [action, toState] = _transition(_state, b);
 
         if (toState != State::NONE) {

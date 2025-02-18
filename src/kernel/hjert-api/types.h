@@ -27,7 +27,7 @@ enum struct Type {
 
 // clang-format on
 
-static inline char const *toStr(Type type) {
+static inline char const* toStr(Type type) {
     switch (type) {
 #define ITER(NAME)   \
     case Type::NAME: \
@@ -144,7 +144,7 @@ struct Cap {
         return _raw != 0;
     }
 
-    std::strong_ordering operator<=>(Cap const &other) const = default;
+    std::strong_ordering operator<=>(Cap const& other) const = default;
 
     usize slot() const {
         auto curr = _raw & MASK;
@@ -288,7 +288,7 @@ struct Props : public _Props {
     using _Props::_Props;
 
     Type type() const {
-        return visit([](auto const &props) {
+        return visit([](auto const& props) {
             return props.TYPE;
         });
     }

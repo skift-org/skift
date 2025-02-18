@@ -22,8 +22,8 @@ enum struct Mode : u8 {
 
 struct Context {
     virtual ~Context() = default;
-    virtual void save(Arch::Frame const &) = 0;
-    virtual void load(Arch::Frame &) = 0;
+    virtual void save(Arch::Frame const&) = 0;
+    virtual void load(Arch::Frame&) = 0;
 };
 
 struct Stack {
@@ -40,7 +40,7 @@ struct Stack {
 
     template <typename T>
     void push(T t) {
-        push(Bytes{reinterpret_cast<u8 *>(&t), sizeof(t)});
+        push(Bytes{reinterpret_cast<u8*>(&t), sizeof(t)});
     }
 };
 

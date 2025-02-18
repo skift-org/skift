@@ -4,7 +4,7 @@
 
 namespace Hideo::Clock {
 
-Ui::Task<Action> reduce(State &s, Action a) {
+Ui::Task<Action> reduce(State& s, Action a) {
     a.visit(Visitor{
         [&](Page p) {
             s.page = p;

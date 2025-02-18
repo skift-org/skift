@@ -7,7 +7,7 @@ namespace Hideo::Shell {
 struct MockLauncher : public Launcher {
     using Launcher::Launcher;
 
-    void launch(State &) override;
+    void launch(State&) override;
 };
 
 struct MockInstance : public Instance {

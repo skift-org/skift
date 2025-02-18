@@ -70,7 +70,7 @@ Ui::Child cpuInfos() {
 
             Ui::Children children;
 
-            for (auto &cpu : cpusinfo) {
+            for (auto& cpu : cpusinfo) {
                 children.pushBack(Kr::rowContent(
                     NONE,
                     "CPU"s,
@@ -84,7 +84,7 @@ Ui::Child cpuInfos() {
     );
 }
 
-Ui::Child pageAbout(State const &) {
+Ui::Child pageAbout(State const&) {
     return Ui::vflow(
                8,
                Kr::titleRow("About"s),

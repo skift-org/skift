@@ -34,7 +34,7 @@ static x86_64::GdtDesc _gdtDesc{_gdt};
 static x86_64::Idt _idt{};
 static x86_64::IdtDesc _idtDesc{_idt};
 
-Res<> init(Handover::Payload &) {
+Res<> init(Handover::Payload&) {
     try$(_com1.init());
 
     _gdtDesc.load();
@@ -57,7 +57,7 @@ Res<> init(Handover::Payload &) {
     return Ok();
 }
 
-Io::TextWriter &globalOut() {
+Io::TextWriter& globalOut() {
     return _com1;
 }
 
@@ -86,13 +86,13 @@ struct Cpu : public Core::Cpu {
 
 static Cpu _cpu{};
 
-Core::Cpu &globalCpu() {
+Core::Cpu& globalCpu() {
     return _cpu;
 }
 
 // MARK: Interrupts ------------------------------------------------------------
 
-static char const *_faultMsg[32] = {
+static char const* _faultMsg[32] = {
     "division-by-zero",
     "debug",
     "non-maskable-interrupt",
@@ -128,7 +128,7 @@ static char const *_faultMsg[32] = {
 };
 
 void backtrace(usize rbp) {
-    usize *frame = reinterpret_cast<usize *>(rbp);
+    usize* frame = reinterpret_cast<usize*>(rbp);
 
     while (frame) {
         usize ip = frame[1];
@@ -136,17 +136,17 @@ void backtrace(usize rbp) {
 
         logPrint("    ip={p}, sp={p}", ip, sp);
 
-        frame = reinterpret_cast<usize *>(sp);
+        frame = reinterpret_cast<usize*>(sp);
     }
 }
 
-void switchTask(Duration span, Frame &frame) {
+void switchTask(Duration span, Frame& frame) {
     Core::Task::self().save(frame);
     Core::globalSched().schedule(span);
     Core::Task::self().load(frame);
 }
 
-void uPanic(Frame &frame) {
+void uPanic(Frame& frame) {
     logError("{} caused a '{}'", Core::Task::self(), _faultMsg[frame.intNo]);
     logError("int={} err={} rip={p} rsp={p} rbp={p} cr2={p} cr3={p}", frame.intNo, frame.errNo, frame.rip, frame.rsp, frame.rbp, x86_64::rdcr2(), x86_64::rdcr3());
     Core::Task::self().space().dump();
@@ -154,7 +154,7 @@ void uPanic(Frame &frame) {
     switchTask(0_ms, frame);
 }
 
-void kPanic(Frame &frame) {
+void kPanic(Frame& frame) {
     logPrint("{}--- {} {}----------------------------------------------------", Cli::style(Cli::YELLOW_LIGHT), Cli::styled("!!!", Cli::Style(Cli::Color::RED).bold()), Cli::style(Cli::YELLOW_LIGHT));
     logPrint("");
     logPrint("    {}", Cli::styled("Kernel Panic", Cli::style(Cli::RED).bold()));
@@ -181,7 +181,7 @@ void kPanic(Frame &frame) {
 }
 
 extern "C" void _intDispatch(usize sp) {
-    auto &frame = *reinterpret_cast<Frame *>(sp);
+    auto& frame = *reinterpret_cast<Frame*>(sp);
 
     globalCpu().beginInterrupt();
 
@@ -214,7 +214,7 @@ void yield() {
 // MARK: Syscalls --------------------------------------------------------------
 
 extern "C" usize _sysDispatch(usize sp) {
-    auto *frame = reinterpret_cast<Frame *>(sp);
+    auto* frame = reinterpret_cast<Frame*>(sp);
 
     auto result = Core::doSyscall(
         (Hj::Syscall)frame->rax,
@@ -237,10 +237,10 @@ extern "C" usize _sysDispatch(usize sp) {
 
 // MARK: Vmm -------------------------------------------------------------------
 
-static x86_64::Pml<4> *_kpml4 = nullptr;
+static x86_64::Pml<4>* _kpml4 = nullptr;
 static Opt<x86_64::Vmm<Hal::UpperHalfMapper>> _vmm = NONE;
 
-Hal::Vmm &globalVmm() {
+Hal::Vmm& globalVmm() {
     if (_vmm == NONE) {
         auto pml4Mem = Core::kmm()
                            .allocRange(Hal::PAGE_SIZE)
@@ -256,7 +256,7 @@ Hal::Vmm &globalVmm() {
 }
 
 struct UserVmm : public x86_64::Vmm<Hal::UpperHalfMapper> {
-    UserVmm(x86_64::Pml<4> *pml4)
+    UserVmm(x86_64::Pml<4>* pml4)
         : x86_64::Vmm<Hal::UpperHalfMapper>{Core::pmm(), pml4} {}
 
     ~UserVmm() {
@@ -274,7 +274,7 @@ Res<Arc<Hal::Vmm>> createVmm() {
                        .unwrap("failed to allocate pml4");
 
     zeroFill(pml4Mem.mutBytes());
-    auto *pml4 = pml4Mem.as<x86_64::Pml<4>>();
+    auto* pml4 = pml4Mem.as<x86_64::Pml<4>>();
 
     // NOTE: Copy the kernel part of the pml4
     for (usize i = _kpml4->LEN / 2; i < _kpml4->LEN; i++) {
@@ -298,12 +298,12 @@ struct Context : public Core::Context {
         x86_64::simdInitContext(_simd.buf());
     }
 
-    virtual void save(Arch::Frame const &frame) {
+    virtual void save(Arch::Frame const& frame) {
         x86_64::simdSaveContext(_simd.buf());
         _frame = frame;
     }
 
-    virtual void load(Arch::Frame &frame) {
+    virtual void load(Arch::Frame& frame) {
         frame = _frame;
         x86_64::simdLoadContext(_simd.buf());
         x86_64::sysSetGs((usize)&_ksp);

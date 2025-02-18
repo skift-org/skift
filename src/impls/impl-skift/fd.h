@@ -15,7 +15,7 @@ enum struct _FdType : u8 {
 struct VmoFd : public Sys::NullFd {
     Hj::Vmo _vmo;
 
-    Hj::Vmo &vmo() {
+    Hj::Vmo& vmo() {
         return _vmo;
     }
 
@@ -26,7 +26,7 @@ struct VmoFd : public Sys::NullFd {
         return Sys::Handle(_vmo.raw());
     }
 
-    Res<> pack(Io::PackEmit &e) override {
+    Res<> pack(Io::PackEmit& e) override {
         try$(Io::pack(e, _FdType::VMO));
         try$(Io::pack(e, _vmo));
         return Ok();
@@ -54,7 +54,7 @@ struct IpcFd : public Sys::NullFd {
         return Ok<Sys::_Received>(bytes, caps, Sys::Ip4::unspecified(0)); // FIXME: Placeholder address
     }
 
-    Res<> pack(Io::PackEmit &e) override {
+    Res<> pack(Io::PackEmit& e) override {
         try$(Io::pack(e, _FdType::IPC));
 
         try$(Io::pack(e, _in));
@@ -63,6 +63,6 @@ struct IpcFd : public Sys::NullFd {
     }
 };
 
-Res<Rc<Sys::Fd>> unpackFd(Io::PackScan &s);
+Res<Rc<Sys::Fd>> unpackFd(Io::PackScan& s);
 
 } // namespace Skift

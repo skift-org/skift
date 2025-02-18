@@ -2,7 +2,7 @@
 
 namespace Skift {
 
-Res<Rc<Sys::Fd>> unpackFd(Io::PackScan &s) {
+Res<Rc<Sys::Fd>> unpackFd(Io::PackScan& s) {
     auto type = try$(Io::unpack<_FdType>(s));
     switch (type) {
     case _FdType::VMO: {

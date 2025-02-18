@@ -4,8 +4,8 @@
 
 #include "../app.h"
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
-    auto &args = useArgs(ctx);
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
+    auto& args = useArgs(ctx);
     Opt<Mime::Url> url;
     Res<String> text = Ok(""s);
     if (args.len()) {

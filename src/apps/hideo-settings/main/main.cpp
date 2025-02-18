@@ -26,7 +26,7 @@
 
 namespace Hideo::Settings {
 
-Ui::Child sidebar(State const &state) {
+Ui::Child sidebar(State const& state) {
     Ui::Children items = {
         Kr::searchbar(""s) | Ui::insets({6, 0}),
         Kr::sidenavItem(state.page() == Page::ACCOUNT, Model::bind<GoTo>(Page::ACCOUNT), Mdi::ACCOUNT, "Accounts"s),
@@ -46,7 +46,7 @@ Ui::Child sidebar(State const &state) {
 
 // MARK: Pages -----------------------------------------------------------------
 
-Ui::Child pageContent(State const &state) {
+Ui::Child pageContent(State const& state) {
     switch (state.page()) {
     case Page::HOME:
         return pageHome(state);
@@ -66,7 +66,7 @@ Ui::Child pageContent(State const &state) {
 // MARK: Body ------------------------------------------------------------------
 
 Ui::Child app() {
-    return Ui::reducer<Model>({}, [](State const &s) {
+    return Ui::reducer<Model>({}, [](State const& s) {
         return Kr::scaffold({
             .icon = Mdi::COG,
             .title = "Settings"s,
@@ -83,6 +83,6 @@ Ui::Child app() {
 
 } // namespace Hideo::Settings
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
     co_return Ui::runApp(ctx, Hideo::Settings::app());
 }

@@ -20,12 +20,12 @@
 
 namespace Hideo::Files {
 
-Ui::Child sidenavItem(State const &s, Mdi::Icon icon, String title, Mime::Url url) {
+Ui::Child sidenavItem(State const& s, Mdi::Icon icon, String title, Mime::Url url) {
     bool selected = url.isParentOf(s.currentUrl());
     return Kr::sidenavItem(selected, Model::bind<GoTo>(url), icon, title);
 }
 
-Ui::Child sidebar(State const &s) {
+Ui::Child sidebar(State const& s) {
     return Kr::sidenav({
         Kr::searchbar(""s) | Ui::insets({6, 0}),
         sidenavItem(s, Mdi::HOME, "Home"s, "location://home"_url),
@@ -42,7 +42,7 @@ Ui::Child sidebar(State const &s) {
     });
 }
 
-Ui::Child pageContent(State const &state) {
+Ui::Child pageContent(State const& state) {
     auto url = state.currentUrl();
     auto dir = Sys::Dir::open(url);
     auto listing = dir
@@ -57,7 +57,7 @@ Ui::Child pageContent(State const &state) {
 }
 
 Ui::Child app() {
-    return Ui::reducer<Model>("location://home"_url, [](State const &s) {
+    return Ui::reducer<Model>("location://home"_url, [](State const& s) {
         return Kr::scaffold({
             .icon = Mdi::FOLDER,
             .title = "Files"s,

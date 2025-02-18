@@ -16,7 +16,7 @@ static inline Page PAGE_DIALOG{
     "A window overlaid on either the primary window or another dialog window, rendering the content underneath inert.",
     [] {
         return Ui::button(
-                   [](auto &n) {
+                   [](auto& n) {
                        Ui::showDialog(
                            n,
                            Kr::dialogContent({

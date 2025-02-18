@@ -19,12 +19,12 @@ inline Res<usize> log(Str msg) {
 }
 
 inline Res<usize> log(Bytes bytes) {
-    try$(_log((char const *)bytes.buf(), bytes.len()));
+    try$(_log((char const*)bytes.buf(), bytes.len()));
     return Ok(bytes.len());
 }
 
 template <typename O, typename... Args>
-inline Res<O> create(Cap dest, Args &&...args) {
+inline Res<O> create(Cap dest, Args&&... args) {
     Cap c;
     typename O::Props props{std::forward<Args>(args)...};
     Props p = props;
@@ -38,11 +38,11 @@ struct Object {
     Object(Cap cap)
         : _cap(cap) {}
 
-    Object(Object &&other)
+    Object(Object&& other)
         : _cap(std::exchange(other._cap, {})) {
     }
 
-    Object(Object const &) = delete;
+    Object(Object const&) = delete;
 
     ~Object() {
         if (_cap)
@@ -90,11 +90,11 @@ struct Domain : public Object {
     }
 
     template <typename O, typename... Args>
-    Res<O> create(Args &&...args) {
+    Res<O> create(Args&&... args) {
         return Hj::create<O>(_cap, std::forward<Args>(args)...);
     }
 
-    Res<Cap> attach(Object &obj) {
+    Res<Cap> attach(Object& obj) {
         Cap out;
         try$(_dup(_cap, &out, obj));
         return Ok(out);
@@ -150,18 +150,18 @@ struct Space : public Object {
         return create<Space>(dest);
     }
 
-    Res<urange> map(usize virt, Vmo &vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+    Res<urange> map(usize virt, Vmo& vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
         try$(_map(_cap, &virt, vmo, off, &len, flags));
         return Ok(urange{virt, len});
     }
 
-    Res<urange> map(Vmo &vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+    Res<urange> map(Vmo& vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
         usize virt = 0;
         try$(_map(_cap, &virt, vmo, off, &len, flags));
         return Ok(urange{virt, len});
     }
 
-    Res<urange> map(Vmo &vmo, MapFlags flags = MapFlags::NONE) {
+    Res<urange> map(Vmo& vmo, MapFlags flags = MapFlags::NONE) {
         usize virt = 0;
         usize len = 0;
         try$(_map(_cap, &virt, vmo, 0, &len, flags));
@@ -180,9 +180,9 @@ struct Mapped {
     Mapped(usize addr, usize len)
         : _addr(addr), _len(len) {}
 
-    Mapped(Mapped const &) = delete;
+    Mapped(Mapped const&) = delete;
 
-    Mapped(Mapped &&other)
+    Mapped(Mapped&& other)
         : _addr(std::exchange(other._addr, {})),
           _len(std::exchange(other._len, {})) {
     }
@@ -194,23 +194,23 @@ struct Mapped {
 
     urange range() const { return {_addr, _len}; }
 
-    MutBytes mutBytes() { return {reinterpret_cast<u8 *>(_addr), _len}; }
+    MutBytes mutBytes() { return {reinterpret_cast<u8*>(_addr), _len}; }
 
-    Bytes bytes() const { return {reinterpret_cast<u8 const *>(_addr), _len}; }
+    Bytes bytes() const { return {reinterpret_cast<u8 const*>(_addr), _len}; }
 };
 
-static inline Res<Mapped> map(usize virt, Vmo &vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+static inline Res<Mapped> map(usize virt, Vmo& vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
     try$(_map(Space::self(), &virt, vmo, off, &len, flags));
     return Ok(Mapped{virt, len});
 }
 
-static inline Res<Mapped> map(Vmo &vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+static inline Res<Mapped> map(Vmo& vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
     usize virt = 0;
     try$(_map(Space::self(), &virt, vmo, off, &len, flags));
     return Ok(Mapped{virt, len});
 }
 
-static inline Res<Mapped> map(Vmo &vmo, MapFlags flags = MapFlags::NONE) {
+static inline Res<Mapped> map(Vmo& vmo, MapFlags flags = MapFlags::NONE) {
     usize virt = 0;
     usize len = 0;
     try$(_map(Space::self(), &virt, vmo, 0, &len, flags));
@@ -310,12 +310,12 @@ struct Listener : public Object {
 
 template <Meta::Derive<Hj::Object> T>
 struct Karm::Io::Packer<T> {
-    static Res<> pack(PackEmit &e, T const &val) {
+    static Res<> pack(PackEmit& e, T const& val) {
         e.give(Sys::Handle{val.raw()});
         return Ok();
     }
 
-    static Res<T> unpack(PackScan &s) {
+    static Res<T> unpack(PackScan& s) {
         auto cap = s.take();
         return Ok(T{Hj::Cap{cap.value()}});
     }

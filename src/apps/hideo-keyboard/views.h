@@ -6,6 +6,6 @@ namespace Hideo::Keyboard {
 
 Ui::Child flyout();
 
-void show(Ui::Node &);
+void show(Ui::Node&);
 
 } // namespace Hideo::Keyboard

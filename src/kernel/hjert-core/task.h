@@ -40,7 +40,7 @@ struct Task :
         Opt<Arc<Domain>> domain = NONE
     );
 
-    static Task &self();
+    static Task& self();
 
     Task(
         Mode mode,
@@ -49,11 +49,11 @@ struct Task :
         Opt<Arc<Domain>> domain
     );
 
-    Stack &stack() { return _stack; }
+    Stack& stack() { return _stack; }
 
-    Space &space() { return *_space.unwrap(); }
+    Space& space() { return *_space.unwrap(); }
 
-    Domain &domain() { return *_domain.unwrap(); }
+    Domain& domain() { return *_domain.unwrap(); }
 
     bool _ret() const {
         return _signals.has(Hj::Sigs::EXITED) and
@@ -79,9 +79,9 @@ struct Task :
 
     void end(Instant now);
 
-    void save(Arch::Frame const &frame);
+    void save(Arch::Frame const& frame);
 
-    void load(Arch::Frame &frame);
+    void load(Arch::Frame& frame);
 
     void enter(Mode mode);
 

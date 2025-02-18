@@ -5,7 +5,7 @@
 
 namespace Grund::Echo {
 
-Async::Task<> serv(Sys::Context &ctx) {
+Async::Task<> serv(Sys::Context& ctx) {
     auto endpoint = Rpc::Endpoint::create(ctx);
     while (true) {
         auto msg = co_trya$(endpoint.recvAsync());
@@ -20,6 +20,6 @@ Async::Task<> serv(Sys::Context &ctx) {
 
 } // namespace Grund::Echo
 
-Async::Task<> entryPointAsync(Sys::Context &ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx) {
     return Grund::Echo::serv(ctx);
 }

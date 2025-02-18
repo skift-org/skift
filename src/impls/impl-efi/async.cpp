@@ -3,7 +3,7 @@
 
 namespace Karm::Sys::_Embed {
 
-Sched &globalSched() {
+Sched& globalSched() {
     notImplemented();
 }
 

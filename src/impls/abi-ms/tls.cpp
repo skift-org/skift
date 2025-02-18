@@ -19,7 +19,7 @@ int _Init_global_epoch = 0;
     if it is -1 it will continue with the initialization, otherwise the
     initialization must be complete and will be skipped.
 */
-extern "C" void _Init_thread_header(int *ptss) {
+extern "C" void _Init_thread_header(int* ptss) {
     while (1) {
         /* Try to acquire the first initialization lock */
         // int oldTss = _InterlockedCompareExchange((long *)ptss, -1, 0);
@@ -44,11 +44,11 @@ extern "C" void _Init_thread_header(int *ptss) {
     }
 }
 
-extern "C" void _Init_thread_footer(int *ptss) {
+extern "C" void _Init_thread_footer(int* ptss) {
     /* Initialization is complete */
     _Init_thread_epoch = *ptss = __atomic_fetch_add(&_Init_global_epoch, 1, __ATOMIC_SEQ_CST);
 }
 
-extern "C" void _Init_thread_abort(int *ptss) {
+extern "C" void _Init_thread_abort(int* ptss) {
     __atomic_store_n(ptss, 0, __ATOMIC_SEQ_CST);
 }

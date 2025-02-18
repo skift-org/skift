@@ -26,8 +26,8 @@ struct Sched {
     void schedule(Duration span);
 };
 
-Res<> initSched(Handover::Payload &payload);
+Res<> initSched(Handover::Payload& payload);
 
-Sched &globalSched();
+Sched& globalSched();
 
 } // namespace Hjert::Core

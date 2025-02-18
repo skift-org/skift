@@ -42,7 +42,7 @@ enum struct Tag : u32 {
 
 using enum Tag;
 
-static char const *tagName(Tag tag) {
+static char const* tagName(Tag tag) {
     switch (tag) {
 #define ITER(NAME, VALUE) \
     case Tag::NAME:       \
@@ -76,7 +76,7 @@ struct Record {
     u64 start = 0;
     u64 size = 0;
 
-    char const *name() const {
+    char const* name() const {
         return tagName(tag);
     }
 
@@ -119,20 +119,20 @@ struct Payload {
     u32 magic, agent, size, len;
     Record records[];
 
-    char const *stringAt(u64 offset) const {
+    char const* stringAt(u64 offset) const {
         if (offset == 0) {
             return "";
         }
-        char const *data = reinterpret_cast<char const *>(this);
+        char const* data = reinterpret_cast<char const*>(this);
         return data + offset;
     }
 
-    char const *agentName() const {
+    char const* agentName() const {
         return stringAt(agent);
     }
 
-    Record const *findTag(Tag tag) const {
-        for (auto const &r : *this) {
+    Record const* findTag(Tag tag) const {
+        for (auto const& r : *this) {
             if (r.tag == tag) {
                 return &r;
             }
@@ -141,8 +141,8 @@ struct Payload {
         return nullptr;
     }
 
-    Record const *fileByName(char const *name) const {
-        for (auto const &r : *this) {
+    Record const* fileByName(char const* name) const {
+        for (auto const& r : *this) {
             if (r.tag == Tag::FILE and cstrEq(stringAt(r.file.name), name)) {
                 return &r;
             }
@@ -151,25 +151,25 @@ struct Payload {
         return nullptr;
     }
 
-    Record *begin() {
+    Record* begin() {
         return records;
     }
 
-    Record *end() {
+    Record* end() {
         return records + len;
     }
 
-    Record const *begin() const {
+    Record const* begin() const {
         return records;
     }
 
-    Record const *end() const {
+    Record const* end() const {
         return records + len;
     }
 
     usize sum(Handover::Tag tag) {
         usize total = 0;
-        for (auto const &r : *this) {
+        for (auto const& r : *this) {
             if (r.tag == tag) {
                 total += r.size;
             }
@@ -178,7 +178,7 @@ struct Payload {
     }
 
     Record find(usize size) {
-        for (auto &r : *this) {
+        for (auto& r : *this) {
             if (r.tag == Tag::FREE and r.size >= size) {
                 return r;
             }
@@ -192,7 +192,7 @@ struct Payload {
         bool first = true;
         usize start = 0, end = 0;
 
-        for (auto const &r : *this) {
+        for (auto const& r : *this) {
             if (r.tag == Tag::FREE) {
                 if (r.start < start or first) {
                     start = r.start;
@@ -216,7 +216,7 @@ struct Request {
     u32 flags;
     u64 more;
 
-    char const *name() const {
+    char const* name() const {
         return tagName(tag);
     }
 };
@@ -249,7 +249,7 @@ inline constexpr Request requestFb(PixelFormat preferedFormat = PixelFormat::BGR
     return {Tag::FB, 0, (u64)preferedFormat};
 }
 
-inline bool valid(u32 magic, Payload const &payload) {
+inline bool valid(u32 magic, Payload const& payload) {
     if (magic != COOLBOOT) {
         return false;
     }
@@ -261,8 +261,8 @@ inline bool valid(u32 magic, Payload const &payload) {
     return true;
 }
 
-static constexpr char const *REQUEST_SECTION = ".handover";
+static constexpr char const* REQUEST_SECTION = ".handover";
 
-using EntryPoint = void (*)(u64 magic, Payload const *handover);
+using EntryPoint = void (*)(u64 magic, Payload const* handover);
 
 } // namespace Handover

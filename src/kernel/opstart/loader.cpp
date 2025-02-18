@@ -15,7 +15,7 @@ namespace Opstart {
 
 void enterKernel(usize entry, usize payload, usize stack, usize vmm);
 
-Res<> loadEntry(Entry const &entry) {
+Res<> loadEntry(Entry const& entry) {
     logInfo("opstart: preparing payload...");
     auto payloadMem = try$(Sys::mmap().read().size(kib(16)).mapMut());
     logInfo("opstart: payload at vaddr: {p} paddr: {p}", payloadMem.vaddr(), payloadMem.paddr());
@@ -52,14 +52,14 @@ Res<> loadEntry(Entry const &entry) {
         logInfo("opstart: loading segment: paddr={p}, vaddr={p}, memsz={p}, filesz={p}", paddr, prog.vaddr(), memsz, prog.filez());
 
         usize remaining = prog.memsz() - prog.filez();
-        memcpy((void *)paddr, prog.buf(), prog.filez());
-        memset((void *)(paddr + prog.filez()), 0, remaining);
+        memcpy((void*)paddr, prog.buf(), prog.filez());
+        memset((void*)(paddr + prog.filez()), 0, remaining);
 
         payload.add(Handover::KERNEL, 0, {paddr, memsz});
     }
 
     logInfo("opstart: loading additional blobs...");
-    for (auto const &blob : entry.blobs) {
+    for (auto const& blob : entry.blobs) {
         logInfo("opstart: loading blob: {}", blob.url);
 
         auto blobFile = try$(Sys::File::open(blob.url));
@@ -92,7 +92,7 @@ Res<> loadEntry(Entry const &entry) {
 
     auto requests = try$(maybeSection).slice<Handover::Request>();
 
-    for (auto const &request : requests) {
+    for (auto const& request : requests) {
         logInfo(" - {}", request.name());
     }
 

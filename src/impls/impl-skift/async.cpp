@@ -47,7 +47,7 @@ struct HjertSched : public Sys::Sched {
 
     virtual Async::Task<_Sent> sendAsync(Rc<Fd> fd, Bytes buf, Slice<Handle> hnds, SocketAddr) {
         if (auto ipc = fd.is<Skift::IpcFd>()) {
-            auto &chan = ipc->_out;
+            auto& chan = ipc->_out;
 
             co_trya$(waitFor(chan.cap(), Hj::Sigs::WRITABLE, Hj::Sigs::NONE));
             static_assert(sizeof(Handle) == sizeof(Hj::Cap) and alignof(Handle) == alignof(Hj::Cap));
@@ -61,7 +61,7 @@ struct HjertSched : public Sys::Sched {
 
     virtual Async::Task<_Received> recvAsync(Rc<Fd> fd, MutBytes buf, MutSlice<Handle> hnds) {
         if (auto ipc = fd.is<Skift::IpcFd>()) {
-            auto &chan = ipc->_in;
+            auto& chan = ipc->_in;
 
             co_trya$(waitFor(chan.cap(), Hj::Sigs::READABLE, Hj::Sigs::NONE));
             static_assert(sizeof(Handle) == sizeof(Hj::Cap) and alignof(Handle) == alignof(Hj::Cap));
@@ -82,7 +82,7 @@ struct HjertSched : public Sys::Sched {
 
     Instant _soonest() {
         auto soonest = Instant::endOfTime();
-        for (auto const &[stamp, _] : _sleeps) {
+        for (auto const& [stamp, _] : _sleeps) {
             if (stamp < soonest)
                 soonest = stamp;
         }
@@ -91,7 +91,7 @@ struct HjertSched : public Sys::Sched {
 
     void _wake(Instant now) {
         for (usize i = 0; i < _sleeps.len(); i++) {
-            auto &[stamp, promise] = _sleeps[i];
+            auto& [stamp, promise] = _sleeps[i];
             if (stamp <= now) {
                 promise.resolve(Ok());
                 _sleeps.removeAt(i);
@@ -119,7 +119,7 @@ struct HjertSched : public Sys::Sched {
     }
 };
 
-Sched &globalSched() {
+Sched& globalSched() {
     static HjertSched sched = [] -> HjertSched {
         return {
             Hj::Listener::create(Hj::ROOT)

@@ -26,10 +26,10 @@ Res<Arc<Vmo>> Vmo::makeDma(Hal::DmaRange prange) {
 Hal::PmmRange Vmo::range() {
     return _mem.visit(
         Visitor{
-            [](Hal::PmmMem const &mem) {
+            [](Hal::PmmMem const& mem) {
                 return mem.range();
             },
-            [](Hal::DmaRange const &range) {
+            [](Hal::DmaRange const& range) {
                 return range.into<Hal::PmmRange>();
             },
         }

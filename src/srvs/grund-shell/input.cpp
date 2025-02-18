@@ -10,7 +10,7 @@ struct Cursor {
 
     virtual Math::Recti bound(Math::Vec2i pos) const = 0;
 
-    virtual void paint(Math::Vec2i pos, Gfx::Canvas &g) const = 0;
+    virtual void paint(Math::Vec2i pos, Gfx::Canvas& g) const = 0;
 };
 
 struct BlobCursor : public Cursor {
@@ -28,7 +28,7 @@ struct BlobCursor : public Cursor {
         return _blob(pos).bound().grow(1).cast<isize>();
     }
 
-    void paint(Math::Vec2i pos, Gfx::Canvas &g) const override {
+    void paint(Math::Vec2i pos, Gfx::Canvas& g) const override {
         g.push();
         g.beginPath();
         g.fillStyle(_fill.withOpacity(_opacity));
@@ -53,7 +53,7 @@ struct ClassicCursor : public Cursor {
             .grow(1);
     }
 
-    void paint(Math::Vec2i pos, Gfx::Canvas &g) const override {
+    void paint(Math::Vec2i pos, Gfx::Canvas& g) const override {
         g.push();
         g.translate(pos.cast<f64>());
         g.beginPath();
@@ -78,7 +78,7 @@ struct InputTranslator : public Ui::ProxyNode<InputTranslator> {
     InputTranslator(Ui::Child child, Box<Cursor> cursor)
         : Ui::ProxyNode<InputTranslator>(std::move(child)), _cursor(std::move(cursor)) {}
 
-    void event(App::Event &e) override {
+    void event(App::Event& e) override {
         if (auto m = e.is<App::MouseEvent>()) {
             if (not _mouseDirty) {
                 _mouseDirty = true;
@@ -127,7 +127,7 @@ struct InputTranslator : public Ui::ProxyNode<InputTranslator> {
         Ui::ProxyNode<InputTranslator>::event(e);
     }
 
-    void paint(Gfx::Canvas &g, Math::Recti r) override {
+    void paint(Gfx::Canvas& g, Math::Recti r) override {
         child().paint(g, r);
 
         if (_cursor->bound(_mousePos).colide(r)) {

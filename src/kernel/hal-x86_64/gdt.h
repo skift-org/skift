@@ -52,7 +52,7 @@ struct [[gnu::packed]] GdtTssEntry {
 
     constexpr GdtTssEntry() = default;
 
-    GdtTssEntry(Tss const &tss)
+    GdtTssEntry(Tss const& tss)
         : len(sizeof(Tss)),
           baseLow16((usize)&tss & 0xffff),
           baseMid8(((usize)&tss >> 16) & 0xff),
@@ -97,11 +97,11 @@ struct [[gnu::packed]] Gdt {
 
     GdtTssEntry tssEntry;
 
-    Gdt(Tss const &tss)
+    Gdt(Tss const& tss)
         : tssEntry(tss) {}
 };
 
-extern "C" void _gdtLoad(void const *ptr);
+extern "C" void _gdtLoad(void const* ptr);
 
 extern "C" void _tssUpdate();
 
@@ -109,7 +109,7 @@ struct [[gnu::packed]] GdtDesc {
     u16 limit;
     u64 base;
 
-    GdtDesc(Gdt const &base)
+    GdtDesc(Gdt const& base)
         : limit(sizeof(Gdt) - 1),
           base(reinterpret_cast<usize>(&base)) {}
 

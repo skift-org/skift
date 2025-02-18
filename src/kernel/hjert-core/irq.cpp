@@ -4,7 +4,7 @@
 
 namespace Hjert::Core {
 
-static Vec<Irq *> _irqs;
+static Vec<Irq*> _irqs;
 static Lock _irqsLock;
 
 Res<Arc<Irq>> Irq::create(usize irq) {
@@ -13,7 +13,7 @@ Res<Arc<Irq>> Irq::create(usize irq) {
 
 void Irq::trigger(usize irqNum) {
     LockScope scope(_irqsLock);
-    for (auto *irq : _irqs) {
+    for (auto* irq : _irqs) {
         if (irq->_irq == irqNum) {
             irq->signal(Hj::Sigs::TRIGGERED, Hj::Sigs::NONE);
         }

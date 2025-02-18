@@ -55,7 +55,7 @@ Res<> dumpMemInfo() {
 Res<> dumpCpusInfo() {
     auto cpusinfo = try$(Sys::cpusinfo());
 
-    for (auto &cpu : cpusinfo) {
+    for (auto& cpu : cpusinfo) {
         Sys::println("{}: {} {} {} MHz", title("CPU"), cpu.name, cpu.brand, cpu.freq);
     }
 
@@ -90,7 +90,7 @@ Res<> dumpKindness() {
 
 } // namespace Sysfetch
 
-Async::Task<> entryPointAsync(Sys::Context &) {
+Async::Task<> entryPointAsync(Sys::Context&) {
     Res<> res = Ok();
 
     Sys::println("{}", Cli::styled(ART, Cli::BLUE));

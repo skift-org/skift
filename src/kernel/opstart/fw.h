@@ -9,9 +9,9 @@ namespace Opstart::Fw {
 
 Res<Arc<Hal::Vmm>> createVmm();
 
-Res<> finalizeHandover(Handover::Builder &builder);
+Res<> finalizeHandover(Handover::Builder& builder);
 
-void enterKernel(usize entry, Handover::Payload &payload, usize stack, Hal::Vmm &vmm);
+void enterKernel(usize entry, Handover::Payload& payload, usize stack, Hal::Vmm& vmm);
 
 Hal::PmmRange imageRange();
 

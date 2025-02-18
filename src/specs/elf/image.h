@@ -93,34 +93,34 @@ struct [[gnu::packed]] ImageHeader {
 
     u16 shstrndx;
 
-    SectionHeader *sectionAt(usize index) {
+    SectionHeader* sectionAt(usize index) {
         usize offset = shoff + index * shentsize;
-        return (SectionHeader *)((u8 *)this + offset);
+        return (SectionHeader*)((u8*)this + offset);
     }
 
-    ProgramHeader *programAt(usize index) {
+    ProgramHeader* programAt(usize index) {
         usize offset = phoff + index * phentsize;
-        return (ProgramHeader *)((u8 *)this + offset);
+        return (ProgramHeader*)((u8*)this + offset);
     }
 
     Str stringAt(usize offset) {
         if (offset == 0) {
             return "<null>";
         }
-        return Str{(char const *)this + sectionAt(shstrndx)->offset + offset};
+        return Str{(char const*)this + sectionAt(shstrndx)->offset + offset};
     }
 };
 
 struct Section {
-    ImageHeader *_base;
-    SectionHeader *_header;
+    ImageHeader* _base;
+    SectionHeader* _header;
 
     Str name() {
         return _base->stringAt(_header->name);
     }
 
-    void *buf() {
-        return (void *)((u8 const *)_base + _header->offset);
+    void* buf() {
+        return (void*)((u8 const*)_base + _header->offset);
     }
 
     usize size() {
@@ -128,24 +128,24 @@ struct Section {
     }
 
     template <typename T>
-    T const *as() {
-        return static_cast<T const *>(buf());
+    T const* as() {
+        return static_cast<T const*>(buf());
     }
 
     template <typename T>
     MutSlice<T> slice() {
-        return MutSlice<T>{(T *)buf(), size() / sizeof(T)};
+        return MutSlice<T>{(T*)buf(), size() / sizeof(T)};
     }
 
     template <typename T>
     Cursor<T> cursor() {
-        return Cursor<T>{(T *)buf(), size() / sizeof(T)};
+        return Cursor<T>{(T*)buf(), size() / sizeof(T)};
     }
 };
 
 struct Program {
-    ImageHeader *_base;
-    ProgramHeader *_header;
+    ImageHeader* _base;
+    ProgramHeader* _header;
 
     using enum ProgramType;
     using Type = ProgramType;
@@ -165,17 +165,17 @@ struct Program {
         return _header->offset;
     }
 
-    void *buf() {
-        return (void *)((u8 *)_base + _header->offset);
+    void* buf() {
+        return (void*)((u8*)_base + _header->offset);
     }
 
-    void const *buf() const {
-        return (void const *)((u8 const *)_base + _header->offset);
+    void const* buf() const {
+        return (void const*)((u8 const*)_base + _header->offset);
     }
 
     Bytes bytes() const {
         return Bytes{
-            (Byte *)buf(),
+            (Byte*)buf(),
             static_cast<usize>(_header->filesz),
         };
     }
@@ -207,8 +207,8 @@ struct Image {
                _buf[3] == 'F';
     }
 
-    ImageHeader &header() {
-        return *(ImageHeader *)_buf.buf();
+    ImageHeader& header() {
+        return *(ImageHeader*)_buf.buf();
     }
 
     auto sections() {
@@ -222,7 +222,7 @@ struct Image {
     }
 
     Opt<Section> sectionByName(Str name) {
-        for (auto &section : sections()) {
+        for (auto& section : sections()) {
             if (section.name() == name)
                 return section;
         }
@@ -242,8 +242,8 @@ struct Image {
         });
     }
 
-    ProgramHeader *programAt(usize index) {
-        return (ProgramHeader *)(_buf.buf() + header().phoff + index * header().phentsize);
+    ProgramHeader* programAt(usize index) {
+        return (ProgramHeader*)(_buf.buf() + header().phoff + index * header().phentsize);
     }
 };
 

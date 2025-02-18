@@ -12,17 +12,17 @@ namespace x86_64 {
 
 template <typename Mapper = Hal::IdentityMapper>
 struct Vmm : public Hal::Vmm {
-    Hal::Pmm &_pmm;
-    Pml<4> *_pml4 = nullptr;
+    Hal::Pmm& _pmm;
+    Pml<4>* _pml4 = nullptr;
     Mapper _mapper;
 
-    Vmm(Hal::Pmm &pmm, Pml<4> *pml4, Mapper mapper = {})
+    Vmm(Hal::Pmm& pmm, Pml<4>* pml4, Mapper mapper = {})
         : _pmm(pmm),
           _pml4(pml4),
           _mapper(mapper) {}
 
     template <usize L>
-    Res<Pml<L - 1> *> pml(Pml<L> &upper, usize vaddr) {
+    Res<Pml<L - 1>*> pml(Pml<L>& upper, usize vaddr) {
         auto page = upper.pageAt(vaddr);
 
         if (not page.present())
@@ -32,7 +32,7 @@ struct Vmm : public Hal::Vmm {
     }
 
     template <usize L>
-    Res<Pml<L - 1> *> pmlOrAlloc(Pml<L> &upper, usize vaddr) {
+    Res<Pml<L - 1>*> pmlOrAlloc(Pml<L>& upper, usize vaddr) {
         auto page = upper.pageAt(vaddr);
 
         if (page.present()) {
@@ -40,9 +40,9 @@ struct Vmm : public Hal::Vmm {
         }
 
         usize lower = try$(_pmm.allocRange(Hal::PAGE_SIZE, Hal::PmmFlags::NONE)).start;
-        memset(_mapper.map((void *)lower), 0, Hal::PAGE_SIZE);
+        memset(_mapper.map((void*)lower), 0, Hal::PAGE_SIZE);
         upper.putPage(vaddr, {lower, Entry::WRITE | Entry::PRESENT | Entry::USER});
-        return Ok(_mapper.map((Pml<L - 1> *)lower));
+        return Ok(_mapper.map((Pml<L - 1>*)lower));
     }
 
     Res<> allocPage(usize vaddr, usize paddr, Hal::VmmFlags flags) {
@@ -149,7 +149,7 @@ struct Vmm : public Hal::Vmm {
     };
 
     template <usize L>
-    void _dumpPml(Context &ctx, Pml<L> &pml, usize vaddr) {
+    void _dumpPml(Context& ctx, Pml<L>& pml, usize vaddr) {
         for (usize i = 0; i < 512; i++) {
             auto page = pml[i];
             usize curr = pml.index2virt(i) | vaddr;
@@ -157,7 +157,7 @@ struct Vmm : public Hal::Vmm {
                 if constexpr (L == 1) {
                     ctx.next(curr, page.paddr());
                 } else {
-                    auto &lower = *_mapper.map(page.template as<Pml<L - 1>>());
+                    auto& lower = *_mapper.map(page.template as<Pml<L - 1>>());
                     _dumpPml(ctx, lower, curr);
                 }
             }

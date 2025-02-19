@@ -1,3 +1,5 @@
+module;
+
 #include <karm-base/witty.h>
 #include <karm-image/loader.h>
 #include <karm-kira/about-dialog.h>
@@ -11,9 +13,11 @@
 #include <mdi/information.h>
 #include <mdi/license.h>
 
+export module Hideo.About;
+
 namespace Hideo::About {
 
-Ui::Child app() {
+export Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::INFORMATION,
         .title = "About"s,

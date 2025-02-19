@@ -11,19 +11,28 @@ namespace Karm::Meta {
 template <typename T, typename... Ts>
 concept Contains = (Same<T, Ts> or ...);
 
-template <typename...>
-inline constexpr usize _indexOf = 0;
+template <typename T, typename... Ts>
+struct _IndexOf;
 
-template <typename T, typename First>
-inline constexpr usize _indexOf<T, First> = 0;
+template <typename T, Meta::Same<T> First>
+struct _IndexOf<T, First> {
+    static constexpr usize value = 0;
+};
 
 template <typename T, typename First, typename... Rest>
-inline constexpr usize _indexOf<T, First, Rest...> = Same<T, First> ? 0 : _indexOf<T, Rest...> + 1;
+struct _IndexOf<T, First, Rest...> {
+    static constexpr usize value = [] {
+        if constexpr (Same<T, First>)
+            return 0;
+        else
+            return 1 + _IndexOf<T, Rest...>::value;
+    }();
+};
 
 template <typename T, typename... Ts>
-    requires Contains<T, Ts...>
-static consteval usize indexOf() {
-    return _indexOf<T, Ts...>;
+    requires(Contains<T, Ts...>)
+consteval usize indexOf() {
+    return _IndexOf<T, Ts...>::value;
 }
 
 template <typename...>

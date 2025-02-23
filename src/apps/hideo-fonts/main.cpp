@@ -63,7 +63,7 @@ static constexpr Str PANGRAM = "All beings born free, equal in dignity, rightsâ€
 Ui::Child allFamiliesItem(State const& s, Str family) {
     auto& fontBook = s.fontBook;
     auto nStyle = s.fontBook.queryFamily(family).len();
-    auto fontface = fontBook.queryClosest({.family = family}).unwrap();
+    auto fontface = fontBook.queryClosest({.family = String{family}}).unwrap();
 
     Text::Font font{
         .fontface = fontface,

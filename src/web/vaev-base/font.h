@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-mime/url.h>
+#include <karm-text/base.h>
 
 #include "angle.h"
 #include "length.h"
@@ -79,20 +80,11 @@ struct FontWidth {
 };
 
 struct FontStyle {
-    enum struct _Named {
-        NORMAL,
-        ITALIC,
-        OBLIQUE,
-
-        _LEN,
-    };
-
-    using enum _Named;
-
-    _Named val;
+    using enum Text::FontStyle;
+    Text::FontStyle val;
     Angle obliqueAngle;
 
-    constexpr FontStyle(_Named named = NORMAL)
+    constexpr FontStyle(Text::FontStyle named = NORMAL)
         : val(named) {
     }
 
@@ -111,65 +103,43 @@ struct FontStyle {
     }
 };
 
-struct FontWeight {
-    enum struct _Named : i16 {
-        LIGHTER = -1,
-        BOLDER = -2,
+enum struct RelativeFontWeight : u8 {
+    LIGHTER,
+    BOLDER,
+};
 
-        THIN = 100,
-        EXTRA_LIGHT = 200,
-        LIGHT = 300,
-        NORMAL = 400,
-        MEDIUM = 500,
-        SEMI_BOLD = 600,
-        BOLD = 700,
-        EXTRA_BOLD = 800,
-        BLACK = 900,
+using _FontWeight = Union<Text::FontWeight, RelativeFontWeight>;
 
-        _LEN,
-    };
-
-    using enum _Named;
-
-    i16 val;
+struct FontWeight : _FontWeight {
+    using _FontWeight::_FontWeight;
 
     bool isRelative() const {
-        return val == static_cast<i16>(LIGHTER) or
-               val == static_cast<i16>(BOLDER);
+        return is<RelativeFontWeight>();
     }
 
-    constexpr FontWeight()
-        : FontWeight(NORMAL) {
-    }
-
-    constexpr FontWeight(_Named named)
-        : val(static_cast<u16>(named)) {
-    }
-
-    constexpr FontWeight(i16 value)
-        : val(clamp(value, 1, 1000)) {
+    FontWeight()
+        : FontWeight(Text::FontWeight::REGULAR) {
     }
 
     void repr(Io::Emit& e) const {
-        e("{}", val);
+        e("{}", static_cast<Union<Text::FontWeight, RelativeFontWeight>>(*this));
     }
 
-    bool operator==(FontWeight const& other) const {
-        return val == other.val;
+    Text::FontWeight resolve() const {
+        if (is<RelativeFontWeight>())
+            return Text::FontWeight::REGULAR;
+
+        return unwrap<Text::FontWeight>();
     }
 
-    FontWeight operator+(i16 value) const {
-        return FontWeight(val + value);
-    }
+    Text::FontWeight resolve(Text::FontWeight const& parent) const {
+        if (is<RelativeFontWeight>()) {
+            if (unwrap<RelativeFontWeight>() == RelativeFontWeight::LIGHTER)
+                return parent.lighter();
+            return parent.bolder();
+        }
 
-    i16 operator-(FontWeight const& other) const {
-        return val - other.val;
-    }
-
-    std::partial_ordering operator<=>(FontWeight const& other) const {
-        if (isRelative() or other.isRelative())
-            return std::partial_ordering::unordered;
-        return val <=> other.val;
+        return unwrap<Text::FontWeight>();
     }
 };
 
@@ -286,11 +256,15 @@ struct FontVariation {
 };
 
 struct FontSource {
-    Mime::Url url;
+    Union<Mime::Url, Text::Family> identifier;
     Opt<String> format;
 
+    FontSource(Mime::Url url) : identifier(url) {}
+
+    FontSource(Text::Family family) : identifier(family) {}
+
     void repr(Io::Emit& e) const {
-        e("(font-source {}", url);
+        e("(font-source {}", identifier);
         if (format)
             e(" format({})", *format);
         e(")");
@@ -298,11 +272,11 @@ struct FontSource {
 };
 
 struct FontProps {
-    Vec<String> families;
-    FontWeight weight;
-    FontWidth width;
-    FontStyle style;
-    FontSize size;
+    Vec<Text::Family> families = {Text::GenericFamily::SANS_SERIF};
+    Text::FontWeight weight = Text::FontWeight::REGULAR;
+    FontWidth width = FontWidth::NORMAL;
+    FontStyle style = FontStyle::NORMAL;
+    FontSize size = FontSize::MEDIUM;
 
     void repr(Io::Emit& e) const {
         e("(font");

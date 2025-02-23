@@ -1,6 +1,7 @@
 #pragma once
 
 #include <karm-gfx/borders.h>
+#include <karm-gfx/outline.h>
 
 #include "base.h"
 
@@ -9,10 +10,11 @@ namespace Karm::Scene {
 struct Box : public Node {
     Math::Rectf _bound;
     Gfx::Borders _borders;
+    Gfx::Outline _outline;
     Vec<Gfx::Fill> _backgrounds;
 
-    Box(Math::Rectf bound, Gfx::Borders borders, Vec<Gfx::Fill> backgrounds)
-        : _bound(bound), _borders(borders), _backgrounds(backgrounds) {
+    Box(Math::Rectf bound, Gfx::Borders borders, Gfx::Outline outline, Vec<Gfx::Fill> backgrounds)
+        : _bound(bound), _borders(borders), _outline(outline), _backgrounds(backgrounds) {
     }
 
     Math::Rectf bound() override {
@@ -33,6 +35,7 @@ struct Box : public Node {
         }
 
         _borders.paint(ctx, _bound);
+        _outline.paint(ctx, _bound, _borders.radii);
     }
 
     void repr(Io::Emit& e) const override {

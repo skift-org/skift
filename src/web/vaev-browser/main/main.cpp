@@ -1,13 +1,15 @@
+#include <karm-gc/heap.h>
 #include <karm-sys/entry.h>
+#include <karm-sys/proc.h>
 #include <karm-ui/app.h>
-#include <vaev-driver/fetcher.h>
 
-#include "../app.h"
+import Vaev.Browser;
+import Vaev.Driver;
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto args = Sys::useArgs(ctx);
     auto url = args.len()
-                   ? co_try$(Mime::parseUrlOrPath(args[0]))
+                   ? Mime::parseUrlOrPath(args[0], co_try$(Sys::pwd()))
                    : "about:start"_url;
     Gc::Heap heap;
 

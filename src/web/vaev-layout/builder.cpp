@@ -1,8 +1,14 @@
+module;
+
 #include <karm-image/loader.h>
 #include <karm-text/loader.h>
+#include <karm-text/prose.h>
+#include <vaev-dom/document.h>
+#include <vaev-style/computer.h>
 
-#include "builder.h"
-#include "values.h"
+export module Vaev.Layout:builder;
+
+import :values;
 
 namespace Vaev::Layout {
 
@@ -56,41 +62,35 @@ static Opt<Rc<Karm::Text::Fontface>> _monospaceFontface = NONE;
 static Opt<Rc<Karm::Text::Fontface>> _regularFontface = NONE;
 static Opt<Rc<Karm::Text::Fontface>> _boldFontface = NONE;
 
-static Rc<Karm::Text::Fontface> _lookupFontface(Style::Computed& style) {
-    if (contains(style.font->families, "monospace"s)) {
-        if (not _monospaceFontface)
-            _monospaceFontface = Karm::Text::loadFontfaceOrFallback("bundle://fonts-fira-code/fonts/FiraCode-Regular.ttf"_url).unwrap();
-        return *_monospaceFontface;
-    } else if (style.font->style != FontStyle::NORMAL) {
-        if (style.font->weight != FontWeight::NORMAL) {
-            if (not _boldFontface)
-                _boldFontface = Karm::Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-BoldItalic.ttf"_url).unwrap();
-            return *_boldFontface;
-        } else {
-            if (not _regularFontface)
-                _regularFontface = Karm::Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Italic.ttf"_url).unwrap();
-            return *_regularFontface;
-        }
-    } else {
-        if (style.font->weight != FontWeight::NORMAL) {
-            if (not _boldFontface)
-                _boldFontface = Karm::Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Bold.ttf"_url).unwrap();
-            return *_boldFontface;
-        } else {
-            if (not _regularFontface)
-                _regularFontface = Karm::Text::loadFontfaceOrFallback("bundle://fonts-inter/fonts/Inter-Regular.ttf"_url).unwrap();
-            return *_regularFontface;
-        }
+static Rc<Karm::Text::Fontface> _lookupFontface(Text::FontBook& fontBook, Style::Computed& style) {
+    Text::FontQuery fq{
+        .weight = style.font->weight,
+        .style = style.font->style.val,
+    };
+
+    for (auto family : style.font->families) {
+        fq.family = family;
+        if (auto font = fontBook.queryClosest(fq))
+            return font.unwrap();
     }
+
+    if (
+        auto font = fontBook.queryClosest({
+            .family = String{"Inter"s},
+        })
+    )
+        return font.unwrap();
+
+    return Text::Fontface::fallback();
 }
 
 auto RE_SEGMENT_BREAK = Re::single('\n', '\r', '\f', '\v');
 
-static void _buildRun(Style::Computer&, Gc::Ref<Dom::Text> node, Box& parent) {
+static void _buildRun(Style::Computer& c, Gc::Ref<Dom::Text> node, Box& parent) {
     auto style = makeRc<Style::Computed>(Style::Computed::initial());
     style->inherit(*parent.style);
 
-    auto fontFace = _lookupFontface(*style);
+    auto fontFace = _lookupFontface(c.fontBook, *style);
     Io::SScan scan{node->data()};
     scan.eat(Re::space());
     if (scan.ended())
@@ -187,7 +187,7 @@ void _buildChildren(Style::Computer& c, Gc::Ref<Dom::Node> node, Box& parent) {
 }
 
 static void _buildBlock(Style::Computer& c, Rc<Style::Computed> style, Gc::Ref<Dom::Element> el, Box& parent) {
-    auto font = _lookupFontface(*style);
+    auto font = _lookupFontface(c.fontBook, *style);
     Box box = {style, font};
     _buildChildren(c, el, box);
     box.attrs = _parseDomAttr(el);
@@ -198,11 +198,13 @@ static void _buildBlock(Style::Computer& c, Rc<Style::Computed> style, Gc::Ref<D
 
 static void _buildImage(Style::Computer& c, Gc::Ref<Dom::Element> el, Box& parent) {
     auto style = c.computeFor(*parent.style, el);
-    auto font = _lookupFontface(*style);
+    auto font = _lookupFontface(c.fontBook, *style);
 
     auto src = el->getAttribute(Html::SRC_ATTR).unwrapOr(""s);
-    auto url = Mime::Url::parse(src);
-    auto img = Karm::Image::loadOrFallback(url).unwrap();
+    auto url = Mime::parseUrlOrPath(src, el->baseURI());
+    auto img = Karm::Image::load(url).unwrapOrElse([] {
+        return Karm::Image::loadOrFallback("bundle://vaev-driver/missing.qoi"_url).unwrap();
+    });
     parent.add({style, font, img});
 }
 
@@ -248,7 +250,7 @@ static void _buildTableChildren(Style::Computer& c, Gc::Ref<Dom::Node> node, Box
 }
 
 static void _buildTable(Style::Computer& c, Rc<Style::Computed> style, Gc::Ref<Dom::Element> el, Box& parent) {
-    auto font = _lookupFontface(*style);
+    auto font = _lookupFontface(c.fontBook, *style);
 
     auto wrapperStyle = makeRc<Style::Computed>(Style::Computed::initial());
     wrapperStyle->display = style->display;
@@ -270,7 +272,7 @@ static void _buildElement(Style::Computer& c, Gc::Ref<Dom::Element> el, Box& par
     }
 
     auto style = c.computeFor(*parent.style, el);
-    auto font = _lookupFontface(*style);
+    auto font = _lookupFontface(c.fontBook, *style);
 
     auto display = style->display;
 
@@ -295,15 +297,15 @@ static void _buildNode(Style::Computer& c, Gc::Ref<Dom::Node> node, Box& parent)
     }
 }
 
-Box build(Style::Computer& c, Gc::Ref<Dom::Document> doc) {
+export Box build(Style::Computer& c, Gc::Ref<Dom::Document> doc) {
     auto style = makeRc<Style::Computed>(Style::Computed::initial());
-    Box root = {style, _lookupFontface(*style)};
+    Box root = {style, _lookupFontface(c.fontBook, *style)};
     _buildNode(c, doc, root);
     return root;
 }
 
-Box buildForPseudoElement(Rc<Style::Computed> style) {
-    auto fontFace = _lookupFontface(*style);
+export Box buildForPseudoElement(Text::FontBook& fontBook, Rc<Style::Computed> style) {
+    auto fontFace = _lookupFontface(fontBook, *style);
 
     // FIXME: We should pass this around from the top in order to properly resolve rems
     Resolver resolver{

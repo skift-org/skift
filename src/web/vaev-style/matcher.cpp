@@ -227,15 +227,13 @@ static bool _match(UniversalSelector const&, Gc::Ref<Dom::Element>) {
 
 static bool _matchSelector(Selector const& selector, Gc::Ref<Dom::Element> el) {
     // Route the selector to the appropriate matching function.
-    return selector.visit(Visitor{
-        [&](auto const& s) {
-            if constexpr (requires { _match(s, el); })
-                return _match(s, el);
+    return selector.visit(Visitor{[&](auto const& s) {
+        if constexpr (requires { _match(s, el); })
+            return _match(s, el);
 
-            logWarnIf(DEBUG_MATCHING, "unimplemented selector: {}", s);
-            return false;
-        }
-    });
+        logWarnIf(DEBUG_MATCHING, "unimplemented selector: {}", s);
+        return false;
+    }});
 }
 
 Opt<Spec> matchSelector(Selector const& selector, Gc::Ref<Dom::Element> el) {

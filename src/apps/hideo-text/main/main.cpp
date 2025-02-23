@@ -1,5 +1,6 @@
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
+#include <karm-sys/proc.h>
 #include <karm-ui/app.h>
 
 #include "../app.h"
@@ -9,7 +10,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
     Opt<Mime::Url> url;
     Res<String> text = Ok(""s);
     if (args.len()) {
-        url = co_try$(Mime::parseUrlOrPath(args[0]));
+        url = Mime::parseUrlOrPath(args[0], co_try$(Sys::pwd()));
         text = Sys::readAllUtf8(*url);
     }
     co_return Ui::runApp(ctx, Hideo::Text::app(url, text));

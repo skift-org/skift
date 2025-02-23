@@ -1,11 +1,15 @@
-#include <karm-kira/print-dialog.h>
-#include <vaev-driver/print.h>
+module;
 
-#include "dialog.h"
+#include <karm-kira/print-dialog.h>
+#include <vaev-dom/document.h>
+
+export module Vaev.View:dialog;
+
+import Vaev.Driver;
 
 namespace Vaev::View {
 
-Ui::Child printDialog(Gc::Ref<Dom::Document> dom) {
+export Ui::Child printDialog(Gc::Ref<Dom::Document> dom) {
     return Kr::printDialog([dom](Print::Settings const& settings) -> Vec<Print::Page> {
         return Driver::print(dom, settings) | collect<Vec<Print::Page>>();
     });

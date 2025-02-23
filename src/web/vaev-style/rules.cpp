@@ -155,7 +155,10 @@ Rule Rule::parse(Css::Sst const& sst, Origin origin) {
         return FontFaceRule::parse(sst);
     else if (tok.data == "@page")
         return PageRule::parse(sst);
-    else
+    else if (tok.data == "@supports") {
+        logWarn("cannot parse '@supports' at-rule");
+        return StyleRule{};
+    } else
         return StyleRule::parse(sst, origin);
 }
 

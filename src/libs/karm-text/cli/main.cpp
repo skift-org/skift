@@ -1,6 +1,7 @@
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
+#include <karm-sys/proc.h>
 #include <karm-text/book.h>
 #include <karm-text/loader.h>
 #include <karm-text/ttf.h>
@@ -65,7 +66,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
         if (args.len() != 2)
             co_return Error::invalidInput("Usage: karm-text.cli dump-ttf <url>");
 
-        auto url = co_try$(Mime::parseUrlOrPath(args[1]));
+        auto url = Mime::parseUrlOrPath(args[1], co_try$(Sys::pwd()));
         auto file = co_try$(Sys::File::open(url));
         auto map = co_try$(Sys::mmap().map(file));
         auto ttf = co_try$(Ttf::Parser::init(map.bytes()));
@@ -83,7 +84,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
         if (args.len() != 2)
             co_return Error::invalidInput("Usage: karm-text.cli dump-attr <url>");
 
-        auto url = co_try$(Mime::parseUrlOrPath(args[1]));
+        auto url = Mime::parseUrlOrPath(args[1], co_try$(Sys::pwd()));
         auto font = co_try$(Text::loadFontface(url));
 
         Sys::println("{}", font->attrs());

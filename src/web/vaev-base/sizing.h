@@ -85,7 +85,6 @@ struct Size {
 };
 
 struct SizingProps {
-    BoxSizing boxSizing;
     Size width, height;
     Size minWidth, minHeight;
     Size maxWidth, maxHeight;
@@ -116,7 +115,6 @@ struct SizingProps {
 
     void repr(Io::Emit& e) const {
         e("(sizing");
-        e(" boxSizing={}", boxSizing);
         e(" width={}", width);
         e(" height={}", height);
         e(" minWidth={}", minWidth);

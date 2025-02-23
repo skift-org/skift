@@ -9,6 +9,22 @@ namespace Karm::Text {
 
 // MARK: Font loading ----------------------------------------------------------
 
+Res<> FontBook::load(Mime::Url const& url, Opt<FontAttrs> attrs) {
+    auto maybeFace = loadFontface(url);
+    if (not maybeFace)
+        return maybeFace.none();
+
+    auto face = maybeFace.take();
+
+    add({
+        .url = url,
+        .attrs = attrs.unwrapOr(face->attrs()),
+        .face = face,
+    });
+
+    return Ok();
+}
+
 Res<> FontBook::loadAll() {
     auto start = Sys::now();
 
@@ -27,18 +43,8 @@ Res<> FontBook::loadAll() {
 
             auto fontUrl = dir.path() / diren.name;
 
-            auto maybeFace = loadFontface(fontUrl);
-            if (not maybeFace)
-                continue;
-
-            auto face = maybeFace.take();
-
-            add({
-                .url = fontUrl,
-                .attrs = face->attrs(),
-                .face = face,
-            });
-            count++;
+            if (load(fontUrl))
+                count++;
         }
     }
 
@@ -208,10 +214,10 @@ FontStyle _pickFontStyle(FontStyle curr, FontStyle best, FontStyle desired) {
     return best;
 }
 
-Str FontBook::_resolveFamily(Family family) const {
+Str FontBook::_resolveFamily(Family const& family) const {
     if (auto gf = family.is<GenericFamily>())
         return _genericFamily[toUnderlyingType(*gf)];
-    return family.unwrap<Str>();
+    return family.unwrap<String>();
 }
 
 Opt<Rc<Fontface>> FontBook::queryExact(FontQuery query) const {

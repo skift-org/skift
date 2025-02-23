@@ -6,7 +6,8 @@
 #include <vaev-base/media.h>
 #include <vaev-base/numbers.h>
 #include <vaev-base/resolution.h>
-#include <vaev-css/parser.h>
+
+#include "css/parser.h"
 
 namespace Vaev::Style {
 
@@ -581,25 +582,21 @@ struct MediaQuery {
     }
 
     bool match(Media const& media) const {
-        return _store.visit(Visitor{
-            [&](auto const& value) {
-                return value.match(media);
-            },
-            [](None) {
-                return true;
-            }
-        });
+        return _store.visit(Visitor{[&](auto const& value) {
+                                        return value.match(media);
+                                    },
+                                    [](None) {
+                                        return true;
+                                    }});
     }
 
     void repr(Io::Emit& e) const {
-        _store.visit(Visitor{
-            [&](auto const& value) {
-                e("{}", value);
-            },
-            [&](None) {
-                e("all");
-            }
-        });
+        _store.visit(Visitor{[&](auto const& value) {
+                                 e("{}", value);
+                             },
+                             [&](None) {
+                                 e("all");
+                             }});
     }
 };
 

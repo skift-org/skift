@@ -1,7 +1,6 @@
 #include <karm-test/macros.h>
-#include <vaev-css/parser.h>
 #include <vaev-style/decls.h>
-#include <vaev-style/styles.h>
+#include <vaev-style/props.h>
 #include <vaev-style/values.h>
 
 namespace Vaev::Style::Tests {

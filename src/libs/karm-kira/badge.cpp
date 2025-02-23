@@ -29,10 +29,12 @@ Ui::Child badge(BadgeStyle style, String t) {
 
 Ui::Child versionBadge() {
     Ui::Children badges = {};
-    badges.pushBack(Kr::badge(
-        Kr::BadgeStyle::INFO,
-        stringify$(__ck_version_value) ""s
-    ));
+    badges.pushBack(
+        Kr::badge(
+            Kr::BadgeStyle::INFO,
+            stringify$(__ck_version_value) ""s
+        )
+    );
 #ifdef __ck_branch_nightly__
     badges.pushBack(Kr::badge(Gfx::INDIGO400, "Nightly"s));
 #elif defined(__ck_branch_stable__)

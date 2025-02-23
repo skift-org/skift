@@ -183,7 +183,7 @@ struct Fill : public _Fills {
             },
             [&](Pixels const& pixels) {
                 e("(pixels {} {})", pixels.width(), pixels.height());
-            }
+            },
         });
     }
 };

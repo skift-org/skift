@@ -1,6 +1,15 @@
-#include "block.h"
+module;
 
-#include "layout.h"
+#include <karm-math/au.h>
+#include <vaev-base/break.h>
+#include <vaev-base/display.h>
+#include <vaev-base/insets.h>
+#include <vaev-base/sizing.h>
+
+export module Vaev.Layout:block;
+
+import :base;
+import :layout;
 
 namespace Vaev::Layout {
 
@@ -161,6 +170,7 @@ struct BlockFormatingContext : public FormatingContext {
 
         bool blockWasCompletelyLaidOut = false;
 
+        Au lastMarginBottom = 0_au;
         for (usize i = startAt; i < endChildren; ++i) {
             auto& c = box.children()[i];
 
@@ -194,7 +204,8 @@ struct BlockFormatingContext : public FormatingContext {
             }
 
             if (c.style->position != Position::ABSOLUTE) {
-                blockSize += margin.top;
+                // TODO: collapsed margins for sibling elements
+                blockSize += max(margin.top, lastMarginBottom) - lastMarginBottom;
                 if (input.fragment or input.knownSize.x)
                     childInput.knownSize.width = childInlineSize;
             }
@@ -214,6 +225,7 @@ struct BlockFormatingContext : public FormatingContext {
             );
             if (c.style->position != Position::ABSOLUTE) {
                 blockSize += output.size.y + margin.bottom;
+                lastMarginBottom = margin.bottom;
             }
 
             maybeProcessChildBreakpoint(
@@ -248,7 +260,7 @@ struct BlockFormatingContext : public FormatingContext {
     }
 };
 
-Rc<FormatingContext> constructBlockFormatingContext(Box&) {
+export Rc<FormatingContext> constructBlockFormatingContext(Box&) {
     return makeRc<BlockFormatingContext>();
 }
 

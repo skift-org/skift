@@ -26,4 +26,6 @@ using Padding = Math::Insets<CalcValue<PercentOr<Length>>>;
 // https://www.w3.org/TR/CSS22/visuren.html#propdef-left
 using Offsets = Math::Insets<Width>;
 
+using Gaps = Math::Vec2<CalcValue<PercentOr<Length>>>;
+
 } // namespace Vaev

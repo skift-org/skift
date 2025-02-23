@@ -180,8 +180,9 @@ constexpr T pow2(T x) {
     return x * x;
 }
 
-constexpr isize pow(isize a, isize b) {
-    isize result = 1;
+template <Meta::Integral T = isize, Precision = PRECISE>
+constexpr T pow(T a, T b) {
+    T result = 1;
     while (b > 0) {
         if (b & 1)
             result *= a;
@@ -189,6 +190,12 @@ constexpr isize pow(isize a, isize b) {
         b >>= 1;
     }
     return result;
+}
+
+template <Meta::Float T = f64, Precision = PRECISE>
+constexpr T pow(T a, T b) {
+    // FIXME: Don't use std::pow
+    return ::pow(a, b);
 }
 
 template <typename T>

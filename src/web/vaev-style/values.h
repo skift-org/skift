@@ -11,7 +11,9 @@
 #include <vaev-base/float.h>
 #include <vaev-base/font.h>
 #include <vaev-base/insets.h>
+#include <vaev-base/keywords.h>
 #include <vaev-base/length.h>
+#include <vaev-base/line.h>
 #include <vaev-base/media.h>
 #include <vaev-base/numbers.h>
 #include <vaev-base/overflow.h>
@@ -19,7 +21,8 @@
 #include <vaev-base/sizing.h>
 #include <vaev-base/table.h>
 #include <vaev-base/z-index.h>
-#include <vaev-css/parser.h>
+
+#include "css/parser.h"
 
 namespace Vaev::Style {
 
@@ -61,6 +64,11 @@ struct ValueParser<bool> {
 template <>
 struct ValueParser<Gfx::BorderStyle> {
     static Res<Gfx::BorderStyle> parse(Cursor<Css::Sst>& c);
+};
+
+template <>
+struct ValueParser<Border> {
+    static Res<Border> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
@@ -106,14 +114,14 @@ struct ValueParser<CalcValue<T>> {
                     content.next();
                 }
                 auto rhs = try$(parseVal(content));
-                return Ok(CalcValue<T>{lhs, op.unwrap(), rhs});
+                return Ok(CalcValue<T>{op.unwrap(), lhs, rhs});
             }
         }
 
         return Ok(try$(parseValue<T>(c)));
     }
 
-    static Res<typename CalcValue<T>::OpCode> parseOp(Cursor<Css::Sst>& c) {
+    static Res<CalcOp> parseOp(Cursor<Css::Sst>& c) {
         if (c.ended())
             return Error::invalidData("unexpected end of input");
 
@@ -124,16 +132,16 @@ struct ValueParser<CalcValue<T>> {
 
         if (c.peek().token.data == "+") {
             c.next();
-            return Ok(CalcValue<T>::OpCode::ADD);
+            return Ok(CalcOp::ADD);
         } else if (c.peek().token.data == "-") {
             c.next();
-            return Ok(CalcValue<T>::OpCode::SUBSTRACT);
+            return Ok(CalcOp::SUBSTRACT);
         } else if (c.peek().token.data == "*") {
             c.next();
-            return Ok(CalcValue<T>::OpCode::MULTIPLY);
+            return Ok(CalcOp::MULTIPLY);
         } else if (c.peek().token.data == "/") {
             c.next();
-            return Ok(CalcValue<T>::OpCode::DIVIDE);
+            return Ok(CalcOp::DIVIDE);
         }
         return Error::invalidData("unexpected operator");
     }
@@ -221,6 +229,11 @@ struct ValueParser<FontWidth> {
 };
 
 template <>
+struct ValueParser<Text::Family> {
+    static Res<Text::Family> parse(Cursor<Css::Sst>& c);
+};
+
+template <>
 struct ValueParser<Float> {
     static Res<Float> parse(Cursor<Css::Sst>& c);
 };
@@ -252,31 +265,43 @@ struct ValueParser<Math::Insets<T>> {
 
         auto right = parseValue<T>(c);
         if (not right)
-            return Ok(Math::Insets<T>{
-                top.take()
-            });
+            return Ok(Math::Insets<T>{top.take()});
 
         auto bottom = parseValue<T>(c);
         if (not bottom)
-            return Ok(Math::Insets<T>{
-                top.take(), right.take()
-            });
+            return Ok(Math::Insets<T>{top.take(), right.take()});
 
         auto left = parseValue<T>(c);
         if (not left)
-            return Ok(Math::Insets<T>{
-                top.take(), right.take(), bottom.take()
-            });
+            return Ok(Math::Insets<T>{top.take(), right.take(), bottom.take()});
 
-        return Ok(Math::Insets<T>{
-            top.take(), right.take(), bottom.take(), left.take()
-        });
+        return Ok(Math::Insets<T>{top.take(), right.take(), bottom.take(), left.take()});
+    }
+};
+
+template <StrLit K>
+struct ValueParser<Keyword<K>> {
+    static Res<Keyword<K>> parse(Cursor<Css::Sst>& c) {
+        if (c.ended())
+            return Error::invalidData("unexpected end of input");
+
+        if (c->token == Css::Token::ident(K)) {
+            c.next();
+            return Ok(Keyword<K>{});
+        }
+
+        return Error::invalidData("expected keyword");
     }
 };
 
 template <>
 struct ValueParser<Length> {
     static Res<Length> parse(Cursor<Css::Sst>& c);
+};
+
+template <>
+struct ValueParser<LineHeight> {
+    static Res<LineHeight> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
@@ -463,6 +488,11 @@ struct ValueParser<ReducedData> {
 template <>
 struct ValueParser<TableLayout> {
     static Res<TableLayout> parse(Cursor<Css::Sst>& c);
+};
+
+template <>
+struct ValueParser<Mime::Url> {
+    static Res<Mime::Url> parse(Cursor<Css::Sst>& c);
 };
 
 template <>

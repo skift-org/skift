@@ -277,7 +277,8 @@ constexpr auto iterRev(S const& slice) {
 
 template <MutSliceable S>
 constexpr auto mutIter(S& slice) {
-    return Iter([&slice, i = 0uz] mutable -> typename S::Inner* {
+    usize i = 0uz;
+    return Iter([&slice, i] mutable -> typename S::Inner* {
         if (i >= slice.len()) {
             return nullptr;
         }
@@ -288,7 +289,8 @@ constexpr auto mutIter(S& slice) {
 
 template <MutSliceable S>
 constexpr auto mutIterRev(S& slice) {
-    return Iter([&slice, i = slice.len()] mutable -> typename S::Inner* {
+    usize i = slice.len();
+    return Iter([&slice, i] mutable -> typename S::Inner* {
         if (i == 0) {
             return nullptr;
         }
@@ -299,7 +301,8 @@ constexpr auto mutIterRev(S& slice) {
 
 template <Sliceable S>
 constexpr auto iterSplit(S const& slice, typename S::Inner const& sep) {
-    return Iter([&slice, sep, i = 0uz] mutable -> Opt<Slice<typename S::Inner>> {
+    usize i = 0uz;
+    return Iter([&slice, sep, i] mutable -> Opt<Slice<typename S::Inner>> {
         if (i >= slice.len())
             return NONE;
 

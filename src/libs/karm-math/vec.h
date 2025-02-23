@@ -2,6 +2,7 @@
 
 #include <karm-base/clamp.h>
 #include <karm-io/emit.h>
+#include <karm-io/pack.h>
 
 #include "funcs.h"
 
@@ -708,3 +709,19 @@ bool epsilonEq(Vec4<T> const& lhs, Vec4<T> const& rhs, T epsilon) {
 }
 
 } // namespace Karm::Math
+
+template <typename T>
+struct Karm::Io::Packer<Math::Vec2<T>> {
+    static Res<> pack(Karm::Io::PackEmit& e, Math::Vec2<T> const& val) {
+        try$(Io::pack(e, val.x));
+        try$(Io::pack(e, val.y));
+        return Ok();
+    }
+
+    static Res<Math::Vec2<T>> unpack(Karm::Io::PackScan& s) {
+        return Ok(Math::Vec2<T>{
+            try$(Io::unpack<T>(s)),
+            try$(Io::unpack<T>(s)),
+        });
+    }
+};

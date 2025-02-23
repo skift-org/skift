@@ -6,7 +6,7 @@
 
 namespace Karm::Gfx {
 
-enum struct BorderStyle {
+enum struct BorderStyle : u8 {
     NONE,
 
     HIDDEN,

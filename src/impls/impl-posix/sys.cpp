@@ -442,6 +442,21 @@ Res<> exit(i32 res) {
     return Ok();
 }
 
+Res<Mime::Url> pwd() {
+    auto buf = Buf<char>::init(256);
+    while (true) {
+        if (::getcwd(buf.buf(), buf.len()) != NULL)
+            break;
+
+        if (errno != ERANGE)
+            return Posix::fromLastErrno();
+
+        buf.resize(buf.len() * 2);
+    }
+
+    return Ok(Mime::parseUrlOrPath(Str::fromNullterminated(buf.buf()), "file:"_url));
+}
+
 // MARK: Sandboxing ------------------------------------------------------------
 
 void hardenSandbox() {

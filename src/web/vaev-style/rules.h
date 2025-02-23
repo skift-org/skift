@@ -4,8 +4,8 @@
 #include "media.h"
 #include "origin.h"
 #include "page.h"
+#include "props.h"
 #include "selector.h"
-#include "styles.h"
 
 namespace Vaev::Style {
 

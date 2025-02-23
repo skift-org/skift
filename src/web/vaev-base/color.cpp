@@ -1,13 +1,10 @@
 #include "color.h"
 
+#include "karm-logger/logger.h"
+
 namespace Vaev {
 
 Opt<Color> parseNamedColor(Str name) {
-    if (eqCi(name, "transparent"s))
-        return TRANSPARENT;
-
-    if (eqCi(name, "currentColor"s))
-        return Color::CURRENT;
 
 #define COLOR(ID, NAME, ...)   \
     if (eqCi(name, #NAME ""s)) \
@@ -34,20 +31,51 @@ static Array<Gfx::Color, static_cast<usize>(SystemColor::_LEN)> SYSTEM_COLOR = {
 #undef COLOR
 };
 
-Gfx::Color resolve(Color c, Gfx::Color currentColor) {
-    switch (c.type) {
-    case Color::Type::SRGB:
-        return c.srgb;
+Gfx::Color resolve(ColorMix const& cm, Gfx::Color currentColor) {
+    Gfx::Color lhsColor = resolve(cm.lhs.color, currentColor);
+    Percent lhsPerc = cm.lhs.perc.unwrapOrElse([&] {
+        return Percent{100} - cm.rhs.perc.unwrapOr(Percent{50});
+    });
 
-    case Color::Type::SYSTEM:
-        return SYSTEM_COLOR[static_cast<usize>(c.system)];
+    Gfx::Color rhsColor = resolve(cm.rhs.color, currentColor);
+    Percent rhsPerc = cm.rhs.perc.unwrapOrElse([&] {
+        return Percent{100} - cm.lhs.perc.unwrapOr(Percent{50});
+    });
 
-    case Color::Type::CURRENT:
-        return currentColor;
-
-    default:
-        panic("Invalid color type");
+    if (lhsPerc == rhsPerc and lhsPerc == Percent{0}) {
+        logWarn("cannot mix colors when both have zero percentages");
+        return Gfx::WHITE;
     }
+
+    Percent rhsPercNorm = rhsPerc;
+
+    if (lhsPerc + rhsPerc != Percent{100})
+        rhsPercNorm = rhsPercNorm / (lhsPerc + rhsPerc);
+    else
+        rhsPercNorm /= Percent{100};
+
+    Gfx::Color resColor = cm.colorSpace.interpolate(lhsColor, rhsColor, rhsPercNorm.value());
+    if (lhsPerc + rhsPerc < Percent{100})
+        resColor = resColor.withOpacity((lhsPerc + rhsPerc).value() / 100.0);
+
+    return resColor;
+}
+
+Gfx::Color resolve(Color const& c, Gfx::Color currentColor) {
+    return c.visit(Visitor{
+        [&](Gfx::Color const& srgb) {
+            return srgb;
+        },
+        [&](CurrentColor) {
+            return currentColor;
+        },
+        [&](SystemColor const& system) {
+            return SYSTEM_COLOR[static_cast<usize>(system)];
+        },
+        [&](ColorMix const& mix) {
+            return resolve(mix, currentColor);
+        },
+    });
 }
 
 } // namespace Vaev

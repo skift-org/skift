@@ -13,7 +13,6 @@ struct Array {
     T _buf[N];
 
     always_inline static constexpr Array from(Sliceable<T> auto slice) {
-
         Array res{};
         for (usize i = 0; i < N; i++)
             res[i] = slice[i];
@@ -24,6 +23,12 @@ struct Array {
         return [&]<usize... Is>(std::index_sequence<Is...>) {
             return Array{f(Is)...};
         }(std::make_index_sequence<N>());
+    }
+
+    always_inline static constexpr Array fill(T value) {
+        return fill([&](usize) {
+            return value;
+        });
     }
 
     always_inline constexpr T& operator[](usize i) {

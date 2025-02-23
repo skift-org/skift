@@ -1,11 +1,15 @@
-#include "positioned.h"
+module;
 
-#include "layout.h"
-#include "values.h"
+#include <vaev-base/insets.h>
+
+export module Vaev.Layout:positioned;
+
+import :layout;
+import :values;
 
 namespace Vaev::Layout {
 
-void layoutPositioned(Tree& tree, Frag& frag, RectAu containingBlock) {
+export void layoutPositioned(Tree& tree, Frag& frag, RectAu containingBlock) {
     auto& style = frag.style();
     auto& metrics = frag.metrics;
 
@@ -42,4 +46,5 @@ void layoutPositioned(Tree& tree, Frag& frag, RectAu containingBlock) {
         layoutPositioned(tree, c, containingBlock);
     }
 }
+
 } // namespace Vaev::Layout

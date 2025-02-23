@@ -1,4 +1,11 @@
-#include "replaced.h"
+module;
+
+#include <karm-image/picture.h>
+#include <karm-math/au.h>
+
+export module Vaev.Layout:replaced;
+
+import :base;
 
 namespace Vaev::Layout {
 
@@ -31,7 +38,7 @@ struct ReplacedFormatingContext : public FormatingContext {
     }
 };
 
-Rc<FormatingContext> constructReplacedFormatingContext(Box&) {
+export Rc<FormatingContext> constructReplacedFormatingContext(Box&) {
     return makeRc<ReplacedFormatingContext>();
 }
 

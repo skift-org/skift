@@ -11,13 +11,9 @@ namespace Karm {
 /// A reference-counted object heap cell.
 template <typename L>
 struct _Cell {
-    static constexpr u64 MAGIC = 0xCAFEBABECAFEBABE;
-
-    u64 _magic = MAGIC;
-    L _lock;
-    bool _clear = false;
-    isize _strong = 0;
-    isize _weak = 0;
+    i32 _strong = 0;
+    i32 _weak = 0;
+    no_unique_address L _lock;
 
     virtual ~_Cell() = default;
 
@@ -27,25 +23,17 @@ struct _Cell {
 
     virtual Meta::Type<> inspect() = 0;
 
-    void collectAndRelease() {
-        if (_strong == 0 and not _clear) {
+    void collectAndRelease(bool collect) {
+        if (_strong == 0 and collect) {
             clear();
-            _clear = true;
         }
-
-        if (_strong == 0 and _weak == 0) {
-            _lock.release();
+        _lock.release();
+        if (_strong == 0 and _weak == 0)
             delete this;
-        } else {
-            _lock.release();
-        }
     }
 
     _Cell* refStrong() lifetimebound {
         LockScope scope(_lock);
-
-        if (_clear) [[unlikely]]
-            panic("refStrong() called on cleared cell");
 
         _strong++;
         if (_strong < 0) [[unlikely]]
@@ -61,7 +49,7 @@ struct _Cell {
         if (_strong < 0) [[unlikely]]
             panic("derefStrong() underflow");
 
-        collectAndRelease();
+        collectAndRelease(true);
     }
 
     _Cell* refWeak() lifetimebound {
@@ -81,14 +69,11 @@ struct _Cell {
         if (_weak < 0) [[unlikely]]
             panic("derefWeak() underflow");
 
-        collectAndRelease();
+        collectAndRelease(false);
     }
 
     template <typename T>
     T& unwrap() lifetimebound {
-        if (_clear) [[unlikely]]
-            panic("unwrap() called on cleared cell");
-
         return *static_cast<T*>(_unwrap());
     }
 };
@@ -356,7 +341,7 @@ struct _Weak {
     ///
     /// Returns `NONE` if the object has been deallocated.
     Opt<_Rc<L, T>> upgrade() const {
-        if (not _cell or _cell->_clear)
+        if (not _cell or _cell->_strong == 0)
             return NONE;
         return _Rc<L, T>(MOVE, _cell);
     }

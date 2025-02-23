@@ -16,7 +16,7 @@ Ui::Child number(f64 value, Ui::OnChange<f64> onChange, f64 step) {
                    Ui::ButtonStyle::subtle(),
                    Mdi::MINUS
                ),
-               Ui::labelMedium("{}", value) | Ui::insets({0, 4}) | Ui::center(),
+               Ui::labelMedium("{:.02}", value) | Ui::insets({0, 4}) | Ui::center(),
                Ui::button(
                    [onChange, value, step](auto& n) {
                        onChange(n, value + step);

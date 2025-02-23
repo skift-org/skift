@@ -140,7 +140,7 @@ struct BackgroundLayer {
 };
 
 struct BackgroundProps {
-    Color color;
+    Color color = TRANSPARENT;
     Vec<BackgroundLayer> layers = {};
 
     void repr(Io::Emit& e) const {

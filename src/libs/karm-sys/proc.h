@@ -13,6 +13,10 @@ inline Res<> sleepUntil(Instant until) {
     return _Embed::sleepUntil(until);
 }
 
+inline Res<Mime::Url> pwd() {
+    return _Embed::pwd();
+}
+
 // MARK: Sandboxing ------------------------------------------------------------
 
 void enterSandbox();

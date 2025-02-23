@@ -62,7 +62,7 @@ void Value::write(Io::Emit& e) const {
         },
         [&](auto const& v) {
             v.write(e);
-        }
+        },
     });
 }
 

@@ -9,7 +9,7 @@ using Percent = Distinct<f64, struct _PercentTag>;
 
 template <typename T>
 struct PercentOr {
-    enum Type {
+    enum Type : u8 {
         PERCENT,
         VALUE,
     };

@@ -1,3 +1,5 @@
+module;
+
 #include <karm-kira/resizable.h>
 #include <karm-kira/side-panel.h>
 #include <karm-ui/input.h>
@@ -11,11 +13,42 @@
 #include <vaev-dom/document-type.h>
 #include <vaev-dom/document.h>
 #include <vaev-dom/element.h>
-#include <vaev-style/styles.h>
+#include <vaev-style/props.h>
 
-#include "inspect.h"
+export module Vaev.Browser:inspect;
 
 namespace Vaev::Browser {
+
+export struct ExpandNode {
+    Gc::Ref<Dom::Node> node;
+};
+
+export struct SelectNode {
+    Gc::Ref<Dom::Node> node;
+};
+
+export using InspectorAction = Union<ExpandNode, SelectNode>;
+
+export struct InspectState {
+    Map<Gc::Ref<Dom::Node>, bool> expandedNodes = {};
+    Opt<Gc::Ref<Dom::Node>> selectedNode = NONE;
+
+    void apply(InspectorAction& a) {
+        a.visit(Visitor{
+            [&](ExpandNode e) {
+                if (expandedNodes.has(e.node))
+                    expandedNodes.del(e.node);
+                else
+                    expandedNodes.put(e.node, true);
+            },
+            [&](SelectNode e) {
+                if (e.node->hasChildren())
+                    expandedNodes.put(e.node, true);
+                selectedNode = e.node;
+            },
+        });
+    }
+};
 
 auto guide() {
     return Ui::hflow(
@@ -145,7 +178,7 @@ Ui::Child computedStyles() {
            Ui::pinSize(128);
 }
 
-Ui::Child inspect(Gc::Ref<Vaev::Dom::Document> n, InspectState const& s, Ui::Action<InspectorAction> a) {
+export Ui::Child inspect(Gc::Ref<Vaev::Dom::Document> n, InspectState const& s, Ui::Action<InspectorAction> a) {
     return Ui::vflow(
         node(n, s, a) | Ui::vscroll() | Ui::grow(),
         computedStyles() | Kr::resizable(Kr::ResizeHandle::TOP, {128}, NONE)

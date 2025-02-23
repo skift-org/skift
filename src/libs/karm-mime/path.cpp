@@ -69,9 +69,8 @@ Str Path::basename() const {
 }
 
 Path Path::join(Path const& other) const {
-    if (other.rooted) {
+    if (other.rooted)
         return other;
-    }
 
     Path path = *this;
     path._parts.pushBack(other._parts);

@@ -1,20 +1,28 @@
+module;
+
+#include <karm-base/box.h>
 #include <karm-scene/stack.h>
 #include <karm-sys/time.h>
-#include <vaev-layout/builder.h>
-#include <vaev-layout/layout.h>
-#include <vaev-layout/paint.h>
-#include <vaev-layout/positioned.h>
-#include <vaev-layout/values.h>
+#include <karm-text/book.h>
 #include <vaev-style/computer.h>
 
-#include "fetcher.h"
-#include "render.h"
+export module Vaev.Driver:render;
+
+import :fetcher;
+import Vaev.Layout;
 
 namespace Vaev::Driver {
 
 static constexpr bool DEBUG_RENDER = false;
 
-RenderResult render(Gc::Ref<Dom::Document> dom, Style::Media const& media, Layout::Viewport viewport) {
+export struct RenderResult {
+    Style::StyleBook style;
+    Rc<Layout::Box> layout;
+    Rc<Scene::Node> scenes;
+    Rc<Layout::Frag> frag;
+};
+
+export RenderResult render(Gc::Ref<Dom::Document> dom, Style::Media const& media, Layout::Viewport viewport) {
     Style::StyleBook stylebook;
     stylebook.add(
         fetchStylesheet("bundle://vaev-driver/html.css"_url, Style::Origin::USER_AGENT)
@@ -28,7 +36,13 @@ RenderResult render(Gc::Ref<Dom::Document> dom, Style::Media const& media, Layou
 
     start = Sys::now();
 
-    Style::Computer computer{media, stylebook};
+    Text::FontBook fontBook;
+    if (not fontBook.loadAll())
+        logWarn("not all fonts were properly loaded into fontbook");
+
+    Style::Computer computer{media, stylebook, fontBook};
+    computer.loadFontFaces();
+
     Layout::Tree tree = {
         Layout::build(computer, dom),
         viewport,

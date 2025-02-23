@@ -1,5 +1,8 @@
 #pragma once
 
+#include <karm-mime/url.h>
+
+#include "_forward.h"
 #include "tree.h"
 
 namespace Vaev::Dom {
@@ -41,19 +44,13 @@ struct Node : public Tree<Node> {
         return static_cast<T const*>(this);
     }
 
+    Mime::Url baseURI();
+
+    Gc::Ptr<Document> ownerDocument();
+
     virtual void _repr(Io::Emit&) const {}
 
-    void repr(Io::Emit& e) const {
-        e("({}", nodeType());
-        _repr(e);
-        if (hasChildren()) {
-            e.indentNewline();
-            for (auto child = firstChild(); child->hasNextSibling(); child = child->nextSibling())
-                child->repr(e);
-            e.deindent();
-        }
-        e(")\n");
-    }
+    void repr(Io::Emit& e) const;
 
     bool operator==(Node const& other) const {
         return this == &other;

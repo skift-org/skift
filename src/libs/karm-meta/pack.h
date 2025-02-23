@@ -92,4 +92,22 @@ always_inline static auto any(auto func) {
     return _Any<Ts...>::eval(func);
 }
 
+// MARK: First -----------------------------------------------------------------
+
+template <typename...>
+struct _First;
+
+template <typename T>
+struct _First<T> {
+    using Type = T;
+};
+
+template <typename T, typename... Ts>
+struct _First<T, Ts...> {
+    using Type = T;
+};
+
+template <typename... Ts>
+using First = typename _First<Ts...>::Type;
+
 } // namespace Karm::Meta

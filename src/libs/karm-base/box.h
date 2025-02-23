@@ -87,6 +87,14 @@ struct Box {
         return unwrap();
     }
 
+    constexpr operator T&() lifetimebound {
+        return unwrap();
+    }
+
+    constexpr operator T const&() const lifetimebound {
+        return unwrap();
+    }
+
     constexpr T const& unwrap() const lifetimebound {
         if (not _ptr) [[unlikely]]
             panic("deferencing moved from Box<T>");

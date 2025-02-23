@@ -30,5 +30,4 @@ concept Callable = requires(T f) {
     f(declval<Args>()...);
 };
 
-
 } // namespace Karm::Meta

@@ -47,7 +47,7 @@ struct Checkbox : public Ui::View<Checkbox> {
     }
 
     void event(App::Event& e) override {
-        if (_mouseListener.listen(*this, e)) {
+        if (_onChange and _mouseListener.listen(*this, e)) {
             _value = not _value;
             _onChange(*this, _value);
         }

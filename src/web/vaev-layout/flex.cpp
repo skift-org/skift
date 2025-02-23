@@ -1,7 +1,15 @@
-#include "flex.h"
+module;
 
-#include "layout.h"
-#include "values.h"
+#include <karm-logger/logger.h>
+#include <karm-math/au.h>
+#include <vaev-base/align.h>
+#include <vaev-base/flex.h>
+#include <vaev-base/sizing.h>
+
+export module Vaev.Layout:flex;
+
+import :layout;
+import :values;
 
 namespace Vaev::Layout {
 
@@ -1554,7 +1562,7 @@ struct FlexFormatingContext : public FormatingContext {
     }
 };
 
-Rc<FormatingContext> constructFlexFormatingContext(Box& box) {
+export Rc<FormatingContext> constructFlexFormatingContext(Box& box) {
     return makeRc<FlexFormatingContext>(*box.style->flex);
 }
 

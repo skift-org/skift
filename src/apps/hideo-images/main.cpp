@@ -1,6 +1,7 @@
 #include <karm-image/loader.h>
 #include <karm-kira/scaffold.h>
 #include <karm-sys/entry.h>
+#include <karm-sys/proc.h>
 #include <karm-ui/app.h>
 #include <karm-ui/dialog.h>
 #include <mdi/image.h>
@@ -33,7 +34,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
     Res<Image::Picture> image = Error::invalidInput("No image provided");
 
     if (args.len()) {
-        auto url = co_try$(Mime::parseUrlOrPath(args[0]));
+        auto url = Mime::parseUrlOrPath(args[0], co_try$(Sys::pwd()));
         image = Image::load(url);
 
         if (not image) {

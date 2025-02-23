@@ -97,6 +97,8 @@ Res<> sleepUntil(Instant);
 
 Res<> exit(i32);
 
+Res<Mime::Url> pwd();
+
 // MARK: Sandboxing ------------------------------------------------------------
 
 void hardenSandbox();

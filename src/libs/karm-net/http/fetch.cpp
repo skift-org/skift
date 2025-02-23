@@ -27,16 +27,18 @@ Async::Task<usize> _fetch(Mime::Url const& url, Sys::_Connection& conn, Io::Writ
     // Send request
     logDebug("GET {} HTTP/1.1", url.path);
     Io::StringWriter req;
-    co_try$(Io::format(
-        req,
-        "GET {} HTTP/1.1\r\n"
-        "Host: {}\r\n"
-        "Connection: close\r\n"
-        "User-Agent: Karm Web Fetch/" stringify$(__ck_version_value) "\r\n"
-                                                                     "\r\n",
-        url.path,
-        url.host
-    ));
+    co_try$(
+        Io::format(
+            req,
+            "GET {} HTTP/1.1\r\n"
+            "Host: {}\r\n"
+            "Connection: close\r\n"
+            "User-Agent: Karm Web Fetch/" stringify$(__ck_version_value) "\r\n"
+                                                                         "\r\n",
+            url.path,
+            url.host
+        )
+    );
 
     co_try$(conn.write(req.bytes()));
 

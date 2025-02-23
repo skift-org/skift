@@ -270,6 +270,15 @@ union Rect {
         );
     }
 
+    always_inline Rect<T> round() {
+        return {
+            Math::round(x),
+            Math::round(y),
+            Math::round(width),
+            Math::round(height)
+        };
+    }
+
     always_inline constexpr bool hasNan() const {
         return xy.hasNan() or wh.hasNan();
     }

@@ -3,6 +3,7 @@
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
+#include <karm-sys/proc.h>
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto& args = useArgs(ctx);
@@ -11,7 +12,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
         co_return Error::invalidInput("Usage: handover-dump <elf-file>");
     }
 
-    auto url = co_try$(Mime::parseUrlOrPath(args[0]));
+    auto url = Mime::parseUrlOrPath(args[0], co_try$(Sys::pwd()));
     auto kernelFile = co_try$(Sys::File::open(url));
     auto kernelMem = co_try$(Sys::mmap().read().map(kernelFile));
     Elf::Image kernelElf{kernelMem.bytes()};

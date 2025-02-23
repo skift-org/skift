@@ -20,27 +20,13 @@ enum struct BorderEdge {
     START,
 };
 
-enum struct BorderStyle {
-    NONE,
-
-    HIDDEN,
-    DOTTED,
-    DASHED,
-    SOLID,
-    DOUBLE,
-    GROOVE,
-    RIDGE,
-    INSET,
-    OUTSET,
-};
-
 struct Border {
     CalcValue<Length> width;
     Gfx::BorderStyle style;
-    Color color = Color::CURRENT;
+    Color color = CURRENT_COLOR;
 
     void repr(Io::Emit& e) const {
-        e("{}-{}-{}", width, style, color);
+        e("(border {} {} {})", width, style, color);
     }
 };
 
@@ -77,7 +63,7 @@ struct BorderProps {
     }
 
     void repr(Io::Emit& e) const {
-        e("(border");
+        e("(borders");
         e(" top={}", top);
         e(" start={}", start);
         e(" bottom={}", bottom);

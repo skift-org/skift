@@ -13,12 +13,9 @@ struct Union {
     static_assert(sizeof...(Ts) <= 255, "Union can only hold up to 255 types");
 
     alignas(max(alignof(Ts)...)) char _buf[max(sizeof(Ts)...)];
-
-    /// Values outside of [0, sizeof...(Ts)) are valid but undefined
-    /// they are used as a niche value to indicate that the union is empty
     u8 _index;
 
-    always_inline Union() = delete;
+    always_inline Union() = delete("union must be initialized with a value");
 
     template <Meta::Contains<Ts...> T>
     always_inline Union(T const& value)

@@ -90,6 +90,26 @@ struct Color {
         }
     }
 
+    always_inline constexpr Color premultiply() const {
+        f64 a = alpha / 255.0f;
+        return {
+            static_cast<u8>(round(red * a)),
+            static_cast<u8>(round(green * a)),
+            static_cast<u8>(round(blue * a)),
+            static_cast<u8>(round(alpha)),
+        };
+    }
+
+    always_inline constexpr Color unpremultiply() const {
+        f64 a = alpha / 255.0f;
+        return {
+            static_cast<u8>(round(red / a)),
+            static_cast<u8>(round(green / a)),
+            static_cast<u8>(round(blue / a)),
+            static_cast<u8>(round(alpha)),
+        };
+    }
+
     always_inline constexpr Color lerpWith(Color const other, f64 const t) const {
         return {
             static_cast<u8>(red + (other.red - red) * t),
@@ -105,6 +125,15 @@ struct Color {
             static_cast<u8>(green),
             static_cast<u8>(blue),
             static_cast<u8>(alpha * opacity),
+        };
+    }
+
+    always_inline constexpr Color withAlpha(u8 const alpha) const {
+        return {
+            static_cast<u8>(red),
+            static_cast<u8>(green),
+            static_cast<u8>(blue),
+            alpha,
         };
     }
 
@@ -163,6 +192,47 @@ struct Hsv {
 Hsv rgbToHsv(Color color);
 
 Color hsvToRgb(Hsv hsv);
+
+struct Hsl {
+    f64 hue, saturation, lightness;
+
+    Hsl(f64 hue, f64 saturation, f64 lightness)
+        : hue(fmod(hue, 360.0f)),
+          saturation(clamp01(saturation)),
+          lightness(clamp01(lightness)) {}
+
+    Hsl withHue(f64 hue) const {
+        return {hue, saturation, lightness};
+    }
+
+    Hsl withSaturation(f64 saturation) const {
+        return {hue, saturation, lightness};
+    }
+
+    Hsl withLightness(f64 lightness) const {
+        return {hue, saturation, lightness};
+    }
+
+    always_inline Hsl lerpWith(Hsl const other, f64 const t) const {
+        return {
+            fmod(hue + (other.hue - hue) * t, 360.0f),
+            saturation + (other.saturation - saturation) * t,
+            lightness + (other.lightness - lightness) * t,
+        };
+    }
+
+    auto operator<=>(Hsl const& other) const = default;
+
+    bool operator==(Hsl const& other) const = default;
+
+    void repr(Io::Emit& e) const {
+        e("(hsl {} {} {})", hue, saturation, lightness);
+    }
+};
+
+Hsl rgbToHsl(Color color);
+
+Color hslToRgb(Hsl hsl);
 
 struct YCbCr {
     f32 y, cb, cr;

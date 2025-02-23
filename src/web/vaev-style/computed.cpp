@@ -19,6 +19,7 @@ void Computed::repr(Io::Emit& e) const {
     e(" borders: {}", borders);
     e(" margin: {}", margin);
     e(" padding: {}", padding);
+    e(" boxSizing: {}", boxSizing);
     e(" sizing: {}", sizing);
     e(" overflows: {}", overflows);
     e(" position: {}", position);

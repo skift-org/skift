@@ -85,8 +85,9 @@ struct PdfPrinter : public FilePrinter {
                     {
                         "Resources"s,
                         Pdf::Dict{
-                            {"Font"s,
-                             pageFontsDict
+                            {
+                                "Font"s,
+                                pageFontsDict,
                             },
                         },
                     }

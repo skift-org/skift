@@ -1,16 +1,22 @@
-#include "writing.h"
+module;
+
+#include <vaev-base/writing.h>
+
+export module Vaev.Layout:writing;
+
+import :base;
 
 namespace Vaev::Layout {
 
 // https://drafts.csswg.org/css-writing-modes-4/#inline-axis
-Axis mainAxis(Box const&) {
+export Axis mainAxis(Box const&) {
     // TODO: Deduce axis
 
     return Axis::HORIZONTAL;
 }
 
 // https://drafts.csswg.org/css-writing-modes-4/#block-axis
-Axis crossAxis(Box const&) {
+export Axis crossAxis(Box const&) {
     // TODO: Deduce axis
 
     return Axis::VERTICAL;

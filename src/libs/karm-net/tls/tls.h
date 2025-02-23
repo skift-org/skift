@@ -11,7 +11,7 @@
 
 namespace Tls {
 
-struct CipherSuite : public Distinct<u16be, struct _CipherSuite> {
+struct CipherSuite : public Distinct<u16be, struct _CipherSuiteTag> {
     using Distinct::Distinct;
     static CipherSuite TLS_AES_128_GCM_SHA256;
 };

@@ -19,9 +19,10 @@ test$("test-specificity-selector-list") {
 
     Rule rule = makeRule();
 
+    Text::FontBook fontBook;
     StyleBook stylebook;
     Media media;
-    Computer computer{media, stylebook};
+    Computer computer{media, stylebook, fontBook};
 
     {
         Dom::Element elZeroMatches{Dom::Element(Html::DIV)};

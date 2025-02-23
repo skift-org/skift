@@ -1,5 +1,6 @@
 #include <karm-pkg/_embed.h>
 #include <karm-sys/_embed.h>
+#include <karm-sys/proc.h>
 
 #include "utils.h"
 
@@ -9,9 +10,9 @@ Res<Vec<String>> installedBundles() {
     auto [repo, format] = try$(Posix::repoRoot());
     Mime::Url repoRoot;
     if (format == Posix::RepoType::CUTEKIT) {
-        repoRoot = try$(Mime::parseUrlOrPath(repo));
+        repoRoot = Mime::parseUrlOrPath(repo, try$(Sys::pwd()));
     } else if (format == Posix::RepoType::PREFIX) {
-        repoRoot = try$(Mime::parseUrlOrPath(repo))
+        repoRoot = Mime::parseUrlOrPath(repo, try$(Sys::pwd()))
                        .join("share");
     } else {
         return Error::notFound("unknown repo type");

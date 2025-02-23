@@ -169,6 +169,10 @@ Res<> exit(i32) {
     notImplemented();
 }
 
+Res<Mime::Url> pwd() {
+    return Ok("file:/"_url);
+}
+
 // MARK: Sandboxing ------------------------------------------------------------
 
 void hardenSandbox() {

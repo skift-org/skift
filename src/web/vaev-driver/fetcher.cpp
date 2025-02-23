@@ -1,15 +1,20 @@
+module;
+
+#include <karm-gc/heap.h>
 #include <karm-mime/mime.h>
+#include <karm-mime/url.h>
 #include <karm-sys/dir.h>
 #include <karm-sys/file.h>
+#include <vaev-dom/document.h>
 #include <vaev-dom/html/parser.h>
 #include <vaev-dom/xml/parser.h>
 #include <vaev-style/stylesheet.h>
 
-#include "fetcher.h"
+export module Vaev.Driver:fetcher;
 
 namespace Vaev::Driver {
 
-Res<Gc::Ref<Dom::Document>> loadDocument(Gc::Heap& heap, Mime::Url const& url, Mime::Mime const& mime, Io::Reader& reader) {
+export Res<Gc::Ref<Dom::Document>> loadDocument(Gc::Heap& heap, Mime::Url const& url, Mime::Mime const& mime, Io::Reader& reader) {
     auto dom = heap.alloc<Dom::Document>(url);
     auto buf = try$(Io::readAllUtf8(reader));
 
@@ -36,7 +41,7 @@ Res<Gc::Ref<Dom::Document>> loadDocument(Gc::Heap& heap, Mime::Url const& url, M
     }
 }
 
-Res<Gc::Ref<Dom::Document>> viewSource(Gc::Heap& heap, Mime::Url const& url) {
+export Res<Gc::Ref<Dom::Document>> viewSource(Gc::Heap& heap, Mime::Url const& url) {
     auto file = try$(Sys::File::open(url));
     auto buf = try$(Io::readAllUtf8(file));
 
@@ -88,7 +93,7 @@ Res<Gc::Ref<Dom::Document>> indexOf(Gc::Heap& heap, Mime::Url const& url) {
     return Ok(dom);
 }
 
-Res<Gc::Ref<Dom::Document>> fetchDocument(Gc::Heap& heap, Mime::Url const& url) {
+export Res<Gc::Ref<Dom::Document>> fetchDocument(Gc::Heap& heap, Mime::Url const& url) {
     if (url.scheme == "about") {
         if (url.path.str() == "blank")
             return fetchDocument(heap, "bundle://vaev-driver/blank.xhtml"_url);
@@ -114,14 +119,14 @@ Res<Gc::Ref<Dom::Document>> fetchDocument(Gc::Heap& heap, Mime::Url const& url) 
     }
 }
 
-Res<Style::StyleSheet> fetchStylesheet(Mime::Url url, Style::Origin origin) {
+export Res<Style::StyleSheet> fetchStylesheet(Mime::Url url, Style::Origin origin) {
     auto file = try$(Sys::File::open(url));
     auto buf = try$(Io::readAllUtf8(file));
     Io::SScan s{buf};
     return Ok(Style::StyleSheet::parse(s, origin));
 }
 
-void fetchStylesheets(Gc::Ref<Dom::Node> node, Style::StyleBook& sb) {
+export void fetchStylesheets(Gc::Ref<Dom::Node> node, Style::StyleBook& sb) {
     auto el = node->is<Dom::Element>();
     if (el and el->tagName == Html::STYLE) {
         auto text = el->textContent();
@@ -137,15 +142,10 @@ void fetchStylesheets(Gc::Ref<Dom::Node> node, Style::StyleBook& sb) {
                 return;
             }
 
-            auto url = Mime::parseUrlOrPath(*href);
-            if (not url) {
-                logWarn("link element href attribute is not a valid URL: {}", *href);
-                return;
-            }
-
-            auto sheet = fetchStylesheet(url.take(), Style::Origin::AUTHOR);
+            auto url = Mime::parseUrlOrPath(*href, node->baseURI());
+            auto sheet = fetchStylesheet(url, Style::Origin::AUTHOR);
             if (not sheet) {
-                logWarn("failed to fetch stylesheet: {}", sheet);
+                logWarn("failed to fetch stylesheet from {}: {}", url, sheet);
                 return;
             }
 

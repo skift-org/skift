@@ -1,7 +1,7 @@
 #pragma once
 
 #include "origin.h"
-#include "styles.h"
+#include "props.h"
 
 namespace Vaev::Style {
 

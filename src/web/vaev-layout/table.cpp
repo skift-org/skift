@@ -1,11 +1,19 @@
-#include "table.h"
+module;
 
-#include "layout.h"
-#include "values.h"
+#include <karm-math/au.h>
+#include <vaev-base/break.h>
+#include <vaev-base/display.h>
+#include <vaev-base/sizing.h>
+#include <vaev-base/table.h>
+
+export module Vaev.Layout:table;
+
+import :layout;
+import :values;
 
 namespace Vaev::Layout {
 
-void advanceUntil(MutCursor<Box>& cursor, Func<bool(Display)> pred) {
+void advanceUntil(MutCursor<Box>& cursor, auto pred) {
     while (not cursor.ended() and not pred(cursor->style->display))
         cursor.next();
 }
@@ -1111,12 +1119,7 @@ struct TableFormatingContext : public FormatingContext {
         if (rowIsFreelyFragmentable) {
             // breakpoint inside of row, take in consideration ALL breakpoints
             // should stay in this row next fragmentation
-            currentBreakpoint.overrideIfBetter(Breakpoint::fromChildren(
-                outputRow.breakpoints,
-                i + 1,
-                avoidBreakInsideRow or avoidBreakInsideRowGroup or avoidBreakInsideTable,
-                false
-            ));
+            currentBreakpoint.overrideIfBetter(Breakpoint::fromChildren(outputRow.breakpoints, i + 1, avoidBreakInsideRow or avoidBreakInsideRowGroup or avoidBreakInsideTable, false));
         }
 
         // we need to abort layout if we cannot fit cells on their last row
@@ -1133,20 +1136,12 @@ struct TableFormatingContext : public FormatingContext {
                     outputRow.breakpoints[j] = NONE;
             }
 
-            currentBreakpoint.overrideIfBetter(Breakpoint::fromChildren(
-                outputRow.breakpoints,
-                i + 1,
-                avoidBreakInsideRow or avoidBreakInsideRowGroup or avoidBreakInsideTable,
-                true
-            ));
+            currentBreakpoint.overrideIfBetter(Breakpoint::fromChildren(outputRow.breakpoints, i + 1, avoidBreakInsideRow or avoidBreakInsideRowGroup or avoidBreakInsideTable, true));
 
         } else {
 
             // no cells are being split
-            currentBreakpoint.overrideIfBetter(Breakpoint::classB(
-                i + 1,
-                avoidBreakInsideTable
-            ));
+            currentBreakpoint.overrideIfBetter(Breakpoint::classB(i + 1, avoidBreakInsideTable));
         }
 
         return true;

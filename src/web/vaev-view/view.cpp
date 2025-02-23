@@ -1,10 +1,21 @@
-#include <karm-ui/view.h>
-#include <vaev-driver/render.h>
-#include <vaev-layout/paint.h>
+module;
 
-#include "view.h"
+#include <karm-gc/root.h>
+#include <karm-ui/node.h>
+#include <karm-ui/view.h>
+#include <vaev-dom/document.h>
+#include <vaev-style/media.h>
+
+export module Vaev.View:view;
+
+import Vaev.Driver;
+import Vaev.Layout;
 
 namespace Vaev::View {
+
+export struct ViewProps {
+    bool wireframe = false;
+};
 
 struct View : public Ui::View<View> {
     Gc::Root<Dom::Document> _dom;
@@ -98,7 +109,7 @@ struct View : public Ui::View<View> {
     }
 };
 
-Ui::Child view(Gc::Root<Dom::Document> dom, ViewProps props) {
+export Ui::Child view(Gc::Root<Dom::Document> dom, ViewProps props) {
     return makeRc<View>(dom, props);
 }
 

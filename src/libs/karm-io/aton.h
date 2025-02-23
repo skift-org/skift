@@ -114,7 +114,7 @@ static inline Opt<f64> atof(_SScan<E>& s, AtoxOptions const& options = {}) {
             exp = maybeExp.unwrap();
     }
 
-    auto result = ipart + fpart * pow(options.base, exp);
+    auto result = (ipart + fpart) * pow(options.base, exp);
     if (neg)
         return -result;
     return result;

@@ -2,6 +2,7 @@
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <karm-sys/mmap.h>
+#include <karm-sys/proc.h>
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto& args = useArgs(ctx);
@@ -10,7 +11,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
         co_return Error::invalidInput("Usage: dtb-dump <dtb-file>");
     }
 
-    auto url = co_try$(Mime::parseUrlOrPath(args[0]));
+    auto url = Mime::parseUrlOrPath(args[0], co_try$(Sys::pwd()));
     auto dtbFile = co_try$(Sys::File::open(url));
     auto dtbMem = co_try$(Sys::mmap().read().map(dtbFile));
     auto dtb = co_try$(DeviceTree::Blob::load(dtbMem.bytes()));

@@ -116,11 +116,11 @@ struct Easing {
     }
 
     static f64 exponentialIn(f64 p) {
-        return (p == 0.0) ? p : pow(2, 10 * (p - 1));
+        return (p == 0.0) ? p : pow<f64>(2, 10 * (p - 1));
     }
 
     static f64 exponentialOut(f64 p) {
-        return (p == 1.0) ? p : 1 - pow(2, -10 * p);
+        return (p == 1.0) ? p : 1 - pow<f64>(2, -10 * p);
     }
 
     static f64 exponentialInOut(f64 p) {
@@ -129,26 +129,26 @@ struct Easing {
         }
 
         if (p < 0.5) {
-            return 0.5 * pow(2, (20 * p) - 10);
+            return 0.5 * pow<f64>(2, (20 * p) - 10);
         }
 
-        return -0.5 * pow(2, (-20 * p) + 10) + 1;
+        return -0.5 * pow<f64>(2, (-20 * p) + 10) + 1;
     }
 
     static f64 elasticIn(f64 p) {
-        return sin(13 * Math::TAU * p) * pow(2, 10 * (p - 1));
+        return sin(13 * Math::TAU * p) * pow<f64>(2, 10 * (p - 1));
     }
 
     static f64 elasticOut(f64 p) {
-        return sin(-13 * Math::TAU * (p + 1)) * pow(2, -10 * p) + 1;
+        return sin(-13 * Math::TAU * (p + 1)) * pow<f64>(2, -10 * p) + 1;
     }
 
     static f64 elasticInOut(f64 p) {
         if (p < 0.5) {
-            return 0.5 * sin(13 * Math::TAU * (2 * p)) * pow(2, 10 * ((2 * p) - 1));
+            return 0.5 * sin(13 * Math::TAU * (2 * p)) * pow<f64>(2, 10 * ((2 * p) - 1));
         }
 
-        return 0.5 * (sin(-13 * Math::TAU * ((2 * p - 1) + 1)) * pow(2, -10 * (2 * p - 1)) + 2);
+        return 0.5 * (sin(-13 * Math::TAU * ((2 * p - 1) + 1)) * pow<f64>(2, -10 * (2 * p - 1)) + 2);
     }
 
     static f64 backIn(f64 p) {

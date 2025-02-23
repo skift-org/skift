@@ -3,9 +3,11 @@
     "id": "vaev-style",
     "type": "lib",
     "description": "The Stylish styling engine",
+    "subdirs": [
+        "css"
+    ],
     "requires": [
         "vaev-base",
-        "vaev-css",
         "vaev-dom"
     ]
 }

@@ -13,30 +13,34 @@
 #include <vaev-base/insets.h>
 #include <vaev-base/line.h>
 #include <vaev-base/numbers.h>
+#include <vaev-base/outline.h>
 #include <vaev-base/overflow.h>
 #include <vaev-base/sizing.h>
 #include <vaev-base/table.h>
 #include <vaev-base/text.h>
 #include <vaev-base/visibility.h>
 #include <vaev-base/z-index.h>
-#include <vaev-css/parser.h>
+
+#include "css/parser.h"
 
 namespace Vaev::Style {
 
 struct Computed {
     static Computed const& initial();
 
-    Color color;
+    Gfx::Color color;
     Number opacity;
     String content = ""s;
 
     AlignProps aligns;
-    Math::Vec2<CalcValue<PercentOr<Length>>> gaps;
+    Cow<Gaps> gaps;
 
     Cow<BackgroundProps> backgrounds;
     Cow<BorderProps> borders;
     Cow<Margin> margin;
+    Cow<Outline> outline;
     Cow<Padding> padding;
+    BoxSizing boxSizing;
     Cow<SizingProps> sizing;
     Overflows overflows;
 

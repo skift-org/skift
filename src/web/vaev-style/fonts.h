@@ -2,8 +2,9 @@
 
 #include <karm-mime/url.h>
 #include <vaev-base/font.h>
-#include <vaev-css/parser.h>
 
+#include "base.h"
+#include "css/parser.h"
 #include "values.h"
 
 namespace Vaev::Style {
@@ -17,7 +18,7 @@ struct FontFace {
 
     Union<None, FontStyle, Range<Angle>> style = FontStyle{FontStyle::NORMAL};
 
-    Opt<Range<FontWeight>> weight = FontWeight::NORMAL;
+    Opt<Range<Text::FontWeight>> weight = Text::FontWeight::REGULAR;
     Opt<Range<FontWidth>> width = FontWidth::NORMAL;
 
     Vec<Range<Rune>> unicodeRange;
@@ -78,6 +79,70 @@ struct SrcDesc {
         return Vec<FontSource>{};
     }
 
+    void apply(FontFace& f) {
+        f.sources = value;
+    }
+
+    Res<> parse(Cursor<Css::Sst>& c) {
+        Vec<FontSource> fontSrcs;
+        while (true) {
+            eatWhitespace(c);
+            if (c.ended())
+                return Error::invalidData("unexpected end of input");
+
+            if (c.peek() == Css::Sst::FUNC and c.peek().prefix == Css::Token::function("local(")) {
+                auto func = c.next();
+                auto localFuncScan = Cursor<Css::Sst>{func.content};
+                auto familyName = try$(parseValue<Text::Family>(localFuncScan));
+                fontSrcs.pushBack(familyName);
+                continue;
+            }
+
+            auto fontSrc = fontSrcs.emplaceBack(try$(parseValue<Mime::Url>(c)));
+            eatWhitespace(c);
+
+            if (not c.ended() and c.peek() == Css::Sst::FUNC and c.peek().prefix == Css::Token::function("format(")) {
+                auto formatScan = Cursor<Css::Sst>{c.next().content};
+
+                eatWhitespace(formatScan);
+
+                if (formatScan.ended())
+                    return Error::invalidData("unexpected end of input");
+
+                if (formatScan.peek() == Css::Token::STRING) {
+                    fontSrc.format = formatScan.next().token.data;
+                } else if (
+                    formatScan.peek() == Css::Token::ident("collection") or
+                    formatScan.peek() == Css::Token::ident("opentype") or
+                    formatScan.peek() == Css::Token::ident("svg") or
+                    formatScan.peek() == Css::Token::ident("truetype") or
+                    formatScan.peek() == Css::Token::ident("embedded-opentype") or
+                    formatScan.peek() == Css::Token::ident("woff") or
+                    formatScan.peek() == Css::Token::ident("woff2")
+                ) {
+                    fontSrc.format = formatScan.next().token.data;
+                }
+            }
+
+            eatWhitespace(c);
+
+            if (not c.ended() and c.peek() == Css::Sst::FUNC and c.peek().prefix == Css::Token::function("tech")) {
+                // TODO: https://www.w3.org/TR/css-fonts-4/#font-tech-values
+            }
+
+            eatWhitespace(c);
+            if (c.ended())
+                break;
+
+            if (not c.skip(Css::Token::Type::COMMA))
+                return Error::invalidData("expected comma separating font srcs");
+        }
+
+        value = std::move(fontSrcs);
+
+        return Ok();
+    }
+
     void apply(FontFace& f) const {
         f.sources = value;
     }
@@ -122,11 +187,11 @@ struct FontStyleDesc {
 // MARK: font-weight
 // https://www.w3.org/TR/css-fonts-4/#font-weight-desc
 struct FontWeightDesc {
-    Opt<Range<FontWeight>> value;
+    Opt<Range<Text::FontWeight>> value;
 
     static Str name() { return "font-weight"; }
 
-    static auto initial() { return FontWeight::NORMAL; }
+    static auto initial() { return Text::FontWeight::REGULAR; }
 
     void apply(FontFace& f) const {
         f.weight = value;
@@ -139,14 +204,22 @@ struct FontWeightDesc {
         }
 
         auto weight = try$(parseValue<FontWeight>(c));
+        if (weight.isRelative())
+            return Error::invalidData("font weight desciptors should use absolute font weight values");
 
         auto val = parseValue<FontWeight>(c);
         if (not val) {
-            value = weight;
+            value = weight.unwrap<Text::FontWeight>();
             return Ok();
         }
 
-        value = Range<FontWeight>::fromStartEnd(weight, val.unwrap());
+        if (val.unwrap().isRelative())
+            return Error::invalidData("font weight desciptors should use absolute font weight values");
+
+        value = Range<Text::FontWeight>::fromStartEnd(
+            weight.unwrap<Text::FontWeight>(),
+            val.unwrap().unwrap<Text::FontWeight>()
+        );
 
         return Ok();
     }

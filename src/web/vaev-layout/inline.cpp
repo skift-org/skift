@@ -1,4 +1,10 @@
-#include "inline.h"
+module;
+
+#include <karm-text/prose.h>
+
+export module Vaev.Layout:inline_;
+
+import :base;
 
 namespace Vaev::Layout {
 
@@ -38,7 +44,7 @@ struct InlineFormatingContext : public FormatingContext {
     }
 };
 
-Rc<FormatingContext> constructInlineFormatingContext(Box&) {
+export Rc<FormatingContext> constructInlineFormatingContext(Box&) {
     return makeRc<InlineFormatingContext>();
 }
 

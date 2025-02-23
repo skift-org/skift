@@ -72,8 +72,9 @@ struct HsvSquare : public Ui::View<HsvSquare> {
         g.fill(Math::Ellipsef{pos.cast<f64>(), 8.});
 
         g.strokeStyle(
-            Gfx::stroke(Gfx::BLACK
-                            .withOpacity(0.25))
+            Gfx::stroke(
+                Gfx::BLACK.withOpacity(0.25)
+            )
                 .withWidth(1)
                 .withAlign(Gfx::OUTSIDE_ALIGN)
         );

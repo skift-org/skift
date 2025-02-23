@@ -50,6 +50,12 @@ test$("atof") {
     expect$(Math::epsilonEq(try$(Io::atof("-0.1"s)), -0.1));
     expect$(Math::epsilonEq(try$(Io::atof("-0.5"s)), -0.5));
 
+    expect$(Math::epsilonEq(try$(Io::atof("2.5e3"s)), 2500.0));
+    expect$(Math::epsilonEq(try$(Io::atof("-1.0e6"s)), -1000000.0));
+    expect$(Math::epsilonEq(try$(Io::atof("3e0"s)), 3.0));
+    expect$(Math::epsilonEq(try$(Io::atof("-7.89e2"s)), -789.0));
+    expect$(Math::epsilonEq(try$(Io::atof("5.00e-3"s)), 0.005));
+
     return Ok();
 }
 

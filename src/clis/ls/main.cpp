@@ -1,6 +1,7 @@
 #include <karm-cli/args.h>
 #include <karm-sys/dir.h>
 #include <karm-sys/entry.h>
+#include <karm-sys/proc.h>
 
 namespace Ls {
 
@@ -32,7 +33,7 @@ Res<> ls(Slice<Str> paths, Options const& options) {
     for (auto& path : paths) {
         if (paths.len() > 1)
             Sys::println("{}:", path);
-        auto url = try$(Mime::parseUrlOrPath(path));
+        auto url = Mime::parseUrlOrPath(path, try$(Sys::pwd()));
         try$(ls(url, options));
     }
 
@@ -66,7 +67,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
     if (argsOperands.unwrap())
         co_try$(Ls::ls(argsOperands.unwrap(), options));
     else
-        co_try$(Ls::ls(co_try$(Mime::parseUrlOrPath(".")), options));
+        co_try$(Ls::ls(Mime::parseUrlOrPath(".", co_try$(Sys::pwd())), options));
 
     co_return Ok();
 }

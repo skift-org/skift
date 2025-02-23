@@ -1,5 +1,6 @@
-#include "computer.h"
 #include <vaev-style/decls.h>
+
+#include "computer.h"
 
 namespace Vaev::Style {
 
@@ -16,37 +17,49 @@ Computed const& Computed::initial() {
 }
 
 void Computer::_evalRule(Rule const& rule, Gc::Ref<Dom::Element> el, MatchingRules& matches) {
-    rule.visit(Visitor{
-        [&](StyleRule const& r) {
-            if (auto specificity = r.match(el))
-                matches.pushBack({&r, specificity.unwrap()});
-        },
-        [&](MediaRule const& r) {
-            if (r.match(_media))
-                for (auto const& subRule : r.rules)
-                    _evalRule(subRule, el, matches);
-        },
-        [&](auto const&) {
-            // Ignore other rule types
-        }
-    });
+    rule.visit(Visitor{[&](StyleRule const& r) {
+                           if (auto specificity = r.match(el))
+                               matches.pushBack({&r, specificity.unwrap()});
+                       },
+                       [&](MediaRule const& r) {
+                           if (r.match(_media))
+                               for (auto const& subRule : r.rules)
+                                   _evalRule(subRule, el, matches);
+                       },
+                       [&](auto const&) {
+                           // Ignore other rule types
+                       }});
 }
 
 void Computer::_evalRule(Rule const& rule, Page const& page, PageComputedStyle& c) {
-    rule.visit(Visitor{
-        [&](PageRule const& r) {
-            if (r.match(page))
-                r.apply(c);
-        },
-        [&](MediaRule const& r) {
-            if (r.match(_media))
-                for (auto const& subRule : r.rules)
-                    _evalRule(subRule, page, c);
-        },
-        [&](auto const&) {
-            // Ignore other rule types
-        }
-    });
+    rule.visit(Visitor{[&](PageRule const& r) {
+                           if (r.match(page))
+                               r.apply(c);
+                       },
+                       [&](MediaRule const& r) {
+                           if (r.match(_media))
+                               for (auto const& subRule : r.rules)
+                                   _evalRule(subRule, page, c);
+                       },
+                       [&](auto const&) {
+                           // Ignore other rule types
+                       }});
+}
+
+void Computer::_evalRule(Rule const& rule, Vec<FontFace>& fontFaces) {
+    rule.visit(Visitor{[&](FontFaceRule const& r) {
+                           auto& fontFace = fontFaces.emplaceBack();
+                           for (auto const& decl : r.descs)
+                               decl.apply(fontFace);
+                       },
+                       [&](MediaRule const& r) {
+                           if (r.match(_media))
+                               for (auto const& subRule : r.rules)
+                                   _evalRule(subRule, fontFaces);
+                       },
+                       [&](auto const&) {
+                           // Ignore other rule types
+                       }});
 }
 
 Rc<Computed> Computer::_evalCascade(Computed const& parent, MatchingRules& matchingRules) {
@@ -119,6 +132,43 @@ Rc<PageComputedStyle> Computer::computeFor(Computed const& parent, Page const& p
             _evalRule(rule, page, *computed);
 
     return computed;
+}
+
+void Computer::loadFontFaces() {
+    for (auto const& sheet : _styleBook.styleSheets) {
+
+        Vec<FontFace> fontFaces;
+        for (auto const& rule : sheet.rules)
+            _evalRule(rule, fontFaces);
+
+        for (auto const& ff : fontFaces) {
+            for (auto const& src : ff.sources) {
+                if (src.identifier.is<Mime::Url>()) {
+                    auto fontUrl = src.identifier.unwrap<Mime::Url>();
+
+                    auto resolvedUrl = Mime::Url::resolveReference(sheet.href, fontUrl);
+
+                    if (not resolvedUrl) {
+                        logWarn("Cannot resolve urls when loading fonts: {} {}", fontUrl, sheet.href);
+                        continue;
+                    }
+
+                    // FIXME: use attrs from style::FontFace
+                    if (fontBook.load(resolvedUrl.unwrap()))
+                        break;
+
+                    logWarn("Failed to load font at {}", resolvedUrl);
+                } else {
+                    if (
+                        fontBook.queryExact(Text::FontQuery{.family = src.identifier.unwrap<Text::Family>()})
+                    )
+                        break;
+
+                    logWarn("Failed to assets font {}", src.identifier.unwrap<Text::Family>());
+                }
+            }
+        }
+    }
 }
 
 } // namespace Vaev::Style

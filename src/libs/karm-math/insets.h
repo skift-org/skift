@@ -61,20 +61,25 @@ struct Insets {
     template <typename U>
     Insets<U> cast() const {
         return {
-            static_cast<U>(start),
             static_cast<U>(top),
             static_cast<U>(end),
             static_cast<U>(bottom),
+            static_cast<U>(start),
         };
     }
 
     void repr(Io::Emit& e) const {
-        e("(insets {} {} {} {})", start, top, end, bottom);
+        e("(insets {} {} {} {})", top, end, bottom, start);
     }
 
     constexpr auto map(auto f) const {
         using U = decltype(f(start));
-        return Insets<U>{f(start), f(top), f(end), f(bottom)};
+        return Insets<U>{
+            f(top),
+            f(end),
+            f(bottom),
+            f(start),
+        };
     }
 };
 

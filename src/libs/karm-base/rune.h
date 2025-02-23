@@ -173,7 +173,7 @@ struct Utf8 {
     }
 };
 
-[[gnu::used]] inline Utf8 UTF8;
+static inline Utf8 UTF8;
 
 static_assert(StaticEncoding<Utf8>);
 
@@ -238,7 +238,7 @@ struct Utf16 {
     }
 };
 
-[[gnu::used]] inline Utf16 UTF16;
+static inline Utf16 UTF16;
 
 static_assert(StaticEncoding<Utf16>);
 
@@ -267,7 +267,7 @@ struct Utf32 {
     }
 };
 
-[[gnu::used]] inline Utf32 UTF32;
+static inline Utf32 UTF32;
 
 static_assert(StaticEncoding<Utf32>);
 
@@ -307,7 +307,7 @@ struct Ascii {
     }
 };
 
-[[gnu::used]] inline Ascii ASCII;
+static inline Ascii ASCII;
 
 static_assert(StaticEncoding<Ascii>);
 
@@ -392,7 +392,7 @@ using Ibm437Mapper = decltype([](u8 c) {
 
 using Ibm437 = EAscii<Ibm437Mapper>;
 
-[[gnu::used]] inline Ibm437 IBM437;
+static inline Ibm437 IBM437;
 
 static_assert(StaticEncoding<Ibm437>);
 
@@ -405,7 +405,7 @@ using Latin1Mapper = decltype([](u8 c) {
 
 using Latin1 = EAscii<Latin1Mapper>;
 
-[[gnu::used]] inline Latin1 LATIN1;
+static inline Latin1 LATIN1;
 
 static_assert(StaticEncoding<Latin1>);
 

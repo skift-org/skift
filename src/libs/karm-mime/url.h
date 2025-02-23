@@ -11,16 +11,16 @@ namespace Karm::Mime {
 
 struct Url {
     String scheme;
-    String authority;
+    String userInfo;
     String host;
     Opt<usize> port;
     Path path;
     String query;
     String fragment;
 
-    static Url parse(Io::SScan& s);
+    static Url parse(Io::SScan& s, Opt<Url> baseUrl = NONE);
 
-    static Url parse(Str str);
+    static Url parse(Str str, Opt<Url> baseUrl = NONE);
 
     static bool isUrl(Str str);
 
@@ -55,21 +55,27 @@ struct Url {
     }
 
     auto operator<=>(Url const&) const = default;
+
+    bool isRelative() const {
+        return not scheme;
+    }
+
+    static Res<Url> resolveReference(Url const& baseUrl, Url const& referenceUrl, bool strict = true);
 };
 
-Res<Url> parseUrlOrPath(Str str);
+Url parseUrlOrPath(Str str, Opt<Url> baseUrl = NONE);
 
 } // namespace Karm::Mime
 
-inline auto operator""_url(char const* str, usize len) {
+inline Mime::Url operator""_url(char const* str, usize len) {
     return Karm::Mime::Url::parse({str, len});
 }
 
-inline auto operator/(Karm::Mime::Url const& url, Str path) {
+inline Mime::Url operator/(Karm::Mime::Url const& url, Str path) {
     return url.join(path);
 }
 
-inline auto operator/(Karm::Mime::Url const& url, Karm::Mime::Path const& path) {
+inline Mime::Url operator/(Karm::Mime::Url const& url, Karm::Mime::Path const& path) {
     return url.join(path);
 }
 

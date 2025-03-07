@@ -26,10 +26,8 @@ Res<> FontBook::load(Mime::Url const& url, Opt<FontAttrs> attrs) {
 }
 
 Res<> FontBook::loadAll() {
-    auto start = Sys::now();
 
     auto bundles = try$(Pkg::installedBundles());
-    usize count = 0;
     for (auto& bundle : bundles) {
         auto maybeDir = Sys::Dir::open(bundle.url() / "fonts");
         if (not maybeDir)
@@ -43,8 +41,9 @@ Res<> FontBook::loadAll() {
 
             auto fontUrl = dir.path() / diren.name;
 
-            if (load(fontUrl))
-                count++;
+            auto res = load(fontUrl);
+            if (not res)
+                logWarn("could not load {}: {}", fontUrl, res);
         }
     }
 
@@ -55,9 +54,6 @@ Res<> FontBook::loadAll() {
         .attrs = ibmVga->attrs(),
         .face = ibmVga,
     });
-
-    auto elapsed = Sys::now() - start;
-    logDebug("Loaded {} fonts in {}", count, elapsed);
 
     return Ok();
 }

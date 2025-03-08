@@ -1,12 +1,14 @@
+module;
+
 #include <karm-kira/scaffold.h>
 #include <karm-ui/layout.h>
 #include <mdi/calendar.h>
 
-#include "app.h"
+export module Hideo.Calendar;
 
 namespace Hideo::Calendar {
 
-Ui::Child app() {
+export Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::CALENDAR,
         .title = "Calendar"s,

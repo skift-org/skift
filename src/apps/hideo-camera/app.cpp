@@ -1,3 +1,5 @@
+module;
+
 #include <karm-kira/scaffold.h>
 #include <karm-ui/input.h>
 #include <karm-ui/layout.h>
@@ -6,7 +8,7 @@
 #include <mdi/cog.h>
 #include <mdi/tune.h>
 
-#include "app.h"
+export module Hideo.Camera;
 
 namespace Hideo::Camera {
 
@@ -83,7 +85,7 @@ Ui::Child appContent() {
     );
 }
 
-Ui::Child app() {
+export Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::CAMERA,
         .title = "Camera"s,

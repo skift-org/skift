@@ -1,3 +1,5 @@
+module;
+
 #include <karm-kira/scaffold.h>
 #include <karm-kira/searchbar.h>
 #include <karm-kira/side-nav.h>
@@ -10,7 +12,7 @@
 #include <mdi/shape.h>
 #include <mdi/star-outline.h>
 
-#include "app.h"
+export module Hideo.Apps;
 
 namespace Hideo::Apps {
 
@@ -30,7 +32,7 @@ Ui::Child pageContent() {
     return Ui::empty();
 }
 
-Ui::Child app() {
+export Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::BASKET,
         .title = "Apps"s,

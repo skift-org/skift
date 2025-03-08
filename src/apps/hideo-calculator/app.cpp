@@ -1,3 +1,5 @@
+module;
+
 #include <karm-kira/scaffold.h>
 #include <karm-ui/drag.h>
 #include <karm-ui/focus.h>
@@ -12,7 +14,8 @@
 #include <mdi/percent.h>
 #include <mdi/plus.h>
 
-#include "model.h"
+export module Hideo.Calculator:app;
+import :model;
 
 namespace Hideo::Calculator {
 
@@ -96,7 +99,7 @@ Ui::Child screen(State const& state) {
            Ui::focusable();
 }
 
-Ui::Child app() {
+export Ui::Child app() {
     return Ui::reducer<Model>([](State const& state) {
         return Kr::scaffold({
             .icon = Mdi::CALCULATOR,

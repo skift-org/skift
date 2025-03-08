@@ -1,3 +1,5 @@
+module;
+
 #include <karm-image/loader.h>
 #include <karm-kira/scaffold.h>
 #include <karm-kira/slider.h>
@@ -13,7 +15,7 @@
 #include <mdi/skip-previous.h>
 #include <mdi/volume-high.h>
 
-#include "app.h"
+export module Hideo.Avplayer;
 
 namespace Hideo::Avplayer {
 
@@ -71,7 +73,7 @@ Ui::Child player() {
            Ui::grow();
 }
 
-Ui::Child app() {
+export Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::PLAY_CIRCLE,
         .title = "Media Player"s,

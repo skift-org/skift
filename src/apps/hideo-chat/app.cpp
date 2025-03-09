@@ -1,12 +1,14 @@
+module;
+
 #include <karm-kira/scaffold.h>
 #include <karm-ui/layout.h>
 #include <mdi/message.h>
 
-#include "app.h"
+export module Hideo.Chat;
 
 namespace Hideo::Chat {
 
-Ui::Child app() {
+export Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::MESSAGE,
         .title = "Chat"s,

@@ -1,10 +1,46 @@
+module;
+
+#include <karm-ui/reducer.h>
 #include <karm-sys/time.h>
 
-#include "model.h"
+export module Hideo.Clock:model;
 
 namespace Hideo::Clock {
 
-Ui::Task<Action> reduce(State& s, Action a) {
+export enum struct Page {
+    ALARM,
+    CLOCK,
+    TIMER,
+    STOPWATCH,
+
+    _DEFAULT = ALARM,
+};
+
+export Str toStr(Page page) {
+    switch (page) {
+    case Page::CLOCK:
+        return "Clock";
+    case Page::STOPWATCH:
+        return "Stopwatch";
+    case Page::TIMER:
+        return "Timer";
+    case Page::ALARM:
+        return "Alarm";
+    default:
+        return "Unknown";
+    }
+}
+
+export struct State {
+    DateTime dateTime;
+    Page page = Page::_DEFAULT;
+};
+
+export struct TimeTick {};
+
+ using Action = Union<Page, TimeTick>;
+
+ Ui::Task<Action> reduce(State& s, Action a) {
     a.visit(Visitor{
         [&](Page p) {
             s.page = p;
@@ -16,5 +52,7 @@ Ui::Task<Action> reduce(State& s, Action a) {
 
     return NONE;
 }
+
+export using Model = Ui::Model<State, Action, reduce>;
 
 } // namespace Hideo::Clock

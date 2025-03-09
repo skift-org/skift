@@ -9,6 +9,7 @@
 #include "page-badge.h"
 #include "page-card.h"
 #include "page-checkbox.h"
+#include "page-clock.h"
 #include "page-color-input.h"
 #include "page-context-menu.h"
 #include "page-dialog.h"
@@ -37,6 +38,7 @@ static Array PAGES = {
     &PAGE_BADGE,
     &PAGE_CARD,
     &PAGE_CHECKBOX,
+    &PAGE_CLOCK,
     &PAGE_COLOR_INPUT,
     &PAGE_CONTEXT_MENU,
     &PAGE_DIALOG,

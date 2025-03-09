@@ -1,7 +1,8 @@
 #include <karm-sys/entry.h>
 #include <karm-ui/app.h>
+#include <karm-async/cancelation.h>
 
-#include "../app.h"
+import Hideo.Clock;
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
     Async::Cancelation c;

@@ -1,12 +1,14 @@
+module;
+
 #include <karm-kira/scaffold.h>
 #include <karm-ui/layout.h>
 #include <mdi/mine.h>
 
-#include "game.h"
+export module Hideo.Mines;
 
 namespace Hideo::Mines {
 
-Ui::Child game() {
+export Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::MINE,
         .title = "Mines"s,

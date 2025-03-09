@@ -1,12 +1,14 @@
+module;
+
 #include <karm-kira/scaffold.h>
 #include <karm-ui/layout.h>
 #include <mdi/map.h>
 
-#include "app.h"
+export module Hideo.Map;
 
 namespace Hideo::Map {
 
-Ui::Child app() {
+export Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::MAP,
         .title = "Map"s,

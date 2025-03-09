@@ -1,12 +1,14 @@
+module;
+
 #include <karm-kira/scaffold.h>
 #include <karm-ui/layout.h>
 #include <mdi/presentation.h>
 
-#include "app.h"
+export module Hideo.Slides;
 
 namespace Hideo::Slides {
 
-Ui::Child app() {
+export Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::PRESENTATION,
         .title = "Slides"s,

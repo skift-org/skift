@@ -1,12 +1,14 @@
+module;
+
 #include <karm-kira/scaffold.h>
 #include <karm-ui/layout.h>
 #include <mdi/account.h>
 
-#include "app.h"
+export module Hideo.Peoples;
 
 namespace Hideo::Peoples {
 
-Ui::Child app() {
+export Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::ACCOUNT,
         .title = "Peoples"s,

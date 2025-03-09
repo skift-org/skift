@@ -1,12 +1,14 @@
+module;
+
 #include <karm-kira/scaffold.h>
 #include <karm-ui/layout.h>
 #include <mdi/text-box.h>
 
-#include "app.h"
+export module Hideo.Write;
 
 namespace Hideo::Write {
 
-Ui::Child app() {
+export Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::TEXT_BOX,
         .title = "Write"s,

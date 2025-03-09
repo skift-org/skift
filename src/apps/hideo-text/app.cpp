@@ -1,3 +1,5 @@
+module;
+
 #include <hideo-files/widgets.h>
 #include <karm-io/funcs.h>
 #include <karm-kira/error-page.h>
@@ -17,6 +19,8 @@
 #include <mdi/redo.h>
 #include <mdi/text.h>
 #include <mdi/undo.h>
+
+export module Hideo.Text;
 
 namespace Hideo::Text {
 
@@ -62,7 +66,7 @@ Ui::Child editor(Rc<Karm::Text::Model> text) {
            Ui::insets(16) | Ui::vscroll() | Ui::grow();
 }
 
-Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
+export Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
     auto text = makeRc<Karm::Text::Model>();
     Opt<Error> error = NONE;
 

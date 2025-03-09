@@ -3,7 +3,7 @@
 #include <karm-sys/proc.h>
 #include <karm-ui/app.h>
 
-#include "../app.h"
+import Hideo.Text;
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto& args = useArgs(ctx);

@@ -1,12 +1,14 @@
+module;
+
 #include <karm-kira/scaffold.h>
 #include <karm-ui/layout.h>
 #include <mdi/code-braces.h>
 
-#include "app.h"
+export module Hideo.Code;
 
 namespace Hideo::Code {
 
-Ui::Child app() {
+export Ui::Child app() {
     return Kr::scaffold({
         .icon = Mdi::CODE_BRACES,
         .title = "Code"s,

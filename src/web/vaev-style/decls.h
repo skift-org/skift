@@ -51,6 +51,8 @@ static inline P _deferProperty(Css::Sst const& sst) {
 template <typename P, typename T>
 static inline Res<P> _parseDeclaration(Css::Sst const& sst) {
     Cursor<Css::Sst> content = sst.content;
+
+    eatWhitespace(content);
     P prop = try$(parseDeclarationValue<T>(content));
 
     if constexpr (requires { P::important; })

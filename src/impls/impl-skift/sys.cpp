@@ -179,4 +179,10 @@ void hardenSandbox() {
     logError("could not harden sandbox");
 }
 
+// MARK: Addr ------------------------------------------------------------------
+
+Async::Task<Vec<Ip>> ipLookupAsync(Str) {
+    co_return Error::notImplemented();
+}
+
 } // namespace Karm::Sys::_Embed

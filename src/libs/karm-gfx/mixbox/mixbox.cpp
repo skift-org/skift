@@ -4,11 +4,10 @@
 
 namespace Mixbox {
 
-[[gnu::used]] unsigned char const _lut[] = {
+static u8 const _LUT[] = {
 #include "mixbox.inc"
 };
 
-Bytes const LUT = Bytes(_lut, sizeof(_lut));
 
 static f64 srgb2linear(f64 srgb) {
     if (srgb <= 0.04045f)
@@ -93,7 +92,7 @@ Latent unmix(Math::Vec3f rgb) {
     auto ty = y - ((f64)iy);
     auto tz = z - ((f64)iz);
 
-    auto lut = next(LUT, (((ix + iy * 64 + iz * 64 * 64) & 0x3FFFF) * 3));
+    auto lut = next(Bytes(_LUT, sizeof(_LUT)), (((ix + iy * 64 + iz * 64 * 64) & 0x3FFFF) * 3));
 
     auto c0 = 0.0;
     auto c1 = 0.0;

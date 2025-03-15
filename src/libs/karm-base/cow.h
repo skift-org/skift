@@ -39,9 +39,9 @@ struct Cow {
 template <typename T>
 Opt<Rc<T>> Cow<T>::_base = NONE;
 
-template <typename T>
-Cow<T> makeCow(T const& value) {
-    return {makeRc<T>(value)};
+template <typename T, typename... Args>
+Cow<T> makeCow(Args&&... args) {
+    return {makeRc<T>(std::forward<Args>(args)...)};
 }
 
 } // namespace Karm

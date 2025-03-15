@@ -32,6 +32,8 @@ struct Document : public Node {
     Mime::Url const& url() const {
         return _url;
     }
+
+    Gc::Ptr<Dom::Element> documentElement() const;
 };
 
 } // namespace Vaev::Dom

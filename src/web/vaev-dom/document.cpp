@@ -18,4 +18,11 @@ String Document::title() const {
     return res;
 }
 
+Gc::Ptr<Dom::Element> Document::documentElement() const {
+    for (auto child = firstChild(); child; child = child->nextSibling())
+        if (auto el = child->is<Dom::Element>())
+            return el;
+    return nullptr;
+}
+
 } // namespace Vaev::Dom

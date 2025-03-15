@@ -139,13 +139,13 @@ Vec2Au computeIntrinsicSize(Tree& tree, Box& box, IntrinsicSize intrinsic, Vec2A
 }
 
 static Opt<Au> _computeSpecifiedSize(Tree& tree, Box& box, Size size, Vec2Au containingBlock, bool isWidth) {
-    if (size == Size::MIN_CONTENT) {
+    if (size.is<Keywords::MinContent>()) {
         auto intrinsicSize = computeIntrinsicSize(tree, box, IntrinsicSize::MIN_CONTENT, containingBlock);
         return isWidth ? Opt<Au>{intrinsicSize.x} : Opt<Au>{NONE};
-    } else if (size == Size::MAX_CONTENT) {
+    } else if (size.is<Keywords::MaxContent>()) {
         auto intrinsicSize = computeIntrinsicSize(tree, box, IntrinsicSize::MAX_CONTENT, containingBlock);
         return isWidth ? Opt<Au>{intrinsicSize.x} : Opt<Au>{NONE};
-    } else if (size == Size::FIT_CONTENT) {
+    } else if (size.is<FitContent>()) {
         auto minIntrinsicSize = computeIntrinsicSize(tree, box, IntrinsicSize::MIN_CONTENT, containingBlock);
         auto maxIntrinsicSize = computeIntrinsicSize(tree, box, IntrinsicSize::MAX_CONTENT, containingBlock);
         auto stretchIntrinsicSize = computeIntrinsicSize(tree, box, IntrinsicSize::STRETCH_TO_FIT, containingBlock);
@@ -154,10 +154,10 @@ static Opt<Au> _computeSpecifiedSize(Tree& tree, Box& box, Size size, Vec2Au con
             return clamp(stretchIntrinsicSize.x, minIntrinsicSize.x, maxIntrinsicSize.x);
         else
             return clamp(stretchIntrinsicSize.y, minIntrinsicSize.y, maxIntrinsicSize.y);
-    } else if (size == Size::AUTO) {
+    } else if (size.is<Keywords::Auto>()) {
         return NONE;
-    } else if (size == Size::LENGTH) {
-        return resolve(tree, box, size.value, isWidth ? containingBlock.x : containingBlock.y);
+    } else if (auto calc = size.is<CalcValue<PercentOr<Length>>>()) {
+        return resolve(tree, box, *calc, isWidth ? containingBlock.x : containingBlock.y);
     } else {
         logWarn("unknown specified size: {}", size);
         return 0_au;

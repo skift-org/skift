@@ -26,6 +26,15 @@ using Padding = Math::Insets<CalcValue<PercentOr<Length>>>;
 // https://www.w3.org/TR/CSS22/visuren.html#propdef-left
 using Offsets = Math::Insets<Width>;
 
-using Gaps = Math::Vec2<CalcValue<PercentOr<Length>>>;
+using Gap = Union<Keywords::Normal, CalcValue<PercentOr<Length>>>;
+
+struct Gaps {
+    Gap x = Keywords::NORMAL;
+    Gap y = Keywords::NORMAL;
+
+    void repr(Io::Emit& e) const {
+        e("(gaps {} {})", x, y);
+    }
+};
 
 } // namespace Vaev

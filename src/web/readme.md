@@ -19,7 +19,7 @@ built for effortless document generation and streamlined web browsing.
 
 Veav aims to support the following standards:
 
-- [CSS Snapshot 2023](https://www.w3.org/TR/CSS)
+- [CSS Latest Snapshot](https://www.w3.org/TR/CSS)
 - [HTML Living Standard](https://html.spec.whatwg.org/multipage/)
 - [SVG 2](https://www.w3.org/TR/SVG2/)
 - [MathML 3](https://www.w3.org/TR/MathML3/)

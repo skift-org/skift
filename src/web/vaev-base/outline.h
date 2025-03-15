@@ -4,18 +4,17 @@
 #include <karm-gfx/fill.h>
 #include <karm-math/radii.h>
 
-#include "calc.h"
 #include "color.h"
-#include "keywords.h"
-#include "length.h"
+#include "line-width.h"
 
 namespace Vaev {
 
+// https://drafts.csswg.org/css-ui/#outline
 struct Outline {
-    CalcValue<Length> width;
-    CalcValue<Length> offset;
+    LineWidth width = Keywords::MEDIUM;
+    CalcValue<Length> offset = 0_au;
     Union<Keywords::Auto, Gfx::BorderStyle> style = Gfx::BorderStyle::NONE;
-    Union<Keywords::Auto, Color> color = Keywords::Auto{};
+    Union<Keywords::Auto, Color> color = Keywords::AUTO;
 
     void repr(Io::Emit& e) const {
         e("(outline {} {} {} {})", width, offset, style, color);

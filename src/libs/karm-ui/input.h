@@ -15,7 +15,7 @@ using OnChange = Meta::Cond<
     Opt<SharedFunc<void(Node&, T value)>>>;
 
 template <typename T>
-[[gnu::used]] static auto IGNORE(Ui::Node&, T) {}
+static inline auto IGNORE(Ui::Node&, T) {}
 
 // MARK: Button ----------------------------------------------------------------
 
@@ -127,7 +127,7 @@ struct ButtonStyle {
 
 using OnPress = Opt<Func<void(Node&)>>;
 
-[[gnu::used]] static auto NOP(Ui::Node&) {}
+static inline auto NOP(Ui::Node&) {}
 
 Child button(OnPress onPress, ButtonStyle style, Child child);
 

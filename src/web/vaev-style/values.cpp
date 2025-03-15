@@ -113,29 +113,12 @@ Res<bool> ValueParser<bool>::parse(Cursor<Css::Sst>& c) {
 }
 
 // MARK: Border-Style
-static Res<CalcValue<Length>> _parseLineWidth(Cursor<Css::Sst>& c) {
-    if (c.peek() == Css::Token::ident("thin")) {
-        c.next();
-        return Ok(BorderProps::THIN);
-    }
-    if (c.peek() == Css::Token::ident("medium")) {
-        c.next();
-        return Ok(BorderProps::MEDIUM);
-    }
-    if (c.peek() == Css::Token::ident("thick")) {
-        c.next();
-        return Ok(BorderProps::THICK);
-    }
-
-    return parseValue<CalcValue<Length>>(c);
-}
-
 Res<Border> ValueParser<Border>::parse(Cursor<Css::Sst>& c) {
     Border border;
     while (not c.ended()) {
         eatWhitespace(c);
 
-        auto width = _parseLineWidth(c);
+        auto width = parseValue<LineWidth>(c);
         if (width) {
             border.width = width.unwrap();
             continue;
@@ -222,6 +205,27 @@ Res<BorderSpacing> ValueParser<BorderSpacing>::parse(Cursor<Css::Sst>& c) {
     }
 
     return Error::invalidData("expected border spacing value");
+}
+
+// MARK: line-width
+Res<LineWidth> ValueParser<LineWidth>::parse(Cursor<Css::Sst>& c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c.peek() == Css::Token::ident("thin")) {
+        c.next();
+        return Ok(Keywords::THIN);
+    }
+    if (c.peek() == Css::Token::ident("medium")) {
+        c.next();
+        return Ok(Keywords::MEDIUM);
+    }
+    if (c.peek() == Css::Token::ident("thick")) {
+        c.next();
+        return Ok(Keywords::THICK);
+    }
+
+    return Ok(try$(parseValue<CalcValue<Length>>(c)));
 }
 
 // MARK: BreakAfter & BreakBefore
@@ -594,8 +598,6 @@ static Res<Gfx::Color> _parseFuncColor(Css::Sst const& s) {
 Res<ColorMix::Side> _parseColorMixSide(Cursor<Css::Sst>& s) {
     Opt<Percent> percent;
 
-    eatWhitespace(s);
-
     if (s.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -663,7 +665,7 @@ Res<Color> ValueParser<Color>::parse(Cursor<Css::Sst>& c) {
 
         if (eqCi(data, "currentcolor"s)) {
             c.next();
-            return Ok(CURRENT_COLOR);
+            return Ok(Keywords::CURRENT_COLOR);
         }
 
         if (eqCi(data, "transparent"s)) {
@@ -878,6 +880,22 @@ Res<Display> ValueParser<Display>::parse(Cursor<Css::Sst>& c) {
     });
 }
 
+// MARK: FitContent
+// https://drafts.csswg.org/css-sizing-3/#preferred-size-properties
+
+Res<FitContent> ValueParser<FitContent>::parse(Cursor<Css::Sst>& c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c->prefix == Css::Token::function("fit-content(")) {
+        FitContent result;
+        Cursor<Css::Sst> scan = c->content;
+        result.value = try$(parseValue<PercentOr<Length>>(scan));
+        return Ok(result);
+    }
+    return Error::invalidData("invalid fit-content");
+}
+
 // MARK: FlexDirection
 // https://drafts.csswg.org/css-flexbox-1/#flex-direction-property
 Res<FlexDirection> ValueParser<FlexDirection>::parse(Cursor<Css::Sst>& c) {
@@ -910,18 +928,6 @@ Res<FlexWrap> ValueParser<FlexWrap>::parse(Cursor<Css::Sst>& c) {
         return Ok(FlexWrap::WRAP_REVERSE);
     else
         return Error::invalidData("expected flex wrap");
-}
-
-// MARK: FlexBasis
-// https://drafts.csswg.org/css-flexbox-1/#flex-basis-property
-Res<FlexBasis> ValueParser<FlexBasis>::parse(Cursor<Css::Sst>& c) {
-    if (c.ended())
-        return Error::invalidData("unexpected end of input");
-
-    if (c.skip(Css::Token::ident("content")))
-        return Ok(FlexBasis{FlexBasis::CONTENT});
-
-    return Ok(try$(parseValue<Width>(c)));
 }
 
 // MARK: FontSize
@@ -976,8 +982,6 @@ Res<FontStyle> ValueParser<FontStyle>::parse(Cursor<Css::Sst>& c) {
 }
 
 Res<Text::Family> ValueParser<Text::Family>::parse(Cursor<Css::Sst>& c) {
-    eatWhitespace(c);
-
     if (c.ended())
         return Error::invalidData("unexpected end of input");
 
@@ -1175,21 +1179,6 @@ Res<LineHeight> ValueParser<LineHeight>::parse(Cursor<Css::Sst>& c) {
     }
 
     return Ok(LineHeight{try$(parseValue<PercentOr<Length>>(c))});
-}
-
-// MARL: MarginWidth
-// https://drafts.csswg.org/css-values/#margin-width
-
-Res<Width> ValueParser<Width>::parse(Cursor<Css::Sst>& c) {
-    if (c.ended())
-        return Error::invalidData("unexpected end of input");
-
-    if (c->token == Css::Token::ident("auto")) {
-        c.next();
-        return Ok(Width::AUTO);
-    }
-
-    return Ok(try$(parseValue<PercentOr<Length>>(c)));
 }
 
 // MARK: MediaType
@@ -1403,33 +1392,6 @@ Res<Scan> ValueParser<Scan>::parse(Cursor<Css::Sst>& c) {
         return Error::invalidData("expected scan value");
 }
 
-// MARK: Size
-// https://drafts.csswg.org/css-sizing-4/#sizing-values
-
-Res<Size> ValueParser<Size>::parse(Cursor<Css::Sst>& c) {
-    if (c.ended())
-        return Error::invalidData("unexpected end of input");
-
-    if (c.peek() == Css::Token::IDENT) {
-        Str data = c.next().token.data;
-        if (data == "auto") {
-            return Ok(Size::AUTO);
-        } else if (data == "none") {
-            return Ok(Size::NONE);
-        } else if (data == "min-content") {
-            return Ok(Size::MIN_CONTENT);
-        } else if (data == "max-content") {
-            return Ok(Size::MAX_CONTENT);
-        } else if (data == "fit-content") {
-            return Ok(Size::FIT_CONTENT);
-        } else {
-            return Error::invalidData("unknown size value");
-        }
-    } else {
-        return Ok(try$(parseValue<CalcValue<PercentOr<Length>>>(c)));
-    }
-}
-
 // MARK: String
 // https://drafts.csswg.org/css-values/#strings
 
@@ -1581,21 +1543,6 @@ Res<Mime::Url> ValueParser<Mime::Url>::parse(Cursor<Css::Sst>& c) {
     // TODO: it is unclear what url-modifiers are and how they are used
 
     return Ok(url);
-}
-
-// MARK: ZIndex
-// https://drafts.csswg.org/css2/#z-index
-
-Res<ZIndex> ValueParser<ZIndex>::parse(Cursor<Css::Sst>& c) {
-    if (c.ended())
-        return Error::invalidData("unexpected end of input");
-
-    if (c->token == Css::Token::ident("auto")) {
-        c.next();
-        return Ok(ZIndex::AUTO);
-    }
-
-    return Ok(try$(parseValue<Integer>(c)));
 }
 
 } // namespace Vaev::Style

@@ -6,7 +6,6 @@
     "requires": [
         "karm-json",
         "karm-net.dns",
-        "karm-net.http",
         "karm-net.tls"
     ]
 }

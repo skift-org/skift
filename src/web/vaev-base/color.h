@@ -3,7 +3,9 @@
 #include <karm-gfx/colors.h>
 #include <karm-io/emit.h>
 #include <karm-logger/logger.h>
-#include <vaev-base/percent.h>
+
+#include "keywords.h"
+#include "percent.h"
 
 // https://www.w3.org/TR/css-color-4
 
@@ -179,19 +181,11 @@ enum struct SystemColor : u8 {
     _LEN
 };
 
-struct CurrentColor {
-    void repr(Io::Emit& e) const {
-        e("currentcolor");
-    }
-};
-
-constexpr static inline auto CURRENT_COLOR = CurrentColor{};
-
 struct ColorMix;
 
 using Color = Union<
     Gfx::Color,
-    CurrentColor,
+    Keywords::CurrentColor,
     SystemColor,
     Box<ColorMix>>;
 

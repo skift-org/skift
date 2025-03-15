@@ -22,18 +22,18 @@ export void layoutPositioned(Tree& tree, Frag& frag, RectAu containingBlock) {
         auto start = metrics.position.x;
 
         auto topOffset = style.offsets->top;
-        if (topOffset != Width::AUTO) {
-            top = origin.y + resolve(tree, *frag.box, topOffset, containingBlock.height);
+        if (auto topOffsetCalc = topOffset.is<CalcValue<PercentOr<Length>>>()) {
+            top = origin.y + resolve(tree, *frag.box, *topOffsetCalc, containingBlock.height);
         }
 
         auto startOffset = style.offsets->start;
-        if (startOffset != Width::AUTO) {
-            start = origin.x + resolve(tree, *frag.box, startOffset, containingBlock.width);
+        if (auto startOffsetCalc = startOffset.is<CalcValue<PercentOr<Length>>>()) {
+            start = origin.x + resolve(tree, *frag.box, *startOffsetCalc, containingBlock.width);
         }
 
         auto endOffset = frag.style().offsets->end;
-        if (endOffset != Width::AUTO) {
-            start = (origin.x + containingBlock.width) - resolve(tree, *frag.box, endOffset, containingBlock.width) - metrics.borderSize.width;
+        if (auto endOffsetCalc = endOffset.is<CalcValue<PercentOr<Length>>>()) {
+            start = (origin.x + containingBlock.width) - resolve(tree, *frag.box, *endOffsetCalc, containingBlock.width) - metrics.borderSize.width;
         }
 
         Vec2Au newPositionOffset = Vec2Au{start, top} - metrics.position;

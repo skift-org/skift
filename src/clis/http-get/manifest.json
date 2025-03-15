@@ -1,10 +1,10 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "fetch",
+    "id": "http-get",
+    "description": "Send an HTTP GET request",
     "type": "exe",
-    "description": "A simple HTTP fetcher",
     "requires": [
-        "karm-net",
-        "karm-sys"
+        "karm-http",
+        "karm-cli"
     ]
 }

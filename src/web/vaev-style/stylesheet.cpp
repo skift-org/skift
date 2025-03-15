@@ -22,7 +22,7 @@ void StyleSheet::repr(Io::Emit& e) const {
     e(")");
 }
 
-StyleSheet StyleSheet::parse(Css::Sst const& sst, Origin origin) {
+StyleSheet StyleSheet::parse(Css::Sst const& sst, Mime::Url href, Origin origin) {
     if (sst != Css::Sst::LIST)
         panic("expected list");
 
@@ -36,6 +36,8 @@ StyleSheet StyleSheet::parse(Css::Sst const& sst, Origin origin) {
     }
 
     res.origin = origin;
+    res.href = href;
+
     return res;
 }
 

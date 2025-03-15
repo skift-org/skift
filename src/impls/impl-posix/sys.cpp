@@ -2,6 +2,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <netdb.h>
 #include <netinet/in.h>
 #include <stdlib.h>
 #include <sys/mman.h>
@@ -18,6 +19,7 @@
 #include <karm-io/funcs.h>
 #include <karm-logger/logger.h>
 #include <karm-sys/_embed.h>
+#include <karm-sys/addr.h>
 #include <karm-sys/launch.h>
 #include <karm-sys/proc.h>
 
@@ -461,6 +463,36 @@ Res<Mime::Url> pwd() {
 
 void hardenSandbox() {
     logError("could not harden sandbox");
+}
+
+// MARK: Addr ------------------------------------------------------------------
+
+Async::Task<Vec<Ip>> ipLookupAsync(Str host) {
+    struct addrinfo hints = {};
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+
+    struct addrinfo* res;
+    if (getaddrinfo(host.buf(), nullptr, &hints, &res) < 0)
+        co_return Posix::fromLastErrno();
+
+    Vec<Ip> ips;
+    for (auto* p = res; p; p = p->ai_next) {
+        if (p->ai_family == AF_INET) {
+            struct sockaddr_in* addr = (struct sockaddr_in*)p->ai_addr;
+            ips.pushBack(Ip4::fromRaw(bswap(addr->sin_addr.s_addr)));
+        } else if (p->ai_family == AF_INET6) {
+            struct sockaddr_in6* addr = (struct sockaddr_in6*)p->ai_addr;
+            u128 raw = 0;
+            auto* buf = addr->sin6_addr.s6_addr16;
+            for (usize i = 0; i < 8; i++)
+                raw |= (u128)buf[i] << (i * 16);
+            ips.pushBack(Ip6::fromRaw(bswap(raw)));
+        }
+    }
+
+    freeaddrinfo(res);
+    co_return Ok(ips);
 }
 
 } // namespace Karm::Sys::_Embed

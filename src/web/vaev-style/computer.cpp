@@ -4,62 +4,56 @@
 
 namespace Vaev::Style {
 
-Computed const& Computed::initial() {
-    static Computed computed = [] {
-        Computed res{};
-        StyleProp::any([&]<typename T>(Meta::Type<T>) {
-            if constexpr (requires { T::initial(); })
-                T{}.apply(res);
-        });
-        return res;
-    }();
-    return computed;
-}
-
 void Computer::_evalRule(Rule const& rule, Gc::Ref<Dom::Element> el, MatchingRules& matches) {
-    rule.visit(Visitor{[&](StyleRule const& r) {
-                           if (auto specificity = r.match(el))
-                               matches.pushBack({&r, specificity.unwrap()});
-                       },
-                       [&](MediaRule const& r) {
-                           if (r.match(_media))
-                               for (auto const& subRule : r.rules)
-                                   _evalRule(subRule, el, matches);
-                       },
-                       [&](auto const&) {
-                           // Ignore other rule types
-                       }});
+    rule.visit(Visitor{
+        [&](StyleRule const& r) {
+            if (auto specificity = r.match(el))
+                matches.pushBack({&r, specificity.unwrap()});
+        },
+        [&](MediaRule const& r) {
+            if (r.match(_media))
+                for (auto const& subRule : r.rules)
+                    _evalRule(subRule, el, matches);
+        },
+        [&](auto const&) {
+            // Ignore other rule types
+        },
+    });
 }
 
 void Computer::_evalRule(Rule const& rule, Page const& page, PageComputedStyle& c) {
-    rule.visit(Visitor{[&](PageRule const& r) {
-                           if (r.match(page))
-                               r.apply(c);
-                       },
-                       [&](MediaRule const& r) {
-                           if (r.match(_media))
-                               for (auto const& subRule : r.rules)
-                                   _evalRule(subRule, page, c);
-                       },
-                       [&](auto const&) {
-                           // Ignore other rule types
-                       }});
+    rule.visit(Visitor{
+        [&](PageRule const& r) {
+            if (r.match(page))
+                r.apply(c);
+        },
+        [&](MediaRule const& r) {
+            if (r.match(_media))
+                for (auto const& subRule : r.rules)
+                    _evalRule(subRule, page, c);
+        },
+        [&](auto const&) {
+            // Ignore other rule types
+        },
+    });
 }
 
 void Computer::_evalRule(Rule const& rule, Vec<FontFace>& fontFaces) {
-    rule.visit(Visitor{[&](FontFaceRule const& r) {
-                           auto& fontFace = fontFaces.emplaceBack();
-                           for (auto const& decl : r.descs)
-                               decl.apply(fontFace);
-                       },
-                       [&](MediaRule const& r) {
-                           if (r.match(_media))
-                               for (auto const& subRule : r.rules)
-                                   _evalRule(subRule, fontFaces);
-                       },
-                       [&](auto const&) {
-                           // Ignore other rule types
-                       }});
+    rule.visit(Visitor{
+        [&](FontFaceRule const& r) {
+            auto& fontFace = fontFaces.emplaceBack();
+            for (auto const& decl : r.descs)
+                decl.apply(fontFace);
+        },
+        [&](MediaRule const& r) {
+            if (r.match(_media))
+                for (auto const& subRule : r.rules)
+                    _evalRule(subRule, fontFaces);
+        },
+        [&](auto const&) {
+            // Ignore other rule types
+        },
+    });
 }
 
 Rc<Computed> Computer::_evalCascade(Computed const& parent, MatchingRules& matchingRules) {

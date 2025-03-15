@@ -9,7 +9,7 @@ Mime::Url Node::baseURI() {
     auto document = ownerDocument();
     if (not document)
         panic("node has no owner document");
-    return document->url().parent(1);
+    return document->url();
 }
 
 // https://dom.spec.whatwg.org/#ref-for-dom-node-ownerdocument%E2%91%A0
@@ -25,7 +25,7 @@ void Node::repr(Io::Emit& e) const {
     _repr(e);
     if (hasChildren()) {
         e.indentNewline();
-        for (auto child = firstChild(); child->hasNextSibling(); child = child->nextSibling())
+        for (auto child = firstChild(); child; child = child->nextSibling())
             child->repr(e);
         e.deindent();
     }

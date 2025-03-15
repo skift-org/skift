@@ -1,0 +1,14 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm",
+    "type": "lib",
+    "description": "A batteries included framework for modern cross-platform C++ applications",
+    "props": {
+        "cpp-excluded": true
+    },
+    "requires": [
+        "karm-aio",
+        "karm-http",
+        "karm-icu"
+    ]
+}

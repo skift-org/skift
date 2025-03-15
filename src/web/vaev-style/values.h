@@ -73,13 +73,17 @@ struct ValueParser<Border> {
 
 template <>
 struct ValueParser<BorderCollapse> {
-
     static Res<BorderCollapse> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
 struct ValueParser<BorderSpacing> {
     static Res<BorderSpacing> parse(Cursor<Css::Sst>& c);
+};
+
+template <>
+struct ValueParser<LineWidth> {
+    static Res<LineWidth> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
@@ -194,6 +198,11 @@ struct ValueParser<CaptionSide> {
 };
 
 template <>
+struct ValueParser<FitContent> {
+    static Res<FitContent> parse(Cursor<Css::Sst>& c);
+};
+
+template <>
 struct ValueParser<FlexDirection> {
     static Res<FlexDirection> parse(Cursor<Css::Sst>& c);
 };
@@ -201,11 +210,6 @@ struct ValueParser<FlexDirection> {
 template <>
 struct ValueParser<FlexWrap> {
     static Res<FlexWrap> parse(Cursor<Css::Sst>& c);
-};
-
-template <>
-struct ValueParser<FlexBasis> {
-    static Res<FlexBasis> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
@@ -294,6 +298,23 @@ struct ValueParser<Keyword<K>> {
     }
 };
 
+template <typename T>
+concept ValueParseable = requires(T a, Cursor<Css::Sst> c) {
+    parseValue<T>(c);
+};
+
+template <ValueParseable... Ts>
+struct ValueParser<Union<Ts...>> {
+    static Res<Union<Ts...>> parse(Cursor<Css::Sst>& c) {
+        if (c.ended())
+            return Error::invalidData("unexpected end of input");
+
+        return Meta::any<Ts...>([&c]<typename T>(Meta::Type<T>) -> Res<Union<Ts...>> {
+            return Ok(try$(parseValue<T>(c)));
+        });
+    }
+};
+
 template <>
 struct ValueParser<Length> {
     static Res<Length> parse(Cursor<Css::Sst>& c);
@@ -302,11 +323,6 @@ struct ValueParser<Length> {
 template <>
 struct ValueParser<LineHeight> {
     static Res<LineHeight> parse(Cursor<Css::Sst>& c);
-};
-
-template <>
-struct ValueParser<Width> {
-    static Res<Width> parse(Cursor<Css::Sst>& c);
 };
 
 template <>
@@ -344,19 +360,6 @@ struct ValueParser<Percent> {
     static Res<Percent> parse(Cursor<Css::Sst>& c);
 };
 
-template <typename T>
-struct ValueParser<PercentOr<T>> {
-    static Res<PercentOr<T>> parse(Cursor<Css::Sst>& c) {
-        if (c.ended())
-            return Error::invalidData("unexpected end of input");
-
-        if (c.peek() == Css::Token::PERCENTAGE)
-            return Ok(try$(parseValue<Percent>(c)));
-
-        return Ok(try$(parseValue<T>(c)));
-    }
-};
-
 template <>
 struct ValueParser<Pointer> {
     static Res<Pointer> parse(Cursor<Css::Sst>& c);
@@ -378,11 +381,6 @@ struct ValueParser<Scan> {
 };
 
 template <>
-struct ValueParser<Size> {
-    static Res<Size> parse(Cursor<Css::Sst>& c);
-};
-
-template <>
 struct ValueParser<String> {
     static Res<String> parse(Cursor<Css::Sst>& c);
 };
@@ -401,7 +399,7 @@ struct ValueParser<Math::Radii<T>> {
 
         auto value1 = parseValue<PercentOr<Length>>(c);
         if (not value1)
-            return Ok(parsePostSlash(c, Math::Radii<T>{}));
+            return Ok(parsePostSlash(c, Math::Radii<T>{Length{}}));
 
         auto value2 = parseValue<PercentOr<Length>>(c);
         if (not value2)
@@ -493,11 +491,6 @@ struct ValueParser<TableLayout> {
 template <>
 struct ValueParser<Mime::Url> {
     static Res<Mime::Url> parse(Cursor<Css::Sst>& c);
-};
-
-template <>
-struct ValueParser<ZIndex> {
-    static Res<ZIndex> parse(Cursor<Css::Sst>& c);
 };
 
 } // namespace Vaev::Style

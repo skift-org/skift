@@ -44,7 +44,7 @@ testAsync$("karm-cli-args-simple-command") {
         NONE,
     };
 
-    Array<Str, 0> args = {};
+    Vec<Str> args = {};
 
     co_trya$(cmd.execAsync(Sys::globalContext(), args));
 

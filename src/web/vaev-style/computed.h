@@ -37,9 +37,9 @@ struct Computed {
 
     Cow<BackgroundProps> backgrounds;
     Cow<BorderProps> borders;
-    Cow<Margin> margin;
+    Cow<Margin> margin = makeCow<Margin>(Width(CalcValue<PercentOr<Length>>(Length(0_au)))); // FIXME
     Cow<Outline> outline;
-    Cow<Padding> padding;
+    Cow<Padding> padding = makeCow<Padding>(Length(0_au)); // FIXME
     BoxSizing boxSizing;
     Cow<SizingProps> sizing;
     Overflows overflows;
@@ -47,7 +47,7 @@ struct Computed {
     // 9.3 Positioning schemes
     // https://www.w3.org/TR/CSS22/visuren.html#positioning-scheme
     Position position;
-    Cow<Offsets> offsets;
+    Cow<Offsets> offsets = makeCow<Offsets>(Width(Keywords::AUTO)); // FIXME
 
     // CSS Writing Modes Level 3
     // https://www.w3.org/TR/css-writing-modes-3
@@ -76,7 +76,7 @@ struct Computed {
     Clear clear = Clear::NONE;
 
     // https://drafts.csswg.org/css2/#z-index
-    ZIndex zIndex = ZIndex::AUTO;
+    ZIndex zIndex = Keywords::AUTO;
 
     void inherit(Computed const& parent);
 

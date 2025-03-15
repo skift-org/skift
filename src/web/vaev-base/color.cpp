@@ -66,7 +66,7 @@ Gfx::Color resolve(Color const& c, Gfx::Color currentColor) {
         [&](Gfx::Color const& srgb) {
             return srgb;
         },
-        [&](CurrentColor) {
+        [&](Keywords::CurrentColor) {
             return currentColor;
         },
         [&](SystemColor const& system) {

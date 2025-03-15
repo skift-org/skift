@@ -7,28 +7,28 @@
 
 namespace Karm::Gfx {
 
-[[gnu::used]] static constexpr Color ALPHA = {0, 0, 0, 0};
-[[gnu::used]] static constexpr Color BLACK = {0, 0, 0, 255};
-[[gnu::used]] static constexpr Color WHITE = {255, 255, 255, 255};
+static inline constexpr Color ALPHA = {0, 0, 0, 0};
+static inline constexpr Color BLACK = {0, 0, 0, 255};
+static inline constexpr Color WHITE = {255, 255, 255, 255};
 
 using ColorRamp = Array<Color, 11>;
 
 #define MAKE_COLOR_RAMP(NAME, COLORS...)                                                \
-    [[gnu::used]] static constexpr ColorRamp NAME##_RAMP = [](auto... v) -> ColorRamp { \
+    static inline constexpr ColorRamp NAME##_RAMP = [](auto... v) -> ColorRamp { \
         return {Color::fromHex(v)...};                                                  \
     }(COLORS);                                                                          \
-    [[gnu::used]] static constexpr Color NAME = NAME##_RAMP[5];                         \
-    [[gnu::used]] static constexpr Color NAME##50 = NAME##_RAMP[0];                     \
-    [[gnu::used]] static constexpr Color NAME##100 = NAME##_RAMP[1];                    \
-    [[gnu::used]] static constexpr Color NAME##200 = NAME##_RAMP[2];                    \
-    [[gnu::used]] static constexpr Color NAME##300 = NAME##_RAMP[3];                    \
-    [[gnu::used]] static constexpr Color NAME##400 = NAME##_RAMP[4];                    \
-    [[gnu::used]] static constexpr Color NAME##500 = NAME##_RAMP[5];                    \
-    [[gnu::used]] static constexpr Color NAME##600 = NAME##_RAMP[6];                    \
-    [[gnu::used]] static constexpr Color NAME##700 = NAME##_RAMP[7];                    \
-    [[gnu::used]] static constexpr Color NAME##800 = NAME##_RAMP[8];                    \
-    [[gnu::used]] static constexpr Color NAME##900 = NAME##_RAMP[9];                    \
-    [[gnu::used]] static constexpr Color NAME##950 = NAME##_RAMP[10];
+    static inline constexpr Color NAME = NAME##_RAMP[5];                         \
+    static inline constexpr Color NAME##50 = NAME##_RAMP[0];                     \
+    static inline constexpr Color NAME##100 = NAME##_RAMP[1];                    \
+    static inline constexpr Color NAME##200 = NAME##_RAMP[2];                    \
+    static inline constexpr Color NAME##300 = NAME##_RAMP[3];                    \
+    static inline constexpr Color NAME##400 = NAME##_RAMP[4];                    \
+    static inline constexpr Color NAME##500 = NAME##_RAMP[5];                    \
+    static inline constexpr Color NAME##600 = NAME##_RAMP[6];                    \
+    static inline constexpr Color NAME##700 = NAME##_RAMP[7];                    \
+    static inline constexpr Color NAME##800 = NAME##_RAMP[8];                    \
+    static inline constexpr Color NAME##900 = NAME##_RAMP[9];                    \
+    static inline constexpr Color NAME##950 = NAME##_RAMP[10];
 
 // from https://tailwindcss.com/docs/customizing-colors
 MAKE_COLOR_RAMP(SLATE, 0xf8fafc, 0xf1f5f9, 0xe2e8f0, 0xcbd5e1, 0x94a3b8, 0x64748b, 0x475569, 0x334155, 0x1e293b, 0x0f172a, 0x020617)
@@ -54,7 +54,7 @@ MAKE_COLOR_RAMP(FUCHSIA, 0xfdf4ff, 0xfae8ff, 0xf5d0fe, 0xf0abfc, 0xe879f9, 0xd94
 MAKE_COLOR_RAMP(PINK, 0xfdf2f8, 0xfce7f3, 0xfbcfe8, 0xf9a8d4, 0xf472b6, 0xec4899, 0xdb2777, 0xbe185d, 0x9d174d, 0x831843, 0x500724)
 MAKE_COLOR_RAMP(ROSE, 0xfff1f2, 0xffe4e6, 0xfecdd3, 0xfda4af, 0xfb7185, 0xf43f5e, 0xe11d48, 0xbe123c, 0x9f1239, 0x881337, 0x4c0519)
 
-[[gnu::used]] static constexpr Array<ColorRamp, 22> RAMPS = {
+static inline constexpr Array<ColorRamp, 22> RAMPS = {
     SLATE_RAMP, GRAY_RAMP, ZINC_RAMP, NEUTRAL_RAMP,
     STONE_RAMP, RED_RAMP, ORANGE_RAMP, AMBER_RAMP,
     YELLOW_RAMP, LIME_RAMP, GREEN_RAMP, EMERALD_RAMP,
@@ -63,7 +63,7 @@ MAKE_COLOR_RAMP(ROSE, 0xfff1f2, 0xffe4e6, 0xfecdd3, 0xfda4af, 0xfb7185, 0xf43f5e
     PINK_RAMP, ROSE_RAMP
 };
 
-[[gnu::used]] static constexpr Array<Color, 22> COLORS = {
+static inline constexpr Array<Color, 22> COLORS = {
     SLATE, GRAY, ZINC, NEUTRAL,
     STONE, RED, ORANGE, AMBER,
     YELLOW, LIME, GREEN, EMERALD,

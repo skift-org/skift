@@ -91,9 +91,8 @@ inline Res<usize> copy(Readable auto& reader, Writable auto& writer) {
         result += read;
 
         auto written = try$(writer.write(sub(buffer, 0, read)));
-        if (written != read) {
+        if (written != read)
             return Ok(result);
-        }
     }
 }
 

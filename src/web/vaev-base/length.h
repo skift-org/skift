@@ -4,6 +4,8 @@
 #include <karm-io/emit.h>
 #include <karm-math/au.h>
 
+#include "resolved.h"
+
 namespace Vaev {
 
 // 6. MARK: Distance Units: the <length> type
@@ -19,8 +21,6 @@ struct [[gnu::packed]] Length {
     };
 
     using enum Unit;
-
-    using Resolved = Au;
 
     f64 _val = 0;
     Unit _unit = Unit::PX;
@@ -126,6 +126,11 @@ struct [[gnu::packed]] Length {
     void repr(Io::Emit& e) const {
         e("{}{}", _val, _unit);
     }
+};
+
+template <>
+struct _Resolved<Length> {
+    using Type = Au;
 };
 
 } // namespace Vaev

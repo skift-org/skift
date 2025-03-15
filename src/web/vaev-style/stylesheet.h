@@ -16,12 +16,12 @@ struct StyleSheet {
 
     void repr(Io::Emit& e) const;
 
-    static StyleSheet parse(Css::Sst const& sst, Origin origin = Origin::AUTHOR);
+    static StyleSheet parse(Css::Sst const& sst, Mime::Url href, Origin origin = Origin::AUTHOR);
 
-    static StyleSheet parse(Io::SScan& s, Origin origin = Origin::AUTHOR) {
+    static StyleSheet parse(Io::SScan& s, Mime::Url href, Origin origin = Origin::AUTHOR) {
         Css::Lexer lex{s};
         Css::Sst sst = consumeRuleList(lex, true);
-        return parse(sst, origin);
+        return parse(sst, href, origin);
     }
 
     void add(Rule&& rule) {

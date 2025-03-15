@@ -154,44 +154,44 @@ struct AlignItemsProp {
 
 // https://drafts.csswg.org/css-align-3/#column-row-gap
 struct RowGapProp {
-    CalcValue<PercentOr<Length>> value = initial();
+    Gap value = initial();
 
     static constexpr Str name() { return "row-gap"; }
 
-    static constexpr PercentOr<Length> initial() { return {}; }
+    static constexpr Keywords::Normal initial() { return Keywords::NORMAL; }
 
     void apply(Computed& c) const {
         c.gaps.cow().y = value;
     }
 
-    static CalcValue<PercentOr<Length>> load(Computed const& c) {
+    static Gap load(Computed const& c) {
         return c.gaps->y;
     }
 
     Res<> parse(Cursor<Css::Sst>& c) {
-        value = try$(parseValue<CalcValue<PercentOr<Length>>>(c));
+        value = try$(parseValue<Gap>(c));
         return Ok();
     }
 };
 
 // https://drafts.csswg.org/css-align-3/#column-row-gap
 struct ColumnGapProp {
-    CalcValue<PercentOr<Length>> value = initial();
+    Gap value = initial();
 
     static constexpr Str name() { return "column-gap"; }
 
-    static constexpr PercentOr<Length> initial() { return {}; }
+    static constexpr Keywords::Normal initial() { return Keywords::NORMAL; }
 
     void apply(Computed& c) const {
         c.gaps.cow().x = value;
     }
 
-    static CalcValue<PercentOr<Length>> load(Computed& c) {
+    static Gap load(Computed const& c) {
         return c.gaps->x;
     }
 
     Res<> parse(Cursor<Css::Sst>& c) {
-        value = try$(parseValue<PercentOr<Length>>(c));
+        value = try$(parseValue<Gap>(c));
         return Ok();
     }
 };
@@ -253,7 +253,7 @@ struct BackgroundImageProp {
 
     static constexpr Str name() { return "background-image"; }
 
-    static Array<Image, 0> initial() { return {}; }
+    static Vec<Image> initial() { return {}; }
 
     void apply(Computed&) const {
         // TODO
@@ -275,7 +275,7 @@ struct BackgroundPositionProp {
 
     static constexpr Str name() { return "background-position"; }
 
-    static constexpr Array<BackgroundPosition, 0> initial() {
+    static constexpr Vec<BackgroundPosition> initial() {
         return {};
     }
 
@@ -679,61 +679,61 @@ struct BorderBottomStyleProp {
 
 // https://www.w3.org/TR/css-backgrounds-3/#border-width
 struct BorderTopWidthProp {
-    CalcValue<Length> value = initial();
+    LineWidth value = initial();
 
     static constexpr Str name() { return "border-top-width"; }
 
-    static constexpr Length initial() { return BorderProps::MEDIUM; }
+    static constexpr LineWidth initial() { return Keywords::MEDIUM; }
 
     void apply(Computed& c) const {
         c.borders.cow().top.width = value;
     }
 
-    static CalcValue<Length> load(Computed const& c) {
+    static LineWidth load(Computed const& c) {
         return c.borders->top.width;
     }
 
     Res<> parse(Cursor<Css::Sst>& c) {
-        value = try$(parseValue<CalcValue<Length>>(c));
+        value = try$(parseValue<LineWidth>(c));
         return Ok();
     }
 };
 
 // https://www.w3.org/TR/css-backgrounds-3/#border-width
 struct BorderRightWidthProp {
-    CalcValue<Length> value = initial();
+    LineWidth value = initial();
 
     static constexpr Str name() { return "border-right-width"; }
 
-    static constexpr Length initial() { return BorderProps::MEDIUM; }
+    static constexpr LineWidth initial() { return Keywords::MEDIUM; }
 
     void apply(Computed& c) const {
         c.borders.cow().end.width = value;
     }
 
-    static CalcValue<Length> load(Computed const& c) {
+    static LineWidth load(Computed const& c) {
         return c.borders->end.width;
     }
 
     Res<> parse(Cursor<Css::Sst>& c) {
-        value = try$(parseValue<CalcValue<Length>>(c));
+        value = try$(parseValue<LineWidth>(c));
         return Ok();
     }
 };
 
 // https://www.w3.org/TR/css-backgrounds-3/#border-width
 struct BorderBottomWidthProp {
-    CalcValue<Length> value = initial();
+    LineWidth value = initial();
 
     static constexpr Str name() { return "border-bottom-width"; }
 
-    static constexpr Length initial() { return BorderProps::MEDIUM; }
+    static constexpr LineWidth initial() { return Keywords::MEDIUM; }
 
     void apply(Computed& c) const {
         c.borders.cow().bottom.width = value;
     }
 
-    static CalcValue<Length> load(Computed const& c) {
+    static LineWidth load(Computed const& c) {
         return c.borders->bottom.width;
     }
 
@@ -745,33 +745,35 @@ struct BorderBottomWidthProp {
 
 // https://www.w3.org/TR/css-backgrounds-3/#border-width
 struct BorderLeftWidthProp {
-    CalcValue<Length> value = initial();
+    LineWidth value = initial();
 
     static constexpr Str name() { return "border-left-width"; }
 
-    static constexpr Length initial() { return BorderProps::MEDIUM; }
+    static constexpr LineWidth initial() { return Keywords::MEDIUM; }
 
     void apply(Computed& c) const {
         c.borders.cow().start.width = value;
     }
 
-    static CalcValue<Length> load(Computed const& c) {
+    static LineWidth load(Computed const& c) {
         return c.borders->start.width;
     }
 
     Res<> parse(Cursor<Css::Sst>& c) {
-        value = try$(parseValue<CalcValue<Length>>(c));
+        value = try$(parseValue<LineWidth>(c));
         return Ok();
     }
 };
 
 // https://drafts.csswg.org/css-backgrounds/#the-border-radius
 struct BorderRadiusTopRight {
-    Array<CalcValue<PercentOr<Length>>, 2> value = {initial(), initial()};
+    Array<CalcValue<PercentOr<Length>>, 2> value = initial();
 
     static constexpr Str name() { return "border-top-right-radius"; }
 
-    static constexpr Length initial() { return 0_au; }
+    static constexpr Array<CalcValue<PercentOr<Length>>, 2> initial() {
+        return makeArray<CalcValue<PercentOr<Length>>, 2>(Length{});
+    }
 
     void apply(Computed& c) const {
         c.borders.cow().radii.c = value[0];
@@ -799,11 +801,13 @@ struct BorderRadiusTopRight {
 
 // https://drafts.csswg.org/css-backgrounds/#the-border-radius
 struct BorderRadiusTopLeft {
-    Array<CalcValue<PercentOr<Length>>, 2> value = {initial(), initial()};
+    Array<CalcValue<PercentOr<Length>>, 2> value = initial();
 
     static constexpr Str name() { return "border-top-left-radius"; }
 
-    static constexpr Length initial() { return 0_au; }
+    static constexpr Array<CalcValue<PercentOr<Length>>, 2> initial() {
+        return makeArray<CalcValue<PercentOr<Length>>, 2>(Length{});
+    }
 
     void apply(Computed& c) const {
         c.borders.cow().radii.a = value[1];
@@ -832,11 +836,13 @@ struct BorderRadiusTopLeft {
 
 // https://drafts.csswg.org/css-backgrounds/#the-border-radius
 struct BorderRadiusBottomRight {
-    Array<CalcValue<PercentOr<Length>>, 2> value = {initial(), initial()};
+    Array<CalcValue<PercentOr<Length>>, 2> value = initial();
 
     static constexpr Str name() { return "border-bottom-right-radius"; }
 
-    static constexpr Length initial() { return 0_au; }
+    static constexpr Array<CalcValue<PercentOr<Length>>, 2> initial() {
+        return makeArray<CalcValue<PercentOr<Length>>, 2>(Length{});
+    }
 
     void apply(Computed& c) const {
         c.borders.cow().radii.e = value[1];
@@ -864,11 +870,13 @@ struct BorderRadiusBottomRight {
 
 // https://drafts.csswg.org/css-backgrounds/#the-border-radius
 struct BorderRadiusBottomLeft {
-    Array<CalcValue<PercentOr<Length>>, 2> value = {initial(), initial()};
+    Array<CalcValue<PercentOr<Length>>, 2> value = initial();
 
     static constexpr Str name() { return "border-bottom-left-radius"; }
 
-    static constexpr Length initial() { return 0_au; }
+    static constexpr Array<CalcValue<PercentOr<Length>>, 2> initial() {
+        return makeArray<CalcValue<PercentOr<Length>>, 2>(Length{});
+    }
 
     void apply(Computed& c) const {
         c.borders.cow().radii.g = value[0];
@@ -900,7 +908,7 @@ struct BorderRadius {
 
     static constexpr Str name() { return "border-radius"; }
 
-    static Math::Radii<CalcValue<PercentOr<Length>>> initial() { return {}; }
+    static Math::Radii<CalcValue<PercentOr<Length>>> initial() { return {CalcValue<PercentOr<Length>>(Length{})}; }
 
     void apply(Computed& c) const {
         c.borders.cow().radii = value;
@@ -1105,18 +1113,19 @@ struct BorderProp {
 
 // https://www.w3.org/TR/css-backgrounds-3/#border-width
 struct BorderWidthProp {
-    Math::Insets<CalcValue<Length>> value;
+    Math::Insets<LineWidth> value = LineWidth{Keywords::MEDIUM};
 
     static constexpr Str name() { return "border-width"; }
 
     void apply(Computed& c) const {
-        c.borders.cow().start.width = value.start;
-        c.borders.cow().end.width = value.end;
-        c.borders.cow().top.width = value.top;
-        c.borders.cow().bottom.width = value.bottom;
+        auto& borders = c.borders.cow();
+        borders.start.width = value.start;
+        borders.end.width = value.end;
+        borders.top.width = value.top;
+        borders.bottom.width = value.bottom;
     }
 
-    static Math::Insets<CalcValue<Length>> load(Computed const& c) {
+    static Math::Insets<LineWidth> load(Computed const& c) {
         return {
             c.borders->start.width,
             c.borders->end.width,
@@ -1126,7 +1135,7 @@ struct BorderWidthProp {
     }
 
     Res<> parse(Cursor<Css::Sst>& c) {
-        value = try$(parseValue<Math::Insets<CalcValue<Length>>>(c));
+        value = try$(parseValue<Math::Insets<LineWidth>>(c));
 
         return Ok();
     }
@@ -1266,7 +1275,7 @@ struct FlexBasisProp {
 
     static constexpr Str name() { return "flex-basis"; }
 
-    static FlexBasis initial() { return Width{Width::AUTO}; }
+    static FlexBasis initial() { return Keywords::AUTO; }
 
     void apply(Computed& c) const {
         c.flex.cow().basis = value;
@@ -1429,7 +1438,7 @@ struct FlexProp {
 
     static FlexItemProps initial() {
         return {
-            Width{Width::AUTO},
+            Keywords::AUTO,
             0,
             1,
         };
@@ -1456,14 +1465,14 @@ struct FlexProp {
 
         if (c.skip(Css::Token::ident("none"))) {
             value = {
-                Width{Width::AUTO},
+                Keywords::AUTO,
                 0,
                 0,
             };
             return Ok();
         } else if (c.skip(Css::Token::ident("initial"))) {
             value = {
-                Width{Width::AUTO},
+                Keywords::AUTO,
                 0,
                 1,
             };
@@ -1472,7 +1481,7 @@ struct FlexProp {
 
         // deafult values if these parameters are omitted
         value.flexGrow = value.flexShrink = 1;
-        value.flexBasis = FlexBasis(Width(Length(0, Length::Unit::PX)));
+        value.flexBasis = CalcValue<PercentOr<Length>>(Length{});
 
         auto parseGrowShrink = [](Cursor<Css::Sst>& c, FlexItemProps& value) -> Res<> {
             auto grow = parseValue<Number>(c);
@@ -1798,7 +1807,7 @@ struct MarginTopProp {
 
     static Str name() { return "margin-top"; }
 
-    static Width initial() { return Length{}; }
+    static Width initial() { return CalcValue<PercentOr<Length>>(Length{}); }
 
     void apply(Computed& c) const {
         c.margin.cow().top = value;
@@ -1819,7 +1828,7 @@ struct MarginRightProp {
 
     static Str name() { return "margin-right"; }
 
-    static Width initial() { return Length{}; }
+    static Width initial() { return CalcValue<PercentOr<Length>>(Length{}); }
 
     void apply(Computed& c) const {
         c.margin.cow().end = value;
@@ -1840,7 +1849,7 @@ struct MarginBottomProp {
 
     static constexpr Str name() { return "margin-bottom"; }
 
-    static Width initial() { return Length{}; }
+    static Width initial() { return CalcValue<PercentOr<Length>>(Length{}); }
 
     void apply(Computed& c) const {
         c.margin.cow().bottom = value;
@@ -1861,7 +1870,7 @@ struct MarginLeftProp {
 
     static Str name() { return "margin-left"; }
 
-    static Width initial() { return Length{}; }
+    static Width initial() { return CalcValue<PercentOr<Length>>(Length{}); }
 
     void apply(Computed& c) const {
         c.margin.cow().start = value;
@@ -1882,7 +1891,7 @@ struct MarginProp {
 
     static Str name() { return "margin"; }
 
-    static Math::Insets<Width> initial() { return {}; }
+    static Math::Insets<Width> initial() { return {CalcValue<PercentOr<Length>>(Length{})}; }
 
     void apply(Computed& c) const {
         c.margin.cow() = value;
@@ -1905,7 +1914,7 @@ struct MarginInlineStartProp {
 
     static Str name() { return "margin-inline-start"; }
 
-    static Width initial() { return Length{}; }
+    static Width initial() { return CalcValue<PercentOr<Length>>(Length{}); }
 
     void apply(Computed& c) const {
         // FIXME: Take writing mode into account
@@ -1927,7 +1936,7 @@ struct MarginInlineEndProp {
 
     static Str name() { return "margin-inline-end"; }
 
-    static Width initial() { return Length{}; }
+    static Width initial() { return CalcValue<PercentOr<Length>>(Length{}); }
 
     void apply(Computed& c) const {
         // FIXME: Take writing mode into account
@@ -1949,7 +1958,7 @@ struct MarginInlineProp {
 
     static Str name() { return "margin-inline"; }
 
-    static Math::Insets<Width> initial() { return {}; }
+    static Math::Insets<Width> initial() { return {CalcValue<PercentOr<Length>>(Length{})}; }
 
     void apply(Computed& c) const {
         // FIXME: Take writing mode into account
@@ -1975,7 +1984,7 @@ struct MarginBlockStartProp {
 
     static Str name() { return "margin-block-start"; }
 
-    static Width initial() { return Length{}; }
+    static Width initial() { return CalcValue<PercentOr<Length>>(Length{}); }
 
     void apply(Computed& c) const {
         // FIXME: Take writing mode into account
@@ -1997,7 +2006,7 @@ struct MarginBlockEndProp {
 
     static Str name() { return "margin-block-end"; }
 
-    static Width initial() { return Length{}; }
+    static Width initial() { return CalcValue<PercentOr<Length>>(Length{}); }
 
     void apply(Computed& c) const {
         // FIXME: Take writing mode into account
@@ -2019,7 +2028,7 @@ struct MarginBlockProp {
 
     static Str name() { return "margin-block"; }
 
-    static Math::Insets<Width> initial() { return {}; }
+    static Math::Insets<Width> initial() { return {CalcValue<PercentOr<Length>>(Length{})}; }
 
     void apply(Computed& c) const {
         // FIXME: Take writing mode into account
@@ -2108,8 +2117,8 @@ struct OutlineProp {
 
             if (c.skip(Css::Token::ident("auto"))) {
                 if (not styleSet)
-                    value.style = Keywords::Auto{};
-                value.color = Keywords::Auto{};
+                    value.style = Keywords::AUTO;
+                value.color = Keywords::AUTO;
                 continue;
             }
 
@@ -2122,29 +2131,30 @@ struct OutlineProp {
 
 // https://drafts.csswg.org/css-ui/#outline-width
 struct OutlineWidthProp {
-    CalcValue<Length> value = initial();
+    LineWidth value = initial();
 
     static Str name() { return "outline-width"; }
 
-    static Length initial() { return BorderProps::MEDIUM; }
+    static LineWidth initial() { return Keywords::MEDIUM; }
 
     void apply(Computed& c) const {
         c.outline.cow().width = value;
     }
 
-    static CalcValue<Length> load(Computed const& c) {
+    static LineWidth load(Computed const& c) {
         return c.outline->width;
     }
 
     Res<> parse(Cursor<Css::Sst>& c) {
-        value = try$(parseValue<CalcValue<Length>>(c));
+        value = try$(parseValue<LineWidth>(c));
         return Ok();
     }
 };
 
 // https://drafts.csswg.org/css-ui/#outline-style
 struct OutlineStyleProp {
-    Union<Keywords::Auto, Gfx::BorderStyle> value = initial();
+    using Value = Union<Keywords::Auto, Gfx::BorderStyle>;
+    Value value = initial();
 
     static Str name() { return "outline-style"; }
 
@@ -2154,42 +2164,35 @@ struct OutlineStyleProp {
         c.outline.cow().style = value;
     }
 
-    static Union<Keywords::Auto, Gfx::BorderStyle> load(Computed const& c) {
+    static Value load(Computed const& c) {
         return c.outline->style;
     }
 
     Res<> parse(Cursor<Css::Sst>& c) {
-        if (c.skip(Css::Token::ident("auto"))) {
-            value = Keywords::Auto{};
-        } else {
-            value = try$(parseValue<Gfx::BorderStyle>(c));
-        }
+        value = try$(parseValue<Value>(c));
         return Ok();
     }
 };
 
 // https://drafts.csswg.org/css-ui/#outline-color
 struct OutlineColorProp {
-    Union<Keywords::Auto, Color> value = initial();
+    using Value = Union<Keywords::Auto, Color>;
+    Value value = initial();
 
     static Str name() { return "outline-color"; }
 
-    static Keywords::Auto initial() { return Keywords::Auto{}; }
+    static Keywords::Auto initial() { return Keywords::AUTO; }
 
     void apply(Computed& c) const {
         c.outline.cow().color = value;
     }
 
-    static Union<Keywords::Auto, Color> load(Computed const& c) {
+    static Value load(Computed const& c) {
         return c.outline->color;
     }
 
     Res<> parse(Cursor<Css::Sst>& c) {
-        if (c.skip(Css::Token::ident("auto"))) {
-            value = Keywords::Auto{};
-        } else {
-            value = try$(parseValue<Color>(c));
-        }
+        value = try$(parseValue<Value>(c));
         return Ok();
     }
 };
@@ -2399,7 +2402,7 @@ struct PaddingProp {
 
     static Str name() { return "padding"; }
 
-    static Math::Insets<CalcValue<PercentOr<Length>>> initial() { return {}; }
+    static Math::Insets<CalcValue<PercentOr<Length>>> initial() { return {Length{}}; }
 
     void apply(Computed& c) const {
         c.padding.cow() = value;
@@ -2467,7 +2470,7 @@ struct TopProp {
 
     static Str name() { return "top"; }
 
-    static Width initial() { return Width::AUTO; }
+    static Width initial() { return Keywords::AUTO; }
 
     void apply(Computed& c) const {
         c.offsets.cow().top = value;
@@ -2489,7 +2492,7 @@ struct RightProp {
 
     static Str name() { return "right"; }
 
-    static Width initial() { return Width::AUTO; }
+    static Width initial() { return Keywords::AUTO; }
 
     void apply(Computed& c) const {
         c.offsets.cow().end = value;
@@ -2511,7 +2514,7 @@ struct BottomProp {
 
     static Str name() { return "bottom"; }
 
-    static Width initial() { return Width::AUTO; }
+    static Width initial() { return Keywords::AUTO; }
 
     void apply(Computed& c) const {
         c.offsets.cow().bottom = value;
@@ -2533,7 +2536,7 @@ struct LeftProp {
 
     static Str name() { return "left"; }
 
-    static Width initial() { return Width::AUTO; }
+    static Width initial() { return Keywords::AUTO; }
 
     void apply(Computed& c) const {
         c.offsets.cow().start = value;
@@ -2587,7 +2590,7 @@ struct WidthProp {
 
     static constexpr Str name() { return "width"; }
 
-    static Size initial() { return Size::AUTO; }
+    static Size initial() { return Keywords::AUTO; }
 
     void apply(Computed& c) const {
         c.sizing.cow().width = value;
@@ -2610,7 +2613,7 @@ struct HeightProp {
 
     static constexpr Str name() { return "height"; }
 
-    static Size initial() { return Size::AUTO; }
+    static Size initial() { return Keywords::AUTO; }
 
     void apply(Computed& c) const {
         c.sizing.cow().height = value;
@@ -2633,7 +2636,7 @@ struct MinWidthProp {
 
     static constexpr Str name() { return "min-width"; }
 
-    static Size initial() { return Size::AUTO; }
+    static Size initial() { return Keywords::AUTO; }
 
     void apply(Computed& c) const {
         c.sizing.cow().minWidth = value;
@@ -2656,7 +2659,7 @@ struct MinHeightProp {
 
     static constexpr Str name() { return "min-height"; }
 
-    static Size initial() { return Size::AUTO; }
+    static Size initial() { return Keywords::AUTO; }
 
     void apply(Computed& c) const {
         c.sizing.cow().minHeight = value;
@@ -2675,22 +2678,22 @@ struct MinHeightProp {
 // https://www.w3.org/TR/css-sizing-3/#propdef-max-width
 
 struct MaxWidthProp {
-    Size value = initial();
+    MaxSize value = initial();
 
     static constexpr Str name() { return "max-width"; }
 
-    static Size initial() { return Size::NONE; }
+    static MaxSize initial() { return Keywords::NONE; }
 
     void apply(Computed& c) const {
         c.sizing.cow().maxWidth = value;
     }
 
-    static Size load(Computed const& c) {
+    static MaxSize load(Computed const& c) {
         return c.sizing->maxWidth;
     }
 
     Res<> parse(Cursor<Css::Sst>& c) {
-        value = try$(parseValue<Size>(c));
+        value = try$(parseValue<MaxSize>(c));
         return Ok();
     }
 };
@@ -2698,22 +2701,22 @@ struct MaxWidthProp {
 // https://www.w3.org/TR/css-sizing-3/#propdef-max-height
 
 struct MaxHeightProp {
-    Size value = initial();
+    MaxSize value = initial();
 
     static constexpr Str name() { return "max-height"; }
 
-    static Size initial() { return Size::NONE; }
+    static MaxSize initial() { return Keywords::NONE; }
 
     void apply(Computed& c) const {
         c.sizing.cow().maxHeight = value;
     }
 
-    static Size load(Computed const& c) {
+    static MaxSize load(Computed const& c) {
         return c.sizing->maxHeight;
     }
 
     Res<> parse(Cursor<Css::Sst>& c) {
-        value = try$(parseValue<Size>(c));
+        value = try$(parseValue<MaxSize>(c));
         return Ok();
     }
 };
@@ -2793,6 +2796,37 @@ struct TextTransformProp {
     }
 };
 
+// https://drafts.csswg.org/css-display/#visibility
+struct VisibilityProp {
+    Visibility value = initial();
+
+    static constexpr Str name() { return "visibility"; }
+
+    static Visibility initial() { return Visibility::VISIBLE; }
+
+    void apply(Computed& c) const {
+        c.visibility = value;
+    }
+
+    static void inherit(Computed const& parent, Computed& child) {
+        child.visibility = parent.visibility;
+    }
+
+    Res<> parse(Cursor<Css::Sst>& c) {
+        if (c.skip(Css::Token::ident("visible"))) {
+            value = Visibility::VISIBLE;
+        } else if (c.skip(Css::Token::ident("hidden"))) {
+            value = Visibility::HIDDEN;
+        } else if (c.skip(Css::Token::ident("collapse"))) {
+            value = Visibility::COLLAPSE;
+        } else {
+            return Error::invalidData("expected visibility");
+        }
+
+        return Ok();
+    }
+};
+
 // https://drafts.csswg.org/css-text/#white-space-property
 
 struct WhiteSpaceProp {
@@ -2838,7 +2872,7 @@ struct ZIndexProp {
 
     static constexpr Str name() { return "z-index"; }
 
-    static constexpr ZIndex initial() { return ZIndex::AUTO; }
+    static constexpr ZIndex initial() { return Keywords::AUTO; }
 
     void apply(Computed& c) const {
         c.zIndex = value;
@@ -2948,6 +2982,7 @@ using _StyleProp = Union<
     DisplayProp,
     TableLayoutProp,
     CaptionSideProp,
+    VisibilityProp,
 
     // Borders
     BorderTopColorProp,

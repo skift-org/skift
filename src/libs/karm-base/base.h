@@ -17,11 +17,21 @@ using u32 = uint32_t;
 using u64 = uint64_t;
 #ifdef __SIZEOF_INT128__
 using u128 = __uint128_t;
+
+inline u128 _bswap128(u128 value) {
+    u64 high = __builtin_bswap64(static_cast<u64>(value));
+    u64 low = __builtin_bswap64(static_cast<u64>(value >> 64));
+    return (static_cast<u128>(high) << 64) | low;
+}
 #endif
 
 template <typename T>
-    requires(sizeof(T) <= 8)
+    requires(sizeof(T) <= 16)
 always_inline constexpr T bswap(T value) {
+#ifdef __SIZEOF_INT128__
+    if (sizeof(T) == 16)
+        return _bswap128(value);
+#endif
     if (sizeof(T) == 8)
         return __builtin_bswap64(value);
     if (sizeof(T) == 4)

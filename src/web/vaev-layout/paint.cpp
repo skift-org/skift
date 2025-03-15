@@ -92,6 +92,10 @@ static void _establishStackingContext(Frag& frag, Scene::Stack& stack);
 static void _paintStackingContext(Frag& frag, Scene::Stack& stack);
 
 static void _paintFrag(Frag& frag, Scene::Stack& stack) {
+    auto& s = frag.style();
+    if (s.visibility == Visibility::HIDDEN)
+        return;
+
     _paintFragBordersAndBackgrounds(frag, stack);
 
     if (auto prose = frag.box->content.is<Rc<Text::Prose>>()) {
@@ -108,7 +112,7 @@ static void _paintChildren(Frag& frag, Scene::Stack& stack, auto predicate) {
         auto& s = c.style();
 
         auto zIndex = s.zIndex;
-        if (zIndex != ZIndex::AUTO) {
+        if (zIndex != Keywords::AUTO) {
             if (predicate(s))
                 _establishStackingContext(c, stack);
             continue;
@@ -133,39 +137,39 @@ static void _paintStackingContext(Frag& frag, Scene::Stack& stack) {
     _paintFrag(frag, stack);
 
     // 2. the child stacking contexts with negative stack levels (most negative first).
-    _paintChildren(frag, stack, [](Style::Computed const& s) {
-        return s.zIndex.value < 0;
+    _paintChildren(frag, stack, [](Style::Computed const& s) -> bool {
+        return s.zIndex.unwrapOr<isize>(0) < 0;
     });
 
     // 3. the in-flow, non-inline-level, non-positioned descendants.
     _paintChildren(frag, stack, [](Style::Computed const& s) {
-        return s.zIndex == ZIndex::AUTO and s.display != Display::INLINE and s.position == Position::STATIC;
+        return s.zIndex == Keywords::AUTO and s.display != Display::INLINE and s.position == Position::STATIC;
     });
 
     // 4. the non-positioned floats.
     _paintChildren(frag, stack, [](Style::Computed const& s) {
-        return s.zIndex == ZIndex::AUTO and s.position == Position::STATIC and s.float_ != Float::NONE;
+        return s.zIndex == Keywords::AUTO and s.position == Position::STATIC and s.float_ != Float::NONE;
     });
 
     // 5. the in-flow, inline-level, non-positioned descendants, including inline tables and inline blocks.
     _paintChildren(frag, stack, [](Style::Computed const& s) {
-        return s.zIndex == ZIndex::AUTO and s.display == Display::INLINE and s.position == Position::STATIC;
+        return s.zIndex == Keywords::AUTO and s.display == Display::INLINE and s.position == Position::STATIC;
     });
 
     // 6. the child stacking contexts with stack level 0 and the positioned descendants with stack level 0.
     _paintChildren(frag, stack, [](Style::Computed const& s) {
-        return s.zIndex.value == 0 and s.position != Position::STATIC;
+        return s.zIndex.unwrapOr<isize>(0) == 0 and s.position != Position::STATIC;
     });
 
     // 7. the child stacking contexts with positive stack levels (least positive first).
     _paintChildren(frag, stack, [](Style::Computed const& s) {
-        return s.zIndex.value > 0;
+        return s.zIndex.unwrapOr<isize>(0) > 0;
     });
 }
 
 static void _establishStackingContext(Frag& frag, Scene::Stack& stack) {
     auto innerStack = makeRc<Scene::Stack>();
-    innerStack->zIndex = frag.style().zIndex.value;
+    innerStack->zIndex = frag.style().zIndex.unwrapOr<isize>(0);
     _paintStackingContext(frag, *innerStack);
     stack.add(std::move(innerStack));
 }
@@ -179,7 +183,7 @@ export void wireframe(Frag& frag, Gfx::Canvas& g) {
         wireframe(c, g);
 
     g.strokeStyle({
-        .fill = Gfx::BLACK,
+        .fill = Gfx::GREEN,
         .width = 1,
         .align = Gfx::INSIDE_ALIGN,
     });

@@ -8,6 +8,8 @@
 
 namespace Karm {
 
+struct Monostate {};
+
 template <typename... Ts>
 struct Union {
     static_assert(sizeof...(Ts) <= 255, "Union can only hold up to 255 types");
@@ -15,7 +17,9 @@ struct Union {
     alignas(max(alignof(Ts)...)) char _buf[max(sizeof(Ts)...)];
     u8 _index;
 
-    always_inline Union() = delete("union must be initialized with a value");
+    always_inline Union()
+        requires(Meta::Contains<Monostate, Ts...>)
+        : Union(Monostate{}) {}
 
     template <Meta::Contains<Ts...> T>
     always_inline Union(T const& value)
@@ -101,6 +105,14 @@ struct Union {
     always_inline T const& unwrap(char const* msg = "unwrapping wrong type") const lifetimebound {
         if (_index != Meta::indexOf<T, Ts...>()) [[unlikely]]
             panic(msg);
+
+        return *reinterpret_cast<T const*>(_buf);
+    }
+
+    template <Meta::Contains<Ts...> T>
+    always_inline T const& unwrapOr(T const& fallback) const lifetimebound {
+        if (_index != Meta::indexOf<T, Ts...>())
+            return fallback;
 
         return *reinterpret_cast<T const*>(_buf);
     }
@@ -210,7 +222,32 @@ struct Visitor : Ts... {
     using Ts::operator()...;
 };
 
-template <class... Ts>
+template <typename... Ts>
 Visitor(Ts...) -> Visitor<Ts...>;
+
+template <typename T, typename... Ts>
+struct _UnionFlatten {
+    using type = T;
+};
+
+// If the type is already in the Union we discard it
+template <typename... Ts, Meta::Contains<Ts...> A, typename... Us>
+struct _UnionFlatten<Union<Ts...>, A, Us...> {
+    using type = _UnionFlatten<Union<Ts...>, Us...>::type;
+};
+
+// Else we add it to the Union
+template <typename... Ts, typename A, typename... Us>
+struct _UnionFlatten<Union<Ts...>, A, Us...> {
+    using type = _UnionFlatten<Union<Ts..., A>, Us...>::type;
+};
+
+template <typename... Ts, typename... Us, typename... Vs>
+struct _UnionFlatten<Union<Ts...>, Union<Us...>, Vs...> {
+    using type = _UnionFlatten<Union<Ts...>, Us..., Vs...>::type;
+};
+
+template <typename... Ts>
+using FlatUnion = _UnionFlatten<Union<>, Ts...>::type;
 
 } // namespace Karm

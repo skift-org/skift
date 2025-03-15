@@ -7,23 +7,15 @@
 #include "calc.h"
 #include "color.h"
 #include "length.h"
+#include "line-width.h"
 #include "percent.h"
 
 namespace Vaev {
 
-enum struct BorderEdge {
-    ALL,
-
-    TOP,
-    END,
-    BOTTOM,
-    START,
-};
-
 struct Border {
-    CalcValue<Length> width;
+    LineWidth width = Keywords::MEDIUM;
     Gfx::BorderStyle style;
-    Color color = CURRENT_COLOR;
+    Color color = Keywords::CURRENT_COLOR;
 
     void repr(Io::Emit& e) const {
         e("(border {} {} {})", width, style, color);
@@ -31,35 +23,11 @@ struct Border {
 };
 
 struct BorderProps {
-    static constexpr Length THIN = 1_au;
-    static constexpr Length MEDIUM = 3_au;
-    static constexpr Length THICK = 5_au;
-
     Border top, start, bottom, end;
-    Math::Radii<CalcValue<PercentOr<Length>>> radii;
+    Math::Radii<CalcValue<PercentOr<Length>>> radii = {Length(0_au)};
 
     void all(Border b) {
         top = start = bottom = end = b;
-    }
-
-    void set(BorderEdge edge, Border b) {
-        switch (edge) {
-        case BorderEdge::ALL:
-            all(b);
-            break;
-        case BorderEdge::TOP:
-            top = b;
-            break;
-        case BorderEdge::START:
-            start = b;
-            break;
-        case BorderEdge::BOTTOM:
-            bottom = b;
-            break;
-        case BorderEdge::END:
-            end = b;
-            break;
-        }
     }
 
     void repr(Io::Emit& e) const {

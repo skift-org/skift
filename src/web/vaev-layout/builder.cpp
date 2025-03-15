@@ -201,7 +201,9 @@ static void _buildImage(Style::Computer& c, Gc::Ref<Dom::Element> el, Box& paren
     auto font = _lookupFontface(c.fontBook, *style);
 
     auto src = el->getAttribute(Html::SRC_ATTR).unwrapOr(""s);
-    auto url = Mime::parseUrlOrPath(src, el->baseURI());
+    auto url = Mime::Url::resolveReference(el->baseURI(), Mime::parseUrlOrPath(src))
+                   .unwrapOr("bundle://vaev-driver/missing.qoi"_url);
+
     auto img = Karm::Image::load(url).unwrapOrElse([] {
         return Karm::Image::loadOrFallback("bundle://vaev-driver/missing.qoi"_url).unwrap();
     });
@@ -212,7 +214,8 @@ static void _buildImage(Style::Computer& c, Gc::Ref<Dom::Element> el, Box& paren
 
 static void _buildTableChildren(Style::Computer& c, Gc::Ref<Dom::Node> node, Box& tableWrapperBox, Rc<Style::Computed> tableBoxStyle) {
     Box tableBox{
-        tableBoxStyle, tableWrapperBox.fontFace
+        tableBoxStyle,
+        tableWrapperBox.fontFace,
     };
 
     tableBox.style->display = Display::Internal::TABLE_BOX;
@@ -298,10 +301,19 @@ static void _buildNode(Style::Computer& c, Gc::Ref<Dom::Node> node, Box& parent)
 }
 
 export Box build(Style::Computer& c, Gc::Ref<Dom::Document> doc) {
+    if (auto el = doc->documentElement()) {
+        auto style = c.computeFor(Style::Computed::initial(), *el);
+        auto font = _lookupFontface(c.fontBook, *style);
+        Box root = {style, _lookupFontface(c.fontBook, *style)};
+        _buildChildren(c, *el, root);
+        return root;
+    }
+    // NOTE: Fallback in case of an empty document
     auto style = makeRc<Style::Computed>(Style::Computed::initial());
-    Box root = {style, _lookupFontface(c.fontBook, *style)};
-    _buildNode(c, doc, root);
-    return root;
+    return {
+        style,
+        _lookupFontface(c.fontBook, *style),
+    };
 }
 
 export Box buildForPseudoElement(Text::FontBook& fontBook, Rc<Style::Computed> style) {

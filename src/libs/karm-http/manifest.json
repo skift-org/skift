@@ -1,15 +1,13 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "karm-net.http.tests",
+    "id": "karm-http",
     "type": "lib",
+    "description": "HTTP client and server",
     "props": {
         "cpp-excluded": true
     },
     "requires": [
-        "karm-net.http",
-        "karm-test"
-    ],
-    "injects": [
-        "__tests__"
+        "karm-aio",
+        "karm-sys"
     ]
 }

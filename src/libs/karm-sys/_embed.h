@@ -10,6 +10,7 @@
 #include "fd.h"
 #include "info.h"
 #include "types.h"
+#include "addr.h"
 
 namespace Karm::Sys {
 
@@ -102,6 +103,10 @@ Res<Mime::Url> pwd();
 // MARK: Sandboxing ------------------------------------------------------------
 
 void hardenSandbox();
+
+// MARK: Addr ------------------------------------------------------------------
+
+Async::Task<Vec<Ip>> ipLookupAsync(Str host);
 
 // MARK: Asynchronous I/O ------------------------------------------------------
 

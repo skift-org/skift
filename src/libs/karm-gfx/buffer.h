@@ -27,7 +27,7 @@ struct Rgba8888 {
     }
 };
 
-[[gnu::used]] inline Rgba8888 RGBA8888;
+static inline Rgba8888 RGBA8888;
 
 struct Bgra8888 {
     always_inline static Color load(void const* pixel) {
@@ -48,7 +48,7 @@ struct Bgra8888 {
     }
 };
 
-[[gnu::used]] inline Bgra8888 BGRA8888;
+static inline Bgra8888 BGRA8888;
 
 using _Fmts = Union<Rgba8888, Bgra8888>;
 

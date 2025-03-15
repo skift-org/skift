@@ -3,6 +3,7 @@ module;
 #include <karm-text/font.h>
 #include <vaev-base/color.h>
 #include <vaev-base/font.h>
+#include <vaev-base/line-width.h>
 #include <vaev-base/width.h>
 #include <vaev-base/writing.h>
 
@@ -12,15 +13,6 @@ import :base;
 import :writing;
 
 namespace Vaev::Layout {
-
-export template <typename T>
-concept Resolvable = requires {
-    typename T::Resolved;
-};
-
-export template <typename T>
-using Resolved = Meta::Cond<Resolvable<T>, typename T::Resolved, T>;
-static_assert(Resolvable<PercentOr<Length>>);
 
 export struct Resolver {
     f64 userFontSize = 16;   /// Font size of the user agent
@@ -248,16 +240,33 @@ export struct Resolver {
         }
     }
 
+    Au resolve(LineWidth const& value) {
+        return value.visit(Visitor{
+            [](Keywords::Thin const&) {
+                return THIN_VALUE;
+            },
+            [](Keywords::Medium const&) {
+                return MEDIUM_VALUE;
+            },
+            [](Keywords::Thick const&) {
+                return THICK_VALUE;
+            },
+            [&](auto const& length) {
+                return resolve(length);
+            },
+        });
+    }
+
     Au resolve(PercentOr<Length> const& value, Au relative) {
-        if (value.resolved())
-            return resolve(value.value());
-        return Au{relative.cast<f64>() * (value.percent().value() / 100.)};
+        if (auto valueLength = value.is<Length>())
+            return resolve(*valueLength);
+        return Au{relative.cast<f64>() * (value.unwrap<Percent>().value() / 100.)};
     }
 
     Au resolve(Width const& value, Au relative) {
-        if (value == Width::Type::AUTO)
+        if (value.is<Keywords::Auto>())
             return 0_au;
-        return resolve(value.value, relative);
+        return resolve(value.unwrap<CalcValue<PercentOr<Length>>>(), relative);
     }
 
     Au resolve(FontSize const& value) {
@@ -361,6 +370,10 @@ export Au resolve(Tree const& tree, Box const& box, PercentOr<Length> const& val
 
 export Au resolve(Tree const& tree, Box const& box, Width const& value, Au relative) {
     return Resolver::from(tree, box).resolve(value, relative);
+}
+
+export Au resolve(Tree const& tree, Box const& box, LineWidth const& value) {
+    return Resolver::from(tree, box).resolve(value);
 }
 
 export Au resolve(Tree const& tree, Box const& box, FontSize const& value) {

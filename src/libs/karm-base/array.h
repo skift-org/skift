@@ -10,6 +10,7 @@ template <typename T, usize N>
 struct Array {
     using Inner = T;
 
+    static_assert(N > 0, "Array length must be greater than 0");
     T _buf[N];
 
     always_inline static constexpr Array from(Sliceable<T> auto slice) {

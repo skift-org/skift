@@ -1,0 +1,17 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "strata-device",
+    "type": "exe",
+    "description": "Skift's device manager service",
+    "enableIf": {
+        "sys": [
+            "skift"
+        ]
+    },
+    "requires": [
+        "strata-base",
+        "karm-rpc",
+        "karm-sys",
+        "hal"
+    ]
+}

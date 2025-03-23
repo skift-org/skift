@@ -1,0 +1,19 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "strata-shell",
+    "type": "exe",
+    "props": {
+        "cpp-excluded": true
+    },
+    "enableIf": {
+        "sys": [
+            "skift"
+        ]
+    },
+    "requires": [
+        "strata-base",
+        "hideo-shell",
+        "karm-rpc",
+        "karm-sys"
+    ]
+}

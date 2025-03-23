@@ -1,0 +1,16 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "strata-fs",
+    "type": "exe",
+    "description": "Skift's virtual file system",
+    "enableIf": {
+        "sys": [
+            "skift"
+        ]
+    },
+    "requires": [
+        "strata-base",
+        "karm-rpc",
+        "karm-sys"
+    ]
+}

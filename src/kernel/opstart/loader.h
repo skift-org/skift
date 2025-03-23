@@ -6,29 +6,35 @@
 #include <karm-logger/logger.h>
 #include <karm-sys/context.h>
 #include <karm-sys/file.h>
+#include <karm-ui/node.h>
 
 namespace Opstart {
-
-Res<Sys::File> openUrl(Mime::Url const& url);
 
 struct Blob {
     Mime::Url url;
     Json::Value props;
 
     static Res<Blob> fromJson(Json::Value const& json) {
-        if (json.isStr())
-            return Ok(Blob{
-                .url = Mime::Url::parse(json.asStr()),
-                .props = NONE,
-            });
+        Blob blob = {};
 
-        if (not json.isObject())
-            return Error::invalidInput("expected object");
+        if (json.isStr()) {
+            blob.url = Mime::Url::parse(json.asStr());
+            return Ok(blob);
+        }
 
-        return Ok(Blob{
-            .url = Mime::Url::parse(try$(json.get("url").take<String>())),
-            .props = json.get("props"),
-        });
+        if (json.isObject()) {
+            if (auto it = json.get("url"); it and it.isStr()) {
+                blob.url = Mime::Url::parse(it.asStr());
+            } else {
+                return Error::invalidInput("missing url");
+            }
+
+            blob.props = json.get("props");
+
+            return Ok(blob);
+        }
+
+        return Error::invalidInput("expected object or string");
     }
 };
 
@@ -44,22 +50,29 @@ struct Entry {
 
         Entry entry = {};
 
-        auto maybeIcon = json.get("icon").take<String>();
-        if (maybeIcon) {
-            auto maybeImage = Image::load(Mime::Url::parse(*maybeIcon));
-            if (maybeImage) {
-                entry.icon = maybeImage.unwrap();
-            }
+        if (auto it = json.get("icon"); it and it.isStr()) {
+            auto icon = Image::load(Mime::Url::parse(it.asStr()));
+            if (icon)
+                entry.icon = icon.unwrap();
         }
 
-        entry.name = try$(json.get("name").take<String>());
-        auto kernelJson = json.get("kernel");
-        entry.kernel = try$(Blob::fromJson(kernelJson));
+        if (auto it = json.get("name"); it and it.isStr()) {
+            entry.name = it.asStr();
+        } else {
+            return Error::invalidInput("missing name");
+        }
 
-        auto blobsJson = try$(json.get("blobs").take<Json::Array>());
-        for (auto const& blobJson : blobsJson) {
-            auto blob = try$(Blob::fromJson(blobJson));
-            entry.blobs.pushBack(blob);
+        if (auto it = json.get("kernel"); it and (it.isStr() or it.isObject())) {
+            entry.kernel = try$(Blob::fromJson(it));
+        } else {
+            return Error::invalidInput("missing kernel");
+        }
+
+        if (auto it = json.get("blobs"); it and it.isArray()) {
+            for (auto const& e : it.asArray()) {
+                auto blob = try$(Blob::fromJson(e));
+                entry.blobs.pushBack(blob);
+            }
         }
 
         return Ok(entry);
@@ -78,20 +91,24 @@ struct Configs {
 
         Configs configs = {};
 
-        configs.title = json.get("title").take<String>();
-        configs.subtitle = json.get("subtitle").take<String>();
+        if (auto it = json.get("title"); it and it.isStr())
+            configs.title = it.asStr();
 
-        auto entriesJson = try$(json.get("entries").take<Json::Array>());
-        for (auto const& entryJson : entriesJson) {
-            auto entry = try$(Entry::fromJson(entryJson));
-            configs.entries.pushBack(entry);
+        if (auto it = json.get("subtitle"); it and it.isStr())
+            configs.subtitle = it.asStr();
+
+        if (auto it = json.get("entries"); it and it.isArray()) {
+            for (auto const& e : it.asArray()) {
+                auto entry = try$(Entry::fromJson(e));
+                configs.entries.pushBack(entry);
+            }
         }
 
         return Ok(configs);
     }
 };
 
-Res<> showMenu(Sys::Context& ctx, Configs const& c);
+Async::Task<> showMenuAsync(Sys::Context& ctx, Configs const& c);
 
 Res<> loadEntry(Entry const&);
 

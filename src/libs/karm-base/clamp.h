@@ -1,5 +1,7 @@
 #pragma once
 
+#include <karm-meta/traits.h>
+
 #include "limits.h"
 
 namespace Karm {

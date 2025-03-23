@@ -8,18 +8,16 @@
 
 namespace Karm {
 
-struct Monostate {};
-
 template <typename... Ts>
 struct Union {
     static_assert(sizeof...(Ts) <= 255, "Union can only hold up to 255 types");
 
-    alignas(max(alignof(Ts)...)) char _buf[max(sizeof(Ts)...)];
+    alignas(max(alignof(Ts)...)) char _buf[max(Meta::zeroableSizeOf<Ts>()...)];
     u8 _index;
 
     always_inline Union()
-        requires(Meta::Contains<Monostate, Ts...>)
-        : Union(Monostate{}) {}
+        requires(Meta::Contains<None, Ts...>)
+        : Union(None{}) {}
 
     template <Meta::Contains<Ts...> T>
     always_inline Union(T const& value)
@@ -131,21 +129,10 @@ struct Union {
     }
 
     template <Meta::Contains<Ts...> T>
-    always_inline Opt<T> take() {
-        if (_index != Meta::indexOf<T, Ts...>()) {
-            return NONE;
-        }
-
+    always_inline T take() {
+        if (_index != Meta::indexOf<T, Ts...>())
+            panic("taking wrong type");
         return std::move(*reinterpret_cast<T*>(_buf));
-    }
-
-    template <Meta::Contains<Ts...> T>
-    always_inline Opt<T> take() const {
-        if (_index != Meta::indexOf<T, Ts...>()) {
-            return NONE;
-        }
-
-        return *reinterpret_cast<T const*>(_buf);
     }
 
     always_inline auto visit(auto visitor) {

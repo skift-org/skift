@@ -515,7 +515,7 @@ struct SdlHost :
         g.pop();
     }
 
-    Res<> wait(Instant ts) override {
+    Async::Task<> waitAsync(Instant ts) override {
         // HACK: Since we don't have a lot of control onto how SDL wait for
         //       events we can't integrate it properly with our event loop
         //       To remedi this we will just cap how long we wait, this way
@@ -526,12 +526,12 @@ struct SdlHost :
         //       but this would require to make the Framework thread safe
         auto delay = Duration::fromMSecs((usize)(FRAME_TIME * 1000));
         auto cappedWait = min(ts, Sys::instant() + delay);
-        try$(Sys::globalSched().wait(cappedWait));
+        co_trya$(Sys::globalSched().sleepAsync(cappedWait));
 
         SDL_Event e{};
         while (SDL_PollEvent(&e) != 0 and alive())
             translate(e);
-        return Ok();
+        co_return Ok();
     }
 
     void bubble(App::Event& event) override {
@@ -644,10 +644,6 @@ Res<Rc<Host>> makeHost(Child root) {
     SDL_SetWindowHitTest(window, _hitTestCallback, (void*)&host.unwrap());
 
     return Ok(host);
-}
-
-Async::Task<> runAsync(Sys::Context&, Child) {
-    notImplemented();
 }
 
 } // namespace Karm::Ui::_Embed

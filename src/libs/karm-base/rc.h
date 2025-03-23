@@ -13,7 +13,7 @@ template <typename L>
 struct _Cell {
     i32 _strong = 0;
     i32 _weak = 0;
-    no_unique_address L _lock;
+    [[no_unique_address]] L _lock;
 
     virtual ~_Cell() = default;
 

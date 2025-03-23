@@ -68,6 +68,10 @@ static bool _paintOutline(Frag& frag, Gfx::Color currentColor, Gfx::Outline& out
     return true;
 }
 
+static bool _needsNewStackingContext(Frag const& frag) {
+    return frag.style().zIndex != Keywords::AUTO;
+}
+
 static void _paintFragBordersAndBackgrounds(Frag& frag, Scene::Stack& stack) {
     auto const& cssBackground = frag.style().backgrounds;
 
@@ -82,10 +86,13 @@ static void _paintFragBordersAndBackgrounds(Frag& frag, Scene::Stack& stack) {
     auto currentColor = Vaev::resolve(frag.style().color, color);
     bool hasBorders = _paintBorders(frag, currentColor, borders);
     bool hasOutline = _paintOutline(frag, currentColor, outline);
-    Math::Rectf bound = frag.metrics.borderBox().cast<f64>();
+    Math::Rectf bound = frag.metrics.borderBox().round().cast<f64>();
 
-    if (any(backgrounds) or hasBorders or hasOutline)
-        stack.add(makeRc<Scene::Box>(bound, std::move(borders), std::move(outline), std::move(backgrounds)));
+    if (any(backgrounds) or hasBorders or hasOutline) {
+        auto box = makeRc<Scene::Box>(bound, std::move(borders), std::move(outline), std::move(backgrounds));
+        box->zIndex = _needsNewStackingContext(frag) ? Limits<isize>::MIN : 0;
+        stack.add(box);
+    }
 }
 
 static void _establishStackingContext(Frag& frag, Scene::Stack& stack);
@@ -111,8 +118,7 @@ static void _paintChildren(Frag& frag, Scene::Stack& stack, auto predicate) {
     for (auto& c : frag.children) {
         auto& s = c.style();
 
-        auto zIndex = s.zIndex;
-        if (zIndex != Keywords::AUTO) {
+        if (_needsNewStackingContext(c)) {
             if (predicate(s))
                 _establishStackingContext(c, stack);
             continue;

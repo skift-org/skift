@@ -2,7 +2,6 @@
 #include <handover/entry.h>
 #include <karm-base/size.h>
 #include <karm-logger/logger.h>
-#include <karm-sys/chan.h>
 
 #include "arch.h"
 #include "cpu.h"

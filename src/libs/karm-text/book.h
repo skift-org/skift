@@ -33,7 +33,19 @@ Str commonFamily(Str lhs, Str rhs);
 
 struct FontBook {
     Vec<FontInfo> _faces;
-    Array<String, toUnderlyingType(GenericFamily::_LEN)> _genericFamily;
+
+    // FIXME: these value depend on the correct loading of the bundle
+    Array<String, toUnderlyingType(GenericFamily::_LEN)> _genericFamily = {
+        /* SERIF */ "Noto Serif"s,
+        /* SANS_SERIF */ "Noto Sans"s,
+        /* MONOSPACE */ "Fira Code"s,
+        /* CURSIVE */ "Dancing Script"s,
+        /* FANTASY */ "Excalibur"s,
+        /* SYSTEM */ "Noto Serif"s,
+        /* EMOJI */ "Noto Emoji"s,
+        /* MATH */ "Noto Sans Math"s,
+        /* FANGSONG */ "Noto"s,
+    };
 
     void add(FontInfo info) {
         _faces.pushBack(info);

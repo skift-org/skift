@@ -10,113 +10,84 @@ module;
 #include <vaev-dom/xml/parser.h>
 #include <vaev-style/stylesheet.h>
 
-export module Vaev.Driver:fetcher;
+export module Vaev.Driver:loader;
+
+import Karm.Http;
+import Karm.Aio;
 
 namespace Vaev::Driver {
 
-export Res<Gc::Ref<Dom::Document>> loadDocument(Gc::Heap& heap, Mime::Url const& url, Mime::Mime const& mime, Io::Reader& reader) {
+Async::Task<Gc::Ref<Dom::Document>> _loadDocumentAsync(Gc::Heap& heap, Mime::Url url, Rc<Http::Response> resp) {
     auto dom = heap.alloc<Dom::Document>(url);
-    auto buf = try$(Io::readAllUtf8(reader));
 
-    if (mime.is("text/html"_mime)) {
+    auto mime = resp->header.contentType();
+
+    if (not mime.has())
+        mime = Mime::sniffSuffix(url.path.suffix());
+
+    if (not mime.has())
+        co_return Error::invalidInput("cannot determine MIME type");
+
+    if (not resp->body)
+        co_return Error::invalidInput("response body is missing");
+
+    auto respBody = resp->body.unwrap();
+
+    auto buf = co_trya$(Aio::readAllUtf8Async(*respBody));
+
+    if (mime->is("text/html"_mime)) {
         Dom::HtmlParser parser{heap, dom};
         parser.write(buf);
 
-        return Ok(dom);
-    } else if (mime.is("application/xhtml+xml"_mime)) {
+        co_return Ok(dom);
+    } else if (mime->is("application/xhtml+xml"_mime)) {
         Io::SScan scan{buf};
         Dom::XmlParser parser{heap};
-        try$(parser.parse(scan, HTML, *dom));
+        co_try$(parser.parse(scan, HTML, *dom));
 
-        return Ok(dom);
-    } else if (mime.is("image/svg+xml"_mime)) {
+        co_return Ok(dom);
+    } else if (mime->is("image/svg+xml"_mime)) {
         Io::SScan scan{buf};
         Dom::XmlParser parser{heap};
-        try$(parser.parse(scan, SVG, *dom));
+        co_try$(parser.parse(scan, SVG, *dom));
 
-        return Ok(dom);
+        co_return Ok(dom);
     } else {
         logError("unsupported MIME type: {}", mime);
-        return Error::invalidInput("unsupported MIME type");
+
+        co_return Error::invalidInput("unsupported MIME type");
     }
 }
 
-export Res<Gc::Ref<Dom::Document>> viewSource(Gc::Heap& heap, Mime::Url const& url) {
-    auto file = try$(Sys::File::open(url));
-    auto buf = try$(Io::readAllUtf8(file));
+export Async::Task<Gc::Ref<Dom::Document>> viewSourceAsync(Gc::Heap& heap, Http::Client& client, Mime::Url const& url) {
+    auto resp = co_trya$(client.getAsync(url));
+    if (not resp->body)
+        co_return Error::invalidInput("response body is missing");
+    auto respBody = resp->body.unwrap();
+    auto buf = co_trya$(Aio::readAllUtf8Async(*respBody));
 
     auto dom = heap.alloc<Dom::Document>(url);
-
     auto body = heap.alloc<Dom::Element>(Html::BODY);
     dom->appendChild(body);
-
     auto pre = heap.alloc<Dom::Element>(Html::PRE);
     body->appendChild(pre);
-
     auto text = heap.alloc<Dom::Text>(buf);
     pre->appendChild(text);
 
-    return Ok(dom);
+    co_return Ok(dom);
 }
 
-Res<Gc::Ref<Dom::Document>> indexOf(Gc::Heap& heap, Mime::Url const& url) {
-    auto dom = heap.alloc<Dom::Document>(url);
-
-    auto body = heap.alloc<Dom::Element>(Html::BODY);
-    dom->appendChild(body);
-
-    auto h1 = heap.alloc<Dom::Element>(Html::H1);
-    body->appendChild(h1);
-
-    auto text = heap.alloc<Dom::Text>(Io::format("Index of {}", url.path));
-    h1->appendChild(text);
-
-    auto ul = heap.alloc<Dom::Element>(Html::UL);
-    body->appendChild(ul);
-
-    auto dir = try$(Sys::Dir::open(url));
-
-    for (auto const& entry : dir.entries()) {
-        auto li = heap.alloc<Dom::Element>(Html::LI);
-        ul->appendChild(li);
-
-        auto a = heap.alloc<Dom::Element>(Html::A);
-        li->appendChild(a);
-
-        auto href = url.join(entry.name);
-        a->setAttribute(Html::HREF_ATTR, href.str());
-
-        auto text = heap.alloc<Dom::Text>(entry.name);
-        a->appendChild(text);
-    }
-
-    return Ok(dom);
-}
-
-export Res<Gc::Ref<Dom::Document>> fetchDocument(Gc::Heap& heap, Mime::Url const& url) {
+export Async::Task<Gc::Ref<Dom::Document>> fetchDocumentAsync(Gc::Heap& heap, Http::Client& client, Mime::Url const& url) {
     if (url.scheme == "about") {
         if (url.path.str() == "blank")
-            return fetchDocument(heap, "bundle://vaev-driver/blank.xhtml"_url);
+            co_return co_await fetchDocumentAsync(heap, client, "bundle://vaev-driver/blank.xhtml"_url);
 
         if (url.path.str() == "start")
-            return fetchDocument(heap, "bundle://vaev-driver/start-page.xhtml"_url);
-
-        return Error::invalidInput("unsupported about page");
-    } else if (url.scheme == "file" or url.scheme == "bundle") {
-        if (try$(Sys::isDir(url))) {
-            return indexOf(heap, url);
-        }
-
-        auto mime = Mime::sniffSuffix(url.path.suffix());
-        if (not mime.has())
-            return Error::invalidInput("cannot determine MIME type");
-
-        auto dom = makeRc<Dom::Document>(url);
-        auto file = try$(Sys::File::open(url));
-        return loadDocument(heap, url, *mime, file);
-    } else {
-        return Error::invalidInput("unsupported url scheme");
+            co_return co_await fetchDocumentAsync(heap, client, "bundle://vaev-driver/start-page.xhtml"_url);
     }
+
+    auto resp = co_trya$(client.getAsync(url));
+    co_return co_await _loadDocumentAsync(heap, url, resp);
 }
 
 export Res<Style::StyleSheet> fetchStylesheet(Mime::Url url, Style::Origin origin) {

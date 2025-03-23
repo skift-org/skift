@@ -6,6 +6,8 @@
 
 namespace Ttf {
 
+static constexpr bool DEBUG_GLYF = false;
+
 struct Glyf : public Io::BChunk {
     static constexpr Str SIG = "glyf";
 
@@ -154,7 +156,7 @@ struct Glyf : public Io::BChunk {
     }
 
     void contourComposite(Gfx::Canvas&, Metrics, Io::BScan&) const {
-        logDebug("composite glyph not implemented");
+        logDebugIf(DEBUG_GLYF, "composite glyph not implemented");
     }
 
     void contour(Gfx::Canvas& g, usize glyfOffset) const {

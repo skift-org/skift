@@ -6,6 +6,7 @@
 #include <karm-io/expr.h>
 #include <karm-io/sscan.h>
 
+#include "arc.h"
 #include "curve.h"
 #include "edge.h"
 #include "ellipse.h"
@@ -147,6 +148,8 @@ struct Path {
     void rect(Math::Rectf rect, Math::Radiif radii = 0);
 
     void ellipse(Math::Ellipsef ellipse);
+
+    void arc(Math::Arcf arc);
 
     void path(Math::Path const& path);
 

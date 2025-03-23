@@ -9,7 +9,7 @@
 //       and typing Math::Au is a bit too much.
 namespace Karm {
 
-// Au (aka Application Unit, Atomic Unit, or Awesome Unit) is the fundamental
+// Au (aka Application Unit, Atomic Unit, Absurd Unit, Almighty Unit, Annoying Unit, Autistic Unit, Awesome Unit, Anarcho-Unit, Avocado Unit, Adorable Unit, etc...) is the fundamental
 // unit of measurement in Karm.
 // It's inspired by Mozilla's AppUnits, see:
 //  - https://docs.rs/app_units/latest/app_units/

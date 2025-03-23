@@ -278,7 +278,7 @@ struct UBig {
         return _len() == rhs._len() and _value == rhs._value;
     }
 
-    Bool operator==(usize rhs) const {
+    bool operator==(usize rhs) const {
         return _len() == 1 and _value[0] == rhs;
     }
 };

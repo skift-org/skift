@@ -25,6 +25,8 @@
 
 namespace Ttf {
 
+static bool DEBUG_PARSER = false;
+
 struct GlyphMetrics {
     f64 x;
     f64 y;
@@ -183,7 +185,7 @@ struct Parser {
             }
         }
 
-        logWarn("ttf: '{}' table not found", T::SIG);
+        logDebugIf(DEBUG_PARSER, "ttf: '{}' table not found", T::SIG);
         return T{};
     }
 

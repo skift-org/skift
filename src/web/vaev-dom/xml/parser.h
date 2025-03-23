@@ -34,11 +34,13 @@ struct XmlParser {
 
     Res<> _parseVersionInfo(Io::SScan& s);
 
-    Res<> _parseXmlDecl(Io::SScan& s);
+    Res<Str> _parseXmlDeclAttr(Io::SScan& s, Re::Expr auto name, Re::Expr auto value);
+
+    Res<> _parseXmlDecl(Io::SScan& s, Dom::Document& doc);
 
     Res<> _parseMisc(Io::SScan& s, Node& parent);
 
-    Res<> _parseProlog(Io::SScan& s, Node& parent);
+    Res<> _parseProlog(Io::SScan& s, Dom::Document& doc);
 
     Res<Gc::Ref<DocumentType>> _parseDoctype(Io::SScan& s);
 

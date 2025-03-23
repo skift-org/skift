@@ -95,6 +95,9 @@ struct Canvas : Meta::NoCopy {
     // Add an ellipse to the current path.
     virtual void ellipse(Math::Ellipsef ellipse) = 0;
 
+    // Add an arc to the current path.
+    virtual void arc(Math::Arcf arc) = 0;
+
     // Add a path to the current path.
     virtual void path(Math::Path const& path) = 0;
 

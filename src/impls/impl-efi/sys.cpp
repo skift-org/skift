@@ -339,12 +339,7 @@ Res<Rc<Fd>> openOrCreateFile(Mime::Url const&) {
 Res<MmapResult> memMap(MmapOptions const& options) {
     usize vaddr = 0;
 
-    try$(Efi::bs()->allocatePages(
-        Efi::AllocateType::ANY_PAGES,
-        Efi::MemoryType::LOADER_DATA,
-        Hal::pageAlignUp(options.size) / Hal::PAGE_SIZE,
-        &vaddr
-    ));
+    try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::LOADER_DATA, Hal::pageAlignUp(options.size) / Hal::PAGE_SIZE, &vaddr));
 
     // Memory is identity mapped, so we can just return the virtual address as paddr
     return Ok(MmapResult{vaddr, vaddr, options.size});
@@ -354,11 +349,7 @@ Res<MmapResult> memMap(MmapOptions const&, Rc<Fd> fd) {
     usize vaddr = 0;
     usize fileSize = try$(Io::size(*fd));
 
-    try$(Efi::bs()->allocatePages(
-        Efi::AllocateType::ANY_PAGES,
-        Efi::MemoryType::LOADER_DATA,
-        Hal::pageAlignUp(fileSize) / Hal::PAGE_SIZE, &vaddr
-    ));
+    try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::LOADER_DATA, Hal::pageAlignUp(fileSize) / Hal::PAGE_SIZE, &vaddr));
 
     MutBytes bytes = {(Byte*)vaddr, fileSize};
     Io::BufWriter writer{bytes};
@@ -462,10 +453,20 @@ Res<> exit(i32) {
         ;
 }
 
+Res<Mime::Url> pwd() {
+    return Ok("file:/"_url);
+}
+
 // MARK: Sandboxing ------------------------------------------------------------
 
 void hardenSandbox() {
     logError("could not harden sandbox");
+}
+
+// MARK: Addr ------------------------------------------------------------------
+
+Async::Task<Vec<Ip>> ipLookupAsync(Str) {
+    co_return Error::notImplemented();
 }
 
 } // namespace Karm::Sys::_Embed

@@ -21,6 +21,25 @@ struct Cmap : public Io::BChunk {
             return slice;
         }
 
+        Map<u16, u16> _extractMappingForType12() {
+            Map<u16, u16> codeMappings;
+
+            auto s = begin().skip(12);
+            u32 nGroups = s.nextU32be();
+
+            for (usize i = 0; i < nGroups; i++) {
+                u32 startCode = s.nextU32be();
+                u32 endCode = s.nextU32be();
+
+                u32 glyphOffset = s.nextU32be();
+
+                for (usize r = startCode; r <= endCode; ++r) {
+                    codeMappings.put(r, (r - startCode) + glyphOffset);
+                }
+            }
+            return codeMappings;
+        }
+
         Text::Glyph _glyphIdForType4(Rune r) const {
             u16 segCountX2 = begin().skip(6).nextU16be();
             u16 segCount = segCountX2 / 2;
@@ -54,11 +73,43 @@ struct Cmap : public Io::BChunk {
             return Text::Glyph(0);
         }
 
+        Map<u16, u16> _extractMappingForType4() {
+            Map<u16, u16> codeMappings;
+
+            u16 segCountX2 = begin().skip(6).nextU16be();
+            u16 segCount = segCountX2 / 2;
+
+            for (usize i = 0; i < segCount; i++) {
+                auto s = begin().skip(14);
+
+                u16 endCode = s.skip(i * 2).peekU16be();
+
+                // + 2 for reserved padding
+                u16 startCode = s.skip(segCountX2 + 2).peekU16be();
+
+                u16 idDelta = s.skip(segCountX2).peekI16be();
+                u16 idRangeOffset = s.skip(segCountX2).peekU16be();
+
+                if (idRangeOffset == 0) {
+                    for (usize code = startCode; code <= endCode; code++) {
+                        codeMappings.put(code, (u16)((code + idDelta) & 0xFFFF));
+                    }
+                } else {
+                    for (usize code = startCode; code <= endCode; code++) {
+                        auto offset = idRangeOffset + (code - startCode) * 2;
+                        codeMappings.put(code, s.skip(offset).nextU16be());
+                    }
+                }
+            }
+
+            return codeMappings;
+        }
+
         Text::Glyph _glyphForType12(Rune r) const {
             auto s = begin().skip(12);
             u32 nGroups = s.nextU32be();
 
-            for (u32 i = 0; i < nGroups; i++) {
+            for (usize i = 0; i < nGroups; i++) {
                 u32 startCode = s.nextU32be();
                 u32 endCode = s.nextU32be();
                 u32 glyphOffset = s.nextU32be();
@@ -75,6 +126,16 @@ struct Cmap : public Io::BChunk {
             }
 
             return Text::Glyph(0);
+        }
+
+        Map<u16, u16> extractMapping() {
+            if (type == 4) {
+                return _extractMappingForType4();
+            } else if (type == 12) {
+                return _extractMappingForType12();
+            } else {
+                return {};
+            }
         }
 
         Text::Glyph glyphIdFor(Rune r) const {

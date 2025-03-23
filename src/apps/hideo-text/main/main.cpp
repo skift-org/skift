@@ -13,5 +13,5 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
         url = Mime::parseUrlOrPath(args[0], co_try$(Sys::pwd()));
         text = Sys::readAllUtf8(*url);
     }
-    co_return Ui::runApp(ctx, Hideo::Text::app(url, text));
+    co_return co_await Ui::runAsync(ctx, Hideo::Text::app(url, text));
 }

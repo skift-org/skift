@@ -1123,7 +1123,9 @@ Res<Integer> ValueParser<Integer>::parse(Cursor<Css::Sst>& c) {
     if (c.peek() == Css::Token::NUMBER) {
         Io::SScan scan = c->token.data.str();
         c.next();
-        return Ok(try$(Io::atoi(scan)));
+        Integer result = try$(Io::atoi(scan));
+        if (scan.ended())
+            return Ok(result);
     }
 
     return Error::invalidData("expected integer");

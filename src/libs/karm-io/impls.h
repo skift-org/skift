@@ -137,6 +137,14 @@ struct BufReader :
         _pos = clamp(_pos, 0uz, sizeOf(_buf));
         return Ok(_pos);
     }
+
+    Bytes bytes() const {
+        return next(_buf, _pos);
+    }
+
+    usize rem() const {
+        return sizeOf(_buf) - _pos;
+    }
 };
 
 struct BufWriter :

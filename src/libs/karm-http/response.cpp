@@ -47,7 +47,7 @@ export struct Response {
     static Res<Response> read(Io::Reader& r) {
         Io::BufferWriter bw;
         while (true) {
-            auto [read, reachedDelim] = try$(Io::readLine(r, bw, bytes("\r\n"s)));
+            auto [read, reachedDelim] = try$(Io::readLine(r, bw, "\r\n"_bytes));
 
             if (not reachedDelim)
                 return Error::invalidInput("input stream ended with incomplete http header");

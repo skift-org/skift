@@ -31,6 +31,7 @@ struct Heap : Meta::Pinned {
             _root = next;
         }
 
+        _root = nullptr;
         _last = nullptr;
     }
 

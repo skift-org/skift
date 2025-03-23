@@ -8,7 +8,6 @@ static u8 const _LUT[] = {
 #include "mixbox.inc"
 };
 
-
 static f64 srgb2linear(f64 srgb) {
     if (srgb <= 0.04045f)
         return srgb / 12.92f;

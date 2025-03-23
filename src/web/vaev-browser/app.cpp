@@ -6,12 +6,15 @@ module;
 #include <karm-kira/dialog.h>
 #include <karm-kira/error-page.h>
 #include <karm-kira/print-dialog.h>
+#include <karm-kira/progress.h>
 #include <karm-kira/resizable.h>
 #include <karm-kira/scaffold.h>
 #include <karm-kira/side-panel.h>
 #include <karm-mime/mime.h>
+#include <karm-sys/async.h>
 #include <karm-sys/file.h>
 #include <karm-sys/launch.h>
+#include <karm-sys/time.h>
 #include <karm-ui/dialog.h>
 #include <karm-ui/focus.h>
 #include <karm-ui/input.h>
@@ -30,6 +33,7 @@ module;
 #include <mdi/dots-horizontal.h>
 #include <mdi/google-downasaur.h>
 #include <mdi/home.h>
+#include <mdi/loading.h>
 #include <mdi/lock.h>
 #include <mdi/printer.h>
 #include <mdi/refresh.h>
@@ -42,6 +46,7 @@ export module Vaev.Browser:app;
 
 import Vaev.View;
 import Vaev.Driver;
+import Karm.Http;
 import :inspect;
 
 namespace Vaev::Browser {
@@ -57,8 +62,15 @@ struct Navigate {
     Mime::Uti action = Mime::Uti::PUBLIC_OPEN;
 };
 
+enum struct Status {
+    LOADING,
+    LOADED,
+};
+
 struct State {
     Gc::Heap& heap;
+    Http::Client& client;
+    Status status = Status::LOADED;
     usize currentIndex = 0;
     Vec<Navigate> history;
     Res<Gc::Root<Dom::Document>> dom;
@@ -66,8 +78,11 @@ struct State {
     InspectState inspect = {};
     bool wireframe = false;
 
-    State(Gc::Heap& heap, Navigate nav, Res<Gc::Root<Dom::Document>> dom)
-        : heap(heap), history{nav}, dom{dom} {}
+    State(Gc::Heap& heap, Http::Client& client, Navigate nav, Res<Gc::Root<Dom::Document>> dom)
+        : heap{heap},
+          client{client},
+          history{nav},
+          dom{dom} {}
 
     bool canGoBack() const {
         return currentIndex > 0;
@@ -84,6 +99,10 @@ struct State {
 
 struct Reload {};
 
+struct Loaded {
+    Res<Gc::Root<Dom::Document>> dom;
+};
+
 struct GoBack {};
 
 struct GoForward {};
@@ -92,6 +111,7 @@ struct ToggleWireframe {};
 
 using Action = Union<
     Reload,
+    Loaded,
     GoBack,
     GoForward,
     ToggleWireframe,
@@ -99,37 +119,56 @@ using Action = Union<
     InspectorAction,
     Navigate>;
 
+Async::_Task<Opt<Action>> navigateAsync(Gc::Heap& heap, Http::Client& client, Navigate nav) {
+    (void)co_await Sys::globalSched().sleepAsync(Sys::instant() + 300_ms);
+
+    if (nav.action == Mime::Uti::PUBLIC_MODIFY) {
+        co_return Loaded{co_await Vaev::Driver::viewSourceAsync(heap, client, nav.url)};
+    } else {
+        co_return Loaded{co_await Vaev::Driver::fetchDocumentAsync(heap, client, nav.url)};
+    }
+}
+
 Ui::Task<Action> reduce(State& s, Action a) {
-    a.visit(Visitor{
-        [&](Reload) {
-            auto const& object = s.currentUrl();
-            if (object.action == Mime::Uti::PUBLIC_MODIFY) {
-                s.dom = Vaev::Driver::viewSource(s.heap, object.url);
-            } else {
-                s.dom = Vaev::Driver::fetchDocument(s.heap, object.url);
-            }
+    return a.visit(Visitor{
+        [&](Reload) -> Ui::Task<Action> {
+            if (s.status == Status::LOADING)
+                return NONE;
+            s.status = Status::LOADING;
+            return navigateAsync(s.heap, s.client, s.currentUrl());
         },
-        [&](GoBack) {
+        [&](Loaded l) -> Ui::Task<Action> {
+            s.status = Status::LOADED;
+            s.dom = l.dom;
+            return NONE;
+        },
+        [&](GoBack) -> Ui::Task<Action> {
             s.currentIndex--;
             reduce(s, Reload{}).unwrap();
+            return NONE;
         },
-        [&](GoForward) {
+        [&](GoForward) -> Ui::Task<Action> {
             s.currentIndex++;
             reduce(s, Reload{}).unwrap();
+            return NONE;
         },
-        [&](ToggleWireframe) {
+        [&](ToggleWireframe) -> Ui::Task<Action> {
             s.wireframe = not s.wireframe;
+            return NONE;
         },
-        [&](SidePanel p) {
+        [&](SidePanel p) -> Ui::Task<Action> {
             s.sidePanel = p;
+            return NONE;
         },
-        [&](InspectorAction a) {
+        [&](InspectorAction a) -> Ui::Task<Action> {
             s.inspect.apply(a);
+            return NONE;
         },
-        [&](Navigate n) {
+        [&](Navigate n) -> Ui::Task<Action> {
             s.history.pushBack(n);
             s.currentIndex++;
             reduce(s, Reload{}).unwrap();
+            return NONE;
         },
     });
 
@@ -192,7 +231,19 @@ Ui::Child addressMenu() {
     });
 }
 
-Ui::Child addressBar(Mime::Url const& url) {
+Ui::Child reloadButton(State const& s) {
+    return (
+               s.status == Status::LOADING
+                   ? Kr::progress()
+                   : Ui::icon(Mdi::REFRESH)
+           ) |
+           Ui::insets(6) |
+           Ui::center() |
+           Ui::minSize({36, 36}) |
+           Ui::button(Model::bind<Reload>(), Ui::ButtonStyle::subtle());
+}
+
+Ui::Child addressBar(State const& s) {
     return Ui::hflow(
                Ui::button(
                    [&](auto& n) {
@@ -200,11 +251,10 @@ Ui::Child addressBar(Mime::Url const& url) {
                    },
                    Ui::ButtonStyle::subtle(), Mdi::TUNE_VARIANT
                ),
-               Ui::input(Ui::TextStyles::labelMedium(), url.str(), NONE) |
+               Ui::input(Ui::TextStyles::labelMedium(), s.currentUrl().url.str(), NONE) |
                    Ui::vcenter() |
                    Ui::hscroll() |
-                   Ui::grow(),
-               Ui::button(Model::bind<Reload>(), Ui::ButtonStyle::subtle(), Mdi::REFRESH)
+                   Ui::grow()
            ) |
            Ui::box({
                .padding = {0, 0, 0, 0},
@@ -309,10 +359,11 @@ Ui::Child appContent(State const& s) {
     );
 }
 
-export Ui::Child app(Gc::Heap& heap, Mime::Url url, Res<Gc::Ref<Vaev::Dom::Document>> dom) {
+export Ui::Child app(Gc::Heap& heap, Http::Client& client, Mime::Url url, Res<Gc::Ref<Vaev::Dom::Document>> dom) {
     return Ui::reducer<Model>(
         {
             heap,
+            client,
             Navigate{url},
             dom,
         },
@@ -324,10 +375,11 @@ export Ui::Child app(Gc::Heap& heap, Mime::Url url, Res<Gc::Ref<Vaev::Dom::Docum
                     return {
                         Ui::button(Model::bindIf<GoBack>(s.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
                         Ui::button(Model::bindIf<GoForward>(s.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
+                        reloadButton(s),
                     };
                 },
                 .middleTools = [&] -> Ui::Children {
-                    return {addressBar(s.currentUrl().url) | Ui::grow()};
+                    return {addressBar(s) | Ui::grow()};
                 },
                 .endTools = [&] -> Ui::Children {
                     return {

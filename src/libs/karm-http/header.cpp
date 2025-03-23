@@ -3,6 +3,7 @@ module;
 #include <karm-io/aton.h>
 #include <karm-io/expr.h>
 #include <karm-io/fmt.h>
+#include <karm-mime/mime.h>
 
 export module Karm.Http:header;
 
@@ -82,6 +83,18 @@ export struct Header : public Map<String, String> {
         try$(w.writeStr("\r\n"s));
 
         return Ok();
+    }
+
+    Opt<usize> contentLength() {
+        if (auto value = tryGet("Content-Length"s))
+            return Io::atou(value->str());
+        return NONE;
+    }
+
+    Opt<Mime::Mime> contentType() {
+        if (auto value = tryGet("Content-Type"s))
+            return Mime::Mime{value->str()};
+        return NONE;
     }
 };
 

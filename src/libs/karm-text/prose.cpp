@@ -125,13 +125,13 @@ void Prose::_wrapLines(Au width) {
 
 Au Prose::_layoutVerticaly() {
     auto m = _style.font.metrics();
-    Au baseline = Au{m.linegap / 2};
+    Au baseline = Au{Math::ceil(m.linegap / 2)};
     for (auto& line : _lines) {
-        baseline += Au{m.ascend};
+        baseline += Au{Math::ceil(m.ascend)};
         line.baseline = baseline;
-        baseline += Au{m.linegap + m.descend};
+        baseline += Au{Math::ceil(m.linegap + m.descend)};
     }
-    return baseline - Au{m.linegap / 2};
+    return baseline - Au{Math::ceil(m.linegap / 2)};
 }
 
 Au Prose::_layoutHorizontaly(Au width) {

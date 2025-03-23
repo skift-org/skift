@@ -4,8 +4,5 @@
 import Hideo.Notes;
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
-    co_return Ui::runApp(
-        ctx,
-        Hideo::Notes::app()
-    );
+    co_return co_await Ui::runAsync(ctx, Hideo::Notes::app());
 }

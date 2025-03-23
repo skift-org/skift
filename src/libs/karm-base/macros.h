@@ -11,9 +11,9 @@ namespace Karm {
 #define always_inline [[gnu::always_inline]]
 
 #ifdef _MSC_VER
-#    define no_unique_address [[msvc::no_unique_address]]
+#    define no_unique_address msvc::no_unique_address
 #else
-#    define no_unique_address [[no_unique_address]]
+#    define no_unique_address no_unique_address
 #endif
 
 // MARK: Enum ------------------------------------------------------------------

@@ -262,4 +262,17 @@ test$("parse-comment-with-gt-symb") {
     return Ok();
 }
 
+test$("parse-xml-decl") {
+    Gc::Heap gc;
+    XmlParser p{gc};
+
+    auto s = Io::SScan("<?xml version='1.0' encoding='UTF-8'?><html></html>");
+    auto dom = gc.alloc<Dom::Document>(Mime::Url());
+    try$(p.parse(s, Vaev::HTML, *dom));
+    expect$(dom->xmlVersion == "1.0");
+    expect$(dom->xmlEncoding == "UTF-8");
+    expect$(dom->xmlStandalone == "no");
+    return Ok();
+}
+
 } // namespace Vaev::Dom::Tests

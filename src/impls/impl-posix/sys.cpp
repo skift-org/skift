@@ -32,6 +32,16 @@ Res<Mime::Path> resolve(Mime::Url const& url) {
     Mime::Path resolved;
     if (url.scheme == "file") {
         resolved = url.path;
+    } else if (url.scheme == "fd") {
+        if (url.path == "stdin"_path) {
+            resolved = "/dev/stdin"_path;
+        } else if (url.path == "stdout"_path) {
+            resolved = "/dev/stdout"_path;
+        } else if (url.path == "stderr"_path) {
+            resolved = "/dev/stderr"_path;
+        } else {
+            return Error::notFound("unknown fd");
+        }
     } else if (url.scheme == "ipc") {
         auto const* runtimeDir = getenv("XDG_RUNTIME_DIR");
         if (not runtimeDir) {

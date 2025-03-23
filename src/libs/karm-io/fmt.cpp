@@ -447,9 +447,15 @@ Res<> NumberFormatter::formatSigned(Io::TextWriter& writer, isize val) {
 Res<> NumberFormatter::formatFloat(Io::TextWriter& writer, f64 val) {
     NumberFormatter formatter;
     isize ipart = (isize)val;
-    try$(formatter.formatSigned(writer, ipart));
-    f64 fpart = val - (f64)ipart;
+    f64 fpart = Math::abs(val - (f64)ipart);
     u64 ifpart = (u64)(fpart * Math::pow(10uz, precision));
+
+    if (val < 0) {
+        try$(writer.writeRune('-'));
+        ipart = -ipart;
+    }
+    try$(formatUnsigned(writer, ipart));
+
     if ((ifpart != 0 or trailingZeros) and precision > 0) {
         try$(writer.writeRune('.'));
         formatter.width = precision;

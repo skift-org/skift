@@ -4,8 +4,5 @@
 import Hideo.Mines;
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
-    co_return Ui::runApp(
-        ctx,
-        Hideo::Mines::app()
-    );
+    co_return co_await Ui::runAsync(ctx, Hideo::Mines::app());
 }

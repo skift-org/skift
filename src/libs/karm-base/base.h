@@ -1,7 +1,5 @@
 #pragma once
 
-#include <karm-meta/traits.h>
-
 #include "_prelude.h"
 #include "macros.h"
 
@@ -114,54 +112,6 @@ using f16 = __fp16;
 using f32 = float;
 using f64 = double;
 using f128 = long double;
-
-// MARK: Boolean type ----------------------------------------------------------
-
-struct Bool {
-    bool _val;
-
-    Bool() = delete;
-
-    constexpr Bool(Meta::Boolean auto value)
-        : _val(value) {}
-
-    constexpr Bool& operator=(Meta::Boolean auto value) {
-        _val = value;
-        return *this;
-    }
-
-    explicit constexpr operator bool() const {
-        return _val;
-    }
-
-    constexpr Bool operator!() const {
-        return Bool(not _val);
-    }
-};
-
-constexpr bool operator==(Bool a, Bool b) {
-    return static_cast<bool>(a) == static_cast<bool>(b);
-}
-
-constexpr bool operator==(Bool a, Meta::Boolean auto b) {
-    return static_cast<bool>(a) == static_cast<bool>(b);
-}
-
-constexpr bool operator==(Meta::Boolean auto a, Bool& b) {
-    return static_cast<bool>(a) == static_cast<bool>(b);
-}
-
-constexpr bool operator!=(Bool a, Bool b) {
-    return static_cast<bool>(a) != static_cast<bool>(b);
-}
-
-constexpr bool operator!=(Bool a, Meta::Boolean auto b) {
-    return static_cast<bool>(a) != static_cast<bool>(b);
-}
-
-constexpr bool operator!=(Meta::Boolean auto a, Bool b) {
-    return static_cast<bool>(a) != static_cast<bool>(b);
-}
 
 // MARK: Tags ------------------------------------------------------------------
 

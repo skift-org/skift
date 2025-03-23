@@ -20,7 +20,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto configs = co_try$(Opstart::Configs::fromJson(json));
 
     if (configs.entries.len() > 1 or configs.entries.len() == 0)
-        co_return Opstart::showMenu(ctx, configs);
+        co_return co_await Opstart::showMenuAsync(ctx, configs);
 
     co_return Opstart::loadEntry(configs.entries[0]);
 }

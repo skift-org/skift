@@ -25,6 +25,7 @@ struct Suffix2Mime {
 static constexpr Array SUFFIXES2MIME = {
     Suffix2Mime{"html", "text/html; charset=UTF-8"},
     Suffix2Mime{"xhtml", "application/xhtml+xml; charset=UTF-8"},
+    Suffix2Mime{"xht", "application/xhtml+xml; charset=UTF-8"},
     Suffix2Mime{"css", "text/css; charset=UTF-8"},
     Suffix2Mime{"js", "application/javascript; charset=UTF-8"},
     Suffix2Mime{"pdf", "application/pdf"},

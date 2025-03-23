@@ -98,6 +98,10 @@ void Canvas::ellipse(Math::Ellipsef) {
     logDebugIf(DEBUG_CANVAS, "pdf: ellipse() operation not implemented");
 }
 
+void Canvas::arc(Math::Arcf) {
+    logDebugIf(DEBUG_CANVAS, "pdf: arc() operation not implemented");
+}
+
 void Canvas::path(Math::Path const&) {
     logDebugIf(DEBUG_CANVAS, "pdf: path() operation not implemented");
 }

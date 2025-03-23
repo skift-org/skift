@@ -227,5 +227,5 @@ Ui::Child app(Text::FontBook book) {
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
     Text::FontBook book;
     co_try$(book.loadAll());
-    co_return Ui::runApp(ctx, Hideo::Fonts::app(book));
+    co_return co_await Ui::runAsync(ctx, Hideo::Fonts::app(book));
 }

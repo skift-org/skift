@@ -5,6 +5,7 @@
     "description": "Browse the web",
     "requires": [
         "karm-kira",
-        "vaev-view"
+        "vaev-view",
+        "fonts-all"
     ]
 }

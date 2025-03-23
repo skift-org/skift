@@ -53,17 +53,15 @@ using Model = Ui::Model<State, Action, reduce>;
 // MARK: Views -----------------------------------------------------------------
 
 Ui::Child icon(Entry const& e) {
-    return e.icon.visit(Visitor{
-        [&](Mdi::Icon i) {
-            return Ui::icon(i, 64);
-        },
-        [&](Image::Picture i) {
-            return Ui::pinSize(64, Ui::image(i));
-        },
-        [&](None) {
-            return Ui::empty();
-        }
-    });
+    return e.icon.visit(Visitor{[&](Mdi::Icon i) {
+                                    return Ui::icon(i, 64);
+                                },
+                                [&](Image::Picture i) {
+                                    return Ui::pinSize(64, Ui::image(i));
+                                },
+                                [&](None) {
+                                    return Ui::empty();
+                                }});
 }
 
 Ui::Child entry(State const& s, Entry const& e, usize i) {
@@ -164,8 +162,8 @@ Ui::Child menu(Configs const& c) {
     );
 }
 
-Res<> showMenu(Sys::Context& ctx, Configs const& c) {
-    return Ui::runApp(ctx, Opstart::menu(c));
+Async::Task<> showMenuAsync(Sys::Context& ctx, Configs const& c) {
+    return Ui::runAsync(ctx, Opstart::menu(c));
 }
 
 } // namespace Opstart

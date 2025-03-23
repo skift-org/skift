@@ -314,7 +314,16 @@ struct UringSched : public Sys::Sched {
         return Async::makeTask(job->future());
     }
 
+    bool _inWait = false;
+
     Res<> wait(Instant until) override {
+        if (_inWait)
+            panic("nested wait");
+        _inWait = true;
+        Defer defer = [&] {
+            _inWait = false;
+        };
+
         // HACK: io_uring_wait_cqes doesn't support absolute timeout
         //       so we have to do it ourselves
         Instant now = Sys::instant();
@@ -337,6 +346,7 @@ struct UringSched : public Sys::Sched {
             _jobs.del(id);
             io_uring_cqe_seen(&_ring, cqe);
         }
+
         return Ok();
     }
 };

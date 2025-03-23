@@ -1,5 +1,6 @@
 #include <impl-posix/fd.h>
 #include <impl-posix/utils.h>
+#include <karm-async/one.h>
 #include <karm-async/promise.h>
 #include <karm-base/map.h>
 #include <karm-sys/_embed.h>
@@ -8,6 +9,8 @@
 #include <sys/epoll.h>
 #include <sys/timerfd.h>
 #include <unistd.h>
+
+#include "../utils.h"
 
 namespace Karm::Sys::_Embed {
 
@@ -19,7 +22,9 @@ struct EpollSched : public Sys::Sched {
     EpollSched(int epollFd)
         : _epollFd(epollFd) {}
 
-    ~EpollSched() { close(_epollFd); }
+    ~EpollSched() {
+        close(_epollFd);
+    }
 
     Async::Task<> waitFor(epoll_event ev, int fd) {
         usize id = _id++;
@@ -28,7 +33,7 @@ struct EpollSched : public Sys::Sched {
 
         ev.data.u64 = id;
         if (::epoll_ctl(_epollFd, EPOLL_CTL_ADD, fd, &ev) < 0)
-            panic("epoll_ctl");
+            return Async::makeTask(Async::One<Res<>>{Posix::fromLastErrno()});
 
         _promises.put(id, std::move(promise));
         return Async::makeTask(future);

@@ -1,10 +1,8 @@
 #pragma once
 
-#include "decl.h"
+#include <karm-base/macros.h>
 
-namespace Karm {
-struct Bool;
-} // namespace Karm
+#include "decl.h"
 
 namespace Karm::Meta {
 
@@ -28,9 +26,6 @@ inline constexpr bool _Boolean = false;
 template <>
 inline constexpr bool _Boolean<bool> = true;
 
-template <>
-inline constexpr bool _Boolean<Karm::Bool> = true;
-
 template <typename T>
 concept Boolean = _Boolean<T>;
 
@@ -53,6 +48,22 @@ template <typename T>
 concept Integral = __is_integral(T);
 
 // MARK: Type properties -------------------------------------------------------
+
+template <typename T>
+struct _Empty {
+    char c;
+    [[no_unique_address]] T t;
+};
+
+template <typename T>
+concept Empty = sizeof(_Empty<T>) == 1;
+
+template <typename T>
+constexpr auto zeroableSizeOf() {
+    if constexpr (Meta::Empty<T>)
+        return 0uz;
+    return sizeof(T);
+}
 
 template <typename T>
 concept Trivial = __is_trivial(T);

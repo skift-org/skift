@@ -377,6 +377,14 @@ void Path::ellipse(Math::Ellipsef ellipse) {
     close();
 }
 
+void Path::arc(Math::Arcf arc) {
+    moveTo(arc.eval(0.0));
+    for (auto t = 0.0; t < 1.0; t += 0.1) {
+        auto p = arc.eval(t);
+        lineTo(p);
+    }
+}
+
 void Path::path(Math::Path const& path) {
     for (auto contour : path.iterContours()) {
         moveTo(first(contour));

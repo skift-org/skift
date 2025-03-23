@@ -43,7 +43,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto app = Ui::text("Hello, GUI!");
 
     // Run the app
-    co_return Ui::runApp(ctx, app);
+    co_return co_await Ui::runAsync(ctx, app);
 }
 ```
 
@@ -72,7 +72,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
     auto app = Ui::text("Hello, GUI!") | Ui::center();
 
     // Run the app
-    co_return Ui::runApp(ctx, app);
+    co_return co_await Ui::runAsync(ctx, app);
 }
 ```
 

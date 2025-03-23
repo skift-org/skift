@@ -19,6 +19,10 @@ struct Document : public Node {
     Mime::Url _url;
     QuirkMode quirkMode{QuirkMode::NO};
 
+    String xmlVersion;
+    String xmlEncoding;
+    String xmlStandalone = "no"s; // https://www.w3.org/TR/xml/#NT-SDDecl
+
     Document(Mime::Url url)
         : _url(url) {
     }

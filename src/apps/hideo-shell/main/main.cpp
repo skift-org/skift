@@ -44,5 +44,5 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
         .instances = {}
     };
 
-    co_return Ui::runApp(ctx, Hideo::Shell::app(std::move(state)));
+    co_return co_await Ui::runAsync(ctx, Hideo::Shell::app(std::move(state)));
 }

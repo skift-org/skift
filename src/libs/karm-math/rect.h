@@ -271,12 +271,16 @@ union Rect {
     }
 
     always_inline Rect<T> round() {
-        return {
-            Math::round(x),
-            Math::round(y),
-            Math::round(width),
-            Math::round(height)
-        };
+        return fromTwoPoint(
+            {
+                Math::round(start()),
+                Math::round(top()),
+            },
+            {
+                Math::round(end()),
+                Math::round(bottom()),
+            }
+        );
     }
 
     always_inline constexpr bool hasNan() const {

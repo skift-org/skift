@@ -8,6 +8,6 @@
         "vaev-dom",
         "karm-print",
         "karm-mime",
-        "karm-sys"
+        "karm-http"
     ]
 }

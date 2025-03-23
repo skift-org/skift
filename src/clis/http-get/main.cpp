@@ -20,7 +20,10 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
 
     auto url = Mime::parseUrlOrPath(urlArg, co_try$(Sys::pwd()));
     auto resp = co_trya$(Http::getAsync(url));
-    auto body = resp->body.unwrapOr(Http::Body::empty());
+    if (not resp->body)
+        co_return Error::invalidData("no body in response");
+
+    auto body = resp->body.take();
 
     auto adaptedOut = Aio::adapt(Sys::out());
     co_trya$(Aio::copyAsync(*body, adaptedOut));

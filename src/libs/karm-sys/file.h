@@ -52,7 +52,7 @@ struct FileReader :
         return _fd->read(bytes);
     }
 
-    auto readAsync(MutBytes bytes, auto& sched = globalSched()) {
+    Async::Task<usize> readAsync(MutBytes bytes, Sched& sched = globalSched()) {
         return sched.readAsync(_fd, bytes);
     }
 };
@@ -67,7 +67,7 @@ struct FileWriter :
         return _fd->write(bytes);
     }
 
-    auto writeAsync(Bytes bytes, auto& sched = globalSched()) {
+    Async::Task<usize> writeAsync(Bytes bytes, Sched& sched = globalSched()) {
         return sched.writeAsync(_fd, bytes);
     }
 };

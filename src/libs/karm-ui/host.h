@@ -36,7 +36,7 @@ struct Host : public Node {
 
     virtual void flip(Slice<Math::Recti> regions) = 0;
 
-    virtual Res<> wait(Instant) = 0;
+    virtual Async::Task<> waitAsync(Instant) = 0;
 
     bool alive() {
         return not _res;
@@ -99,7 +99,7 @@ struct Host : public Node {
         }
     }
 
-    Res<> run() {
+    Async::Task<> runAsync() {
         _shouldLayout = true;
 
         auto lastFrame = Sys::instant();
@@ -135,15 +135,15 @@ struct Host : public Node {
             }
 
             if (_dirty.len() > 0) {
-                paint();
+                Host::paint();
                 _dirty.clear();
             }
 
-            try$(wait(nextFrameScheduled ? nextFrame : Instant::endOfTime()));
+            co_trya$(waitAsync(nextFrameScheduled ? nextFrame : Instant::endOfTime()));
             nextFrameScheduled = false;
         }
 
-        return _res.unwrap();
+        co_return _res.unwrap();
     }
 };
 

@@ -80,6 +80,16 @@ test$("fmt-float-number") {
     try$(testCase("3.0", 3.001, ".01"));
     try$(testCase("1.9", 1.99999999999, ".1"));
 
+    try$(testCase("-0.1", -0.19, ".1"));
+    try$(testCase("-0.19", -0.19, ".2"));
+    try$(testCase("-0.19000", -0.19, ".05"));
+
+    try$(testCase("-3", -3.001, ".00"));
+    try$(testCase("-3", -3.001, ".1"));
+    try$(testCase("-3.1", -3.1, ".1"));
+    try$(testCase("-3.0", -3.001, ".01"));
+    try$(testCase("-1.9", -1.99999999999, ".1"));
+
     return Ok();
 }
 

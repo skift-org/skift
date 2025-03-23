@@ -4,8 +4,5 @@
 import Hideo.Map;
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
-    co_return Ui::runApp(
-        ctx,
-        Hideo::Map::app()
-    );
+    co_return co_await Ui::runAsync(ctx, Hideo::Map::app());
 }

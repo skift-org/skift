@@ -190,6 +190,14 @@ struct _String {
     always_inline constexpr explicit operator bool() const {
         return _len > 0;
     }
+
+    Buf<Byte> takeBytes() {
+        return {
+            MOVE,
+            reinterpret_cast<Byte*>(std::exchange(_buf, nullptr)),
+            std::exchange(_len, 0) * sizeof(Unit),
+        };
+    }
 };
 
 template <
@@ -324,6 +332,14 @@ struct _StringBuilder {
         usize len = _buf.len();
         _buf.insert(len, 0);
         return {MOVE, _buf.take(), len};
+    }
+
+    Buf<Byte> takeBytes() {
+        return {
+            MOVE,
+            _buf.take(),
+            _buf.len() * sizeof(typename E::Unit),
+        };
     }
 };
 

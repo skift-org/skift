@@ -659,3 +659,10 @@ always_inline Match endWith(Sliceable auto const& slice, Sliceable auto const& s
 #pragma clang unsafe_buffer_usage end
 
 } // namespace Karm
+
+static inline constexpr Karm::Bytes operator""_bytes(char const* buf, usize len) {
+    return Bytes{
+        (Byte const*)(buf),
+        len,
+    };
+}

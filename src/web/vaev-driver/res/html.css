@@ -164,6 +164,10 @@ ul {
     display: block;
 }
 
+li {
+    display: list-item;
+}
+
 dir,
 dl,
 menu,

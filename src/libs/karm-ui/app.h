@@ -9,8 +9,6 @@ namespace Karm::Ui {
 
 Child inspector(Child child);
 
-Res<> runApp(Sys::Context& ctx, Child root);
-
 Async::Task<> runAsync(Sys::Context& ctx, Child root);
 
 void mountApp(Cli::Command& cmd, Slot rootSlot);

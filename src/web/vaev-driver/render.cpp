@@ -8,7 +8,7 @@ module;
 
 export module Vaev.Driver:render;
 
-import :fetcher;
+import :loader;
 import Vaev.Layout;
 
 namespace Vaev::Driver {

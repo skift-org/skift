@@ -217,25 +217,66 @@ Res<> XmlParser::_parseCDSect(Io::SScan& s, StringBuilder& sb) {
 // https://www.w3.org/TR/xml/#sec-prolog-dtd
 
 static constexpr auto RE_XML_DECL_START = "<?xml"_re;
+static constexpr auto RE_XML_DECL_VERSION = Re::chain("1."_re, Re::oneOrMore(Re::digit()));
+static constexpr auto RE_XML_DECL_ENCODING = Re::chain(Re::alpha(), Re::zeroOrMore(Re::word() | "."_re | "-"_re));
+static constexpr auto RE_XML_DECL_STANDALONE = "yes"_re | "no"_re;
 
-Res<> XmlParser::_parseVersionInfo(Io::SScan& s) {
-    // versionInfo ::= S 'version' Eq ("'" VersionNum "'" | '"' VersionNum '"')
+Res<Str> XmlParser::_parseXmlDeclAttr(Io::SScan& s, Re::Expr auto name, Re::Expr auto value) {
+    auto rollback = s.rollbackPoint();
 
     try$(_parseS(s));
 
-    if (not s.skip("version"_re))
-        return Error::invalidData("expected 'version'");
+    if (not s.skip(name))
+        return Error::invalidData("expected attribute");
 
-    return Ok();
+    try$(_parseS(s));
+
+    if (not s.skip('='))
+        return Error::invalidData("expected '='");
+
+    try$(_parseS(s));
+
+    auto quote = s.next();
+    if (quote != '"' and quote != '\'')
+        return Error::invalidData("expected '\"' or '''");
+
+    auto result = s.token(value);
+    if (not result)
+        return Error::invalidData("expected attribute value");
+
+    if (s.peek() != quote)
+        return Error::invalidData("expected closing quote");
+    s.next();
+
+    rollback.disarm();
+    return Ok(result);
 }
 
-Res<> XmlParser::_parseXmlDecl(Io::SScan& s) {
+Res<> XmlParser::_parseXmlDecl(Io::SScan& s, Dom::Document& doc) {
     // XMLDecl ::= '<?xml' VersionInfo EncodingDecl? SDDecl? S? '?>'
 
     if (not s.skip(RE_XML_DECL_START))
         return Error::invalidData("expected '<?xml'");
 
-    // TODO: Parse version info
+    // versionInfo ::= S 'version' Eq ("'" VersionNum "'" | '"' VersionNum '"')
+    auto version = try$(_parseXmlDeclAttr(s, "version"_re, RE_XML_DECL_VERSION));
+    logWarnIf(version != "1.0", "Version {} not supported, treating this document as a 1.0 document", version);
+    doc.xmlVersion = version;
+
+    // EncodingDecl ::= S 'encoding' Eq ('"' EncName '"' | "'" EncName "'" )
+    auto encoding = _parseXmlDeclAttr(s, "encoding"_re, RE_XML_DECL_ENCODING);
+    if (encoding.has())
+        doc.xmlEncoding = encoding.unwrap();
+
+    // SDDecl ::= S 'standalone' Eq (("'" ('yes' | 'no') "'") | ('"' ('yes' | 'no') '"'))
+    auto standalone = _parseXmlDeclAttr(s, "standalone"_re, RE_XML_DECL_STANDALONE);
+    if (standalone.has())
+        doc.xmlStandalone = standalone.unwrap();
+
+    try$(_parseS(s));
+
+    if (not s.skip(RE_PI_END))
+        return Error::invalidData("expected '?>'");
 
     return Ok();
 }
@@ -259,19 +300,19 @@ Res<> XmlParser::_parseMisc(Io::SScan& s, Node& parent) {
     return Ok();
 }
 
-Res<> XmlParser::_parseProlog(Io::SScan& s, Node& parent) {
+Res<> XmlParser::_parseProlog(Io::SScan& s, Dom::Document& doc) {
     // prolog ::= XMLDecl? Misc* (doctypedecl Misc*)?
     auto rollback = s.rollbackPoint();
 
     if (s.match(RE_XML_DECL_START) != Match::NO)
-        try$(_parseXmlDecl(s));
+        try$(_parseXmlDecl(s, doc));
 
-    while (_parseMisc(s, parent) and not s.ended())
+    while (_parseMisc(s, doc) and not s.ended())
         ;
 
     if (auto doctype = _parseDoctype(s)) {
-        parent.appendChild(doctype.unwrap());
-        while (_parseMisc(s, parent) and not s.ended())
+        doc.appendChild(doctype.unwrap());
+        while (_parseMisc(s, doc) and not s.ended())
             ;
     }
 

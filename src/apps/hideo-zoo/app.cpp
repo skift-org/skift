@@ -19,6 +19,7 @@
 #include "page-navbar.h"
 #include "page-number.h"
 #include "page-print-dialog.h"
+#include "page-progress.h"
 #include "page-radio.h"
 #include "page-resizable.h"
 #include "page-rich-text.h"
@@ -48,6 +49,7 @@ static Array PAGES = {
     &PAGE_NAVBAR,
     &PAGE_NUMBER,
     &PAGE_PRINT_DIALOG,
+    &PAGE_PROGRESS,
     &PAGE_RADIO,
     &PAGE_RESIZABLE,
     &PAGE_RICHTEXT,

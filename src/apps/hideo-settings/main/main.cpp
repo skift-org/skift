@@ -90,5 +90,5 @@ Ui::Child app() {
 } // namespace Hideo::Settings
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
-    co_return Ui::runApp(ctx, Hideo::Settings::app());
+    co_return co_await Ui::runAsync(ctx, Hideo::Settings::app());
 }

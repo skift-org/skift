@@ -238,5 +238,5 @@ Ui::Child app() {
 } // namespace Hideo::Spreadsheet
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
-    co_return Ui::runApp(ctx, Hideo::Spreadsheet::app());
+    co_return co_await Ui::runAsync(ctx, Hideo::Spreadsheet::app());
 }

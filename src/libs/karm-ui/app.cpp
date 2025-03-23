@@ -11,12 +11,9 @@
 
 namespace Karm::Ui {
 
-Res<> runApp(Sys::Context&, Child root) {
-    return try$(_Embed::makeHost(root))->run();
-}
-
-Async::Task<> runAsync(Sys::Context& ctx, Child root) {
-    return _Embed::runAsync(ctx, root);
+Async::Task<> runAsync(Sys::Context&, Child root) {
+    auto host = co_try$(_Embed::makeHost(root));
+    co_return co_await host->runAsync();
 }
 
 void mountApp(Cli::Command& cmd, Slot rootSlot) {
@@ -25,7 +22,7 @@ void mountApp(Cli::Command& cmd, Slot rootSlot) {
     cmd.option(mobileArg);
     cmd.callbackAsync = [rootSlot = std::move(rootSlot)](Sys::Context&) -> Async::Task<> {
         auto root = rootSlot();
-        co_return co_try$(_Embed::makeHost(root))->run();
+        co_return co_await runAsync(Sys::globalContext(), root);
     };
 }
 

@@ -99,6 +99,8 @@ struct CpuCanvas : public Canvas {
 
     void rect(Math::Rectf rect, Math::Radiif radii) override;
 
+    void arc(Math::Arcf arc) override;
+
     void path(Math::Path const& path) override;
 
     void ellipse(Math::Ellipsef ellipse) override;

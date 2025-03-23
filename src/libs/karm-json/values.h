@@ -103,7 +103,7 @@ struct Value {
     }
 
     bool isArray() const {
-        return _store.is<Vec<Value>>();
+        return _store.is<Array>();
     }
 
     bool isObject() const {
@@ -150,13 +150,13 @@ struct Value {
                 [](None) -> String {
                     return "null"s;
                 },
-                [](Vec<Value>) -> String {
+                [](Array const&) -> String {
                     return "<array>"s;
                 },
-                [](Map<String, Value>) -> String {
+                [](Object const&) -> String {
                     return "<object>"s;
                 },
-                [](String s) -> String {
+                [](String const& s) -> String {
                     return s;
                 },
                 [](Integer i) -> String {
@@ -190,7 +190,7 @@ struct Value {
                 [](bool b) {
                     return b ? 1 : 0;
                 },
-                [](auto) {
+                [](auto const&) {
                     return 0;
                 },
             }
@@ -210,7 +210,7 @@ struct Value {
                 [](bool b) {
                     return b ? (Number)1.0 : (Number)0.0;
                 },
-                [](auto) {
+                [](auto const&) {
                     return (Number)0;
                 },
             }
@@ -224,10 +224,10 @@ struct Value {
                 [](None) {
                     return false;
                 },
-                [](Vec<Value> v) {
+                [](Array const& v) {
                     return v.len() > 0;
                 },
-                [](Map<String, Value> m) {
+                [](Object const& m) {
                     return m.len() > 0;
                 },
                 [](String s) {
@@ -254,6 +254,14 @@ struct Value {
         return try$(asObject().tryGet(key));
     }
 
+    Value getOr(Str key, Value const& def) const {
+        if (not isObject())
+            return def;
+        return asObject()
+            .tryGet(key)
+            .unwrapOr(def);
+    }
+
     Value get(usize index) const {
         if (not isArray() or asArray().len() <= index) {
             return NONE;
@@ -270,16 +278,16 @@ struct Value {
     usize len() const {
         return _store.visit(
             Visitor{
-                [](Vec<Value> v) {
+                [](Array const& v) {
                     return v.len();
                 },
-                [](Map<String, Value> m) {
+                [](Object const& m) {
                     return m.len();
                 },
-                [](String s) {
+                [](String const& s) {
                     return s.len();
                 },
-                [](auto) {
+                [](auto const&) {
                     return 0;
                 },
             }
@@ -315,6 +323,10 @@ struct Value {
     template <Meta::Equatable<_Store> T>
     bool operator==(T const& other) const {
         return _store == other;
+    }
+
+    operator bool() const {
+        return asBool();
     }
 };
 

@@ -161,6 +161,10 @@ void CpuCanvas::rect(Math::Rectf rect, Math::Radiif radii) {
     _path.rect(rect, radii);
 }
 
+void CpuCanvas::arc(Math::Arcf arc) {
+    _path.arc(arc);
+}
+
 void CpuCanvas::path(Math::Path const& path) {
     _path.path(path);
 }

@@ -164,7 +164,7 @@ Ui::Child node(Gc::Ref<Dom::Node> n, InspectState const& s, Ui::Action<Inspector
 Ui::Child computedStyles() {
     Ui::Children children;
 
-    Style::StyleProp::any([&]<typename T>(Meta::Type<T>) {
+    Style::StyleProp::any([&]<typename T>() {
         if constexpr (requires { T::initial(); }) {
             children.pushBack(Ui::text(Ui::TextStyles::codeSmall(), "{}: {}", T::name(), T::initial()) | Ui::insets({4, 8}));
         }

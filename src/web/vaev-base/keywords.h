@@ -49,6 +49,36 @@ static constexpr inline Thick THICK{};
 using Thin = Keyword<"thin">;
 static constexpr inline Thin THIN{};
 
+using First = Keyword<"first">;
+static constexpr inline First FIRST{};
+
+using Last = Keyword<"last">;
+static constexpr inline Last LAST{};
+
+using Baseline = Keyword<"baseline">;
+static constexpr inline Baseline BASELINE{};
+
+using TextBottom = Keyword<"text-bottom">;
+static constexpr inline TextBottom TEXT_BOTTOM{};
+
+using Alphabetic = Keyword<"alphabetic">;
+static constexpr inline Alphabetic ALPHABETIC{};
+
+using Ideographic = Keyword<"ideographic">;
+static constexpr inline Ideographic IDEOGRAPHIC{};
+
+using Middle = Keyword<"middle">;
+static constexpr inline Middle MIDDLE{};
+
+using Central = Keyword<"central">;
+static constexpr inline Central CENTRAL{};
+
+using Mathematical = Keyword<"mathematical">;
+static constexpr inline Mathematical MATHEMATICAL{};
+
+using TextTop = Keyword<"text-top">;
+static constexpr inline TextTop TEXT_TOP{};
+
 } // namespace Keywords
 
 } // namespace Vaev

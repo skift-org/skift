@@ -42,7 +42,7 @@ struct ContentBody : public Body {
     Async::Task<usize> readAsync(MutBytes buf) override {
         if (_resumesPos < _resumes.len()) {
             usize n = min(buf.len(), _resumes.len() - _resumesPos);
-            copy(sub(_resumes, _resumesPos, n), buf);
+            copy(sub(_resumes, _resumesPos, _resumesPos + n), buf);
             _resumesPos += n;
             co_return n;
         }
@@ -69,6 +69,7 @@ struct ChunkedBody : public Body {
 struct HttpTransport : public Transport {
     Async::Task<> _sendRequestAsync(Request& request, Sys::TcpConnection& conn) {
         Io::StringWriter req;
+        request.version = Version{1, 1};
         co_try$(request.unparse(req));
         co_trya$(conn.writeAsync(req.bytes()));
 
@@ -134,12 +135,23 @@ struct LocalTransport : public Transport {
         return Ok(Body::from(sw.take()));
     }
 
+    Async::Task<> _saveAsync(Mime::Url url, Rc<Body> body) {
+        auto file = co_try$(Sys::File::create(url));
+        co_trya$(Aio::copyAsync(*body, file));
+        co_return Ok();
+    }
+
     Async::Task<Rc<Response>> doAsync(Rc<Request> request) override {
         auto response = makeRc<Response>();
 
         response->code = Code::OK;
 
-        if (request->method == Method::GET)
+        if (auto it = request->body;
+            it and (request->method == Method::PUT or
+                    request->method == Method::POST))
+            co_trya$(_saveAsync(request->url, *it));
+
+        if (request->method == Method::GET or request->method == Method::POST)
             response->body = co_try$(_load(request->url));
 
         co_return Ok(response);

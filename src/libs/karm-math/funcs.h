@@ -41,44 +41,44 @@ static constexpr bool isNegInf(f64 x) {
 
 template <typename T>
 constexpr isize floori(T x) {
-    if (x < 0)
-        return (long)(x - 1);
-
-    return (long)x;
+    isize inum = (isize)x;
+    if ((T)inum == x)
+        return inum;
+    if (x < T{0})
+        return inum - 1;
+    return inum;
 }
 
 template <typename T>
 constexpr isize ceili(T x) {
-    if (x < 0)
-        return (long)x;
-
-    return (long)(x + 1);
+    isize inum = (isize)x;
+    if ((T)inum == x)
+        return inum;
+    if (x < T{0})
+        return inum;
+    return inum + 1;
 }
 
 template <typename T>
 constexpr isize roundi(T x) {
-    return (long)(x + 0.5);
+    if (x < T{0})
+        return (long)(x - T{0.5});
+    return (long)(x + T{0.5});
 }
 
 template <typename T>
 constexpr T floor(T x) {
-    if (x < T{})
-        return (T)(long)(x - T{1});
-
-    return (T)(long)x;
+    return static_cast<T>(floori(x));
 }
 
 template <typename T>
 constexpr T ceil(T x) {
-    if (x < T{})
-        return (T)(long)x;
-
-    return (T)(long)(x + T{1});
+    return static_cast<T>(ceili(x));
 }
 
 template <typename T>
 constexpr T round(T x) {
-    return (T)(long)(x + T{0.5});
+    return static_cast<T>(roundi(x));
 }
 
 // MARK: Trigonometry ----------------------------------------------------------

@@ -176,13 +176,13 @@ Ui::Child editorFilterControls(Gfx::Filter const& filter) {
                 Mdi::DRAG_VERTICAL_VARIANT,
                 Io::toTitleCase(T::NAME).unwrap()
             );
-        }
+        },
     });
 }
 
 Ui::Child editorFilters(State const& s) {
     Ui::Children tiles;
-    Gfx::Filter::any([&]<typename T>(Meta::Type<T>) {
+    Gfx::Filter::any([&]<typename T>() {
         tiles.pushBack(
             editorFilterTile(
                 [](auto& n) {

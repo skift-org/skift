@@ -21,7 +21,7 @@ struct _Cell {
 
     virtual void clear() = 0;
 
-    virtual Meta::Type<> inspect() = 0;
+    virtual Meta::Id id() = 0;
 
     void collectAndRelease(bool collect) {
         if (_strong == 0 and collect) {
@@ -91,8 +91,8 @@ struct Cell : public _Cell<L> {
         return &_buf.unwrap();
     }
 
-    Meta::Type<> inspect() override {
-        return Meta::typeOf<T>();
+    Meta::Id id() override {
+        return Meta::idOf<T>();
     }
 
     void clear() override {
@@ -228,7 +228,7 @@ struct _Rc {
 
         if (not Meta::Same<T, U> and
             not Meta::Derive<T, U> and
-            not(_cell->inspect().id() == Meta::idOf<U>())) {
+            not(_cell->id() == Meta::idOf<U>())) {
             return nullptr;
         }
 
@@ -242,16 +242,16 @@ struct _Rc {
 
         if (not Meta::Same<T, U> and
             not Meta::Derive<T, U> and
-            not _cell->inspect().id() == Meta::idOf<U>()) {
+            not(_cell->id() == Meta::idOf<U>())) {
             return nullptr;
         }
 
         return &_cell->template unwrap<U>();
     }
 
-    Meta::Type<> inspect() const {
+    Meta::Id id() const {
         ensure();
-        return _cell->inspect();
+        return _cell->id();
     }
 
     template <typename U>

@@ -3,6 +3,7 @@
 #include <karm-base/cow.h>
 #include <vaev-base/align.h>
 #include <vaev-base/background.h>
+#include <vaev-base/baseline.h>
 #include <vaev-base/borders.h>
 #include <vaev-base/break.h>
 #include <vaev-base/color.h>
@@ -43,6 +44,10 @@ struct Computed {
     BoxSizing boxSizing;
     Cow<SizingProps> sizing;
     Overflows overflows;
+
+    // CSS Inline Layout Module Level 3
+    // https://drafts.csswg.org/css-inline-3/
+    Cow<Baseline> baseline;
 
     // 9.3 Positioning schemes
     // https://www.w3.org/TR/CSS22/visuren.html#positioning-scheme

@@ -7,7 +7,7 @@ namespace Vaev::Style {
 Computed const& Computed::initial() {
     static Computed computed = [] {
         Computed res{};
-        StyleProp::any([&]<typename T>(Meta::Type<T>) {
+        StyleProp::any([&]<typename T>() {
             if constexpr (requires { T::initial(); })
                 T{}.apply(res);
         });
@@ -31,6 +31,7 @@ void Computed::repr(Io::Emit& e) const {
     e(" aligns: {}", aligns);
     e(" gaps: {}", gaps);
     e(" backgrounds: {}", backgrounds);
+    e(" baseline: {}", baseline);
     e(" borders: {}", borders);
     e(" margin: {}", margin);
     e(" padding: {}", padding);

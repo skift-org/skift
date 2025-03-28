@@ -79,6 +79,89 @@ test$("slice-contains") {
     expectNot$(contains("Hello, world!"s, "Hello, world! "s));
     expectNot$(contains("Hello, world!"s, "bruh"s));
 
+    auto customCmp = [](Rune a, Rune b) {
+        return toAsciiLower(a) == toAsciiLower(b);
+    };
+
+    expect$(contains("Ab"s, "ab"s, customCmp));
+    expect$(contains("ab"s, "Ab"s, customCmp));
+    expectNot$(contains("Ab"s, "ab"s));
+    expectNot$(contains("ab"s, "Ab"s));
+
+    return Ok();
+}
+
+test$("slice-split-simple") {
+
+    Str text = "hello my friends"s;
+
+    auto pieces = split(text, ' ');
+
+    expectEq$(pieces.next(), "hello"s);
+    expectEq$(pieces.next(), "my"s);
+    expectEq$(pieces.next(), "friends"s);
+    expectEq$(pieces.next(), NONE);
+
+    return Ok();
+}
+
+test$("slice-split-consecutive-delim") {
+    {
+        Str text = "hello  my  friends"s;
+
+        auto pieces = split(text, ' ');
+
+        expectEq$(pieces.next(), "hello"s);
+        expectEq$(pieces.next(), ""s);
+        expectEq$(pieces.next(), "my"s);
+        expectEq$(pieces.next(), ""s);
+        expectEq$(pieces.next(), "friends"s);
+        expectEq$(pieces.next(), NONE);
+
+        return Ok();
+    }
+    {
+        Str text = " my "s;
+        auto pieces = split(text, ' ');
+
+        expectEq$(pieces.next(), ""s);
+        expectEq$(pieces.next(), "my"s);
+        expectEq$(pieces.next(), ""s);
+        expectEq$(pieces.next(), NONE);
+
+        return Ok();
+    }
+}
+
+test$("slice-split-no-delim") {
+
+    Str text = "hellomyfriends"s;
+    auto pieces = split(text, ' ');
+
+    expectEq$(pieces.next(), "hellomyfriends"s);
+    expectEq$(pieces.next(), NONE);
+
+    return Ok();
+}
+
+test$("slice-split-empty") {
+    {
+        Str text = ""s;
+        auto pieces = split(text, ' ');
+
+        expectEq$(pieces.next(), ""s);
+        expectEq$(pieces.next(), NONE);
+    }
+
+    {
+        Str text = " "s;
+        auto pieces = split(text, ' ');
+
+        expectEq$(pieces.next(), ""s);
+        expectEq$(pieces.next(), ""s);
+        expectEq$(pieces.next(), NONE);
+    }
+
     return Ok();
 }
 

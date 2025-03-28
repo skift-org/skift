@@ -27,10 +27,6 @@ struct Tuple<> {
         return 0;
     }
 
-    constexpr static auto inspect(auto) {
-        return true;
-    }
-
     constexpr auto visit(auto) {
         return true;
     }
@@ -61,10 +57,6 @@ struct Tuple<_T0> {
 
     constexpr static usize len() {
         return 1;
-    }
-
-    constexpr static auto inspect(auto f) {
-        return f(Meta::Type<T0>{});
     }
 
     constexpr auto visit(auto f) {
@@ -105,13 +97,6 @@ struct Tuple<_T0, _T1> {
 
     constexpr static usize len() {
         return 2;
-    }
-
-    constexpr static auto inspect(auto f) {
-        auto res = f(Meta::Type<T0>{});
-        if (not res)
-            return res;
-        return f(Meta::Type<T1>{});
     }
 
     constexpr auto visit(auto f) {
@@ -160,16 +145,6 @@ struct Tuple<_T0, _T1, _T2> {
 
     constexpr static usize len() {
         return 3;
-    }
-
-    constexpr static auto inspect(auto f) {
-        auto res = f(Meta::Type<T0>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T1>{});
-        if (not res)
-            return res;
-        return f(Meta::Type<T2>{});
     }
 
     constexpr auto visit(auto f) {
@@ -226,19 +201,6 @@ struct Tuple<_T0, _T1, _T2, _T3> {
 
     constexpr static usize len() {
         return 4;
-    }
-
-    constexpr static auto inspect(auto f) {
-        auto res = f(Meta::Type<T0>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T1>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T2>{});
-        if (not res)
-            return res;
-        return f(Meta::Type<T3>{});
     }
 
     constexpr auto visit(auto f) {
@@ -303,22 +265,6 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4> {
 
     constexpr static usize len() {
         return 5;
-    }
-
-    constexpr static auto inspect(auto f) {
-        auto res = f(Meta::Type<T0>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T1>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T2>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T3>{});
-        if (not res)
-            return res;
-        return f(Meta::Type<T4>{});
     }
 
     constexpr auto visit(auto f) {
@@ -391,25 +337,6 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5> {
 
     constexpr static usize len() {
         return 6;
-    }
-
-    constexpr static auto inspect(auto f) {
-        auto res = f(Meta::Type<T0>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T1>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T2>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T3>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T4>{});
-        if (not res)
-            return res;
-        return f(Meta::Type<T5>{});
     }
 
     constexpr auto visit(auto f) {
@@ -490,28 +417,6 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6> {
 
     constexpr static usize len() {
         return 7;
-    }
-
-    constexpr static auto inspect(auto f) {
-        auto res = f(Meta::Type<T0>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T1>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T2>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T3>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T4>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T5>{});
-        if (not res)
-            return res;
-        return f(Meta::Type<T6>{});
     }
 
     constexpr auto visit(auto f) {
@@ -600,31 +505,6 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7> {
 
     constexpr static usize len() {
         return 8;
-    }
-
-    constexpr static auto inspect(auto f) {
-        auto res = f(Meta::Type<T0>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T1>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T2>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T3>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T4>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T5>{});
-        if (not res)
-            return res;
-        res = f(Meta::Type<T6>{});
-        if (not res)
-            return res;
-        return f(Meta::Type<T7>{});
     }
 
     constexpr auto visit(auto f) {

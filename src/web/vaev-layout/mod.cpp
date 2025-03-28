@@ -13,3 +13,4 @@ export import :replaced;
 export import :table;
 export import :values;
 export import :writing;
+export import :backgroundCanvas;

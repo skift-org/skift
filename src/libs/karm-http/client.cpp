@@ -11,17 +11,19 @@ import :transport;
 
 namespace Karm::Http {
 
+static constexpr bool DEBUG_CLIENT = false;
+
 export struct Client : public Transport {
     String userAgent = "Karm-Http/" stringify$(__ck_version_value) ""s;
-    Rc<Transport> transport;
+    Rc<Transport> _transport;
 
     Client(Rc<Transport> transport)
-        : transport(std::move(transport)) {}
+        : _transport(std::move(transport)) {}
 
     Async::Task<Rc<Response>> doAsync(Rc<Request> request) override {
         request->header.add("User-Agent", userAgent);
-        auto resp = co_trya$(transport->doAsync(request));
-        logInfo("\"{} {}\" {} {}", request->method, request->url, toUnderlyingType(resp->code), resp->code);
+        auto resp = co_trya$(_transport->doAsync(request));
+        logDebugIf(DEBUG_CLIENT, "\"{} {}\" {} {}", request->method, request->url, toUnderlyingType(resp->code), resp->code);
         co_return Ok(resp);
     }
 
@@ -29,7 +31,6 @@ export struct Client : public Transport {
         auto req = makeRc<Request>();
         req->method = Method::GET;
         req->url = url;
-        req->version = Version{1, 1};
         req->header.add("Host", url.host);
 
         return doAsync(req);
@@ -39,7 +40,6 @@ export struct Client : public Transport {
         auto req = makeRc<Request>();
         req->method = Method::HEAD;
         req->url = url;
-        req->version = Version{1, 1};
         req->header.add("Host", url.host);
 
         return doAsync(req);
@@ -49,7 +49,6 @@ export struct Client : public Transport {
         auto req = makeRc<Request>();
         req->method = Method::POST;
         req->url = url;
-        req->version = Version{1, 1};
         req->body = body;
         req->header.add("Host", url.host);
 
@@ -69,19 +68,23 @@ export Rc<Client> defaultClient() {
 }
 
 export Async::Task<Rc<Response>> getAsync(Mime::Url url) {
-    return defaultClient()->getAsync(url);
+    auto client = defaultClient();
+    co_return co_await client->getAsync(url);
 }
 
 export Async::Task<Rc<Response>> headAsync(Mime::Url url) {
-    return defaultClient()->headAsync(url);
+    auto client = defaultClient();
+    co_return co_await client->headAsync(url);
 }
 
 export Async::Task<Rc<Response>> postAsync(Mime::Url url, Rc<Body> body) {
-    return defaultClient()->postAsync(url, body);
+    auto client = defaultClient();
+    co_return co_await client->postAsync(url, body);
 }
 
 export Async::Task<Rc<Response>> doAsync(Rc<Request> request) {
-    return defaultClient()->doAsync(request);
+    auto client = defaultClient();
+    co_return co_await client->doAsync(request);
 }
 
 } // namespace Karm::Http

@@ -2,6 +2,7 @@
 
 #include <karm-base/string.h>
 #include <karm-io/emit.h>
+#include <karm-logger/logger.h>
 
 namespace Vaev {
 
@@ -227,6 +228,8 @@ struct AttrName {
         if (result) {
             return *result;
         }
+
+        logWarn("unknown attribute name {} in {} namespace", name, ns);
         return AttrName{0, ns};
     }
 
@@ -282,6 +285,11 @@ namespace MathMl {
 #include "defs/ns-mathml-tag-names.inc"
 #undef TAG
 
+#define ATTR(IDENT, _) \
+    inline constexpr AttrName IDENT##_ATTR = AttrId::IDENT;
+#include "defs/ns-mathml-attr-names.inc"
+#undef ATTR
+
 } // namespace MathMl
 
 namespace Svg {
@@ -290,6 +298,11 @@ namespace Svg {
     inline constexpr TagName IDENT = TagId::IDENT;
 #include "defs/ns-svg-tag-names.inc"
 #undef TAG
+
+#define ATTR(IDENT, _) \
+    inline constexpr AttrName IDENT##_ATTR = AttrId::IDENT;
+#include "defs/ns-svg-attr-names.inc"
+#undef ATTR
 
 } // namespace Svg
 

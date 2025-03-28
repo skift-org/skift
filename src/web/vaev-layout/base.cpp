@@ -254,12 +254,13 @@ struct Box : public Meta::NoCopy {
     Content content = NONE;
     Attrs attrs;
     Opt<Rc<FormatingContext>> formatingContext = NONE;
+    Gc::Ptr<Dom::Element> origin;
 
-    Box(Rc<Style::Computed> style, Rc<Text::Fontface> font)
-        : style{std::move(style)}, fontFace{font} {}
+    Box(Rc<Style::Computed> style, Rc<Text::Fontface> font, Gc::Ptr<Dom::Element> og)
+        : style{std::move(style)}, fontFace{font} , origin{og} {}
 
-    Box(Rc<Style::Computed> style, Rc<Text::Fontface> font, Content content)
-        : style{std::move(style)}, fontFace{font}, content{std::move(content)} {}
+    Box(Rc<Style::Computed> style, Rc<Text::Fontface> font, Content content, Gc::Ptr<Dom::Element> og)
+        : style{std::move(style)}, fontFace{font}, content{std::move(content)} , origin{og} {}
 
     Slice<Box> children() const {
         if (auto children = content.is<Vec<Box>>())

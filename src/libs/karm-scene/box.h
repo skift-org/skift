@@ -1,5 +1,6 @@
 #pragma once
 
+#include <karm-base/vec.h>
 #include <karm-gfx/borders.h>
 #include <karm-gfx/outline.h>
 

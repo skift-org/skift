@@ -64,30 +64,30 @@ struct ValueParser;
 
 template <>
 struct ValueParser<bool> {
-    static void usage(Io::Emit& e);
+    static Res<> usage(Io::TextWriter& w);
 
     static Res<bool> parse(Cursor<Token>&);
 };
 
 template <>
 struct ValueParser<isize> {
-    static void usage(Io::Emit& e);
+    static Res<> usage(Io::TextWriter& w);
 
     static Res<isize> parse(Cursor<Token>& c);
 };
 
 template <>
 struct ValueParser<Str> {
-    static void usage(Io::Emit& e);
+    static Res<> usage(Io::TextWriter& w);
 
     static Res<Str> parse(Cursor<Token>& c);
 };
 
 template <typename T>
 struct ValueParser<Vec<T>> {
-    static void usage(Io::Emit& e) {
-        ValueParser<T>::usage(e);
-        e("...");
+    static Res<> usage(Io::TextWriter& w) {
+        ValueParser<T>::usage(w);
+        return w.writeStr("..."s);
     }
 
     static Res<Vec<T>> parse(Cursor<Token>& c) {
@@ -103,8 +103,8 @@ struct ValueParser<Vec<T>> {
 
 template <typename T>
 struct ValueParser<Opt<T>> {
-    static void usage(Io::Emit& e) {
-        ValueParser<T>::usage(e);
+    static Res<> usage(Io::TextWriter& w) {
+        return ValueParser<T>::usage(w);
     }
 
     static Res<Opt<T>> parse(Cursor<Token>& c) {
@@ -143,18 +143,20 @@ struct _OptionImpl {
 
     virtual Res<> eval(Cursor<Token>& c) = 0;
 
-    virtual void usage(Io::Emit& e) {
+    virtual Res<> usage(Io::TextWriter& w) {
         if (kind == OptionKind::OPTION) {
-            e("[");
+            try$(w.writeRune('['));
             if (shortName)
-                e("-{c},", shortName.unwrap());
-            e("--{}", longName);
-            e("]");
+                try$(format(w, "-{c},", shortName.unwrap()));
+            try$(format(w, "--{}", longName));
+            try$(w.writeRune(']'));
         } else if (kind == OptionKind::OPERAND) {
-            e("{}", longName);
+            try$(w.writeStr(longName.str()));
         } else if (kind == OptionKind::EXTRA) {
-            e("[-- {}...]", longName);
+            try$(format(w, "[-- {}...]", longName));
         }
+
+        return Ok();
     }
 };
 
@@ -219,7 +221,7 @@ static inline Option<Vec<Str>> extra(String description) {
 
 // MARK: Command ---------------------------------------------------------------
 
-struct Command {
+struct Command : Meta::Pinned {
     using Callback = Func<Async::Task<>(Sys::Context&)>;
 
     struct Props {
@@ -232,6 +234,7 @@ struct Command {
     Opt<Callback> callbackAsync;
 
     Vec<Rc<Command>> _commands;
+    Command* _parent = nullptr;
 
     Option<bool> _help = flag('h', "help"s, "Show this help message and exit."s);
     Option<bool> _usage = flag('u', "usage"s, "Show usage message and exit."s);
@@ -270,6 +273,7 @@ struct Command {
             options,
             std::move(callbackAsync)
         );
+        cmd->_parent = this;
         _commands.pushBack(cmd);
         return *last(_commands);
     }
@@ -309,70 +313,82 @@ struct Command {
         return {store};
     }
 
-    void usage(Io::Emit& e) {
-        e("{} ", longName);
+    Res<> usage(Io::TextWriter& w) {
+        auto printLongName = [](this auto& self, Command& cmd, Io::TextWriter& w) -> Res<> {
+            if (cmd._parent)
+                try$(self(*cmd._parent, w));
+            try$(format(w, "{} ", cmd.longName));
+            return Ok();
+        };
+
+        try$(printLongName(*this, w));
 
         for (auto& opt : options) {
             if (opt->kind != OptionKind::OPTION)
                 continue;
-            opt->usage(e);
-            e(" ");
+            try$(opt->usage(w));
+            try$(w.writeRune(' '));
         }
 
         for (auto& opt : options) {
             if (opt->kind != OptionKind::OPERAND)
                 continue;
-            opt->usage(e);
-            e(" ");
+            try$(opt->usage(w));
+            try$(w.writeRune(' '));
         }
 
         for (auto& opt : options) {
             if (opt->kind != OptionKind::EXTRA)
                 continue;
-            opt->usage(e);
+            try$(opt->usage(w));
         }
 
         if (Karm::any(_commands)) {
-            e("<command> [args...]");
+            try$(format(w, "<command> [args...]"));
         }
+
+        return Ok();
     }
 
-    void _showUsage(Io::Emit& e) {
-        e("Usage: ");
-        usage(e);
-        e("\n");
+    Res<> _showUsage(Io::TextWriter& w) {
+        try$(format(w, "Usage: "));
+        try$(usage(w));
+        try$(w.writeRune('\n'));
+
+        return Ok();
     }
 
-    void _showHelp(Io::Emit& e) {
-        e("{}\n\n", longName);
+    Res<> _showHelp(Io::TextWriter& w) {
+        try$(format(w, "Usage:\n  "));
+        try$(usage(w));
+        try$(w.writeStr("\n\n"s));
 
-        e("Usage:\n\t");
-        usage(e);
-        e("\n\n");
-
-        e("Description:\n\t{}\n\n", description);
+        try$(format(w, "Description:\n  {}\n\n", description));
 
         if (Karm::any(options)) {
-            e("Options:\n");
+            try$(w.writeStr("Options:\n"s));
             for (auto& opt : options) {
                 if (opt->kind != OptionKind::OPTION)
                     continue;
 
-                e("\t");
+                try$(w.writeStr("  "s));
                 if (opt->shortName)
-                    e("-{c}, ", opt->shortName.unwrap());
+                    try$(format(w, "-{c}, ", opt->shortName.unwrap()));
 
-                e("--{} - {}\n", opt->longName, opt->description);
+                try$(format(w, "--{} - {}\n", opt->longName, opt->description));
             }
-            e("\n");
+            try$(w.writeRune('\n'));
         }
 
         if (Karm::any(_commands)) {
-            e("Subcommands:\n");
+            try$(w.writeStr("Subcommands:\n"s));
             for (auto& cmd : _commands) {
-                e("\t{c} {} - {}\n", cmd->shortName.unwrapOr(' '), cmd->longName, cmd->description);
+                try$(format(w, "  {c} {} - {}\n", cmd->shortName.unwrapOr(' '), cmd->longName, cmd->description));
             }
+            try$(w.writeRune('\n'));
         }
+
+        return Ok();
     }
 
     Res<bool> _evalOption(Cursor<Token>& c) {
@@ -434,23 +450,17 @@ struct Command {
         co_try$(_evalParams(c));
 
         if (_help) {
-            Io::Emit e{Sys::out()};
-            _showHelp(e);
+            co_try$(_showHelp(Sys::out()));
             co_return Ok();
         }
 
         if (_usage) {
-            Io::Emit e{Sys::out()};
-            _showUsage(e);
-            e.newline();
-            co_try$(e.flush());
+            co_try$(_showUsage(Sys::out()));
             co_return Ok();
         }
 
         if (_version) {
-            Io::Emit e{Sys::out()};
-            e("{} {}\n", longName, stringify$(__ck_version_value) ""s);
-            co_try$(e.flush());
+            co_try$(format(Sys::out(), "{} {}\n", longName, stringify$(__ck_version_value) ""s));
             co_return Ok();
         }
 
@@ -459,10 +469,7 @@ struct Command {
             co_trya$(callbackAsync.unwrap()(ctx));
 
         if (Karm::any(_commands) and c.ended()) {
-            Io::Emit e{Sys::out()};
-            _showUsage(e);
-            e.newline();
-            co_try$(e.flush());
+            co_try$(_showUsage(Sys::out()));
             co_return Error::invalidInput("expected subcommand");
         }
 
@@ -487,7 +494,6 @@ struct Command {
                 co_return co_await cmd->execAsync(ctx, c);
             }
 
-            logError("unknown subcommand '{}'", value);
             co_return Error::invalidInput("unknown subcommand");
         }
         co_return Ok();

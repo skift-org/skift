@@ -62,6 +62,14 @@ struct HtmlToken {
             e(" selfClosing");
         e(")");
     }
+
+    bool hasAttribute(Str name) const {
+        for (auto& attr : attrs) {
+            if (attr.name == name)
+                return true;
+        }
+        return false;
+    }
 };
 
 struct HtmlSink {

@@ -32,16 +32,16 @@ void tokenize(int argc, char** argv, Vec<Token>& out) {
 
 // MARK: Values ----------------------------------------------------------------
 
-void ValueParser<bool>::usage(Io::Emit& e) {
-    e("true|false");
+Res<> ValueParser<bool>::usage(Io::TextWriter& w) {
+    return w.writeStr("true|false"s);
 }
 
 Res<bool> ValueParser<bool>::parse(Cursor<Token>&) {
     return Ok(true);
 }
 
-void ValueParser<isize>::usage(Io::Emit& e) {
-    e("integer");
+Res<> ValueParser<isize>::usage(Io::TextWriter& w) {
+    return w.writeStr("integer"s);
 }
 
 Res<isize> ValueParser<isize>::parse(Cursor<Token>& c) {
@@ -57,8 +57,8 @@ Res<isize> ValueParser<isize>::parse(Cursor<Token>& c) {
     return Ok(result.unwrap());
 }
 
-void ValueParser<Str>::usage(Io::Emit& e) {
-    e("string");
+Res<> ValueParser<Str>::usage(Io::TextWriter& w) {
+    return w.writeStr("string"s);
 }
 
 Res<Str> ValueParser<Str>::parse(Cursor<Token>& c) {

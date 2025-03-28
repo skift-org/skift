@@ -84,7 +84,7 @@ void DeferredProp::apply(Computed const& parent, Computed& c) const {
 
 void DefaultedProp::apply(Computed const& parent, Computed& c) const {
     if (value == Default::INITIAL) {
-        StyleProp::any([&]<typename T>(Meta::Type<T>) {
+        StyleProp::any([&]<typename T>() {
             if (T::name() != propName)
                 return false;
             if constexpr (requires { T::initial(); })
@@ -92,7 +92,7 @@ void DefaultedProp::apply(Computed const& parent, Computed& c) const {
             return true;
         });
     } else if (value == Default::INHERIT) {
-        StyleProp::any([&]<typename T>(Meta::Type<T>) {
+        StyleProp::any([&]<typename T>() {
             if (T::name() != propName)
                 return false;
             if constexpr (requires { T::load(parent); })
@@ -100,7 +100,7 @@ void DefaultedProp::apply(Computed const& parent, Computed& c) const {
             return true;
         });
     } else if (value == Default::UNSET) {
-        StyleProp::any([&]<typename T>(Meta::Type<T>) {
+        StyleProp::any([&]<typename T>() {
             if (T::name() != propName)
                 return false;
             if constexpr (requires { T::inherit;  T::load(parent); })

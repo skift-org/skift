@@ -229,3 +229,17 @@ th {
 th {
     font-weight: bold;
 }
+
+/* 15.3.10 MARK: Form controls ---------------------------------------------- */
+
+input[type="reset" i],
+input[type="button" i],
+input[type="submit" i],
+button {
+    text-align: center;
+}
+
+input,
+button {
+    display: inline-block;
+}

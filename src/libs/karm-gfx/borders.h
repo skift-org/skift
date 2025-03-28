@@ -40,6 +40,10 @@ struct Borders {
 
     void _paintStraightEdges(Gfx::Canvas& c, Math::Rectf rect);
 
+    void _paintSimpleEdges(Gfx::Canvas& c, Math::Rectf rect);
+
+    bool _isSimple();
+
     void paint(Gfx::Canvas& c, Math::Rectf rect);
 };
 

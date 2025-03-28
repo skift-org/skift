@@ -57,6 +57,9 @@ struct HtmlParser : public HtmlSink {
     Gc::Ptr<Element> _headElement = nullptr;
     Gc::Ptr<Element> _formElement = nullptr;
 
+    // https://html.spec.whatwg.org/multipage/parsing.html#concept-frag-parse-context
+    Gc::Ptr<Element> _contextElement = nullptr;
+
     Vec<HtmlToken> _pendingTableCharacterTokens;
 
     HtmlParser(Gc::Heap& heap, Gc::Ref<Document> document)
@@ -65,9 +68,35 @@ struct HtmlParser : public HtmlSink {
     }
 
     // MARK: Algorithm
+
+    // https://html.spec.whatwg.org/multipage/parsing.html#current-node
+    Gc::Ref<Element> _currentElement() {
+        if (_openElements.len() == 0)
+            panic("no current element");
+        return last(_openElements);
+    }
+
+    // https://html.spec.whatwg.org/multipage/parsing.html#adjusted-current-node
+    Gc::Ref<Element> _adjustedCurrentElement() {
+        // If the parser was created as part of the HTML fragment parsing
+        // algorithm and the stack of open elements has
+        // only one element in it (fragment case);
+        if (_contextElement and _openElements.len() == 1) {
+            // The adjusted current node is the context element
+            return *_contextElement;
+        }
+
+        // Otherwise, the adjusted current node is the current node.
+        return _currentElement();
+    }
+
     void _raise(Str msg = "parse-error");
 
     bool _isSpecial(TagName const& tag);
+
+    bool _isMathMlTextIntegrationPoint(Element const&);
+
+    bool _isHtmlIntegrationPoint(Element const&);
 
     void _reconstructActiveFormattingElements();
 
@@ -198,6 +227,8 @@ struct HtmlParser : public HtmlSink {
     void _handleInCell(HtmlToken const& t);
 
     void _handleAfterBody(HtmlToken const& t);
+
+    void _handleInForeignContent(HtmlToken const& t);
 
     void _switchTo(Mode mode);
 

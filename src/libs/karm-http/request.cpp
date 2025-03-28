@@ -17,6 +17,17 @@ export struct Request {
     Header header;
     Opt<Rc<Body>> body;
 
+    static Rc<Request> from(Http::Method method, Mime::Url url, Opt<Rc<Body>> body = NONE) {
+        auto req = makeRc<Request>();
+
+        req->method = method;
+        req->url = url;
+        req->header.add("Host", url.host);
+        req->body = body;
+
+        return req;
+    }
+
     static Res<Request> parse(Io::SScan& s) {
         Request req;
 

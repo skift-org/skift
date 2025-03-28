@@ -168,7 +168,7 @@ struct Settings {
 
     f64 scale = 1.;
     bool headerFooter = true;
-    bool backgroundGraphics = false;
+    bool backgroundGraphics = true;
 };
 
 } // namespace Karm::Print

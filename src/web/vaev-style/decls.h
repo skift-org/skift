@@ -92,7 +92,7 @@ Res<P> parseDeclaration(Css::Sst const& sst, bool allowDeferred = true) {
 
     P::any(
         Visitor{
-            [&](Meta::Type<CustomProp>) -> bool {
+            [&]<Meta::Same<CustomProp>>() -> bool {
                 if constexpr (requires(P& p) { p.template unwrap<CustomProp>(); }) {
                     if (startWith(sst.token.data, "--"s) == Match::NO) {
                         return false;
@@ -103,7 +103,7 @@ Res<P> parseDeclaration(Css::Sst const& sst, bool allowDeferred = true) {
                 }
                 return false;
             },
-            [&]<typename T>(Meta::Type<T>) -> bool {
+            [&]<typename T>() -> bool {
                 if (sst.token != Css::Token::ident(T::name())) {
                     return false;
                 }

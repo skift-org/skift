@@ -45,6 +45,10 @@ struct PdfPrinter : public FilePrinter {
         for (auto& [_, value] : fontManager.mapping._els) {
             auto& [id, fontFace] = value;
 
+            if (not fontFace.is<Text::TtfFontface>()) {
+                panic("no support for printing fonts other than TrueType");
+            }
+
             TrueTypeFontAdapter ttfAdapter{
                 fontFace.cast<Text::TtfFontface>().unwrap(),
                 alloc

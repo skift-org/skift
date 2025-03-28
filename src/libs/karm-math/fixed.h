@@ -151,6 +151,9 @@ struct _Fixed {
     }
 
     constexpr _Fixed loosyDiv(_Fixed const& rhs) const {
+        if (rhs._val == 0)
+            panic("division by zero");
+
         isize val = _val;
         val <<= _FRAC;
         val /= rhs._val;

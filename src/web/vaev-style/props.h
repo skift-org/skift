@@ -196,6 +196,74 @@ struct ColumnGapProp {
     }
 };
 
+// MARK: Baselines ------------------------------------------------------
+
+// https://www.w3.org/TR/css-inline-3/#dominant-baseline-property
+struct DominantBaselineProp {
+    DominantBaseline value = initial();
+
+    static constexpr Str name() { return "dominant-baseline"; }
+
+    static constexpr Keywords::Auto initial() { return Keywords::AUTO; }
+
+    void apply(Computed& c) const {
+        c.baseline.cow().dominant = value;
+    }
+
+    static DominantBaseline load(Computed const& c) {
+        return c.baseline->dominant;
+    }
+
+    Res<> parse(Cursor<Css::Sst>& c) {
+        value = try$(parseValue<DominantBaseline>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-inline-3/#baseline-source
+struct BaselineSourceProp {
+    BaselineSource value = initial();
+
+    static constexpr Str name() { return "baseline-source"; }
+
+    static constexpr Keywords::Auto initial() { return Keywords::AUTO; }
+
+    void apply(Computed& c) const {
+        c.baseline.cow().source = value;
+    }
+
+    static BaselineSource load(Computed const& c) {
+        return c.baseline->source;
+    }
+
+    Res<> parse(Cursor<Css::Sst>& c) {
+        value = try$(parseValue<BaselineSource>(c));
+        return Ok();
+    }
+};
+
+// https://www.w3.org/TR/css-inline-3/#alignment-baseline-property
+struct AlignmentBaselineProp {
+    AlignmentBaseline value = initial();
+
+    static constexpr Str name() { return "alignment-baseline"; }
+
+    static constexpr Keywords::Baseline initial() { return Keywords::BASELINE; }
+
+    void apply(Computed& c) const {
+        c.baseline.cow().alignment = value;
+    }
+
+    static AlignmentBaseline load(Computed const& c) {
+        return c.baseline->alignment;
+    }
+
+    Res<> parse(Cursor<Css::Sst>& c) {
+        value = try$(parseValue<AlignmentBaseline>(c));
+        return Ok();
+    }
+};
+
 // MARK: Background Color ------------------------------------------------------
 
 // https://www.w3.org/TR/CSS22/colors.html#propdef-background-color
@@ -263,7 +331,7 @@ struct BackgroundImageProp {
         return {};
     }
 
-    Res<> pase(Cursor<Css::Sst>&) {
+    Res<> parse(Cursor<Css::Sst>&) {
         // TODO
         return Ok();
     }
@@ -287,7 +355,7 @@ struct BackgroundPositionProp {
         return {};
     }
 
-    Res<> pase(Cursor<Css::Sst>&) {
+    Res<> parse(Cursor<Css::Sst>&) {
         // TODO
         return Ok();
     }
@@ -311,7 +379,7 @@ struct BackgroundRepeatProp {
         return {};
     }
 
-    Res<> pase(Cursor<Css::Sst>&) {
+    Res<> parse(Cursor<Css::Sst>&) {
         // TODO
         return Ok();
     }
@@ -2970,6 +3038,11 @@ using _StyleProp = Union<
 
     RowGapProp,
     ColumnGapProp,
+
+    // Baseline
+    DominantBaselineProp,
+    BaselineSourceProp,
+    AlignmentBaselineProp,
 
     // Background
     BackgroundAttachmentProp,

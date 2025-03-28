@@ -122,6 +122,92 @@ static bool _match(ClassSelector const& s, Gc::Ref<Dom::Element> el) {
     return el->classList.contains(s.class_);
 }
 
+// 6. Attribute Selector
+// https://www.w3.org/TR/selectors-4/#attribute-selectors
+static bool _match(AttributeSelector const& s, Gc::Ref<Dom::Element> el) {
+    auto attrName = AttrName::tryMake(s.name, HTML);
+    if (not attrName)
+        return false;
+
+    auto maybeAttrValue = el->getAttribute(attrName.unwrap());
+    if (s.match == AttributeSelector::PRESENT) {
+        // Represents an element with the att attribute, whatever the value of the attribute.
+        return maybeAttrValue != NONE;
+    }
+
+    if (not maybeAttrValue)
+        return false;
+
+    auto attrValue = maybeAttrValue.unwrap();
+
+    auto cmp = [&s](Rune const& a, Rune const& b) {
+        if (s.case_ == AttributeSelector::INSENSITIVE)
+            return toAsciiLower(a) == toAsciiLower(b);
+        else
+            return a == b;
+    };
+
+    if (s.match == AttributeSelector::EXACT) {
+        // Represents an element with the att attribute whose value is exactly "val".
+        return startWith(attrValue, s.value.str(), cmp) == Match::YES;
+    } else if (s.match == AttributeSelector::CONTAINS) {
+        // If "val" contains whitespace, it will never represent anything (since the words are separated by spaces).
+        if (contains(s.value, ' '))
+            return false;
+
+        // Also if "val" is the empty string, it will never represent anything.
+        if (s.value.len() == 0)
+            return false;
+
+        // Represents an element with the att attribute whose value is a whitespace-separated list of words,
+        // one of which is exactly "val".
+        // FIXME: proper use of generators
+        auto splitSlices = split(attrValue, ' ');
+        auto piece = splitSlices.next();
+        while (piece) {
+            if (piece.unwrap().len() == 0) {
+                piece = splitSlices.next();
+                continue;
+            }
+
+            if (startWith(piece.unwrap(), s.value, cmp) == Match::YES)
+                return true;
+
+            piece = splitSlices.next();
+        }
+        return false;
+    } else if (s.match == AttributeSelector::HYPHENATED) {
+        // Represents an element with the att attribute, its value either being exactly "val"
+        auto prefixMatch = startWith(attrValue, s.value.str(), cmp);
+        if (prefixMatch == Match::YES)
+            return true;
+        if (prefixMatch == Match::NO)
+            return false;
+
+        // or beginning with "val" immediately followed by "-" (U+002D).
+        return attrValue[s.value.len()] == '-';
+    } else {
+        // 6.2. Substring matching attribute selectors
+        // https://www.w3.org/TR/selectors-4/#attribute-substrings
+
+        // If "val" is the empty string then the selector does not represent anything.
+        if (s.value.len() == 0)
+            return false;
+
+        if (s.match == AttributeSelector::STR_START_WITH) {
+            // Represents an element with the att attribute whose value begins with the prefix "val".
+            return startWith(attrValue, s.value.str(), cmp) != Match::NO;
+        } else if (s.match == AttributeSelector::STR_END_WITH) {
+            // Represents an element with the att attribute whose value ends with the suffix "val".
+            return endWith(attrValue, s.value.str(), cmp) != Match::NO;
+        } else {
+            // Represents an element with the att attribute whose value contains at least one instance of the
+            // substring "val".
+            return contains(attrValue, s.value, cmp);
+        }
+    }
+}
+
 // 8.2. The Link History Pseudo-classes: :link and :visited
 // https://www.w3.org/TR/selectors-4/#link
 

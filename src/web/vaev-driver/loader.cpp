@@ -25,14 +25,18 @@ Async::Task<Gc::Ref<Dom::Document>> _loadDocumentAsync(Gc::Heap& heap, Mime::Url
     if (not mime.has())
         mime = Mime::sniffSuffix(url.path.suffix());
 
-    if (not mime.has())
-        co_return Error::invalidInput("cannot determine MIME type");
-
     if (not resp->body)
         co_return Error::invalidInput("response body is missing");
 
-    auto respBody = resp->body.unwrap();
+    if (not mime.has() and url == "fd:stdin"_url) {
+        mime = "text/html"_mime;
+        logInfo("assuming stdin is {}", mime);
+    }
 
+    if (not mime.has())
+        co_return Error::invalidInput("cannot determine MIME type");
+
+    auto respBody = resp->body.unwrap();
     auto buf = co_trya$(Aio::readAllUtf8Async(*respBody));
 
     if (mime->is("text/html"_mime)) {

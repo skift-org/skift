@@ -213,9 +213,47 @@ void Borders::_paintStraightEdges(Gfx::Canvas& c, Math::Rectf rect) {
         );
 }
 
+void Borders::_paintSimpleEdges(Gfx::Canvas& c, Math::Rectf rect) {
+    Math::Rectf outerRect = rect;
+    Math::Radiif outerRadii = radii;
+    outerRadii.reduceOverlap(outerRect.size());
+    Math::Rectf innerRect = rect.shrink(widths);
+    Math::Radiif innerRadii = radii.shrink(widths);
+
+    c.beginPath();
+    c.rect(outerRect, outerRadii);
+    c.rect(innerRect, innerRadii);
+    c.fill(fills[0], FillRule::EVENODD);
+}
+
+bool Borders::_isSimple() {
+    // A border is simple if the four sides are solid and have the same color.
+    if (styles[0] != BorderStyle::SOLID or
+        styles[1] != BorderStyle::SOLID or
+        styles[2] != BorderStyle::SOLID or
+        styles[3] != BorderStyle::SOLID)
+        return false;
+
+    auto color = fills[0].is<Color>();
+    if (not color)
+        return false;
+
+    if (fills[1] != *color or
+        fills[2] != *color or
+        fills[3] != *color)
+        return false;
+
+    return true;
+}
+
 void Borders::paint(Gfx::Canvas& c, Math::Rectf rect) {
     if (widths.zero())
         return;
+
+    if (_isSimple()) {
+        _paintSimpleEdges(c, rect);
+        return;
+    }
 
     if (radii.zero()) {
         _paintStraightEdges(c, rect);
@@ -224,4 +262,5 @@ void Borders::paint(Gfx::Canvas& c, Math::Rectf rect) {
 
     _paintCurveEdges(c, rect);
 }
+
 } // namespace Karm::Gfx

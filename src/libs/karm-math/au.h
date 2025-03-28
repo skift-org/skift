@@ -29,3 +29,7 @@ using RadiiAu = Math::Radii<Au>;
 constexpr Karm::Au operator""_au(unsigned long long val) {
     return Karm::Au{val};
 }
+
+constexpr Karm::Au operator""_au(long double val) {
+    return Karm::Au{val};
+}

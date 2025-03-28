@@ -29,6 +29,49 @@ bool HtmlParser::_isSpecial(TagName const& tag) {
     return contains(SPECIAL, tag);
 }
 
+// https://html.spec.whatwg.org/multipage/parsing.html#mathml-text-integration-point
+bool HtmlParser::_isMathMlTextIntegrationPoint(Element const& el) {
+    // A node is a MathML text integration point if it is one of the following elements:
+    Array const MATHML_TEXT_INTEGRATION_POINT{
+        MathMl::MI,
+        MathMl::MO,
+        MathMl::MN,
+        MathMl::MS,
+        MathMl::MTEXT,
+    };
+
+    // - A MathML mi element
+    // - A MathML mo element
+    // - A MathML mn element
+    // - A MathML ms element
+    // - A MathML mtext element
+    return contains(MATHML_TEXT_INTEGRATION_POINT, el.tagName);
+}
+
+// https://html.spec.whatwg.org/multipage/parsing.html#html-integration-point
+bool HtmlParser::_isHtmlIntegrationPoint(Element const& el) {
+    // A node is an HTML integration point if it is one of the following elements:
+
+    // - A MathML annotation-xml element whose start tag token had an attribute with the name "encoding" whose value was an ASCII case-insensitive match for the string "text/html"
+    // - A MathML annotation-xml element whose start tag token had an attribute with the name "encoding" whose value was an ASCII case-insensitive match for the string "application/xhtml+xml"
+    if (el.tagName == MathMl::ANNOTATION_XML and
+        (el.getAttribute(MathMl::ENCODING_ATTR) == "text/html" or
+         el.getAttribute(MathMl::ENCODING_ATTR) == "application/xhtml+xml")) {
+        return true;
+    }
+
+    // - An SVG foreignObject element
+    // - An SVG desc element
+    // - An SVG title element
+    Array const HTML_INTEGRATION_POINT{
+        Svg::FOREIGN_OBJECT,
+        Svg::DESC,
+        Svg::TITLE,
+    };
+
+    return contains(HTML_INTEGRATION_POINT, el.tagName);
+}
+
 // 13.2.4.3 MARK: The list of active formatting elements
 // https://html.spec.whatwg.org/multipage/parsing.html#list-of-active-formatting-elements
 
@@ -58,7 +101,7 @@ HtmlParser::AdjustedInsertionLocation HtmlParser::_apropriatePlaceForInsertingAN
     //    Otherwise, let target be the current node.
     auto target = overrideTarget
                       ? overrideTarget
-                      : last(_openElements);
+                      : _currentElement();
 
     // 2. Determine the adjusted insertion location using the first
     //    matching steps from the following list:
@@ -190,7 +233,6 @@ Gc::Ref<Element> HtmlParser::_createElementFor(HtmlToken const& t, Ns ns) {
 }
 
 // https://html.spec.whatwg.org/multipage/parsing.html#insert-a-foreign-element
-
 Gc::Ref<Element> HtmlParser::_insertAForeignElement(HtmlToken const& t, Ns ns, bool onlyAddToElementStack) {
     // 1. Let the adjusted insertion location be the appropriate place for inserting a node.
     auto location = _apropriatePlaceForInsertingANode();
@@ -420,8 +462,8 @@ static constexpr Array IMPLIED_END_TAGS = {
 };
 
 static void _generateImpliedEndTags(HtmlParser& b, Opt<TagName> except = NONE) {
-    while (contains(IMPLIED_END_TAGS, last(b._openElements)->tagName) and
-           last(b._openElements)->tagName != except) {
+    while (contains(IMPLIED_END_TAGS, b._currentElement()->tagName) and
+           b._currentElement()->tagName != except) {
         b._openElements.popBack();
     }
 }
@@ -618,15 +660,14 @@ void HtmlParser::_handleInHead(HtmlToken const& t) {
     else if (t.type == HtmlToken::START_TAG and (t.name == "base" or t.name == "basefont" or t.name == "bgsound" or t.name == "link")) {
         _insertHtmlElement(t);
         _openElements.popBack();
-        // TODO: Acknowledge the token's self-closing flag, if it is set.
+        _acknowledgeSelfClosingFlag(t);
     }
 
     // A start tag whose tag name is "meta"
     else if (t.type == HtmlToken::START_TAG and (t.name == "meta")) {
         _insertHtmlElement(t);
         _openElements.popBack();
-        // TODO: Acknowledge the token's self-closing flag, if it is set.
-
+        _acknowledgeSelfClosingFlag(t);
         // TODO: Handle handle speculative parsing
     }
 
@@ -882,7 +923,7 @@ void HtmlParser::_handleInBody(HtmlToken const& t) {
             _generateImpliedEndTags(*this, Html::P);
 
             // If the current node is not a p element, then this is a parse error.
-            if (last(_openElements)->tagName != Html::P)
+            if (_currentElement()->tagName != Html::P)
                 _raise();
 
             // Pop elements from the stack of open elements until a p element has been popped from the stack.
@@ -1027,7 +1068,7 @@ void HtmlParser::_handleInBody(HtmlToken const& t) {
                 _generateImpliedEndTags(*this, Html::DD);
 
                 // 2. If the current node is not a dd element, then this is a parse error.
-                if (last(_openElements)->tagName != Html::DD) {
+                if (_currentElement()->tagName != Html::DD) {
                     _raise();
                 }
 
@@ -1046,7 +1087,7 @@ void HtmlParser::_handleInBody(HtmlToken const& t) {
                 _generateImpliedEndTags(*this, Html::DT);
 
                 // 2. If the current node is not a dt element, then this is a parse error.
-                if (last(_openElements)->tagName != Html::DT) {
+                if (_currentElement()->tagName != Html::DT) {
                     _raise();
                 }
 
@@ -1105,7 +1146,7 @@ void HtmlParser::_handleInBody(HtmlToken const& t) {
 
     // TODO: An end tag token whose tag name is one of: "applet", "marquee", "object"
 
-    // TODO: A start tag whose tag name is "table"
+    // A start tag whose tag name is "table"
     else if (t.type == HtmlToken::START_TAG and t.name == "table") {
         // TODO: If the Document is not set to quirks mode,
         // and the stack of open elements has a p element in button scope, then close a p element.
@@ -1121,10 +1162,36 @@ void HtmlParser::_handleInBody(HtmlToken const& t) {
     }
 
     // TODO: An end tag whose tag name is "br"
-
     // TODO: A start tag whose tag name is one of: "area", "br", "embed", "img", "keygen", "wbr"
+    else if (
+        t.name == "br" or
+        (t.type == HtmlToken::START_TAG and
+         (t.name == "area" or t.name == "br" or t.name == "embed" or t.name == "img" or t.name == "keygen" or t.name == "wbr")
+        )
+    ) {
+        if (t.type == HtmlToken::END_TAG) {
+            // Parse error.
+            _raise();
 
-    // TODO: A start tag whose tag name is "input"
+            // Drop the attributes from the token, and act as described in the next entry; i.e. act as if
+            // this was a "br" start tag token with no attributes, rather than the end tag token that it actually is.
+            // FIXME: cannot drop attributes since token is const
+        }
+
+        // Reconstruct the active formatting elements, if any.
+        _reconstructActiveFormattingElements();
+
+        // Insert an HTML element for the token. Immediately pop the current node off the stack of open elements.
+        _insertHtmlElement(t);
+        _openElements.popBack();
+
+        // TODO: Acknowledge the token's self-closing flag, if it is set.
+
+        // Set the frameset-ok flag to "not ok".
+        _framesetOk = false;
+    }
+
+    // A start tag whose tag name is "input"
     else if (t.type == HtmlToken::START_TAG and t.name == "input") {
         // TODO: Reconstruct the active formatting elements, if any.
 
@@ -1132,7 +1199,8 @@ void HtmlParser::_handleInBody(HtmlToken const& t) {
         _insertHtmlElement(t);
         _openElements.popBack();
 
-        // TODO: Acknowledge the token's self-closing flag, if it is set.
+        // Acknowledge the token's self-closing flag, if it is set.
+        _acknowledgeSelfClosingFlag(t);
 
         // If the token does not have an attribute with the name "type",
         // or if it does, but that attribute's value is not an ASCII case-insensitive match for the string "hidden",
@@ -1179,7 +1247,27 @@ void HtmlParser::_handleInBody(HtmlToken const& t) {
 
     // TODO: A start tag whose tag name is "math"
 
-    // TODO: A start tag whose tag name is "svg"
+    // A start tag whose tag name is "svg"
+    else if (t.type == HtmlToken::START_TAG and t.name == "svg") {
+        // Reconstruct the active formatting elements, if any.
+        _reconstructActiveFormattingElements();
+
+        // TODO: Adjust SVG attributes for the token. (This fixes the case of
+        // SVG attributes that are not all lowercase.)
+
+        // TODO: Adjust foreign attributes for the token. (This fixes the use of
+        // namespaced attributes, in particular XLink in SVG.)
+
+        // Insert a foreign element for the token, with SVG namespace and false.
+        _insertAForeignElement(t, Vaev::SVG, false);
+
+        // If the token has its self-closing flag set, pop the current node
+        // off the stack of open elements and acknowledge the token's self-closing flag.
+        if (t.selfClosing) {
+            _openElements.popBack();
+            _acknowledgeSelfClosingFlag(t);
+        }
+    }
 
     // TODO: A start tag whose tag name is one of: "caption", "col", "colgroup", "frame", "head", "tbody", "td", "tfoot", "th", "thead", "tr"
 
@@ -1202,11 +1290,11 @@ void HtmlParser::_handleInBody(HtmlToken const& t) {
                 _generateImpliedEndTags(*this, node->tagName);
 
                 // 2. If node is not the current node, then this is a parse error.
-                if (node != last(_openElements))
+                if (node != _currentElement())
                     _raise();
 
                 // 3. Pop all the nodes from the current node up to node, including node, then stop these steps
-                while (last(_openElements) != node) {
+                while (_currentElement() != node) {
                     _openElements.popBack();
                 }
                 _openElements.popBack();
@@ -1279,9 +1367,9 @@ void HtmlParser::_inTableModeAnythingElse(HtmlToken const& t) {
 // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intable
 void HtmlParser::_handleInTable(HtmlToken const& t) {
     auto _clearTheStackBackToATableContext = [&]() {
-        while (last(_openElements)->tagName != Html::TABLE and
-               last(_openElements)->tagName != Html::TEMPLATE and
-               last(_openElements)->tagName != Html::HTML) {
+        while (_currentElement()->tagName != Html::TABLE and
+               _currentElement()->tagName != Html::TEMPLATE and
+               _currentElement()->tagName != Html::HTML) {
 
             _openElements.popBack();
         }
@@ -1289,9 +1377,9 @@ void HtmlParser::_handleInTable(HtmlToken const& t) {
 
     // A character token, if the current node is table, tbody, template, tfoot, thead, or tr element
     if (t.type == HtmlToken::CHARACTER and
-        (last(_openElements)->tagName == Html::TABLE or last(_openElements)->tagName == Html::TBODY or
-         last(_openElements)->tagName == Html::TEMPLATE or last(_openElements)->tagName == Html::TFOOT or
-         last(_openElements)->tagName == Html::THEAD or last(_openElements)->tagName == Html::TR
+        (_currentElement()->tagName == Html::TABLE or _currentElement()->tagName == Html::TBODY or
+         _currentElement()->tagName == Html::TEMPLATE or _currentElement()->tagName == Html::TFOOT or
+         _currentElement()->tagName == Html::THEAD or _currentElement()->tagName == Html::TR
         )) {
         // Let the pending table character tokens be an empty list of tokens.
         _pendingTableCharacterTokens.clear();
@@ -1447,7 +1535,7 @@ void HtmlParser::_handleInTable(HtmlToken const& t) {
         _acceptIn(Mode::IN_HEAD, t);
     }
 
-    // TODO: A start tag whose tag name is "input"
+    // A start tag whose tag name is "input"
     else if (t.type == HtmlToken::START_TAG and t.name == "input") {
 
         // If the token does not have an attribute with the name "type",
@@ -1456,7 +1544,7 @@ void HtmlParser::_handleInTable(HtmlToken const& t) {
         for (auto& [name, value] : t.attrs) {
             if (name == "type") {
                 // TODO: ASCII case-insensitive match
-                if (value == "hidden") {
+                if (eqCi(value.str(), "hidden"s)) {
                     hasHiddenAsTypeAttrValue = true;
                 }
 
@@ -1479,7 +1567,8 @@ void HtmlParser::_handleInTable(HtmlToken const& t) {
         // Pop that input element off the stack of open elements.
         _openElements.popBack();
 
-        // TODO: Acknowledge the token's self-closing flag, if it is set.
+        // Acknowledge the token's self-closing flag, if it is set.
+        _acknowledgeSelfClosingFlag(t);
     }
 
     // A start tag whose tag name is "form"
@@ -1541,8 +1630,10 @@ void HtmlParser::_handleInTableText(HtmlToken const& t) {
         // then this is a parse error:
         bool hasNonWhitespace = false;
         for (auto const& token : _pendingTableCharacterTokens) {
-            if (token.rune != '\t' and token.rune != '\n' and
-                token.rune != '\f' and token.rune != '\r' and token.rune != ' ') {
+            if (
+                token.rune != '\t' and token.rune != '\n' and
+                token.rune != '\f' and token.rune != '\r' and token.rune != ' '
+            ) {
                 hasNonWhitespace = true;
                 break;
             }
@@ -1571,12 +1662,13 @@ void HtmlParser::_handleInTableText(HtmlToken const& t) {
 // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intbody
 void HtmlParser::_handleInTableBody(HtmlToken const& t) {
     auto _clearTheStackBackToATableBodyContext = [&]() {
-        while (last(_openElements)->tagName != Html::TBODY and
-               last(_openElements)->tagName != Html::TFOOT and
-               last(_openElements)->tagName != Html::THEAD and
-               last(_openElements)->tagName != Html::TEMPLATE and
-               last(_openElements)->tagName != Html::HTML) {
-
+        while (
+            _currentElement()->tagName != Html::TBODY and
+            _currentElement()->tagName != Html::TFOOT and
+            _currentElement()->tagName != Html::THEAD and
+            _currentElement()->tagName != Html::TEMPLATE and
+            _currentElement()->tagName != Html::HTML
+        ) {
             _openElements.popBack();
         }
     };
@@ -1626,12 +1718,12 @@ void HtmlParser::_handleInTableBody(HtmlToken const& t) {
         _switchTo(Mode::IN_TABLE);
     }
 
-    else if ((t.type == HtmlToken::START_TAG and
-              (t.name == "caption" or t.name == "col" or t.name == "colgroup" or
-               t.name == "tbody" or t.name == "tfoot" or t.name == "thead"
-              )) or
-             (t.type == HtmlToken::END_TAG and t.name == "table"
-             )) {
+    else if (
+        (t.type == HtmlToken::START_TAG and
+         (t.name == "caption" or t.name == "col" or t.name == "colgroup" or
+          t.name == "tbody" or t.name == "tfoot" or t.name == "thead")) or
+        (t.type == HtmlToken::END_TAG and t.name == "table")
+    ) {
 
         // If the stack of open elements does not have a tbody, thead, or tfoot element in table scope,
         // TODO: consider refactor so _hasElementInScope accepts list instead of single element
@@ -1657,11 +1749,13 @@ void HtmlParser::_handleInTableBody(HtmlToken const& t) {
     }
 
     // An end tag whose tag name is one of: "body", "caption", "col", "colgroup", "html", "td", "th", "tr"
-    else if (t.type == HtmlToken::END_TAG and
-             (t.name == "body" or t.name == "caption" or t.name == "col" or
-              t.name == "colgroup" or t.name == "html" or
-              t.name == "td" or t.name == "th" or t.name == "tr"
-             )) {
+    else if (
+        t.type == HtmlToken::END_TAG and
+        (t.name == "body" or t.name == "caption" or t.name == "col" or
+         t.name == "colgroup" or t.name == "html" or
+         t.name == "td" or t.name == "th" or t.name == "tr"
+        )
+    ) {
         // Parse error. Ignore the token.
         _raise();
     }
@@ -1676,9 +1770,9 @@ void HtmlParser::_handleInTableBody(HtmlToken const& t) {
 // https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-intr
 void HtmlParser::_handleInTableRow(HtmlToken const& t) {
     auto _clearTheStackBackToATableRowContext = [&]() {
-        while (last(_openElements)->tagName != Html::TR and
-               last(_openElements)->tagName != Html::TEMPLATE and
-               last(_openElements)->tagName != Html::HTML) {
+        while (_currentElement()->tagName != Html::TR and
+               _currentElement()->tagName != Html::TEMPLATE and
+               _currentElement()->tagName != Html::HTML) {
 
             _openElements.popBack();
         }
@@ -1794,7 +1888,7 @@ void HtmlParser::_handleInCell(HtmlToken const& t) {
         _generateImpliedEndTags(*this);
 
         // If the current node is not now a td element or a th element, then this is a parse error.
-        if (last(_openElements)->tagName != Html::TD and last(_openElements)->tagName != Html::TR) {
+        if (_currentElement()->tagName != Html::TD and _currentElement()->tagName != Html::TR) {
             _raise();
         }
 
@@ -1829,7 +1923,7 @@ void HtmlParser::_handleInCell(HtmlToken const& t) {
         _generateImpliedEndTags(*this);
 
         // Now, if the current node is not an HTML element with the same tag name as the token,
-        if (last(_openElements)->tagName != tokenTagName) {
+        if (_currentElement()->tagName != tokenTagName) {
             // then this is a parse error.
             _raise();
         }
@@ -1927,12 +2021,190 @@ void HtmlParser::_handleAfterBody(HtmlToken const& t) {
     }
 }
 
+// https://html.spec.whatwg.org/multipage/parsing.html#parsing-main-inforeign
+void HtmlParser::_handleInForeignContent(HtmlToken const& t) {
+
+    auto handleScript = [&] {
+        // TODO
+
+        // Pop the current node off the stack of open elements.
+        _openElements.popBack();
+
+        // Let the old insertion point have the same value as the current insertion point. Let the insertion point be just before the next input character.
+
+        // Increment the parser's script nesting level by one. Set the parser pause flag to true.
+
+        // If the active speculative HTML parser is null and the user agent supports SVG, then Process the SVG script element according to the SVG rules. [SVG]
+
+        // Even if this causes new characters to be inserted into the tokenizer, the parser will not be executed reentrantly, since the parser pause flag is true.
+
+        // Decrement the parser's script nesting level by one. If the parser's script nesting level is zero, then set the parser pause flag to false.
+
+        // Let the insertion point have the value of the old insertion point. (In other words, restore the insertion point to its previous value. This value might be the "undefined" value.)
+    };
+
+    // A character token that is U+0000 NULL
+    if (t.type == HtmlToken::CHARACTER and t.rune == '\0') {
+        // Parse error. Insert a U+FFFD REPLACEMENT CHARACTER character.
+        _raise();
+        _insertACharacter(0xFFFD);
+    }
+
+    // A character token that is one of U+0009 CHARACTER TABULATION, U+000A LINE FEED (LF), U+000C FORM FEED (FF), U+000D CARRIAGE RETURN (CR), or U+0020 SPACE
+    else if (
+        t.type == HtmlToken::CHARACTER and
+        (t.rune == '\t' or t.rune == '\n' or t.rune == '\f' or t.rune == '\r' or t.rune == ' ')
+    ) {
+        // Insert the token's character.
+        _insertACharacter(t.rune);
+    }
+
+    // Any other character token
+    else if (
+        t.type == HtmlToken::CHARACTER
+    ) {
+        // Insert the token's character.
+        _insertACharacter(t.rune);
+
+        // Set the frameset-ok flag to "not ok".
+        _framesetOk = false;
+    }
+
+    // A comment token
+    else if (t.type == HtmlToken::COMMENT) {
+        // Insert a comment.
+        _insertAComment(t);
+    }
+
+    // A DOCTYPE token
+    else if (t.type == HtmlToken::DOCTYPE) {
+        // Parse error. Ignore the token.
+        _raise();
+    }
+
+    // A start tag whose tag name is one of: "b", "big", "blockquote", "body", "br", "center", "code", "dd", "div", "dl", "dt", "em", "embed", "h1", "h2", "h3", "h4", "h5", "h6", "head", "hr", "i", "img", "li", "listing", "menu", "meta", "nobr", "ol", "p", "pre", "ruby", "s", "small", "span", "strong", "strike", "sub", "sup", "table", "tt", "u", "ul", "var"
+    // A start tag whose tag name is "font", if the token has any attributes named "color", "face", or "size"
+    // An end tag whose tag name is "br", "p"
+    else if (
+        (t.type == HtmlToken::START_TAG and contains(Array{"b"s, "big", "blockquote", "body", "br", "center", "code", "dd", "div", "dl", "dt", "em", "embed", "h1", "h2", "h3", "h4", "h5", "h6", "head", "hr", "i", "img", "li", "listing", "menu", "meta", "nobr", "ol", "p", "pre", "ruby", "s", "small", "span", "strong", "strike", "sub", "sup", "table", "tt", "u", "ul", "var"}, t.name)) or
+        (t.type == HtmlToken::START_TAG and (t.hasAttribute("color") or t.hasAttribute("face") or t.hasAttribute("size"))) or
+        (t.type == HtmlToken::END_TAG and (t.name == "br" or t.name == "p"))
+    ) {
+        // Parse error.
+        _raise();
+
+        while (_openElements.len()) {
+            auto el = _currentElement();
+            // While the current node is not:
+            //  - a MathML text integration point,
+            //  - an HTML integration point,
+            //  - or an element in the HTML namespace
+            if (_isMathMlTextIntegrationPoint(*el) and
+                _isHtmlIntegrationPoint(*el) and
+                el->tagName.ns == Vaev::HTML) {
+                break;
+            }
+
+            // pop elements from the stack of open elements.
+            _openElements.popBack();
+        }
+
+        // Reprocess the token according to the rules given in the section
+        // corresponding to the current insertion mode in HTML content.
+        accept(t);
+    }
+
+    // Any other start tag
+    else if (t.type == HtmlToken::START_TAG) {
+        // If the adjusted current node is an element in the MathML namespace, ...
+        if (_currentElement()->tagName.ns == Vaev::MathML) {
+            // TODO: ...adjust MathML attributes for the token. (This fixes the case of MathML attributes that are not all lowercase.)
+        }
+
+        // If the adjusted current node is an element in the SVG namespace
+        if (_adjustedCurrentElement()->tagName.ns == SVG) {
+            // TODO: and the token's tag name is one of the ones in the first column of the following table, change the tag name to the name given in the corresponding cell in the second column. (This fixes the case of SVG elements that are not all lowercase.)
+        }
+
+        // If the adjusted current node is an element in the SVG namespace, ...
+        if (_adjustedCurrentElement()->tagName.ns == SVG) {
+            // TODO: ...adjust foreign attributes for the token. (This fixes the use of namespaced attributes, in particular XLink in SVG.)
+        }
+
+        // Insert a foreign element for the token, with adjusted current node's namespace and false.
+        _insertAForeignElement(t, _currentElement()->tagName.ns);
+
+        // If the token has its self-closing flag set, then run the appropriate steps from the following list:
+        if (t.selfClosing) {
+            // If the token's tag name is "script", and the new current node is in the SVG namespace
+            // Acknowledge the token's self-closing flag, and then act as described in the steps for a "script" end tag below.
+            if (t.name == "script" and _currentElement()->tagName.ns == SVG) {
+                _acknowledgeSelfClosingFlag(t);
+                handleScript();
+            }
+
+            // Otherwise
+            else {
+                // Pop the current node off the stack of open elements and acknowledge the token's self-closing flag.
+                _openElements.popBack();
+                _acknowledgeSelfClosingFlag(t);
+            }
+        }
+    }
+
+    // An end tag whose tag name is "script", if the current node is an SVG script element
+    else if (t.type == HtmlToken::END_TAG and t.name == "script") {
+        handleScript();
+    }
+
+    // Any other end tag
+    else if (t.type == HtmlToken::END_TAG) {
+        // Run these steps:
+
+        // If node's tag name, converted to ASCII lowercase, is not the same as the tag name of the token, then this is a parse error.
+        if (not eqCi(_currentElement()->tagName.name(), t.name.str())) {
+            _raise();
+        }
+
+        usize curr = _openElements.len();
+        while (curr > 0) {
+            auto node = _openElements[curr - 1];
+            // Loop: If node is the topmost element in the stack of open elements, then return. (fragment case)
+            if (curr == 0)
+                return;
+
+            // If node's tag name, converted to ASCII lowercase, is the same as the tag name of the token,
+            if (eqCi(node->tagName.name(), t.name.str())) {
+                // pop elements from the stack of open elements until node has been popped from the stack, and then return.
+                while (_currentElement() != node) {
+                    _openElements.popBack();
+                }
+                _openElements.popBack();
+                return;
+            }
+
+            // Set node to the previous entry in the stack of open elements.
+            curr--;
+            node = _openElements[curr];
+
+            // If node is not an element in the HTML namespace, return to the step labeled loop.
+            if (node->tagName.ns != HTML)
+                continue;
+
+            // Otherwise, process the token according to the rules given in the section corresponding to the current insertion mode in HTML content.
+            _acceptIn(_insertionMode, t);
+            break;
+        }
+    }
+}
+
 void HtmlParser::_switchTo(Mode mode) {
     _insertionMode = mode;
 }
 
 void HtmlParser::_acceptIn(Mode mode, HtmlToken const& t) {
-    logDebugIf(DEBUG_HTML_PARSER, "Parsing {} in {}", t, mode);
+    if (t.type != HtmlToken::CHARACTER)
+        logDebugIf(DEBUG_HTML_PARSER, "Parsing {} in {}", t, mode);
 
     switch (mode) {
 
@@ -2033,8 +2305,33 @@ void HtmlParser::_acceptIn(Mode mode, HtmlToken const& t) {
     }
 }
 
+// https://html.spec.whatwg.org/multipage/parsing.html#tree-construction
 void HtmlParser::accept(HtmlToken const& t) {
-    _acceptIn(_insertionMode, t);
+    // If the stack of open elements is empty
+    // If the adjusted current node is an element in the HTML namespace
+    // If the adjusted current node is a MathML text integration point and the token is a start tag whose tag name is neither "mglyph" nor "malignmark"
+    // If the adjusted current node is a MathML text integration point and the token is a character token
+    // If the adjusted current node is a MathML annotation-xml element and the token is a start tag whose tag name is "svg"
+    // If the adjusted current node is an HTML integration point and the token is a start tag
+    // If the adjusted current node is an HTML integration point and the token is a character token
+    // If the token is an end-of-file token
+    if (
+        isEmpty(_openElements) or
+        _currentElement()->tagName.ns == HTML or
+        (t.type == HtmlToken::START_TAG and _isHtmlIntegrationPoint(*_currentElement())) or
+        (t.type == HtmlToken::CHARACTER and _isMathMlTextIntegrationPoint(*_currentElement())) or
+        t.type == HtmlToken::END_OF_FILE
+    ) {
+        // Process the token according to the rules given in the section
+        // corresponding to the current insertion mode in HTML content.
+        _acceptIn(_insertionMode, t);
+    }
+
+    // Otherwise
+    else {
+        // Process the token according to the rules given in the section for parsing tokens in foreign content.
+        _handleInForeignContent(t);
+    }
 }
 
 } // namespace Vaev::Dom

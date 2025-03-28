@@ -31,7 +31,7 @@ static Feature _parseMediaFeature(Cursor<Css::Sst>& c) {
     Opt<Feature> prop;
 
     eatWhitespace(c);
-    Feature::any([&]<typename F>(Meta::Type<F>) -> bool {
+    Feature::any([&]<typename F>() -> bool {
         if (name != F::name())
             return false;
 

@@ -48,7 +48,7 @@ struct UringSched : public Sys::Sched {
     };
 
     io_uring _ring;
-    usize _id = 0;
+    usize _id = 1;
     Map<usize, Rc<_Job>> _jobs;
 
     UringSched(io_uring ring)
@@ -63,9 +63,9 @@ struct UringSched : public Sys::Sched {
         auto* sqe = io_uring_get_sqe(&_ring);
         if (not sqe) [[unlikely]]
             panic("failed to get sqe");
-        sqe->user_data = id;
         _jobs.put(id, job);
         job->submit(sqe);
+        sqe->user_data = id;
         io_uring_submit(&_ring);
     }
 
@@ -79,7 +79,13 @@ struct UringSched : public Sys::Sched {
                 : _fd(fd), _buf(buf) {}
 
             void submit(io_uring_sqe* sqe) override {
-                io_uring_prep_read(sqe, _fd->handle().value(), _buf.buf(), _buf.len(), 0);
+                io_uring_prep_read(
+                    sqe,
+                    _fd->handle().value(),
+                    _buf.buf(),
+                    _buf.len(),
+                    -1
+                );
             }
 
             void complete(io_uring_cqe* cqe) override {
@@ -110,7 +116,17 @@ struct UringSched : public Sys::Sched {
                 : _fd(fd), _buf(buf) {}
 
             void submit(io_uring_sqe* sqe) override {
-                io_uring_prep_write(sqe, _fd->handle().value(), _buf.buf(), _buf.len(), 0);
+                io_uring_prep_write(
+                    sqe,
+                    _fd->handle().value(),
+                    _buf.buf(),
+                    _buf.len(),
+                    // NOTE: On files that support seeking, if the offset is set
+                    //       to -1, the write operation commences at the file
+                    //       offset, and the file offset is incremented by
+                    //       the number of bytes written. See io_uring_prep_write(3).
+                    -1
+                );
             }
 
             void complete(io_uring_cqe* cqe) override {
@@ -324,8 +340,6 @@ struct UringSched : public Sys::Sched {
             _inWait = false;
         };
 
-        // HACK: io_uring_wait_cqes doesn't support absolute timeout
-        //       so we have to do it ourselves
         Instant now = Sys::instant();
 
         Duration delta = Duration::zero();
@@ -333,19 +347,20 @@ struct UringSched : public Sys::Sched {
             delta = until - now;
 
         struct __kernel_timespec ts = toKernelTimespec(delta);
-        Array<io_uring_cqe*, NCQES> cqes{};
-        io_uring_wait_cqes(&_ring, cqes.buf(), 1, &ts, nullptr);
+        io_uring_cqe* cqe = nullptr;
+        io_uring_wait_cqe_timeout(&_ring, &cqe, &ts);
 
-        for (auto* cqe : cqes) {
-            if (not cqe)
-                break;
-
+        unsigned head;
+        usize i = 0;
+        io_uring_for_each_cqe(&_ring, head, cqe) {
             auto id = cqe->user_data;
             auto job = _jobs.get(id);
             job->complete(cqe);
             _jobs.del(id);
-            io_uring_cqe_seen(&_ring, cqe);
+            ++i;
         }
+
+        io_uring_cq_advance(&_ring, i);
 
         return Ok();
     }

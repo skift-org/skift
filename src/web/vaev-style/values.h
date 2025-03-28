@@ -309,7 +309,7 @@ struct ValueParser<Union<Ts...>> {
         if (c.ended())
             return Error::invalidData("unexpected end of input");
 
-        return Meta::any<Ts...>([&c]<typename T>(Meta::Type<T>) -> Res<Union<Ts...>> {
+        return Meta::any<Ts...>([&c]<typename T>() -> Res<Union<Ts...>> {
             return Ok(try$(parseValue<T>(c)));
         });
     }

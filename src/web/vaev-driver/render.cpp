@@ -20,6 +20,7 @@ export struct RenderResult {
     Rc<Layout::Box> layout;
     Rc<Scene::Node> scenes;
     Rc<Layout::Frag> frag;
+    Gfx::Color canvasColor;
 };
 
 export RenderResult render(Gc::Ref<Dom::Document> dom, Style::Media const& media, Layout::Viewport viewport) {
@@ -45,8 +46,10 @@ export RenderResult render(Gc::Ref<Dom::Document> dom, Style::Media const& media
 
     Layout::Tree tree = {
         Layout::build(computer, dom),
-        viewport,
+        viewport
     };
+
+    auto canvasColor = fixupBackgrounds(computer, dom, tree);
 
     elapsed = Sys::now() - start;
 
@@ -79,7 +82,8 @@ export RenderResult render(Gc::Ref<Dom::Document> dom, Style::Media const& media
         std::move(stylebook),
         makeRc<Layout::Box>(std::move(tree.root)),
         sceneRoot,
-        makeRc<Layout::Frag>(std::move(root))
+        makeRc<Layout::Frag>(std::move(root)),
+        canvasColor
     };
 }
 

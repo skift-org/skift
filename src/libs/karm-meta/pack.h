@@ -67,23 +67,23 @@ struct _Any;
 template <typename T>
 struct _Any<T> {
     always_inline static auto eval(auto func) {
-        return func(Type<T>{});
+        return func.template operator()<T>();
     }
 };
 
 template <typename T, typename... Ts>
 struct _Any<T, Ts...> {
     always_inline static auto eval(auto func)
-        requires(not Meta::Same<decltype(func(Type<T>{})), void>)
+        requires(not Meta::Same<decltype(func.template operator()<T>()), void>)
     {
-        return func(Type<T>{}) ?: _Any<Ts...>::eval(func);
+        return func.template operator()<T>() ?: _Any<Ts...>::eval(func);
     }
 
     always_inline static auto eval(auto func)
-        requires(Meta::Same<decltype(func(Type<T>{})), void>)
+        requires(Meta::Same<decltype(func.template operator()<T>()), void>)
     {
-        func(Type<T>{});
-        _Any<Ts...>::eval(func);
+        func.template operator()<T>();
+        (func.template operator()<Ts>(), ...);
     }
 };
 

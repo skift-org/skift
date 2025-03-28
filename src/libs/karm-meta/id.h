@@ -19,34 +19,4 @@ static constexpr Id idOf() {
     return hash;
 }
 
-template <typename T = struct __noType>
-struct Type;
-
-template <typename T>
-struct Type {
-    using TYPE = T;
-
-    constexpr static Id id() {
-        return idOf<T>();
-    }
-};
-
-template <>
-struct Type<struct __noType> {
-    Id _id;
-
-    template <typename T>
-    constexpr Type(Type<T> type)
-        : _id(type.id()) {}
-
-    constexpr Id id() const {
-        return _id;
-    }
-};
-
-template <typename T>
-Type<T> typeOf() {
-    return Type<T>{};
-}
-
 } // namespace Karm::Meta

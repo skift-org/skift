@@ -108,7 +108,7 @@ struct _String {
 
     static constexpr Array<Unit, 1> _EMPTY = {0};
 
-    Unit* _buf = nullptr;
+    Unit * _buf = nullptr;
     usize _len = 0;
 
     constexpr _String() = default;
@@ -189,14 +189,6 @@ struct _String {
 
     always_inline constexpr explicit operator bool() const {
         return _len > 0;
-    }
-
-    Buf<Byte> takeBytes() {
-        return {
-            MOVE,
-            reinterpret_cast<Byte*>(std::exchange(_buf, nullptr)),
-            std::exchange(_len, 0) * sizeof(Unit),
-        };
     }
 };
 
@@ -332,14 +324,6 @@ struct _StringBuilder {
         usize len = _buf.len();
         _buf.insert(len, 0);
         return {MOVE, _buf.take(), len};
-    }
-
-    Buf<Byte> takeBytes() {
-        return {
-            MOVE,
-            _buf.take(),
-            _buf.len() * sizeof(typename E::Unit),
-        };
     }
 };
 

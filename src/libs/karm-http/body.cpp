@@ -43,8 +43,8 @@ export struct Body : public Aio::Reader {
         return makeRc<BufBody>(std::move(buf));
     }
 
-    static Rc<Body> from(String str) {
-        return from(str.takeBytes());
+    static Rc<Body> from(Str str) {
+        return from(bytes(str));
     }
 
     static Rc<Body> empty() {

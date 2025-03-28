@@ -7,7 +7,7 @@ namespace Karm::Sys::Tests {
 
 Async::Task<> sleepyBoy() {
 #ifdef __ck_sys_darwin__
-    logInfo("Skipping test on macOS");
+    logInfo("skipping test on macOS");
     co_return Error::skipped();
 #endif
 

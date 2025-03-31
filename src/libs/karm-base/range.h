@@ -88,6 +88,10 @@ struct Range {
         return slice(off, size - off);
     }
 
+    constexpr Range slice(Range other) const {
+        return slice(other.start, other.size);
+    }
+
     constexpr Range halfOver(Range other) {
         if (overlaps(other) and other.end() < end()) {
             return {other.end(), end() - other.end()};

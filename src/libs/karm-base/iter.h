@@ -399,6 +399,23 @@ constexpr auto iter(AtLen auto& o) {
         });
 }
 
+// MARK: Iter2 ----------------------------------------------------------------
+
+// NOTE: New iterator interface, that will replace the old one.
+// This is a work in progress and not all features are implemented yet.
+
+template <typename T>
+concept Iter2Item = requires(T t) {
+    *t;
+    t == NONE;
+    t != NONE;
+};
+
+template <typename T>
+concept Iter2 = requires(T t) {
+    { t.next() } -> Iter2Item;
+};
+
 // MARK: Generator -------------------------------------------------------------
 
 template <typename T>
@@ -472,6 +489,40 @@ struct Generator {
         return _coro.promise()._value.take();
     }
 };
+
+static_assert(Iter2<Generator<int>>);
+
+// MARK: Iter ------------------------------------------------------------------
+
+template <Iter2 I>
+struct It {
+    using Item = decltype(Meta::declval<I>().next());
+    Item curr;
+    I& iter;
+
+    constexpr auto& operator*() {
+        return *curr;
+    }
+
+    constexpr auto operator++() {
+        curr = iter.next();
+        return *this;
+    }
+
+    constexpr bool operator!=(None) {
+        return curr != NONE;
+    }
+};
+
+template <Iter2 I>
+constexpr It<I> begin(I& iter) {
+    return {iter.next(), iter};
+}
+
+template <Iter2 I>
+constexpr None end(I&) {
+    return NONE;
+}
 
 // MARK: ForEach ---------------------------------------------------------------
 

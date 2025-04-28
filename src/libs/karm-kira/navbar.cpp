@@ -1,12 +1,19 @@
-#include <karm-ui/layout.h>
+module;
 
-#include "navbar.h"
+#include <karm-base/opt.h>
+#include <karm-gfx/icon.h>
+#include <karm-math/align.h>
+
+export module Karm.Kira:navbar;
+
+import Karm.Ui;
+import :separator;
 
 namespace Karm::Kira {
 
-Ui::Child navbarContent(Ui::Children children) {
+export Ui::Child navbarContent(Ui::Children children) {
     return Ui::vflow(
-        Ui::separator(),
+        separator(),
         Ui::hflow(
             4,
             children
@@ -18,7 +25,7 @@ Ui::Child navbarContent(Ui::Children children) {
     );
 }
 
-Ui::Child navbarItem(Ui::OnPress onPress, Mdi::Icon icon, Str text, bool selected) {
+export Ui::Child navbarItem(Opt<Ui::Send<>> onPress, Gfx::Icon icon, Str text, bool selected) {
     return Ui::button(
                std::move(onPress),
                selected

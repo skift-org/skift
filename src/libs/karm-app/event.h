@@ -54,7 +54,7 @@ struct Event {
 };
 
 template <typename T>
-struct _Event : public Event {
+struct _Event : Event {
     T _buf;
 
     template <typename... Args>

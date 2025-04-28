@@ -141,6 +141,8 @@ void Canvas::fill(Text::Prose& prose) {
         _e("[<");
         for (auto& block : line.blocks()) {
             for (auto& cell : block.cells()) {
+                if (cell.strut())
+                    continue;
                 auto glyphAdvance = prose._style.font.advance(cell.glyph);
                 auto nextEndPosWithoutKern = prevEndPos + glyphAdvance;
                 auto nextDesiredEndPos = (block.pos + cell.pos + cell.adv).cast<f64>();

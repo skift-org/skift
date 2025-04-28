@@ -237,4 +237,21 @@ struct _UnionFlatten<Union<Ts...>, Union<Us...>, Vs...> {
 template <typename... Ts>
 using FlatUnion = _UnionFlatten<Union<>, Ts...>::type;
 
+template <typename... Ts>
+    requires(sizeof...(Ts) <= 254)
+struct Niche<Union<Ts...>> {
+    struct Content {
+        alignas(max(alignof(Ts)...)) char _buf[max(Meta::zeroableSizeOf<Ts>()...)];
+        u8 index;
+
+        always_inline constexpr Content() : index(255) {}
+
+        always_inline constexpr bool has() const {
+            return index != 255;
+        }
+
+        always_inline constexpr void setupValue() {}
+    };
+};
+
 } // namespace Karm

@@ -1,3 +1,6 @@
+#include <stdlib.h>
+
+//
 #include <karm-pkg/_embed.h>
 #include <karm-sys/_embed.h>
 #include <karm-sys/proc.h>

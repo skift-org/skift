@@ -2,7 +2,8 @@
 
 #include <karm-base/map.h>
 #include <karm-text/font.h>
-#include <karm-ui/reducer.h>
+
+import Karm.Ui;
 
 namespace Hideo::Spreadsheet {
 

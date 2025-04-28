@@ -26,7 +26,7 @@ enum struct NodeType {
 };
 
 // https://dom.spec.whatwg.org/#interface-node
-struct Node : public Tree<Node> {
+struct Node : Tree<Node> {
     virtual ~Node() = default;
     virtual NodeType nodeType() const = 0;
 

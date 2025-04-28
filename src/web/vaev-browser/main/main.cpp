@@ -1,8 +1,8 @@
 #include <karm-gc/heap.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/proc.h>
-#include <karm-ui/app.h>
 
+import Karm.Ui;
 import Vaev.Browser;
 import Vaev.Driver;
 import Karm.Http;

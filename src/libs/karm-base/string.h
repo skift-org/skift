@@ -7,7 +7,7 @@
 namespace Karm {
 
 template <StaticEncoding E, typename U = typename E::Unit>
-struct _Str : public Slice<U> {
+struct _Str : Slice<U> {
     using Encoding = E;
     using Unit = U;
 
@@ -41,6 +41,11 @@ struct _Str : public Slice<U> {
     always_inline constexpr explicit operator bool() const {
         return this->_len > 0;
     }
+};
+
+template <StaticEncoding E, typename U>
+struct Niche<_Str<E, U>> {
+    struct Content : public Niche<Slice<U>>::Content {};
 };
 
 template <StaticEncoding E, usize N>
@@ -97,6 +102,12 @@ struct _InlineString {
     }
 };
 
+template <StaticEncoding E, usize N>
+    requires Nicheable<Array<typename E::Unit, N>>
+struct Niche<_InlineString<E, N>> {
+    struct Content : public Niche<Array<typename E::Unit, N>>::Content {};
+};
+
 template <usize N>
 using InlineString = _InlineString<Utf8, N>;
 
@@ -108,7 +119,7 @@ struct _String {
 
     static constexpr Array<Unit, 1> _EMPTY = {0};
 
-    Unit * _buf = nullptr;
+    Unit* _buf = nullptr;
     usize _len = 0;
 
     constexpr _String() = default;
@@ -190,6 +201,22 @@ struct _String {
     always_inline constexpr explicit operator bool() const {
         return _len > 0;
     }
+};
+
+template <StaticEncoding E>
+struct Niche<_String<E>> {
+    struct Content {
+        char const* ptr;
+        usize _len;
+
+        always_inline constexpr Content() : ptr(_NONE_PTR) {}
+
+        always_inline constexpr bool has() const {
+            return ptr != _NONE_PTR;
+        }
+
+        always_inline constexpr void setupValue() {}
+    };
 };
 
 template <

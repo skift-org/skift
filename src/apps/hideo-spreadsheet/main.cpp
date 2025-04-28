@@ -1,52 +1,10 @@
-#include <karm-kira/row.h>
-#include <karm-kira/scaffold.h>
-#include <karm-kira/titlebar.h>
-#include <karm-kira/toolbar.h>
 #include <karm-sys/entry.h>
-#include <karm-ui/app.h>
-#include <karm-ui/dialog.h>
-#include <karm-ui/focus.h>
-#include <karm-ui/input.h>
-#include <karm-ui/layout.h>
-#include <karm-ui/scroll.h>
-#include <karm-ui/view.h>
-#include <mdi/align-horizontal-center.h>
-#include <mdi/align-horizontal-left.h>
-#include <mdi/align-horizontal-right.h>
-#include <mdi/align-vertical-bottom.h>
-#include <mdi/align-vertical-center.h>
-#include <mdi/align-vertical-top.h>
-#include <mdi/border-all.h>
-#include <mdi/border-bottom.h>
-#include <mdi/border-horizontal.h>
-#include <mdi/border-left.h>
-#include <mdi/border-none.h>
-#include <mdi/border-right.h>
-#include <mdi/border-top.h>
-#include <mdi/border-vertical.h>
-#include <mdi/brush-variant.h>
-#include <mdi/content-save-plus.h>
-#include <mdi/content-save.h>
-#include <mdi/file.h>
-#include <mdi/filter.h>
-#include <mdi/folder.h>
-#include <mdi/format-bold.h>
-#include <mdi/format-clear.h>
-#include <mdi/format-italic.h>
-#include <mdi/format-paint.h>
-#include <mdi/format-strikethrough.h>
-#include <mdi/format-underline.h>
-#include <mdi/function.h>
-#include <mdi/plus.h>
-#include <mdi/redo.h>
-#include <mdi/sigma.h>
-#include <mdi/table-merge-cells.h>
-#include <mdi/table.h>
-#include <mdi/undo.h>
-#include <mdi/wrap-disabled.h>
-#include <mdi/wrap.h>
 
 #include "app.h"
+
+import Mdi;
+import Karm.Ui;
+import Karm.Kira;
 
 namespace Hideo::Spreadsheet {
 
@@ -58,7 +16,7 @@ Ui::Child formula() {
                    .backgroundFill = Ui::GRAY800,
                },
                Ui::hflow(
-                   Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FUNCTION),
+                   Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::FUNCTION),
                    Ui::grow(NONE)
                )
            ) |
@@ -67,19 +25,19 @@ Ui::Child formula() {
 
 Ui::Child toolbar(State const& state) {
     return Kr::toolbar({
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FILE),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FOLDER),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE_PLUS),
-        Ui::separator(),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::UNDO),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::REDO),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_PAINT),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_CLEAR),
-        Ui::separator(),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FILTER),
-        Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::SIGMA),
-        Ui::separator(),
+        Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::FILE),
+        Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::FOLDER),
+        Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE),
+        Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::CONTENT_SAVE_PLUS),
+        Kr::separator(),
+        Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::UNDO),
+        Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::REDO),
+        Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::FORMAT_PAINT),
+        Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::FORMAT_CLEAR),
+        Kr::separator(),
+        Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::FILTER),
+        Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::SIGMA),
+        Kr::separator(),
         Ui::empty(4),
         formula() | Ui::grow(),
         Ui::empty(4),
@@ -98,7 +56,7 @@ Ui::Child properties() {
         Ui::vflow(
             Kr::titleRow("Text Properties"s),
 
-            Kr::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Color"s),
+            Kr::colorRow(Gfx::RED, Ui::SINK<Gfx::Color>, "Color"s),
 
             Kr::rowContent(
                 NONE,
@@ -106,10 +64,10 @@ Ui::Child properties() {
                 NONE,
                 Ui::hflow(
                     4,
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_BOLD),
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_ITALIC),
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_UNDERLINE),
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::FORMAT_STRIKETHROUGH)
+                    Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::FORMAT_BOLD),
+                    Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::FORMAT_ITALIC),
+                    Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::FORMAT_UNDERLINE),
+                    Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::FORMAT_STRIKETHROUGH)
                 )
             ),
 
@@ -119,8 +77,8 @@ Ui::Child properties() {
                 NONE,
                 Ui::hflow(
                     4,
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::WRAP),
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::WRAP_DISABLED)
+                    Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::WRAP),
+                    Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::WRAP_DISABLED)
                 )
             ),
 
@@ -148,11 +106,11 @@ Ui::Child properties() {
                 )
             ),
 
-            Ui::separator(),
+            Kr::separator(),
 
             Kr::titleRow("Cell Properties"s),
-            Kr::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Background Color"s),
-            Kr::colorRow(Gfx::RED, Ui::IGNORE<Gfx::Color>, "Border Color"s),
+            Kr::colorRow(Gfx::RED, Ui::SINK<Gfx::Color>, "Background Color"s),
+            Kr::colorRow(Gfx::RED, Ui::SINK<Gfx::Color>, "Border Color"s),
 
             Kr::rowContent(
                 NONE,
@@ -160,10 +118,10 @@ Ui::Child properties() {
                 NONE,
                 Ui::hflow(
                     4,
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_ALL),
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_NONE),
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_VERTICAL),
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_HORIZONTAL)
+                    Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::BORDER_ALL),
+                    Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::BORDER_NONE),
+                    Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::BORDER_VERTICAL),
+                    Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::BORDER_HORIZONTAL)
                 )
             ),
 
@@ -173,16 +131,16 @@ Ui::Child properties() {
                 NONE,
                 Ui::hflow(
                     4,
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_TOP),
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_BOTTOM),
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_LEFT),
-                    Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::BORDER_RIGHT)
+                    Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::BORDER_TOP),
+                    Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::BORDER_BOTTOM),
+                    Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::BORDER_LEFT),
+                    Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::BORDER_RIGHT)
                 )
             ),
 
-            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::TABLE_MERGE_CELLS, "Merge Cells"),
+            Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::TABLE_MERGE_CELLS, "Merge Cells"),
 
-            Ui::separator(),
+            Kr::separator(),
 
             Kr::titleRow("Sheet Properties"s)
         )
@@ -211,7 +169,7 @@ Ui::Child tabs(State const& state) {
         ),
 
         Ui::button(
-            Ui::NOP,
+            Ui::SINK<>,
             Ui::ButtonStyle::subtle(),
             Mdi::PLUS
         )
@@ -223,7 +181,7 @@ Ui::Child app() {
         auto tb = Kr::titlebar(Mdi::TABLE, "Spreadsheet"s, tabs(s));
         auto body = table(s) | Ui::grow();
         if (s.propertiesVisible) {
-            body = hflow(body, Ui::separator(), properties());
+            body = hflow(body, Kr::separator(), properties());
         }
 
         return Ui::vflow(

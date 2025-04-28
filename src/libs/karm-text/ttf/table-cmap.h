@@ -7,7 +7,7 @@
 
 namespace Ttf {
 
-struct Cmap : public Io::BChunk {
+struct Cmap : Io::BChunk {
     static constexpr Str SIG = "cmap";
 
     struct Table {

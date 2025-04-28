@@ -7,7 +7,7 @@
 
 namespace Karm::Io {
 
-struct Emit : public Io::TextWriter {
+struct Emit : Io::TextWriter {
     Io::TextWriter& _writer;
     usize _ident = 0;
     Res<> _error = Ok();

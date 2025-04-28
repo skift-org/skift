@@ -35,4 +35,6 @@ enum struct RepoType {
 
 Res<Tuple<Str, RepoType>> repoRoot();
 
+void overrideRepo(Tuple<Str, RepoType> repo);
+
 } // namespace Posix

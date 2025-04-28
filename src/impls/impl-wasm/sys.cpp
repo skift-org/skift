@@ -8,7 +8,7 @@
 
 namespace Karm::Sys::_Embed {
 
-struct JSConsole : public Sys::Fd {
+struct JSConsole : Sys::Fd {
     enum Proto {
         LOG,
         ERROR

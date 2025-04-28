@@ -203,7 +203,7 @@ Res<Value> parseNumber(Io::SScan& s) {
         if (expSign)
             exp = -exp;
 
-        return Ok<Value>(ipart + fpart * pow(10, exp));
+        return Ok<Value>(ipart + fpart * Math::pow<isize>(10, exp));
     }
 
     return Ok<Value>(ipart + fpart);

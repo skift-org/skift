@@ -4,9 +4,10 @@ namespace Karm::Sys {
 
 static bool _sandboxed = false;
 
-void enterSandbox() {
-    _Embed::hardenSandbox();
+Res<> enterSandbox() {
+    try$(_Embed::hardenSandbox());
     _sandboxed = true;
+    return Ok();
 }
 
 Res<> ensureUnrestricted() {

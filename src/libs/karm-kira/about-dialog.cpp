@@ -1,11 +1,13 @@
+module;
 
-#include <karm-ui/dialog.h>
-#include <karm-ui/layout.h>
-#include <karm-ui/scroll.h>
+#include <karm-base/string.h>
+#include <karm-math/align.h>
 
-#include "about-dialog.h"
-#include "badge.h"
-#include "dialog.h"
+export module Karm.Kira:aboutDialog;
+
+import Karm.Ui;
+import :badge;
+import :dialog;
 
 namespace Karm::Kira {
 
@@ -17,7 +19,7 @@ See the GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.)";
 
-Ui::Child licenseDialog() {
+export Ui::Child licenseDialog() {
     return dialogContent({
         dialogTitleBar("License"s),
         Ui::bodySmall(LICENSE) |
@@ -28,7 +30,7 @@ Ui::Child licenseDialog() {
     });
 }
 
-Ui::Child aboutDialog(String name) {
+export Ui::Child aboutDialog(String name) {
     return dialogContent({
         dialogHeader({
             Ui::hflow(6, Math::Align::CENTER, dialogTitle(name), versionBadge()),
@@ -44,7 +46,7 @@ Ui::Child aboutDialog(String name) {
                 showDialog(n, licenseDialog());
             },
                    Ui::ButtonStyle::regular(), "License"),
-            dialogAction(Ui::NOP, "Ok"s),
+            dialogAction(Ui::SINK<>, "Ok"s),
         }),
     });
 }

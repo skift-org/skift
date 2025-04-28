@@ -6,7 +6,7 @@
 
 namespace Ttf {
 
-struct Post : public Io::BChunk {
+struct Post : Io::BChunk {
     static constexpr Str SIG = "post";
 
     using ItalicAngle = Io::BField<Fixed, 4>;

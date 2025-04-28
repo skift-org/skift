@@ -15,9 +15,9 @@ Opt<Action> Action::fromEvent(App::Event& e) {
         auto ke = e.is<App::KeyboardEvent>();
         ke and ke->type == App::KeyboardEvent::PRESS
     ) {
-        bool shift = !!(ke->mods & App::KeyMod::SHIFT);
-        bool ctrl = !!(ke->mods & App::KeyMod::CTRL);
-        bool alt = !!(ke->mods & App::KeyMod::ALT);
+        bool shift = App::match(ke->mods, App::KeyMod::SHIFT);
+        bool ctrl = App::match(ke->mods, App::KeyMod::CTRL);
+        bool alt = App::match(ke->mods, App::KeyMod::ALT);
         bool nomod = not(shift or ctrl or alt);
         bool optionalyShift = (nomod or shift);
 

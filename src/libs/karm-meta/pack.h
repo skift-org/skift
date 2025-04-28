@@ -11,28 +11,19 @@ namespace Karm::Meta {
 template <typename T, typename... Ts>
 concept Contains = (Same<T, Ts> or ...);
 
-template <typename T, typename... Ts>
-struct _IndexOf;
-
-template <typename T, Meta::Same<T> First>
-struct _IndexOf<T, First> {
-    static constexpr usize value = 0;
-};
-
-template <typename T, typename First, typename... Rest>
-struct _IndexOf<T, First, Rest...> {
-    static constexpr usize value = [] {
-        if constexpr (Same<T, First>)
-            return 0;
-        else
-            return 1 + _IndexOf<T, Rest...>::value;
-    }();
-};
+template <usize Start, typename T, typename... Ts>
+    requires(Contains<T, Ts...>)
+consteval usize _indexOf() {
+    if constexpr (Same<T, Ts...[Start]>)
+        return Start;
+    else
+        return _indexOf<Start + 1, T, Ts...>();
+}
 
 template <typename T, typename... Ts>
     requires(Contains<T, Ts...>)
 consteval usize indexOf() {
-    return _IndexOf<T, Ts...>::value;
+    return _indexOf<0, T, Ts...>();
 }
 
 template <typename...>
@@ -61,22 +52,14 @@ always_inline static auto indexCast(usize index, auto* ptr, auto func) {
     return _IndexCast<RemoveRef<decltype(*ptr)>, Ts...>::eval(index, ptr, func);
 }
 
-template <typename...>
-struct _Any;
-
-template <typename T>
-struct _Any<T> {
-    always_inline static auto eval(auto func) {
-        return func.template operator()<T>();
-    }
-};
-
 template <typename T, typename... Ts>
-struct _Any<T, Ts...> {
+struct _Any {
     always_inline static auto eval(auto func)
         requires(not Meta::Same<decltype(func.template operator()<T>()), void>)
     {
-        return func.template operator()<T>() ?: _Any<Ts...>::eval(func);
+        auto test = func.template operator()<T>();
+        test or ((test = func.template operator()<Ts>()) or ...);
+        return test;
     }
 
     always_inline static auto eval(auto func)
@@ -89,18 +72,16 @@ struct _Any<T, Ts...> {
 
 template <typename... Ts>
 always_inline static auto any(auto func) {
-    return _Any<Ts...>::eval(func);
+    if constexpr (sizeof...(Ts) == 0)
+        return;
+    else
+        return _Any<Ts...>::eval(func);
 }
 
 // MARK: First -----------------------------------------------------------------
 
 template <typename...>
 struct _First;
-
-template <typename T>
-struct _First<T> {
-    using Type = T;
-};
 
 template <typename T, typename... Ts>
 struct _First<T, Ts...> {

@@ -6,6 +6,7 @@
     "requires": [
         "karm-sys-impl",
         "karm-sys-async-impl",
+        "karm-sys-sandbox-impl",
         "karm-io",
         "karm-mime",
         "karm-aio"

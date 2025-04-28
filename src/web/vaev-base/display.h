@@ -221,6 +221,96 @@ struct Display {
             unreachable();
         }
     }
+
+    always_inline bool isTableTrack() const {
+        if (not is(Type::INTERNAL))
+            return false;
+        return _internal == TABLE_ROW or _internal == TABLE_COLUMN;
+    }
+
+    always_inline bool isTableTrackGroup() const {
+        if (not is(Type::INTERNAL))
+            return false;
+        return _internal == TABLE_ROW_GROUP or _internal == TABLE_HEADER_GROUP or
+               _internal == TABLE_FOOTER_GROUP or _internal == TABLE_COLUMN_GROUP;
+    }
+
+    always_inline bool isProperTableChild() const {
+        if (not is(Type::INTERNAL))
+            return false;
+        return _internal == TABLE_CAPTION or isTableTrack() or isTableTrackGroup();
+    }
+
+    static Array constexpr const INTERNAL_TABLE = {
+        TABLE_ROW_GROUP,
+        TABLE_HEADER_GROUP,
+        TABLE_FOOTER_GROUP,
+        TABLE_ROW,
+        TABLE_CELL,
+        TABLE_COLUMN_GROUP,
+        TABLE_COLUMN,
+        TABLE_CAPTION,
+        TABLE_BOX
+    };
+
+    bool isTableInternal() const {
+        if (type() != INTERNAL)
+            return false;
+        return contains(INTERNAL_TABLE, _internal);
+    }
+
+    // https://www.w3.org/TR/css-display-3/#blockify
+    Display blockify() {
+        if (_type == BOX)
+            return *this;
+
+        if (_type == INTERNAL) {
+            // If a layout-internal box is blockified, its inner display type converts to flow so that it becomes
+            // a block container.
+            // FIXME: in our representation, layout-internal does not have an inner display property
+            panic("cannot blockify layout-internal display");
+        }
+
+        if (_outside == BLOCK)
+            return *this;
+
+        if (_inside == FLOW_ROOT) {
+            return {
+                FLOW,
+                BLOCK,
+                _item,
+            };
+        } else {
+            return {
+                _inside,
+                BLOCK,
+                _item,
+            };
+        }
+    }
+
+    // https://www.w3.org/TR/css-display-3/#inlinify
+    Display inlinify() {
+        if (_type != DEFAULT)
+            return *this;
+
+        if (_outside == INLINE)
+            return *this;
+
+        if (_inside == FLOW) {
+            return {
+                FLOW,
+                BLOCK,
+                _item,
+            };
+        } else {
+            return {
+                _inside,
+                BLOCK,
+                _item,
+            };
+        }
+    }
 };
 
 } // namespace Vaev

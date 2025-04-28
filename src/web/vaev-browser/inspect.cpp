@@ -1,14 +1,5 @@
 module;
 
-#include <karm-kira/resizable.h>
-#include <karm-kira/side-panel.h>
-#include <karm-ui/input.h>
-#include <karm-ui/layout.h>
-#include <karm-ui/reducer.h>
-#include <karm-ui/scroll.h>
-#include <karm-ui/view.h>
-#include <mdi/chevron-down.h>
-#include <mdi/chevron-right.h>
 #include <vaev-dom/comment.h>
 #include <vaev-dom/document-type.h>
 #include <vaev-dom/document.h>
@@ -16,6 +7,10 @@ module;
 #include <vaev-style/props.h>
 
 export module Vaev.Browser:inspect;
+
+import Karm.Kira;
+import Karm.Ui;
+import Mdi;
 
 namespace Vaev::Browser {
 
@@ -53,7 +48,7 @@ export struct InspectState {
 auto guide() {
     return Ui::hflow(
         Ui::empty(8),
-        Ui::separator(),
+        Kr::separator(),
         Ui::empty(9)
     );
 }
@@ -166,13 +161,16 @@ Ui::Child computedStyles() {
 
     Style::StyleProp::any([&]<typename T>() {
         if constexpr (requires { T::initial(); }) {
-            children.pushBack(Ui::text(Ui::TextStyles::codeSmall(), "{}: {}", T::name(), T::initial()) | Ui::insets({4, 8}));
+            children.pushBack(
+                Ui::text(Ui::TextStyles::codeSmall(), "{}: {}", T::name(), T::initial()) |
+                Ui::insets({4, 8})
+            );
         }
     });
 
     return Ui::vflow(
                Kr::sidePanelTitle("Computed Styles") | Ui::dragRegion({0, -1}),
-               Ui::separator(),
+               Kr::separator(),
                Ui::vflow(children) | Ui::vscroll() | Ui::grow()
            ) |
            Ui::pinSize(128);
@@ -181,7 +179,7 @@ Ui::Child computedStyles() {
 export Ui::Child inspect(Gc::Ref<Vaev::Dom::Document> n, InspectState const& s, Ui::Action<InspectorAction> a) {
     return Ui::vflow(
         node(n, s, a) | Ui::vscroll() | Ui::grow(),
-        computedStyles() | Kr::resizable(Kr::ResizeHandle::TOP, {128}, NONE)
+        computedStyles() | Kr::resizable(Kr::ResizeHandle::TOP, {128}, Ui::SINK<Math::Vec2i>)
     );
 }
 

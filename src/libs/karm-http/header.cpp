@@ -33,7 +33,7 @@ export struct Version {
     auto operator<=>(Version const& other) const = default;
 };
 
-export struct Header : public Map<String, String> {
+export struct Header : Map<String, String> {
     using Map<String, String>::Map;
 
     void add(Str const& key, Str value) {

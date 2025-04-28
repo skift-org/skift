@@ -9,7 +9,7 @@
 
 namespace Qoi {
 
-struct Decoder : public Io::BChunk {
+struct Decoder : Io::BChunk {
     using Width = Io::BField<i32be, 4>;
     using Height = Io::BField<i32be, 8>;
     using Channels = Io::BField<u8be, 12>;

@@ -19,7 +19,7 @@ static LcdLayout RGB = {{+0.33, 0.0}, {0.0, 0.0}, {-0.33, 0.0}};
 static LcdLayout BGR = {{-0.33, 0.0}, {0.0, 0.0}, {+0.33, 0.0}};
 static LcdLayout VRGB = {{0.0, +0.33}, {0.0, 0.0}, {0.0, -0.33}};
 
-struct CpuCanvas : public Canvas {
+struct CpuCanvas : Canvas {
     struct Scope {
         Fill fill = Gfx::WHITE;
         Stroke stroke{};

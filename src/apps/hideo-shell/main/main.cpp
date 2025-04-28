@@ -1,26 +1,16 @@
 #include <karm-app/form-factor.h>
+#include <karm-gfx/colors.h>
 #include <karm-image/loader.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/time.h>
-#include <karm-ui/app.h>
-#include <mdi/calculator.h>
-#include <mdi/cog.h>
-#include <mdi/counter.h>
-#include <mdi/duck.h>
-#include <mdi/emoticon.h>
-#include <mdi/file.h>
-#include <mdi/format-font.h>
-#include <mdi/image.h>
-#include <mdi/information-outline.h>
-#include <mdi/palette-swatch.h>
-#include <mdi/table.h>
 
-#include "../app.h"
-#include "../mock.h"
+import Mdi;
+import Karm.Ui;
+import Hideo.Shell;
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto args = useArgs(ctx);
-    bool isMobile = App::useFormFactor() == App::FormFactor::MOBILE;
+    bool isMobile = App::formFactor == App::FormFactor::MOBILE;
 
     Hideo::Shell::State state = {
         .isMobile = isMobile,

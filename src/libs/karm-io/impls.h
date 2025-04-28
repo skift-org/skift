@@ -9,19 +9,19 @@
 
 namespace Karm::Io {
 
-struct Sink : public Writer {
+struct Sink : Writer {
     Res<usize> write(Bytes bytes) override {
         return Ok(sizeOf(bytes));
     }
 };
 
-struct Zero : public Reader {
+struct Zero : Reader {
     Res<usize> read(MutBytes bytes) override {
         return Ok(zeroFill(bytes));
     }
 };
 
-struct Repeat : public Reader {
+struct Repeat : Reader {
     Byte _byte;
 
     Repeat(Byte byte) : _byte(byte) {}
@@ -31,13 +31,13 @@ struct Repeat : public Reader {
     }
 };
 
-struct Empty : public Reader {
+struct Empty : Reader {
     Res<usize> read(MutBytes) override {
         return Ok(0uz);
     }
 };
 
-struct Count : public Writer, Seeker {
+struct Count : Writer, Seeker {
     Io::Writer& _reader;
     usize _pos;
 
@@ -58,7 +58,7 @@ struct Count : public Writer, Seeker {
 };
 
 template <Readable Readable>
-struct Limit : public Reader {
+struct Limit : Reader {
     Readable _reader;
     usize _limit;
     usize _read;
@@ -76,7 +76,7 @@ struct Limit : public Reader {
 };
 
 template <SeekableWritable Writable>
-struct WriterSlice : public Writer, public Seeker {
+struct WriterSlice : Writer, Seeker {
     Writable _writer;
     usize _start;
     usize _end;
@@ -117,8 +117,8 @@ inline Res<Slice<Writable>> makeSlice(Writable&& writer, usize size) {
 }
 
 struct BufReader :
-    public Reader,
-    public Seeker {
+    Reader,
+    Seeker {
 
     Bytes _buf;
     usize _pos;
@@ -148,8 +148,8 @@ struct BufReader :
 };
 
 struct BufWriter :
-    public Writer,
-    public Seeker {
+    Writer,
+    Seeker {
 
     MutBytes _buf;
     usize _pos = 0;
@@ -170,7 +170,7 @@ struct BufWriter :
     }
 };
 
-struct BufferWriter : public Writer, public Flusher {
+struct BufferWriter : Writer, Flusher {
     Buf<Byte> _buf;
 
     BufferWriter(usize cap = 16) : _buf(cap) {}

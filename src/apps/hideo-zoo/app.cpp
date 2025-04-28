@@ -1,68 +1,19 @@
-#include <karm-kira/scaffold.h>
+module;
 
-#include "app.h"
-#include "model.h"
+#include <karm-base/string.h>
 
-// Pages
-#include "page-alert.h"
-#include "page-avatar.h"
-#include "page-badge.h"
-#include "page-card.h"
-#include "page-checkbox.h"
-#include "page-clock.h"
-#include "page-color-input.h"
-#include "page-context-menu.h"
-#include "page-dialog.h"
-#include "page-focusable.h"
-#include "page-hsv-square.h"
-#include "page-input.h"
-#include "page-navbar.h"
-#include "page-number.h"
-#include "page-print-dialog.h"
-#include "page-progress.h"
-#include "page-radio.h"
-#include "page-resizable.h"
-#include "page-rich-text.h"
-#include "page-rows.h"
-#include "page-select.h"
-#include "page-side-nav.h"
-#include "page-side-panel.h"
-#include "page-slider.h"
-#include "page-titlebar.h"
-#include "page-toggle.h"
+export module Hideo.Zoo:app;
+
+import Karm.Kira;
+import Karm.Ui;
+import Mdi;
+
+import :pages;
+import :model;
 
 namespace Hideo::Zoo {
 
-static Array PAGES = {
-    &PAGE_ALERT,
-    &PAGE_AVATAR,
-    &PAGE_BADGE,
-    &PAGE_CARD,
-    &PAGE_CHECKBOX,
-    &PAGE_CLOCK,
-    &PAGE_COLOR_INPUT,
-    &PAGE_CONTEXT_MENU,
-    &PAGE_DIALOG,
-    &PAGE_FOCUS,
-    &PAGE_HSV_SQUARE,
-    &PAGE_INPUT,
-    &PAGE_NAVBAR,
-    &PAGE_NUMBER,
-    &PAGE_PRINT_DIALOG,
-    &PAGE_PROGRESS,
-    &PAGE_RADIO,
-    &PAGE_RESIZABLE,
-    &PAGE_RICHTEXT,
-    &PAGE_ROWS,
-    &PAGE_SELECT,
-    &PAGE_SIDE_PANEL,
-    &PAGE_SIDENAV,
-    &PAGE_SLIDER,
-    &PAGE_TITLEBAR,
-    &PAGE_TOGGLE,
-};
-
-Ui::Child app() {
+export Ui::Child app() {
     return Ui::reducer<Model>([](State const& s) {
         return Kr::scaffold({
             .icon = Mdi::DUCK,
@@ -89,7 +40,7 @@ Ui::Child app() {
                         Ui::empty(4),
                         Ui::bodySmall(page->description)
                     ) | Ui::insets(16),
-                    Ui::separator(),
+                    Kr::separator(),
                     page->build() | Ui::grow()
                 );
             },

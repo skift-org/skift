@@ -13,7 +13,7 @@ struct Prefs {
     virtual Async::Task<> saveAsync(String key, Json::Value value) = 0;
 };
 
-struct MockPrefs : public Prefs {
+struct MockPrefs : Prefs {
     Json::Object _store;
 
     Async::Task<Json::Value> loadAsync(String key, Json::Value defaultValue) override;

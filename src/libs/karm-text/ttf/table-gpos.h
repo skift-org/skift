@@ -21,7 +21,7 @@ enum struct GposLookupType : u16 {
     EXTENSION_POSITIONING = 9,
 };
 
-struct Gpos : public Io::BChunk {
+struct Gpos : Io::BChunk {
     static constexpr Str SIG = "GPOS";
 
     using ScriptListOffset = Io::BField<u16be, 4>;

@@ -59,6 +59,8 @@ struct Fontface {
 
     virtual FontMetrics metrics() const = 0;
 
+    virtual BaselineSet baselineSet() = 0;
+
     virtual FontAttrs attrs() const = 0;
 
     virtual Glyph glyph(Rune rune) = 0;
@@ -78,6 +80,7 @@ struct Font {
     static Font fallback();
 
     FontMetrics metrics() const;
+    BaselineSet baselineSet();
 
     Glyph glyph(Rune rune);
 

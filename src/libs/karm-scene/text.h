@@ -6,7 +6,7 @@
 
 namespace Karm::Scene {
 
-struct Text : public Node {
+struct Text : Node {
     Math::Vec2f _origin;
     Rc<Karm::Text::Prose> _prose;
 

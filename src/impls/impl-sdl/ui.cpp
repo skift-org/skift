@@ -1,15 +1,23 @@
+module;
+
 #include <SDL.h>
+#include <karm-app/host.h>
+#include <karm-app/inputs.h>
+#include <karm-gfx/canvas.h>
 #include <karm-image/loader.h>
+#include <karm-logger/logger.h>
 #include <karm-pkg/bundle.h>
-#include <karm-ui/_embed.h>
-#include <karm-ui/drag.h>
+#include <karm-sys/time.h>
+
+module Karm.Ui:_embed;
+
+import Karm.Ui;
 
 namespace Karm::Ui::_Embed {
 
 static SDL_HitTestResult _hitTestCallback(SDL_Window* window, SDL_Point const* area, void* data);
 
-struct SdlHost :
-    public Host {
+struct SdlHost : Host {
     SDL_Window* _window{};
 
     Math::Vec2i _lastMousePos{};
@@ -39,6 +47,7 @@ struct SdlHost :
         SDL_Surface* s = SDL_GetWindowSurface(_window);
         if (not s)
             panic("Failed to get window surface");
+        SDL_LockSurface(s);
 
         return {
             s->pixels,
@@ -49,6 +58,11 @@ struct SdlHost :
     }
 
     void flip(Slice<Math::Recti>) override {
+        SDL_Surface* s = SDL_GetWindowSurface(_window);
+        if (not s)
+            panic("Failed to get window surface");
+        SDL_UnlockSurface(s);
+
         SDL_UpdateWindowSurface(_window);
     }
 
@@ -311,7 +325,6 @@ struct SdlHost :
         switch (sdlEvent.type) {
         case SDL_WINDOWEVENT:
             switch (sdlEvent.window.event) {
-
             case SDL_WINDOWEVENT_RESIZED:
                 _shouldLayout = true;
                 break;
@@ -323,6 +336,8 @@ struct SdlHost :
             break;
 
         case SDL_KEYDOWN: {
+            if (sdlEvent.key.repeat)
+                return;
             auto ev = _fromSdlKeyboardEvent(sdlEvent.key);
             ev.type = App::KeyboardEvent::PRESS;
             event<App::KeyboardEvent>(*this, ev);
@@ -594,8 +609,8 @@ static SDL_HitTestResult _hitTestCallback(SDL_Window* window, SDL_Point const* a
 static Res<> _setWindowIcon(SDL_Window* window) {
     auto url = try$(Pkg::currentBundle()).url() / "images/icon.qoi"_path;
     auto defaultUrl = "bundle://karm-ui/images/icon.qoi"_url;
-    auto image = Image::load(url).unwrapOrElse([&] {
-        return Image::loadOrFallback(defaultUrl).take();
+    auto image = Karm::Image::load(url).unwrapOrElse([&] {
+        return Karm::Image::loadOrFallback(defaultUrl).take();
     });
 
     auto* surface = SDL_CreateRGBSurface(0, image.width(), image.height(), 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);

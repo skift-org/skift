@@ -6,7 +6,7 @@
 
 namespace Ttf {
 
-struct Os2 : public Io::BChunk {
+struct Os2 : Io::BChunk {
     static constexpr Str SIG = "OS/2";
 
     using WeightClass = Io::BField<u16be, 4>;

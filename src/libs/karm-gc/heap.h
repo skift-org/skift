@@ -11,7 +11,7 @@ struct Cell {
 };
 
 template <typename T>
-struct _Cell : public Cell {
+struct _Cell : Cell {
     T store;
 
     template <typename... Args>

@@ -2,6 +2,7 @@
 
 #include "iter.h"
 #include "range.h"
+#include "slice.h"
 
 namespace Karm {
 
@@ -174,6 +175,27 @@ struct MutSlice {
     constexpr explicit operator bool() const {
         return _len > 0;
     }
+};
+
+template <typename T>
+struct Niche<Slice<T>> {
+    struct Content {
+        char const* ptr;
+        usize _len;
+
+        always_inline constexpr Content() : ptr(_NONE_PTR) {}
+
+        always_inline constexpr bool has() const {
+            return ptr != _NONE_PTR;
+        }
+
+        always_inline constexpr void setupValue() {}
+    };
+};
+
+template <typename T>
+struct Niche<MutSlice<T>> {
+    struct Content : public Niche<Slice<T>>::Content {};
 };
 
 using Bytes = Slice<Byte>;
@@ -492,7 +514,7 @@ always_inline constexpr Opt<usize> indexOf(T const& slice, Meta::Equatable<U> au
 }
 
 template <Sliceable T, typename U = T::Inner>
-Generator<Slice<U>> split(T const& slice, Meta::Equatable<U> auto const& delim) {
+Generator<Slice<U>> split(T const& slice, Meta::Equatable<U> auto const delim) {
     Slice<U> curr = sub(slice);
     while (curr) {
         auto end = indexOf(curr, delim);

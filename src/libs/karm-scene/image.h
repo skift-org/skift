@@ -6,7 +6,7 @@
 
 namespace Karm::Scene {
 
-struct Image : public Node {
+struct Image : Node {
     Math::Rectf _bound;
     ::Image::Picture _picture;
 

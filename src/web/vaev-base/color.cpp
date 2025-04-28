@@ -1,6 +1,6 @@
-#include "color.h"
+#include <karm-logger/logger.h>
 
-#include "karm-logger/logger.h"
+#include "color.h"
 
 namespace Vaev {
 
@@ -10,6 +10,7 @@ Opt<Color> parseNamedColor(Str name) {
     if (eqCi(name, #NAME ""s)) \
         return ID;
 #include "defs/colors.inc"
+
 #undef COLOR
 
     return NONE;
@@ -20,6 +21,7 @@ Opt<SystemColor> parseSystemColor(Str name) {
     if (name == #NAME)       \
         return SystemColor::ID;
 #include "defs/system-colors.inc"
+
 #undef COLOR
 
     return NONE;
@@ -28,6 +30,7 @@ Opt<SystemColor> parseSystemColor(Str name) {
 static Array<Gfx::Color, static_cast<usize>(SystemColor::_LEN)> SYSTEM_COLOR = {
 #define COLOR(NAME, _, VALUE) Gfx::Color::fromHex(VALUE),
 #include "defs/system-colors.inc"
+
 #undef COLOR
 };
 

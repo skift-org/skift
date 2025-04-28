@@ -1,6 +1,12 @@
+module;
+
 #include <efi/base.h>
-#include <karm-ui/_embed.h>
-#include <karm-ui/drag.h>
+#include <karm-async/task.h>
+#include <karm-gfx/canvas.h>
+#include <karm-logger/logger.h>
+
+module Karm.Ui:_embed;
+import Karm.Ui;
 
 namespace Karm::Ui::_Embed {
 
@@ -63,10 +69,6 @@ Res<Rc<Host>> makeHost(Child root) {
     auto back = Gfx::Surface::alloc({front.width(), front.height()}, Gfx::BGRA8888);
 
     return Ok(makeRc<EfiHost>(root, stip, front, back));
-}
-
-Async::Task<> runAsync(Sys::Context&, Child) {
-    notImplemented();
 }
 
 } // namespace Karm::Ui::_Embed

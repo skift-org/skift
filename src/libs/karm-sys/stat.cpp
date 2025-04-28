@@ -6,7 +6,8 @@
 namespace Karm::Sys {
 
 Res<Stat> stat(Mime::Url const& url) {
-    try$(ensureUnrestricted());
+    if (url.scheme != "bundle")
+        try$(ensureUnrestricted());
     return _Embed::stat(url);
 }
 

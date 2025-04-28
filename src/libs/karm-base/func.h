@@ -23,6 +23,7 @@ struct Func<Out(In...)> {
 
         Wrap(F&& f) : _f(std::move(f)) {}
 
+        [[clang::coro_wrapper]]
         Out operator()(In... in) const override { return _f(std::forward<In>(in)...); }
     };
 
@@ -66,6 +67,7 @@ struct Func<Out(In...)> {
 
     // clang-format on
 
+    [[clang::coro_wrapper]]
     Out operator()(In... in) const {
         return (*_wrap)(std::forward<In>(in)...);
     }

@@ -14,7 +14,7 @@ enum struct Cfp {
 };
 
 template <typename T>
-struct [[nodiscard]] _Task {
+struct [[nodiscard, clang::coro_return_type, clang::coro_lifetimebound]] _Task {
     using Inner = T;
 
     struct promise_type {
@@ -89,7 +89,7 @@ struct [[nodiscard]] _Task {
 
     template <typename R>
     auto connect(R r) {
-        struct Operation : public Continuation<T> {
+        struct Operation : Continuation<T> {
             using Continuation<T>::value;
 
             _Task _t;

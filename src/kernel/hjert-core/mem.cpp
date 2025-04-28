@@ -184,30 +184,26 @@ Res<> initMem(Handover::Payload& payload) {
     _pmm->dump();
 
     logInfo("mem: mapping kernel...");
-    try$(Arch::globalVmm().mapRange(
-        {
-            Handover::KERNEL_BASE + Hal::PAGE_SIZE,
-            gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE,
-        },
-        {
-            Hal::PAGE_SIZE,
-            gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE,
-        },
-        Hal::Vmm::READ | Hal::Vmm::WRITE
-    ));
+    try$(Arch::globalVmm().mapRange({
+                                        Handover::KERNEL_BASE + Hal::PAGE_SIZE,
+                                        gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE,
+                                    },
+                                    {
+                                        Hal::PAGE_SIZE,
+                                        gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE,
+                                    },
+                                    Hal::Vmm::READ | Hal::Vmm::WRITE));
 
     logInfo("mem: mapping upper half...");
-    try$(Arch::globalVmm().mapRange(
-        {
-            Handover::UPPER_HALF + Hal::PAGE_SIZE,
-            gib(4) - Hal::PAGE_SIZE,
-        },
-        {
-            Hal::PAGE_SIZE,
-            gib(4) - Hal::PAGE_SIZE,
-        },
-        Hal::Vmm::READ | Hal::Vmm::WRITE
-    ));
+    try$(Arch::globalVmm().mapRange({
+                                        Handover::UPPER_HALF + Hal::PAGE_SIZE,
+                                        gib(4) - Hal::PAGE_SIZE,
+                                    },
+                                    {
+                                        Hal::PAGE_SIZE,
+                                        gib(4) - Hal::PAGE_SIZE,
+                                    },
+                                    Hal::Vmm::READ | Hal::Vmm::WRITE));
 
     Arch::globalVmm().activate();
 

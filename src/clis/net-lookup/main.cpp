@@ -3,8 +3,6 @@
 #include <karm-sys/lookup.h>
 #include <karm-sys/proc.h>
 
-import Karm;
-
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto domainArg = Cli::operand<Str>("domain"s, "Domain name to lookup"s);
 

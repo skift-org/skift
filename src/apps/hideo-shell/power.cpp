@@ -1,15 +1,18 @@
-#include <karm-kira/dialog.h>
-#include <karm-ui/dialog.h>
-#include <karm-ui/input.h>
-#include <karm-ui/layout.h>
-#include <mdi/logout.h>
-#include <mdi/power-standby.h>
-#include <mdi/restart.h>
-#include <mdi/sleep.h>
+module;
+
+#include <karm-base/string.h>
+
+export module Hideo.Shell:power;
+
+import Mdi;
+import Karm.Ui;
+import Karm.Kira;
+
+using namespace Karm;
 
 namespace Hideo::Shell {
 
-Ui::Child powerDialog() {
+export Ui::Child powerDialog() {
     return Kr::dialogContent({
         Kr::dialogTitleBar("Power Options"s),
         Ui::vflow(

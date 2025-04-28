@@ -60,7 +60,7 @@ struct _Future {
 
     template <Receiver<T> R>
     struct _Operation :
-        public State<T>::Listener,
+        State<T>::Listener,
         Meta::Pinned {
 
         Rc<State<T>> _state;
@@ -78,12 +78,13 @@ struct _Future {
         }
 
         bool start() {
-            if (not _state->has()) {
-                _state->attach(*this);
-                return false;
+            if (_state->has()) {
+                _r.recv(Async::INLINE, _state->unwrap());
+                return true;
             }
-            _r.recv(Async::INLINE, _state->unwrap());
-            return true;
+
+            _state->attach(*this);
+            return false;
         }
     };
 
@@ -109,7 +110,7 @@ struct _Promise : Meta::NoCopy {
     }
 
     _Future<T> future() {
-        return _Future<T>{_state.unwrap()};
+        return {_state.unwrap()};
     }
 };
 

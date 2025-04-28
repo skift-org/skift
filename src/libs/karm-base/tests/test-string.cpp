@@ -43,4 +43,40 @@ test$("string-value-constructed") {
     return Ok();
 }
 
+test$("string-niche") {
+    Opt<String> test;
+
+    auto comp = String("test");
+
+    expectEq$(sizeof(test), sizeof(String));
+    expectEq$(test.has(), false);
+    expectEq$(test, NONE);
+    test = "test";
+    expectEq$(test.unwrap(), comp);
+    expectEq$(test.take(), comp);
+    expectEq$(test, NONE);
+    test = "";
+    expectEq$(test.has(), true);
+
+    return Ok();
+}
+
+test$("str-niche") {
+    Opt<Str> test;
+
+    auto comp = Str("test");
+
+    expectEq$(sizeof(test), sizeof(Str));
+    expectEq$(test.has(), false);
+    expectEq$(test, NONE);
+    test = Str("test");
+    expectEq$(test.unwrap(), comp);
+    expectEq$(test.take(), comp);
+    expectEq$(test, NONE);
+    test = Str("");
+    expectEq$(test.has(), true);
+
+    return Ok();
+}
+
 } // namespace Karm::Base::Tests

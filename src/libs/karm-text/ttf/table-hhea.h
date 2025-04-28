@@ -4,7 +4,7 @@
 
 namespace Ttf {
 
-struct Hhea : public Io::BChunk {
+struct Hhea : Io::BChunk {
     static constexpr Str SIG = "hhea";
 
     isize ascender() const {

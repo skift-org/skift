@@ -4,7 +4,7 @@
 
 namespace Ttf {
 
-struct Maxp : public Io::BChunk {
+struct Maxp : Io::BChunk {
     static constexpr Str SIG = "maxp";
 
     u16 numGlyphs() const {

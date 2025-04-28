@@ -10,7 +10,7 @@ import :traits;
 namespace Karm::Aio {
 
 export template <typename T>
-struct Adapter : public Reader, public Writer {
+struct Adapter : Reader, Writer {
     T& _inner;
 
     Adapter(T& inner)

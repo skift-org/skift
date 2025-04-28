@@ -15,7 +15,7 @@ using _Dimension = Union<
     Frequency,
     Resolution>;
 
-struct Dimension : public _Dimension {
+struct Dimension : _Dimension {
     using _Dimension::_Dimension;
 };
 

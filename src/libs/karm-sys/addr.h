@@ -116,7 +116,7 @@ union Ip6 {
 
 // MARK: IP --------------------------------------------------------------------
 
-struct Ip : public Union<Ip4, Ip6> {
+struct Ip : Union<Ip4, Ip6> {
     using Union<Ip4, Ip6>::Union;
 
     static Res<Ip> parse(Io::SScan& s) {

@@ -273,7 +273,7 @@ using _Selector = Union<
 
 void unparse(Selector const& sel, Io::Emit& e);
 
-struct Selector : public _Selector {
+struct Selector : _Selector {
     using _Selector::_Selector;
 
     Selector() : _Selector{UniversalSelector{}} {}

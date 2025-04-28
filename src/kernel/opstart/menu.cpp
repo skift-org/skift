@@ -1,12 +1,8 @@
-#include <karm-kira/error-page.h>
-#include <karm-ui/app.h>
-#include <karm-ui/input.h>
-#include <karm-ui/layout.h>
-#include <karm-ui/reducer.h>
-#include <karm-ui/view.h>
-#include <mdi/alert-decagram.h>
-
 #include "loader.h"
+
+import Mdi;
+import Karm.Ui;
+import Karm.Kira;
 
 namespace Opstart {
 
@@ -81,7 +77,7 @@ Ui::Child entry(State const& s, Entry const& e, usize i) {
            Ui::center() |
            Ui::pinSize({192, 128}) |
            Ui::insets(12) |
-           Ui::button(Ui::NOP, style);
+           Ui::button(Ui::SINK<>, style);
 }
 
 Ui::Child list(State const& s) {

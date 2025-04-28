@@ -20,7 +20,7 @@ test$("test-specificity-selector-list") {
     Rule rule = makeRule();
 
     Text::FontBook fontBook;
-    StyleBook stylebook;
+    StyleSheetList stylebook;
     Media media;
     Computer computer{media, stylebook, fontBook};
 

@@ -11,7 +11,7 @@
         },
         "cute-engineering/ce-mdi": {
             "git": "https://github.com/cute-engineering/ce-mdi.git",
-            "tag": "v0.3.0"
+            "tag": "v0.4.0"
         },
         "cute-engineering/ce-libc": {
             "git": "https://github.com/cute-engineering/ce-libc.git",
@@ -39,6 +39,12 @@
             "description": "Linux io_uring library",
             "names": [
                 "liburing"
+            ]
+        },
+        "seccomp": {
+            "description": "Linux seccomp library",
+            "names": [
+                "libseccomp"
             ]
         }
     }

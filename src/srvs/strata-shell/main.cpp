@@ -6,13 +6,14 @@
 #include <karm-rpc/base.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/time.h>
-#include <karm-ui/host.h>
-#include <mdi/calculator.h>
 
 #include "../strata-bus/api.h"
 #include "api.h"
 #include "framebuffer.h"
 #include "input.h"
+
+import Mdi;
+import Karm.Ui;
 
 namespace Strata::Shell {
 

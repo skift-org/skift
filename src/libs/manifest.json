@@ -9,6 +9,8 @@
     "requires": [
         "karm-aio",
         "karm-http",
-        "karm-icu"
+        "karm-icu",
+        "karm-kira",
+        "karm-kv"
     ]
 }

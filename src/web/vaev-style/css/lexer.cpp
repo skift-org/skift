@@ -10,7 +10,7 @@ namespace Vaev::Css {
 // MARK: Token -----------------------------------------------------------------
 
 void Token::repr(Io::Emit& e) const {
-    if (not*this) {
+    if (not *this) {
         e("nil");
         return;
     }

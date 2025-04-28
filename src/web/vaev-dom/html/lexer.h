@@ -96,9 +96,9 @@ struct HtmlLexer {
     HtmlSink* _sink = nullptr;
 
     Rune _currChar = 0;
-    StringBuilder _builder, _commentBuilder;
+    StringBuilder _builder;
     StringBuilder _temp;
-    StringBuilder peekerForSingleState;
+    StringBuilder _peek;
 
     Opt<usize> matchedCharReferenceNoSemiColon;
 

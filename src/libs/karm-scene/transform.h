@@ -4,20 +4,15 @@
 
 namespace Karm::Scene {
 
-struct Transform : public Node {
-    Rc<Node> _content;
+struct Transform : Proxy {
     Math::Trans2f _transform;
 
-    Transform(Rc<Node> content, Math::Trans2f transform)
-        : _content(content), _transform(transform) {}
-
-    void prepare() override {
-        _content->prepare();
-    }
+    Transform(Rc<Node> node, Math::Trans2f transform)
+        : Proxy(node), _transform(transform) {}
 
     Math::Rectf bound() override {
         return _transform
-            .apply(_content->bound())
+            .apply(_node->bound())
             .bound();
     }
 
@@ -28,12 +23,12 @@ struct Transform : public Node {
         g.push();
         g.transform(_transform);
         r = _transform.inverse().apply(r).bound();
-        _content->paint(g, r, o);
+        _node->paint(g, r, o);
         g.pop();
     }
 
     void repr(Io::Emit& e) const override {
-        e("(transform transform:{} content:{})", _transform, _content);
+        e("(transform transform:{} content:{})", _transform, _node);
     }
 };
 

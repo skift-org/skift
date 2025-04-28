@@ -176,6 +176,7 @@ struct ColorSpace {
 enum struct SystemColor : u8 {
 #define COLOR(NAME, ...) NAME,
 #include "defs/system-colors.inc"
+
 #undef COLOR
 
     _LEN

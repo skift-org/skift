@@ -1,27 +1,15 @@
-#include <karm-kira/row.h>
-#include <karm-kira/scaffold.h>
-#include <karm-kira/slider.h>
-#include <karm-kira/toolbar.h>
-#include <karm-ui/anim.h>
-#include <karm-ui/input.h>
-#include <karm-ui/layout.h>
-#include <karm-ui/scroll.h>
-#include <karm-ui/view.h>
-#include <mdi/auto-fix.h>
-#include <mdi/blur.h>
-#include <mdi/cancel.h>
-#include <mdi/contrast-circle.h>
-#include <mdi/drag-vertical-variant.h>
-#include <mdi/eyedropper-plus.h>
-#include <mdi/eyedropper.h>
-#include <mdi/floppy.h>
-#include <mdi/grain.h>
-#include <mdi/image-filter-vintage.h>
-#include <mdi/image.h>
-#include <mdi/invert-colors.h>
-#include <mdi/lightbulb.h>
+module;
 
-#include "app.h"
+#include <karm-base/union.h>
+#include <karm-gfx/canvas.h>
+#include <karm-gfx/icon.h>
+
+export module Hideo.Images:editor;
+
+import Mdi;
+import Karm.Ui;
+import Karm.Kira;
+import :model;
 
 namespace Hideo::Images {
 
@@ -60,15 +48,6 @@ Ui::Child histogram(Hist const& hist) {
     });
 }
 
-Ui::Child editor(State const& state) {
-    return Ui::vflow(
-        editorToolbar(state),
-        histogram(state.hist) | Ui::pinSize(64),
-        editorPreview(state) | Ui::grow(),
-        editorControls(state)
-    );
-}
-
 Ui::Child editorPreview(State const& state) {
     return Ui::image(state.image.unwrap()) |
            Ui::box({
@@ -100,7 +79,7 @@ Ui::Child editorToolbar(State const&) {
     });
 }
 
-Ui::Child editorFilterTile(Ui::OnPress onPress, Ui::ButtonStyle style, Mdi::Icon icon, String text) {
+Ui::Child editorFilterTile(Ui::Send<> onPress, Ui::ButtonStyle style, Gfx::Icon icon, String text) {
     return Ui::vflow(
                Ui::icon(icon, 36) | Ui::center() | Ui::grow(),
                Ui::text(text) | Ui::center()
@@ -108,11 +87,11 @@ Ui::Child editorFilterTile(Ui::OnPress onPress, Ui::ButtonStyle style, Mdi::Icon
            Ui::insets(8) |
            Ui::bound() |
            Ui::minSize({96, 72}) |
-           Ui::button(std::move(onPress), style);
+           Ui::button(onPress, style);
 }
 
 template <typename T>
-Mdi::Icon editorFilterIcon() {
+Gfx::Icon editorFilterIcon() {
     if constexpr (Meta::Same<T, Gfx::Unfiltered>) {
         return Mdi::IMAGE;
     }
@@ -209,6 +188,15 @@ Ui::Child editorControls(State const& state) {
                    Ui::hscroll()
            ) |
            Ui::slideIn(Ui::SlideFrom::BOTTOM);
+}
+
+Ui::Child editor(State const& state) {
+    return Ui::vflow(
+        editorToolbar(state),
+        histogram(state.hist) | Ui::pinSize(64),
+        editorPreview(state) | Ui::grow(),
+        editorControls(state)
+    );
 }
 
 } // namespace Hideo::Images

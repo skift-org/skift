@@ -24,7 +24,7 @@ struct TokenList {
     }
 
     void add(Str token) {
-        if (not::contains(_tokens, token))
+        if (not ::contains(_tokens, token))
             _tokens.pushBack(token);
     }
 
@@ -42,7 +42,7 @@ struct TokenList {
     }
 
     bool replace(Str oldToken, Str newToken) {
-        if (not::contains(_tokens, oldToken))
+        if (not ::contains(_tokens, oldToken))
             return false;
         _tokens.removeAll(oldToken);
         _tokens.pushBack(newToken);

@@ -1,19 +1,32 @@
-#include "resizable.h"
+module;
+
+#include <karm-app/event.h>
+#include <karm-math/rect.h>
+
+export module Karm.Kira:resizable;
+
+import Karm.Ui;
 
 namespace Karm::Kira {
 
-struct Resizable : public Ui::ProxyNode<Resizable> {
-    Math::Vec2i _size;
-    Ui::OnChange<Math::Vec2i> _onChange;
+export enum struct ResizeHandle {
+    TOP,
+    START,
+    BOTTOM,
+    END
+};
 
-    Resizable(Ui::Child child, Math::Vec2i size, Ui::OnChange<Math::Vec2i> onChange)
+struct Resizable : Ui::ProxyNode<Resizable> {
+    Math::Vec2i _size;
+    Ui::Send<Math::Vec2i> _onChange;
+
+    Resizable(Ui::Child child, Math::Vec2i size, Ui::Send<Math::Vec2i> onChange)
         : ProxyNode<Resizable>(child),
           _size(size),
           _onChange(std::move(onChange)) {}
 
     void reconcile(Resizable& o) override {
-        if (o._onChange)
-            _size = o._size;
+        _size = o._size;
         _onChange = std::move(o._onChange);
         ProxyNode<Resizable>::reconcile(o);
     }
@@ -24,11 +37,7 @@ struct Resizable : public Ui::ProxyNode<Resizable> {
                 _size = _size + de->delta;
                 auto minSize = child().size({}, Ui::Hint::MIN);
                 _size = _size.max(minSize);
-                if (_onChange) {
-                    _onChange(*this, _size);
-                } else {
-                    shouldLayout(*this);
-                }
+                _onChange(*this, _size);
                 e.accept();
             }
         }
@@ -43,8 +52,14 @@ struct Resizable : public Ui::ProxyNode<Resizable> {
     }
 };
 
-Ui::Child resizable(Ui::Child child, Math::Vec2i size, Ui::OnChange<Math::Vec2i> onChange) {
+export Ui::Child resizable(Ui::Child child, Math::Vec2i size, Ui::Send<Math::Vec2i> onChange) {
     return makeRc<Resizable>(child, size, std::move(onChange));
+}
+
+export auto resizable(Math::Vec2i size, Ui::Send<Math::Vec2i> onChange) {
+    return [size, onChange = std::move(onChange)](Ui::Child child) mutable -> Ui::Child {
+        return resizable(child, size, std::move(onChange));
+    };
 }
 
 static Ui::Child _resizeHandle(Math::Vec2i dir) {
@@ -55,7 +70,7 @@ static Ui::Child _resizeHandle(Math::Vec2i dir) {
            Ui::dragRegion(dir);
 }
 
-Ui::Child resizable(Ui::Child child, ResizeHandle handlePosition, Math::Vec2i size, Ui::OnChange<Math::Vec2i> onChange) {
+export Ui::Child resizable(Ui::Child child, ResizeHandle handlePosition, Math::Vec2i size, Ui::Send<Math::Vec2i> onChange) {
     if (handlePosition == ResizeHandle::TOP) {
         return Ui::stack(
                    child,
@@ -93,6 +108,12 @@ Ui::Child resizable(Ui::Child child, ResizeHandle handlePosition, Math::Vec2i si
     } else {
         unreachable();
     }
+}
+
+export auto resizable(ResizeHandle handlePosition, Math::Vec2i size, Ui::Send<Math::Vec2i> onChange) {
+    return [handlePosition, size, onChange = std::move(onChange)](Ui::Child child) mutable -> Ui::Child {
+        return resizable(child, handlePosition, size, std::move(onChange));
+    };
 }
 
 } // namespace Karm::Kira

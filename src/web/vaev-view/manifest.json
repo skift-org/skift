@@ -6,6 +6,7 @@
     "requires": [
         "karm-ui",
         "karm-kira",
-        "vaev-driver"
+        "vaev-driver",
+        "hideo-printers"
     ]
 }

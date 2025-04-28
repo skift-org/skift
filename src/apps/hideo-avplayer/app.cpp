@@ -1,21 +1,14 @@
 module;
 
+#include <karm-gfx/filters.h>
 #include <karm-image/loader.h>
-#include <karm-kira/scaffold.h>
-#include <karm-kira/slider.h>
-#include <karm-ui/input.h>
-#include <karm-ui/layout.h>
-#include <karm-ui/scroll.h>
-#include <mdi/cog.h>
-#include <mdi/fullscreen.h>
-#include <mdi/pause.h>
-#include <mdi/play-circle.h>
-#include <mdi/play.h>
-#include <mdi/skip-next.h>
-#include <mdi/skip-previous.h>
-#include <mdi/volume-high.h>
+#include <karm-math/align.h>
 
 export module Hideo.Avplayer;
+
+import Mdi;
+import Karm.Ui;
+import Karm.Kira;
 
 namespace Hideo::Avplayer {
 
@@ -32,11 +25,11 @@ Ui::Child player() {
             6,
             Math::Align::VCENTER | Math::Align::HFILL | Math::Align::TOP_START,
             Ui::hflow(
-                Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::SKIP_PREVIOUS),
-                Ui::separator(),
-                Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::PLAY),
-                Ui::separator(),
-                Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::SKIP_NEXT)
+                Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::SKIP_PREVIOUS),
+                Kr::separator(),
+                Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::PLAY),
+                Kr::separator(),
+                Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::SKIP_NEXT)
             ) | Ui::box({
                     .borderRadii = 4,
                     .borderFill = Ui::GRAY700,
@@ -53,9 +46,9 @@ Ui::Child player() {
                 Ui::grow(),
             Ui::labelMedium("00:00"),
             Ui::empty(4),
-            Ui::button(Ui::NOP, Ui::ButtonStyle::regular(), Mdi::VOLUME_HIGH),
-            Ui::button(Ui::NOP, Ui::ButtonStyle::regular(), Mdi::FULLSCREEN),
-            Ui::button(Ui::NOP, Ui::ButtonStyle::regular(), Mdi::COG)
+            Ui::button(Ui::SINK<>, Ui::ButtonStyle::regular(), Mdi::VOLUME_HIGH),
+            Ui::button(Ui::SINK<>, Ui::ButtonStyle::regular(), Mdi::FULLSCREEN),
+            Ui::button(Ui::SINK<>, Ui::ButtonStyle::regular(), Mdi::COG)
         ) |
         Ui::insets(8) |
         Ui::box({

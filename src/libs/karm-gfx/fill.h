@@ -160,7 +160,7 @@ using _Fills = Union<
     Gradient,
     Pixels>;
 
-struct Fill : public _Fills {
+struct Fill : _Fills {
     using _Fills::_Fills;
 
     Fill(Color color = ALPHA) : _Fills(color) {}

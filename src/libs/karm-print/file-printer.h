@@ -11,7 +11,7 @@ struct FilePrinterProps {
     f64 density = 1;
 };
 
-struct FilePrinter : public Printer {
+struct FilePrinter : Printer {
     static Res<Rc<FilePrinter>> create(Mime::Uti uti, FilePrinterProps props = {});
 
     virtual Res<> write(Io::Writer& w) = 0;

@@ -79,7 +79,7 @@ struct _Cell {
 };
 
 template <typename L, typename T>
-struct Cell : public _Cell<L> {
+struct Cell : _Cell<L> {
     Manual<T> _buf{};
 
     template <typename... Args>
@@ -370,5 +370,20 @@ template <typename T, typename... Args>
 constexpr static Arc<T> makeArc(Args&&... args) {
     return {MOVE, new Cell<Lock, T>(std::forward<Args>(args)...)};
 }
+
+template <typename L, typename T>
+struct Niche<_Rc<L, T>> {
+    struct Content {
+        void* ptr;
+
+        constexpr Content() : ptr(nullptr) {}
+
+        constexpr bool has() const {
+            return ptr != nullptr;
+        }
+
+        constexpr void setupValue() {}
+    };
+};
 
 } // namespace Karm

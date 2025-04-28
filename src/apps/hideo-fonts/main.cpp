@@ -1,12 +1,11 @@
-#include <karm-kira/badge.h>
-#include <karm-kira/scaffold.h>
+#include <karm-math/align.h>
 #include <karm-sys/entry.h>
 #include <karm-text/book.h>
-#include <karm-ui/app.h>
-#include <karm-ui/layout.h>
-#include <karm-ui/scroll.h>
-#include <mdi/arrow-left.h>
-#include <mdi/format-font.h>
+#include <karm-text/prose.h>
+
+import Karm.Kira;
+import Karm.Ui;
+import Mdi;
 
 namespace Hideo::Fonts {
 
@@ -152,7 +151,7 @@ Ui::Child familyContent(State const& s) {
 
     return Ui::vflow(
         header,
-        Ui::separator(),
+        Kr::separator(),
         Ui::vflow(8, children) | Ui::insets(16) | Ui::vscroll() | Ui::grow()
     );
 }
@@ -188,7 +187,7 @@ Ui::Child fontfaceContent(State const& s) {
             Ui::labelSmall(attrs.normal() ? "{}" : "{}  · ", attrs.family),
             fontfaceTags(attrs)
         ) | Ui::insets({6, 16}),
-        Ui::separator(),
+        Kr::separator(),
         pangrams(fontface)
     );
 }

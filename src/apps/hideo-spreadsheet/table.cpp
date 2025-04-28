@@ -1,7 +1,8 @@
-#include <karm-ui/input.h>
-#include <karm-ui/view.h>
+#include <karm-app/inputs.h>
 
 #include "app.h"
+
+import Karm.Ui;
 
 namespace Hideo::Spreadsheet {
 

@@ -1,9 +1,9 @@
 #include <karm-sys/entry.h>
 #include <karm-sys/file.h>
 #include <karm-sys/proc.h>
-#include <karm-ui/app.h>
 
 import Hideo.Text;
+import Karm.Ui;
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto& args = useArgs(ctx);

@@ -1,10 +1,12 @@
 module;
 
-#include <karm-kira/scaffold.h>
-#include <karm-ui/layout.h>
-#include <mdi/account.h>
+#include <karm-base/string.h>
 
 export module Hideo.Peoples;
+
+import Mdi;
+import Karm.Ui;
+import Karm.Kira;
 
 namespace Hideo::Peoples {
 

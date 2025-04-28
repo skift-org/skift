@@ -125,7 +125,7 @@ Output fragmentEmptyBox(Tree& tree, Input input) {
 }
 
 // https://www.w3.org/TR/CSS22/visuren.html#normal-flow
-struct BlockFormatingContext : public FormatingContext {
+struct BlockFormatingContext : FormatingContext {
     Au _computeCapmin(Tree& tree, Box& box, Input input, Au inlineSize) {
         Au capmin{};
         for (auto& c : box.children()) {
@@ -165,6 +165,7 @@ struct BlockFormatingContext : public FormatingContext {
             inlineSize = run(tree, box, input.withFragment(nullptr), startAt, stopAt).width();
 
         Breakpoint currentBreakpoint;
+        BaselinePositionsSet firstBaselineSet, lastBaselineSet;
 
         usize endChildren = stopAt.unwrapOr(box.children().len());
 
@@ -236,6 +237,10 @@ struct BlockFormatingContext : public FormatingContext {
                 output.breakpoint
             );
 
+            if (i == startAt)
+                firstBaselineSet = output.firstBaselineSet.translate(childInput.position.y - input.position.y);
+            lastBaselineSet = output.lastBaselineSet.translate(childInput.position.y - input.position.y);
+
             try$(processBreakpointsAfterChild(
                 tree.fc,
                 currentBreakpoint,
@@ -255,7 +260,9 @@ struct BlockFormatingContext : public FormatingContext {
         return {
             .size = Vec2Au{inlineSize, blockSize},
             .completelyLaidOut = blockWasCompletelyLaidOut,
-            .breakpoint = currentBreakpoint
+            .breakpoint = currentBreakpoint,
+            .firstBaselineSet = firstBaselineSet,
+            .lastBaselineSet = lastBaselineSet,
         };
     }
 };

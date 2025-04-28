@@ -6,7 +6,7 @@
 
 namespace Karm::Print {
 
-struct ImagePrinter : public FilePrinter {
+struct ImagePrinter : FilePrinter {
     static constexpr isize GAPS = 16;
 
     Vec<Rc<Gfx::Surface>> _pages;

@@ -108,6 +108,31 @@ struct Ptr {
         return not _ptr;
     }
 
+    template <Meta::Comparable<T> U>
+    bool operator==(Ptr<U> other) const {
+        if (_ptr == other._ptr)
+            return true;
+
+        if (not _ptr)
+            return false;
+
+        if (not other._ptr)
+            return false;
+
+        return *_ptr == *other._ptr;
+    }
+
+    template <Meta::Comparable<T> U>
+    bool operator==(Ref<U> other) const {
+        if (not _ptr)
+            return false;
+
+        if (_ptr == other._ptr)
+            return true;
+
+        return *_ptr == *other._ptr;
+    }
+
     void repr(Io::Emit& e) const {
         if (not _ptr)
             e("nullptr");

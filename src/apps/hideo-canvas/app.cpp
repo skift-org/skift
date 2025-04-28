@@ -1,10 +1,12 @@
 module;
 
-#include <karm-kira/scaffold.h>
-#include <karm-ui/layout.h>
-#include <mdi/draw.h>
+#include <karm-base/string.h>
 
 export module Hideo.Canvas;
+
+import Mdi;
+import Karm.Ui;
+import Karm.Kira;
 
 namespace Hideo::Canvas {
 

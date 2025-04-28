@@ -1,5 +1,4 @@
 #include <karm-base/ring.h>
-#include <karm-logger/logger.h>
 #include <karm-math/funcs.h>
 
 #include "canvas.h"
@@ -261,7 +260,9 @@ void CpuCanvas::fill(Text::Font& font, Text::Glyph glyph, Math::Vec2f baseline) 
 // MARK: Clear Operations ------------------------------------------------------
 
 void CpuCanvas::clear(Color color) {
-    clear(current().clip, color);
+    mutPixels()
+        .clip(current().clip)
+        .clear(color);
 }
 
 void CpuCanvas::clear(Math::Recti rect, Color color) {

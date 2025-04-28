@@ -8,7 +8,7 @@ namespace Ttf {
 
 static constexpr bool DEBUG_GLYF = false;
 
-struct Glyf : public Io::BChunk {
+struct Glyf : Io::BChunk {
     static constexpr Str SIG = "glyf";
 
     static constexpr u8 ON_CURVE_POINT = 0x01;

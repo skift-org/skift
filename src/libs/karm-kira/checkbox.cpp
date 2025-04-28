@@ -1,16 +1,22 @@
-#include <karm-ui/input.h>
-#include <mdi/check-bold.h>
+module;
 
-#include "checkbox.h"
+#include <karm-app/event.h>
+#include <karm-gfx/canvas.h>
+#include <karm-gfx/icon.h>
+
+export module Karm.Kira:checkbox;
+
+import Karm.Ui;
+import Mdi;
 
 namespace Karm::Kira {
 
-struct Checkbox : public Ui::View<Checkbox> {
+struct Checkbox : Ui::View<Checkbox> {
     bool _value = false;
-    Ui::OnChange<bool> _onChange;
+    Ui::Send<bool> _onChange;
     Ui::MouseListener _mouseListener;
 
-    Checkbox(bool value, Ui::OnChange<bool> onChange)
+    Checkbox(bool value, Ui::Send<bool> onChange)
         : _value(value), _onChange(std::move(onChange)) {
     }
 
@@ -27,7 +33,7 @@ struct Checkbox : public Ui::View<Checkbox> {
             g.fill(bound(), 4);
 
             g.fillStyle(Gfx::GRAY50);
-            Gfx::Icon{Mdi::CHECK_BOLD, 18}.fill(g, bound().topStart());
+            Gfx::Icon{Mdi::CHECK_BOLD}.fill(g, bound().topStart().cast<f64>(), 18);
 
             if (_mouseListener.isPress()) {
                 g.strokeStyle(Gfx::stroke(Ui::ACCENT600).withWidth(1).withAlign(Gfx::INSIDE_ALIGN));
@@ -47,7 +53,7 @@ struct Checkbox : public Ui::View<Checkbox> {
     }
 
     void event(App::Event& e) override {
-        if (_onChange and _mouseListener.listen(*this, e)) {
+        if (_mouseListener.listen(*this, e)) {
             _value = not _value;
             _onChange(*this, _value);
         }
@@ -58,7 +64,7 @@ struct Checkbox : public Ui::View<Checkbox> {
     }
 };
 
-Ui::Child checkbox(bool value, Ui::OnChange<bool> onChange) {
+export Ui::Child checkbox(bool value, Ui::Send<bool> onChange) {
     return makeRc<Checkbox>(value, std::move(onChange));
 }
 

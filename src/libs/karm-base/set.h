@@ -8,7 +8,7 @@ namespace Karm {
 
 template <typename T>
 struct Set {
-    struct Slot : public Manual<T> {
+    struct Slot : Manual<T> {
         enum State : u8 {
             FREE,
             USED,

@@ -2,7 +2,6 @@ module;
 
 #include <karm-scene/box.h>
 #include <karm-scene/image.h>
-#include <karm-scene/stack.h>
 #include <karm-scene/text.h>
 #include <vaev-style/computer.h>
 
@@ -105,10 +104,8 @@ static void _paintFrag(Frag& frag, Scene::Stack& stack) {
 
     _paintFragBordersAndBackgrounds(frag, stack);
 
-    if (auto prose = frag.box->content.is<Rc<Text::Prose>>()) {
-        (*prose)->_style.color = frag.style().color;
-
-        stack.add(makeRc<Scene::Text>(frag.metrics.borderBox().topStart().cast<f64>(), *prose));
+    if (auto ic = frag.box->content.is<InlineBox>()) {
+        stack.add(makeRc<Scene::Text>(frag.metrics.contentBox().topStart().cast<f64>(), ic->prose));
     } else if (auto image = frag.box->content.is<Karm::Image::Picture>()) {
         stack.add(makeRc<Scene::Image>(frag.metrics.borderBox().cast<f64>(), *image));
     }
@@ -143,32 +140,32 @@ static void _paintStackingContext(Frag& frag, Scene::Stack& stack) {
     _paintFrag(frag, stack);
 
     // 2. the child stacking contexts with negative stack levels (most negative first).
-    _paintChildren(frag, stack, [](Style::Computed const& s) -> bool {
+    _paintChildren(frag, stack, [](Style::ComputedStyle const& s) -> bool {
         return s.zIndex.unwrapOr<isize>(0) < 0;
     });
 
     // 3. the in-flow, non-inline-level, non-positioned descendants.
-    _paintChildren(frag, stack, [](Style::Computed const& s) {
+    _paintChildren(frag, stack, [](Style::ComputedStyle const& s) {
         return s.zIndex == Keywords::AUTO and s.display != Display::INLINE and s.position == Position::STATIC;
     });
 
     // 4. the non-positioned floats.
-    _paintChildren(frag, stack, [](Style::Computed const& s) {
+    _paintChildren(frag, stack, [](Style::ComputedStyle const& s) {
         return s.zIndex == Keywords::AUTO and s.position == Position::STATIC and s.float_ != Float::NONE;
     });
 
     // 5. the in-flow, inline-level, non-positioned descendants, including inline tables and inline blocks.
-    _paintChildren(frag, stack, [](Style::Computed const& s) {
+    _paintChildren(frag, stack, [](Style::ComputedStyle const& s) {
         return s.zIndex == Keywords::AUTO and s.display == Display::INLINE and s.position == Position::STATIC;
     });
 
     // 6. the child stacking contexts with stack level 0 and the positioned descendants with stack level 0.
-    _paintChildren(frag, stack, [](Style::Computed const& s) {
+    _paintChildren(frag, stack, [](Style::ComputedStyle const& s) {
         return s.zIndex.unwrapOr<isize>(0) == 0 and s.position != Position::STATIC;
     });
 
     // 7. the child stacking contexts with positive stack levels (least positive first).
-    _paintChildren(frag, stack, [](Style::Computed const& s) {
+    _paintChildren(frag, stack, [](Style::ComputedStyle const& s) {
         return s.zIndex.unwrapOr<isize>(0) > 0;
     });
 }
@@ -195,6 +192,37 @@ export void wireframe(Frag& frag, Gfx::Canvas& g) {
     });
 
     g.stroke(frag.metrics.borderBox().cast<f64>());
+}
+
+export void overlay(Frag& frag, Gfx::Canvas& g, Gc::Ref<Dom::Node> node) {
+    if (frag.box->origin == node) {
+        Gfx::Borders border;
+
+        // Margins
+        border.widths = frag.metrics.margin.cast<f64>();
+        border.withFill(Gfx::YELLOW800.withOpacity(0.5));
+        border.withStyle(Gfx::BorderStyle::SOLID);
+        border.paint(g, frag.metrics.marginBox().cast<f64>());
+
+        // Borders
+        border.widths = frag.metrics.borders.cast<f64>();
+        border.withFill(Gfx::YELLOW500.withOpacity(0.5));
+        border.withStyle(Gfx::BorderStyle::SOLID);
+        border.paint(g, frag.metrics.borderBox().cast<f64>());
+
+        // Paddings
+        border.widths = frag.metrics.padding.cast<f64>();
+        border.withFill(Gfx::GREEN500.withOpacity(0.5));
+        border.withStyle(Gfx::BorderStyle::SOLID);
+        border.paint(g, frag.metrics.paddingBox().cast<f64>());
+
+        // Content Box
+        g.fillStyle(Gfx::BLUE.withOpacity(0.5));
+        g.fill(frag.metrics.contentBox().cast<f64>());
+    }
+
+    for (auto& c : frag.children)
+        overlay(c, g, node);
 }
 
 } // namespace Vaev::Layout

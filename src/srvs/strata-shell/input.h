@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-ui/node.h>
+import Karm.Ui;
 
 namespace Strata::Shell {
 

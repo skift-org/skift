@@ -10,7 +10,7 @@ namespace Vaev::Style {
 
 struct Computer {
     Media _media;
-    StyleBook const& _styleBook;
+    StyleSheetList const& _styleBook;
     Text::FontBook& fontBook;
 
     using MatchingRules = Vec<Tuple<Cursor<StyleRule>, Spec>>;
@@ -21,11 +21,11 @@ struct Computer {
 
     void _evalRule(Rule const& rule, Vec<FontFace>& fontFaces);
 
-    Rc<Computed> _evalCascade(Computed const& parent, MatchingRules& matches);
+    Rc<ComputedStyle> _evalCascade(ComputedStyle const& parent, MatchingRules& matches);
 
-    Rc<Computed> computeFor(Computed const& parent, Gc::Ref<Dom::Element> el);
+    Rc<ComputedStyle> computeFor(ComputedStyle const& parent, Gc::Ref<Dom::Element> el);
 
-    Rc<PageComputedStyle> computeFor(Computed const& parent, Page const& page);
+    Rc<PageComputedStyle> computeFor(ComputedStyle const& parent, Page const& page);
 
     void loadFontFaces();
 };

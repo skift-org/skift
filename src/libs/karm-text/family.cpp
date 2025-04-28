@@ -71,6 +71,16 @@ FontMetrics FontFamily::metrics() const {
     return metrics;
 }
 
+// FIXME: baselineSet() for a font family does not make sense: remove FontFace inheritance
+BaselineSet FontFamily::baselineSet() {
+    BaselineSet bs = {};
+
+    for (auto& member : _members)
+        bs = bs.combine(member.face->baselineSet());
+
+    return bs;
+}
+
 FontAttrs FontFamily::attrs() const {
     FontAttrs attrs;
 

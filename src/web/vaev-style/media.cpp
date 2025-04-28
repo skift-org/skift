@@ -78,6 +78,8 @@ MediaQuery _parseMediaQueryLeaf(Cursor<Css::Sst>& c) {
 
 MediaQuery _parseMediaQueryInfix(Cursor<Css::Sst>& c) {
     auto lhs = _parseMediaQueryLeaf(c);
+
+    eatWhitespace(c);
     while (not c.ended()) {
         if (c.skip(Css::Token::ident("and"))) {
             lhs = MediaQuery::combineAnd(lhs, _parseMediaQueryLeaf(c));
@@ -90,8 +92,15 @@ MediaQuery _parseMediaQueryInfix(Cursor<Css::Sst>& c) {
     return lhs;
 }
 
+// https://drafts.csswg.org/mediaqueries/#mq-syntax
+// https://drafts.csswg.org/mediaqueries/#typedef-media-query-list
 MediaQuery parseMediaQuery(Cursor<Css::Sst>& c) {
     eatWhitespace(c);
+
+    // This definition of <media-query-list> parsing intentionally accepts an empty list.
+    if (c.ended())
+        return {};
+
     MediaQuery lhs = _parseMediaQueryInfix(c);
     eatWhitespace(c);
     while (not c.ended() and c.skip(Css::Token::COMMA)) {

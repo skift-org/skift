@@ -6,7 +6,7 @@
 
 namespace Karm::Scene {
 
-struct Shape : public Node {
+struct Shape : Node {
     Math::Path _path;
     Opt<Gfx::Stroke> _stroke;
     Opt<Gfx::Fill> _fill;
@@ -23,17 +23,21 @@ struct Shape : public Node {
         if (not bound().colide(r))
             return;
 
-        g.path(_path);
+        if (not _fill and not _stroke)
+            return;
 
+        g.push();
+        g.beginPath()
+            g.path(_path);
         if (_fill)
             g.fill(*_fill, _rule);
-
         if (_stroke)
             g.stroke(*_stroke);
+        g.pop();
     }
 
     void repr(Io::Emit& e) const override {
-        e("(shape z:{} {})", zIndex);
+        e("(shape z:{} {})", zIndex, _path);
     }
 };
 

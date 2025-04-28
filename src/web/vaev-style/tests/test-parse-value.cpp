@@ -74,7 +74,7 @@ test$("vaev-css-build-margin") {
         auto res = parseDeclaration<StyleProp>(sst);
         expect$(res);
 
-        Computed c;
+        ComputedStyle c;
         res.unwrap().apply(c, c);
 
         expectEq$(Io::format("{}", *c.margin), Io::format("{}", expected));

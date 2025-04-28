@@ -1,8 +1,15 @@
-#include "progress.h"
+module;
+
+#include <karm-app/event.h>
+#include <karm-gfx/canvas.h>
+
+export module Karm.Kira:progress;
+
+import Karm.Ui;
 
 namespace Karm::Kira {
 
-struct Progress : public Ui::View<Progress> {
+struct Progress : Ui::View<Progress> {
     isize _size;
     f64 _spin = 0;
 
@@ -54,7 +61,7 @@ struct Progress : public Ui::View<Progress> {
     }
 };
 
-Ui::Child progress(isize size) {
+export Ui::Child progress(isize size = 16) {
     return makeRc<Progress>(size);
 }
 

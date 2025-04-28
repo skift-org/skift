@@ -37,7 +37,7 @@ struct Affix {
 
 using _Expr = Union<Ident, Infix, Affix>;
 
-struct Expr : public _Expr {
+struct Expr : _Expr {
     using _Expr::_Expr;
 };
 
@@ -51,7 +51,7 @@ using _Stmt = Union<
     Expr,
     Block>;
 
-struct Stmt : public _Stmt {
+struct Stmt : _Stmt {
     using _Stmt::_Stmt;
 };
 

@@ -425,11 +425,11 @@ Res<> populate(Vec<UserInfo>&) {
 // MARK: User interactions -----------------------------------------------------
 
 Res<> launch(Sys::Intent) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Async::Task<> launchAsync(Sys::Intent) {
-    notImplemented();
+    co_return Error::notImplemented();
 }
 
 // MARK: Process Managment -----------------------------------------------------
@@ -459,8 +459,9 @@ Res<Mime::Url> pwd() {
 
 // MARK: Sandboxing ------------------------------------------------------------
 
-void hardenSandbox() {
-    logError("could not harden sandbox");
+Res<> hardenSandbox() {
+    logInfo("could not harden sandbox");
+    return Ok();
 }
 
 // MARK: Addr ------------------------------------------------------------------

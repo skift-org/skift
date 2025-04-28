@@ -26,7 +26,8 @@ export struct Server {
 // MARK: Serverless ------------------------------------------------------------
 
 export Async::Task<> servAsync(Rc<Service> srv) {
-    return Server::simple(srv)->serveAsync();
+    auto server = Server::simple(srv);
+    co_return co_await server->serveAsync();
 }
 
 } // namespace Karm::Http

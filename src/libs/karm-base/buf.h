@@ -686,4 +686,26 @@ struct ViewBuf {
 
 #pragma clang unsafe_buffer_usage end
 
+template <typename T>
+struct Niche<Buf<T>> {
+    struct Content {
+        char const* ptr;
+        usize _cap;
+        usize _len;
+
+        always_inline constexpr Content() : ptr(_NONE_PTR) {}
+
+        always_inline constexpr bool has() const {
+            return ptr != _NONE_PTR;
+        }
+
+        always_inline constexpr void setupValue() {}
+    };
+};
+
+template <typename T>
+struct Niche<ViewBuf<T>> {
+    struct Content : public Niche<Buf<T>>::Content {};
+};
+
 } // namespace Karm

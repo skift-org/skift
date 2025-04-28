@@ -19,7 +19,7 @@ export struct Response {
     Header header;
     Opt<Rc<Body>> body;
 
-    struct Writer : public Io::Writer {
+    struct Writer : Io::Writer {
         virtual Header& header() = 0;
         virtual Res<> writeHeader(Code code) = 0;
     };

@@ -1,26 +1,17 @@
 module;
 
 #include <karm-async/cancelation.h>
-#include <karm-kira/navbar.h>
-#include <karm-kira/scaffold.h>
-#include <karm-kira/toggle.h>
+#include <karm-math/align.h>
 #include <karm-sys/time.h>
-#include <karm-ui/anim.h>
-#include <karm-ui/layout.h>
-#include <mdi/alarm.h>
-#include <mdi/clock-outline.h>
-#include <mdi/clock.h>
-#include <mdi/dots-horizontal.h>
-#include <mdi/timer-outline.h>
-#include <mdi/timer-sand.h>
 
 export module Hideo.Clock:app;
 
+import Mdi;
 import Karm.Kira;
+import Karm.Ui;
 import :model;
 
 namespace Hideo::Clock {
-
 
 // MARK: Alarm Page ------------------------------------------------------------
 
@@ -30,7 +21,7 @@ Ui::Child alarmCard(Time alarm, bool enabled) {
                Math::Align::CENTER,
                Ui::displayMedium("{02}:{02}", alarm.hour, alarm.minute),
                Ui::grow(NONE),
-               Kr::toggle(enabled, NONE)
+               Kr::toggle(enabled, Ui::SINK<bool>)
            ) |
            Ui::box({
                .padding = 12,
@@ -131,7 +122,7 @@ export Ui::Child app() {
                             Math::Align::CENTER,
                             Ui::titleLarge(toStr(s.page)),
                             Ui::grow(NONE),
-                            Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::DOTS_HORIZONTAL)
+                            Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::DOTS_HORIZONTAL)
                         ) | Ui::insets({18, 18, 0, 18}),
                         appContent(s) | Ui::grow(),
                         navbar

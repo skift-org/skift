@@ -1,21 +1,23 @@
-#include <karm-ui/layout.h>
+export module Karm.Kira:toolbar;
 
-#include "toolbar.h"
+import Karm.Ui;
+
+import :separator;
 
 namespace Karm::Kira {
 
-Ui::Child toolbar(Ui::Children children) {
+export Ui::Child toolbar(Ui::Children children) {
     return Ui::vflow(
         Ui::hflow(4, children) |
             Ui::insets(8) |
             Ui::box({.backgroundFill = Ui::GRAY900}),
-        Ui::separator()
+        separator()
     );
 }
 
-Ui::Child bottombar(Ui::Children children) {
+export Ui::Child bottombar(Ui::Children children) {
     return Ui::vflow(
-        Ui::separator(),
+        separator(),
         Ui::hflow(4, children) |
             Ui::insets(8) |
             Ui::box({.backgroundFill = Ui::GRAY900})

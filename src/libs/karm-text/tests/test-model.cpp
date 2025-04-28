@@ -6,6 +6,9 @@ namespace Karm::Text::Tests {
 test$("karm-text-model-moves") {
     Model mdl{"foo bar baz"};
 
+    mdl.moveStart();
+    expectEq$(mdl._cur.head, 0uz);
+
     mdl.moveNext();
     expectEq$(mdl._cur.head, 1uz);
 

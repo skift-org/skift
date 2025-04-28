@@ -85,24 +85,27 @@ static Selector _parseAttributeSelector(Slice<Css::Sst> content) {
             break;
         case 1:
             if (cur->token.data != "="s) {
-                if (cur.ended() or cur.peek(1).token.data != "="s) {
-                    break;
-                }
+                auto attrSelectorCase = cur.next().token.data;
 
-                if (cur->token.data == "~") {
+                if (cur.ended())
+                    break;
+
+                if (not(cur.peek() == (Css::Token::delim("="))))
+                    break;
+
+                if (attrSelectorCase == "~") {
                     match = AttributeSelector::CONTAINS;
-                } else if (cur->token.data == "|") {
+                } else if (attrSelectorCase == "|") {
                     match = AttributeSelector::HYPHENATED;
-                } else if (cur->token.data == "^") {
+                } else if (attrSelectorCase == "^") {
                     match = AttributeSelector::STR_START_WITH;
-                } else if (cur->token.data == "$") {
+                } else if (attrSelectorCase == "$") {
                     match = AttributeSelector::STR_END_WITH;
-                } else if (cur->token.data == "*") {
+                } else if (attrSelectorCase == "*") {
                     match = AttributeSelector::STR_CONTAIN;
                 } else {
                     break;
                 }
-                cur.next();
             } else {
                 match = AttributeSelector::EXACT;
             }

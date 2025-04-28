@@ -56,7 +56,7 @@ In this example, the `vflow` node is the root node of the tree, and it contains 
 Views also known as Leaf nodes, are the most basic type of node. They contain content to be displayed on the screen, such as text or images. They are the content of the user interface.
 
 ```cpp
-#include <karm-ui/view.h>
+import Karm.Ui;
 
 auto app = Ui::text("Hello, world!"); // A text view
 
@@ -68,7 +68,7 @@ auto app = Ui::image("image.png"); // An image view
 Layouts are nodes that contain other nodes. They are used to arrange nodes in a specific way, such as in a grid or a list. There are two types of layout nodes: flow and grid.
 
 ```cpp
-#include <karm-ui/layout.h>
+import Karm.Ui;
 
 auto app = Ui::vflow(
     Ui::text("Hello, world!"),
@@ -101,7 +101,7 @@ A grid layout arranges its child nodes in a grid with a fixed number of rows and
 Decorators are nodes that modify the appearance or behavior of other nodes. They can be used to add borders, padding, or other visual effects to nodes.
 
 ```cpp
-#include <karm-ui/layout.h>
+import Karm.Ui;
 
 auto app = Ui::text("Hello, world!") | Ui::center(); // Center the text
 ```
@@ -150,7 +150,7 @@ Here is a non exaustive list of decorators
 Uis are stateless by default, but you can use the `state` node to create stateful UIs.
 
 ```cpp
-#include <karm-ui/react.h>
+import Karm.Ui;
 
 auto app = Ui::state(
     0,

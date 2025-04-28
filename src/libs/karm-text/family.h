@@ -17,7 +17,7 @@ struct FontAdjust {
     FontAdjust combine(FontAdjust other) const;
 };
 
-struct FontFamily : public Fontface {
+struct FontFamily : Fontface {
     struct Member {
         FontAdjust adjust;
         Rc<Fontface> face;
@@ -50,6 +50,7 @@ struct FontFamily : public Fontface {
     static Builder make(FontBook const& book);
 
     FontMetrics metrics() const override;
+    BaselineSet baselineSet() override;
 
     FontAttrs attrs() const override;
 

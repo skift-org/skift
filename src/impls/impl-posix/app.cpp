@@ -1,3 +1,6 @@
+#include <stdlib.h>
+
+//
 #include <karm-app/_embed.h>
 #include <karm-app/prefs.h>
 #include <karm-json/parse.h>
@@ -9,7 +12,7 @@
 
 namespace Karm::App::_Ember {
 
-struct XdgConfigPrefs : public Prefs {
+struct XdgConfigPrefs : Prefs {
     Mime::Url _url;
 
     XdgConfigPrefs(Mime::Url url)

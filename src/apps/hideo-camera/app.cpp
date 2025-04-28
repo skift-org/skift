@@ -1,14 +1,13 @@
 module;
 
-#include <karm-kira/scaffold.h>
-#include <karm-ui/input.h>
-#include <karm-ui/layout.h>
-#include <mdi/camera-flip.h>
-#include <mdi/camera.h>
-#include <mdi/cog.h>
-#include <mdi/tune.h>
+#include <karm-base/string.h>
+#include <karm-gfx/canvas.h>
 
 export module Hideo.Camera;
+
+import Mdi;
+import Karm.Ui;
+import Karm.Kira;
 
 namespace Hideo::Camera {
 
@@ -36,7 +35,7 @@ Ui::Child appContent() {
     auto topBar =
         Ui::hflow(
             Ui::button(
-                Ui::NOP,
+                Ui::SINK<>,
                 Ui::ButtonStyle::regular().withForegroundFill(Gfx::WHITE).withRadii(999),
                 Mdi::COG
             ),
@@ -44,7 +43,7 @@ Ui::Child appContent() {
             Ui::grow(NONE),
 
             Ui::button(
-                Ui::NOP,
+                Ui::SINK<>,
                 Ui::ButtonStyle::regular().withForegroundFill(Gfx::WHITE).withRadii(999),
                 Mdi::TUNE
             )
@@ -54,19 +53,19 @@ Ui::Child appContent() {
     auto bottomBar =
         Ui::hflow(
             Ui::button(
-                Ui::NOP,
+                Ui::SINK<>,
                 Ui::ButtonStyle::regular().withRadii(999).withPadding(12),
-                Gfx::Icon(Mdi::CAMERA_FLIP, 24)
+                Ui::icon(Mdi::CAMERA_FLIP, 24)
             ) | Ui::center(),
 
             Ui::button(
-                Ui::NOP,
+                Ui::SINK<>,
                 Ui::ButtonStyle::regular().withRadii(999).withPadding(16),
-                Gfx::Icon(Mdi::CAMERA, 38)
+                Ui::icon(Mdi::CAMERA, 38)
             ) | Ui::center() |
                 Ui::grow(),
             Ui::button(
-                Ui::NOP,
+                Ui::SINK<>,
                 Ui::ButtonStyle::outline().withRadii(999).withPadding(12),
                 Ui::empty(24)
             ) | Ui::center()

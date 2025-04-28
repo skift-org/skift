@@ -123,11 +123,13 @@ void Canvas::fill(Text::Prose& prose) {
         fillStyle(*prose._style.color);
 
     for (auto const& line : prose._lines) {
-        for (auto& block : line.blocks()) {
-            for (auto& cell : block.cells()) {
-                if (cell.span and cell.span->color) {
+        for (auto const& block : line.blocks()) {
+            for (auto const& cell : block.cells()) {
+                if (cell.strut())
+                    continue;
+                if (cell.span and cell.span.unwrap()->color) {
                     push();
-                    fillStyle(*cell.span->color);
+                    fillStyle(*cell.span.unwrap()->color);
                     fill(prose._style.font, cell.glyph, Vec2Au{block.pos + cell.pos, line.baseline}.cast<f64>());
                     pop();
                 } else {

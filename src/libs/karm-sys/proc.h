@@ -5,21 +5,21 @@
 
 namespace Karm::Sys {
 
-inline Res<> sleep(Duration span) {
+static inline Res<> sleep(Duration span) {
     return _Embed::sleep(span);
 }
 
-inline Res<> sleepUntil(Instant until) {
+static inline Res<> sleepUntil(Instant until) {
     return _Embed::sleepUntil(until);
 }
 
-inline Res<Mime::Url> pwd() {
+static inline Res<Mime::Url> pwd() {
     return _Embed::pwd();
 }
 
 // MARK: Sandboxing ------------------------------------------------------------
 
-void enterSandbox();
+Res<> enterSandbox();
 
 Res<> ensureUnrestricted();
 

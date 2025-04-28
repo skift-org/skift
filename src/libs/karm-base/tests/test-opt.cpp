@@ -70,4 +70,43 @@ test$("opt-equal") {
     return Ok();
 }
 
+test$("bool-niche") {
+    Opt<bool> test;
+
+    expectEq$(sizeof(test), sizeof(bool));
+    expectEq$(test.has(), false);
+    expectEq$(test, NONE);
+    test = true;
+    expectEq$(test.unwrap(), true);
+    expectEq$(test.take(), true);
+    expectEq$(test, NONE);
+    test = false;
+    expectEq$(test.has(), true);
+
+    return Ok();
+}
+
+enum struct TestEnum {
+    A,
+    B,
+
+    _LEN,
+};
+
+test$("bool-niche") {
+    Opt<TestEnum> test;
+
+    expectEq$(sizeof(test), sizeof(TestEnum));
+    expectEq$(test.has(), false);
+    expectEq$(test, NONE);
+    test = TestEnum::A;
+    expectEq$(test.unwrap(), TestEnum::A);
+    expectEq$(test.take(), TestEnum::A);
+    expectEq$(test, NONE);
+    test = TestEnum::_LEN;
+    expectEq$(test.has(), true);
+
+    return Ok();
+}
+
 } // namespace Karm::Base::Tests

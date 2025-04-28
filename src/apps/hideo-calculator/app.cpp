@@ -1,32 +1,26 @@
 module;
 
-#include <karm-kira/scaffold.h>
-#include <karm-ui/drag.h>
-#include <karm-ui/focus.h>
-#include <karm-ui/layout.h>
-#include <mdi/backspace-outline.h>
-#include <mdi/calculator.h>
-#include <mdi/circle-small.h>
-#include <mdi/division.h>
-#include <mdi/equal.h>
-#include <mdi/minus.h>
-#include <mdi/multiplication.h>
-#include <mdi/percent.h>
-#include <mdi/plus.h>
+#include <karm-base/string.h>
+#include <karm-math/align.h>
 
 export module Hideo.Calculator:app;
+
+import Mdi;
+import Karm.Kira;
+import Karm.Ui;
+
 import :model;
 
 namespace Hideo::Calculator {
 
-Ui::Child textButton(Ui::OnPress onPress, Ui::ButtonStyle style, String t) {
+Ui::Child textButton(Opt<Ui::Send<>> onPress, Ui::ButtonStyle style, String t) {
     return Ui::text(Ui::TextStyles::labelLarge().withSize(18), t) |
            Ui::center() |
            Ui::bound() |
-           Ui::button(std::move(onPress), style);
+           Ui::button(onPress, style);
 }
 
-Ui::Child textButton(Ui::OnPress onPress, String t) {
+Ui::Child textButton(Opt<Ui::Send<>> onPress, String t) {
     return textButton(std::move(onPress), Ui::ButtonStyle::regular(), t);
 }
 

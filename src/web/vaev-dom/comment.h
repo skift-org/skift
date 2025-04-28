@@ -5,7 +5,7 @@
 namespace Vaev::Dom {
 
 // https://dom.spec.whatwg.org/#interface-comment
-struct Comment : public CharacterData {
+struct Comment : CharacterData {
     using CharacterData::CharacterData;
 
     static constexpr auto TYPE = NodeType::COMMENT;

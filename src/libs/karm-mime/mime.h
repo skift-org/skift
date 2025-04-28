@@ -3,7 +3,6 @@
 #include <karm-io/emit.h>
 #include <karm-io/expr.h>
 #include <karm-io/sscan.h>
-#include <mdi/_prelude.h>
 
 namespace Karm::Mime {
 
@@ -50,9 +49,6 @@ struct Mime {
 
 /// Try to sniff the mime type from a file extension.
 Opt<Mime> sniffSuffix(Str suffix);
-
-/// Guess an icon for a given mime type.
-Mdi::Icon iconFor(Mime const& mime);
 
 } // namespace Karm::Mime
 

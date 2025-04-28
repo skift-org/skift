@@ -8,7 +8,11 @@ inline constexpr f64 PI = 3.14159265358979323846;
 
 inline constexpr f64 TAU = 2 * PI;
 
-inline constexpr f64 SQRT = 1.41421356237309504880;
+// sqrt(2)
+inline constexpr f64 SQRT2 = 1.41421356237309504880;
+
+// log2(e)
+inline constexpr f64 L2_E = 1.442695040888963407359924681001892137L;
 
 inline constexpr f64 E = 2.71828182845904523536;
 

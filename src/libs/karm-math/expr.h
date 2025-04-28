@@ -162,7 +162,7 @@ using _Expr = Union<
     BinaryExpr,
     RelationalExpr>;
 
-struct Expr : public _Expr {
+struct Expr : _Expr {
     using _Expr::_Expr;
 };
 

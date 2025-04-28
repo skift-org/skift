@@ -20,45 +20,45 @@ static HueValueChroma _rgbToHueValueChroma(Color color) {
 
     f64 delta = rgbMax - rgbMin;
 
-    f64 hue = 0.0f;
-    if (delta != 0.0f) {
+    f64 hue = 0.0;
+    if (delta != 0.0) {
         if (rgbMax == r) {
             hue = (g - b) / delta;
         } else if (rgbMax == g) {
-            hue = 2.0f + (b - r) / delta;
+            hue = 2.0 + (b - r) / delta;
         } else if (rgbMax == b) {
-            hue = 4.0f + (r - g) / delta;
+            hue = 4.0 + (r - g) / delta;
         }
     }
 
-    hue *= 60.0f;
-    if (hue < 0.0f) {
-        hue += 360.0f;
+    hue *= 60.0;
+    if (hue < 0.0) {
+        hue += 360.0;
     }
 
     return {hue, rgbMax, delta};
 }
 
 static Color _chromaHueMinCompToRgb(f64 c, f64 h, f64 m) {
-    f64 x = c * (1.0f - Math::abs(fmod(h / 60.0f, 2.0f) - 1.0f));
+    f64 x = c * (1.0 - Math::abs(Math::fmod(h / 60.0, 2.0) - 1.0));
 
-    f64 r = 0.0f;
-    f64 g = 0.0f;
-    f64 b = 0.0f;
+    f64 r = 0.0;
+    f64 g = 0.0;
+    f64 b = 0.0;
 
-    if (h < 60.0f) {
+    if (h < 60.0) {
         r = c;
         g = x;
-    } else if (h < 120.0f) {
+    } else if (h < 120.0) {
         r = x;
         g = c;
-    } else if (h < 180.0f) {
+    } else if (h < 180.0) {
         g = c;
         b = x;
-    } else if (h < 240.0f) {
+    } else if (h < 240.0) {
         g = x;
         b = c;
-    } else if (h < 300.0f) {
+    } else if (h < 300.0) {
         r = x;
         b = c;
     } else {
@@ -67,9 +67,9 @@ static Color _chromaHueMinCompToRgb(f64 c, f64 h, f64 m) {
     }
 
     return {
-        static_cast<u8>(round((r + m) * 255.0f)),
-        static_cast<u8>(round((g + m) * 255.0f)),
-        static_cast<u8>(round((b + m) * 255.0f)),
+        static_cast<u8>(Math::round((r + m) * 255.0)),
+        static_cast<u8>(Math::round((g + m) * 255.0)),
+        static_cast<u8>(Math::round((b + m) * 255.0)),
     };
 }
 
@@ -109,8 +109,8 @@ Color hslToRgb(Hsl hsl) {
     f64 s = hsl.saturation;
     f64 l = hsl.lightness;
 
-    f64 c = (1.0f - Math::abs(2.0f * l - 1.0f)) * s;
-    f64 minComp = l - c / 2.0f;
+    f64 c = (1.0f - Math::abs(2.0 * l - 1.0)) * s;
+    f64 minComp = l - c / 2.0;
 
     return _chromaHueMinCompToRgb(c, h, minComp);
 }

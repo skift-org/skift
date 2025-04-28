@@ -8,13 +8,16 @@
 
 namespace Karm::Scene {
 
-struct Box : public Node {
+struct Box : Node {
     Math::Rectf _bound;
     Gfx::Borders _borders;
     Gfx::Outline _outline;
     Vec<Gfx::Fill> _backgrounds;
 
-    Box(Math::Rectf bound, Gfx::Borders borders, Gfx::Outline outline, Vec<Gfx::Fill> backgrounds)
+    Box(Math::Rectf bound,
+        Gfx::Borders borders,
+        Gfx::Outline outline,
+        Vec<Gfx::Fill> backgrounds)
         : _bound(bound), _borders(borders), _outline(outline), _backgrounds(backgrounds) {
     }
 

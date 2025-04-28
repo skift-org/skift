@@ -1,12 +1,15 @@
-#include <karm-ui/box.h>
-#include <karm-ui/layout.h>
-#include <karm-ui/view.h>
+module;
 
-#include "error-page.h"
+#include <karm-gfx/icon.h>
+#include <karm-math/align.h>
+
+export module Karm.Kira:errorPage;
+
+import Karm.Ui;
 
 namespace Karm::Kira {
 
-Ui::Child errorPageTitle(Mdi::Icon icon, String text) {
+export Ui::Child errorPageTitle(Gfx::Icon icon, String text) {
     return Ui::vflow(
         0,
         Math::Align::CENTER,
@@ -15,15 +18,15 @@ Ui::Child errorPageTitle(Mdi::Icon icon, String text) {
     );
 }
 
-Ui::Child errorPageSubTitle(String text) {
+export Ui::Child errorPageSubTitle(String text) {
     return Ui::titleMedium(text);
 }
 
-Ui::Child errorPageBody(String text) {
+export Ui::Child errorPageBody(String text) {
     return Ui::bodyMedium(text);
 }
 
-Ui::Child errorPageContent(Ui::Children children) {
+export Ui::Child errorPageContent(Ui::Children children) {
     return Ui::vflow(
                6,
                Math::Align::CENTER,
@@ -36,12 +39,12 @@ Ui::Child errorPageContent(Ui::Children children) {
     ;
 }
 
-Ui::Child errorPageFooter(Ui::Children children) {
+export Ui::Child errorPageFooter(Ui::Children children) {
     return Ui::hflow(16, children) |
            Ui::insets({8, 0, 0, 0});
 }
 
-Ui::Child errorPage(Mdi::Icon icon, String text, String body) {
+export Ui::Child errorPage(Gfx::Icon icon, String text, String body) {
     return errorPageContent({
         errorPageTitle(icon, "An error occurred."s),
         errorPageSubTitle(text),

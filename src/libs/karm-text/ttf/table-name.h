@@ -5,7 +5,7 @@
 
 namespace Ttf {
 
-struct Name : public Io::BChunk {
+struct Name : Io::BChunk {
     static constexpr Str SIG = "name";
 
     enum NameId : u16 {

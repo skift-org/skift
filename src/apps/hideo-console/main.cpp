@@ -1,7 +1,8 @@
-#include <karm-kira/scaffold.h>
 #include <karm-sys/entry.h>
-#include <karm-ui/app.h>
-#include <mdi/console-line.h>
+
+import Mdi;
+import Karm.Ui;
+import Karm.Kira;
 
 namespace Hideo::Console {
 

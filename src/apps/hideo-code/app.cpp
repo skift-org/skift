@@ -1,10 +1,12 @@
 module;
 
-#include <karm-kira/scaffold.h>
-#include <karm-ui/layout.h>
-#include <mdi/code-braces.h>
+#include <karm-base/string.h>
 
 export module Hideo.Code;
+
+import Mdi;
+import Karm.Kira;
+import Karm.Ui;
 
 namespace Hideo::Code {
 

@@ -4,6 +4,8 @@
 #include <karm-base/res.h>
 #include <karm-base/vec.h>
 
+#include "funcs.h"
+
 namespace Karm::Math {
 
 // MARK: Unsigned Big Integer --------------------------------------------------
@@ -248,7 +250,7 @@ struct UBig {
     explicit operator f64() const {
         f64 res = 0;
         for (usize i = _len(); i-- > 0;) {
-            res *= ::pow(2.0, Limits<usize>::BITS);
+            res *= Math::pow<f64>(2.0, Limits<usize>::BITS);
             res += _value[i];
         }
         return res;

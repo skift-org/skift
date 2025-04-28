@@ -1,8 +1,10 @@
 module;
 
-#include <karm-kira/scaffold.h>
-#include <karm-ui/layout.h>
-#include <mdi/text-box.h>
+#include <karm-base/string.h>
+
+import Mdi;
+import Karm.Ui;
+import Karm.Kira;
 
 export module Hideo.Write;
 

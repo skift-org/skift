@@ -28,4 +28,22 @@ test$("vec-push-front-slice") {
     return Ok();
 }
 
+test$("vec-niche") {
+    Opt<Vec<int>> test;
+
+    auto comp = Vec<int>{5, 0, 2};
+
+    expectEq$(sizeof(test), sizeof(Vec<int>));
+    expectEq$(test.has(), false);
+    expectEq$(test, NONE);
+    test = Vec<int>{5, 0, 2};
+    expectEq$(test.unwrap(), comp);
+    expectEq$(test.take(), comp);
+    expectEq$(test, NONE);
+    test = Vec<int>{};
+    expectEq$(test.has(), true);
+
+    return Ok();
+}
+
 } // namespace Karm::Base::Tests

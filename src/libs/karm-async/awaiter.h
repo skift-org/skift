@@ -16,7 +16,7 @@ struct Continuation {
 
 template <Sender S>
 struct [[nodiscard]] Awaiter :
-    public Continuation<typename S::Inner>,
+    Continuation<typename S::Inner>,
     Meta::Pinned,
     Meta::NoCopy {
 

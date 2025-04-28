@@ -6,7 +6,9 @@
 #include <karm-logger/logger.h>
 #include <karm-sys/context.h>
 #include <karm-sys/file.h>
-#include <karm-ui/node.h>
+
+import Mdi;
+import Karm.Ui;
 
 namespace Opstart {
 
@@ -39,7 +41,7 @@ struct Blob {
 };
 
 struct Entry {
-    Union<None, Mdi::Icon, Image::Picture> icon = NONE;
+    Union<None, Gfx::Icon, Image::Picture> icon = NONE;
     String name;
     Blob kernel;
     Vec<Blob> blobs;

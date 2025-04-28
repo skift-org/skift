@@ -161,7 +161,7 @@ struct _OptionImpl {
 };
 
 template <typename T>
-struct OptionImpl : public _OptionImpl {
+struct OptionImpl : _OptionImpl {
     Opt<T> value;
 
     OptionImpl(

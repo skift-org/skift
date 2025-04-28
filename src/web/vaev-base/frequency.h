@@ -6,7 +6,7 @@ namespace Vaev {
 
 // https://drafts.csswg.org/css-values/#frequency
 // It represents the number of occurrences per second.
-struct Frequency : public Distinct<f64, struct FrequencyTag> {
+struct Frequency : Distinct<f64, struct FrequencyTag> {
     using Distinct::Distinct;
 
     static constexpr Frequency fromHz(f64 hz) {

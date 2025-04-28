@@ -5,7 +5,7 @@
 namespace Vaev::Dom {
 
 // https://dom.spec.whatwg.org/#interface-characterdata
-struct CharacterData : public Node {
+struct CharacterData : Node {
     StringBuilder _data;
 
     CharacterData() = default;
@@ -14,7 +14,7 @@ struct CharacterData : public Node {
         : _data(std::move(data)) {
     }
 
-    void appendData(String const& s) {
+    void appendData(Str s) {
         _data.append(s);
     }
 

@@ -11,11 +11,11 @@ namespace Karm::Aio {
 export struct Pipe {
     bool _closed;
 
-    struct Reader : public Aio::Reader {
+    struct Reader : Aio::Reader {
         Rc<Pipe> _pipe;
     };
 
-    struct Writer : public Aio::Writer {
+    struct Writer : Aio::Writer {
         Rc<Pipe> _pipe;
     };
 };

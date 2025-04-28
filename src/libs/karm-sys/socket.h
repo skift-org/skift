@@ -9,9 +9,9 @@ namespace Karm::Sys {
 // MARK: Abstract Socket -------------------------------------------------------
 
 struct _Connection :
-    public Io::Reader,
-    public Io::Writer,
-    public Io::Flusher,
+    Io::Reader,
+    Io::Writer,
+    Io::Flusher,
     Meta::NoCopy {
 
     virtual Async::Task<usize> readAsync(MutBytes buf) = 0;
@@ -22,7 +22,7 @@ struct _Connection :
 };
 
 struct Connection :
-    public _Connection {
+    _Connection {
 
     Rc<Sys::Fd> _fd;
 
@@ -37,6 +37,7 @@ struct Connection :
         return _fd->read(buf);
     }
 
+    [[clang::coro_wrapper]]
     Async::Task<usize> readAsync(MutBytes buf) override {
         return globalSched().readAsync(_fd, buf);
     }
@@ -45,6 +46,7 @@ struct Connection :
         return _fd->write(buf);
     }
 
+    [[clang::coro_wrapper]]
     Async::Task<usize> writeAsync(Bytes buf) override {
         return globalSched().writeAsync(_fd, buf);
     }
@@ -53,6 +55,7 @@ struct Connection :
         return _fd->flush();
     }
 
+    [[clang::coro_wrapper]]
     Async::Task<> flushAsync() override {
         return globalSched().flushAsync(_fd);
     }
@@ -100,6 +103,7 @@ struct UdpConnection :
         return Ok(nbytes);
     }
 
+    [[clang::coro_wrapper]]
     auto sendAsync(Bytes buf, SocketAddr addr) {
         return globalSched().sendAsync(_fd, buf, {}, addr);
     }
@@ -109,6 +113,7 @@ struct UdpConnection :
         return Ok<Pair<usize, SocketAddr>>(nbytes, addr);
     }
 
+    [[clang::coro_wrapper]]
     auto recvAsync(MutBytes buf) {
         return globalSched().recvAsync(_fd, buf, {});
     }
@@ -117,7 +122,7 @@ struct UdpConnection :
 // MARK: Tcp Socket ------------------------------------------------------------
 
 struct TcpConnection :
-    public Connection {
+    Connection {
 
     SocketAddr _addr;
 
@@ -132,7 +137,7 @@ struct TcpConnection :
 };
 
 struct TcpListener :
-    public _Listener<TcpConnection> {
+    _Listener<TcpConnection> {
 
     SocketAddr _addr;
 

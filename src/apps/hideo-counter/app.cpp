@@ -1,16 +1,18 @@
-#include <karm-kira/scaffold.h>
-#include <karm-ui/input.h>
-#include <karm-ui/layout.h>
-#include <mdi/counter.h>
-#include <mdi/minus-thick.h>
-#include <mdi/plus-thick.h>
-#include <mdi/refresh.h>
+module;
 
-#include "model.h"
+#include <karm-base/string.h>
+#include <karm-math/align.h>
+
+export module Hideo.Counter;
+
+import Karm.Ui;
+import Karm.Kira;
+import Mdi;
+import :model;
 
 namespace Hideo::Counter {
 
-Ui::Child app() {
+export Ui::Child app() {
     return Ui::reducer<Model>([](State const& s) {
         return Kr::scaffold({
             .icon = Mdi::COUNTER,

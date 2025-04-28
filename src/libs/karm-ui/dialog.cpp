@@ -1,22 +1,34 @@
-#include "dialog.h"
+module;
 
-#include "anim.h"
-#include "funcs.h"
+#include <karm-app/event.h>
+#include <karm-app/inputs.h>
+#include <karm-gfx/canvas.h>
+#include <karm-math/easing.h>
+
+export module Karm.Ui:dialog;
+
+import :anim;
+import :funcs;
+import :atoms;
 
 namespace Karm::Ui {
 
-void showDialog(Node& n, Child child) {
+export struct ShowDialogEvent {
+    Child child;
+};
+
+export void showDialog(Node& n, Child child) {
     bubble<ShowDialogEvent>(n, child);
 }
 
-struct CloseDialogEvent {
+export struct CloseDialogEvent {
 };
 
-void closeDialog(Node& n) {
+export void closeDialog(Node& n) {
     bubble<CloseDialogEvent>(n);
 }
 
-struct DialogLayer : public LeafNode<DialogLayer> {
+struct DialogLayer : LeafNode<DialogLayer> {
     Easedf _visibility{};
 
     Child _child;
@@ -151,8 +163,14 @@ struct DialogLayer : public LeafNode<DialogLayer> {
     }
 };
 
-Child dialogLayer(Child child) {
+export Child dialogLayer(Child child) {
     return makeRc<DialogLayer>(child);
+}
+
+export auto dialogLayer() {
+    return [](Child child) {
+        return dialogLayer(child);
+    };
 }
 
 } // namespace Karm::Ui

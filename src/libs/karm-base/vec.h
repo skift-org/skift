@@ -150,4 +150,9 @@ using Vec = _Vec<Buf<T>>;
 template <typename T, usize N>
 using InlineVec = _Vec<InlineBuf<T, N>>;
 
+template <Nicheable T>
+struct Niche<_Vec<T>> {
+    struct Content : public Niche<T>::Content {};
+};
+
 } // namespace Karm

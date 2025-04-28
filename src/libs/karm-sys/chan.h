@@ -8,7 +8,7 @@
 
 namespace Karm::Sys {
 
-struct In : public Io::Reader {
+struct In : Io::Reader {
     Rc<Fd> _fd;
 
     In(Rc<Fd> fd)
@@ -23,7 +23,7 @@ struct In : public Io::Reader {
     }
 };
 
-struct Out : public Io::TextEncoderBase<> {
+struct Out : Io::TextEncoderBase<> {
     Rc<Fd> _fd;
 
     Out(Rc<Fd> fd)
@@ -42,7 +42,7 @@ struct Out : public Io::TextEncoderBase<> {
     }
 };
 
-struct Err : public Io::TextEncoderBase<> {
+struct Err : Io::TextEncoderBase<> {
     Rc<Fd> _fd;
 
     Err(Rc<Fd> fd)

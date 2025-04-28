@@ -1,5 +1,7 @@
 #pragma once
 
+#include <karm-math/funcs.h>
+
 #include "sscan.h"
 
 namespace Karm::Io {
@@ -123,7 +125,7 @@ static inline Opt<f64> atof(_SScan<E>& s, AtoxOptions const& options = {}) {
     if (not ipart and not hasFpart)
         return NONE;
 
-    auto result = (ipart.unwrapOr(0) + fpart) * pow(options.base, exp);
+    auto result = (ipart.unwrapOr(0) + fpart) * Math::pow<f64>(options.base, exp);
     if (neg)
         result = -result;
 

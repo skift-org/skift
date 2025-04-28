@@ -1,11 +1,23 @@
-#include <karm-ui/box.h>
-#include <karm-ui/layout.h>
+module;
 
-#include "badge.h"
+#include <karm-gfx/colors.h>
+
+export module Karm.Kira:badge;
+
+import Karm.Ui;
 
 namespace Karm::Kira {
 
-Ui::Child badge(Gfx::Color color, String t) {
+export enum struct BadgeStyle {
+    INFO,
+    SUCCESS,
+    WARNING,
+    ERROR,
+
+    _LEN
+};
+
+export Ui::Child badge(Gfx::Color color, String t) {
     Ui::BoxStyle boxStyle = {
         .padding = {2, 6},
         .borderRadii = 99,
@@ -16,7 +28,7 @@ Ui::Child badge(Gfx::Color color, String t) {
     return Ui::labelSmall(t) | box(boxStyle);
 }
 
-Ui::Child badge(BadgeStyle style, String t) {
+export Ui::Child badge(BadgeStyle style, String t) {
     Array COLORS = {
         Gfx::BLUE400,
         Gfx::LIME400,
@@ -27,20 +39,20 @@ Ui::Child badge(BadgeStyle style, String t) {
     return badge(COLORS[static_cast<u8>(style)], t);
 }
 
-Ui::Child versionBadge() {
+export Ui::Child versionBadge() {
     Ui::Children badges = {};
     badges.pushBack(
-        Kr::badge(
-            Kr::BadgeStyle::INFO,
+        badge(
+            BadgeStyle::INFO,
             stringify$(__ck_version_value) ""s
         )
     );
 #ifdef __ck_branch_nightly__
-    badges.pushBack(Kr::badge(Gfx::INDIGO400, "Nightly"s));
+    badges.pushBack(badge(Gfx::INDIGO400, "Nightly"s));
 #elif defined(__ck_branch_stable__)
     // No badge for stable
 #else
-    badges.pushBack(Kr::badge(Gfx::EMERALD, "Dev"s));
+    badges.pushBack(badge(Gfx::EMERALD, "Dev"s));
 #endif
     return Ui::hflow(4, badges);
 }

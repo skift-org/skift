@@ -256,37 +256,25 @@ static Style::Media _constructMedia(Print::Settings const& settings) {
         // NOTE: Deprecated Media Features
         .deviceWidth = Au{settings.paper.width},
         .deviceHeight = Au{settings.paper.height},
-        .deviceAspectRatio = settings.paper.width / (f64)settings.paper.height,
+        .deviceAspectRatio = settings.paper.width / settings.paper.height,
     };
 }
 
 export Generator<Print::Page> print(Gc::Ref<Dom::Document> dom, Print::Settings const& settings) {
     auto media = _constructMedia(settings);
 
-    Style::StyleBook stylebook;
-    stylebook.add(
-        fetchStylesheet("bundle://vaev-driver/html.css"_url, Style::Origin::USER_AGENT)
-            .take("user agent stylesheet not available")
-    );
-    stylebook.add(
-        fetchStylesheet("bundle://vaev-driver/print.css"_url, Style::Origin::USER_AGENT)
-            .take("print stylesheet not available")
-    );
-
-    fetchStylesheets(dom, stylebook);
-
     Text::FontBook fontBook;
     if (not fontBook.loadAll())
         logWarn("not all fonts were properly loaded into fontbook");
 
     Style::Computer computer{
-        media, stylebook, fontBook
+        media, *dom->styleSheets, fontBook
     };
     computer.loadFontFaces();
 
     // MARK: Page and Margins --------------------------------------------------
 
-    Style::Computed initialStyle = Style::Computed::initial();
+    Style::ComputedStyle initialStyle = Style::ComputedStyle::initial();
     initialStyle.color = Gfx::BLACK;
     initialStyle.setCustomProp("-vaev-url", {Css::Token::string(Io::format("\"{}\"", dom->url()))});
     initialStyle.setCustomProp("-vaev-title", {Css::Token::string(Io::format("\"{}\"", dom->title()))});
@@ -331,6 +319,7 @@ export Generator<Print::Page> print(Gc::Ref<Dom::Document> dom, Print::Settings 
         } else if (settings.margins == Print::Margins::CUSTOM) {
             pageMargin = settings.margins.custom.cast<Au>();
         } else if (settings.margins == Print::Margins::MINIMUM) {
+            // NOTE: No margins
         }
 
         RectAu pageContent = pageRect.shrink(pageMargin);

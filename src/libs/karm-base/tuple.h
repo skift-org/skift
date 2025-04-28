@@ -130,8 +130,8 @@ struct Tuple<_T0, _T1> {
     auto operator<=>(Tuple const&) const = default;
 };
 
-template <typename _T0, typename _T1>
-Tuple(_T0, _T1) -> Tuple<_T0, _T1>;
+template <typename T0, typename T1>
+Tuple(T0, T1) -> Tuple<T0, T1>;
 
 template <typename _T0, typename _T1, typename _T2>
 struct Tuple<_T0, _T1, _T2> {
@@ -184,8 +184,8 @@ struct Tuple<_T0, _T1, _T2> {
     auto operator<=>(Tuple const&) const = default;
 };
 
-template <typename _T0, typename _T1, typename _T2>
-Tuple(_T0, _T1, _T2) -> Tuple<_T0, _T1, _T2>;
+template <typename T0, typename T1, typename T2>
+Tuple(T0, T1, T2) -> Tuple<T0, T1, T2>;
 
 template <typename _T0, typename _T1, typename _T2, typename _T3>
 struct Tuple<_T0, _T1, _T2, _T3> {
@@ -246,8 +246,8 @@ struct Tuple<_T0, _T1, _T2, _T3> {
     auto operator<=>(Tuple const&) const = default;
 };
 
-template <typename _T0, typename _T1, typename _T2, typename _T3>
-Tuple(_T0, _T1, _T2, _T3) -> Tuple<_T0, _T1, _T2, _T3>;
+template <typename T0, typename T1, typename T2, typename T3>
+Tuple(T0, T1, T2, T3) -> Tuple<T0, T1, T2, T3>;
 
 template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4>
 struct Tuple<_T0, _T1, _T2, _T3, _T4> {
@@ -316,8 +316,8 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4> {
     auto operator<=>(Tuple const&) const = default;
 };
 
-template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4>
-Tuple(_T0, _T1, _T2, _T3, _T4) -> Tuple<_T0, _T1, _T2, _T3, _T4>;
+template <typename T0, typename T1, typename T2, typename T3, typename T4>
+Tuple(T0, T1, T2, T3, T4) -> Tuple<T0, T1, T2, T3, T4>;
 
 template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4, typename _T5>
 struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5> {
@@ -394,8 +394,8 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5> {
     auto operator<=>(Tuple const&) const = default;
 };
 
-template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4, typename _T5>
-Tuple(_T0, _T1, _T2, _T3, _T4, _T5) -> Tuple<_T0, _T1, _T2, _T3, _T4, _T5>;
+template <typename T0, typename T1, typename T2, typename T3, typename T4, typename T5>
+Tuple(T0, T1, T2, T3, T4, T5) -> Tuple<T0, T1, T2, T3, T4, T5>;
 
 template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4, typename _T5, typename _T6>
 struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6> {
@@ -480,8 +480,8 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6> {
     auto operator<=>(Tuple const&) const = default;
 };
 
-template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4, typename _T5, typename _T6>
-Tuple(_T0, _T1, _T2, _T3, _T4, _T5, _T6) -> Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6>;
+template <typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+Tuple(T0, T1, T2, T3, T4, T5, T6) -> Tuple<T0, T1, T2, T3, T4, T5, T6>;
 
 template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4, typename _T5, typename _T6, typename _T7>
 struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7> {
@@ -574,7 +574,7 @@ struct Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7> {
     auto operator<=>(Tuple const&) const = default;
 };
 
-template <typename _T0, typename _T1, typename _T2, typename _T3, typename _T4, typename _T5, typename _T6, typename _T7>
-Tuple(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7) -> Tuple<_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7>;
+template <typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
+Tuple(T0, T1, T2, T3, T4, T5, T6, T7) -> Tuple<T0, T1, T2, T3, T4, T5, T6, T7>;
 
 } // namespace Karm

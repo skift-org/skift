@@ -419,7 +419,7 @@ concept Iter2 = requires(T t) {
 // MARK: Generator -------------------------------------------------------------
 
 template <typename T>
-struct Generator {
+struct [[nodiscard, clang::coro_return_type, clang::coro_lifetimebound]] Generator {
     struct promise_type;
 
     struct promise_type {

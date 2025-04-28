@@ -4,7 +4,7 @@
 
 namespace Karm::Scene {
 
-struct Screen : public Stack {
+struct Screen : Stack {
     void repr(Io::Emit& e) const override {
         e("(screen");
         if (_children) {

@@ -9,10 +9,6 @@ enum struct FormFactor {
     MOBILE,
 };
 
-inline FormFactor useFormFactor(Sys::Context& ctx = Sys::globalContext()) {
-    if (useArgs(ctx).has("--mobile"))
-        return FormFactor::MOBILE;
-    return FormFactor::DESKTOP;
-}
+static constexpr FormFactor formFactor = FormFactor::DESKTOP;
 
 } // namespace Karm::App

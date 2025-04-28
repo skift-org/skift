@@ -9,7 +9,7 @@ import :base;
 
 namespace Vaev::Layout {
 
-struct ReplacedFormatingContext : public FormatingContext {
+struct ReplacedFormatingContext : FormatingContext {
     Output run(Tree& tree, Box& box, Input input, [[maybe_unused]] usize startAt, [[maybe_unused]] Opt<usize> stopAt) override {
         Vec2Au size = {};
 

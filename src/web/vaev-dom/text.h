@@ -5,7 +5,7 @@
 namespace Vaev::Dom {
 
 // https://dom.spec.whatwg.org/#text
-struct Text : public CharacterData {
+struct Text : CharacterData {
     static constexpr auto TYPE = NodeType::TEXT;
 
     using CharacterData::CharacterData;

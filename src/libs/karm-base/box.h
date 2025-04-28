@@ -108,6 +108,21 @@ struct Box {
     }
 };
 
+template <typename T>
+struct Niche<Box<T>> {
+    struct Content {
+        char const* ptr;
+
+        always_inline constexpr Content() : ptr(_NONE_PTR) {}
+
+        always_inline constexpr bool has() const {
+            return ptr != _NONE_PTR;
+        }
+
+        always_inline constexpr void setupValue() {}
+    };
+};
+
 template <typename T, typename... Args>
 constexpr static Box<T> makeBox(Args... args) {
     return {MOVE, new T(std::forward<Args>(args)...)};

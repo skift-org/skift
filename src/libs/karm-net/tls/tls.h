@@ -11,7 +11,7 @@
 
 namespace Tls {
 
-struct CipherSuite : public Distinct<u16be, struct _CipherSuiteTag> {
+struct CipherSuite : Distinct<u16be, struct _CipherSuiteTag> {
     using Distinct::Distinct;
     static CipherSuite TLS_AES_128_GCM_SHA256;
 };
@@ -33,7 +33,7 @@ static bool isHello(Bytes buf) {
            buf[5] == 0x01;
 }
 
-struct TlsConnection : public Sys::_Connection {
+struct TlsConnection : Sys::_Connection {
     Sys::_Connection& _conn;
 
     static Res<TlsConnection> accept(Sys::_Connection& conn, Bytes hello) {

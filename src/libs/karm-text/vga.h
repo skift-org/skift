@@ -7,7 +7,7 @@
 
 namespace Karm::Text {
 
-struct VgaFontface : public Fontface {
+struct VgaFontface : Fontface {
     static constexpr isize WIDTH = 8;
     static constexpr isize HEIGHT = 8;
     static constexpr f64 UNIT_PER_EM = 8;
@@ -24,6 +24,16 @@ struct VgaFontface : public Fontface {
             .linegap = 4 / UNIT_PER_EM,
             .advance = 8 / UNIT_PER_EM,
         };
+    }
+
+    BaselineSet baselineSet() override {
+        return UnresolvedBaselineSet{
+            .alphabetic = 0 / UNIT_PER_EM,
+            .xHeight = 6 / UNIT_PER_EM,
+            .capHeight = 10 / UNIT_PER_EM,
+            .xMiddle = 3 / UNIT_PER_EM,
+        }
+            .resolve();
     }
 
     FontAttrs attrs() const override {

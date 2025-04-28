@@ -8,6 +8,7 @@
     },
     "requires": [
         "karm-aio",
-        "karm-sys"
+        "karm-sys",
+        "karm-logger"
     ]
 }

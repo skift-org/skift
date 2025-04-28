@@ -1,26 +1,32 @@
-#include "popover.h"
+module;
 
-#include "dialog.h"
-#include "funcs.h"
+#include <karm-app/inputs.h>
+#include <karm-gfx/canvas.h>
+#include <karm-math/rect.h>
+
+export module Karm.Ui:popover;
+
+import :dialog;
+import :funcs;
 
 namespace Karm::Ui {
 
-struct ShowPopoverEvent {
+export struct ShowPopoverEvent {
     Math::Vec2i at;
     Child child;
 };
 
-struct ClosePopoverEvent {};
+export struct ClosePopoverEvent {};
 
-void showPopover(Node& n, Math::Vec2i at, Child child) {
+export void showPopover(Node& n, Math::Vec2i at, Child child) {
     bubble<ShowPopoverEvent>(n, at, child);
 }
 
-void closePopover(Node& n) {
+export void closePopover(Node& n) {
     bubble<ClosePopoverEvent>(n);
 }
 
-struct PopoverLayer : public ProxyNode<PopoverLayer> {
+struct PopoverLayer : ProxyNode<PopoverLayer> {
     Opt<Child> _popover;
     Opt<Child> _shouldPopover;
     bool _shouldPopoverClose = false;
@@ -124,8 +130,14 @@ struct PopoverLayer : public ProxyNode<PopoverLayer> {
     }
 };
 
-Child popoverLayer(Child child) {
+export Child popoverLayer(Child child) {
     return makeRc<PopoverLayer>(child);
+}
+
+export auto popoverLayer() {
+    return [](Child child) {
+        return popoverLayer(child);
+    };
 }
 
 } // namespace Karm::Ui

@@ -5,7 +5,8 @@
     "description": "A graphics library",
     "requires": [
         "karm-math",
-        "karm-io"
+        "karm-io",
+        "mdi"
     ],
     "subdirs": [
         "mixbox",

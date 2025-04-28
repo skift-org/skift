@@ -47,7 +47,7 @@ struct Fd : Meta::NoCopy {
     static Res<Rc<Fd>> unpack(Io::PackScan& s);
 };
 
-struct NullFd : public Fd {
+struct NullFd : Fd {
     Handle handle() const override {
         return INVALID;
     }

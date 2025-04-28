@@ -9,7 +9,7 @@
 namespace Vaev::Dom {
 
 // https://dom.spec.whatwg.org/#interface-element
-struct Element : public Node {
+struct Element : Node {
     static constexpr auto TYPE = NodeType::ELEMENT;
 
     Opt<Str> id() const {

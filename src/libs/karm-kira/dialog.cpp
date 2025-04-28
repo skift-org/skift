@@ -1,14 +1,19 @@
-#include <karm-app/form-factor.h>
-#include <karm-ui/dialog.h>
-#include <karm-ui/drag.h>
-#include <karm-ui/input.h>
-#include <mdi/close.h>
+module;
 
-#include "dialog.h"
+#include <karm-app/form-factor.h>
+#include <karm-app/inputs.h>
+#include <karm-gfx/shadow.h>
+#include <karm-math/align.h>
+
+export module Karm.Kira:dialog;
+
+import Karm.Ui;
+import Mdi;
+import :separator;
 
 namespace Karm::Kira {
 
-Ui::Child dialogContent(Ui::Children children) {
+export Ui::Child dialogContent(Ui::Children children) {
     Ui::BoxStyle const boxStyle = {
         .borderRadii = 8,
         .borderWidth = 1,
@@ -24,7 +29,7 @@ Ui::Child dialogContent(Ui::Children children) {
            Ui::insets(32);
 }
 
-Ui::Child dialogTitleBar(String title) {
+export Ui::Child dialogTitleBar(String title) {
     return Ui::vflow(
         Ui::hflow(
             Ui::titleSmall(title) | Ui::vcenter(),
@@ -32,26 +37,26 @@ Ui::Child dialogTitleBar(String title) {
             Ui::button(Ui::closeDialog, Ui::ButtonStyle::subtle(), Mdi::CLOSE)
         ) |
             Ui::insets({4, 4, 4, 16}),
-        Ui::separator()
+        separator()
     );
 }
 
-Ui::Child dialogHeader(Ui::Children children) {
+export Ui::Child dialogHeader(Ui::Children children) {
     return Ui::vflow(8, children) |
            Ui::insets({16, 16, 8, 16});
 }
 
-Ui::Child dialogTitle(String text) {
+export Ui::Child dialogTitle(String text) {
     return Ui::titleMedium(text);
 }
 
-Ui::Child dialogDescription(String text) {
+export Ui::Child dialogDescription(String text) {
     return Ui::bodySmall(Ui::GRAY400, text) |
            Ui::pinSize({380, Ui::UNCONSTRAINED});
 }
 
-Ui::Child dialogFooter(Ui::Children children) {
-    auto isMobile = App::useFormFactor() == App::FormFactor::MOBILE;
+export Ui::Child dialogFooter(Ui::Children children) {
+    auto isMobile = App::formFactor == App::FormFactor::MOBILE;
     if (not isMobile)
         children.pushFront(Ui::grow(NONE));
     return Ui::flow(
@@ -65,32 +70,33 @@ Ui::Child dialogFooter(Ui::Children children) {
            Ui::insets({8, 16, 16, 16});
 }
 
-Ui::Child dialogAction(Ui::OnPress onPress, String text) {
+export Ui::Child dialogAction(Opt<Ui::Send<>> onPress, String text) {
     return Ui::button(
-        [onPress = std::move(onPress)](auto& n) {
-            onPress(n);
-            Ui::closeDialog(n);
-        },
-        Ui::ButtonStyle::primary(),
-        text
-    );
+               [onPress = std::move(onPress)](auto& n) {
+                   onPress(n);
+                   Ui::closeDialog(n);
+               },
+               Ui::ButtonStyle::primary(),
+               text
+           ) |
+           Ui::keyboardShortcut(App::Key::ENTER);
 }
 
-Ui::Child dialogCancel() {
+export Ui::Child dialogCancel() {
     return Ui::button(
         Ui::closeDialog,
         "Cancel"
     );
 }
 
-Ui::Child alert(String title, String description) {
+export Ui::Child alertDialog(String title, String description) {
     return dialogContent({
         dialogHeader({
             dialogTitle(title),
             dialogDescription(description),
         }),
         dialogFooter({
-            dialogAction(Ui::NOP, "Ok"s),
+            dialogAction(Ui::SINK<>, "Ok"s),
         }),
     });
 }

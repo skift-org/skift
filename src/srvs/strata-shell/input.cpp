@@ -1,7 +1,8 @@
 #include <karm-app/inputs.h>
-#include <karm-ui/funcs.h>
 
 #include "input.h"
+
+import Karm.Ui;
 
 namespace Strata::Shell {
 

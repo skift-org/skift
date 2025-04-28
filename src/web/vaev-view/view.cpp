@@ -1,8 +1,7 @@
 module;
 
 #include <karm-gc/root.h>
-#include <karm-ui/node.h>
-#include <karm-ui/view.h>
+#include <karm-gfx/canvas.h>
 #include <vaev-dom/document.h>
 #include <vaev-style/media.h>
 
@@ -10,14 +9,16 @@ export module Vaev.View:view;
 
 import Vaev.Driver;
 import Vaev.Layout;
+import Karm.Ui;
 
 namespace Vaev::View {
 
 export struct ViewProps {
     bool wireframe = false;
+    Opt<Gc::Ref<Dom::Node>> selected = NONE;
 };
 
-struct View : public Ui::View<View> {
+struct View : Ui::View<View> {
     Gc::Root<Dom::Document> _dom;
     ViewProps _props;
     Opt<Driver::RenderResult> _renderResult;
@@ -54,7 +55,7 @@ struct View : public Ui::View<View> {
             .prefersReducedTransparency = ReducedTransparency::NO_PREFERENCE,
             .prefersContrast = Contrast::NO_PREFERENCE,
             .forcedColors = Colors::NONE,
-            .prefersColorScheme = Ui::darkMode ? ColorScheme::DARK : ColorScheme::LIGHT,
+            .prefersColorScheme = Ui::DARK_MODE ? ColorScheme::DARK : ColorScheme::LIGHT,
             .prefersReducedData = ReducedData::NO_PREFERENCE,
 
             // NOTE: Deprecated Media Features
@@ -83,19 +84,15 @@ struct View : public Ui::View<View> {
         g.origin(bound().xy.cast<f64>());
         g.clip(viewport);
 
-        auto [_, layout, paint, frag, canvasColor] = *_renderResult;
+        auto [layout, paint, frag] = *_renderResult;
         auto paintRect = rect.offset(-bound().xy);
-
-        if (canvasColor.alpha < 255) {
-            g.clear(paintRect, Gfx::WHITE);
-            g.rect(paintRect.cast<f64>());
-            g.fill(canvasColor);
-        } else
-            g.clear(paintRect, canvasColor);
-
         paint->paint(g, paintRect.cast<f64>());
+
         if (_props.wireframe)
             Layout::wireframe(*frag, g);
+
+        if (_props.selected)
+            Layout::overlay(*frag, g, *_props.selected);
 
         g.pop();
     }
@@ -108,7 +105,7 @@ struct View : public Ui::View<View> {
     Math::Vec2i size(Math::Vec2i size, Ui::Hint) override {
         // FIXME: This is wasteful, we should cache the result
         auto media = _constructMedia(size);
-        auto [_, layout, _, frag, _] = Driver::render(*_dom, media, {.small = size.cast<Au>()});
+        auto [layout, _, frag] = Driver::render(*_dom, media, {.small = size.cast<Au>()});
 
         return {
             frag->metrics.borderBox().width.cast<isize>(),

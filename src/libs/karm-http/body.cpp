@@ -11,9 +11,9 @@ import Karm.Aio;
 
 namespace Karm::Http {
 
-export struct Body : public Aio::Reader {
+export struct Body : Aio::Reader {
     static Rc<Body> from(Sys::FileReader file) {
-        struct FileBody : public Body {
+        struct FileBody : Body {
             Sys::FileReader _file;
 
             FileBody(Sys::FileReader file)
@@ -28,7 +28,7 @@ export struct Body : public Aio::Reader {
     }
 
     static Rc<Body> from(Buf<Byte> buf) {
-        struct BufBody : public Body {
+        struct BufBody : Body {
             Buf<Byte> _buf;
             Io::BufReader _reader{_buf};
 
@@ -48,7 +48,7 @@ export struct Body : public Aio::Reader {
     }
 
     static Rc<Body> empty() {
-        struct EmptyBody : public Body {
+        struct EmptyBody : Body {
             Async::Task<usize> readAsync(MutBytes) override {
                 co_return Ok(0);
             }

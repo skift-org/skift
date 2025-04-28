@@ -53,7 +53,7 @@ test$("fixed-arithmethic-division") {
 }
 
 test$("fixed-arithmethic-division-range") {
-    using P = _Fixed<i32, 12>;
+    using P = Fixed<i32, 12>;
 
     // These calculation will overflow and produce
     // wrong results without the intermediate type.

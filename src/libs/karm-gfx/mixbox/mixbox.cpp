@@ -10,8 +10,8 @@ static u8 const _LUT[] = {
 
 static f64 srgb2linear(f64 srgb) {
     if (srgb <= 0.04045f)
-        return srgb / 12.92f;
-    return pow((srgb + 0.055f) / 1.055f, 2.4f);
+        return srgb / 12.92;
+    return Math::pow((srgb + 0.055) / 1.055, 2.4);
 }
 
 static Math::Vec3f srgb2linear(Gfx::Color color) {
@@ -23,9 +23,9 @@ static Math::Vec3f srgb2linear(Gfx::Color color) {
 }
 
 static f64 linear2srgb(f64 linear) {
-    if (linear <= 0.0031308f)
-        return linear * 12.92f;
-    return 1.055f * ::pow(linear, 1.0f / 2.4f) - 0.055f;
+    if (linear <= 0.0031308)
+        return linear * 12.92;
+    return 1.055 * Math::pow(linear, 1.0 / 2.4) - 0.055;
 }
 
 static Gfx::Color linear2srgb(Math::Vec3f linear) {

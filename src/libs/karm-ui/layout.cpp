@@ -1,45 +1,23 @@
-#include "layout.h"
+module;
 
-#include "view.h"
+#include <karm-app/event.h>
+#include <karm-gfx/canvas.h>
+#include <karm-math/align.h>
+#include <karm-math/insets.h>
+
+export module Karm.Ui:layout;
+
+import :node;
+import :view;
+import :atoms;
 
 namespace Karm::Ui {
 
-// MARK: Grow ------------------------------------------------------------------
-
-struct Grow : public ProxyNode<Grow> {
-    isize _grow;
-
-    Grow(Child child)
-        : ProxyNode(child), _grow(1) {}
-
-    Grow(isize grow, Child child)
-        : ProxyNode(child), _grow(grow) {}
-
-    isize grow() const {
-        return _grow;
-    }
-};
-
-Child grow(Opt<Child> child) {
-    return makeRc<Grow>(
-        child.unwrapOrElse([] {
-            return empty();
-        })
-    );
-}
-
-Child grow(isize grow, Opt<Child> child) {
-    return makeRc<Grow>(
-        grow,
-        child.unwrapOrElse([] {
-            return empty();
-        })
-    );
-}
+export constexpr auto UNCONSTRAINED = -1;
 
 // MARK: Empty -----------------------------------------------------------------
 
-struct Empty : public View<Empty> {
+struct Empty : View<Empty> {
     Math::Vec2i _size;
 
     Empty(Math::Vec2i size)
@@ -56,19 +34,25 @@ struct Empty : public View<Empty> {
     void paint(Gfx::Canvas&, Math::Recti) override {}
 };
 
-Child empty(Math::Vec2i size) {
+export Child empty(Math::Vec2i size = {}) {
     return makeRc<Empty>(size);
 }
 
-Child cond(bool cond, Child child) {
+export Child cond(bool cond, Child child) {
     if (cond)
         return child;
     return empty();
 }
 
+export auto cond(bool c) {
+    return [c](Child child) {
+        return cond(c, child);
+    };
+}
+
 // MARK: Bound -----------------------------------------------------------------
 
-struct Bound : public ProxyNode<Bound> {
+struct Bound : ProxyNode<Bound> {
     Math::Recti _bound;
 
     Bound(Child child)
@@ -88,11 +72,17 @@ struct Bound : public ProxyNode<Bound> {
     }
 };
 
-Child bound(Child child) {
+export Child bound(Child child) {
     return makeRc<Bound>(child);
 }
 
-struct Placed : public ProxyNode<Placed> {
+export auto bound() {
+    return [](Child child) {
+        return bound(child);
+    };
+}
+
+struct Placed : ProxyNode<Placed> {
     Math::Recti _bound;
     Math::Recti _place;
 
@@ -120,32 +110,64 @@ struct Placed : public ProxyNode<Placed> {
     }
 };
 
-Child placed(Math::Recti place, Child child) {
+export Child placed(Math::Recti place, Child child) {
     return makeRc<Placed>(place, child);
 }
 
-// MARK: Separator -------------------------------------------------------------
+export auto placed(Math::Recti bound) {
+    return [bound](Child child) {
+        return placed(bound, child);
+    };
+}
 
-struct Separator : public View<Separator> {
-    Math::Vec2i size(Math::Vec2i, Hint) override {
-        return {1};
-    }
+// MARK: Grow ------------------------------------------------------------------
 
-    void paint(Gfx::Canvas& g, Math::Recti) override {
-        g.push();
-        g.fillStyle(GRAY800);
-        g.fill(bound());
-        g.pop();
+struct Grow : ProxyNode<Grow> {
+    isize _grow;
+
+    Grow(Child child)
+        : ProxyNode(child), _grow(1) {}
+
+    Grow(isize grow, Child child)
+        : ProxyNode(child), _grow(grow) {}
+
+    isize grow() const {
+        return _grow;
     }
 };
 
-Child separator() {
-    return makeRc<Separator>();
+export Child grow(Opt<Child> child) {
+    return makeRc<Grow>(
+        child.unwrapOrElse([] {
+            return empty();
+        })
+    );
+}
+
+export auto grow() {
+    return [](Child child) {
+        return grow(child);
+    };
+}
+
+export Child grow(isize grow, Opt<Child> child) {
+    return makeRc<Grow>(
+        grow,
+        child.unwrapOrElse([] {
+            return empty();
+        })
+    );
+}
+
+export auto grow(isize g) {
+    return [g](Child child) {
+        return grow(g, child);
+    };
 }
 
 // MARK: Align -----------------------------------------------------------------
 
-struct Align : public ProxyNode<Align> {
+struct Align : ProxyNode<Align> {
     Math::Align _align;
 
     Align(Math::Align align, Child child) : ProxyNode(child), _align(align) {}
@@ -172,49 +194,109 @@ struct Align : public ProxyNode<Align> {
     }
 };
 
-Child align(Math::Align align, Child child) {
+export Child align(Math::Align align, Child child) {
     return makeRc<Align>(align, child);
 }
 
-Child center(Child child) {
+export auto align(Math::Align a) {
+    return [a](Child child) {
+        return align(a, child);
+    };
+}
+
+export Child center(Child child) {
     return align(Math::Align::CENTER, child);
 }
 
-Child start(Child child) {
+export auto center() {
+    return [](Child child) {
+        return center(child);
+    };
+}
+
+export Child start(Child child) {
     return align(Math::Align::START | Math::Align::VFILL, child);
 }
 
-Child end(Child child) {
+export auto start() {
+    return [](Child child) {
+        return start(child);
+    };
+}
+
+export Child end(Child child) {
     return align(Math::Align::END | Math::Align::VFILL, child);
 }
 
-Child fit(Child child) {
+export auto end() {
+    return [](Child child) {
+        return end(child);
+    };
+}
+
+export Child fit(Child child) {
     return align(Math::Align::FIT, child);
 }
 
-Child cover(Child child) {
+export auto fit() {
+    return [](Child child) {
+        return fit(child);
+    };
+}
+
+export Child cover(Child child) {
     return align(Math::Align::COVER, child);
 }
 
-Child hcenter(Child child) {
+export auto cover() {
+    return [](Child child) {
+        return cover(child);
+    };
+}
+
+export Child hcenter(Child child) {
     return align(Math::Align::HCENTER | Math::Align::TOP, child);
 }
 
-Child vcenter(Child child) {
+export auto hcenter() {
+    return [](Child child) {
+        return hcenter(child);
+    };
+}
+
+export Child vcenter(Child child) {
     return align(Math::Align::VCENTER | Math::Align::START, child);
 }
 
-Child hcenterFill(Child child) {
+export auto vcenter() {
+    return [](Child child) {
+        return vcenter(child);
+    };
+}
+
+export Child hcenterFill(Child child) {
     return align(Math::Align::HCENTER | Math::Align::VFILL, child);
 }
 
-Child vcenterFill(Child child) {
+export auto hcenterFill() {
+    return [](Child child) {
+        return hcenterFill(child);
+    };
+}
+
+export Child vcenterFill(Child child) {
     return align(Math::Align::VCENTER | Math::Align::HFILL, child);
+}
+
+export auto vcenterFill() {
+    return [](Child child) {
+        return vcenterFill(child);
+    };
 }
 
 // MARK: Sizing ----------------------------------------------------------------
 
-struct Sizing : public ProxyNode<Sizing> {
+struct Sizing : ProxyNode<Sizing> {
     Math::Vec2i _min;
     Math::Vec2i _max;
     Math::Recti _rect;
@@ -260,37 +342,79 @@ struct Sizing : public ProxyNode<Sizing> {
     }
 };
 
-Child sizing(Math::Vec2i min, Math::Vec2i max, Child child) {
+export Child sizing(Math::Vec2i min, Math::Vec2i max, Child child) {
     return makeRc<Sizing>(min, max, child);
 }
 
-Child minSize(Math::Vec2i size, Child child) {
+export auto sizing(Math::Vec2i min, Math::Vec2i max) {
+    return [min, max](Child child) {
+        return sizing(min, max, child);
+    };
+}
+
+export Child minSize(Math::Vec2i size, Child child) {
     return makeRc<Sizing>(size, UNCONSTRAINED, child);
 }
 
-Child minSize(isize size, Child child) {
+export auto minSize(Math::Vec2i size) {
+    return [size](Child child) {
+        return minSize(size, child);
+    };
+}
+
+export Child minSize(isize size, Child child) {
     return minSize(Math::Vec2i{size}, child);
 }
 
-Child maxSize(Math::Vec2i size, Child child) {
+export auto minSize(isize size) {
+    return [size](Child child) {
+        return minSize(size, child);
+    };
+}
+
+export Child maxSize(Math::Vec2i size, Child child) {
     return makeRc<Sizing>(UNCONSTRAINED, size, child);
 }
 
-Child maxSize(isize size, Child child) {
+export auto maxSize(Math::Vec2i size) {
+    return [size](Child child) {
+        return maxSize(size, child);
+    };
+}
+
+export Child maxSize(isize size, Child child) {
     return maxSize(Math::Vec2i{size}, child);
 }
 
-Child pinSize(Math::Vec2i size, Child child) {
+export auto maxSize(isize size) {
+    return [size](Child child) {
+        return maxSize(size, child);
+    };
+}
+
+export Child pinSize(Math::Vec2i size, Child child) {
     return makeRc<Sizing>(size, size, child);
 }
 
-Child pinSize(isize size, Child child) {
+export auto pinSize(Math::Vec2i size) {
+    return [size](Child child) {
+        return pinSize(size, child);
+    };
+}
+
+export Child pinSize(isize size, Child child) {
     return pinSize(Math::Vec2i{size}, child);
+}
+
+export auto pinSize(isize size) {
+    return [size](Child child) {
+        return pinSize(size, child);
+    };
 }
 
 // MARK: Insets ---------------------------------------------------------------
 
-struct Insets : public ProxyNode<Insets> {
+struct Insets : ProxyNode<Insets> {
     Math::Insetsi _insets;
 
     Insets(Math::Insetsi insets, Child child)
@@ -318,13 +442,19 @@ struct Insets : public ProxyNode<Insets> {
     }
 };
 
-Child insets(Math::Insetsi s, Child child) {
+export Child insets(Math::Insetsi s, Child child) {
     return makeRc<Insets>(s, child);
+}
+
+export auto insets(Math::Insetsi s) {
+    return [s](Child child) {
+        return insets(s, child);
+    };
 }
 
 // MARK: Aspect Ratio ----------------------------------------------------------
 
-struct AspectRatio : public ProxyNode<AspectRatio> {
+struct AspectRatio : ProxyNode<AspectRatio> {
     f64 _ratio;
 
     AspectRatio(f64 ratio, Child child)
@@ -351,13 +481,19 @@ struct AspectRatio : public ProxyNode<AspectRatio> {
     }
 };
 
-Child aspectRatio(f64 ratio, Child child) {
+export Child aspectRatio(f64 ratio, Child child) {
     return makeRc<AspectRatio>(ratio, child);
+}
+
+export auto aspectRatio(f64 ratio) {
+    return [ratio](Child child) {
+        return aspectRatio(ratio, child);
+    };
 }
 
 // MARK: Stack -----------------------------------------------------------------
 
-struct StackLayout : public GroupNode<StackLayout> {
+struct StackLayout : GroupNode<StackLayout> {
     using GroupNode::GroupNode;
 
     void event(App::Event& e) override {
@@ -385,13 +521,31 @@ struct StackLayout : public GroupNode<StackLayout> {
     }
 };
 
-Child stack(Children children) {
+export Child stack(Children children) {
     return makeRc<StackLayout>(children);
+}
+
+export Child stack(auto... children) {
+    return stack(Children{children...});
 }
 
 // MARK: Flow ------------------------------------------------------------------
 
-struct FlowLayout : public GroupNode<FlowLayout> {
+struct FlowStyle {
+    Math::Flow flow = Math::Flow::LEFT_TO_RIGHT;
+    Math::Align align = Math::Align::FILL;
+    isize gaps{};
+
+    static FlowStyle horizontal(isize gaps = 0, Math::Align align = Math::Align::FILL) {
+        return FlowStyle{Math::Flow::LEFT_TO_RIGHT, align, gaps};
+    }
+
+    static FlowStyle vertical(isize gaps = 0, Math::Align align = Math::Align::FILL) {
+        return FlowStyle{Math::Flow::TOP_TO_BOTTOM, align, gaps};
+    }
+};
+
+struct FlowLayout : GroupNode<FlowLayout> {
     using GroupNode::GroupNode;
 
     FlowStyle _style;
@@ -471,13 +625,132 @@ struct FlowLayout : public GroupNode<FlowLayout> {
     }
 };
 
-Child flow(FlowStyle style, Children children) {
+export Child flow(FlowStyle style, Children children) {
     return makeRc<FlowLayout>(style, children);
+}
+
+export Child hflow(Meta::Same<Child> auto... children) {
+    return flow({.flow = Math::Flow::LEFT_TO_RIGHT}, {children...});
+}
+
+export Child hflow(isize gaps, Meta::Same<Child> auto... children) {
+    return flow({.flow = Math::Flow::LEFT_TO_RIGHT, .gaps = gaps}, {children...});
+}
+
+export Child hflow(isize gaps, Math::Align align, Meta::Same<Child> auto... children) {
+    return flow({.flow = Math::Flow::LEFT_TO_RIGHT, .align = align, .gaps = gaps}, {children...});
+}
+
+export Child hflow(Children children) {
+    return flow({.flow = Math::Flow::LEFT_TO_RIGHT}, children);
+}
+
+export Child hflow(isize gaps, Children children) {
+    return flow({.flow = Math::Flow::LEFT_TO_RIGHT, .gaps = gaps}, children);
+}
+
+export Child hflow(isize gaps, Math::Align align, Children children) {
+    return flow({.flow = Math::Flow::LEFT_TO_RIGHT, .align = align, .gaps = gaps}, children);
+}
+
+export Child vflow(Meta::Same<Child> auto... children) {
+    return flow({.flow = Math::Flow::TOP_TO_BOTTOM}, {children...});
+}
+
+export Child vflow(isize gaps, Meta::Same<Child> auto... children) {
+    return flow({.flow = Math::Flow::TOP_TO_BOTTOM, .gaps = gaps}, {children...});
+}
+
+export Child vflow(isize gaps, Math::Align align, Meta::Same<Child> auto... children) {
+    return flow({.flow = Math::Flow::TOP_TO_BOTTOM, .align = align, .gaps = gaps}, {children...});
+}
+
+export Child vflow(Children children) {
+    return flow({.flow = Math::Flow::TOP_TO_BOTTOM}, children);
+}
+
+export Child vflow(isize gaps, Children children) {
+    return flow({.flow = Math::Flow::TOP_TO_BOTTOM, .gaps = gaps}, children);
+}
+
+export Child vflow(isize gaps, Math::Align align, Children children) {
+    return flow({.flow = Math::Flow::TOP_TO_BOTTOM, .align = align, .gaps = gaps}, children);
 }
 
 // MARK: Grid ------------------------------------------------------------------
 
-struct Cell : public ProxyNode<Cell> {
+export struct GridUnit {
+    enum _Unit {
+        AUTO,
+        FIXED,
+        GROW,
+    };
+
+    _Unit unit;
+    isize value;
+
+    static GridUnit auto_() {
+        return {AUTO, 0};
+    }
+
+    static GridUnit fixed(isize value) {
+        return {FIXED, value};
+    }
+
+    static GridUnit grow(isize value = 1) {
+        return {GROW, value};
+    }
+
+    GridUnit(_Unit unit, isize value) : unit(unit), value(value) {}
+
+    Vec<GridUnit> repeated(usize count) {
+        Vec<GridUnit> units{};
+        while (count--)
+            units.pushBack(*this);
+        return units;
+    }
+};
+
+export struct GridStyle {
+    Vec<GridUnit> rows;
+    Vec<GridUnit> columns;
+
+    Math::Vec2i gaps;
+    Math::Flow flow = Math::Flow::LEFT_TO_RIGHT;
+    Math::Align align = Math::Align::FILL;
+
+    static GridStyle simpleGrow(isize rows, isize columns, Math::Vec2i gaps = 0) {
+        return GridStyle{
+            GridUnit::grow().repeated(rows),
+            GridUnit::grow().repeated(columns),
+            gaps,
+            Math::Flow::LEFT_TO_RIGHT,
+            Math::Align::FILL,
+        };
+    }
+
+    static GridStyle simpleFixed(Pair<isize, isize> rows, Pair<isize, isize> columns, Math::Vec2i gaps = {}) {
+        return GridStyle{
+            GridUnit::fixed(rows.v1).repeated(rows.v0),
+            GridUnit::fixed(columns.v1).repeated(columns.v0),
+            gaps,
+            Math::Flow::LEFT_TO_RIGHT,
+            Math::Align::FILL,
+        };
+    }
+
+    static GridStyle simpleAuto(isize rows, isize columns, Math::Vec2i gaps = 0) {
+        return GridStyle{
+            GridUnit::auto_().repeated(rows),
+            GridUnit::auto_().repeated(columns),
+            gaps,
+            Math::Flow::LEFT_TO_RIGHT,
+            Math::Align::FILL,
+        };
+    }
+};
+
+struct Cell : ProxyNode<Cell> {
     Math::Vec2i _start{};
     Math::Vec2i _end{};
 
@@ -493,15 +766,27 @@ struct Cell : public ProxyNode<Cell> {
     }
 };
 
-Child cell(Math::Vec2i pos, Child child) {
+export Child cell(Math::Vec2i pos, Child child) {
     return makeRc<Cell>(pos, pos, child);
 }
 
-Child cell(Math::Vec2i start, Math::Vec2i end, Child child) {
+export auto cell(Math::Vec2i pos) {
+    return [pos](Child child) {
+        return cell(pos, child);
+    };
+}
+
+export Child cell(Math::Vec2i start, Math::Vec2i end, Child child) {
     return makeRc<Cell>(start, end, child);
 }
 
-struct GridLayout : public GroupNode<GridLayout> {
+export auto cell(Math::Vec2i start, Math::Vec2i end) {
+    return [start, end](Child child) {
+        return cell(start, end, child);
+    };
+}
+
+struct GridLayout : GroupNode<GridLayout> {
     struct _Dim {
         isize start;
         isize size;
@@ -677,8 +962,12 @@ struct GridLayout : public GroupNode<GridLayout> {
     }
 };
 
-Child grid(GridStyle style, Children children) {
+export Child grid(GridStyle style, Children children) {
     return makeRc<GridLayout>(style, children);
+}
+
+export Child grid(GridStyle style, Meta::Same<Child> auto... children) {
+    return grid(style, Children{children...});
 }
 
 } // namespace Karm::Ui

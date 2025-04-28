@@ -20,6 +20,26 @@ void Prose::_beginBlock() {
     });
 }
 
+void Prose::append(StrutCell&& strut) {
+    if (_blocks.len() and not last(_blocks).empty())
+        _beginBlock();
+
+    _strutCellsIndexes.pushBack(_cells.len());
+    _cells.pushBack({
+        .prose = this,
+        .span = _currentSpan,
+        .runeRange = {_runes.len(), 1},
+        .glyph = Glyph::TOFU,
+        .relatedStrutIndex = _struts.len(),
+    });
+    _struts.pushBack(std::move(strut));
+
+    _runes.pushBack(0);
+
+    last(_blocks).cellRange.size++;
+    last(_blocks).runeRange.end(_runes.len());
+}
+
 void Prose::append(Rune rune) {
     if (any(_blocks) and last(_blocks).newline())
         _beginBlock();
@@ -46,8 +66,25 @@ void Prose::clear() {
     _cells.clear();
     _blocks.clear();
     _blocksMeasured = false;
-    _beginBlock();
     _lines.clear();
+
+    _beginBlock();
+}
+
+void Prose::overrideSpanStackWith(Prose const& prose) {
+    _spans.clear();
+
+    for (auto currSpan = prose._currentSpan; currSpan != NONE; currSpan = currSpan.unwrap()->parent) {
+        Rc<Span> copySpanRc = currSpan.unwrap();
+        _spans.pushBack(copySpanRc);
+    }
+
+    reverse(mutSub(_spans));
+
+    if (_spans.len()) {
+        auto lastSpan = last(_spans);
+        _currentSpan = lastSpan;
+    }
 }
 
 void Prose::append(Slice<Rune> runes) {
@@ -71,7 +108,8 @@ void Prose::_measureBlocks() {
                 first = false;
 
             cell.pos = adv;
-            cell.adv = Au{_style.font.advance(cell.glyph)};
+            cell.measureAdvance();
+
             adv += cell.adv;
             prev = cell.glyph;
         }
@@ -125,13 +163,34 @@ void Prose::_wrapLines(Au width) {
 
 Au Prose::_layoutVerticaly() {
     auto m = _style.font.metrics();
-    Au baseline = Au{Math::ceil(m.linegap / 2)};
+
+    // NOTE: applying ceiling so fonts are pixel aligned
+    f64 halfFontLineGap = m.linegap / 2;
+    Au fontAscent = Au{Math::ceil(m.ascend + halfFontLineGap)};
+    Au fontDescend = Au{Math::ceil(m.descend + halfFontLineGap)};
+
+    Au currHeight = 0_au;
     for (auto& line : _lines) {
-        baseline += Au{Math::ceil(m.ascend)};
-        line.baseline = baseline;
-        baseline += Au{Math::ceil(m.linegap + m.descend)};
+        Au lineTop = currHeight;
+
+        Au maxAscent = 0_au;
+        Au maxDescend = 0_au;
+        for (auto const& block : line.blocks()) {
+            if (block.strut()) {
+                Au baseline{block.strut()->baseline};
+                maxAscent = max(maxAscent, baseline);
+                maxDescend = max(maxDescend, block.strut()->size.y - baseline);
+            } else {
+                maxAscent = max(maxAscent, fontAscent);
+                maxDescend = max(maxDescend, fontDescend);
+            }
+        }
+
+        line.baseline = lineTop + maxAscent;
+        currHeight += maxAscent + maxDescend;
     }
-    return baseline - Au{Math::ceil(m.linegap / 2)};
+
+    return currHeight;
 }
 
 Au Prose::_layoutHorizontaly(Au width) {

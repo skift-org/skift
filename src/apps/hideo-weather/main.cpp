@@ -1,10 +1,9 @@
 #include <karm-image/loader.h>
-#include <karm-kira/scaffold.h>
 #include <karm-sys/entry.h>
-#include <karm-ui/app.h>
-#include <karm-ui/layout.h>
-#include <karm-ui/scroll.h>
-#include <mdi/weather-partly-cloudy.h>
+
+import Mdi;
+import Karm.Ui;
+import Karm.Kira;
 
 namespace Hideo::Weather {
 

@@ -197,7 +197,7 @@ struct Hsl {
     f64 hue, saturation, lightness;
 
     Hsl(f64 hue, f64 saturation, f64 lightness)
-        : hue(fmod(hue, 360.0f)),
+        : hue(Math::fmod(hue, 360.0)),
           saturation(clamp01(saturation)),
           lightness(clamp01(lightness)) {}
 
@@ -215,7 +215,7 @@ struct Hsl {
 
     always_inline Hsl lerpWith(Hsl const other, f64 const t) const {
         return {
-            fmod(hue + (other.hue - hue) * t, 360.0f),
+            Math::fmod(hue + (other.hue - hue) * t, 360.0),
             saturation + (other.saturation - saturation) * t,
             lightness + (other.lightness - lightness) * t,
         };

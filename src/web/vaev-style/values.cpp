@@ -333,9 +333,9 @@ static Res<u8> _parseAlphaValue(Cursor<Css::Sst>& scan) {
 
     if (scan.peek() == Css::Token::Type::PERCENTAGE) {
         auto perc = try$(parseValue<Percent>(scan)).value();
-        return Ok(round((perc * 255) / 100));
+        return Ok(Math::round((perc * 255) / 100));
     } else if (scan.peek() == Css::Token::Type::NUMBER)
-        return Ok(round(try$(parseValue<Number>(scan)) * 255));
+        return Ok(Math::round(try$(parseValue<Number>(scan)) * 255));
     return Error::invalidData("expected alpha channel");
 }
 
@@ -372,7 +372,7 @@ static Res<Array<Number, 3>> _parsePredefinedRGBParams(Cursor<Css::Sst>& scan, N
         if (scan.ended())
             return Error::invalidData("unexpected end of input");
 
-        channels[i] = round(try$(_parseNumPercNone(scan, percOf)));
+        channels[i] = Math::round(try$(_parseNumPercNone(scan, percOf)));
 
         eatWhitespace(scan);
     }
@@ -388,9 +388,9 @@ static Res<Gfx::Color> _parseSRGBModernFuncColor(Css::Sst const& s) {
         return Error::invalidData("unexpected end of input");
 
     auto channels = try$(_parsePredefinedRGBParams(scan));
-    u8 r = round(channels[0]);
-    u8 g = round(channels[1]);
-    u8 b = round(channels[2]);
+    u8 r = Math::round(channels[0]);
+    u8 g = Math::round(channels[1]);
+    u8 b = Math::round(channels[2]);
 
     eatWhitespace(scan);
 
@@ -420,7 +420,7 @@ static Res<Gfx::Color> _parseSRGBLegacyFuncColor(Css::Sst const& s) {
 
         if (usingPercentages) {
             auto perc = try$(parseValue<Percent>(scan));
-            channels[i] = round((perc.value() * 255) / 100.0f);
+            channels[i] = Math::round((perc.value() * 255) / 100.0f);
         } else {
             channels[i] = try$(parseValue<Number>(scan));
         }
@@ -558,16 +558,36 @@ static Res<Gfx::Color> _parseColorFuncColor(Css::Sst const& s) {
 
         if (scan.ended()) {
             // FIXME: dispatch to constructor of colorSpace without alpha
-            return Ok(Gfx::Color::fromRgb(round(r * 255), round(g * 255), round(b * 255)));
+            return Ok(
+                Gfx::Color::fromRgb(
+                    Math::round(r * 255),
+                    Math::round(g * 255),
+                    Math::round(b * 255)
+                )
+            );
         }
 
         if (auto alphaComponent = try$(_parseAlphaComponentModernSyntax(scan))) {
             // FIXME: dispatch to constructor of colorSpace with alpha
-            return Ok(Gfx::Color::fromRgba(round(r * 255), round(g * 255), round(b * 255), alphaComponent.unwrap()));
+            return Ok(
+                Gfx::Color::fromRgba(
+                    Math::round(r * 255),
+                    Math::round(g * 255),
+                    Math::round(b * 255),
+                    alphaComponent.unwrap()
+                )
+            );
         } else {
             // FIXME: correctly deal with missing alpha values
             // FIXME: dispatch to constructor of colorSpace with missing alpha
-            return Ok(Gfx::Color::fromRgba(round(r * 255), round(g * 255), round(b * 255), 0));
+            return Ok(
+                Gfx::Color::fromRgba(
+                    Math::round(r * 255),
+                    Math::round(g * 255),
+                    Math::round(b * 255),
+                    0
+                )
+            );
         }
     } else {
         logWarn("predefined color space not implemented: {}", colorSpace);

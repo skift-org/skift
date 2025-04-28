@@ -11,8 +11,8 @@ struct FileReader;
 struct FileWriter;
 
 struct _File :
-    public Io::Seeker,
-    public Io::Flusher,
+    Io::Seeker,
+    Io::Flusher,
     Meta::NoCopy {
 
     Rc<Fd> _fd;
@@ -43,8 +43,8 @@ struct _File :
 };
 
 struct FileReader :
-    public virtual _File,
-    public Io::Reader {
+    virtual _File,
+    Io::Reader {
 
     using _File::_File;
 
@@ -52,14 +52,15 @@ struct FileReader :
         return _fd->read(bytes);
     }
 
+    [[clang::coro_wrapper]]
     Async::Task<usize> readAsync(MutBytes bytes, Sched& sched = globalSched()) {
         return sched.readAsync(_fd, bytes);
     }
 };
 
 struct FileWriter :
-    public virtual _File,
-    public Io::Writer {
+    virtual _File,
+    Io::Writer {
 
     using _File::_File;
 
@@ -67,14 +68,15 @@ struct FileWriter :
         return _fd->write(bytes);
     }
 
+    [[clang::coro_wrapper]]
     Async::Task<usize> writeAsync(Bytes bytes, Sched& sched = globalSched()) {
         return sched.writeAsync(_fd, bytes);
     }
 };
 
 struct File :
-    public FileReader,
-    public FileWriter {
+    FileReader,
+    FileWriter {
 
     using FileReader::FileReader;
     using FileWriter::FileWriter;

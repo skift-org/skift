@@ -7,7 +7,7 @@
 
 namespace Png {
 
-struct Ihdr : public Io::BChunk {
+struct Ihdr : Io::BChunk {
     static constexpr Str SIG = "IHDR";
 
     Math::Vec2i size() {
@@ -39,15 +39,15 @@ struct Ihdr : public Io::BChunk {
     }
 };
 
-struct Plte : public Io::BChunk {
+struct Plte : Io::BChunk {
     static constexpr Str SIG = "PLTE";
 };
 
-struct Idat : public Io::BChunk {
+struct Idat : Io::BChunk {
     static constexpr Str SIG = "IDAT";
 };
 
-struct Iend : public Io::BChunk {
+struct Iend : Io::BChunk {
     static constexpr Str SIG = "IEND";
 };
 

@@ -1,13 +1,15 @@
-#include <karm-ui/focus.h>
-#include <karm-ui/layout.h>
-#include <mdi/minus.h>
-#include <mdi/plus.h>
+module;
 
-#include "number.h"
+#include <karm-base/base.h>
+
+export module Karm.Kira:number;
+
+import Karm.Ui;
+import Mdi;
 
 namespace Karm::Kira {
 
-Ui::Child number(f64 value, Ui::OnChange<f64> onChange, f64 step) {
+export Ui::Child number(f64 value, Ui::Send<f64> onChange, f64 step) {
     return Ui::hflow(
                Ui::button(
                    [onChange, value, step](auto& n) {

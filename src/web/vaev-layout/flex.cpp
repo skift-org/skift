@@ -4,6 +4,7 @@ module;
 #include <karm-math/au.h>
 #include <vaev-base/align.h>
 #include <vaev-base/flex.h>
+#include <vaev-base/insets.h>
 #include <vaev-base/sizing.h>
 
 export module Vaev.Layout:flex;
@@ -620,33 +621,42 @@ struct FlexLine {
     }
 };
 
-struct FlexFormatingContext : public FormatingContext {
+struct FlexFormatingContext : FormatingContext {
     FlexProps _flex;
     FlexAxis fa{_flex.isRowOriented()};
 
     // https://www.w3.org/TR/css-flexbox-1/#layout-algorithm
     FlexFormatingContext(FlexProps flex) : _flex(flex) {}
 
-    // 0. Mark: Empty Container ------------------------------------------------------
+    // XX. MARK: Generate flex items ----------------------------------
+    Vec<FlexItem> _items = {};
 
-    Res<None, Output> returnIfEmptyContainer(Box& box, Input input) {
-        if (box.children())
+    void _generateFlexItems(Tree& tree, Box& box, Vec2Au containingBlock) {
+        // NOTE: we assume all children are non-absolute positioned for fast mem allocation
+        _items.ensure(box.children().len());
+        for (auto& c : box.children()) {
+            if (c.style->position == Position::ABSOLUTE)
+                continue;
+            _items.emplaceBack(tree, c, _flex.isRowOriented(), containingBlock);
+        }
+    }
+
+    // XX. MARK: Layout aboslute positioned children ----------------------------------
+    // https://www.w3.org/TR/css-flexbox-1/#abspos-items
+
+    void _layoutAbsolutePositionedChildren() {
+        // TODO
+    }
+
+    // 0. MARK: Empty flex items list ------------------------------------------------------
+
+    Res<None, Output> returnIfNoFlexItems(Input input) {
+        if (_items.len())
             return Ok(NONE);
 
         return Output::fromSize(
             {input.knownSize.x.unwrapOr(0_au), input.knownSize.y.unwrapOr(0_au)}
         );
-    }
-
-    // 1. MARK: Generate anonymous flex items ----------------------------------
-    // https://www.w3.org/TR/css-flexbox-1/#algo-anon-box
-
-    Vec<FlexItem> _items = {};
-
-    void _generateAnonymousFlexItems(Tree& tree, Box& box, Vec2Au containingBlock) {
-        _items.ensure(box.children().len());
-        for (auto& c : box.children())
-            _items.emplaceBack(tree, c, _flex.isRowOriented(), containingBlock);
     }
 
     // 2. MARK: Available main and cross space for the flex items --------------
@@ -1501,10 +1511,16 @@ struct FlexFormatingContext : public FormatingContext {
         //       Proper reset logic to be implemented in a future commit.
         *this = {*box.style->flex};
 
-        try$(returnIfEmptyContainer(box, input));
-
         // 1. Generate anonymous flex items
-        _generateAnonymousFlexItems(tree, box, input.containingBlock);
+        // NOTE: Done during box building phase
+
+        // XX. Populate flex items list
+        _generateFlexItems(tree, box, input.containingBlock);
+
+        // XX. Handle absolute positioned children
+        _layoutAbsolutePositionedChildren();
+
+        try$(returnIfNoFlexItems(input));
 
         // 2. Determine the available main and cross space for the flex items.
         _determineAvailableMainAndCrossSpace(tree, input);

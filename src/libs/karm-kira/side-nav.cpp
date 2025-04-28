@@ -1,22 +1,23 @@
-#include <karm-ui/anim.h>
-#include <karm-ui/layout.h>
-#include <karm-ui/reducer.h>
-#include <karm-ui/scroll.h>
-#include <mdi/chevron-down.h>
-#include <mdi/chevron-up.h>
+module;
 
-#include "side-nav.h"
+#include <karm-base/opt.h>
+#include <karm-gfx/icon.h>
+
+export module Karm.Kira:sideNav;
+
+import Karm.Ui;
+import Mdi;
 
 namespace Karm::Kira {
 
-Ui::Child sidenav(Ui::Children children) {
+export Ui::Child sidenav(Ui::Children children) {
     return Ui::vflow(8, children) |
            Ui::insets(8) |
            Ui::vscroll() |
            Ui::minSize({198, Ui::UNCONSTRAINED});
 }
 
-Ui::Child sidenavTree(Mdi::Icon icon, String title, Ui::Slot child) {
+export Ui::Child sidenavTree(Gfx::Icon icon, String title, Ui::Slot child) {
     return Ui::state(true, [=, child = std::move(child)](bool state, auto bind) {
         return Ui::vflow(
             Ui::button(
@@ -42,7 +43,7 @@ Ui::Child sidenavTree(Mdi::Icon icon, String title, Ui::Slot child) {
     });
 }
 
-Ui::Child sidenavItem(bool selected, Ui::OnPress onPress, Mdi::Icon icon, String title) {
+export Ui::Child sidenavItem(bool selected, Opt<Ui::Send<>> onPress, Ui::Child content) {
     auto buttonStyle = Ui::ButtonStyle::regular();
 
     buttonStyle.idleStyle = {
@@ -66,15 +67,25 @@ Ui::Child sidenavItem(bool selected, Ui::OnPress onPress, Mdi::Icon icon, String
             hflow(
                 indicator,
                 Ui::empty(8),
-                Ui::icon(icon, 18),
-                Ui::empty(12),
-                Ui::labelMedium(title) | Ui::center()
+                content
             )
         )
     );
 }
 
-Ui::Child sidenavTitle(String title) {
+export Ui::Child sidenavItem(bool selected, Opt<Ui::Send<>> onPress, Gfx::Icon icon, String title) {
+    return sidenavItem(
+        selected,
+        onPress,
+        Ui::hflow(
+            Ui::icon(icon, 18),
+            Ui::empty(12),
+            Ui::labelMedium(title) | Ui::center()
+        )
+    );
+}
+
+export Ui::Child sidenavTitle(String title) {
     return Ui::titleMedium(title) | Ui::insets({8, 12, 8, 8});
 }
 

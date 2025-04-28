@@ -1,5 +1,7 @@
 #include "bigint.h"
 
+#include "funcs.h"
+
 namespace Karm::Math {
 
 // MARK: Unsigned Big Integer --------------------------------------------------
@@ -335,7 +337,7 @@ void _fromF64(BigFrac& frac, f64 value) {
     }
 
     isize currPow = 0;
-    while (::pow(10.0, currPow) <= value) {
+    while (Math::pow<f64>(10.0, currPow) <= value) {
         currPow += 1;
     }
     currPow -= 1;
@@ -343,9 +345,9 @@ void _fromF64(BigFrac& frac, f64 value) {
     UBig dec = 0_ubig;
     while (value >= __DBL_EPSILON__ or currPow >= 0) {
         frac._num *= TEN;
-        usize digit = (u64)(value * ::pow(0.1, (f64)currPow)) % 10;
+        usize digit = (u64)(value * Math::pow(0.1, (f64)currPow)) % 10;
         frac._num += IBig{digit};
-        value -= digit * ::pow(10.0, (f64)currPow);
+        value -= digit * Math::pow(10.0, (f64)currPow);
         if (currPow < 0) {
             ++dec;
             _pow(TEN.value(), dec, frac._den);

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <karm-base/backtrace.h>
 #include <karm-base/box.h>
 #include <karm-base/cow.h>
 #include <karm-base/endian.h>
@@ -27,7 +26,7 @@ struct _Args {
 };
 
 template <typename... Ts>
-struct Args : public _Args {
+struct Args : _Args {
     Tuple<Ts...> _tuple{};
 
     Args(Ts&&... ts) : _tuple(std::forward<Ts>(ts)...) {}
@@ -285,7 +284,7 @@ struct NumberFormatter {
 };
 
 template <Meta::UnsignedIntegral T>
-struct Formatter<T> : public NumberFormatter {
+struct Formatter<T> : NumberFormatter {
     Res<> format(Io::TextWriter& writer, T const& val) {
         if (isChar)
             return formatRune(writer, val);
@@ -294,7 +293,7 @@ struct Formatter<T> : public NumberFormatter {
 };
 
 template <Meta::SignedIntegral T>
-struct Formatter<T> : public NumberFormatter {
+struct Formatter<T> : NumberFormatter {
     Res<> format(Io::TextWriter& writer, T const& val) {
         if (isChar)
             return writer.writeRune(val);
@@ -304,7 +303,7 @@ struct Formatter<T> : public NumberFormatter {
 
 #ifndef __ck_freestanding__
 template <Meta::Float T>
-struct Formatter<T> : public NumberFormatter {
+struct Formatter<T> : NumberFormatter {
     Res<> format(Io::TextWriter& writer, f64 const& val) {
         return formatFloat(writer, val);
     }
@@ -312,14 +311,14 @@ struct Formatter<T> : public NumberFormatter {
 #endif
 
 template <typename T>
-struct Formatter<Be<T>> : public Formatter<T> {
+struct Formatter<Be<T>> : Formatter<T> {
     Res<> format(Io::TextWriter& writer, Be<T> const& val) {
         return Formatter<T>::format(writer, val.value());
     }
 };
 
 template <typename T>
-struct Formatter<Le<T>> : public Formatter<T> {
+struct Formatter<Le<T>> : Formatter<T> {
     Res<> format(Io::TextWriter& writer, Le<T> const& val) {
         return Formatter<T>::format(writer, val.value());
     }
@@ -745,20 +744,20 @@ struct StringFormatter {
 };
 
 template <StaticEncoding E>
-struct Formatter<_Str<E>> : public StringFormatter<E> {};
+struct Formatter<_Str<E>> : StringFormatter<E> {};
 
 template <StaticEncoding E>
-struct Formatter<_String<E>> : public StringFormatter<E> {
+struct Formatter<_String<E>> : StringFormatter<E> {
     Res<> format(Io::TextWriter& writer, _String<E> const& text) {
         return StringFormatter<E>::format(writer, text.str());
     }
 };
 
 template <usize N>
-struct Formatter<StrLit<N>> : public StringFormatter<Utf8> {};
+struct Formatter<StrLit<N>> : StringFormatter<Utf8> {};
 
 template <>
-struct Formatter<char const*> : public StringFormatter<Utf8> {
+struct Formatter<char const*> : StringFormatter<Utf8> {
     Res<> format(Io::TextWriter& writer, char const* text) {
         _Str<Utf8> str = Str::fromNullterminated(text);
         return StringFormatter::format(writer, str);
@@ -844,27 +843,6 @@ struct Formatter<Tuple<Ts...>> {
             return Ok();
         }));
         try$(writer.writeRune('}'));
-        return Ok();
-    }
-};
-
-// MARK: Format backtrace ------------------------------------------------------
-
-template <>
-struct Formatter<Backtrace> {
-    Res<> format(Io::TextWriter& writer, Backtrace const& val) {
-        if (val.status() == Backtrace::DISABLED)
-            return writer.writeStr("(backtrace disabled)"s);
-
-        if (val.status() == Backtrace::UNSUPPORTED)
-            return writer.writeStr("(backtrace unsupported)"s);
-
-        usize index = 1;
-        for (auto const& frame : val.frames()) {
-            try$(Io::format(writer, "#{}: {} at {}:{}\n", index, frame.desc, frame.file, frame.line));
-            index++;
-        }
-
         return Ok();
     }
 };

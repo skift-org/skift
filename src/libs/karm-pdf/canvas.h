@@ -22,7 +22,7 @@ struct FontManager {
     }
 };
 
-struct Canvas : public Gfx::Canvas {
+struct Canvas : Gfx::Canvas {
     Io::Emit _e;
     Math::Vec2f _mediaBox{};
     Math::Vec2f _p{};

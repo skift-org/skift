@@ -1,0 +1,16 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "impl-posix.darwin",
+    "type": "lib",
+    "props": {
+        "cpp-excluded": true
+    },
+    "enableIf": {
+        "sys": [
+            "darwin"
+        ]
+    },
+    "provides": [
+        "karm-sys-sandbox-impl"
+    ]
+}

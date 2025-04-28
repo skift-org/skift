@@ -75,7 +75,7 @@ void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radii, f64 angle, Flags 
 
     f64 dx = x1 - x2;
     f64 dy = y1 - y2;
-    f64 d = sqrtf(dx * dx + dy * dy);
+    f64 d = Math::sqrt(dx * dx + dy * dy);
 
     if (d < 1e-6f or radii.x < 1e-6f or radii.y < 1e-6f) {
         // The arc degenerates to a line
@@ -83,21 +83,21 @@ void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radii, f64 angle, Flags 
         return;
     }
 
-    f64 rotx = angle / 180.0f * M_PI; // x rotation angle
-    f64 sinrx = sinf(rotx);
-    f64 cosrx = cosf(rotx);
+    f64 rotx = angle / 180.0 * Math::PI; // x rotation angle
+    f64 sinrx = Math::sin(rotx);
+    f64 cosrx = Math::cos(rotx);
 
     // Convert to center point parameterization.
     // http://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
 
     // 1) Compute x1', y1'
-    f64 x1p = cosrx * dx / 2.0f + sinrx * dy / 2.0f;
-    f64 y1p = -sinrx * dx / 2.0f + cosrx * dy / 2.0f;
+    f64 x1p = cosrx * dx / 2.0 + sinrx * dy / 2.0;
+    f64 y1p = -sinrx * dx / 2.0 + cosrx * dy / 2.0;
 
     d = Math::pow2(x1p) / Math::pow2(radii.x) + Math::pow2(y1p) / Math::pow2(radii.y);
 
     if (d > 1) {
-        d = sqrtf(d);
+        d = Math::sqrt(d);
         radii.x *= d;
         radii.y *= d;
     }
@@ -110,13 +110,13 @@ void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radii, f64 angle, Flags 
     f64 sb = Math::pow2(radii.x) * Math::pow2(y1p) +
              Math::pow2(radii.y) * Math::pow2(x1p);
 
-    if (sa < 0.0f)
-        sa = 0.0f;
+    if (sa < 0.0)
+        sa = 0.0;
 
-    f64 s = 0.0f;
+    f64 s = 0.0;
 
-    if (sb > 0.0f)
-        s = sqrtf(sa / sb);
+    if (sb > 0.0)
+        s = Math::sqrt(sa / sb);
 
     bool fa = flags & LARGE;
     bool fs = flags & SWEEP;
@@ -129,8 +129,8 @@ void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radii, f64 angle, Flags 
     f64 cyp = s * -radii.y * x1p / radii.x;
 
     // 3) Compute cx,cy from cx',cy'
-    f64 cx = cosrx * cxp - sinrx * cyp + (x1 + x2) / 2.0f;
-    f64 cy = sinrx * cxp + cosrx * cyp + (y1 + y2) / 2.0f;
+    f64 cx = cosrx * cxp - sinrx * cyp + (x1 + x2) / 2.0;
+    f64 cy = sinrx * cxp + cosrx * cyp + (y1 + y2) / 2.0;
 
     // 4) Calculate theta1, and delta theta.
     Math::Vec2f u = {(x1p - cxp) / radii.x, (y1p - cyp) / radii.y};
@@ -140,9 +140,9 @@ void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radii, f64 angle, Flags 
     f64 da = u.angleWith(v);
 
     if (not fs and da > 0) {
-        da -= 2 * M_PI;
+        da -= 2 * Math::PI;
     } else if (fs and da < 0) {
-        da += 2 * M_PI;
+        da += 2 * Math::PI;
     }
 
     // Approximate the arc using cubic spline segments.
@@ -150,11 +150,11 @@ void Path::_flattenArcTo(Math::Vec2f start, Math::Vec2f radii, f64 angle, Flags 
 
     // Split arc into max 90 degree segments.
     // The loop assumes an Iter per end point (including start and end), this +1.
-    isize ndivs = (isize)(Math::abs(da) / (M_PI * 0.5f) + 1.0f);
-    f64 hda = (da / (f64)ndivs) / 2.0f;
-    f64 kappa = Math::abs(4.0f / 3.0f * (1.0f - Math::cos(hda)) / Math::sin(hda));
+    isize ndivs = (isize)(Math::abs(da) / (Math::PI * 0.5) + 1.0);
+    f64 hda = (da / (f64)ndivs) / 2.0;
+    f64 kappa = Math::abs(4.0 / 3.0 * (1.0 - Math::cos(hda)) / Math::sin(hda));
 
-    if (da < 0.0f) {
+    if (da < 0.0) {
         kappa = -kappa;
     }
 

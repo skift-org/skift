@@ -130,7 +130,7 @@ using _Image = Union<
     Stripes,
     Mime::Url>;
 
-struct Image : public _Image {
+struct Image : _Image {
     using _Image::_Image;
 
     void repr(Io::Emit& e) const {

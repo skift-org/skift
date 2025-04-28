@@ -29,7 +29,7 @@ struct StyleSheet {
     }
 };
 
-struct StyleBook {
+struct StyleSheetList {
     Vec<StyleSheet> styleSheets;
 
     void repr(Io::Emit& e) const;

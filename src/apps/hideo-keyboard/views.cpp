@@ -1,20 +1,19 @@
-#include <karm-ui/dialog.h>
-#include <karm-ui/drag.h>
-#include <karm-ui/input.h>
-#include <mdi/arrow-up-bold-outline.h>
-#include <mdi/arrow-up-bold.h>
-#include <mdi/backspace-outline.h>
-#include <mdi/cog-outline.h>
-#include <mdi/emoticon.h>
-#include <mdi/keyboard-return.h>
+module;
 
-#include "model.h"
+#include <karm-math/align.h>
+
+export module Hideo.Keyboard;
+
+import Mdi;
+import Karm.Ui;
+import Karm.Kira;
+import :model;
 
 namespace Hideo::Keyboard {
 
 static Ui::Child toolbar() {
     return Ui::hflow(
-               Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::EMOTICON),
+               Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::EMOTICON),
                Ui::empty({128, 4}) |
                    Ui::box({
                        .borderRadii = 999,
@@ -22,13 +21,13 @@ static Ui::Child toolbar() {
                    }) |
                    Ui::center() |
                    Ui::grow(),
-               Ui::button(Ui::NOP, Ui::ButtonStyle::subtle(), Mdi::COG_OUTLINE)
+               Ui::button(Ui::SINK<>, Ui::ButtonStyle::subtle(), Mdi::COG_OUTLINE)
            ) |
            Ui::dragRegion();
 }
 
 static Ui::Child key(auto icon) {
-    return Ui::button(Ui::NOP, Ui::titleMedium(icon) | Ui::center() | Ui::pinSize(32));
+    return Ui::button(Ui::SINK<>, Ui::titleMedium(icon) | Ui::center() | Ui::pinSize(32));
 }
 
 static Ui::Child keyboard(State const& k) {
@@ -76,7 +75,7 @@ static Ui::Child keyboard(State const& k) {
         key(k.shift ? "N" : "n"),
         key(k.shift ? "M" : "m"),
         Ui::button(
-            Ui::NOP,
+            Ui::SINK<>,
             Ui::ButtonStyle::secondary(),
             Mdi::BACKSPACE_OUTLINE
         ) | Ui::grow()
@@ -84,11 +83,11 @@ static Ui::Child keyboard(State const& k) {
 
     auto fourthRow = Ui::hflow(
                          8,
-                         Ui::button(Ui::NOP, Ui::ButtonStyle::secondary(), "&123") | Ui::grow(2),
+                         Ui::button(Ui::SINK<>, Ui::ButtonStyle::secondary(), "&123") | Ui::grow(2),
                          key(","),
-                         Ui::button(Ui::NOP, Ui::empty()) | Ui::grow(6),
+                         Ui::button(Ui::SINK<>, Ui::empty()) | Ui::grow(6),
                          key("."),
-                         Ui::button(Ui::NOP, Ui::ButtonStyle::primary(), Mdi::KEYBOARD_RETURN) | Ui::grow(2)
+                         Ui::button(Ui::SINK<>, Ui::ButtonStyle::primary(), Mdi::KEYBOARD_RETURN) | Ui::grow(2)
                      ) |
                      Ui::grow();
 
@@ -101,10 +100,10 @@ static Ui::Child keyboard(State const& k) {
     );
 }
 
-Ui::Child flyout() {
+export Ui::Child flyout() {
     return Ui::reducer<Model>({}, [](auto& k) {
         return Ui::vflow(
-                   Ui::separator(),
+                   Kr::separator(),
                    Ui::vflow(
                        8,
                        toolbar(),
@@ -127,7 +126,7 @@ Ui::Child flyout() {
     });
 }
 
-void show(Ui::Node& n) {
+export void show(Ui::Node& n) {
     Ui::showDialog(n, flyout());
 }
 

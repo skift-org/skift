@@ -4,7 +4,7 @@
 
 namespace Ttf {
 
-struct Head : public Io::BChunk {
+struct Head : Io::BChunk {
     static constexpr Str SIG = "head";
 
     u16 unitPerEm() const {

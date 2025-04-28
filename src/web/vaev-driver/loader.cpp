@@ -50,6 +50,11 @@ Async::Task<Gc::Ref<Dom::Document>> _loadDocumentAsync(Gc::Heap& heap, Mime::Url
         co_try$(parser.parse(scan, HTML, *dom));
 
         co_return Ok(dom);
+    } else if (mime->is("text/plain"_mime)) {
+        auto text = heap.alloc<Dom::Text>();
+        text->appendData(buf);
+        dom->appendChild(text);
+        co_return Ok(dom);
     } else if (mime->is("image/svg+xml"_mime)) {
         Io::SScan scan{buf};
         Dom::XmlParser parser{heap};
@@ -81,27 +86,17 @@ export Async::Task<Gc::Ref<Dom::Document>> viewSourceAsync(Gc::Heap& heap, Http:
     co_return Ok(dom);
 }
 
-export Async::Task<Gc::Ref<Dom::Document>> fetchDocumentAsync(Gc::Heap& heap, Http::Client& client, Mime::Url const& url) {
-    if (url.scheme == "about") {
-        if (url.path.str() == "blank")
-            co_return co_await fetchDocumentAsync(heap, client, "bundle://vaev-driver/blank.xhtml"_url);
-
-        if (url.path.str() == "start")
-            co_return co_await fetchDocumentAsync(heap, client, "bundle://vaev-driver/start-page.xhtml"_url);
-    }
-
+Async::Task<Style::StyleSheet> _fetchStylesheetAsync(Http::Client& client, Mime::Url url, Style::Origin origin) {
     auto resp = co_trya$(client.getAsync(url));
-    co_return co_await _loadDocumentAsync(heap, url, resp);
-}
 
-export Res<Style::StyleSheet> fetchStylesheet(Mime::Url url, Style::Origin origin) {
-    auto file = try$(Sys::File::open(url));
-    auto buf = try$(Io::readAllUtf8(file));
+    auto respBody = resp->body.unwrap();
+    auto buf = co_trya$(Aio::readAllUtf8Async(*respBody));
+
     Io::SScan s{buf};
-    return Ok(Style::StyleSheet::parse(s, url, origin));
+    co_return Ok(Style::StyleSheet::parse(s, url, origin));
 }
 
-export void fetchStylesheets(Gc::Ref<Dom::Node> node, Style::StyleBook& sb) {
+Async::Task<> _fetchStylesheetsAsync(Http::Client& client, Gc::Ref<Dom::Node> node, Style::StyleSheetList& sb) {
     auto el = node->is<Dom::Element>();
     if (el and el->tagName == Html::STYLE) {
         auto text = el->textContent();
@@ -114,27 +109,48 @@ export void fetchStylesheets(Gc::Ref<Dom::Node> node, Style::StyleBook& sb) {
             auto href = el->getAttribute(Html::HREF_ATTR);
             if (not href) {
                 logWarn("link element missing href attribute");
-                return;
+                co_return Error::invalidInput("link element missing href");
             }
 
             auto url = Mime::Url::resolveReference(node->baseURI(), Mime::parseUrlOrPath(*href));
             if (not url) {
                 logWarn("failed to resolve stylesheet url: {}", url);
-                return;
+                co_return Error::invalidInput("failed to resolve stylesheet url");
             }
 
-            auto sheet = fetchStylesheet(url.unwrap(), Style::Origin::AUTHOR);
+            auto sheet = co_await _fetchStylesheetAsync(client, url.unwrap(), Style::Origin::AUTHOR);
             if (not sheet) {
                 logWarn("failed to fetch stylesheet from {}: {}", url, sheet);
-                return;
+                co_return Error::invalidInput("failed to fetch stylesheet from {}");
             }
 
             sb.add(sheet.take());
         }
     } else {
         for (auto child = node->firstChild(); child; child = child->nextSibling())
-            fetchStylesheets(*child, sb);
+            (void)co_await _fetchStylesheetsAsync(client, *child, sb);
     }
+
+    co_return Ok();
+}
+
+export Async::Task<Gc::Ref<Dom::Document>> fetchDocumentAsync(Gc::Heap& heap, Http::Client& client, Mime::Url const& url) {
+    if (url.scheme == "about") {
+        if (url.path.str() == "blank")
+            co_return co_await fetchDocumentAsync(heap, client, "bundle://vaev-driver/blank.xhtml"_url);
+
+        if (url.path.str() == "start")
+            co_return co_await fetchDocumentAsync(heap, client, "bundle://vaev-driver/start-page.xhtml"_url);
+    }
+
+    auto resp = co_trya$(client.getAsync(url));
+    auto dom = co_trya$(_loadDocumentAsync(heap, url, resp));
+    auto stylesheets = heap.alloc<Style::StyleSheetList>();
+    stylesheets->add((co_await _fetchStylesheetAsync(client, "bundle://vaev-driver/html.css"_url, Style::Origin::USER_AGENT))
+                         .take("user agent stylesheet not available"));
+    (void)co_await _fetchStylesheetsAsync(client, *dom, *stylesheets);
+    dom->styleSheets = stylesheets;
+    co_return Ok(dom);
 }
 
 } // namespace Vaev::Driver

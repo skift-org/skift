@@ -6,7 +6,6 @@
     "requires": [
         "karm-base-impl",
         "karm-meta",
-        "stdc-math",
         "stdc-ansi",
         "stdcpp"
     ]

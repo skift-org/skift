@@ -1,13 +1,14 @@
-#include <karm-kira/scaffold.h>
-#include <karm-kira/side-nav.h>
-#include <karm-ui/layout.h>
-#include <mdi/apps.h>
-#include <mdi/atom.h>
-#include <mdi/cog.h>
-#include <mdi/view-dashboard.h>
+module;
 
-#include "app.h"
-#include "model.h"
+#include <karm-base/string.h>
+#include <karm-gfx/canvas.h>
+
+export module Hideo.Sysmon;
+
+import Mdi;
+import Karm.Ui;
+import Karm.Kira;
+import :model;
 
 namespace Hideo::Sysmon {
 
@@ -23,22 +24,21 @@ Ui::Child graph(Gfx::Color color) {
            });
 }
 
-Ui::Child sidebarItem(bool selected, Ui::OnPress onPress, Gfx::Color color, String title, String description) {
-    return Ui::hflow(
-               4,
-               graph(color),
-               Ui::vflow(
-                   Ui::titleSmall(title),
-                   Ui::labelMedium(description)
-               ) |
-                   Ui::insets(4) |
-                   Ui::minSize({112, Ui::UNCONSTRAINED})
-           ) |
-           Ui::insets(4) |
-           Ui::button(
-               std::move(onPress),
-               selected ? Ui::ButtonStyle::secondary() : Ui::ButtonStyle::subtle()
-           );
+Ui::Child sidebarItem(bool selected, Ui::Send<> onPress, Gfx::Color color, String title, String description) {
+    return Kr::sidenavItem(
+        selected,
+        onPress,
+        Ui::hflow(
+            4,
+            graph(color),
+            Ui::vflow(
+                Ui::titleSmall(title),
+                Ui::labelMedium(description)
+            ) |
+                Ui::insets(4) |
+                Ui::minSize({112, Ui::UNCONSTRAINED})
+        )
+    );
 }
 
 Ui::Child sidebar(State const& s) {
@@ -63,7 +63,7 @@ Ui::Child sidebar(State const& s) {
             "Kernel"s
         ),
 
-        Ui::separator(),
+        Kr::separator(),
         Kr::sidenavTitle("Hardware"s),
 
         sidebarItem(
@@ -106,7 +106,7 @@ Ui::Child sidebar(State const& s) {
 
 // MARK: App -------------------------------------------------------------------
 
-Ui::Child app() {
+export Ui::Child app() {
     return Ui::reducer<Model>({}, [](State const& s) {
         return Kr::scaffold({
             .icon = Mdi::VIEW_DASHBOARD,

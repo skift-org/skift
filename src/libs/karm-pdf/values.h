@@ -19,19 +19,19 @@ struct Ref {
     auto operator<=>(Ref const& other) const = default;
 };
 
-struct Name : public String {
+struct Name : String {
     using String::String;
 
     void write(Io::Emit& e) const;
 };
 
-struct Array : public Vec<Value> {
+struct Array : Vec<Value> {
     using Vec<Value>::Vec;
 
     void write(Io::Emit& e) const;
 };
 
-struct Dict : public Map<Name, Value> {
+struct Dict : Map<Name, Value> {
     using Map<Name, Value>::Map;
 
     void write(Io::Emit& e) const;
@@ -57,7 +57,7 @@ using _Value = Union<
     Dict,
     Stream>;
 
-struct Value : public _Value {
+struct Value : _Value {
     using _Value::_Value;
 
     void write(Io::Emit& e) const;

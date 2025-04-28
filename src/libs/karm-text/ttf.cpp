@@ -24,6 +24,20 @@ FontMetrics TtfFontface::metrics() const {
     };
 }
 
+BaselineSet TtfFontface::baselineSet() {
+    // FIXME: we assume that `alphabetic` is placed at the vertical origin. however, depending on the BASE table, it
+    // might be placed somewhere else
+    f64 alphabetic = 0;
+
+    auto xHeight = _parser.glyphMetrics(glyph('x')).y;
+    return UnresolvedBaselineSet{
+        .alphabetic = alphabetic,
+        .xHeight = alphabetic + xHeight,
+        .capHeight = alphabetic + _parser.glyphMetrics(glyph('H')).y,
+    }
+        .resolve();
+}
+
 FontAttrs TtfFontface::attrs() const {
     FontAttrs attrs;
 

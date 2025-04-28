@@ -13,7 +13,7 @@ struct PdfPage {
     Io::StringWriter data;
 };
 
-struct PdfPrinter : public FilePrinter {
+struct PdfPrinter : FilePrinter {
     Vec<PdfPage> _pages;
     Opt<Pdf::Canvas> _canvas;
     Pdf::FontManager fontManager;

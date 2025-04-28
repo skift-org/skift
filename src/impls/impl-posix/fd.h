@@ -4,7 +4,7 @@
 
 namespace Posix {
 
-struct Fd : public Sys::Fd {
+struct Fd : Sys::Fd {
     isize _raw;
     bool _leak = false; //< Do not close on destruction
 

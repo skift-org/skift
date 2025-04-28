@@ -276,6 +276,23 @@ namespace Html {
 #include "defs/ns-html-attr-names.inc"
 #undef ATTR
 
+// https://developer.mozilla.org/en-US/docs/Glossary/Void_element
+Array const VOID_TAGS = {
+    AREA,
+    BASE,
+    BR,
+    COL,
+    EMBED,
+    HR,
+    IMG,
+    INPUT,
+    LINK,
+    META,
+    PARAM,
+    SOURCE,
+    TRACK,
+    WBR
+};
 } // namespace Html
 
 namespace MathMl {

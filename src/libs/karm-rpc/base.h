@@ -13,7 +13,7 @@ namespace Karm::Rpc {
 
 // MARK: Primitive Types -------------------------------------------------------
 
-struct Port : public Distinct<u64, struct _PortTag> {
+struct Port : Distinct<u64, struct _PortTag> {
     static Port const INVALID;
     static Port const BUS;
     static Port const BROADCAST;

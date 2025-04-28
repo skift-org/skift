@@ -6,7 +6,8 @@
 namespace Karm::Sys {
 
 Res<Dir> Dir::open(Mime::Url url) {
-    try$(ensureUnrestricted());
+    if (url.scheme != "bundle")
+        try$(ensureUnrestricted());
 
     auto entries = try$(_Embed::readDir(url));
     sort(entries, [](auto const& lhs, auto const& rhs) {

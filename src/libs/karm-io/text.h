@@ -4,9 +4,7 @@
 
 namespace Karm::Io {
 
-struct TextWriter :
-    public Writer,
-    public Flusher {
+struct TextWriter : Writer, Flusher {
     using Writer::write;
 
     template <StaticEncoding E>
@@ -24,8 +22,7 @@ struct TextWriter :
 };
 
 template <StaticEncoding E = typename Sys::Encoding>
-struct TextEncoderBase :
-    public TextWriter {
+struct TextEncoderBase : TextWriter {
 
     using Writer::write;
 
@@ -39,8 +36,7 @@ struct TextEncoderBase :
 };
 
 template <StaticEncoding E = typename Sys::Encoding>
-struct TextEncoder :
-    public TextEncoderBase<E> {
+struct TextEncoder : TextEncoderBase<E> {
 
     Io::Writer& _writer;
 
@@ -53,9 +49,7 @@ struct TextEncoder :
 };
 
 template <StaticEncoding E>
-struct _StringWriter :
-    public TextWriter,
-    public _StringBuilder<E> {
+struct _StringWriter : TextWriter, _StringBuilder<E> {
 
     _StringWriter(usize cap = 16) : _StringBuilder<E>(cap) {}
 

@@ -3,13 +3,15 @@
 #include <karm-base/checked.h>
 #include <karm-io/fmt.h>
 
+#include "funcs.h"
+
 namespace Karm::Math {
 
 template <typename T>
-struct _Frac;
+struct Frac;
 
 template <Meta::SignedIntegral T, usize _F>
-struct _Fixed {
+struct Fixed {
     static constexpr bool _FIXED = true;
 
     static constexpr usize _FRAC = _F;
@@ -23,36 +25,36 @@ struct _Fixed {
 
     T _val;
 
-    static constexpr _Fixed fromRaw(T val) {
-        _Fixed f;
+    static constexpr Fixed fromRaw(T val) {
+        Fixed f;
         f._val = val;
         return f;
     }
 
     template <Meta::SignedIntegral I>
-    static constexpr _Fixed fromInt(I val) {
+    static constexpr Fixed fromInt(I val) {
         if (val < _MIN or val > _MAX)
             return fromRaw(val < _MIN ? _MIN : _MAX);
         return fromRaw(static_cast<T>(val << _FRAC));
     }
 
     template <Meta::UnsignedIntegral U>
-    static constexpr _Fixed fromUint(U val) {
+    static constexpr Fixed fromUint(U val) {
         if (val > _MAX)
             return fromRaw(_MAX);
         return fromRaw(static_cast<T>(val << _FRAC));
     }
 
     template <Meta::Float F>
-    static constexpr _Fixed fromFloatNearest(F val) {
+    static constexpr Fixed fromFloatNearest(F val) {
         T raw = 0;
-        if (not isnan(val))
+        if (not isNan(val))
             raw = clampTo<T>(val * _DENO);
         return fromRaw(raw);
     }
 
     template <Meta::Float F>
-    static constexpr _Fixed fromFloatFloor(F val) {
+    static constexpr Fixed fromFloatFloor(F val) {
         T raw = 0;
         if (not isnan(val))
             raw = clampTo<T>(floor(val * _DENO));
@@ -60,23 +62,23 @@ struct _Fixed {
     }
 
     template <Meta::Float F>
-    static constexpr _Fixed fromFloatCeil(F val) {
+    static constexpr Fixed fromFloatCeil(F val) {
         T raw = 0;
         if (not isnan(val))
             raw = clampTo<T>(ceil(val * _DENO));
         return fromRaw(raw);
     }
 
-    constexpr _Fixed() : _val(0) {}
+    constexpr Fixed() : _val(0) {}
 
     template <Meta::Float F>
-    explicit constexpr _Fixed(F from) : _val(fromFloatNearest(from)._val) {}
+    explicit constexpr Fixed(F from) : _val(fromFloatNearest(from)._val) {}
 
     template <Meta::SignedIntegral I>
-    explicit constexpr _Fixed(I from) : _val(fromInt<I>(from)._val) {}
+    explicit constexpr Fixed(I from) : _val(fromInt<I>(from)._val) {}
 
     template <Meta::UnsignedIntegral U>
-    explicit constexpr _Fixed(U from) : _val(fromUint<U>(from)._val) {}
+    explicit constexpr Fixed(U from) : _val(fromUint<U>(from)._val) {}
 
     constexpr T raw() const {
         return _val;
@@ -96,45 +98,45 @@ struct _Fixed {
         return cast<U>();
     }
 
-    constexpr _Fixed& operator++() {
+    constexpr Fixed& operator++() {
         _val = saturatingAdd<T>(_val, _DENO);
         return *this;
     }
 
-    constexpr _Fixed operator++(int) {
-        _Fixed f = *this;
+    constexpr Fixed operator++(int) {
+        Fixed f = *this;
         ++*this;
         return f;
     }
 
-    constexpr _Fixed& operator--() {
+    constexpr Fixed& operator--() {
         _val = saturatingSub<T>(_val, _DENO);
         return *this;
     }
 
-    constexpr _Fixed operator--(int) {
-        _Fixed f = *this;
+    constexpr Fixed operator--(int) {
+        Fixed f = *this;
         --*this;
         return f;
     }
 
-    constexpr _Fixed operator+() const {
+    constexpr Fixed operator+() const {
         return *this;
     }
 
-    constexpr _Fixed operator-() const {
+    constexpr Fixed operator-() const {
         return fromRaw(-_val);
     }
 
-    constexpr _Fixed operator+(_Fixed const& rhs) const {
+    constexpr Fixed operator+(Fixed const& rhs) const {
         return fromRaw(saturatingAdd<T>(_val, rhs._val));
     }
 
-    constexpr _Fixed operator-(_Fixed const& rhs) const {
+    constexpr Fixed operator-(Fixed const& rhs) const {
         return fromRaw(saturatingSub<T>(_val, rhs._val));
     }
 
-    constexpr _Fixed operator*(_Fixed const& rhs) const {
+    constexpr Fixed operator*(Fixed const& rhs) const {
         isize val = _val;
         val *= rhs._val;
 
@@ -150,7 +152,7 @@ struct _Fixed {
         return fromRaw(ival);
     }
 
-    constexpr _Fixed loosyDiv(_Fixed const& rhs) const {
+    constexpr Fixed loosyDiv(Fixed const& rhs) const {
         if (rhs._val == 0)
             panic("division by zero");
 
@@ -160,41 +162,41 @@ struct _Fixed {
         return fromRaw(clampTo<T>(val));
     }
 
-    constexpr _Frac<_Fixed> operator/(_Fixed const& rhs) const;
+    constexpr Frac<Fixed> operator/(Fixed const& rhs) const;
 
-    constexpr _Fixed operator/(_Frac<_Fixed> const& rhs) const;
+    constexpr Fixed operator/(Frac<Fixed> const& rhs) const;
 
-    constexpr _Fixed& operator+=(_Fixed const& rhs) {
+    constexpr Fixed& operator+=(Fixed const& rhs) {
         return *this = *this + rhs;
     }
 
-    constexpr _Fixed& operator-=(_Fixed const& rhs) {
+    constexpr Fixed& operator-=(Fixed const& rhs) {
         return *this = *this - rhs;
     }
 
-    constexpr _Fixed& operator*=(_Fixed const& rhs) {
+    constexpr Fixed& operator*=(Fixed const& rhs) {
         return *this = *this * rhs;
     }
 
-    constexpr _Frac<_Fixed>& operator/=(_Fixed const& rhs) {
+    constexpr Frac<Fixed>& operator/=(Fixed const& rhs) {
         return *this = *this / rhs;
     }
 
-    constexpr bool operator==(_Fixed const& rhs) const = default;
+    constexpr bool operator==(Fixed const& rhs) const = default;
 
-    constexpr std::strong_ordering operator<=>(_Fixed const& rhs) const = default;
+    constexpr std::strong_ordering operator<=>(Fixed const& rhs) const = default;
 };
 
 template <typename T>
-struct _Frac {
+struct Frac {
     T _num;
     T _deno;
 
-    _Frac(T num, T deno = 1)
+    Frac(T num, T deno = 1)
         : _num(num), _deno(deno) {}
 
     template <Meta::SignedIntegral I>
-    _Frac(I num, I deno = 1)
+    Frac(I num, I deno = 1)
         : _num(num), _deno(deno) {}
 
     constexpr operator T() const {
@@ -203,39 +205,46 @@ struct _Frac {
 };
 
 template <Meta::SignedIntegral T, usize F>
-constexpr _Frac<_Fixed<T, F>> _Fixed<T, F>::operator/(_Fixed<T, F> const& rhs) const {
-    return _Frac<_Fixed<T, F>>{fromRaw(_val), rhs};
+constexpr Frac<Fixed<T, F>> Fixed<T, F>::operator/(Fixed<T, F> const& rhs) const {
+    return Frac<Fixed<T, F>>{fromRaw(_val), rhs};
 }
 
 template <Meta::SignedIntegral T, usize F>
-constexpr _Fixed<T, F> _Fixed<T, F>::operator/(_Frac<_Fixed<T, F>> const& rhs) const {
+constexpr Fixed<T, F> Fixed<T, F>::operator/(Frac<Fixed<T, F>> const& rhs) const {
     return fromRaw(saturatingDiv(_val, rhs._num) * rhs._deno);
 }
 
-using i24f8 = _Fixed<i32, 8>;
-using i16f16 = _Fixed<i32, 16>;
-using i8f24 = _Fixed<i32, 24>;
+using i24f8 = Fixed<i32, 8>;
+using i16f16 = Fixed<i32, 16>;
+using i8f24 = Fixed<i32, 24>;
+
+// MARK: Functions -------------------------------------------------------------
+
+template <Meta::SignedIntegral T, usize _F>
+constexpr Fixed<T, _F> abs(Fixed<T, _F> const& val) {
+    return val < Fixed<T, _F>{0} ? -val : val;
+}
 
 } // namespace Karm::Math
 
 template <Meta::SignedIntegral T, usize F>
-struct Karm::Limits<Math::_Fixed<T, F>> {
-    static constexpr Math::_Fixed<T, F> MIN = Math::_Fixed<T, F>::fromRaw(Limits<T>::MIN);
-    static constexpr Math::_Fixed<T, F> MAX = Math::_Fixed<T, F>::fromRaw(Limits<T>::MAX);
-    static constexpr Math::_Fixed<T, F> EPSILON = Math::_Fixed<T, F>::fromRaw(1);
+struct Karm::Limits<Math::Fixed<T, F>> {
+    static constexpr Math::Fixed<T, F> MIN = Math::Fixed<T, F>::fromRaw(Limits<T>::MIN);
+    static constexpr Math::Fixed<T, F> MAX = Math::Fixed<T, F>::fromRaw(Limits<T>::MAX);
+    static constexpr Math::Fixed<T, F> EPSILON = Math::Fixed<T, F>::fromRaw(1);
     static constexpr bool SIGNED = false;
 };
 
 template <Meta::SignedIntegral T, usize F>
-struct Karm::Io::Formatter<Math::_Fixed<T, F>> {
-    Res<> format(Io::TextWriter& writer, Math::_Fixed<T, F> const& val) {
+struct Karm::Io::Formatter<Math::Fixed<T, F>> {
+    Res<> format(Io::TextWriter& writer, Math::Fixed<T, F> const& val) {
         return Io::format(writer, "{}", val.template cast<f64>());
     }
 };
 
 template <typename T>
-struct Karm::Io::Formatter<Math::_Frac<T>> {
-    Res<> format(Io::TextWriter& writer, Math::_Frac<T> const& val) {
+struct Karm::Io::Formatter<Math::Frac<T>> {
+    Res<> format(Io::TextWriter& writer, Math::Frac<T> const& val) {
         return Io::format(writer, "{}/{}", val._num, val._deno);
     }
 };

@@ -11,7 +11,7 @@
 
 namespace Karm::Io {
 
-struct PackEmit : public BEmit {
+struct PackEmit : BEmit {
     Vec<Sys::Handle> _handles;
 
     using BEmit::BEmit;
@@ -29,7 +29,7 @@ struct PackEmit : public BEmit {
     }
 };
 
-struct PackScan : public BScan {
+struct PackScan : BScan {
     Cursor<Sys::Handle> _handles;
 
     PackScan(Bytes bytes, Slice<Sys::Handle> handles)

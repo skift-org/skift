@@ -1,6 +1,7 @@
-#include <karm-ui/_embed.h>
 #include <strata-bus/api.h>
 #include <strata-shell/api.h>
+
+import Karm.Ui;
 
 namespace Karm::Ui::_Embed {
 

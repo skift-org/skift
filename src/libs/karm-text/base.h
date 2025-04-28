@@ -37,7 +37,7 @@ enum struct FontStyle {
 
 // MARK: Fonteight -------------------------------------------------------------
 
-struct FontWeight : public Distinct<u16, struct _FontWeightTag> {
+struct FontWeight : Distinct<u16, struct _FontWeightTag> {
     using Distinct::Distinct;
 
     static FontWeight const THIN;
@@ -134,7 +134,7 @@ constexpr FontWeight FontWeight::NO_MATCH{Limits<u16>::MAX};
 
 // MARK: FontStretch -----------------------------------------------------------
 
-struct FontStretch : public Distinct<u16, struct _FontStretchTag> {
+struct FontStretch : Distinct<u16, struct _FontStretchTag> {
     using Distinct::Distinct;
 
     static FontStretch const ULTRA_CONDENSED;
@@ -295,6 +295,59 @@ struct FontAttrs {
             return ordr;
 
         return weight <=> other.weight;
+    }
+};
+
+// MARK: Baseline -------------------------------------------------------------
+
+struct BaselineSet {
+    f64 alphabetic;
+    f64 xHeight;
+    f64 xMiddle;
+    f64 capHeight;
+
+    BaselineSet combine(BaselineSet other) {
+        return {
+            .alphabetic = ::max(alphabetic, other.alphabetic),
+            .xHeight = ::max(xHeight, other.xHeight),
+            .xMiddle = ::max(xMiddle, other.xMiddle),
+            .capHeight = ::max(capHeight, other.capHeight),
+        };
+    }
+
+    BaselineSet scale(f64 factor) {
+        return {
+            .alphabetic = alphabetic * factor,
+            .xHeight = xHeight * factor,
+            .xMiddle = xMiddle * factor,
+            .capHeight = capHeight * factor,
+        };
+    }
+};
+
+// https://drafts.csswg.org/css-align-3/#baseline-set
+// https://www.w3.org/TR/css-inline-3/#baseline-types
+// FIXME: add missing baseline types
+struct UnresolvedBaselineSet {
+    f64 alphabetic;
+    f64 xHeight;
+    f64 capHeight;
+
+    Opt<f64> xMiddle = NONE;
+
+    f64 _resolveXMiddle() const {
+        if (xMiddle)
+            return xMiddle.unwrap();
+        return (alphabetic + xHeight) / 2;
+    }
+
+    BaselineSet resolve() const {
+        return {
+            .alphabetic = alphabetic,
+            .xHeight = xHeight,
+            .xMiddle = _resolveXMiddle(),
+            .capHeight = capHeight,
+        };
     }
 };
 

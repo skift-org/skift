@@ -77,7 +77,7 @@ struct Mmap :
 };
 
 struct MutMmap :
-    public Io::Flusher,
+    Io::Flusher,
     Meta::NoCopy {
     using enum MmapFlags;
 

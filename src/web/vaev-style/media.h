@@ -448,7 +448,7 @@ using _Feature = Union<
     DeviceHeightFeature,
     DeviceAspectRatioFeature>;
 
-struct Feature : public _Feature {
+struct Feature : _Feature {
     using _Feature::_Feature;
 
     void repr(Io::Emit& e) const {

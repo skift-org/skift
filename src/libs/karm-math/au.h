@@ -16,6 +16,23 @@ namespace Karm {
 //  - https://bugzilla.mozilla.org/show_bug.cgi?id=177805
 using Au = Math::i24f8;
 
+struct RAu {
+    Au abs;
+    Math::Frac<Au> frac;
+
+    RAu(Au abs)
+        : abs(abs), frac(0) {}
+
+    RAu(Au abs, Math::Frac<Au> frac)
+        : abs(abs), frac(frac) {}
+
+    Au resolve(Au relative) const {
+        if (frac._num == Au{0})
+            return abs;
+        return abs + relative * frac;
+    }
+};
+
 using RectAu = Math::Rect<Au>;
 
 using Vec2Au = Math::Vec2<Au>;

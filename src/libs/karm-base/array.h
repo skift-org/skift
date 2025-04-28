@@ -84,4 +84,9 @@ always_inline constexpr Array<T, N> makeArray(T value) {
     return _makeArray(value, std::make_index_sequence<N>());
 }
 
+template <Nicheable T, usize N>
+struct Niche<Array<T, N>> {
+    struct Content : public Niche<T>::Content {};
+};
+
 } // namespace Karm

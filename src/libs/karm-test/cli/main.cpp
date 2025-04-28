@@ -2,5 +2,5 @@
 #include <karm-test/driver.h>
 
 Async::Task<> entryPointAsync(Sys::Context&) {
-    return Test::driver().runAllAsync();
+    co_return co_await Test::driver().runAllAsync();
 }

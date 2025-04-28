@@ -4,7 +4,7 @@
 
 namespace Ttf {
 
-struct Gsub : public Io::BChunk {
+struct Gsub : Io::BChunk {
     static constexpr Str SIG = "GSUB";
 
     using ScriptListOffset = Io::BField<u16be, 4>;

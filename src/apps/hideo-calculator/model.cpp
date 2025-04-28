@@ -1,8 +1,12 @@
 module;
 
-#include <karm-ui/reducer.h>
+#include <karm-base/string.h>
+#include <karm-base/union.h>
+#include <karm-math/funcs.h>
 
 export module Hideo.Calculator:model;
+
+import Karm.Ui;
 
 namespace Hideo::Calculator {
 
@@ -143,7 +147,7 @@ void doOperator(State& s, Operator op) {
 
     case Operator::SQRT:
         s.lhs = s.rhs;
-        s.rhs = sqrt(s.lhs);
+        s.rhs = Math::sqrt(static_cast<f64>(s.lhs));
         s.op = Operator::NONE;
         break;
 

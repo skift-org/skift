@@ -1,7 +1,6 @@
 #pragma once
 
 #include <karm-scene/base.h>
-#include <karm-scene/stack.h>
 #include <karm-scene/viewbox.h>
 
 #include "paper.h"

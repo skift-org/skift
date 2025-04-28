@@ -62,7 +62,7 @@ using _Rule = Union<
     ImportRule,
     PageRule>;
 
-struct Rule : public _Rule {
+struct Rule : _Rule {
     using _Rule::_Rule;
 
     void repr(Io::Emit& e) const;

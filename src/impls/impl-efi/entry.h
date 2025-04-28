@@ -17,7 +17,7 @@ extern "C" Efi::Status efi_main(Efi::Handle handle, Efi::SystemTable* st) {
 
     char const* self = "efi-app";
     char const* argv[] = {self, nullptr};
-    auto& ctx = Sys::globalContext();
+    Sys::Context ctx;
     ctx.add<Sys::ArgsHook>(1, argv);
     Res<> code = Async::run(entryPointAsync(ctx));
     if (not code) {

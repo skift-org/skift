@@ -1,10 +1,12 @@
 module;
 
-#include <karm-kira/scaffold.h>
-#include <karm-ui/layout.h>
-#include <mdi/microphone.h>
+#include <karm-base/string.h>
 
 export module Hideo.Recorder;
+
+import Mdi;
+import Karm.Kira;
+import Karm.Ui;
 
 namespace Hideo::Recorder {
 

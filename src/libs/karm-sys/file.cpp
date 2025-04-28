@@ -12,7 +12,8 @@ Res<FileWriter> File::create(Mime::Url url) {
 }
 
 Res<FileReader> File::open(Mime::Url url) {
-    try$(ensureUnrestricted());
+    if (url.scheme != "bundle")
+        try$(ensureUnrestricted());
     auto fd = try$(_Embed::openFile(url));
     return Ok(FileReader{fd, url});
 }

@@ -1,9 +1,14 @@
-#include <karm-text/loader.h>
-#include <karm-ui/box.h>
-#include <karm-ui/drag.h>
-#include <mdi/chevron-up.h>
+module;
 
-#include "app.h"
+#include <karm-math/align.h>
+#include <karm-text/loader.h>
+
+export module Hideo.Shell:lock;
+
+import Mdi;
+import Karm.Ui;
+import :model;
+import :background;
 
 namespace Hideo::Shell {
 
@@ -29,13 +34,15 @@ Ui::Child lock(State const& state) {
     auto clock = Ui::vflow(
         0,
         Math::Align::CENTER,
-        Ui::text({
-                     .font = Text::Font{
-                         blackFontface(),
-                         16,
-                     },
-                 },
-                 dateTime),
+        Ui::text(
+            {
+                .font = Text::Font{
+                    blackFontface(),
+                    16,
+                },
+            },
+            dateTime
+        ),
         Ui::text({
                      .font = Text::Font{
                          blackFontface(),
@@ -47,11 +54,7 @@ Ui::Child lock(State const& state) {
 
     auto hintText = Ui::vflow(
         Ui::center(Ui::icon(Mdi::CHEVRON_UP, 48)),
-        Ui::center(Ui::labelLarge(
-            state.isMobile
-                ? "Swipe up to unlock"
-                : "Swipe up or press any key to unlock"
-        ))
+        Ui::center(Ui::labelLarge(state.isMobile ? "Swipe up to unlock" : "Swipe up or press any key to unlock"))
     );
 
     return Ui::stack(

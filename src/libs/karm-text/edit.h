@@ -92,6 +92,9 @@ struct Model {
     Model(Str text = "") {
         for (auto r : iterRunes(text))
             _buf.pushBack(r);
+
+        _cur.head = _buf.len();
+        _cur.tail = _buf.len();
     }
 
     Slice<Rune> runes() const {

@@ -1,26 +1,16 @@
 module;
 
-#include <hideo-files/widgets.h>
-#include <karm-io/funcs.h>
-#include <karm-kira/error-page.h>
-#include <karm-kira/scaffold.h>
+#include <karm-logger/logger.h>
+#include <karm-math/align.h>
 #include <karm-sys/file.h>
 #include <karm-text/edit.h>
-#include <karm-ui/app.h>
-#include <karm-ui/dialog.h>
-#include <karm-ui/layout.h>
-#include <karm-ui/scroll.h>
-#include <mdi/alert-decagram.h>
-#include <mdi/circle-small.h>
-#include <mdi/content-save-plus.h>
-#include <mdi/content-save.h>
-#include <mdi/file.h>
-#include <mdi/folder.h>
-#include <mdi/redo.h>
-#include <mdi/text.h>
-#include <mdi/undo.h>
 
 export module Hideo.Text;
+
+import Mdi;
+import Karm.Ui;
+import Karm.Kira;
+import Hideo.Files;
 
 namespace Hideo::Text {
 
@@ -91,7 +81,12 @@ export Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
                         Ui::button(Model::bind<New>(), Ui::ButtonStyle::subtle(), Mdi::FILE),
                         Ui::button(
                             [](auto& n) {
-                                Ui::showDialog(n, Files::openFileDialog());
+                                Ui::showDialog(
+                                    n,
+                                    Files::openDialog([](auto&, auto url) {
+                                        logInfo("selected file: {}", url);
+                                    })
+                                );
                             },
                             Ui::ButtonStyle::subtle(), Mdi::FOLDER
                         ),
@@ -128,21 +123,21 @@ export Ui::Child app(Opt<Mime::Url> url, Res<String> str) {
                             Ui::icon(Mdi::CIRCLE_SMALL, Ui::GRAY700) | Ui::insets({0, -3}),
                             Ui::text(Ui::TextStyles::labelSmall().withColor(Ui::GRAY500), "{}", s.url)
                         ) | Ui::insets({6, 16}),
-                        Ui::separator(),
+                        Kr::separator(),
 
                         s.error
                             ? Kr::errorPage(Mdi::ALERT_DECAGRAM, "Unable to load text"s, Io::toStr(s.error)) | Ui::grow()
                             : editor(s.text),
-                        Ui::separator(),
+                        Kr::separator(),
                         Ui::hflow(
                             6,
                             Math::Align::CENTER,
                             Ui::labelSmall("{}", s.text->dirty() ? "Edited" : ""),
                             Ui::grow(NONE),
                             Ui::labelSmall("Ln {}, Col {}", 0, 0),
-                            Ui::separator(),
+                            Kr::separator(),
                             Ui::labelSmall("UTF-8"),
-                            Ui::separator(),
+                            Kr::separator(),
                             Ui::labelSmall("LF")
                         ) | Ui::box({
                                 .padding = {6, 12},

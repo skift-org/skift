@@ -1,21 +1,18 @@
-#include <karm-app/form-factor.h>
-#include <karm-sys/context.h>
-#include <karm-ui/input.h>
-#include <karm-ui/layout.h>
-#include <mdi/account.h>
-#include <mdi/information-outline.h>
-#include <mdi/laptop.h>
-#include <mdi/palette.h>
-#include <mdi/security.h>
-#include <mdi/update.h>
-#include <mdi/widgets-outline.h>
-#include <mdi/wifi.h>
+module;
 
-#include "app.h"
+#include <karm-app/form-factor.h>
+#include <karm-gfx/icon.h>
+#include <karm-sys/context.h>
+
+export module Hideo.Settings:page_home;
+
+import Mdi;
+import Karm.Ui;
+import :model;
 
 namespace Hideo::Settings {
 
-Ui::Child tileButton(Ui::OnPress onPress, Mdi::Icon icon, String text) {
+Ui::Child tileButton(Ui::Send<> onPress, Gfx::Icon icon, String text) {
     return Ui::vflow(
                Ui::icon(icon, 36) | Ui::center() | Ui::grow(),
                Ui::text(text) | Ui::center()
@@ -26,7 +23,7 @@ Ui::Child tileButton(Ui::OnPress onPress, Mdi::Icon icon, String text) {
            Ui::button(std::move(onPress), Ui::ButtonStyle::secondary());
 }
 
-Ui::Child pageHome(State const&) {
+export Ui::Child pageHome(State const&) {
     Ui::Children items = {
         tileButton(Model::bind<GoTo>(Page::ACCOUNT), Mdi::ACCOUNT, "Accounts"s),
         tileButton(Model::bind<GoTo>(Page::PERSONALIZATION), Mdi::PALETTE, "Personalization"s),
@@ -40,7 +37,7 @@ Ui::Child pageHome(State const&) {
         tileButton(Model::bind<GoTo>(Page::ABOUT), Mdi::INFORMATION_OUTLINE, "About"s),
     };
 
-    auto isMobile = App::useFormFactor() == App::FormFactor::MOBILE;
+    auto isMobile = App::formFactor == App::FormFactor::MOBILE;
 
     auto gridLayout = isMobile
                           ? Ui::GridStyle::simpleGrow(4, 2, 4)

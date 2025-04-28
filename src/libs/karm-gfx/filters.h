@@ -111,7 +111,7 @@ using _Filters = Union<
     TintFilter,
     OverlayFilter>;
 
-struct Filter : public _Filters {
+struct Filter : _Filters {
     using _Filters::_Filters;
 
     void apply(MutPixels s) const {

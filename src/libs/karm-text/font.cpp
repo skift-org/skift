@@ -32,6 +32,10 @@ FontMetrics Font::metrics() const {
     return m;
 }
 
+BaselineSet Font::baselineSet() {
+    return fontface->baselineSet().scale(fontsize);
+}
+
 Glyph Font::glyph(Rune rune) {
     return fontface->glyph(rune);
 }
@@ -60,6 +64,7 @@ f64 Font::fontSize() {
 }
 
 f64 Font::xHeight() {
+    // FIXME: capbound height as it is here is a font metric, not a glyph metric
     return measure(glyph('x')).capbound.height;
 }
 

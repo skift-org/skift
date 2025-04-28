@@ -43,11 +43,11 @@ StyleSheet StyleSheet::parse(Css::Sst const& sst, Mime::Url href, Origin origin)
 
 // MARK: StyleBook -------------------------------------------------------------
 
-void StyleBook::repr(Io::Emit& e) const {
+void StyleSheetList::repr(Io::Emit& e) const {
     e("(style-book {})", styleSheets);
 }
 
-void StyleBook::add(StyleSheet&& sheet) {
+void StyleSheetList::add(StyleSheet&& sheet) {
     styleSheets.pushBack(std::move(sheet));
 }
 

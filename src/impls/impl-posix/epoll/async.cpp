@@ -14,7 +14,7 @@
 
 namespace Karm::Sys::_Embed {
 
-struct EpollSched : public Sys::Sched {
+struct EpollSched : Sys::Sched {
     int _epollFd;
     usize _id = 0;
     Map<usize, Async::Promise<>> _promises;

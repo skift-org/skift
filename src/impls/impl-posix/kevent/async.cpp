@@ -15,7 +15,7 @@
 namespace Karm::Sys::_Embed {
 
 struct DarwinSched :
-    public Sys::Sched {
+    Sys::Sched {
 
     int _kqueue;
     usize _id = 0;
@@ -37,6 +37,7 @@ struct DarwinSched :
         return Posix::toTimespec(delta);
     }
 
+    [[clang::coro_wrapper]]
     Async::Task<> waitFor(struct kevent64_s ev) {
         usize id = _id++;
         auto promise = Async::Promise<>();

@@ -1,34 +1,40 @@
 #pragma once
 
 #include <karm-math/rect.h>
-#include <mdi/_prelude.h>
 
 #include "canvas.h"
 
 namespace Karm::Gfx {
 
+template <typename T>
+concept RawIcon = requires(T t) {
+    { t.path } -> Meta::Convertible<char const*>;
+    { t.size } -> Meta::Convertible<f64>;
+    { t.name } -> Meta::Convertible<char const*>;
+};
+
 struct Icon {
-    Mdi::Icon _icon;
-    f64 _size;
+    Str path;
+    f64 size;
+    Str name;
 
-    Icon(Mdi::Icon icon, f64 size = 18)
-        : _icon(icon), _size(size) {}
+    explicit Icon(Str path, f64 size = 18, Str name = "")
+        : path(path), size(size), name(name) {}
 
-    Math::Rectf bound() {
-        return {_size, _size};
+    Icon(RawIcon auto const& icon)
+        : path(Str::fromNullterminated(icon.path)), size(icon.size), name(Str::fromNullterminated(icon.name)) {}
+
+    void fill(Gfx::Canvas& g, Math::Vec2f pos, isize size) const;
+
+    void stroke(Gfx::Canvas& g, Math::Vec2f pos, isize size) const;
+
+    void fill(Gfx::Canvas& g, Math::Vec2f pos = {}) const {
+        fill(g, pos, size);
     }
 
-    Str name() const {
-        return Str::fromNullterminated(_icon.name);
+    void stroke(Gfx::Canvas& g, Math::Vec2f pos = {}) const {
+        stroke(g, pos, size);
     }
-
-    Str svg() const {
-        return Str::fromNullterminated(_icon.path);
-    }
-
-    void fill(Gfx::Canvas& g, Math::Vec2i pos) const;
-
-    void stroke(Gfx::Canvas& g, Math::Vec2i pos) const;
 };
 
 } // namespace Karm::Gfx

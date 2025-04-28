@@ -173,7 +173,7 @@ Res<Vec<DirEntry>> readDir(Mime::Url const& url) {
         return Posix::fromLastErrno();
 
     Vec<DirEntry> entries;
-    struct dirent* entry;
+    dirent* entry;
     errno = 0;
     while ((entry = ::readdir(dir))) {
         try$(Posix::consumeErrno());
@@ -451,7 +451,7 @@ Res<> sleep(Duration span) {
 
 Res<> exit(i32 res) {
     ::exit(res);
-    return Ok();
+    return Error::other("reached the afterlife");
 }
 
 Res<Mime::Url> pwd() {
@@ -467,12 +467,6 @@ Res<Mime::Url> pwd() {
     }
 
     return Ok(Mime::parseUrlOrPath(Str::fromNullterminated(buf.buf()), "file:"_url));
-}
-
-// MARK: Sandboxing ------------------------------------------------------------
-
-void hardenSandbox() {
-    logError("could not harden sandbox");
 }
 
 // MARK: Addr ------------------------------------------------------------------
@@ -494,7 +488,7 @@ Async::Task<Vec<Ip>> ipLookupAsync(Str host) {
         } else if (p->ai_family == AF_INET6) {
             struct sockaddr_in6* addr = (struct sockaddr_in6*)p->ai_addr;
             u128 raw = 0;
-            auto* buf = addr->sin6_addr.s6_addr16;
+            u16 const* buf = (u16 const*)addr->sin6_addr.s6_addr;
             for (usize i = 0; i < 8; i++)
                 raw |= (u128)buf[i] << (i * 16);
             ips.pushBack(Ip6::fromRaw(bswap(raw)));

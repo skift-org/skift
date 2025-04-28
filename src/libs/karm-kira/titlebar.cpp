@@ -1,21 +1,27 @@
-#include <karm-app/host.h>
-#include <karm-ui/dialog.h>
-#include <karm-ui/drag.h>
-#include <karm-ui/layout.h>
-#include <mdi/close.h>
-#include <mdi/crop-square.h>
-#include <mdi/minus.h>
+module;
 
-#include "about-dialog.h"
-#include "titlebar.h"
+#include <karm-app/host.h>
+#include <karm-gfx/icon.h>
+
+export module Karm.Kira:titlebar;
+
+import Karm.Ui;
+import Mdi;
+import :aboutDialog;
 
 namespace Karm::Kira {
 
-Ui::Child titlebarTitle(Mdi::Icon icon, String title, bool compact) {
+export enum struct TitlebarStyle {
+    DEFAULT,
+    FIXED,
+    DIALOG
+};
+
+export Ui::Child titlebarTitle(Gfx::Icon icon, String title, bool compact = false) {
     if (compact) {
         return Ui::button(
             [=](Ui::Node& n) {
-                Ui::showDialog(n, Kr::aboutDialog(title));
+                Ui::showDialog(n, aboutDialog(title));
             },
             Ui::ButtonStyle::subtle(),
             icon
@@ -24,13 +30,13 @@ Ui::Child titlebarTitle(Mdi::Icon icon, String title, bool compact) {
 
     return Ui::button(
         [=](auto& n) {
-            Ui::showDialog(n, Kr::aboutDialog(title));
+            Ui::showDialog(n, aboutDialog(title));
         },
         Ui::ButtonStyle::subtle(), icon, title
     );
 }
 
-Ui::Child titlebarControls(TitlebarStyle style) {
+export Ui::Child titlebarControls(TitlebarStyle style) {
     return Ui::hflow(
         4,
         Ui::button(
@@ -51,7 +57,7 @@ Ui::Child titlebarControls(TitlebarStyle style) {
     );
 }
 
-Ui::Child titlebarContent(Ui::Children children) {
+export Ui::Child titlebarContent(Ui::Children children) {
     return Ui::hflow(
                4,
                children
@@ -61,7 +67,7 @@ Ui::Child titlebarContent(Ui::Children children) {
            Ui::box({.backgroundFill = Ui::GRAY900});
 }
 
-Ui::Child titlebar(Mdi::Icon icon, String title, TitlebarStyle style) {
+export Ui::Child titlebar(Gfx::Icon icon, String title, TitlebarStyle style = TitlebarStyle::DEFAULT) {
     return titlebarContent({
         titlebarTitle(icon, title),
         Ui::grow(NONE),
@@ -69,7 +75,7 @@ Ui::Child titlebar(Mdi::Icon icon, String title, TitlebarStyle style) {
     });
 }
 
-Ui::Child titlebar(Mdi::Icon icon, String title, Ui::Child middle, TitlebarStyle style) {
+export Ui::Child titlebar(Gfx::Icon icon, String title, Ui::Child middle, TitlebarStyle style = TitlebarStyle::DEFAULT) {
     return titlebarContent({
         titlebarTitle(icon, title),
         middle | Ui::grow(),

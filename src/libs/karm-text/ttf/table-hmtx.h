@@ -4,7 +4,7 @@
 
 namespace Ttf {
 
-struct Hmtx : public Io::BChunk {
+struct Hmtx : Io::BChunk {
     static constexpr Str SIG = "hmtx";
     static constexpr isize LONG_RECORD_SIZE = 4;
     static constexpr isize SHORT_RECORD_SIZE = 2;

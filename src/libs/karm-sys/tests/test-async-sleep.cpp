@@ -28,7 +28,7 @@ Async::Task<> sleepyBoy() {
 }
 
 testAsync$("async-sleep") {
-    return sleepyBoy();
+    co_return co_await sleepyBoy();
 }
 
 } // namespace Karm::Sys::Tests

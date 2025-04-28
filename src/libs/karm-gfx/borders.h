@@ -45,6 +45,16 @@ struct Borders {
     bool _isSimple();
 
     void paint(Gfx::Canvas& c, Math::Rectf rect);
+
+    Borders& withFill(Fill const& fill) {
+        fills = {fill, fill, fill, fill};
+        return *this;
+    }
+
+    Borders& withStyle(BorderStyle const& style) {
+        styles = {style, style, style, style};
+        return *this;
+    }
 };
 
 } // namespace Karm::Gfx

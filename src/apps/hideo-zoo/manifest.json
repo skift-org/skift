@@ -4,6 +4,8 @@
     "type": "lib",
     "description": "Showcase the beautiful Kira components library",
     "requires": [
+        "hideo-files",
+        "hideo-printers",
         "karm-kira"
     ]
 }

@@ -98,7 +98,7 @@ struct PrefixSum {
     }
 };
 
-struct TableFormatingContext : public FormatingContext {
+struct TableFormatingContext : FormatingContext {
     TableGrid grid;
 
     Vec<TableAxis> cols;

@@ -13,7 +13,7 @@ namespace Karm::Http {
 
 static constexpr bool DEBUG_CLIENT = false;
 
-export struct Client : public Transport {
+export struct Client : Transport {
     String userAgent = "Karm-Http/" stringify$(__ck_version_value) ""s;
     Rc<Transport> _transport;
 
@@ -22,11 +22,18 @@ export struct Client : public Transport {
 
     Async::Task<Rc<Response>> doAsync(Rc<Request> request) override {
         request->header.add("User-Agent", userAgent);
-        auto resp = co_trya$(_transport->doAsync(request));
+        auto maybeResp = co_await _transport->doAsync(request);
+        if (not maybeResp) {
+            logDebugIf(DEBUG_CLIENT, "\"{} {}\" {}", request->method, request->url, maybeResp.none());
+            co_return maybeResp.none();
+        }
+
+        auto resp = maybeResp.unwrap();
         logDebugIf(DEBUG_CLIENT, "\"{} {}\" {} {}", request->method, request->url, toUnderlyingType(resp->code), resp->code);
         co_return Ok(resp);
     }
 
+    [[clang::coro_wrapper]]
     Async::Task<Rc<Response>> getAsync(Mime::Url url) {
         auto req = makeRc<Request>();
         req->method = Method::GET;
@@ -36,6 +43,7 @@ export struct Client : public Transport {
         return doAsync(req);
     }
 
+    [[clang::coro_wrapper]]
     Async::Task<Rc<Response>> headAsync(Mime::Url url) {
         auto req = makeRc<Request>();
         req->method = Method::HEAD;
@@ -45,6 +53,7 @@ export struct Client : public Transport {
         return doAsync(req);
     }
 
+    [[clang::coro_wrapper]]
     Async::Task<Rc<Response>> postAsync(Mime::Url url, Rc<Body> body) {
         auto req = makeRc<Request>();
         req->method = Method::POST;

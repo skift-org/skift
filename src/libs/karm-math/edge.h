@@ -131,4 +131,10 @@ using Edgei = Edge<isize>;
 
 using Edgef = Edge<f64>;
 
+template <typename T>
+Edge(Vec2<T>, Vec2<T>) -> Edge<T>;
+
+template <typename T>
+Edge(T, T, T, T) -> Edge<T>;
+
 } // namespace Karm::Math

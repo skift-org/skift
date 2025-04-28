@@ -56,7 +56,7 @@ static inline void detach(S s, Cb cb) {
         }
     };
 
-    struct Holder : public _Holder {
+    struct Holder : _Holder {
         using Op = OperationOf<S, Receiver>;
         Op _op;
         Cb _cb;

@@ -24,7 +24,7 @@ static Opt<Rc<FormatingContext>> _constructFormatingContext(Box& box) {
 
     if (box.content.is<Karm::Image::Picture>()) {
         return constructReplacedFormatingContext(box);
-    } else if (box.content.is<Rc<Text::Prose>>()) {
+    } else if (box.content.is<InlineBox>()) {
         return constructInlineFormatingContext(box);
     } else if (
         display == Display::FLOW or
@@ -265,12 +265,16 @@ Output layout(Tree& tree, Box& box, Input input) {
             out.breakpoint
         );
 
-        out.size = size + padding.all() + borders.all();
-
         if (isMonolithicDisplay)
             tree.fc.leaveMonolithicBox();
 
-        return out;
+        return {
+            .size = size + padding.all() + borders.all(),
+            .completelyLaidOut = out.completelyLaidOut,
+            .breakpoint = out.breakpoint,
+            .firstBaselineSet = out.firstBaselineSet.translate(padding.top + borders.top),
+            .lastBaselineSet = out.lastBaselineSet.translate(padding.top + borders.top),
+        };
     } else {
         Opt<usize> stopAt = tree.fc.allowBreak()
                                 ? input.breakpointTraverser.getEnd()
@@ -310,7 +314,9 @@ Output layout(Tree& tree, Box& box, Input input) {
 
         return Output{
             .size = size,
-            .completelyLaidOut = out.completelyLaidOut
+            .completelyLaidOut = out.completelyLaidOut,
+            .firstBaselineSet = out.firstBaselineSet.translate(padding.top + borders.top),
+            .lastBaselineSet = out.lastBaselineSet.translate(padding.top + borders.top),
         };
     }
 }

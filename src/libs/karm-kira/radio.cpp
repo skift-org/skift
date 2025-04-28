@@ -1,13 +1,20 @@
-#include "radio.h"
+module;
+
+#include <karm-app/event.h>
+#include <karm-gfx/canvas.h>
+
+export module Karm.Kira:radio;
+
+import Karm.Ui;
 
 namespace Karm::Kira {
 
-struct Radio : public Ui::View<Radio> {
+struct Radio : Ui::View<Radio> {
     bool _value = false;
-    Ui::OnChange<bool> _onChange;
+    Ui::Send<bool> _onChange;
     Ui::MouseListener _mouseListener;
 
-    Radio(bool value, Ui::OnChange<bool> onChange)
+    Radio(bool value, Ui::Send<bool> onChange)
         : _value(value), _onChange(std::move(onChange)) {
     }
 
@@ -53,7 +60,7 @@ struct Radio : public Ui::View<Radio> {
     }
 };
 
-Ui::Child radio(bool value, Ui::OnChange<bool> onChange) {
+export Ui::Child radio(bool value, Ui::Send<bool> onChange) {
     return makeRc<Radio>(value, std::move(onChange));
 }
 

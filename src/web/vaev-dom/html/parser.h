@@ -33,7 +33,7 @@ namespace Vaev::Dom {
     MODE(AFTER_AFTER_BODY)           \
     MODE(AFTER_AFTER_FRAMESET)
 
-struct HtmlParser : public HtmlSink {
+struct HtmlParser : HtmlSink {
     enum struct Mode {
 #define ITER(NAME) NAME,
         FOREACH_INSERTION_MODE(ITER)
@@ -219,6 +219,10 @@ struct HtmlParser : public HtmlSink {
     void _handleInTable(HtmlToken const& t);
 
     void _handleInTableText(HtmlToken const& t);
+
+    void _handleInCaption(HtmlToken const& t);
+
+    void _handleInColumnGroup(HtmlToken const& t);
 
     void _handleInTableBody(HtmlToken const& t);
 

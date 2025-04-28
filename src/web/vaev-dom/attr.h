@@ -7,7 +7,7 @@ namespace Vaev::Dom {
 
 // https://dom.spec.whatwg.org/#interface-attr
 
-struct Attr : public Node {
+struct Attr : Node {
     AttrName name;
     String value;
 

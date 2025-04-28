@@ -3,7 +3,7 @@
 
 namespace Karm::Scene {
 
-struct Viewbox : public Node {
+struct Viewbox : Node {
     Rc<Node> _content;
     Math::Rectf _viewbox;
 

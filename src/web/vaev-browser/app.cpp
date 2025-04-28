@@ -1,52 +1,23 @@
 module;
 
+#include <karm-app/inputs.h>
 #include <karm-gc/heap.h>
 #include <karm-gc/root.h>
-#include <karm-kira/context-menu.h>
-#include <karm-kira/dialog.h>
-#include <karm-kira/error-page.h>
-#include <karm-kira/print-dialog.h>
-#include <karm-kira/progress.h>
-#include <karm-kira/resizable.h>
-#include <karm-kira/scaffold.h>
-#include <karm-kira/side-panel.h>
-#include <karm-mime/mime.h>
+#include <karm-gfx/colors.h>
 #include <karm-sys/async.h>
 #include <karm-sys/file.h>
 #include <karm-sys/launch.h>
 #include <karm-sys/time.h>
-#include <karm-ui/dialog.h>
-#include <karm-ui/focus.h>
-#include <karm-ui/input.h>
-#include <karm-ui/layout.h>
-#include <karm-ui/popover.h>
-#include <karm-ui/scroll.h>
-#include <mdi/alert-decagram.h>
-#include <mdi/arrow-left.h>
-#include <mdi/arrow-right.h>
-#include <mdi/bookmark-outline.h>
-#include <mdi/bookmark.h>
-#include <mdi/button-cursor.h>
-#include <mdi/close.h>
-#include <mdi/code-tags.h>
-#include <mdi/cog.h>
-#include <mdi/dots-horizontal.h>
-#include <mdi/google-downasaur.h>
-#include <mdi/home.h>
-#include <mdi/loading.h>
-#include <mdi/lock.h>
-#include <mdi/printer.h>
-#include <mdi/refresh.h>
-#include <mdi/surfing.h>
-#include <mdi/tune-variant.h>
-#include <mdi/web.h>
 #include <vaev-dom/document.h>
 
 export module Vaev.Browser:app;
 
+import Mdi;
 import Vaev.View;
 import Vaev.Driver;
 import Karm.Http;
+import Karm.Kira;
+import Karm.Ui;
 import :inspect;
 
 namespace Vaev::Browser {
@@ -76,13 +47,14 @@ struct State {
     Res<Gc::Root<Dom::Document>> dom;
     SidePanel sidePanel = SidePanel::CLOSE;
     InspectState inspect = {};
+    String location;
     bool wireframe = false;
 
     State(Gc::Heap& heap, Http::Client& client, Navigate nav, Res<Gc::Root<Dom::Document>> dom)
         : heap{heap},
           client{client},
           history{nav},
-          dom{dom} {}
+          dom{dom}, location(dom ? dom.unwrap()->url().str() : String{}) {}
 
     bool canGoBack() const {
         return currentIndex > 0;
@@ -109,6 +81,13 @@ struct GoForward {};
 
 struct ToggleWireframe {};
 
+struct UpdateLocation {
+    String location;
+};
+
+struct NavigateLocation {
+};
+
 using Action = Union<
     Reload,
     Loaded,
@@ -117,11 +96,11 @@ using Action = Union<
     ToggleWireframe,
     SidePanel,
     InspectorAction,
-    Navigate>;
+    Navigate,
+    UpdateLocation,
+    NavigateLocation>;
 
 Async::_Task<Opt<Action>> navigateAsync(Gc::Heap& heap, Http::Client& client, Navigate nav) {
-    (void)co_await Sys::globalSched().sleepAsync(Sys::instant() + 300_ms);
-
     if (nav.action == Mime::Uti::PUBLIC_MODIFY) {
         co_return Loaded{co_await Vaev::Driver::viewSourceAsync(heap, client, nav.url)};
     } else {
@@ -135,6 +114,7 @@ Ui::Task<Action> reduce(State& s, Action a) {
             if (s.status == Status::LOADING)
                 return NONE;
             s.status = Status::LOADING;
+            s.location = s.currentUrl().url.str();
             return navigateAsync(s.heap, s.client, s.currentUrl());
         },
         [&](Loaded l) -> Ui::Task<Action> {
@@ -144,20 +124,22 @@ Ui::Task<Action> reduce(State& s, Action a) {
         },
         [&](GoBack) -> Ui::Task<Action> {
             s.currentIndex--;
-            reduce(s, Reload{}).unwrap();
-            return NONE;
+            return reduce(s, Reload{});
         },
         [&](GoForward) -> Ui::Task<Action> {
             s.currentIndex++;
-            reduce(s, Reload{}).unwrap();
-            return NONE;
+            return reduce(s, Reload{});
         },
         [&](ToggleWireframe) -> Ui::Task<Action> {
             s.wireframe = not s.wireframe;
             return NONE;
         },
         [&](SidePanel p) -> Ui::Task<Action> {
-            s.sidePanel = p;
+            if (s.sidePanel == p) {
+                s.sidePanel = SidePanel::CLOSE;
+            } else {
+                s.sidePanel = p;
+            }
             return NONE;
         },
         [&](InspectorAction a) -> Ui::Task<Action> {
@@ -165,10 +147,17 @@ Ui::Task<Action> reduce(State& s, Action a) {
             return NONE;
         },
         [&](Navigate n) -> Ui::Task<Action> {
+            s.history.trunc(s.currentIndex + 1);
             s.history.pushBack(n);
             s.currentIndex++;
-            reduce(s, Reload{}).unwrap();
+            return reduce(s, Reload{});
+        },
+        [&](UpdateLocation u) -> Ui::Task<Action> {
+            s.location = u.location;
             return NONE;
+        },
+        [&](NavigateLocation) -> Ui::Task<Action> {
+            return reduce(s, Navigate{Mime::Url::parse(s.location)});
         },
     });
 
@@ -177,17 +166,54 @@ Ui::Task<Action> reduce(State& s, Action a) {
 
 using Model = Ui::Model<State, Action, reduce>;
 
+#ifdef __ck_host__
+
+Ui::Child openInDefaultBrowser(State const& s) {
+    return Kr::contextMenuItem(
+        [&](auto& n) {
+            auto url = s.currentUrl().url;
+            if (url.scheme != "http" and url.scheme != "https" and url.scheme != "file") {
+                Ui::showDialog(
+                    n,
+                    Kr::alertDialog(
+                        "Could not open in default browser"s,
+                        Io::format("Only http, https, and file urls can be opened in the default browser.")
+                    )
+                );
+                return;
+            }
+
+            auto res = Sys::launch({
+                .action = Mime::Uti::PUBLIC_OPEN,
+                .objects = {s.currentUrl().url},
+            });
+
+            if (not res)
+                Ui::showDialog(
+                    n,
+                    Kr::alertDialog(
+                        "Could not open in default browser"s,
+                        Io::format("Failed to open in default browser\n\n{}", res)
+                    )
+                );
+        },
+        Mdi::WEB, "Open in default browser..."
+    );
+}
+
+#endif
+
 Ui::Child mainMenu([[maybe_unused]] State const& s) {
     return Kr::contextMenuContent({
         Kr::contextMenuItem(
-            Ui::NOP,
+            Ui::SINK<>,
             Mdi::BOOKMARK_OUTLINE, "Add bookmark..."
         ),
         Kr::contextMenuItem(Model::bind(SidePanel::BOOKMARKS), Mdi::BOOKMARK, "Bookmarks"),
-        Ui::separator(),
+        Kr::separator(),
         Kr::contextMenuItem(
             not s.dom
-                ? Ui::OnPress{NONE}
+                ? Opt<Ui::Send<>>{NONE}
                 : [dom = s.dom.unwrap()](auto& n) {
                       Ui::showDialog(
                           n,
@@ -197,28 +223,13 @@ Ui::Child mainMenu([[maybe_unused]] State const& s) {
             Mdi::PRINTER, "Print..."
         ),
 #ifdef __ck_host__
-        Kr::contextMenuItem([&](auto& n) {
-            auto res = Sys::launch({
-                .action = Mime::Uti::PUBLIC_OPEN,
-                .objects = {s.currentUrl().url},
-            });
-
-            if (not res)
-                Ui::showDialog(
-                    n,
-                    Kr::alert(
-                        "Error"s,
-                        Io::format("Failed to open in default browser\n\n{}", res)
-                    )
-                );
-        },
-                            Mdi::WEB, "Open in default browser..."),
+        openInDefaultBrowser(s),
 #endif
-        Ui::separator(),
+        Kr::separator(),
         Kr::contextMenuItem(Model::bind(SidePanel::DEVELOPER_TOOLS), Mdi::CODE_TAGS, "Developer Tools"),
         Kr::contextMenuCheck(Model::bind<ToggleWireframe>(), s.wireframe, "Show wireframe"),
-        Ui::separator(),
-        Kr::contextMenuItem(Ui::NOP, Mdi::COG, "Settings"),
+        Kr::separator(),
+        Kr::contextMenuItem(Ui::SINK<>, Mdi::COG, "Settings"),
     });
 }
 
@@ -226,7 +237,7 @@ Ui::Child addressMenu() {
     return Kr::contextMenuContent({
         Kr::contextMenuDock({
             Ui::labelMedium("Your are viewing a secure page") | Ui::insets(8),
-            Kr::contextMenuIcon(Ui::NOP, Mdi::CLOSE),
+            Kr::contextMenuIcon(Ui::SINK<>, Mdi::CLOSE),
         }),
     });
 }
@@ -251,7 +262,7 @@ Ui::Child addressBar(State const& s) {
                    },
                    Ui::ButtonStyle::subtle(), Mdi::TUNE_VARIANT
                ),
-               Ui::input(Ui::TextStyles::labelMedium(), s.currentUrl().url.str(), NONE) |
+               Ui::input(Ui::TextStyles::labelMedium(), s.location, Model::map<UpdateLocation>()) |
                    Ui::vcenter() |
                    Ui::hscroll() |
                    Ui::grow()
@@ -262,7 +273,9 @@ Ui::Child addressBar(State const& s) {
                .borderWidth = 1,
                .backgroundFill = Ui::GRAY800,
            }) |
-           Ui::focusable();
+           Ui::keyboardShortcut(App::Key::ENTER, Model::bind<NavigateLocation>()) |
+           Ui::focusable() |
+           Ui::keyboardShortcut(App::Key::L, App::KeyMod::CTRL);
 }
 
 Ui::Child contextMenu(State const& s) {
@@ -272,7 +285,7 @@ Ui::Child contextMenu(State const& s) {
             Kr::contextMenuIcon(Model::bindIf<GoForward>(s.canGoForward()), Mdi::ARROW_RIGHT),
             Kr::contextMenuIcon(Model::bind<Reload>(), Mdi::REFRESH),
         }),
-        Ui::separator(),
+        Kr::separator(),
         Kr::contextMenuItem(
             Model::bind<Navigate>(
                 s.currentUrl().url,
@@ -307,7 +320,7 @@ Ui::Child sidePanel(State const& s) {
     case SidePanel::BOOKMARKS:
         return Kr::sidePanelContent({
             Kr::sidePanelTitle(Model::bind(SidePanel::CLOSE), "Bookmarks"),
-            Ui::separator(),
+            Kr::separator(),
             Ui::labelMedium(Ui::GRAY500, "No bookmarks") |
                 Ui::center() |
                 Ui::grow(),
@@ -316,7 +329,7 @@ Ui::Child sidePanel(State const& s) {
     case SidePanel::DEVELOPER_TOOLS:
         return Kr::sidePanelContent({
             Kr::sidePanelTitle(Model::bind(SidePanel::CLOSE), "Developer Tools"),
-            Ui::separator(),
+            Kr::separator(),
             inspectorContent(s) | Ui::grow(),
         });
 
@@ -340,7 +353,7 @@ Ui::Child webview(State const& s) {
     if (not s.dom)
         return alert(s, "The page could not be loaded"s, Io::toStr(s.dom));
 
-    return Vaev::View::view(s.dom.unwrap(), {.wireframe = s.wireframe}) |
+    return Vaev::View::view(s.dom.unwrap(), {.wireframe = s.wireframe, .selected = s.inspect.selectedNode}) |
            Ui::vscroll() |
            Ui::box({
                .backgroundFill = Gfx::WHITE,
@@ -351,11 +364,12 @@ Ui::Child webview(State const& s) {
 }
 
 Ui::Child appContent(State const& s) {
-    if (s.sidePanel == SidePanel::CLOSE)
+    if (s.sidePanel == SidePanel::CLOSE) {
         return webview(s);
+    }
     return Ui::hflow(
         webview(s) | Ui::grow(),
-        sidePanel(s) | Kr::resizable(Kr::ResizeHandle::START, {320}, NONE)
+        sidePanel(s) | Kr::resizable(Kr::ResizeHandle::START, {320}, Ui::SINK<Math::Vec2i>)
     );
 }
 
@@ -368,13 +382,15 @@ export Ui::Child app(Gc::Heap& heap, Http::Client& client, Mime::Url url, Res<Gc
             dom,
         },
         [](State const& s) {
-            return Kr::scaffold({
+            auto scaffold = Kr::scaffold({
                 .icon = Mdi::SURFING,
                 .title = "Vaev"s,
                 .startTools = [&] -> Ui::Children {
                     return {
-                        Ui::button(Model::bindIf<GoBack>(s.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT),
-                        Ui::button(Model::bindIf<GoForward>(s.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT),
+                        Ui::button(Model::bindIf<GoBack>(s.canGoBack()), Ui::ButtonStyle::subtle(), Mdi::ARROW_LEFT) | Ui::keyboardShortcut(App::Key::LEFT, App::KeyMod::ALT, Model::bind<GoBack>()) |
+                            Ui::keyboardShortcut(App::Key::LEFT, App::KeyMod::ALT),
+                        Ui::button(Model::bindIf<GoForward>(s.canGoForward()), Ui::ButtonStyle::subtle(), Mdi::ARROW_RIGHT) |
+                            Ui::keyboardShortcut(App::Key::RIGHT, App::KeyMod::ALT),
                         reloadButton(s),
                     };
                 },
@@ -397,6 +413,20 @@ export Ui::Child app(Gc::Heap& heap, Http::Client& client, Mime::Url url, Res<Gc
                 },
                 .compact = true,
             });
+            return scaffold |
+                   Ui::keyboardShortcut(App::Key::R, App::KeyMod::CTRL, Model::bind<Reload>()) |
+                   Ui::keyboardShortcut(App::Key::F5, Model::bind<Reload>()) |
+                   Ui::keyboardShortcut(App::Key::F12, Model::bind(SidePanel::DEVELOPER_TOOLS)) |
+                   Ui::keyboardShortcut(App::Key::B, App::KeyMod::CTRL, Model::bind(SidePanel::BOOKMARKS)) |
+                   Ui::keyboardShortcut(App::Key::P, App::KeyMod::CTRL, [&](auto& n) {
+                       if (not s.dom)
+                           return;
+
+                       Ui::showDialog(
+                           n,
+                           View::printDialog(s.dom.unwrap())
+                       );
+                   });
         }
     );
 }

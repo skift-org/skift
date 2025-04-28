@@ -57,20 +57,37 @@ struct ProseStyle {
     }
 };
 
-struct Prose : public Meta::Pinned {
+struct Prose : Meta::Pinned {
     struct Span {
-        MutCursor<Span> parent = nullptr;
+        Opt<Rc<Span>> parent;
         Opt<Gfx::Color> color;
+    };
+
+    struct StrutCell {
+        usize id;
+        Vec2Au size{};
+        // NOTE: baseline is distance from strut's top to the considered baseline
+        Au baseline{};
     };
 
     struct Cell {
         MutCursor<Prose> prose;
-        MutCursor<Span> span;
+        Opt<Rc<Span>> span;
 
         urange runeRange;
         Glyph glyph;
         Au pos = 0_au; //< Position of the glyph within the block
         Au adv = 0_au; //< Advance of the glyph
+
+        Opt<usize> relatedStrutIndex = NONE;
+
+        void measureAdvance() {
+            if (strut()) {
+                adv = prose->_struts[relatedStrutIndex.unwrap()].size.x;
+            } else {
+                adv = Au{prose->_style.font.advance(glyph)};
+            }
+        }
 
         MutSlice<Rune> runes() {
             return mutSub(prose->_runes, runeRange);
@@ -92,6 +109,27 @@ struct Prose : public Meta::Pinned {
             if (not r)
                 return false;
             return last(r) == '\n' or isAsciiSpace(last(r));
+        }
+
+        Cursor<StrutCell> strut() const {
+            if (relatedStrutIndex == NONE)
+                return nullptr;
+
+            return &prose->_struts[relatedStrutIndex.unwrap()];
+        }
+
+        MutCursor<StrutCell> strut() {
+            if (relatedStrutIndex == NONE)
+                return nullptr;
+
+            return &prose->_struts[relatedStrutIndex.unwrap()];
+        }
+
+        Au Yposition(Au dominantBaselineYPosition) const {
+            if (relatedStrutIndex == NONE)
+                return dominantBaselineYPosition;
+
+            return dominantBaselineYPosition - prose->_struts[relatedStrutIndex.unwrap()].baseline;
         }
     };
 
@@ -127,6 +165,21 @@ struct Prose : public Meta::Pinned {
                 return false;
             return last(cells()).newline();
         }
+
+        MutCursor<StrutCell> strut() {
+            if (empty())
+                return nullptr;
+
+            auto cellsRef = cells();
+            return last(cellsRef).strut();
+        }
+
+        Cursor<StrutCell> strut() const {
+            if (empty())
+                return nullptr;
+
+            return last(cells()).strut();
+        }
     };
 
     struct Line {
@@ -152,6 +205,9 @@ struct Prose : public Meta::Pinned {
     Vec<Cell> _cells;
     Vec<Block> _blocks;
     Vec<Line> _lines;
+
+    Vec<StrutCell> _struts;
+    Vec<usize> _strutCellsIndexes;
 
     // Various cached values
     bool _blocksMeasured = false;
@@ -181,27 +237,50 @@ struct Prose : public Meta::Pinned {
     }
 
     void append(Slice<Rune> runes);
+    void append(StrutCell&& strut);
 
     // MARK: Span --------------------------------------------------------------
 
-    Vec<Box<Span>> _spans;
-    MutCursor<Span> _currentSpan = nullptr;
+    Vec<Rc<Span>> _spans;
+    Opt<Rc<Span>> _currentSpan = NONE;
 
     void pushSpan() {
-        _spans.pushBack(makeBox<Span>(_currentSpan));
-        _currentSpan = &*last(_spans);
+        if (_currentSpan == NONE)
+            _spans.pushBack(makeRc<Span>(Span{}));
+        else
+            _spans.pushBack(makeRc<Span>(_currentSpan->unwrap()));
+
+        last(_spans)->parent = _currentSpan;
+
+        auto refToLast = last(_spans);
+        _currentSpan = refToLast;
     }
 
     void spanColor(Gfx::Color color) {
         if (not _currentSpan)
             return;
 
-        _currentSpan->color = color;
+        _currentSpan.unwrap()->color = color;
     }
 
     void popSpan() {
-        if (_currentSpan)
-            _currentSpan = _currentSpan->parent;
+        if (not _currentSpan)
+            return;
+
+        auto newCurr = _currentSpan.unwrap()->parent;
+        _currentSpan = newCurr;
+    }
+
+    void overrideSpanStackWith(Prose const& prose);
+
+    // MARK: Strut ------------------------------------------------------------
+
+    Vec<MutCursor<Cell>> cellsWithStruts() {
+        // FIXME: Vec of MutCursor of length 1 is bad design, try to use Generator
+        Vec<MutCursor<Cell>> cells;
+        for (auto i : _strutCellsIndexes)
+            cells.pushBack(&_cells[i]);
+        return cells;
     }
 
     // MARK: Layout ------------------------------------------------------------
@@ -227,8 +306,34 @@ struct Prose : public Meta::Pinned {
         g.beginPath();
         g.moveTo(cs);
         g.lineTo(ce);
-        g.strokeStyle(Gfx::stroke(color).withAlign(Gfx::CENTER_ALIGN).withWidth(1));
+        g.strokeStyle({
+            .fill = color,
+            .width = 1.0,
+            .align = Gfx::INSIDE_ALIGN,
+        });
         g.stroke();
+    }
+
+    void paintSelection(Gfx::Canvas& g, usize start, usize end, Gfx::Color color) const {
+        if (start == end)
+            return;
+
+        if (not _style.multiline) {
+            auto ps = queryPosition(start);
+            auto pe = queryPosition(end);
+            auto m = _style.font.metrics();
+
+            auto rect =
+                RectAu::fromTwoPoint(
+                    ps + Vec2Au{0_au, Au{m.descend}},
+                    pe - Vec2Au{0_au, Au{m.ascend}}
+                )
+                    .cast<f64>();
+
+            g.fillStyle(color);
+            g.fill(rect);
+            return;
+        }
     }
 
     struct Lbc {
@@ -302,12 +407,12 @@ struct Prose : public Meta::Pinned {
         if (ci >= block.cells().len()) {
             // Handle the case where the rune is the last of the text
             auto& cell = last(block.cells());
-            return {block.pos + cell.pos + cell.adv, line.baseline};
+            return {block.pos + cell.pos + cell.adv, cell.Yposition(line.baseline)};
         }
 
         auto& cell = block.cells()[ci];
 
-        return {block.pos + cell.pos, line.baseline};
+        return {block.pos + cell.pos, cell.Yposition(line.baseline)};
     }
 };
 

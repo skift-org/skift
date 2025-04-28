@@ -475,7 +475,7 @@ using _FontDesc = Union<
     /**/
     >;
 
-struct FontDesc : public _FontDesc {
+struct FontDesc : _FontDesc {
     using _FontDesc::_FontDesc;
 
     static constexpr Array LEGACY_ALIAS = {

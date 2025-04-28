@@ -1,17 +1,54 @@
-#include <karm-app/form-factor.h>
-#include <karm-kira/toolbar.h>
-#include <karm-ui/dialog.h>
-#include <karm-ui/drag.h>
-#include <karm-ui/layout.h>
-#include <karm-ui/popover.h>
-#include <mdi/menu-open.h>
-#include <mdi/menu.h>
+module;
 
-#include "scaffold.h"
+#include <karm-app/form-factor.h>
+#include <karm-app/inputs.h>
+#include <karm-gfx/icon.h>
+
+export module Karm.Kira:scaffold;
+
+import Mdi;
+import Karm.Ui;
+import :titlebar;
+import :toolbar;
+import :separator;
 
 namespace Karm::Kira {
 
-Ui::Child mobilescaffold(Scaffold::State const& s, Scaffold const& scaffold) {
+export struct Scaffold : Meta::NoCopy {
+    Gfx::Icon icon;
+    String title;
+    TitlebarStyle titlebar = TitlebarStyle::DEFAULT;
+
+    Opt<Ui::Slots> startTools = NONE;
+    Opt<Ui::Slots> middleTools = NONE;
+    Opt<Ui::Slots> endTools = NONE;
+    Opt<Ui::Slot> sidebar = NONE;
+    Ui::Slot body;
+
+    Math::Vec2i size = {800, 600};
+    bool compact = false;
+
+    struct State {
+        bool sidebarOpen = false;
+        bool isMobile = false;
+    };
+
+    struct ToggleSidebar {};
+
+    using Action = Union<ToggleSidebar>;
+
+    static Ui::Task<Action> reduce(State& s, Action a) {
+        if (a.is<ToggleSidebar>()) {
+            s.sidebarOpen = !s.sidebarOpen;
+        }
+
+        return NONE;
+    }
+
+    using Model = Ui::Model<State, Action, reduce>;
+};
+
+static Ui::Child _mobileScaffold(Scaffold::State const& s, Scaffold const& scaffold) {
     Ui::Children body;
 
     if (scaffold.middleTools)
@@ -36,7 +73,8 @@ Ui::Child mobilescaffold(Scaffold::State const& s, Scaffold const& scaffold) {
                 s.sidebarOpen
                     ? Mdi::MENU_OPEN
                     : Mdi::MENU
-            )
+            ) |
+            Ui::keyboardShortcut(App::Key::M, App::KeyMod::ALT)
         );
 
     if (scaffold.startTools)
@@ -61,7 +99,7 @@ Ui::Child mobilescaffold(Scaffold::State const& s, Scaffold const& scaffold) {
            Ui::popoverLayer();
 }
 
-Ui::Child desktopscaffold(Scaffold::State const& s, Scaffold const& scaffold) {
+static Ui::Child _desktopScaffold(Scaffold::State const& s, Scaffold const& scaffold) {
     Ui::Children body;
 
     if (not scaffold.compact)
@@ -78,7 +116,8 @@ Ui::Child desktopscaffold(Scaffold::State const& s, Scaffold const& scaffold) {
                 Scaffold::Model::bind<Scaffold::ToggleSidebar>(),
                 Ui::ButtonStyle::subtle(),
                 s.sidebarOpen ? Mdi::MENU_OPEN : Mdi::MENU
-            )
+            ) |
+            Ui::keyboardShortcut(App::Key::M, App::KeyMod::ALT)
         );
 
     if (scaffold.startTools)
@@ -108,14 +147,14 @@ Ui::Child desktopscaffold(Scaffold::State const& s, Scaffold const& scaffold) {
         );
     else
         body.pushBack(
-            Ui::separator()
+            separator()
         );
 
     if (s.sidebarOpen and scaffold.sidebar) {
         body.pushBack(
             hflow(
                 scaffold.sidebar().unwrap(),
-                Ui::separator(),
+                separator(),
                 scaffold.body() | Ui::grow()
             ) |
             Ui::grow()
@@ -130,8 +169,8 @@ Ui::Child desktopscaffold(Scaffold::State const& s, Scaffold const& scaffold) {
            Ui::popoverLayer();
 }
 
-Ui::Child scaffold(Scaffold scaffold) {
-    auto isMobile = App::useFormFactor() == App::FormFactor::MOBILE;
+export Ui::Child scaffold(Scaffold scaffold) {
+    auto isMobile = App::formFactor == App::FormFactor::MOBILE;
 
     Scaffold::State state{
         .sidebarOpen = not isMobile,
@@ -140,8 +179,8 @@ Ui::Child scaffold(Scaffold scaffold) {
 
     return Ui::reducer<Scaffold::Model>(state, [scaffold = std::move(scaffold)](Scaffold::State const& state) {
         return state.isMobile
-                   ? mobilescaffold(state, scaffold)
-                   : desktopscaffold(state, scaffold);
+                   ? _mobileScaffold(state, scaffold)
+                   : _desktopScaffold(state, scaffold);
     });
 }
 

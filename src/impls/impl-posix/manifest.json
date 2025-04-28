@@ -9,9 +9,11 @@
             "darwin"
         ]
     },
-    "requires": [],
+    "requires": [
+        "karm-sys-async-impl",
+        "karm-logger"
+    ],
     "provides": [
-        "karm-logger-impl",
         "karm-sys-impl",
         "karm-pkg-impl"
     ]

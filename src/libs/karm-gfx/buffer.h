@@ -52,7 +52,7 @@ static inline Bgra8888 BGRA8888;
 
 using _Fmts = Union<Rgba8888, Bgra8888>;
 
-struct Fmt : public _Fmts {
+struct Fmt : _Fmts {
     using _Fmts::_Fmts;
 
     always_inline Color load(void const* pixel) const {

@@ -1,8 +1,8 @@
 #include <karm-sys/entry.h>
-#include <karm-ui/app.h>
 
 import Hideo.About;
+import Karm.Ui;
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
-    return Ui::runAsync(ctx, Hideo::About::app());
+    co_return co_await Ui::runAsync(ctx, Hideo::About::app());
 }

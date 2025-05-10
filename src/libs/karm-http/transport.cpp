@@ -174,7 +174,7 @@ struct PipeTransport : Transport {
 
     Async::Task<Rc<Response>> doAsync(Rc<Request> request) override {
         auto& url = request->url;
-        if (url.scheme != "http")
+        if (url.scheme != "pipe")
             co_return Error::unsupported("unsupported scheme");
 
         co_trya$(_sendRequest(*request));

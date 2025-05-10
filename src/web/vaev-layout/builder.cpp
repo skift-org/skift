@@ -401,7 +401,7 @@ static void _buildImage(Style::Computer& c, Gc::Ref<Dom::Element> el, Rc<Style::
         return Karm::Image::loadOrFallback("bundle://vaev-driver/missing.qoi"_url).unwrap();
     });
 
-    rootInlineBox.add({style, font, el});
+    rootInlineBox.add({style, font, img, el});
 }
 
 static void _buildInputProse(Style::Computer& c, Gc::Ref<Dom::Element> el, Box& parent) {

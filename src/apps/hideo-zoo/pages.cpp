@@ -631,9 +631,8 @@ Page PAGE_SIDE_PANEL{
                            Ui::center() |
                            Ui::grow();
 
-            if (not state) {
+            if (not state)
                 return content;
-            }
 
             return Ui::hflow(
                 content,
@@ -662,6 +661,46 @@ Page PAGE_SLIDER{
                ) |
                Ui::minSize({320, Ui::UNCONSTRAINED}) |
                Ui::center();
+    },
+};
+
+Page PAGE_TABBAR{
+    Mdi::NOTEBOOK,
+    "Tab Bar",
+    "A horizontal navigation bar that displays a list of tabs",
+    [] {
+        return Ui::state(0, [](auto state, auto bind) {
+            return Ui::vflow(
+                Kr::tabbarContent({
+                    Kr::tabbarItem(state == 0, bind(0), Ui::labelMedium("Alarm"s)),
+                    Kr::tabbarItem(state == 1, bind(1), Ui::labelMedium("Clock"s)),
+                    Kr::tabbarItem(state == 2, bind(2), Ui::labelMedium("Timer"s)),
+                    Kr::tabbarItem(state == 3, bind(3), Ui::labelMedium("Stopwatch"s)),
+                }),
+                Kr::TitlebarContent{
+                    .start = Kr::titlebarTitle(Mdi::SURFING, "Cool App"s),
+                    .middle = Kr::tabbarWrapper({
+                        Kr::tabbarItem(state == 0, bind(0), Ui::labelMedium("Tab 0"s)),
+                        Kr::tabbarItem(state == 1, bind(1), Ui::labelMedium("Tab 1"s)),
+                        Kr::tabbarItem(state == 2, bind(2), Ui::labelMedium("Tab 2"s)),
+                        Kr::tabbarItem(state == 3, bind(3), Ui::labelMedium("Tab 3"s)),
+                        Ui::button(
+                            bind(0),
+                            Ui::ButtonStyle::subtle(),
+                            Mdi::PLUS
+                        ) | Ui::center(),
+                    }),
+                    .end = Kr::titlebarControls(Kr::TitlebarStyle::DEFAULT),
+                },
+                Kr::toolbar({
+                    Ui::button(
+                        bind(0),
+                        Ui::ButtonStyle::subtle(),
+                        Mdi::ALARM
+                    ),
+                }) | Ui::box({.backgroundFill = Ui::GRAY900})
+            );
+        });
     },
 };
 
@@ -754,6 +793,7 @@ export Array PAGES = {
     &PAGE_SIDE_PANEL,
     &PAGE_SIDENAV,
     &PAGE_SLIDER,
+    &PAGE_TABBAR,
     &PAGE_TITLEBAR,
     &PAGE_TOGGLE,
     &PAGE_TYPOGRAPHY,

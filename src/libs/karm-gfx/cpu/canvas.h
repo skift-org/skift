@@ -25,6 +25,8 @@ struct CpuCanvas : Canvas {
         Stroke stroke{};
         Math::Recti clip{};
         Math::Trans2f trans = Math::Trans2f::IDENTITY;
+        Opt<Rc<Surface>> clipMask = NONE;
+        Math::Recti clipBound = {0, 0};
     };
 
     Opt<MutPixels> _pixels{};

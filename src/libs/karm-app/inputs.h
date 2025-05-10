@@ -39,6 +39,21 @@ static inline bool match(KeyMod in, KeyMod mods) {
     KeyMod either = KeyMod::NONE;
     KeyMod mask = KeyMod::NONE;
 
+    // Removing the non-combinable modifiers from the matching
+    // Because eg: NumLock + A should be considered exactly like A
+    if (static_cast<bool>(in & KeyMod::NUM)) {
+        mask |= KeyMod::NUM;
+    }
+    if (static_cast<bool>(in & KeyMod::CAPS)) {
+        mask |= KeyMod::CAPS;
+    }
+    if (static_cast<bool>(in & KeyMod::MODE)) {
+        mask |= KeyMod::MODE;
+    }
+    if (static_cast<bool>(in & KeyMod::SCROLL)) {
+        mask |= KeyMod::SCROLL;
+    }
+
     if (static_cast<bool>(in & KeyMod::LSHIFT) or
         static_cast<bool>(in & KeyMod::RSHIFT)) {
         either |= KeyMod::SHIFT;

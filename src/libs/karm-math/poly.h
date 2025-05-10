@@ -66,6 +66,10 @@ struct Poly {
         _bound = NONE;
     }
 
+    void repr(Io::Emit& e) const {
+        e("(poly {})", _edges);
+    }
+
     void transform(Trans2<T> const& trans) {
         _bound = NONE;
         for (auto& e : _edges) {

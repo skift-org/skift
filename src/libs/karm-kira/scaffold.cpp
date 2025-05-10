@@ -26,7 +26,6 @@ export struct Scaffold : Meta::NoCopy {
     Ui::Slot body;
 
     Math::Vec2i size = {800, 600};
-    bool compact = false;
 
     struct State {
         bool sidebarOpen = false;
@@ -99,17 +98,8 @@ static Ui::Child _mobileScaffold(Scaffold::State const& s, Scaffold const& scaff
            Ui::popoverLayer();
 }
 
-static Ui::Child _desktopScaffold(Scaffold::State const& s, Scaffold const& scaffold) {
-    Ui::Children body;
-
-    if (not scaffold.compact)
-        body.pushBack(titlebar(scaffold.icon, scaffold.title, scaffold.titlebar));
-
+static Ui::Child _desktopScaffoldToolbar(Scaffold::State const& s, Scaffold const& scaffold) {
     Ui::Children tools;
-
-    if (scaffold.compact)
-        tools.pushBack(titlebarTitle(scaffold.icon, scaffold.title, true));
-
     if (scaffold.sidebar)
         tools.pushBack(
             button(
@@ -138,17 +128,23 @@ static Ui::Child _desktopScaffold(Scaffold::State const& s, Scaffold const& scaf
             hflow(4, scaffold.endTools().unwrap())
         );
 
-    if (scaffold.compact)
-        tools.pushBack(titlebarControls(scaffold.titlebar));
-
     if (tools.len())
-        body.pushBack(
-            toolbar(tools) | Ui::dragRegion()
-        );
-    else
-        body.pushBack(
-            separator()
-        );
+        return toolbar(tools);
+    return separator();
+}
+
+static Ui::Child _desktopScaffoldHeader(Scaffold::State const& s, Scaffold const& scaffold) {
+    return Ui::vflow(
+               titlebar(scaffold.icon, scaffold.title, scaffold.titlebar),
+               _desktopScaffoldToolbar(s, scaffold)
+           ) |
+           Ui::box({.backgroundFill = Ui::GRAY900}) |
+           Ui::dragRegion();
+}
+
+static Ui::Child _desktopScaffold(Scaffold::State const& s, Scaffold const& scaffold) {
+    Ui::Children body;
+    body.pushBack(_desktopScaffoldHeader(s, scaffold));
 
     if (s.sidebarOpen and scaffold.sidebar) {
         body.pushBack(

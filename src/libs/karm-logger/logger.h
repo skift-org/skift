@@ -42,7 +42,16 @@ inline void _catch(Res<> res) {
     panic(res.none().msg());
 }
 
+inline isize _logLevel = -2;
+
+inline void setLogLevel(Level level) {
+    _logLevel = level.value;
+}
+
 inline void _log(Level level, Format fmt, Io::_Args& args) {
+    if (level.value < _logLevel)
+        return;
+
     Logger::_Embed::loggerLock();
 
     if (level.value != -2) {

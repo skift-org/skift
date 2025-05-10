@@ -381,8 +381,6 @@ struct Niche<_Rc<L, T>> {
         constexpr bool has() const {
             return ptr != nullptr;
         }
-
-        constexpr void setupValue() {}
     };
 };
 

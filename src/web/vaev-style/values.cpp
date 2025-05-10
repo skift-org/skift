@@ -1,4 +1,5 @@
 #include <karm-io/aton.h>
+#include <karm-sys/chan.h>
 
 #include "base.h"
 #include "values.h"
@@ -103,6 +104,449 @@ Res<Angle> ValueParser<Angle>::parse(Cursor<Css::Sst>& c) {
     }
 
     return Error::invalidData("expected angle");
+}
+
+// https://www.w3.org/TR/css-backgrounds-3/#typedef-bg-position
+// [
+//   case 1 :
+//   [ left | center | right | top | bottom | <length-percentage> ]
+// |
+//   case 2 :
+//   [ left | center | right | <length-percentage> ]
+//   [ top | center | bottom | <length-percentage> ]
+// |
+//   case 3 :
+//   [ center | [ left | right ] <length-percentage>? ] &&
+//   [ center | [ top | bottom ] <length-percentage>? ]
+// ]
+Res<BackgroundPosition> ValueParser<BackgroundPosition>::parse(Cursor<Css::Sst>& c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    using Item = FlatUnion<BackgroundPosition::HorizontalAnchor, BackgroundPosition::VerticalAnchor, CalcValue<PercentOr<Length>>>;
+
+    InlineVec<Item, 4> items;
+    for (int i = 0; i < 4 && not c.ended(); ++i) {
+        eatWhitespace(c);
+        auto item = parseValue<Item>(c);
+        eatWhitespace(c);
+        if (item)
+            items.pushBack(item.unwrap());
+        else
+            break;
+    }
+
+    if (not items)
+        return Error::invalidData("invalid background position");
+
+    if (items.len() == 1) { // case 1
+        if (items[0].is<Keywords::Bottom>() or items[0].is<Keywords::Top>())
+            items.pushFront(Keywords::CENTER);
+        else
+            items.pushBack(Keywords::CENTER);
+    }
+
+    if (items.len() == 2) { // case 2
+        if (items[0].is<Keywords::Center>() and (items[1].is<Keywords::Left>() or items[1].is<Keywords::Right>()))
+            items.pushBack(items.popFront());
+
+        BackgroundPosition::HorizontalAnchor hAnchor = Keywords::LEFT;
+        CalcValue<PercentOr<Length>> hValue = {Percent(0)};
+        BackgroundPosition::VerticalAnchor vAnchor = Keywords::TOP;
+        CalcValue<PercentOr<Length>> vValue = {Percent(0)};
+
+        try$(items[0].visit(Visitor{
+            [&](Meta::Contains<Keywords::Left, Keywords::Right, Keywords::Center> auto& t) -> Res<> {
+                hAnchor = t;
+                return Ok();
+            },
+            [&](CalcValue<PercentOr<Length>>& t) -> Res<> {
+                hValue = t;
+                return Ok();
+            },
+            [](auto&) -> Res<> {
+                return Error::invalidData("invalid horizontal anchor");
+            },
+        }));
+
+        try$(items[1].visit(Visitor{
+            [&](Meta::Contains<Keywords::Bottom, Keywords::Top, Keywords::Center> auto& t) -> Res<> {
+                vAnchor = t;
+                return Ok();
+            },
+            [&](CalcValue<PercentOr<Length>>& t) -> Res<> {
+                vValue = t;
+                return Ok();
+            },
+            [](auto&) -> Res<> {
+                return Error::invalidData("invalid vertical anchor");
+            },
+        }));
+
+        return Ok(BackgroundPosition(hAnchor, hValue, vAnchor, vValue));
+    }
+
+    // case 3
+    BackgroundPosition::HorizontalAnchor hAnchor = Keywords::LEFT;
+    CalcValue<PercentOr<Length>> hValue = {Percent(0)};
+    bool hSet = false;
+
+    BackgroundPosition::VerticalAnchor vAnchor = Keywords::TOP;
+    CalcValue<PercentOr<Length>> vValue = {Percent(0)};
+
+    usize secondPairIndex = 2;
+
+    try$(items[0].visit(Visitor{
+        [&](Meta::Contains<Keywords::Left, Keywords::Right> auto& t) -> Res<> {
+            hAnchor = t;
+            hSet = true;
+
+            if (auto mesure = items[1].is<CalcValue<PercentOr<Length>>>()) {
+                hValue = *mesure;
+            } else {
+                secondPairIndex = 1;
+            }
+
+            return Ok();
+        },
+        [&](Keywords::Center& t) -> Res<> {
+            hAnchor = t;
+            hSet = true;
+
+            secondPairIndex = 1;
+
+            return Ok();
+        },
+        [&](Meta::Contains<Keywords::Top, Keywords::Bottom> auto& t) -> Res<> {
+            vAnchor = t;
+
+            if (auto mesure = items[1].is<CalcValue<PercentOr<Length>>>()) {
+                vValue = *mesure;
+            } else {
+                secondPairIndex = 1;
+            }
+
+            return Ok();
+        },
+        [](auto&) -> Res<> {
+            return Error::invalidData("invalid anchor");
+        },
+    }));
+
+    try$(items[secondPairIndex].visit(Visitor{
+        [&](Meta::Contains<Keywords::Left, Keywords::Right> auto& t) -> Res<> {
+            if (hSet) {
+                if (hAnchor.is<Keywords::Center>()) { // the first center was aimed at the vertical part so we exchange
+                    vAnchor = Keywords::CENTER;
+                    vValue = hValue;
+                } else {
+                    return Error::invalidData("expected vertical anchor");
+                }
+            }
+
+            hAnchor = t;
+
+            if (secondPairIndex + 1 < items.len()) {
+                if (auto mesure = items[secondPairIndex + 1].is<CalcValue<PercentOr<Length>>>())
+                    hValue = *mesure;
+                else {
+                    return Error::invalidData("expected percent or length");
+                }
+            }
+
+            return Ok();
+        },
+        [&](Meta::Contains<Keywords::Top, Keywords::Bottom, Keywords::Center> auto& t) -> Res<> {
+            vAnchor = t;
+
+            if (secondPairIndex + 1 < items.len()) {
+                if (auto mesure = items[secondPairIndex + 1].is<CalcValue<PercentOr<Length>>>())
+                    vValue = *mesure;
+                else {
+                    return Error::invalidData("unexpected last value");
+                }
+            }
+
+            return Ok();
+        },
+        [](auto&) -> Res<> {
+            return Error::invalidData("invalid anchor");
+        },
+    }));
+
+    return Ok(BackgroundPosition(hAnchor, hValue, vAnchor, vValue));
+}
+
+// MARK: BasicShape = [ <basic-shape> || <geometry-box> ]
+// https://drafts.fxtf.org/css-masking/#the-clip-path
+Res<BasicShape> ValueParser<BasicShape>::parse(Cursor<Css::Sst>& c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    BasicShape resultShape;
+    auto box = parseValue<GeometryBox>(c);
+    auto shape = parseValue<BasicShapeFunction>(c);
+
+    if (shape and not box)
+        box = parseValue<GeometryBox>(c);
+
+    if (not shape and not box)
+        return Error::invalidData("expected basic shape or geometry box");
+
+    resultShape.referenceBox = box.unwrapOr(Keywords::BORDER_BOX);
+
+    if (shape)
+        resultShape.shape = shape.unwrap();
+
+    return Ok(resultShape);
+}
+
+// https://www.w3.org/TR/css-shapes-1/#funcdef-basic-shape-polygon
+Res<Polygon> ValueParser<Polygon>::parse(Cursor<Css::Sst>& c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c->prefix == Css::Token::function("polygon(")) {
+        Polygon result;
+        Cursor<Css::Sst> scan = c->content;
+
+        bool begin = true;
+        if (auto fill = parseValue<FillRule>(scan)) {
+            result.fillRule = fillRuleToGfx(fill.unwrap());
+            begin = false;
+        }
+
+        while ((begin or scan.skip(Css::Token::COMMA)) and not scan.ended()) {
+            begin = false;
+
+            eatWhitespace(scan);
+            auto x = try$(parseValue<CalcValue<PercentOr<Length>>>(scan));
+            eatWhitespace(scan);
+            auto y = try$(parseValue<CalcValue<PercentOr<Length>>>(scan));
+            eatWhitespace(scan);
+            result.points.emplaceBack(x, y);
+        }
+
+        if (not result.points)
+            return Error::invalidData("expected points in polygon");
+
+        c.next();
+        return Ok(result);
+    }
+    return Error::invalidData("invalid polygon");
+}
+
+// https://www.w3.org/TR/css-shapes-1/#funcdef-basic-shape-circle
+Res<Circle> ValueParser<Circle>::parse(Cursor<Css::Sst>& c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c->prefix == Css::Token::function("circle(")) {
+        Circle result;
+        Cursor<Css::Sst> scan = c->content;
+
+        if (auto radius = parseValue<ShapeRadius>(scan)) {
+            result.radius = radius.unwrap();
+        }
+
+        eatWhitespace(scan);
+        if (scan.skip(Css::Token::ident("at"))) {
+            eatWhitespace(scan);
+            if (auto position = parseValue<BackgroundPosition>(scan)) {
+                result.position = position.unwrap();
+            }
+            eatWhitespace(scan);
+        }
+
+        if (not scan.ended())
+            return Error::invalidData("unexpected data in circle");
+
+        c.next();
+        return Ok(result);
+    }
+    return Error::invalidData("invalid circle");
+}
+
+// https://www.w3.org/TR/css-shapes-1/#funcdef-basic-shape-inset
+Res<Inset> ValueParser<Inset>::parse(Cursor<Css::Sst>& c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c->prefix == Css::Token::function("inset(")) {
+        Inset result;
+        Cursor<Css::Sst> scan = c->content;
+
+        if (auto insets = parseValue<Math::Insets<CalcValue<PercentOr<Length>>>>(scan)) {
+            result.insets = insets.unwrap();
+        } else {
+            return Error::invalidData("expected insets");
+        }
+
+        eatWhitespace(scan);
+        if (scan.skip(Css::Token::ident("round"))) {
+            eatWhitespace(scan);
+            if (auto radii = parseValue<Math::Radii<CalcValue<PercentOr<Length>>>>(scan)) {
+                result.borderRadius = radii.unwrap();
+            }
+            eatWhitespace(scan);
+        }
+
+        if (not scan.ended())
+            return Error::invalidData("unexpected data in inset");
+
+        c.next();
+        return Ok(result);
+    }
+    return Error::invalidData("invalid inset");
+}
+
+// https://www.w3.org/TR/css-shapes-1/#funcdef-basic-shape-xywh
+Res<Xywh> ValueParser<Xywh>::parse(Cursor<Css::Sst>& c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c->prefix == Css::Token::function("xywh(")) {
+        Xywh result;
+        Cursor<Css::Sst> scan = c->content;
+
+        eatWhitespace(scan);
+        result.rect.x = try$(parseValue<CalcValue<PercentOr<Length>>>(scan));
+
+        eatWhitespace(scan);
+        result.rect.y = try$(parseValue<CalcValue<PercentOr<Length>>>(scan));
+
+        eatWhitespace(scan);
+        result.rect.width = try$(parseValue<CalcValue<PercentOr<Length>>>(scan));
+
+        eatWhitespace(scan);
+        result.rect.height = try$(parseValue<CalcValue<PercentOr<Length>>>(scan));
+
+        eatWhitespace(scan);
+        if (scan.skip(Css::Token::ident("round"))) {
+            eatWhitespace(scan);
+            if (auto radii = parseValue<Math::Radii<CalcValue<PercentOr<Length>>>>(scan)) {
+                result.borderRadius = radii.unwrap();
+            }
+            eatWhitespace(scan);
+        }
+
+        if (not scan.ended())
+            return Error::invalidData("unexpected data in xywh");
+
+        c.next();
+        return Ok(result);
+    }
+    return Error::invalidData("invalid xywh");
+}
+
+// https://www.w3.org/TR/css-shapes-1/#funcdef-basic-shape-rect
+Res<Rect> ValueParser<Rect>::parse(Cursor<Css::Sst>& c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c->prefix == Css::Token::function("rect(")) {
+        Rect result;
+        Cursor<Css::Sst> scan = c->content;
+
+        eatWhitespace(scan);
+        if (not parseValue<Keywords::Auto>(scan))
+            result.insets.top = try$(parseValue<CalcValue<PercentOr<Length>>>(scan));
+
+        eatWhitespace(scan);
+        if (not parseValue<Keywords::Auto>(scan))
+            result.insets.end = try$(parseValue<CalcValue<PercentOr<Length>>>(scan));
+
+        eatWhitespace(scan);
+        if (not parseValue<Keywords::Auto>(scan))
+            result.insets.bottom = try$(parseValue<CalcValue<PercentOr<Length>>>(scan));
+
+        eatWhitespace(scan);
+        if (not parseValue<Keywords::Auto>(scan))
+            result.insets.start = try$(parseValue<CalcValue<PercentOr<Length>>>(scan));
+
+        eatWhitespace(scan);
+        if (scan.skip(Css::Token::ident("round"))) {
+            eatWhitespace(scan);
+            if (auto radii = parseValue<Math::Radii<CalcValue<PercentOr<Length>>>>(scan)) {
+                result.borderRadius = radii.unwrap();
+            }
+            eatWhitespace(scan);
+        }
+        if (not scan.ended())
+            return Error::invalidData("unexpected data in rect");
+
+        c.next();
+        return Ok(result);
+    }
+    return Error::invalidData("invalid rect");
+}
+
+// https://www.w3.org/TR/css-shapes-1/#funcdef-basic-shape-ellipse
+Res<Ellipse> ValueParser<Ellipse>::parse(Cursor<Css::Sst>& c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c->prefix == Css::Token::function("ellipse(")) {
+        Ellipse result;
+        Cursor<Css::Sst> scan = c->content;
+
+        if (auto radius = parseValue<ShapeRadius>(scan)) {
+            result.rx = radius.unwrap();
+            eatWhitespace(scan);
+            result.ry = try$(parseValue<ShapeRadius>(scan));
+        }
+
+        eatWhitespace(scan);
+        if (scan.skip(Css::Token::ident("at"))) {
+            eatWhitespace(scan);
+            if (auto position = parseValue<BackgroundPosition>(scan)) {
+                result.position = position.unwrap();
+            }
+            eatWhitespace(scan);
+        }
+
+        if (not scan.ended())
+            return Error::invalidData("unexpected data in ellipse");
+
+        c.next();
+        return Ok(result);
+    }
+    return Error::invalidData("invalid ellipse");
+}
+
+// https://www.w3.org/TR/css-shapes-1/#funcdef-basic-shape-path
+Res<Path> ValueParser<Path>::parse(Cursor<Css::Sst>& c) {
+    if (c.ended())
+        return Error::invalidData("unexpected end of input");
+
+    if (c->prefix == Css::Token::function("path(")) {
+        Path result;
+        Cursor<Css::Sst> scan = c->content;
+
+        bool begin = true;
+        if (auto fill = parseValue<FillRule>(scan)) {
+            result.fillRule = fillRuleToGfx(fill.unwrap());
+            begin = false;
+        }
+
+        while ((begin or scan.skip(Css::Token::COMMA)) and not scan.ended()) {
+            begin = false;
+
+            eatWhitespace(scan);
+            if (not result.path.evalSvg(try$(parseValue<String>(scan))))
+                return Error::invalidData("expected svg path in a string");
+
+            if (not last(result.path._contours).close)
+                result.path.close();
+        }
+
+        if (begin)
+            return Error::invalidData("expected data in path");
+
+        c.next();
+        return Ok(result);
+    }
+    return Error::invalidData("invalid path");
 }
 
 // MARK: Boolean
@@ -911,6 +1355,7 @@ Res<FitContent> ValueParser<FitContent>::parse(Cursor<Css::Sst>& c) {
         FitContent result;
         Cursor<Css::Sst> scan = c->content;
         result.value = try$(parseValue<PercentOr<Length>>(scan));
+        c.next();
         return Ok(result);
     }
     return Error::invalidData("invalid fit-content");
@@ -1159,6 +1604,7 @@ static Res<Length::Unit> _parseLengthUnit(Str unit) {
     if (eqCi(unit, #NAME ""s)) \
         return Ok(Length::Unit::NAME);
 #include <vaev-base/defs/lengths.inc>
+
 #undef LENGTH
 
     logWarn("unknown length unit: {}", unit);

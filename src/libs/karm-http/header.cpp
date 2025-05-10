@@ -34,7 +34,7 @@ export struct Version {
 };
 
 export struct Header : Map<String, String> {
-    using Map<String, String>::Map;
+    using Map::Map;
 
     void add(Str const& key, Str value) {
         put(key, std::move(value));
@@ -79,9 +79,6 @@ export struct Header : Map<String, String> {
         for (auto& [key, value] : iter()) {
             try$(Io::format(w, "{}: {}\r\n", key, value));
         }
-
-        try$(w.writeStr("\r\n"s));
-
         return Ok();
     }
 

@@ -10,6 +10,7 @@ export import :colorInput;
 export import :contextMenu;
 export import :dialog;
 export import :errorPage;
+export import :handle;
 export import :input;
 export import :navbar;
 export import :number;
@@ -20,14 +21,14 @@ export import :row;
 export import :scaffold;
 export import :searchbar;
 export import :select;
+export import :separator;
 export import :sideNav;
 export import :sidePanel;
-export import :handle;
 export import :slider;
+export import :tabbar;
 export import :titlebar;
 export import :toggle;
 export import :toolbar;
-export import :separator;
 
 namespace Karm {
 namespace Kira {}

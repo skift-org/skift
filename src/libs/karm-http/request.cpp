@@ -66,6 +66,7 @@ export struct Request {
 
         // Headers and empty line
         try$(header.unparse(w));
+        try$(w.writeStr("\r\n"s));
 
         return Ok();
     }

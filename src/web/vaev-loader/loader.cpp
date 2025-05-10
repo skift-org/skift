@@ -3,19 +3,18 @@ module;
 #include <karm-gc/heap.h>
 #include <karm-mime/mime.h>
 #include <karm-mime/url.h>
-#include <karm-sys/dir.h>
 #include <karm-sys/file.h>
 #include <vaev-dom/document.h>
 #include <vaev-dom/html/parser.h>
 #include <vaev-dom/xml/parser.h>
 #include <vaev-style/stylesheet.h>
 
-export module Vaev.Driver:loader;
+export module Vaev.Loader:loader;
 
 import Karm.Http;
 import Karm.Aio;
 
-namespace Vaev::Driver {
+namespace Vaev::Loader {
 
 Async::Task<Gc::Ref<Dom::Document>> _loadDocumentAsync(Gc::Heap& heap, Mime::Url url, Rc<Http::Response> resp) {
     auto dom = heap.alloc<Dom::Document>(url);
@@ -153,4 +152,4 @@ export Async::Task<Gc::Ref<Dom::Document>> fetchDocumentAsync(Gc::Heap& heap, Ht
     co_return Ok(dom);
 }
 
-} // namespace Vaev::Driver
+} // namespace Vaev::Loader

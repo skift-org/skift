@@ -6,6 +6,7 @@
 #include <vaev-dom/html/parser.h>
 #include <vaev-dom/xml/parser.h>
 #include <vaev-style/media.h>
+#include <vaev-style/stylesheet.h>
 
 import Vaev.Driver;
 import Vaev.Layout;
@@ -48,6 +49,22 @@ static Style::Media const TEST_MEDIA = {
 };
 
 struct FakeBox;
+
+void buildHtmlTestCase(Gc::Heap& gc, Gc::Ref<Dom::Document> dom, Str testCase) {
+    dom->styleSheets = gc.alloc<Style::StyleSheetList>();
+    Dom::HtmlParser parser{gc, dom};
+
+    Io::SScan textScan{"html, body, div { display: block; }"s};
+    auto sheet = Style::StyleSheet::parse(textScan, ""_url);
+    dom->styleSheets->add(std::move(sheet));
+
+    Karm::StringBuilder builder;
+    builder.append("<html>"s);
+    builder.append(testCase);
+    builder.append("</html>"s);
+
+    parser.write(builder.take());
+}
 
 struct FakeInlineBox {
     Vec<FakeBox> atomicBoxes{};
@@ -155,11 +172,7 @@ test$("empty-body") {
     Gc::Heap gc;
 
     auto dom = gc.alloc<Dom::Document>(Mime::Url());
-    Dom::HtmlParser parser{gc, dom};
-
-    parser.write(
-        "<html></body></html>"
-    );
+    buildHtmlTestCase(gc, dom, "<body/>");
 
     auto expectedBodySubtree =
         FakeBox{
@@ -178,11 +191,7 @@ test$("no span") {
     Gc::Heap gc;
 
     auto dom = gc.alloc<Dom::Document>(Mime::Url());
-    Dom::HtmlParser parser{gc, dom};
-
-    parser.write(
-        "<html><body>hello, world</body></html>"
-    );
+    buildHtmlTestCase(gc, dom, "<body>hello, world</body>");
 
     auto expectedBodySubtree =
         FakeBox{
@@ -204,11 +213,7 @@ test$("no span") {
     Gc::Heap gc;
 
     auto dom = gc.alloc<Dom::Document>(Mime::Url());
-    Dom::HtmlParser parser{gc, dom};
-
-    parser.write(
-        "<html><body>hello,<br>brrrrr world</body></html>"
-    );
+    buildHtmlTestCase(gc, dom, "<body>hello,<br>brrrrr world</body>");
 
     auto expectedBodySubtree =
         FakeBox{
@@ -241,11 +246,7 @@ test$("no span, breaking block") {
     Gc::Heap gc;
 
     auto dom = gc.alloc<Dom::Document>(Mime::Url());
-    Dom::HtmlParser parser{gc, dom};
-
-    parser.write(
-        "<html><body>hello, <div>cruel</div> world</body></html>"
-    );
+    buildHtmlTestCase(gc, dom, "<body>hello, <div>cruel</div> world</body>");
 
     auto expectedBodySubtree =
         FakeBox{
@@ -282,18 +283,14 @@ test$("span and breaking block 1") {
     Gc::Heap gc;
 
     auto dom = gc.alloc<Dom::Document>(Mime::Url());
-    Dom::HtmlParser parser{gc, dom};
-
-    parser.write(
-        "<html><body>"
-        "<span>hello"
-        "<span>cruel"
-        "<span>world"
-        "<div></div>"
-        "</span></span></span>"
-        "melancholy"
-        "</body></html>"
-    );
+    buildHtmlTestCase(gc, dom, "<body>"
+                               "<span>hello"
+                               "<span>cruel"
+                               "<span>world"
+                               "<div></div>"
+                               "</span></span></span>"
+                               "melancholy"
+                               "</body>");
 
     auto expectedBodySubtree =
         FakeBox{
@@ -359,19 +356,15 @@ test$("span and breaking block 2") {
     Gc::Heap gc;
 
     auto dom = gc.alloc<Dom::Document>(Mime::Url());
-    Dom::HtmlParser parser{gc, dom};
-
-    parser.write(
-        "<html><body>"
-        "<span>hello"
-        "<span>cruel"
-        "<span>world"
-        "<div></div>"
-        "melancholy"
-        "</span></span><div>kidding</div></span>"
-        "good vibes"
-        "</body></html>"
-    );
+    buildHtmlTestCase(gc, dom, "<body>"
+                               "<span>hello"
+                               "<span>cruel"
+                               "<span>world"
+                               "<div></div>"
+                               "melancholy"
+                               "</span></span><div>kidding</div></span>"
+                               "good vibes"
+                               "</body>");
 
     auto expectedBodySubtree =
         FakeBox{
@@ -455,20 +448,16 @@ test$("inline-block") {
     Gc::Heap gc;
 
     auto dom = gc.alloc<Dom::Document>(Mime::Url());
-    Dom::HtmlParser parser{gc, dom};
-
-    parser.write(
-        "<html><body>"
-        "   A <span>X</span>"
-        "   <div id=\"banana\" style=\"display:inline-block\">"
-        "       B"
-        "       <div id=\"apple\" style=\"display:inline-block\">"
-        "           C"
-        "       </div>"
-        "   </div>"
-        "   D"
-        "</body></html>"
-    );
+    buildHtmlTestCase(gc, dom, "<body>"
+                               "   A <span>X</span>"
+                               "   <div id=\"banana\" style=\"display:inline-block\">"
+                               "       B"
+                               "       <div id=\"apple\" style=\"display:inline-block\">"
+                               "           C"
+                               "       </div>"
+                               "   </div>"
+                               "   D"
+                               "</body>");
 
     auto expectedBodySubtree =
         FakeBox{
@@ -511,15 +500,15 @@ test$("flex-blockify") {
     Gc::Heap gc;
 
     auto dom = gc.alloc<Dom::Document>(Mime::Url());
-    Dom::HtmlParser parser{gc, dom};
-
-    parser.write(
-        "<html><body><div style=\"display:flex\">"
+    buildHtmlTestCase(
+        gc,
+        dom,
+        "<body><div style=\"display:flex\">"
         "hello"
         "<div style=\"display:inline-block\">hi</div>"
         "goodbye"
         "<div style=\"display:block\">hi</div>"
-        "</div></body></html>"
+        "</div></body>"
     );
 
     auto expectedBodySubtree =
@@ -558,10 +547,11 @@ test$("flex-blockify") {
     return Ok();
 }
 
-test$("table-fixup-1") {
+test$("table-fixup") {
     Gc::Heap gc;
 
     auto dom = gc.alloc<Dom::Document>(Mime::Url());
+    dom->styleSheets = gc.alloc<Style::StyleSheetList>();
 
     Io::SScan scan{
         "<html><body><table>"
@@ -572,6 +562,17 @@ test$("table-fixup-1") {
         "<tr>wrap me!</tr>"
         "</table></body></html>"
     };
+    Dom::XmlParser parser{gc};
+    try$(parser.parse(scan, HTML, *dom));
+
+    Io::SScan styleScan{
+        "html, body, div { display: block; }"s
+        "table { display: table; }"s
+        "tr { display: table-row; }"s
+        "td { display: table-cell; }"s
+    };
+    auto sheet = Style::StyleSheet::parse(styleScan, ""_url);
+    dom->styleSheets->add(std::move(sheet));
 
     auto expectedBodySubtree =
         FakeBox{
@@ -600,26 +601,35 @@ test$("table-fixup-1") {
                                         }
                                     }
                                 },
-                                FakeBox{// row for "dont wrap me!"
-                                        .isInternal = true,
-                                        .content = Vec<FakeBox>{
-                                            FakeBox{.isInternal = true, .content = FakeInlineBox{}},
-                                        }
+                                FakeBox{
+                                    // row for "dont wrap me!"
+                                    .isInternal = true,
+                                    .content = Vec<FakeBox>{
+                                        FakeBox{
+                                            .isInternal = true,
+                                            .content = FakeInlineBox{},
+                                        },
+                                    },
                                 },
                                 FakeBox{// anon row for "wrap mi"
                                         .isInternal = true,
                                         .content = Vec<FakeBox>{
-                                            FakeBox{.isInternal = true, .content = FakeInlineBox{}},
-                                        }
-                                },
-                                FakeBox{// row for "wrap me!"
-                                        .isInternal = true,
-                                        .content = Vec<FakeBox>{
-                                            FakeBox{// anon cell for "wrap me!"
-                                                    .isInternal = true,
-                                                    .content = FakeInlineBox{}
+                                            FakeBox{
+                                                .isInternal = true,
+                                                .content = FakeInlineBox{},
                                             },
                                         }
+                                },
+                                FakeBox{
+                                    // row for "wrap me!"
+                                    .isInternal = true,
+                                    .content = Vec<FakeBox>{
+                                        FakeBox{
+                                            // anon cell for "wrap me!"
+                                            .isInternal = true,
+                                            .content = FakeInlineBox{},
+                                        },
+                                    },
                                 },
                             }
                         }
@@ -627,9 +637,6 @@ test$("table-fixup-1") {
                 }
             }
         };
-
-    Dom::XmlParser parser{gc};
-    try$(parser.parse(scan, HTML, *dom));
 
     auto rootBox = Vaev::Driver::render(dom, TEST_MEDIA, Viewport{.small = Vec2Au{100_au, 100_au}}).layout;
     auto const& bodyBox = rootBox->children()[0];

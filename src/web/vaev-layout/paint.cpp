@@ -1,6 +1,7 @@
 module;
 
 #include <karm-scene/box.h>
+#include <karm-scene/clip.h>
 #include <karm-scene/image.h>
 #include <karm-scene/text.h>
 #include <vaev-style/computer.h>
@@ -68,7 +69,7 @@ static bool _paintOutline(Frag& frag, Gfx::Color currentColor, Gfx::Outline& out
 }
 
 static bool _needsNewStackingContext(Frag const& frag) {
-    return frag.style().zIndex != Keywords::AUTO;
+    return frag.style().zIndex != Keywords::AUTO or frag.style().clip.has();
 }
 
 static void _paintFragBordersAndBackgrounds(Frag& frag, Scene::Stack& stack) {
@@ -170,8 +171,214 @@ static void _paintStackingContext(Frag& frag, Scene::Stack& stack) {
     });
 }
 
+static Math::Vec2f _resolveBackgroundPosition(Resolver& resolver, BackgroundPosition const& position, RectAu const& referenceBox) {
+    Math::Vec2f result;
+
+    if (position.horizontalAnchor.is<Keywords::Left>()) {
+        result.x = resolver.resolve(position.horizontal, referenceBox.width).cast<f64>();
+    } else if (position.horizontalAnchor.is<Keywords::Right>()) {
+        result.x = (referenceBox.width - resolver.resolve(position.horizontal, referenceBox.width)).cast<f64>();
+    } else if (position.horizontalAnchor.is<Keywords::Center>()) {
+        result.x = referenceBox.width.cast<f64>() / 2.0;
+    }
+
+    if (position.verticalAnchor.is<Keywords::Top>()) {
+        result.y = resolver.resolve(position.vertical, referenceBox.height).cast<f64>();
+    } else if (position.verticalAnchor.is<Keywords::Bottom>()) {
+        result.y = (referenceBox.height - resolver.resolve(position.vertical, referenceBox.height)).cast<f64>();
+    } else if (position.verticalAnchor.is<Keywords::Center>()) {
+        result.y = referenceBox.height.cast<f64>() / 2.0;
+    }
+
+    return result;
+}
+
+static Math::Radiif _resolveRadii(Resolver& resolver, Math::Radii<CalcValue<PercentOr<Length>>> const& baseRadii, RectAu const& referenceBox) {
+    Math::Radiif radii;
+    radii.a = resolver.resolve(baseRadii.a, referenceBox.height).cast<f64>();
+    radii.b = resolver.resolve(baseRadii.b, referenceBox.width).cast<f64>();
+    radii.c = resolver.resolve(baseRadii.c, referenceBox.width).cast<f64>();
+    radii.d = resolver.resolve(baseRadii.d, referenceBox.height).cast<f64>();
+    radii.e = resolver.resolve(baseRadii.e, referenceBox.height).cast<f64>();
+    radii.f = resolver.resolve(baseRadii.f, referenceBox.width).cast<f64>();
+    radii.g = resolver.resolve(baseRadii.g, referenceBox.width).cast<f64>();
+    radii.h = resolver.resolve(baseRadii.h, referenceBox.height).cast<f64>();
+    return radii;
+}
+
+static Rc<Scene::Clip> _resolveClip(Frag const& frag) {
+    Math::Path result;
+    auto& clip = frag.style().clip.unwrap();
+
+    // TODO: handle SVG cases (https://drafts.fxtf.org/css-masking/#typedef-geometry-box)
+    auto [referenceBox, radii] = clip.referenceBox.visit(Visitor{
+        [&](Keywords::BorderBox const&) -> Pair<RectAu, RadiiAu> {
+            return {frag.metrics.borderBox(), frag.metrics.radii};
+        },
+        [&](Keywords::PaddingBox const&) -> Pair<RectAu, RadiiAu> {
+            return {frag.metrics.paddingBox(), {0_au}};
+        },
+        [&](Keywords::ContentBox const&) -> Pair<RectAu, RadiiAu> {
+            return {frag.metrics.contentBox(), {0_au}};
+        },
+        [&](Keywords::MarginBox const&) -> Pair<RectAu, RadiiAu> {
+            return {frag.metrics.marginBox(), {0_au}};
+        },
+        [&](Keywords::FillBox const&) -> Pair<RectAu, RadiiAu> {
+            return {frag.metrics.contentBox(), {0_au}};
+        },
+        [&](Keywords::StrokeBox const&) -> Pair<RectAu, RadiiAu> {
+            return {frag.metrics.borderBox(), frag.metrics.radii};
+        },
+        [&](Keywords::ViewBox const&) -> Pair<RectAu, RadiiAu> {
+            return {frag.metrics.borderBox(), {0_au}};
+        },
+    });
+
+    if (not clip.shape) {
+        result.rect(referenceBox.round().cast<f64>(), radii.cast<f64>());
+        return makeRc<Scene::Clip>(result);
+    }
+
+    auto resolver = Resolver();
+    return clip.shape.unwrap().visit(Visitor{
+        [&](Polygon const& polygon) {
+            result.moveTo(
+                referenceBox.xy.cast<f64>() +
+                Math::Vec2f(
+                    resolver.resolve(first(polygon.points).v0, referenceBox.width).cast<f64>(),
+                    resolver.resolve(first(polygon.points).v1, referenceBox.height).cast<f64>()
+                )
+            );
+            for (auto& point : next(polygon.points)) {
+                result.lineTo(
+                    referenceBox.xy.cast<f64>() +
+                    Math::Vec2f(
+                        resolver.resolve(point.v0, referenceBox.width).cast<f64>(),
+                        resolver.resolve(point.v1, referenceBox.height).cast<f64>()
+                    )
+                );
+            }
+
+            return makeRc<Scene::Clip>(result, polygon.fillRule);
+        },
+        [&](Circle const& circle) {
+            auto center = _resolveBackgroundPosition(resolver, circle.position, referenceBox);
+            f64 radius;
+            if (circle.radius.is<Keywords::ClosestSide>()) {
+                radius = min(
+                    Math::abs(referenceBox.width.cast<f64>() - center.x),
+                    center.x,
+                    center.y,
+                    Math::abs(referenceBox.height.cast<f64>() - center.y)
+                );
+            } else if (circle.radius.is<Keywords::FarthestSide>()) {
+                radius = max(
+                    Math::abs(referenceBox.width.cast<f64>() - center.x),
+                    center.x,
+                    center.y,
+                    Math::abs(referenceBox.height.cast<f64>() - center.y)
+                );
+            } else {
+                auto hSquared = Math::pow2(referenceBox.height.cast<f64>());
+                auto wSquared = Math::pow2(referenceBox.width.cast<f64>());
+                radius = resolver.resolve(
+                                     circle.radius.unwrap<CalcValue<PercentOr<Length>>>(),
+                                     Au(Math::sqrt(hSquared + wSquared) / Math::sqrt(2.0))
+                )
+                             .cast<f64>();
+            }
+            result.ellipse(Math::Ellipsef(center + referenceBox.xy.cast<f64>(), radius));
+
+            return makeRc<Scene::Clip>(result);
+        },
+        [&](Inset const& inset) {
+            Math::Insetsf resolved;
+            resolved.start = resolver.resolve(inset.insets.start, referenceBox.width).cast<f64>();
+            resolved.end = resolver.resolve(inset.insets.end, referenceBox.width).cast<f64>();
+            resolved.top = resolver.resolve(inset.insets.top, referenceBox.height).cast<f64>();
+            resolved.bottom = resolver.resolve(inset.insets.bottom, referenceBox.height).cast<f64>();
+
+            Math::Radiif resolvedRadii = _resolveRadii(resolver, inset.borderRadius, referenceBox);
+
+            result.rect(referenceBox.cast<f64>().shrink(resolved), resolvedRadii);
+
+            return makeRc<Scene::Clip>(result);
+        },
+        [&](Xywh const& xywh) {
+            Math::Rectf resolvedRect;
+            resolvedRect.x = resolver.resolve(xywh.rect.x, referenceBox.width).cast<f64>();
+            resolvedRect.y = resolver.resolve(xywh.rect.y, referenceBox.height).cast<f64>();
+            resolvedRect.width = resolver.resolve(xywh.rect.width, referenceBox.width).cast<f64>();
+            resolvedRect.height = resolver.resolve(xywh.rect.height, referenceBox.height).cast<f64>();
+
+            Math::Radiif resolvedRadii = _resolveRadii(resolver, xywh.borderRadius, referenceBox);
+
+            result.rect(resolvedRect.offset(referenceBox.xy.cast<f64>()), resolvedRadii);
+
+            return makeRc<Scene::Clip>(result);
+        },
+        [&](Rect const& rect) {
+            Math::Insetsf resolvedInsets;
+            resolvedInsets.top = resolver.resolve(rect.insets.top, referenceBox.height).cast<f64>();
+            resolvedInsets.end = resolver.resolve(rect.insets.end, referenceBox.width).cast<f64>();
+            resolvedInsets.bottom = resolver.resolve(rect.insets.bottom, referenceBox.height).cast<f64>();
+            resolvedInsets.start = resolver.resolve(rect.insets.start, referenceBox.width).cast<f64>();
+
+            Math::Radiif resolvedRadii = _resolveRadii(resolver, rect.borderRadius, referenceBox);
+
+            auto resultBox = referenceBox.cast<f64>();
+            resultBox.width = max(resolvedInsets.end - resolvedInsets.start, 0);
+            resultBox.height = max(resolvedInsets.bottom - resolvedInsets.top, 0);
+            resultBox.x += resolvedInsets.start;
+            resultBox.y += resolvedInsets.top;
+
+            result.rect(resultBox, resolvedRadii);
+
+            return makeRc<Scene::Clip>(result);
+        },
+        [&](Ellipse const& ellipse) {
+            auto center = _resolveBackgroundPosition(resolver, ellipse.position, referenceBox);
+
+            f64 rx;
+            if (ellipse.rx.is<Keywords::ClosestSide>()) {
+                rx = min(Math::abs(referenceBox.width.cast<f64>() - center.x), center.x);
+            } else if (ellipse.rx.is<Keywords::FarthestSide>()) {
+                rx = max(Math::abs(referenceBox.width.cast<f64>() - center.x), center.x);
+            } else {
+                rx = resolver.resolve(
+                                 ellipse.rx.unwrap<CalcValue<PercentOr<Length>>>(),
+                                 referenceBox.width
+                )
+                         .cast<f64>();
+            }
+
+            f64 ry;
+            if (ellipse.ry.is<Keywords::ClosestSide>()) {
+                ry = min(Math::abs(referenceBox.height.cast<f64>() - center.y), center.y);
+            } else if (ellipse.ry.is<Keywords::FarthestSide>()) {
+                ry = max(Math::abs(referenceBox.height.cast<f64>() - center.y), center.y);
+            } else {
+                ry = resolver.resolve(
+                                 ellipse.ry.unwrap<CalcValue<PercentOr<Length>>>(),
+                                 referenceBox.height
+                )
+                         .cast<f64>();
+            }
+            result.ellipse(Math::Ellipsef(center + referenceBox.xy.cast<f64>(), Math::Vec2f(rx, ry)));
+
+            return makeRc<Scene::Clip>(result);
+        },
+        [&](Path const& path) {
+            result.path(path.path);
+            result.offset(referenceBox.xy.cast<f64>());
+            return makeRc<Scene::Clip>(result, path.fillRule);
+        },
+    });
+}
+
 static void _establishStackingContext(Frag& frag, Scene::Stack& stack) {
-    auto innerStack = makeRc<Scene::Stack>();
+    Rc<Scene::Stack> innerStack = frag.style().clip.has() ? _resolveClip(frag) : makeRc<Scene::Stack>();
     innerStack->zIndex = frag.style().zIndex.unwrapOr<isize>(0);
     _paintStackingContext(frag, *innerStack);
     stack.add(std::move(innerStack));

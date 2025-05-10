@@ -2,7 +2,7 @@
 
 #include <handover/hook.h>
 #include <hjert-api/api.h>
-#include <karm-gfx/cpu/surface.h>
+#include <karm-gfx/buffer.h>
 #include <karm-logger/logger.h>
 
 namespace Strata::Shell {

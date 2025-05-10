@@ -185,15 +185,18 @@ union Trans2 {
         return {
             yy / det, -xy / det,
             -yx / det, xx / det,
-            (oy * yy - ox * yx) / det,
-            (ox * xy - oy * xx) / det
+            -(ox * yy - oy * xy) / det,
+            -(oy * xx - ox * yx) / det
         };
     }
 
-    constexpr bool isIdentity() const {
-        return xx == 1 and xy == 0 and
-               yx == 0 and yy == 1 and
-               ox == 0 and oy == 0;
+    constexpr bool isIdentity(T epsilon = Limits<T>::EPSILON) const {
+        return epsilonEq(xx, T{1}, epsilon) and
+               epsilonEq(yx, T{}, epsilon) and
+               epsilonEq(xy, T{}, epsilon) and
+               epsilonEq(yy, T{1}, epsilon) and
+               epsilonEq(ox, T{}, epsilon) and
+               epsilonEq(oy, T{}, epsilon);
     }
 
     constexpr bool hasNan() const {

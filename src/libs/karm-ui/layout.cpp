@@ -629,15 +629,15 @@ export Child flow(FlowStyle style, Children children) {
     return makeRc<FlowLayout>(style, children);
 }
 
-export Child hflow(Meta::Same<Child> auto... children) {
+export Child hflow(Meta::Convertible<Child> auto... children) {
     return flow({.flow = Math::Flow::LEFT_TO_RIGHT}, {children...});
 }
 
-export Child hflow(isize gaps, Meta::Same<Child> auto... children) {
+export Child hflow(isize gaps, Meta::Convertible<Child> auto... children) {
     return flow({.flow = Math::Flow::LEFT_TO_RIGHT, .gaps = gaps}, {children...});
 }
 
-export Child hflow(isize gaps, Math::Align align, Meta::Same<Child> auto... children) {
+export Child hflow(isize gaps, Math::Align align, Meta::Convertible<Child> auto... children) {
     return flow({.flow = Math::Flow::LEFT_TO_RIGHT, .align = align, .gaps = gaps}, {children...});
 }
 
@@ -653,15 +653,15 @@ export Child hflow(isize gaps, Math::Align align, Children children) {
     return flow({.flow = Math::Flow::LEFT_TO_RIGHT, .align = align, .gaps = gaps}, children);
 }
 
-export Child vflow(Meta::Same<Child> auto... children) {
+export Child vflow(Meta::Convertible<Child> auto... children) {
     return flow({.flow = Math::Flow::TOP_TO_BOTTOM}, {children...});
 }
 
-export Child vflow(isize gaps, Meta::Same<Child> auto... children) {
+export Child vflow(isize gaps, Meta::Convertible<Child> auto... children) {
     return flow({.flow = Math::Flow::TOP_TO_BOTTOM, .gaps = gaps}, {children...});
 }
 
-export Child vflow(isize gaps, Math::Align align, Meta::Same<Child> auto... children) {
+export Child vflow(isize gaps, Math::Align align, Meta::Convertible<Child> auto... children) {
     return flow({.flow = Math::Flow::TOP_TO_BOTTOM, .align = align, .gaps = gaps}, {children...});
 }
 
@@ -966,7 +966,7 @@ export Child grid(GridStyle style, Children children) {
     return makeRc<GridLayout>(style, children);
 }
 
-export Child grid(GridStyle style, Meta::Same<Child> auto... children) {
+export Child grid(GridStyle style, Meta::Convertible<Child> auto... children) {
     return grid(style, Children{children...});
 }
 

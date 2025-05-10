@@ -57,30 +57,36 @@ export Ui::Child titlebarControls(TitlebarStyle style) {
     );
 }
 
-export Ui::Child titlebarContent(Ui::Children children) {
-    return Ui::hflow(
-               4,
-               children
-           ) |
-           Ui::insets(8) |
-           Ui::dragRegion() |
-           Ui::box({.backgroundFill = Ui::GRAY900});
-}
+export struct TitlebarContent {
+    Ui::Child start;
+    Ui::Child middle = Ui::empty();
+    Ui::Child end;
+
+    operator Ui::Child() const {
+        return Ui::hflow(
+                   4,
+                   start | Ui::insets({8, 0}),
+                   middle | Ui::grow(),
+                   end | Ui::insets({8, 0})
+               ) |
+               Ui::insets({0, 8}) |
+               Ui::dragRegion();
+    }
+};
 
 export Ui::Child titlebar(Gfx::Icon icon, String title, TitlebarStyle style = TitlebarStyle::DEFAULT) {
-    return titlebarContent({
-        titlebarTitle(icon, title),
-        Ui::grow(NONE),
-        titlebarControls(style),
-    });
+    return TitlebarContent{
+        .start = titlebarTitle(icon, title),
+        .end = titlebarControls(style)
+    };
 }
 
 export Ui::Child titlebar(Gfx::Icon icon, String title, Ui::Child middle, TitlebarStyle style = TitlebarStyle::DEFAULT) {
-    return titlebarContent({
-        titlebarTitle(icon, title),
-        middle | Ui::grow(),
-        titlebarControls(style),
-    });
+    return TitlebarContent{
+        .start = titlebarTitle(icon, title),
+        .middle = middle,
+        .end = titlebarControls(style),
+    };
 }
 
 } // namespace Karm::Kira

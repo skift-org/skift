@@ -82,6 +82,8 @@ test$("bool-niche") {
     expectEq$(test, NONE);
     test = false;
     expectEq$(test.has(), true);
+    test = 2;
+    expectEq$(test.has(), true);
 
     return Ok();
 }

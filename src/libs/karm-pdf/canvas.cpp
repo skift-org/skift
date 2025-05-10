@@ -102,8 +102,15 @@ void Canvas::arc(Math::Arcf) {
     logDebugIf(DEBUG_CANVAS, "pdf: arc() operation not implemented");
 }
 
-void Canvas::path(Math::Path const&) {
-    logDebugIf(DEBUG_CANVAS, "pdf: path() operation not implemented");
+void Canvas::path(Math::Path const& path) {
+    // FIXME: use list of ops
+    for (auto& contour : path.iterContours()) {
+        moveTo(contour[0], Math::Path::DEFAULT);
+        for (auto& vert : next(contour)) {
+            lineTo(vert, Math::Path::DEFAULT);
+        }
+        closePath();
+    }
 }
 
 void Canvas::fill(Gfx::FillRule rule) {
@@ -197,8 +204,11 @@ void Canvas::stroke(Gfx::Stroke style) {
     _e.ln("S");
 }
 
-void Canvas::clip(Gfx::FillRule) {
-    logDebugIf(DEBUG_CANVAS, "pdf: clip() operation not implemented");
+void Canvas::clip(Gfx::FillRule rule) {
+    if (rule == Gfx::FillRule::EVENODD)
+        _e.ln("W* n");
+    else
+        _e.ln("W n");
 }
 
 void Canvas::apply(Gfx::Filter) {

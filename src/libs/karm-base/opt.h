@@ -352,23 +352,18 @@ struct [[nodiscard]] Opt<T> {
     template <typename U = T>
     always_inline constexpr Opt(U const& value)
         requires(not Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> and Meta::CopyConstructible<T, U>)
-        : _value(value) {
-        _content.setupValue();
-    }
+        : _value(value) {}
 
     template <typename U = T>
     always_inline constexpr Opt(U&& value)
         requires(not Meta::Same<Meta::RemoveConstVolatileRef<U>, Opt<T>> and Meta::MoveConstructible<T, U>)
-        : _value(std::forward<U>(value)) {
-        _content.setupValue();
-    }
+        : _value(std::forward<U>(value)) {}
 
     always_inline constexpr Opt(Opt const& other)
         requires(Meta::CopyConstructible<T>)
     {
         if (other.has()) {
             std::construct_at(&_value, other.unwrap());
-            _content.setupValue();
         } else
             std::construct_at(&_content);
     }
@@ -378,7 +373,6 @@ struct [[nodiscard]] Opt<T> {
     {
         if (other.has()) {
             std::construct_at(&_value, other.take());
-            _content.setupValue();
         } else
             std::construct_at(&_content);
     }
@@ -389,7 +383,6 @@ struct [[nodiscard]] Opt<T> {
     {
         if (other.has()) {
             std::construct_at(&_value, other.unwrap());
-            _content.setupValue();
         } else
             std::construct_at(&_content);
     }
@@ -399,7 +392,6 @@ struct [[nodiscard]] Opt<T> {
     always_inline constexpr Opt(Opt<U>&& other) {
         if (other.has()) {
             std::construct_at(&_value, other.take());
-            _content.setupValue();
         } else
             std::construct_at(&_content);
     }
@@ -418,7 +410,6 @@ struct [[nodiscard]] Opt<T> {
     always_inline constexpr Opt& operator=(U const& value) {
         clear();
         std::construct_at(&_value, value);
-        _content.setupValue();
         return *this;
     }
 
@@ -427,7 +418,6 @@ struct [[nodiscard]] Opt<T> {
     always_inline constexpr Opt& operator=(U&& value) {
         clear();
         std::construct_at(&_value, std::move(value));
-        _content.setupValue();
         return *this;
     }
 
@@ -444,7 +434,6 @@ struct [[nodiscard]] Opt<T> {
         clear();
         if (other.has()) {
             std::construct_at(&_value, other.take());
-            _content.setupValue();
         }
         return *this;
     }
@@ -464,7 +453,6 @@ struct [[nodiscard]] Opt<T> {
         clear();
         if (other.has()) {
             std::construct_at(&_value, other.take());
-            _content.setupValue();
         }
         return *this;
     }
@@ -671,8 +659,6 @@ struct Niche<bool> {
         constexpr bool has() const {
             return data != 2;
         }
-
-        constexpr void setupValue() {}
     };
 };
 
@@ -688,8 +674,6 @@ struct Niche<T> {
         constexpr bool has() const {
             return data != (IntType(T::_LEN) + 1);
         }
-
-        constexpr void setupValue() {}
     };
 };
 

@@ -698,8 +698,6 @@ struct Niche<Buf<T>> {
         always_inline constexpr bool has() const {
             return ptr != _NONE_PTR;
         }
-
-        always_inline constexpr void setupValue() {}
     };
 };
 

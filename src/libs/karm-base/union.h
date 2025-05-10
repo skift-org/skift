@@ -249,8 +249,6 @@ struct Niche<Union<Ts...>> {
         always_inline constexpr bool has() const {
             return index != 255;
         }
-
-        always_inline constexpr void setupValue() {}
     };
 };
 

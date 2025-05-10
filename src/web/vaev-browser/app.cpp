@@ -15,6 +15,7 @@ export module Vaev.Browser:app;
 import Mdi;
 import Vaev.View;
 import Vaev.Driver;
+import Vaev.Loader;
 import Karm.Http;
 import Karm.Kira;
 import Karm.Ui;
@@ -102,9 +103,9 @@ using Action = Union<
 
 Async::_Task<Opt<Action>> navigateAsync(Gc::Heap& heap, Http::Client& client, Navigate nav) {
     if (nav.action == Mime::Uti::PUBLIC_MODIFY) {
-        co_return Loaded{co_await Vaev::Driver::viewSourceAsync(heap, client, nav.url)};
+        co_return Loaded{co_await Vaev::Loader::viewSourceAsync(heap, client, nav.url)};
     } else {
-        co_return Loaded{co_await Vaev::Driver::fetchDocumentAsync(heap, client, nav.url)};
+        co_return Loaded{co_await Vaev::Loader::fetchDocumentAsync(heap, client, nav.url)};
     }
 }
 
@@ -411,7 +412,6 @@ export Ui::Child app(Gc::Heap& heap, Http::Client& client, Mime::Url url, Res<Gc
                 .body = [&] {
                     return appContent(s);
                 },
-                .compact = true,
             });
             return scaffold |
                    Ui::keyboardShortcut(App::Key::R, App::KeyMod::CTRL, Model::bind<Reload>()) |

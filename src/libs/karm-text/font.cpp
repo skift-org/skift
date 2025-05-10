@@ -1,5 +1,4 @@
 #include <karm-gfx/canvas.h>
-#include <karm-logger/logger.h>
 
 #include "font.h"
 #include "vga.h"

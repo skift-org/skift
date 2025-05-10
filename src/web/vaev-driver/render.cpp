@@ -10,7 +10,6 @@ module;
 export module Vaev.Driver:render;
 
 import Vaev.Layout;
-import :loader;
 
 namespace Vaev::Driver {
 

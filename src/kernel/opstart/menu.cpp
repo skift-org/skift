@@ -1,3 +1,7 @@
+#include <karm-app/event.h>
+#include <karm-app/inputs.h>
+#include <karm-math/align.h>
+
 #include "loader.h"
 
 import Mdi;
@@ -49,15 +53,17 @@ using Model = Ui::Model<State, Action, reduce>;
 // MARK: Views -----------------------------------------------------------------
 
 Ui::Child icon(Entry const& e) {
-    return e.icon.visit(Visitor{[&](Mdi::Icon i) {
-                                    return Ui::icon(i, 64);
-                                },
-                                [&](Image::Picture i) {
-                                    return Ui::pinSize(64, Ui::image(i));
-                                },
-                                [&](None) {
-                                    return Ui::empty();
-                                }});
+    return e.icon.visit(Visitor{
+        [&](Gfx::Icon i) {
+            return Ui::icon(i, 64);
+        },
+        [&](Image::Picture i) {
+            return Ui::pinSize(64, Ui::image(i));
+        },
+        [&](None) {
+            return Ui::empty();
+        },
+    });
 }
 
 Ui::Child entry(State const& s, Entry const& e, usize i) {
@@ -159,7 +165,7 @@ Ui::Child menu(Configs const& c) {
 }
 
 Async::Task<> showMenuAsync(Sys::Context& ctx, Configs const& c) {
-    return Ui::runAsync(ctx, Opstart::menu(c));
+    co_return co_await Ui::runAsync(ctx, Opstart::menu(c));
 }
 
 } // namespace Opstart

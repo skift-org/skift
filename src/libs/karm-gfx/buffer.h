@@ -50,7 +50,25 @@ struct Bgra8888 {
 
 static inline Bgra8888 BGRA8888;
 
-using _Fmts = Union<Rgba8888, Bgra8888>;
+struct Greyscale8 {
+    always_inline static Color load(void const* pixel) {
+        u8 const* p = static_cast<u8 const*>(pixel);
+        return Color::fromRgba(p[0], p[0], p[0], 255);
+    }
+
+    always_inline static void store(void* pixel, Color color) {
+        u8* p = static_cast<u8*>(pixel);
+        p[0] = color.red;
+    }
+
+    always_inline static constexpr usize bpp() {
+        return 1;
+    }
+};
+
+static inline Greyscale8 GREYSCALE8;
+
+using _Fmts = Union<Rgba8888, Bgra8888, Greyscale8>;
 
 struct Fmt : _Fmts {
     using _Fmts::_Fmts;

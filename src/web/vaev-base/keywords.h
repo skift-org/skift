@@ -79,6 +79,54 @@ static constexpr inline Mathematical MATHEMATICAL{};
 using TextTop = Keyword<"text-top">;
 static constexpr inline TextTop TEXT_TOP{};
 
+using MarginBox = Keyword<"margin-box">;
+static constexpr inline MarginBox MARGIN_BOX{};
+
+using BorderBox = Keyword<"border-box">;
+static constexpr inline BorderBox BORDER_BOX{};
+
+using PaddingBox = Keyword<"padding-box">;
+static constexpr inline PaddingBox PADDING_BOX{};
+
+using ContentBox = Keyword<"content-box">;
+static constexpr inline ContentBox CONTENT_BOX{};
+
+using FillBox = Keyword<"fill-box">;
+static constexpr inline FillBox FILL_BOX{};
+
+using StrokeBox = Keyword<"stroke-box">;
+static constexpr inline StrokeBox STROKE_BOX{};
+
+using ViewBox = Keyword<"view-box">;
+static constexpr inline ViewBox VIEW_BOX{};
+
+using Nonzero = Keyword<"nonzero">;
+static constexpr inline Nonzero NONZERO{};
+
+using Evenodd = Keyword<"evenodd">;
+static constexpr inline Evenodd EVENODD{};
+
+using Left = Keyword<"left">;
+static constexpr inline Left LEFT{};
+
+using Right = Keyword<"right">;
+static constexpr inline Right RIGHT{};
+
+using Top = Keyword<"top">;
+static constexpr inline Top TOP{};
+
+using Bottom = Keyword<"bottom">;
+static constexpr inline Bottom BOTTOM{};
+
+using Center = Keyword<"center">;
+static constexpr inline Center CENTER{};
+
+using ClosestSide = Keyword<"closest-side">;
+static constexpr inline ClosestSide CLOSEST_SIDE{};
+
+using FarthestSide = Keyword<"farthest-side">;
+static constexpr inline FarthestSide FARTHEST_SIDE{};
+
 } // namespace Keywords
 
 } // namespace Vaev

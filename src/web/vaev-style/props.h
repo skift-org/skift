@@ -2,6 +2,7 @@
 
 #include <karm-io/emit.h>
 #include <karm-mime/url.h>
+#include <vaev-base/basic-shape.h>
 #include <vaev-base/color.h>
 #include <vaev-base/font.h>
 
@@ -1229,6 +1230,36 @@ struct ContentProp {
 
     Res<> parse(Cursor<Css::Sst>& c) {
         value = try$(parseValue<String>(c));
+        return Ok();
+    }
+};
+
+// MARK: Clip Path -------------------------------------------------------------
+
+// https://drafts.fxtf.org/css-masking/#the-clip-path
+struct ClipPathProp {
+    using Value = Union</* Url, */ BasicShape, Keywords::None>;
+    Value value = initial();
+
+    static constexpr Str name() { return "clip-path"; }
+
+    static Keywords::None initial() { return Keywords::NONE; }
+
+    void apply(ComputedStyle& c) const {
+        if (auto clipShape = value.is<BasicShape>())
+            c.clip = *clipShape;
+        else
+            c.clip = NONE;
+    }
+
+    static Value load(ComputedStyle const& c) {
+        if (c.clip.has())
+            return c.clip.unwrap();
+        return Keywords::NONE;
+    }
+
+    Res<> parse(Cursor<Css::Sst>& c) {
+        value = try$(parseValue<Value>(c));
         return Ok();
     }
 };
@@ -3127,6 +3158,9 @@ using _StyleProp = Union<
     // Borders - Table
     BorderCollapseProp,
     BorderSpacingProp,
+
+    // Clip
+    ClipPathProp,
 
     // Content
     ContentProp,

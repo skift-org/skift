@@ -9,6 +9,7 @@
         ]
     },
     "requires": [
-        "karm-base"
+        "karm-base",
+        "karm-gfx"
     ]
 }

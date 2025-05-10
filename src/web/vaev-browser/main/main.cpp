@@ -4,7 +4,7 @@
 
 import Karm.Ui;
 import Vaev.Browser;
-import Vaev.Driver;
+import Vaev.Loader;
 import Karm.Http;
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
@@ -16,7 +16,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto client = Http::defaultClient();
     client->userAgent = "Vaev-Browser/" stringify$(__ck_version_value) ""s;
 
-    auto dom = co_await Vaev::Driver::fetchDocumentAsync(heap, *client, url);
+    auto dom = co_await Vaev::Loader::fetchDocumentAsync(heap, *client, url);
 
     co_return co_await Ui::runAsync(
         ctx,

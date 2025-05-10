@@ -124,7 +124,6 @@ using i128 = __int128_t;
 
 // MARK: Floating point --------------------------------------------------------
 
-using f16 = _Float16;
 using f32 = float;
 using f64 = double;
 

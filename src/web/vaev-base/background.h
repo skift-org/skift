@@ -3,8 +3,10 @@
 #include <karm-gfx/fill.h>
 #include <karm-mime/url.h>
 
+#include "calc.h"
 #include "color.h"
 #include "image.h"
+#include "keywords.h"
 #include "length.h"
 #include "percent.h"
 
@@ -19,79 +21,34 @@ enum struct BackgroundAttachment {
 };
 
 struct BackgroundPosition {
-    enum struct HorizontalAnchor {
-        LEFT,
-        CENTER,
-        RIGHT,
-
-        _LEN0
-    };
-
-    enum struct VerticalPosition {
-        TOP,
-        CENTER,
-        BOTTOM,
-
-        _LEN1
-    };
+    using HorizontalAnchor = Union<Keywords::Left, Keywords::Center, Keywords::Right>;
+    using VerticalAnchor = Union<Keywords::Top, Keywords::Center, Keywords::Bottom>;
 
     HorizontalAnchor horizontalAnchor;
-    PercentOr<Length> horizontal;
-    VerticalPosition verticalAnchor;
-    PercentOr<Length> vertical;
+    CalcValue<PercentOr<Length>> horizontal;
+    VerticalAnchor verticalAnchor;
+    CalcValue<PercentOr<Length>> vertical;
 
     constexpr BackgroundPosition()
-        : horizontalAnchor(HorizontalAnchor::LEFT),
+        : horizontalAnchor(Keywords::LEFT),
           horizontal(Percent{0}),
-          verticalAnchor(VerticalPosition::TOP),
+          verticalAnchor(Keywords::TOP),
           vertical(Percent{0}) {
     }
 
-    constexpr BackgroundPosition(PercentOr<Length> horizontal, PercentOr<Length> vertical)
-        : horizontalAnchor(HorizontalAnchor::LEFT), horizontal(horizontal), verticalAnchor(VerticalPosition::TOP), vertical(vertical) {
+    constexpr BackgroundPosition(CalcValue<PercentOr<Length>> horizontal, CalcValue<PercentOr<Length>> vertical)
+        : horizontalAnchor(Keywords::LEFT), horizontal(horizontal), verticalAnchor(Keywords::TOP), vertical(vertical) {
     }
 
-    constexpr BackgroundPosition(HorizontalAnchor horizontalAnchor, PercentOr<Length> horizontal, VerticalPosition verticalAnchor, PercentOr<Length> vertical)
+    constexpr BackgroundPosition(HorizontalAnchor horizontalAnchor, CalcValue<PercentOr<Length>> horizontal, VerticalAnchor verticalAnchor, CalcValue<PercentOr<Length>> vertical)
         : horizontalAnchor(horizontalAnchor), horizontal(horizontal), verticalAnchor(verticalAnchor), vertical(vertical) {
     }
 
     void repr(Io::Emit& e) const {
-        switch (horizontalAnchor) {
-        case HorizontalAnchor::LEFT:
-            e("left");
-            break;
-        case HorizontalAnchor::CENTER:
-            e("center");
-            break;
-        case HorizontalAnchor::RIGHT:
-            e("right");
-            break;
-
-        default:
-            unreachable();
-        }
+        e("({} {}", horizontalAnchor, horizontal);
 
         e(" ");
-
-        switch (verticalAnchor) {
-        case VerticalPosition::TOP:
-            e("top");
-            break;
-        case VerticalPosition::CENTER:
-            e("center");
-            break;
-        case VerticalPosition::BOTTOM:
-            e("bottom");
-            break;
-
-        default:
-            unreachable();
-        }
-
-        e(" ");
-        e("{}", horizontal);
-        e(" ");
-        e("{}", vertical);
+        e("{} {})", verticalAnchor, vertical);
     }
 };
 

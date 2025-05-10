@@ -205,6 +205,7 @@ void Path::evalOp(Op op) {
         break;
 
     case CLOSE:
+        op.p = _verts[last(_contours).start];
         _flattenClose();
         break;
 
@@ -310,6 +311,9 @@ void Path::curve(Math::Curvef curve) {
 }
 
 void Path::rect(Math::Rectf rect, Math::Radiif radii) {
+    if (Math::epsilonEq(min(rect.width, rect.height), 0.0, 0.001))
+        return;
+
     if (radii.zero()) {
         moveTo(rect.topStart());
         lineTo(rect.topEnd());
@@ -395,6 +399,13 @@ void Path::path(Math::Path const& path) {
         if (contour.close)
             close();
     }
+}
+
+// MARK: Transform
+
+void Path::offset(Math::Vec2f offset) {
+    for (auto& v : _verts)
+        v = v + offset;
 }
 
 // MARK: Svg -------------------------------------------------------------------
@@ -501,7 +512,9 @@ bool Path::evalSvg(Str svg) {
 
 Path Path::fromSvg(Str svg) {
     Path p;
-    p.evalSvg(svg);
+    if (not p.evalSvg(svg)) {
+        logWarn("couldn't create SVG from input");
+    }
     return p;
 }
 

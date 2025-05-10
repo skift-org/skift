@@ -10,32 +10,6 @@ template <typename T>
 union FloatBits;
 
 template <>
-union FloatBits<f16> {
-    static constexpr int mantissaBits = 10;
-    static constexpr u16 mantissaMax = (((u16)1) << 10) - 1;
-    static constexpr int exponentBias = 15;
-    static constexpr int exponentBits = 5;
-    static constexpr unsigned exponentMax = 31;
-
-    struct [[gnu::packed]] {
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-        u16 sign : 1;
-        u16 exponent : 5;
-        u16 mantissa : 10;
-#else
-        u16 mantissa : 10;
-        u16 exponent : 5;
-        u16 sign : 1;
-#endif
-    };
-
-    f16 d;
-};
-
-static_assert(sizeof(f16) == 2);
-static_assert(sizeof(FloatBits<f16>) == sizeof(f16));
-
-template <>
 union FloatBits<f32> {
     static constexpr int mantissaBits = 23;
     static constexpr u32 mantissaMax = (((u32)1) << 23) - 1;
@@ -125,19 +99,16 @@ struct Karm::Niche<T> {
     struct Content {
         Math::FloatBits<T> bits;
 
-        constexpr Content() {
-            bits.d = Math::NAN;
-            bits.mantissa &= ~1;
-        }
+        static constexpr Math::FloatBits<T> _none = {
+            .sign = 1,
+            .exponent = Math::FloatBits<T>::exponentMax,
+            .mantissa = static_cast<decltype(Math::FloatBits<T>::mantissaMax)>(0b11) << (Math::FloatBits<T>::mantissaBits - 2)
+        };
+
+        constexpr Content() : bits(_none) {}
 
         constexpr bool has() const {
-            return not __builtin_isnan(bits.d) or bits.mantissa & 1;
-        }
-
-        constexpr void setupValue() {
-            if (__builtin_isnan(bits.d)) {
-                bits.mantissa |= 1;
-            }
+            return not(bits.sign == _none.sign and bits.exponent == _none.exponent and bits.mantissa == _none.mantissa);
         }
     };
 };

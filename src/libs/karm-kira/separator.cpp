@@ -10,9 +10,14 @@ import Karm.Ui;
 namespace Karm::Kira {
 
 struct Separator : Ui::View<Separator> {
+    Gfx::Color _color;
+
+    Separator(Gfx::Color color)
+        : _color(color) {}
+
     void paint(Gfx::Canvas& g, Math::Recti) override {
         g.push();
-        g.fillStyle(Ui::GRAY800);
+        g.fillStyle(_color);
         g.fill(bound());
         g.pop();
     }
@@ -22,8 +27,8 @@ struct Separator : Ui::View<Separator> {
     }
 };
 
-export Ui::Child separator() {
-    return makeRc<Separator>();
+export Ui::Child separator(Gfx::Color color = Ui::GRAY800) {
+    return makeRc<Separator>(color);
 }
 
 export Ui::Child separator(String text) {

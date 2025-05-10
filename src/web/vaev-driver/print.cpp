@@ -223,7 +223,7 @@ export Generator<Print::Page> print(Gc::Ref<Dom::Document> dom, Print::Settings 
         Layout::paint(fragment, *pageStack);
         pageStack->prepare();
 
-        co_yield Print::Page(settings.paper, makeRc<Scene::Transform>(pageStack, Math::Trans2f::makeScale(media.resolution.toDppx())));
+        co_yield Print::Page(settings.paper, makeRc<Scene::Transform>(pageStack, Math::Trans2f::scale(media.resolution.toDppx())));
 
         if (outReal.completelyLaidOut)
             break;

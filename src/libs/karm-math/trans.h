@@ -30,9 +30,17 @@ union Trans2 {
         Vec2<T> o;
     };
 
-    static Trans2 const IDENTITY;
+    Array<T, 6> _els{};
 
-    static constexpr Trans2 makeRotate(T angle) {
+    static constexpr Trans2 identity() {
+        return {
+            1, 0,
+            0, 1,
+            0, 0
+        };
+    }
+
+    static constexpr Trans2 rotate(T angle) {
         T c = cos(angle);
         T s = sin(angle);
         return {
@@ -42,7 +50,7 @@ union Trans2 {
         };
     }
 
-    static constexpr Trans2 makeSkew(Vec2<T> v) {
+    static constexpr Trans2 skew(Vec2<T> v) {
         return {
             1, v.x,
             v.y, 1,
@@ -50,7 +58,7 @@ union Trans2 {
         };
     }
 
-    static constexpr Trans2 makeScale(Vec2<T> v) {
+    static constexpr Trans2 scale(Vec2<T> v) {
         return {
             v.x, 0,
             0, v.y,
@@ -58,15 +66,13 @@ union Trans2 {
         };
     }
 
-    static constexpr Trans2 makeTranslate(Vec2<T> v) {
+    static constexpr Trans2 translate(Vec2<T> v) {
         return {
             1, 0,
             0, 1,
             v.x, v.y
         };
     }
-
-    Array<T, 6> _els{};
 
     bool rotated() const {
         return xx * yy - xy * yx < 0;
@@ -165,19 +171,19 @@ union Trans2 {
     }
 
     constexpr Trans2 rotated(T angle) {
-        return multiply(makeRotate(angle));
+        return multiply(rotate(angle));
     }
 
     constexpr Trans2 skewed(Vec2<T> v) {
-        return multiply(makeSkew(v));
+        return multiply(skew(v));
     }
 
     constexpr Trans2 scaled(Vec2<T> v) {
-        return multiply(makeScale(v));
+        return multiply(scale(v));
     }
 
     constexpr Trans2 translated(Vec2<T> v) {
-        return multiply(makeTranslate(v));
+        return multiply(translate(v));
     }
 
     constexpr Trans2 inverse() const {
@@ -212,14 +218,7 @@ union Trans2 {
     }
 };
 
-template <typename T>
-Trans2<T> const Trans2<T>::IDENTITY = {
-    1, 0,
-    0, 1,
-    0, 0
-};
-
-using Trans2i = Trans2<isize>;
+using Trans2i = Trans2<i64>;
 
 using Trans2f = Trans2<f64>;
 

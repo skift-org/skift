@@ -10,10 +10,10 @@ test$("transform-inverse") {
         return m.multiply(m.inverse());
     };
 
-    expect$(makeIdentity(Trans2f::makeRotate(10)).isIdentity());
-    expect$(makeIdentity(Trans2f::makeSkew(transVec)).isIdentity());
-    expect$(makeIdentity(Trans2f::makeScale(transVec)).isIdentity());
-    expect$(makeIdentity(Trans2f::makeTranslate(transVec)).isIdentity());
+    expect$(makeIdentity(Trans2f::rotate(10)).isIdentity());
+    expect$(makeIdentity(Trans2f::skew(transVec)).isIdentity());
+    expect$(makeIdentity(Trans2f::scale(transVec)).isIdentity());
+    expect$(makeIdentity(Trans2f::translate(transVec)).isIdentity());
 
     return Ok();
 }

@@ -22,19 +22,19 @@ void Canvas::origin(Math::Vec2f p) {
 }
 
 void Canvas::translate(Math::Vec2f pos) {
-    transform(Math::Trans2f::makeTranslate(pos));
+    transform(Math::Trans2f::translate(pos));
 }
 
 void Canvas::scale(Math::Vec2f pos) {
-    transform(Math::Trans2f::makeScale(pos));
+    transform(Math::Trans2f::scale(pos));
 }
 
 void Canvas::rotate(f64 angle) {
-    transform(Math::Trans2f::makeRotate(angle));
+    transform(Math::Trans2f::rotate(angle));
 }
 
 void Canvas::skew(Math::Vec2f pos) {
-    transform(Math::Trans2f::makeSkew(pos));
+    transform(Math::Trans2f::skew(pos));
 }
 
 // MARK: Path Operations ---------------------------------------------------

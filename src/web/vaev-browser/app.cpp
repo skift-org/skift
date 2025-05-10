@@ -370,7 +370,7 @@ Ui::Child appContent(State const& s) {
     }
     return Ui::hflow(
         webview(s) | Ui::grow(),
-        sidePanel(s) | Kr::resizable(Kr::ResizeHandle::START, {320}, Ui::SINK<Math::Vec2i>)
+        sidePanel(s) | Kr::resizable(Kr::ResizeHandle::START, {320}, NONE)
     );
 }
 

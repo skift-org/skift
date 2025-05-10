@@ -179,7 +179,7 @@ Ui::Child computedStyles() {
 export Ui::Child inspect(Gc::Ref<Vaev::Dom::Document> n, InspectState const& s, Ui::Action<InspectorAction> a) {
     return Ui::vflow(
         node(n, s, a) | Ui::vscroll() | Ui::grow(),
-        computedStyles() | Kr::resizable(Kr::ResizeHandle::TOP, {128}, Ui::SINK<Math::Vec2i>)
+        computedStyles() | Kr::resizable(Kr::ResizeHandle::TOP, {128}, NONE)
     );
 }
 

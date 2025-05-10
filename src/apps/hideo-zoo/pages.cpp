@@ -438,9 +438,9 @@ Page PAGE_RESIZABLE{
     "A control that allows the user to resize an element.",
     [] {
         return Ui::hflow(
-            Ui::labelMedium("One") | Ui::center() | Kr::resizable(Kr::ResizeHandle::END, 200, Ui::SINK<Math::Vec2i>),
+            Ui::labelMedium("One") | Ui::center() | Kr::resizable(Kr::ResizeHandle::END, 200, NONE),
             Ui::vflow(
-                Ui::labelMedium("Two") | Ui::center() | Kr::resizable(Kr::ResizeHandle::BOTTOM, 200, Ui::SINK<Math::Vec2i>),
+                Ui::labelMedium("Two") | Ui::center() | Kr::resizable(Kr::ResizeHandle::BOTTOM, 200, NONE),
                 Ui::labelMedium("Three") | Ui::center() | Ui::grow()
             ) | Ui::grow()
         );

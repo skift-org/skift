@@ -48,7 +48,7 @@ Ui::Child viewerControls(State const&) {
            Ui::center();
 }
 
-export Ui::Child viewer(State const& state) {
+export Ui::Child viewerApp(State const& state) {
     return Ui::vflow(
         viewerToolbar(state),
         viewerPreview(state) | Ui::grow(),

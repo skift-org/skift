@@ -13,15 +13,9 @@ export Ui::Child app(State initial) {
     return Ui::reducer<Model>(
         initial,
         [](auto const& s) {
-            return Kr::scaffold({
-                .icon = Mdi::IMAGE,
-                .title = "Images"s,
-                .body = [&] {
-                    return s.isEditor
-                               ? editor(s)
-                               : viewer(s);
-                },
-            });
+            return s.isEditor
+                       ? editorApp(s)
+                       : viewerApp(s);
         }
     );
 }

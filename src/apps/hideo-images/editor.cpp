@@ -61,21 +61,9 @@ Ui::Child editorPreview(State const& state) {
 
 Ui::Child editorToolbar(State const&) {
     return Kr::toolbar({
+
         Ui::grow(NONE),
 
-        Ui::button(
-            Model::bind<ToggleEditor>(),
-            Ui::ButtonStyle::subtle(),
-            Mdi::CANCEL,
-            "Cancel"
-        ),
-
-        Ui::button(
-            Model::bind<SaveImage>(),
-            Ui::ButtonStyle::primary(),
-            Mdi::FLOPPY,
-            "Save Changes"
-        ),
     });
 }
 
@@ -190,13 +178,92 @@ Ui::Child editorControls(State const& state) {
            Ui::slideIn(Ui::SlideFrom::BOTTOM);
 }
 
-Ui::Child editor(State const& state) {
+Ui::Child editorProperties(State const& s) {
     return Ui::vflow(
-        editorToolbar(state),
-        histogram(state.hist) | Ui::pinSize(64),
-        editorPreview(state) | Ui::grow(),
-        editorControls(state)
+        histogram(s.hist) | Ui::pinSize(64),
+        Kr::separator(),
+        Ui::vscroll(
+            Ui::vflow(
+                Kr::titleRow("Composition"s),
+                Kr::sliderRow(0, Ui::SINK<f64>, "Rotation"s),
+                Kr::separator(),
+
+                Kr::titleRow("Light"s),
+                Kr::sliderRow(0, Ui::SINK<f64>, "Brightness"s),
+                Kr::sliderRow(0, Ui::SINK<f64>, "Exposure"s),
+                Kr::sliderRow(0, Ui::SINK<f64>, "Gamma"s),
+                Kr::sliderRow(0, Ui::SINK<f64>, "Contrast"s),
+                Kr::sliderRow(0, Ui::SINK<f64>, "Shadow"s),
+                Kr::sliderRow(0, Ui::SINK<f64>, "Highlights"s),
+                Kr::sliderRow(0, Ui::SINK<f64>, "Bloom"s),
+                Kr::separator(),
+
+                Kr::titleRow("Color"s),
+                Kr::sliderRow(0, Ui::SINK<f64>, "Temparature"s),
+                Kr::sliderRow(0, Ui::SINK<f64>, "Tint"s),
+                Kr::sliderRow(0, Ui::SINK<f64>, "Vibrance"s),
+                Kr::sliderRow(0, Ui::SINK<f64>, "Saturation"s),
+                Kr::sliderRow(0, Ui::SINK<f64>, "Sepia"s),
+                Kr::separator(),
+
+                Kr::titleRow("Effects"s),
+                Kr::sliderRow(0, Ui::SINK<f64>, "Clarity"s),
+                Kr::sliderRow(0, Ui::SINK<f64>, "Noise"s),
+                Kr::sliderRow(0, Ui::SINK<f64>, "Vignette"s),
+                Kr::separator(),
+
+                Kr::titleRow("Curves"s),
+                Kr::separator(),
+
+                Kr::titleRow("Filters"s)
+            )
+        ) | Ui::grow()
     );
+}
+
+Ui::Child editorApp(State const& s) {
+    return Kr::scaffold({
+        .icon = Mdi::IMAGE,
+        .title = "Images"s,
+        .startTools = [&] -> Ui::Children {
+            return {
+                Ui::button(
+                    Model::bind<ToggleEditor>(),
+                    Ui::ButtonStyle::subtle(),
+                    Mdi::UNDO
+                ),
+
+                Ui::button(
+                    Model::bind<ToggleEditor>(),
+                    Ui::ButtonStyle::subtle(),
+                    Mdi::REDO
+                ),
+            };
+        },
+        .endTools = [&] -> Ui::Children {
+            return {
+                Ui::button(
+                    Model::bind<ToggleEditor>(),
+                    Ui::ButtonStyle::subtle(),
+                    Mdi::CANCEL,
+                    "Cancel"
+                ),
+
+                Ui::button(
+                    Model::bind<SaveImage>(),
+                    Ui::ButtonStyle::primary(),
+                    Mdi::FLOPPY,
+                    "Save Changes"
+                ),
+            };
+        },
+        .body = [&] {
+            return Ui::hflow(
+                editorPreview(s) | Ui::grow(),
+                editorProperties(s) | Kr::resizable(Kr::ResizeHandle::START, {320}, NONE)
+            );
+        },
+    });
 }
 
 } // namespace Hideo::Images

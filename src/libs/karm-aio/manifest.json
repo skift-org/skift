@@ -1,9 +1,0 @@
-{
-    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "karm-aio",
-    "type": "lib",
-    "description": "Base traits for asynchroneous IO",
-    "requires": [
-        "karm-io"
-    ]
-}

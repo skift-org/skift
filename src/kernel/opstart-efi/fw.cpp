@@ -89,7 +89,7 @@ Res<> parseMemoryMap(Handover::Builder& builder) {
     // https://stackoverflow.com/questions/39407280/uefi-simple-example-of-using-exitbootservices-with-gnu-efi
     mmapSize += 2 * descSize;
 
-    auto buf = Buf<Byte>::init(mmapSize);
+    auto buf = Buf<u8>::init(mmapSize);
     try$(Efi::bs()->getMemoryMap(&mmapSize, (Efi::MemoryDescriptor*)buf.buf(), &key, &descSize, &descVersion));
 
     usize descLen = mmapSize / descSize;

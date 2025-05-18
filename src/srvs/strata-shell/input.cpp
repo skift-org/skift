@@ -1,4 +1,6 @@
 #include <karm-app/inputs.h>
+#include <karm-math/rect.h>
+#include <karm-gfx/canvas.h>
 
 #include "input.h"
 

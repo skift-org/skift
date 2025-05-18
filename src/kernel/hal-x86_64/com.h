@@ -125,7 +125,7 @@ struct Com : public Io::TextEncoderBase<> {
         return Ok();
     }
 
-    Res<usize> putByte(Byte c) {
+    Res<usize> putByte(u8 c) {
         try$(waitWrite());
         try$(writeReg(DATA, static_cast<u8>(c)));
 

@@ -39,7 +39,7 @@ extern "C" void __entryPoint(usize rawHandover) {
     Abi::SysV::init();
     Karm::registerPanicHandler(__panicHandler);
 
-    auto& ctx = Sys::globalContext();
+    Sys::Context ctx;
     char const* argv[] = {"strata-bus", nullptr};
     ctx.add<Sys::ArgsHook>(1, argv);
     ctx.add<HandoverHook>((Handover::Payload*)rawHandover);

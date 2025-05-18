@@ -3,7 +3,7 @@
 
 namespace Strata::Conf {
 
-Async::Task<> serv(Sys::Context& ctx) {
+Async::Task<> servAsync(Sys::Context& ctx) {
     auto endpoint = Rpc::Endpoint::create(ctx);
 
     logInfo("service started");
@@ -11,10 +11,12 @@ Async::Task<> serv(Sys::Context& ctx) {
         co_trya$(endpoint.recvAsync());
         logDebug("received message from system");
     }
+
+    co_return Ok();
 }
 
 } // namespace Strata::Conf
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
-    return Strata::Conf::serv(ctx);
+    co_return co_await Strata::Conf::servAsync(ctx);
 }

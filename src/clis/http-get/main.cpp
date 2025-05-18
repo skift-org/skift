@@ -10,7 +10,6 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
 
     Cli::Command cmd{
         "http-get"s,
-        NONE,
         "Send a GET request to a URL and print the response body"s,
         {
             urlArg,

@@ -1,11 +1,11 @@
-#include <hideo-shell/app.h>
-#include <hideo-shell/mock.h>
 #include <karm-app/host.h>
 #include <karm-gfx/cpu/canvas.h>
+#include <karm-gfx/icon.h>
 #include <karm-image/loader.h>
 #include <karm-rpc/base.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/time.h>
+#include <karm-app/inputs.h>
 
 #include "../strata-bus/api.h"
 #include "api.h"
@@ -14,16 +14,17 @@
 
 import Mdi;
 import Karm.Ui;
+import Hideo.Shell;
 
 namespace Strata::Shell {
 
 struct Root : public Ui::ProxyNode<Root> {
     Vec<Math::Recti> _dirty;
-    Rc<Gfx::CpuSurface> _frontbuffer;
+    Rc<Framebuffer> _frontbuffer;
     Rc<Gfx::Surface> _backbuffer;
     bool _shouldLayout{};
 
-    Root(Ui::Child child, Rc<Gfx::CpuSurface> frontbuffer)
+    Root(Ui::Child child, Rc<Framebuffer> frontbuffer)
         : Ui::ProxyNode<Root>(std::move(child)),
           _frontbuffer(std::move(frontbuffer)),
           _backbuffer(Gfx::Surface::alloc(_frontbuffer->bound().size(), Gfx::BGRA8888)) {
@@ -120,7 +121,7 @@ struct ServiceInstance : public Hideo::Shell::Instance {
 struct ServiceLauncher : public Hideo::Shell::Launcher {
     String componentId;
 
-    ServiceLauncher(Mdi::Icon icon, String name, Gfx::ColorRamp ramp, String serviceId)
+    ServiceLauncher(Gfx::Icon icon, String name, Gfx::ColorRamp ramp, String serviceId)
         : Launcher(icon, name, ramp), componentId(serviceId) {}
 
     void launch(Hideo::Shell::State&) override {
@@ -177,5 +178,5 @@ Async::Task<> servAsync(Sys::Context& ctx) {
 } // namespace Strata::Shell
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
-    return Strata::Shell::servAsync(ctx);
+    co_return co_await Strata::Shell::servAsync(ctx);
 }

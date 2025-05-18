@@ -86,9 +86,9 @@ struct I8042 : public Node {
 
     Res<> waitWrite();
 
-    Res<Byte> readData();
+    Res<u8> readData();
 
-    Res<> writeData(Byte data);
+    Res<> writeData(u8 data);
 
     Res<> writeCmd(Cmd cmd);
 
@@ -117,7 +117,7 @@ struct Keyboard : public Device {
         return Ok();
     }
 
-    Res<> sendCmd(_Cmd cmd, Byte data) {
+    Res<> sendCmd(_Cmd cmd, u8 data) {
         try$(ctrl().writeData(cmd));
         try$(ctrl().writeData(data));
         return Ok();
@@ -144,20 +144,20 @@ struct Mouse : public Device {
 
     Res<> decode();
 
-    Res<Byte> sendCmd(_Cmd cmd) {
+    Res<u8> sendCmd(_Cmd cmd) {
         try$(ctrl().writeCmd(Cmd::WRITE_IN_AUX));
         try$(ctrl().writeData(cmd));
         return Ok(try$(ctrl().readData()));
     }
 
-    Res<Byte> sendCmd(_Cmd cmd, Byte data) {
+    Res<u8> sendCmd(_Cmd cmd, u8 data) {
         try$(sendCmd(cmd));
         try$(ctrl().writeCmd(Cmd::WRITE_IN_AUX));
         try$(ctrl().writeData(data));
         return Ok(try$(ctrl().readData()));
     }
 
-    Res<Byte> getDeiceId() {
+    Res<u8> getDeiceId() {
         try$(sendCmd(GET_DEVICE_ID));
         return ctrl().readData();
     }

@@ -351,7 +351,7 @@ Res<MmapResult> memMap(MmapOptions const&, Rc<Fd> fd) {
 
     try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::LOADER_DATA, Hal::pageAlignUp(fileSize) / Hal::PAGE_SIZE, &vaddr));
 
-    MutBytes bytes = {(Byte*)vaddr, fileSize};
+    MutBytes bytes = {(u8*)vaddr, fileSize};
     Io::BufWriter writer{bytes};
     try$(Io::copy(*fd, writer));
 

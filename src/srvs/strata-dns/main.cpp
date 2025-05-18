@@ -6,7 +6,7 @@
 
 namespace Strata::Dns {
 
-Async::Task<> serv(Sys::Context& ctx) {
+Async::Task<> servAsync(Sys::Context& ctx) {
     auto endpoint = Rpc::Endpoint::create(ctx);
 
     logDebug("sending nonsens to system");
@@ -27,5 +27,5 @@ Async::Task<> serv(Sys::Context& ctx) {
 } // namespace Strata::Dns
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
-    return Strata::Dns::serv(ctx);
+    co_return co_await Strata::Dns::servAsync(ctx);
 }

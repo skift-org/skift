@@ -41,7 +41,7 @@ struct Builder {
     char* _string{};
     _Vec<ViewBuf<Record>> _records;
 
-    Builder(MutSlice<Byte> slice)
+    Builder(MutSlice<u8> slice)
         : _buf(slice.buf()),
           _size(slice.len()),
           _string((char*)end(slice)),

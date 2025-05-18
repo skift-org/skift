@@ -54,7 +54,7 @@ struct Parser {
     State _state = State::GROUND;
 
     static constexpr usize MAX_CHARS = 16;
-    Vec<Byte> _chars;
+    Vec<u8> _chars;
     bool _hasIgnoreChars = false;
 
     static constexpr usize MAX_PARAMS = 16;
@@ -77,7 +77,7 @@ struct Parser {
         return __transition(State::ANYWHERE, c);
     }
 
-    auto _doAction(Action action, Byte b, auto& sink) {
+    auto _doAction(Action action, u8 b, auto& sink) {
         switch (action) {
         case Action::PRINT:
         case Action::EXECUTE:
@@ -135,11 +135,11 @@ struct Parser {
         }
     }
 
-    Slice<Byte> chars() const { return _chars; }
+    Slice<u8> chars() const { return _chars; }
 
     Slice<usize> params() const { return _params; }
 
-    void injest(Byte b, auto& sink) {
+    void injest(u8 b, auto& sink) {
         auto [action, toState] = _transition(_state, b);
 
         if (toState != State::NONE) {

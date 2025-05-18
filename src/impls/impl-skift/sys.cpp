@@ -63,6 +63,7 @@ Res<> launch(Intent) {
     notImplemented();
 }
 
+[[clang::coro_wrapper]]
 Async::Task<> launchAsync(Intent) {
     notImplemented();
 }
@@ -175,8 +176,9 @@ Res<Mime::Url> pwd() {
 
 // MARK: Sandboxing ------------------------------------------------------------
 
-void hardenSandbox() {
-    logError("could not harden sandbox");
+Res<> hardenSandbox() {
+    // TODO: Implement sandboxing
+    return Ok();
 }
 
 // MARK: Addr ------------------------------------------------------------------

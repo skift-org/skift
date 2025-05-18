@@ -25,7 +25,7 @@ static x86_64::Com _com1 = x86_64::Com::com1();
 static x86_64::DualPic _pic = x86_64::DualPic::dualPic();
 static x86_64::Pit _pit = x86_64::Pit::pit();
 
-static Array<Byte, Hal::PAGE_SIZE * 16> _kstack{};
+static Array<u8, Hal::PAGE_SIZE * 16> _kstack{};
 static x86_64::Tss _tss{};
 
 static x86_64::Gdt _gdt{_tss};
@@ -291,7 +291,7 @@ struct Context : public Core::Context {
     usize _usp;
 
     Frame _frame;
-    Array<Byte, 1024> _simd __attribute__((aligned(16)));
+    Array<u8, 1024> _simd __attribute__((aligned(16)));
 
     Context(usize ksp)
         : _ksp(ksp), _usp(0) {

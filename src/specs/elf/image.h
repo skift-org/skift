@@ -175,7 +175,7 @@ struct Program {
 
     Bytes bytes() const {
         return Bytes{
-            (Byte*)buf(),
+            (u8*)buf(),
             static_cast<usize>(_header->filesz),
         };
     }

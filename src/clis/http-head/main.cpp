@@ -10,7 +10,6 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
 
     Cli::Command cmd{
         "http-head"s,
-        NONE,
         "Send a HEAD request to a URL and print the response headers"s,
         {
             urlArg,

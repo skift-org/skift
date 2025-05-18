@@ -5,7 +5,7 @@
 
 namespace Strata::Echo {
 
-Async::Task<> serv(Sys::Context& ctx) {
+Async::Task<> servAsync(Sys::Context& ctx) {
     auto endpoint = Rpc::Endpoint::create(ctx);
     while (true) {
         auto msg = co_trya$(endpoint.recvAsync());
@@ -21,5 +21,5 @@ Async::Task<> serv(Sys::Context& ctx) {
 } // namespace Strata::Echo
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
-    return Strata::Echo::serv(ctx);
+    co_return co_await Strata::Echo::servAsync(ctx);
 }

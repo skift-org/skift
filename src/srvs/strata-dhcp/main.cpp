@@ -3,7 +3,7 @@
 
 namespace Strata::Dhcp {
 
-Async::Task<> serv(Sys::Context& ctx) {
+Async::Task<> servAsync(Sys::Context& ctx) {
     auto endpoint = Rpc::Endpoint::create(ctx);
 
     logInfo("service started");
@@ -16,5 +16,5 @@ Async::Task<> serv(Sys::Context& ctx) {
 } // namespace Strata::Dhcp
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
-    return Strata::Dhcp::serv(ctx);
+    co_return co_await Strata::Dhcp::servAsync(ctx);
 }

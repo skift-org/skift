@@ -8,7 +8,6 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
 
     Cli::Command cmd{
         "net-lookup"s,
-        NONE,
         "Do a domain name lookup"s,
         {
             domainArg,

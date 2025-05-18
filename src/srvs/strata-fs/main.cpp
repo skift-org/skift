@@ -3,7 +3,7 @@
 
 namespace Strata::Fs {
 
-Async::Task<> serv(Sys::Context& ctx) {
+Async::Task<> servAsync(Sys::Context& ctx) {
     auto endpoint = Rpc::Endpoint::create(ctx);
 
     logInfo("service started");
@@ -16,5 +16,5 @@ Async::Task<> serv(Sys::Context& ctx) {
 } // namespace Strata::Fs
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
-    return Strata::Fs::serv(ctx);
+    co_return co_await Strata::Fs::servAsync(ctx);
 }

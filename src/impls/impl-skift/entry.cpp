@@ -21,7 +21,7 @@ extern "C" [[gnu::weak]] void __entryPoint(usize rawHandover, usize rawIn, usize
     Abi::SysV::init();
     Karm::registerPanicHandler(__panicHandler);
 
-    auto& ctx = Sys::globalContext();
+    Sys::Context ctx;
     char const* argv[] = {"service", nullptr};
     ctx.add<Sys::ArgsHook>(1, argv);
     ctx.add<HandoverHook>((Handover::Payload*)rawHandover);

@@ -49,7 +49,6 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
 
     Cli::Command cmd{
         "ls"s,
-        NONE,
         "List directory contents."s,
         {allFlag, listFlag, argsOperands}
     };

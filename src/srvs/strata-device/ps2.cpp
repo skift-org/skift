@@ -53,13 +53,13 @@ Res<> I8042::waitWrite() {
     return Error::timedOut("waiting for write");
 }
 
-Res<Byte> I8042::readData() {
+Res<u8> I8042::readData() {
     try$(waitRead());
     auto data = try$(io().read<DataReg>());
     return Ok(data);
 }
 
-Res<> I8042::writeData(Byte data) {
+Res<> I8042::writeData(u8 data) {
     try$(waitWrite());
     try$(io().write<DataReg>(data));
     return Ok();

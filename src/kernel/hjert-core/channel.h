@@ -14,7 +14,7 @@ struct Channel :
     bool _closed = false;
 
     Ring<Hj::SentRecv> _sr;
-    Ring<Byte> _bytes;
+    Ring<u8> _bytes;
     Ring<Arc<Object>> _caps;
 
     static Res<Arc<Channel>> create(usize bufCap = 4096, usize capsCap = 16);

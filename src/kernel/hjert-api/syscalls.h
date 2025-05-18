@@ -28,9 +28,9 @@ Res<> _in(Cap cap, IoLen len, usize port, Arg* val);
 
 Res<> _out(Cap cap, IoLen len, usize port, Arg val);
 
-Res<> _send(Cap cap, Byte const* buf, usize bufLen, Cap const* caps, usize capLen);
+Res<> _send(Cap cap, u8 const* buf, usize bufLen, Cap const* caps, usize capLen);
 
-Res<> _recv(Cap cap, Byte* buf, usize* bufLen, Cap* caps, usize* capLen);
+Res<> _recv(Cap cap, u8* buf, usize* bufLen, Cap* caps, usize* capLen);
 
 Res<> _close(Cap cap);
 

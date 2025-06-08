@@ -134,13 +134,13 @@ def checkForSymbol(header: str, symbol: str) -> bool:
     )
 
 
-@cli.command("n", "tools/nuke", "Nuke the development tools")
-@cli.command("s", "tools/setup", "Setup the development environment")
+@cli.command("tools/nuke", "Nuke the development tools")
+@cli.command("tools/setup", "Setup the development environment")
 def _():
     raise RuntimeError("Don't use ck directly, use ./skift.sh instead.")
 
 
-@cli.command("d", "tools/doctor", "Check if all required commands are available")
+@cli.command("tools/doctor", "Check if all required commands are available")
 def _():
     everythingIsOk = True
 

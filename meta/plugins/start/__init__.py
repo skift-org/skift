@@ -17,7 +17,7 @@ def generateSystem(img: image.Image) -> None:
     img.cpTree("meta/image/efi/boot", "boot")
 
 
-@cli.command("i", "image", "Generate the boot image")
+@cli.command("image", "Generate the boot image")
 def _() -> None:
     pass
 
@@ -29,7 +29,7 @@ class BuildArgs(model.RegistryArgs):
     dist: bool = cli.arg(None, "dist", "Copy the image to the dist folder")
 
 
-@cli.command("g", "image/build", "Generate the boot image")
+@cli.command("image/build", "Generate the boot image")
 def _(args: BuildArgs) -> None:
     args.mixins.append("release" if not args.debug else "debug")
 
@@ -71,7 +71,7 @@ class StartArgs:
     clean: bool = cli.arg(None, "clean", "Clean the image before starting")
 
 
-@cli.command("s", "image/start", "Boot the system")
+@cli.command("image/boot", "Boot the system")
 def _(args: StartArgs) -> None:
     if args.arch not in ["x86_64", "riscv32"]:
         raise RuntimeError("Unknown arch")
@@ -124,7 +124,7 @@ class WasmServer(server.SimpleHTTPRequestHandler):
         super().end_headers()
 
 
-@cli.command("w", "image/wasm", "Start a WASM component")
+@cli.command("image/wasm", "Start a WASM component")
 def _(args: WasmArgs):
     rargs = cli.defaults(model.RegistryArgs)
     rargs.mixins.append("release" if not args.debug else "debug")

@@ -9,10 +9,6 @@ import Karm.Ui;
 
 namespace Karm::Ui::_Embed {
 
-Res<Rc<Host>> makeHost(Child) {
-    notImplemented();
-}
-
 struct Host : public Ui::ProxyNode<Host> {
     Rpc::Endpoint& _endpoint;
     Rpc::Port _shell;

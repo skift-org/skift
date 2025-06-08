@@ -11,6 +11,6 @@ struct HandoverHook : public Sys::Service {
         : payload(payload) {}
 };
 
-inline Handover::Payload& useHandover(Sys::Context& ctx = Sys::globalContext()) {
+inline Handover::Payload& useHandover(Sys::Context& ctx = Sys::rootContext()) {
     return *ctx.use<HandoverHook>().payload;
 }

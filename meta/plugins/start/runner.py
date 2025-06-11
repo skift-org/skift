@@ -5,6 +5,12 @@ import logging
 from cutekit import shell
 from .image import Image
 
+def isWSL() -> bool:
+    try:
+        with open("/proc/sys/kernel/osrelease") as f:
+            return "microsoft" in f.read().lower()
+    except Exception:
+        return False
 
 class Machine:
     logger: logging.Logger
@@ -81,8 +87,12 @@ class Qemu(Machine):
         if self.debugger:
             qemuCmd += ["-s", "-S"]
 
+        # WSL detection and forced TCG fallback
         if not self.logError:
-            if kvmAvailable():
+            if isWSL():
+                self._logger.info("Detected WSL: using TCG acceleration.")
+                qemuCmd += ["-accel", "tcg"]
+            elif kvmAvailable():
                 qemuCmd += ["-enable-kvm"]
             elif hvfAvailable():
                 qemuCmd += ["-accel", "hvf"]

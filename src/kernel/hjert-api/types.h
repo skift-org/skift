@@ -102,8 +102,6 @@ enum struct Pledge : u32 {
 
 // clang-format on
 
-FlagsEnum$(Pledge);
-
 static inline Str toStr(Pledge pledge) {
     switch (pledge) {
 #define ITER(NAME, VAL) \
@@ -160,8 +158,6 @@ struct Cap {
 inline constexpr Cap ROOT = {};
 
 enum struct Sigs : u32 {
-    NONE = 0,
-
     READABLE = 1uz << 0,
     WRITABLE = 1uz << 1,
     CLOSED = 1uz << 2,
@@ -180,8 +176,6 @@ enum struct Sigs : u32 {
     USER6 = 1uz << 30,
     USER7 = 1uz << 31,
 };
-
-FlagsEnum$(Sigs);
 
 struct Event {
     Cap cap;

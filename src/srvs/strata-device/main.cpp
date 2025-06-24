@@ -1,5 +1,4 @@
 #include <hjert-api/api.h>
-#include <karm-app/inputs.h>
 #include <karm-base/map.h>
 #include <karm-logger/logger.h>
 #include <karm-rpc/base.h>
@@ -8,6 +7,8 @@
 #include "cmos.h"
 #include "io.h"
 #include "ps2.h"
+
+import Karm.App;
 
 namespace Strata::Device {
 

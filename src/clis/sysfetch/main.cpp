@@ -1,10 +1,11 @@
-#include <karm-app/form-factor.h>
 #include <karm-base/witty.h>
 #include <karm-cli/cursor.h>
 #include <karm-cli/style.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/info.h>
 #include <karm-sys/time.h>
+
+import Karm.App;
 
 static Str const ART = R"(
         ___

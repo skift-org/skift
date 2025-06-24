@@ -1,5 +1,3 @@
-#include <karm-app/event.h>
-#include <karm-app/inputs.h>
 #include <karm-math/align.h>
 
 #include "loader.h"
@@ -7,6 +5,7 @@
 import Mdi;
 import Karm.Ui;
 import Karm.Kira;
+import Karm.App;
 
 namespace Opstart {
 

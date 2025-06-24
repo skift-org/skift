@@ -1,9 +1,10 @@
 #pragma once
 
-#include <karm-app/inputs.h>
 #include <karm-base/res.h>
 
 #include "guid.h"
+
+import Karm.App;
 
 namespace Efi {
 

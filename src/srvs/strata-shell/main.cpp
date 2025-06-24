@@ -1,11 +1,9 @@
-#include <karm-app/host.h>
 #include <karm-gfx/cpu/canvas.h>
 #include <karm-gfx/icon.h>
 #include <karm-image/loader.h>
 #include <karm-rpc/base.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/time.h>
-#include <karm-app/inputs.h>
 
 #include "../strata-bus/api.h"
 #include "api.h"
@@ -15,6 +13,7 @@
 import Mdi;
 import Karm.Ui;
 import Hideo.Shell;
+import Karm.App;
 
 namespace Strata::Shell {
 

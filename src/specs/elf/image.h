@@ -29,7 +29,6 @@ enum struct ProgramType : u32 {
 };
 
 enum struct ProgramFlags : u32 {
-    NIL = 0,
     READ = 1,
     WRITE = 2,
     EXEC = 4,
@@ -38,11 +37,10 @@ enum struct ProgramFlags : u32 {
     TLS = 67,
 };
 
-FlagsEnum$(ProgramFlags);
 
 struct [[gnu::packed]] ProgramHeader {
     ProgramType type;
-    ProgramFlags flags;
+    Flags<ProgramFlags> flags;
     u64 offset;
     u64 vaddr;
     u64 paddr;

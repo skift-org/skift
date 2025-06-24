@@ -3,6 +3,9 @@
     "id": "efi",
     "type": "lib",
     "description": "EFI firmware",
+    "requires": [
+        "karm-app"
+    ],
     "enableIf": {
         "abi": [
             "ms"

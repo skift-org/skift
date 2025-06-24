@@ -1,9 +1,7 @@
+module Karm.App._embed;
+import Karm.App;
 
-
-#include <karm-app/_embed.h>
-#include <karm-app/prefs.h>
-
-namespace Karm::App::_Ember {
+namespace Karm::App::_Embed {
 
 static Opt<MockPrefs> _globalPrefs;
 

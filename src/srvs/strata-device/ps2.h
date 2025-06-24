@@ -33,8 +33,6 @@ enum struct Status : u8 {
     PARITY = 1 << 7,
 };
 
-FlagsEnum$(Status);
-
 enum struct Cmd : u8 {
     READ_CONFIG = 0x20,
     WRITE_CONFIG = 0x60,
@@ -57,8 +55,6 @@ enum struct Configs : u8 {
     SECOND_PORT_CLOCK_DISABLE = (1 << 5),
     FIRST_TRANSLATION = (1 << 6),
 };
-
-FlagsEnum$(Configs);
 
 struct I8042 : public Node {
     Rc<Hal::Io> _io;

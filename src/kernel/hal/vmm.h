@@ -11,7 +11,6 @@ namespace Hal {
 struct Vmm;
 
 enum struct VmmFlags : u64 {
-    NONE = 0,
     READ = (1 << 0),
     WRITE = (1 << 1),
     EXEC = (1 << 2),
@@ -20,7 +19,6 @@ enum struct VmmFlags : u64 {
     UNCACHED = (1 << 5),
 };
 
-FlagsEnum$(VmmFlags);
 
 using VmmRange = Range<usize, struct _VmmRangeTag>;
 
@@ -39,16 +37,16 @@ struct Vmm {
 
     virtual ~Vmm() = default;
 
-    virtual Res<VmmRange> mapRange(VmmRange vaddr, PmmRange paddr, VmmFlags flags) = 0;
+    virtual Res<VmmRange> mapRange(VmmRange vaddr, PmmRange paddr, Flags<VmmFlags> flags) = 0;
 
-    Res<VmmMem> mapOwned(VmmRange vaddr, PmmRange paddr, VmmFlags flags) {
+    Res<VmmMem> mapOwned(VmmRange vaddr, PmmRange paddr, Flags<VmmFlags> flags) {
         auto range = try$(mapRange(vaddr, paddr, flags));
         return Ok(VmmMem{*this, range});
     }
 
     virtual Res<> free(VmmRange vaddr) = 0;
 
-    virtual Res<> update(VmmRange vaddr, VmmFlags flags) = 0;
+    virtual Res<> update(VmmRange vaddr, Flags<VmmFlags> flags) = 0;
 
     virtual Res<> flush(VmmRange vaddr) = 0;
 

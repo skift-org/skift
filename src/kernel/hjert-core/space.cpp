@@ -1,4 +1,5 @@
-#include <karm-base/checked.h>
+import Karm.Core;
+
 #include <karm-logger/logger.h>
 
 #include "arch.h"
@@ -57,7 +58,7 @@ Res<> Space::_validate(Hal::VmmRange vrange) {
     return Error::invalidInput("bad address");
 }
 
-Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Arc<Vmo> vmo, usize off, Hj::MapFlags flags) {
+Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Arc<Vmo> vmo, usize off, Flags<Hj::MapFlags> flags) {
     ObjectLockScope scope(*this);
 
     try$(vrange.ensureAligned(Hal::PAGE_SIZE));

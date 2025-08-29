@@ -1,8 +1,9 @@
+import Karm.Core;
+import Karm.App;
+
 #include <hjert-api/api.h>
-#include <karm-app/inputs.h>
-#include <karm-base/map.h>
 #include <karm-logger/logger.h>
-#include <karm-rpc/base.h>
+#include <karm-sys/endpoint.h>
 #include <karm-sys/entry.h>
 
 #include "cmos.h"
@@ -24,9 +25,9 @@ struct IsaRootBus : public Node {
 };
 
 struct RootBus : public Node {
-    Rpc::Endpoint& rpc;
+    Sys::Endpoint& rpc;
 
-    RootBus(Rpc::Endpoint& rpc)
+    RootBus(Sys::Endpoint& rpc)
         : rpc{rpc} {}
 
     Res<> init() override {
@@ -36,10 +37,10 @@ struct RootBus : public Node {
 
     Res<> bubble(App::Event& e) override {
         if (auto me = e.is<App::MouseEvent>()) {
-            try$(rpc.send<App::MouseEvent>(Rpc::Port::BROADCAST, *me));
+            try$(rpc.send<App::MouseEvent>(Sys::Port::BROADCAST, *me));
             e.accept();
         } else if (auto ke = e.is<App::KeyboardEvent>()) {
-            try$(rpc.send<App::KeyboardEvent>(Rpc::Port::BROADCAST, *ke));
+            try$(rpc.send<App::KeyboardEvent>(Sys::Port::BROADCAST, *ke));
             e.accept();
         }
 
@@ -50,7 +51,7 @@ struct RootBus : public Node {
 } // namespace Strata::Device
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
-    auto endpoint = Rpc::Endpoint::create(ctx);
+    auto endpoint = Sys::Endpoint::create(ctx);
 
     logInfo("devices: building device tree...");
     auto root = makeRc<Strata::Device::RootBus>(endpoint);

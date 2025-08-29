@@ -24,7 +24,7 @@ usize Stack::loadSp() {
 
 void Stack::push(Bytes bytes) {
     _sp -= bytes.len();
-    memcpy((void*)_sp, bytes.buf(), bytes.len());
+    std::memcpy((void*)_sp, bytes.buf(), bytes.len());
 }
 
 } // namespace Hjert::Core

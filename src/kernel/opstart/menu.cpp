@@ -1,5 +1,3 @@
-#include <karm-app/event.h>
-#include <karm-app/inputs.h>
 #include <karm-math/align.h>
 
 #include "loader.h"
@@ -7,6 +5,7 @@
 import Mdi;
 import Karm.Ui;
 import Karm.Kira;
+import Karm.App;
 
 namespace Opstart {
 
@@ -37,8 +36,10 @@ static Ui::Task<Action> reduce(State& s, Action a) {
                 s.selected += a.delta;
         },
         [&](SelectAction) {
-            if (s.error)
+            if (s.error){
                 s.error = NONE;
+                return;
+            }
             auto res = Opstart::loadEntry(s.configs.entries[s.selected]);
             if (not res)
                 s.error = String{res.none().msg()};
@@ -137,7 +138,8 @@ Ui::Child menu(Configs const& c) {
                 return alert(
                     "System startup failed."s,
                     s.error.unwrap()
-                );
+                )|
+                   Ui::intent(intent);
 
             Ui::Children children;
 

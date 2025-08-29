@@ -1,9 +1,9 @@
 #pragma once
 
+import Karm.Core;
+
 #include <hal/vmm.h>
 #include <handover/builder.h>
-#include <karm-base/rc.h>
-#include <karm-base/res.h>
 
 namespace Opstart::Fw {
 

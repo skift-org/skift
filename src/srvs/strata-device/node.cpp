@@ -1,4 +1,7 @@
+#include <karm-core/macros.h>
+
 #include "node.h"
+
 
 namespace Strata::Device {
 

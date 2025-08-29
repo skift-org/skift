@@ -1,7 +1,8 @@
 #pragma once
 
+import Karm.Core;
+
 #include <hal/raw.h>
-#include <karm-io/traits.h>
 
 #include "asm.h"
 

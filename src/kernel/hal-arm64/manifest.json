@@ -9,7 +9,7 @@
         ]
     },
     "requires": [
-        "karm-io"
+        "karm-core"
     ],
     "provides": [
         "hal-impl"

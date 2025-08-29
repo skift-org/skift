@@ -1,7 +1,6 @@
 #pragma once
 
-#include <karm-base/rune.h>
-#include <karm-base/vec.h>
+import Karm.Core;   
 
 namespace Vte {
 

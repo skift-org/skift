@@ -4,7 +4,7 @@
     "type": "lib",
     "enableIf": {
         "sys": [
-            "hjert"
+            "kernel"
         ]
     },
     "requires": [
@@ -12,6 +12,6 @@
         "libheap"
     ],
     "provides": [
-        "karm-base-impl"
+        "karm-core-impl"
     ]
 }

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <karm-base/cursor.h>
-#include <karm-base/enum.h>
-#include <karm-base/string.h>
+import Karm.Core;
+
+using namespace Karm;
 
 namespace Elf {
 
@@ -29,7 +29,6 @@ enum struct ProgramType : u32 {
 };
 
 enum struct ProgramFlags : u32 {
-    NIL = 0,
     READ = 1,
     WRITE = 2,
     EXEC = 4,
@@ -38,11 +37,9 @@ enum struct ProgramFlags : u32 {
     TLS = 67,
 };
 
-FlagsEnum$(ProgramFlags);
-
 struct [[gnu::packed]] ProgramHeader {
     ProgramType type;
-    ProgramFlags flags;
+    u32 flags;
     u64 offset;
     u64 vaddr;
     u64 paddr;
@@ -151,14 +148,13 @@ struct Program {
     using Type = ProgramType;
 
     using enum ProgramFlags;
-    using Flags = ProgramFlags;
 
     Type type() const {
         return _header->type;
     }
 
-    Flags flags() const {
-        return _header->flags;
+    Flags<ProgramFlags> flags() const {
+        return Flags<ProgramFlags>::fromUnderlying(_header->flags);
     }
 
     usize offset() const {
@@ -166,17 +162,17 @@ struct Program {
     }
 
     void* buf() {
-        return (void*)((u8*)_base + _header->offset);
+        return (u8*)_base + _header->offset;
     }
 
     void const* buf() const {
-        return (void const*)((u8 const*)_base + _header->offset);
+        return (u8 const*)_base + _header->offset;
     }
 
     Bytes bytes() const {
         return Bytes{
             (u8*)buf(),
-            static_cast<usize>(_header->filesz),
+            (_header->filesz),
         };
     }
 

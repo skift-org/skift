@@ -1,6 +1,7 @@
 // https://opensource.apple.com/source/libcppabi/libcppabi-14/src/cxa_guard.cxx
 
-#include <karm-base/lock.h>
+import Karm.Core;
+using namespace Karm;
 
 extern "C" int __cxa_atexit(void (*)(void*), void*, void*) {
     return 0;

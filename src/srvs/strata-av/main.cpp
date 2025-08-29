@@ -1,10 +1,13 @@
-#include <karm-rpc/base.h>
+#include <karm-sys/endpoint.h>
 #include <karm-sys/entry.h>
+#include <karm-logger/logger.h>
+
+using namespace Karm;
 
 namespace Strata::Av {
 
 Async::Task<> servAsync(Sys::Context& ctx) {
-    auto endpoint = Rpc::Endpoint::create(ctx);
+    auto endpoint = Sys::Endpoint::create(ctx);
 
     logInfo("service started");
     while (true) {

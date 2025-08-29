@@ -1,10 +1,10 @@
 #pragma once
 
+import Karm.Core;
+
 #include <hal/vmm.h>
 #include <handover/spec.h>
 #include <hjert-api/types.h>
-#include <karm-base/rc.h>
-#include <karm-io/text.h>
 
 #include "context.h"
 

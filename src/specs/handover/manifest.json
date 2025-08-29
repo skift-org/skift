@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "The handover boot protocol",
     "requires": [
-        "karm-base"
+        "karm-core"
     ]
 }

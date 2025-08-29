@@ -1,6 +1,5 @@
-#include <karm-base/bits.h>
-#include <karm-base/lock.h>
-#include <karm-base/size.h>
+import Karm.Core;
+
 #include <karm-logger/logger.h>
 
 #include "arch.h"
@@ -8,7 +7,7 @@
 
 namespace Hjert::Core {
 
-struct Pmm : public Hal::Pmm {
+struct Pmm : Hal::Pmm {
     Hal::PmmRange _usable;
     Bits _bits;
     Lock _lock;
@@ -19,9 +18,9 @@ struct Pmm : public Hal::Pmm {
         clear();
     }
 
-    Res<Hal::PmmRange> allocRange(usize size, Hal::PmmFlags flags) override {
+    Res<Hal::PmmRange> allocRange(usize size, Flags<Hal::PmmFlags> flags) override {
         LockScope scope(_lock);
-        auto upper = (flags & Hal::PmmFlags::UPPER) == Hal::PmmFlags::UPPER;
+        auto upper = flags.has(Hal::PmmFlags::UPPER);
         upper = false;
 
         try$(ensureAlign(size, Hal::PAGE_SIZE));
@@ -30,7 +29,7 @@ struct Pmm : public Hal::Pmm {
         return Ok(prange);
     }
 
-    Res<> used(Hal::PmmRange prange, Hal::PmmFlags) override {
+    Res<> used(Hal::PmmRange prange, Flags<Hal::PmmFlags>) override {
         if (not prange.overlaps(_usable))
             return Error::invalidInput("range is not in usable memory");
 
@@ -88,7 +87,7 @@ struct Kmm : public Hal::Kmm {
     }
 
     Res<Hal::KmmRange> allocRange(usize size) override {
-        auto range = try$(pmm2Kmm(try$(_pmm.allocRange(size, Hal::PmmFlags::NONE))));
+        auto range = try$(pmm2Kmm(try$(_pmm.allocRange(size, {}))));
         return Ok(range);
     }
 
@@ -168,7 +167,7 @@ Res<> initMem(Handover::Payload& payload) {
     for (auto& record : payload) {
         if (record.tag == Handover::Tag::FREE) {
             logInfo("mem: free memory at {p} {p} ({}kib)", record.start, record.start + record.size, record.size / kib(1));
-            try$(pmm().free({static_cast<usize>(record.start), static_cast<usize>(record.size)}));
+            try$(pmm().free({record.start, record.size}));
         }
     }
 
@@ -176,34 +175,42 @@ Res<> initMem(Handover::Payload& payload) {
 
     if (firstPage.overlaps(usableRange)) {
         logInfo("mem: marking first page as used...");
-        try$(pmm().used(firstPage, Hal::PmmFlags::NONE));
+        try$(pmm().used(firstPage));
     }
 
-    try$(pmm().used({pmmBits.start, pmmBits.size}, Hal::PmmFlags::NONE));
+    try$(pmm().used({pmmBits.start, pmmBits.size}));
 
     _pmm->dump();
 
     logInfo("mem: mapping kernel...");
-    try$(Arch::globalVmm().mapRange({
-                                        Handover::KERNEL_BASE + Hal::PAGE_SIZE,
-                                        gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE,
-                                    },
-                                    {
-                                        Hal::PAGE_SIZE,
-                                        gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE,
-                                    },
-                                    Hal::Vmm::READ | Hal::Vmm::WRITE));
+    try$(
+        Arch::globalVmm().mapRange(
+            {
+                Handover::KERNEL_BASE + Hal::PAGE_SIZE,
+                gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE,
+            },
+            {
+                Hal::PAGE_SIZE,
+                gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE,
+            },
+            {Hal::Vmm::READ, Hal::Vmm::WRITE}
+        )
+    );
 
     logInfo("mem: mapping upper half...");
-    try$(Arch::globalVmm().mapRange({
-                                        Handover::UPPER_HALF + Hal::PAGE_SIZE,
-                                        gib(4) - Hal::PAGE_SIZE,
-                                    },
-                                    {
-                                        Hal::PAGE_SIZE,
-                                        gib(4) - Hal::PAGE_SIZE,
-                                    },
-                                    Hal::Vmm::READ | Hal::Vmm::WRITE));
+    try$(
+        Arch::globalVmm().mapRange(
+            {
+                Handover::UPPER_HALF + Hal::PAGE_SIZE,
+                gib(4) - Hal::PAGE_SIZE,
+            },
+            {
+                Hal::PAGE_SIZE,
+                gib(4) - Hal::PAGE_SIZE,
+            },
+            {Hal::Vmm::READ, Hal::Vmm::WRITE}
+        )
+    );
 
     Arch::globalVmm().activate();
 

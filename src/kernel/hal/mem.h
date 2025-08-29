@@ -1,8 +1,7 @@
 #pragma once
 
-#include <karm-base/align.h>
-#include <karm-base/error.h>
-#include <karm-base/range.h>
+import Karm.Core;
+using namespace Karm;
 
 namespace Hal {
 

@@ -1,6 +1,7 @@
+import Karm.Core;
+
 #include <elf/image.h>
 #include <handover/entry.h>
-#include <karm-base/size.h>
 #include <karm-logger/logger.h>
 
 #include "arch.h"
@@ -78,15 +79,15 @@ Res<> enterUserspace(Handover::Payload& payload) {
 
         usize size = alignUp(max(prog.memsz(), prog.filez()), Hal::PAGE_SIZE);
 
-        if ((prog.flags() & Elf::ProgramFlags::WRITE) == Elf::ProgramFlags::WRITE) {
+        if (prog.flags().has(Elf::ProgramFlags::WRITE)) {
             auto sectionVmo = try$(Vmo::alloc(size, Hj::VmoFlags::UPPER));
             sectionVmo->label("elf-writeable");
             auto sectionRange = try$(kmm().pmm2Kmm(sectionVmo->range()));
             logInfo("entry: mapping section: {x}-{x}", sectionRange.start, sectionRange.end());
             copy(prog.bytes(), sectionRange.mutBytes());
-            try$(space->map({prog.vaddr(), size}, sectionVmo, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
+            try$(space->map({prog.vaddr(), size}, sectionVmo, 0, {Hj::MapFlags::READ , Hj::MapFlags::WRITE}));
         } else {
-            try$(space->map({prog.vaddr(), size}, elfVmo, prog.offset(), Hj::MapFlags::READ | Hj::MapFlags::EXEC));
+            try$(space->map({prog.vaddr(), size}, elfVmo, prog.offset(), {Hj::MapFlags::READ, Hj::MapFlags::EXEC}));
         }
     }
 
@@ -100,7 +101,7 @@ Res<> enterUserspace(Handover::Payload& payload) {
     logInfo("entry: mapping stack...");
     auto stackVmo = try$(Vmo::alloc(kib(64), Hj::VmoFlags::UPPER));
     stackVmo->label("stack");
-    auto stackRange = try$(space->map({}, stackVmo, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
+    auto stackRange = try$(space->map({}, stackVmo, 0, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
     logInfo("entry: stack: {x}-{x}", stackRange.start, stackRange.end());
 
     logInfo("entry: creating task...");

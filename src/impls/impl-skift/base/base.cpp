@@ -1,4 +1,8 @@
+module;
+
 #include <hjert-api/api.h>
+
+module Karm.Core;
 
 namespace Karm::_Embed {
 

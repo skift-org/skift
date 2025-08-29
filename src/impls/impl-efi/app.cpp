@@ -1,7 +1,8 @@
+module Karm.App;
 
-
-#include <karm-app/_embed.h>
-#include <karm-app/prefs.h>
+import Karm.Core;
+import :_embed;
+import :prefs;
 
 namespace Karm::App::_Ember {
 

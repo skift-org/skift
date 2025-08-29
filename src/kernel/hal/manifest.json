@@ -5,6 +5,6 @@
     "description": "Hardware Abstraction Layer",
     "requires": [
         "hal-impl",
-        "karm-base"
+        "karm-core"
     ]
 }

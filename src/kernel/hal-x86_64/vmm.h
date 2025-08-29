@@ -39,13 +39,13 @@ struct Vmm : public Hal::Vmm {
             return Ok(_mapper.map(page.template as<Pml<L - 1>>()));
         }
 
-        usize lower = try$(_pmm.allocRange(Hal::PAGE_SIZE, Hal::PmmFlags::NONE)).start;
-        memset(_mapper.map((void*)lower), 0, Hal::PAGE_SIZE);
+        usize lower = try$(_pmm.allocRange(Hal::PAGE_SIZE, {})).start;
+        std::memset(_mapper.map((void*)lower), 0, Hal::PAGE_SIZE);
         upper.putPage(vaddr, {lower, Entry::WRITE | Entry::PRESENT | Entry::USER});
         return Ok(_mapper.map((Pml<L - 1>*)lower));
     }
 
-    Res<> allocPage(usize vaddr, usize paddr, Hal::VmmFlags flags) {
+    Res<> allocPage(usize vaddr, usize paddr, Flags<Hal::VmmFlags> flags) {
         auto pml3 = try$(pmlOrAlloc(*_pml4, vaddr));
         auto pml2 = try$(pmlOrAlloc(*pml3, vaddr));
         auto pml1 = try$(pmlOrAlloc(*pml2, vaddr));
@@ -79,7 +79,7 @@ struct Vmm : public Hal::Vmm {
         return Ok();
     }
 
-    Res<Hal::VmmRange> mapRange(Hal::VmmRange vaddr, Hal::PmmRange paddr, Hal::VmmFlags flags) override {
+    Res<Hal::VmmRange> mapRange(Hal::VmmRange vaddr, Hal::PmmRange paddr, Flags<Hal::VmmFlags> flags) override {
         if (paddr.size != vaddr.size) {
             return Error::invalidInput();
         }
@@ -99,7 +99,7 @@ struct Vmm : public Hal::Vmm {
         return Ok();
     }
 
-    Res<> update(Hal::VmmRange, Hal::VmmFlags) override {
+    Res<> update(Hal::VmmRange, Flags<Hal::VmmFlags>) override {
         notImplemented();
     }
 

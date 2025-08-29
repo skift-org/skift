@@ -1,7 +1,10 @@
-#include <karm-cli/args.h>
 #include <karm-sys/dir.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/proc.h>
+
+import Karm.Cli;
+
+using namespace Karm;
 
 namespace Ls {
 

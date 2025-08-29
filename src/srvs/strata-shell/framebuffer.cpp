@@ -7,7 +7,7 @@ Res<Rc<Framebuffer>> Framebuffer::open(Sys::Context& ctx) {
     auto* record = handover.findTag(Handover::Tag::FB);
     auto vmo = try$(Hj::Vmo::create(Hj::ROOT, record->start, record->size, Hj::VmoFlags::DMA));
     try$(vmo.label("framebuffer"));
-    return Ok(makeRc<Framebuffer>(*record, try$(Hj::map(vmo, Hj::MapFlags::READ | Hj::MapFlags::WRITE))));
+    return Ok(makeRc<Framebuffer>(*record, try$(Hj::map(vmo, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}))));
 }
 
 Framebuffer::Framebuffer(Handover::Record record, Hj::Mapped map)

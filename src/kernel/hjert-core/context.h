@@ -1,9 +1,9 @@
 #pragma once
 
+import Karm.Core;
+
 #include <hal/kmm.h>
-#include <karm-base/box.h>
-#include <karm-base/res.h>
-#include <karm-base/size.h>
+
 
 namespace Hjert::Arch {
 

@@ -1,13 +1,11 @@
 #include <efi/base.h>
 #include <hal/mem.h>
-#include <karm-base/align.h>
-#include <karm-io/funcs.h>
-#include <karm-io/impls.h>
-#include <karm-json/parse.h>
 #include <karm-logger/logger.h>
 #include <karm-sys/_embed.h>
 #include <karm-sys/file.h>
 #include <karm-sys/launch.h>
+
+import Karm.Core;
 
 namespace Karm::Sys::_Embed {
 
@@ -88,7 +86,7 @@ struct ConOut : public Fd {
         notImplemented();
     }
 
-    Res<> pack(Io::PackEmit&) override {
+    Res<> pack(Sys::MessageWriter&) override {
         notImplemented();
     }
 };
@@ -196,12 +194,12 @@ struct FileProto : public Fd {
         notImplemented();
     }
 
-    Res<> pack(Io::PackEmit&) override {
+    Res<> pack(Sys::MessageWriter&) override {
         notImplemented();
     }
 };
 
-Res<Rc<Fd>> unpackFd(Io::PackScan&) {
+Res<Rc<Fd>> unpackFd(Sys::MessageReader&) {
     notImplemented();
 }
 
@@ -237,7 +235,7 @@ Res<Rc<Fd>> listenIpc(Mime::Url) {
 
 // MARK: Files -----------------------------------------------------------------
 
-static Opt<Json::Value> _index = NONE;
+static Opt<Serde::Value> _index = NONE;
 
 static Res<Mime::Path> resolve(Mime::Url url) {
     if (url.scheme == "file") {
@@ -270,7 +268,7 @@ static Res<Mime::Path> resolve(Mime::Url url) {
         auto object = _index->get(key);
 
         if (not object.isObject()) {
-            logError("invalid object");
+            logError("cound not resolve {}: invalid object", url);
             return Error::invalidData("invalid object");
         }
 
@@ -336,7 +334,7 @@ Res<Rc<Fd>> openOrCreateFile(Mime::Url const&) {
     return Error::notImplemented();
 }
 
-Res<MmapResult> memMap(MmapOptions const& options) {
+Res<MmapResult> memMap(MmapProps const& options) {
     usize vaddr = 0;
 
     try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::LOADER_DATA, Hal::pageAlignUp(options.size) / Hal::PAGE_SIZE, &vaddr));
@@ -345,7 +343,7 @@ Res<MmapResult> memMap(MmapOptions const& options) {
     return Ok(MmapResult{vaddr, vaddr, options.size});
 }
 
-Res<MmapResult> memMap(MmapOptions const&, Rc<Fd> fd) {
+Res<MmapResult> memMap(MmapProps const&, Rc<Fd> fd) {
     usize vaddr = 0;
     usize fileSize = try$(Io::size(*fd));
 
@@ -468,6 +466,16 @@ Res<> hardenSandbox() {
 
 Async::Task<Vec<Ip>> ipLookupAsync(Str) {
     co_return Error::notImplemented();
+}
+
+// MARK: Bundle ----------------------------------------------------------------
+
+Res<Vec<String>> installedBundles() {
+    return Error::notImplemented("not implemented");
+}
+
+Res<String> currentBundle() {
+    return Error::notImplemented("not implemented");
 }
 
 } // namespace Karm::Sys::_Embed

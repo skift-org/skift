@@ -5,7 +5,7 @@
     "description": "The Hjert micro-kernel platform layer for riscv",
     "enableIf": {
         "sys": [
-            "hjert"
+            "kernel"
         ],
         "arch": [
             "riscv32",

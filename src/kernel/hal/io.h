@@ -1,8 +1,10 @@
 #pragma once
 
-#include <karm-base/range.h>
-#include <karm-base/res.h>
-#include <karm-base/slice.h>
+import Karm.Core;
+
+#include <karm-core/macros.h>
+
+using namespace Karm;
 
 namespace Hal {
 

@@ -1,9 +1,8 @@
 #pragma once
 
-#include <karm-base/res.h>
-#include <karm-io/bscan.h>
+import Karm.Core;
 
-#include "karm-base/slice.h"
+using namespace Karm;
 
 namespace DeviceTree {
 

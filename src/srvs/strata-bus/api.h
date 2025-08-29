@@ -1,12 +1,15 @@
 #pragma once
 
-#include <karm-base/string.h>
-#include <karm-rpc/base.h>
+import Karm.Core;
+
+#include <karm-sys/message.h>
+
+using namespace Karm;
 
 namespace Strata::Bus::Api {
 
 struct Locate {
-    using Response = Rpc::Port;
+    using Response = Sys::Port;
     String id;
 };
 

@@ -1,10 +1,11 @@
+import Karm.Core;
+
 #include <abi-sysv/abi.h>
 #include <handover/hook.h>
 #include <hjert-api/api.h>
-#include <karm-base/panic.h>
 #include <karm-logger/logger.h>
-#include <karm-rpc/base.h>
 #include <karm-sys/context.h>
+#include <karm-sys/message.h>
 
 #include "fd.h"
 
@@ -24,9 +25,8 @@ extern "C" [[gnu::weak]] void __entryPoint(usize rawHandover, usize rawIn, usize
     Sys::Context ctx;
     char const* argv[] = {"service", nullptr};
     ctx.add<Sys::ArgsHook>(1, argv);
-    ctx.add<HandoverHook>((Handover::Payload*)rawHandover);
+    ctx.add<HandoverHook>(reinterpret_cast<Handover::Payload*>(rawHandover));
     auto fd = makeRc<Skift::IpcFd>(Hj::Cap{rawIn}, Hj::Cap{rawOut});
-    ctx.add<ChannelHook>(Sys::IpcConnection{fd, ""_url});
 
     auto res = Sys::run(entryPointAsync(ctx));
 

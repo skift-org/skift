@@ -1,4 +1,4 @@
-#include <karm-base/vec.h>
+import Karm.Core;
 
 #include "irq.h"
 

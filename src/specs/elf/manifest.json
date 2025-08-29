@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "The ELF specification",
     "requires": [
-        "karm-base"
+        "karm-core"
     ]
 }

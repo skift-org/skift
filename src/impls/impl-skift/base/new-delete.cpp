@@ -1,6 +1,7 @@
+import Karm.Core;
+
 #include <ce-heap/libheap.h>
 #include <hjert-api/api.h>
-#include <karm-base/lock.h>
 #include <karm-logger/logger.h>
 
 // MARK: Heap Implementation ---------------------------------------------------
@@ -13,7 +14,7 @@ static constinit Heap _heapImpl = {
         vmo.label("heap").unwrap();
 
         auto space = Hj::Space::self();
-        return (void*)space.map(vmo, 0, size, Hj::MapFlags::READ | Hj::MapFlags::WRITE).unwrap().start;
+        return (void*)space.map(vmo, 0, size, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}).unwrap().start;
     },
     .free = [](void*, void* ptr, usize size) -> void {
         auto space = Hj::Space::self();

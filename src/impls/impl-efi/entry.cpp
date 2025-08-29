@@ -1,9 +1,9 @@
 #include <efi/base.h>
-#include <karm-base/align.h>
-#include <karm-base/string.h>
-#include <karm-io/traits.h>
+#include <karm-sys/defs.h>
 
-struct DebugOut : public Io::TextEncoderBase<> {
+import Karm.Core;
+
+struct DebugOut : Io::TextEncoderBase<Utf16> {
     Res<usize> write(Bytes bytes) override {
         usize writen{};
         Array<u16, 129> buf{};

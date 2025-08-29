@@ -1,6 +1,7 @@
+import Karm.Core;
+
 #include <elf/image.h>
 #include <handover/hook.h>
-#include <karm-base/size.h>
 #include <karm-logger/logger.h>
 
 #include "api.h"
@@ -13,7 +14,7 @@ static constexpr bool DEBUG_ELF = false;
 
 // MARK: Endpoint --------------------------------------------------------------
 
-Res<> Endpoint::dispatch(Rpc::Message& msg) {
+Res<> Endpoint::dispatch(Sys::Message& msg) {
     msg.header().from = _port;
     return _bus->dispatch(msg);
 }
@@ -69,18 +70,18 @@ Res<> Service::activate(Sys::Context& ctx) {
         if ((prog.flags() & Elf::ProgramFlags::WRITE) == Elf::ProgramFlags::WRITE) {
             auto sectionVmo = try$(Hj::Vmo::create(Hj::ROOT, 0, size, Hj::VmoFlags::UPPER));
             try$(sectionVmo.label("elf-writeable"));
-            auto sectionRange = try$(Hj::map(sectionVmo, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
+            auto sectionRange = try$(Hj::map(sectionVmo, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
             copy(prog.bytes(), sectionRange.mutBytes());
-            try$(elfSpace.map(prog.vaddr(), sectionVmo, 0, size, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
+            try$(elfSpace.map(prog.vaddr(), sectionVmo, 0, size, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
         } else {
-            try$(elfSpace.map(prog.vaddr(), elfVmo, prog.offset(), size, Hj::MapFlags::READ | Hj::MapFlags::EXEC));
+            try$(elfSpace.map(prog.vaddr(), elfVmo, prog.offset(), size, {Hj::MapFlags::READ, Hj::MapFlags::EXEC}));
         }
     }
 
     logInfoIf(DEBUG_ELF, "mapping the stack...");
     auto stackVmo = try$(Hj::Vmo::create(Hj::ROOT, 0, kib(64), Hj::VmoFlags::UPPER));
     try$(stackVmo.label("stack"));
-    auto stackRange = try$(elfSpace.map(0, stackVmo, 0, 0, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
+    auto stackRange = try$(elfSpace.map(0, stackVmo, 0, 0, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
 
     logInfoIf(DEBUG_TASK, "creating the task...");
     auto domain = try$(Hj::Domain::create(Hj::ROOT));
@@ -117,7 +118,7 @@ Res<> Service::activate(Sys::Context& ctx) {
 
 Async::Task<> Service::runAsync() {
     while (true) {
-        auto msg = co_trya$(Rpc::rpcRecvAsync(_con));
+        auto msg = co_trya$(Sys::rpcRecvAsync(_con));
 
         if (msg.is<Api::Listen>()) {
             auto listen = co_try$(msg.unpack<Api::Listen>());
@@ -126,34 +127,34 @@ Async::Task<> Service::runAsync() {
             auto res = dispatch(msg);
             if (not res) {
                 logError("{}: dispatch failed: {}", id(), res);
-                co_try$(Rpc::rpcSend<Error>(_con, port(), msg.header().seq, res.none()));
+                co_try$(Sys::rpcSend<Error>(_con, port(), msg.header().seq, res.none()));
             }
         }
     }
 }
 
-Res<> Service::send(Rpc::Message& msg) {
+Res<> Service::send(Sys::Message& msg) {
     return _con.send(
         msg.bytes(),
         msg.handles()
     );
 }
 
-bool Service::accept(Rpc::Message const& msg) {
+bool Service::accept(Sys::Message const& msg) {
     return contains(_listen, msg.header().mid);
 }
 
 // MARK: System ----------------------------------------------------------------
 
 System::System() {
-    _port = Rpc::Port::BUS;
+    _port = Sys::Port::BUS;
 }
 
 Str System::id() const {
     return "strata-bus";
 }
 
-Res<> System::send(Rpc::Message& msg) {
+Res<> System::send(Sys::Message& msg) {
     if (msg.is<Api::Locate>()) {
         auto locate = try$(msg.unpack<Api::Locate>());
         for (auto& endpoint : _bus->_endpoints) {
@@ -200,7 +201,7 @@ Res<> Bus::attach(Rc<Endpoint> endpoint) {
     return Ok();
 }
 
-void Bus::_broadcast(Rpc::Message& msg) {
+void Bus::_broadcast(Sys::Message& msg) {
     for (auto& endpoint : _endpoints) {
         if (msg.header().from != endpoint->port() and endpoint->accept(msg)) {
             auto res = endpoint->send(msg);
@@ -210,8 +211,8 @@ void Bus::_broadcast(Rpc::Message& msg) {
     }
 }
 
-Res<> Bus::dispatch(Rpc::Message& msg) {
-    if (msg.header().to == Rpc::Port::BROADCAST) {
+Res<> Bus::dispatch(Sys::Message& msg) {
+    if (msg.header().to == Sys::Port::BROADCAST) {
         _broadcast(msg);
         return Ok();
     }

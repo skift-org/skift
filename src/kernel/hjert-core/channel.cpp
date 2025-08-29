@@ -24,12 +24,15 @@ Res<> Channel::_ensureOpen() {
 
 void Channel::_updateSignalsUnlock() {
     _signalUnlock(
-        (_sr.len() > 0 ? Hj::Sigs::READABLE : Hj::Sigs::NONE) |
-            (_sr.rem() > 0 ? Hj::Sigs::WRITABLE : Hj::Sigs::NONE) |
+        {
+            (_sr.len() > 0 ? Hj::Sigs::READABLE : Hj::Sigs::NONE),
+            (_sr.rem() > 0 ? Hj::Sigs::WRITABLE : Hj::Sigs::NONE),
             (_closed ? Hj::Sigs::CLOSED : Hj::Sigs::NONE),
-
-        (_sr.len() > 0 ? Hj::Sigs::NONE : Hj::Sigs::READABLE) |
-            (_sr.rem() > 0 ? Hj::Sigs::NONE : Hj::Sigs::WRITABLE)
+        },
+        {
+            (_sr.len() > 0 ? Hj::Sigs::NONE : Hj::Sigs::READABLE),
+            (_sr.rem() > 0 ? Hj::Sigs::NONE : Hj::Sigs::WRITABLE),
+        }
     );
 }
 

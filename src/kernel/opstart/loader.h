@@ -1,22 +1,24 @@
 #pragma once
 
+import Mdi;
+import Karm.Ui;
+import Karm.Core;
+import Karm.Image;
+
 #include <karm-gfx/icon.h>
-#include <karm-image/loader.h>
-#include <karm-json/parse.h>
 #include <karm-logger/logger.h>
 #include <karm-sys/context.h>
 #include <karm-sys/file.h>
 
-import Mdi;
-import Karm.Ui;
+using namespace Karm;
 
 namespace Opstart {
 
 struct Blob {
     Mime::Url url;
-    Json::Value props;
+    Serde::Value props;
 
-    static Res<Blob> fromJson(Json::Value const& json) {
+    static Res<Blob> fromJson(Serde::Value const& json) {
         Blob blob = {};
 
         if (json.isStr()) {
@@ -46,7 +48,7 @@ struct Entry {
     Blob kernel;
     Vec<Blob> blobs;
 
-    static Res<Entry> fromJson(Json::Value const& json) {
+    static Res<Entry> fromJson(Serde::Value const& json) {
         if (not json.isObject())
             return Error::invalidInput("expected object");
 
@@ -86,7 +88,7 @@ struct Configs {
     Opt<String> subtitle;
     Vec<Entry> entries;
 
-    static Res<Configs> fromJson(Json::Value const& json) {
+    static Res<Configs> fromJson(Serde::Value const& json) {
         if (not json.isObject()) {
             return Error::invalidInput("expected array");
         }

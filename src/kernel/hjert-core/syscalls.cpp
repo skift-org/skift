@@ -1,5 +1,5 @@
-#include <karm-base/defer.h>
-#include <karm-cli/style.h>
+import Karm.Core;
+
 #include <karm-logger/logger.h>
 
 #include "arch.h"
@@ -12,6 +12,8 @@
 #include "syscalls.h"
 #include "task.h"
 #include "user.h"
+
+import Karm.Tty;
 
 namespace Hjert::Core {
 
@@ -29,7 +31,7 @@ Res<> doLog(Task& self, UserSlice<Str> msg) {
             Logger::_Embed::loggerUnlock();
         }};
 
-        auto styledLabel = Cli::styled(self.label(), Cli::style(Cli::random(self.id())));
+        auto styledLabel = self.label() | Tty::random(self.id());
         try$(Io::format(Hjert::Arch::globalOut(), "{} | ", Io::aligned(styledLabel, Io::Align::LEFT, 26)));
 
         try$(Hjert::Arch::globalOut().writeStr(str));
@@ -78,7 +80,7 @@ Res<> doCreate(Task& self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
             [&](Hj::VmoProps& props) -> Res<Arc<Object>> {
                 try$(self.ensure(Hj::Pledge::MEM));
 
-                bool isDma = (props.flags & Hj::VmoFlags::DMA) == Hj::VmoFlags::DMA;
+                bool isDma = props.flags.has(Hj::VmoFlags::DMA);
 
                 if (isDma) {
                     try$(self.ensure(Hj::Pledge::HW));

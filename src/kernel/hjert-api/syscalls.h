@@ -20,7 +20,7 @@ Res<> _dup(Cap dest, Cap* out, Cap cap);
 
 Res<> _start(Cap cap, usize ip, usize sp, Args const* args);
 
-Res<> _map(Cap cap, usize* virt, Cap vmo, usize off, usize* len, MapFlags flags = MapFlags::NONE);
+Res<> _map(Cap cap, usize* virt, Cap vmo, usize off, usize* len, Flags<MapFlags> flags = {});
 
 Res<> _unmap(Cap cap, usize virt, usize len);
 

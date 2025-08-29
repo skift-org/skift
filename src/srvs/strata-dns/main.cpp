@@ -1,5 +1,6 @@
-#include <karm-rpc/base.h>
+#include <karm-sys/endpoint.h>
 #include <karm-sys/entry.h>
+#include <karm-logger/logger.h>
 
 #include "../strata-bus/api.h"
 #include "../strata-echo/api.h"
@@ -7,11 +8,11 @@
 namespace Strata::Dns {
 
 Async::Task<> servAsync(Sys::Context& ctx) {
-    auto endpoint = Rpc::Endpoint::create(ctx);
+    auto endpoint = Sys::Endpoint::create(ctx);
 
     logDebug("sending nonsens to system");
 
-    auto echoPort = co_trya$(endpoint.callAsync<Bus::Api::Locate>(Rpc::Port::BUS, "strata-echo"s));
+    auto echoPort = co_trya$(endpoint.callAsync<Bus::Api::Locate>(Sys::Port::BUS, "strata-echo"s));
     logDebug("located echo service at port: {}", echoPort);
 
     auto res = co_trya$(endpoint.callAsync<Echo::Api::Request>(echoPort, "nonsens"s));

@@ -5,7 +5,7 @@
     "enableIf": {
         "sys": [
             "skift",
-            "hjert"
+            "kernel"
         ]
     },
     "description": "The Hjert micro-kernel APIs"

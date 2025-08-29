@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-base/ranges.h>
+import Karm.Core;
 
 #include "object.h"
 #include "vmo.h"
@@ -34,7 +34,7 @@ struct Space : public BaseObject<Space, Hj::Type::SPACE> {
 
     Res<> _validate(Hal::VmmRange vrange);
 
-    Res<Hal::VmmRange> map(Hal::VmmRange vrange, Arc<Vmo> vmo, usize off, Hj::MapFlags flags);
+    Res<Hal::VmmRange> map(Hal::VmmRange vrange, Arc<Vmo> vmo, usize off, Flags<Hj::MapFlags> flags);
 
     Res<> unmap(Hal::VmmRange vrange);
 

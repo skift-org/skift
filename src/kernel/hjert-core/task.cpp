@@ -33,7 +33,7 @@ Task::Task(
       _domain(domain) {
 }
 
-Res<> Task::ensure(Hj::Pledge pledge) {
+Res<> Task::ensure(Flags<Hj::Pledge> pledge) {
     ObjectLockScope scope(*this);
 
     if (not _pledges.has(pledge)) {
@@ -42,7 +42,7 @@ Res<> Task::ensure(Hj::Pledge pledge) {
     return Ok();
 }
 
-Res<> Task::pledge(Hj::Pledge pledge) {
+Res<> Task::pledge(Flags<Hj::Pledge> pledge) {
     ObjectLockScope scope(*this);
     if (not _pledges.has(pledge))
         return Error::permissionDenied("task does not have pledge");
@@ -62,7 +62,7 @@ Res<> Task::block(Blocker blocker) {
         return Ok();
 
     // NOTE: Can't use ObjectLockScope here because
-    //       we need to yield outside of the lock.
+    //       we need to yield outside the lock.
     _lock.acquire();
     _block = std::move(blocker);
     _lock.release();
@@ -73,7 +73,7 @@ Res<> Task::block(Blocker blocker) {
 void Task::crash() {
     logError("{}: crashed", *this);
     signal(
-        Hj::Sigs::EXITED | Hj::Sigs::CRASHED,
+        {Hj::Sigs::EXITED, Hj::Sigs::CRASHED},
         Hj::Sigs::NONE
     );
 }
@@ -112,7 +112,7 @@ void Task::enter(Mode mode) {
 
 void Task::leave() {
     // NOTE: Can't use ObjectLockScope here because
-    //       we need to yield outside of the lock.
+    //       we need to yield outside the lock.
     _lock.acquire();
     _mode = Mode::USER;
     bool yield = _ret();

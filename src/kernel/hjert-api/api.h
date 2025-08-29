@@ -1,7 +1,8 @@
 #pragma once
 
-#include <karm-base/string.h>
-#include <karm-io/pack.h>
+import Karm.Core;
+
+#include <karm-sys/message.h>
 
 #include "syscalls.h"
 
@@ -76,7 +77,7 @@ struct Object {
     }
 };
 
-struct Domain : public Object {
+struct Domain : Object {
     using Props = DomainProps;
 
     using Object::Object;
@@ -101,7 +102,7 @@ struct Domain : public Object {
     }
 };
 
-struct Task : public Object {
+struct Task : Object {
     using Props = TaskProps;
 
     using Object::Object;
@@ -123,21 +124,21 @@ struct Task : public Object {
     }
 
     Res<> crash() {
-        return signal(Sigs::EXITED | Sigs::CRASHED, Sigs::NONE);
+        return signal({Sigs::EXITED, Sigs::CRASHED}, Sigs::NONE);
     }
 };
 
-struct Vmo : public Object {
+struct Vmo : Object {
     using Props = VmoProps;
 
     using Object::Object;
 
-    static Res<Vmo> create(Cap dest, usize phys, usize len, VmoFlags flags = VmoFlags::NONE) {
+    static Res<Vmo> create(Cap dest, usize phys, usize len, Flags<VmoFlags> flags = {}) {
         return create<Vmo>(dest, phys, len, flags);
     }
 };
 
-struct Space : public Object {
+struct Space : Object {
     using Props = SpaceProps;
 
     using Object::Object;
@@ -150,18 +151,18 @@ struct Space : public Object {
         return create<Space>(dest);
     }
 
-    Res<urange> map(usize virt, Vmo& vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+    Res<urange> map(usize virt, Vmo& vmo, usize off, usize len, Flags<MapFlags> flags = {}) {
         try$(_map(_cap, &virt, vmo, off, &len, flags));
         return Ok(urange{virt, len});
     }
 
-    Res<urange> map(Vmo& vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+    Res<urange> map(Vmo& vmo, usize off, usize len, Flags<MapFlags> flags = {}) {
         usize virt = 0;
         try$(_map(_cap, &virt, vmo, off, &len, flags));
         return Ok(urange{virt, len});
     }
 
-    Res<urange> map(Vmo& vmo, MapFlags flags = MapFlags::NONE) {
+    Res<urange> map(Vmo& vmo, Flags<MapFlags> flags = {}) {
         usize virt = 0;
         usize len = 0;
         try$(_map(_cap, &virt, vmo, 0, &len, flags));
@@ -199,25 +200,25 @@ struct Mapped {
     Bytes bytes() const { return {reinterpret_cast<u8 const*>(_addr), _len}; }
 };
 
-static inline Res<Mapped> map(usize virt, Vmo& vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+static inline Res<Mapped> map(usize virt, Vmo& vmo, usize off, usize len, Flags<MapFlags> flags = {}) {
     try$(_map(Space::self(), &virt, vmo, off, &len, flags));
     return Ok(Mapped{virt, len});
 }
 
-static inline Res<Mapped> map(Vmo& vmo, usize off, usize len, MapFlags flags = MapFlags::NONE) {
+static inline Res<Mapped> map(Vmo& vmo, usize off, usize len, Flags<MapFlags> flags = {}) {
     usize virt = 0;
     try$(_map(Space::self(), &virt, vmo, off, &len, flags));
     return Ok(Mapped{virt, len});
 }
 
-static inline Res<Mapped> map(Vmo& vmo, MapFlags flags = MapFlags::NONE) {
+static inline Res<Mapped> map(Vmo& vmo, Flags<MapFlags> flags = {}) {
     usize virt = 0;
     usize len = 0;
     try$(_map(Space::self(), &virt, vmo, 0, &len, flags));
     return Ok(Mapped{virt, len});
 }
 
-struct Io : public Object {
+struct Io : Object {
     using Props = IopProps;
 
     using Object::Object;
@@ -237,7 +238,7 @@ struct Io : public Object {
     }
 };
 
-struct Channel : public Object {
+struct Channel : Object {
     using Props = ChannelProps;
 
     using Object::Object;
@@ -259,7 +260,7 @@ struct Channel : public Object {
     }
 };
 
-struct Irq : public Object {
+struct Irq : Object {
     using Props = IrqProps;
 
     using Object::Object;
@@ -269,7 +270,7 @@ struct Irq : public Object {
     }
 };
 
-struct Listener : public Object {
+struct Listener : Object {
     using Props = ListenerProps;
 
     using Object::Object;
@@ -309,13 +310,13 @@ struct Listener : public Object {
 } // namespace Hj
 
 template <Meta::Derive<Hj::Object> T>
-struct Karm::Io::Packer<T> {
-    static Res<> pack(PackEmit& e, T const& val) {
+struct Karm::Sys::MessagePacker<T> {
+    static Res<> pack(Karm::Sys::MessageWriter& e, T const& val) {
         e.give(Sys::Handle{val.raw()});
         return Ok();
     }
 
-    static Res<T> unpack(PackScan& s) {
+    static Res<T> unpack(Karm::Sys::MessageReader& s) {
         auto cap = s.take();
         return Ok(T{Hj::Cap{cap.value()}});
     }

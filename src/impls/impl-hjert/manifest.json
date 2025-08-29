@@ -5,7 +5,7 @@
     "description": "Karm platform embedding layer for hjert.",
     "enableIf": {
         "sys": [
-            "hjert"
+            "kernel"
         ]
     },
     "provides": [

@@ -1,9 +1,11 @@
-#include <karm-cli/args.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/proc.h>
 
+import Karm.Cli;
 import Karm.Http;
-import Karm.Aio;
+import Karm.Core;
+
+using namespace Karm;
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto urlArg = Cli::operand<Str>("url"s, "URL to fetch"s, "localhost"s);

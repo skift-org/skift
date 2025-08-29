@@ -1,6 +1,7 @@
 #pragma once
 
 #include <efi/spec.h>
+#include <karm-core/macros.h>
 
 namespace Efi {
 

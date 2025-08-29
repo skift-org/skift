@@ -8,13 +8,13 @@
 
 namespace Karm::Sys::_Embed {
 
-Res<Rc<Sys::Fd>> unpackFd(Io::PackScan& s) {
+Res<Rc<Fd>> unpackFd(MessageReader& s) {
     return Skift::unpackFd(s);
 }
 
 // MARK: File I/O --------------------------------------------------------------
 
-Res<Rc<Sys::Fd>> openFile(Mime::Url const& url) {
+Res<Rc<Fd>> openFile(Mime::Url const& url) {
     auto urlStr = url.str();
     auto* fileRecord = useHandover().fileByName(urlStr.buf());
     if (not fileRecord)
@@ -25,31 +25,39 @@ Res<Rc<Sys::Fd>> openFile(Mime::Url const& url) {
     return Ok(makeRc<Skift::VmoFd>(std::move(vmo)));
 }
 
-Res<Rc<Sys::Fd>> createFile(Mime::Url const&) {
+Res<Rc<Fd>> createFile(Mime::Url const&) {
     notImplemented();
 }
 
-Res<Rc<Sys::Fd>> openOrCreateFile(Mime::Url const&) {
+Res<Rc<Fd>> openOrCreateFile(Mime::Url const&) {
     notImplemented();
 }
 
-Res<Pair<Rc<Sys::Fd>, Rc<Sys::Fd>>> createPipe() {
+Res<Pair<Rc<Fd>, Rc<Fd>>> createPipe() {
     notImplemented();
 }
 
-Res<Rc<Sys::Fd>> createIn() {
-    return Ok(makeRc<Sys::NullFd>());
+Res<Rc<Fd>> createIn() {
+    return Ok(makeRc<NullFd>());
 }
 
-Res<Rc<Sys::Fd>> createOut() {
-    return Ok(makeRc<Sys::NullFd>());
+Res<Rc<Fd>> createOut() {
+    return Ok(makeRc<NullFd>());
 }
 
-Res<Rc<Sys::Fd>> createErr() {
-    return Ok(makeRc<Sys::NullFd>());
+Res<Rc<Fd>> createErr() {
+    return Ok(makeRc<NullFd>());
 }
 
-Res<Vec<Sys::DirEntry>> readDir(Mime::Url const&) {
+Res<Vec<DirEntry>> readDir(Mime::Url const&) {
+    notImplemented();
+}
+
+Res<> createDir(Mime::Url const&) {
+    notImplemented();
+}
+
+Res<Vec<DirEntry>> readDirOrCreate(Mime::Url const&) {
     notImplemented();
 }
 
@@ -70,19 +78,19 @@ Async::Task<> launchAsync(Intent) {
 
 // MARK: Sockets ---------------------------------------------------------------
 
-Res<Rc<Sys::Fd>> connectTcp(SocketAddr) {
+Res<Rc<Fd>> connectTcp(SocketAddr) {
     notImplemented();
 }
 
-Res<Rc<Sys::Fd>> listenTcp(SocketAddr) {
+Res<Rc<Fd>> listenTcp(SocketAddr) {
     notImplemented();
 }
 
-Res<Rc<Sys::Fd>> listenUdp(SocketAddr) {
+Res<Rc<Fd>> listenUdp(SocketAddr) {
     notImplemented();
 }
 
-Res<Rc<Sys::Fd>> listenIpc(Mime::Url) {
+Res<Rc<Fd>> listenIpc(Mime::Url) {
     notImplemented();
 }
 
@@ -104,19 +112,19 @@ Duration uptime() {
 
 // MARK: Memory Managment ------------------------------------------------------
 
-Res<Sys::MmapResult> memMap(Sys::MmapOptions const&) {
+Res<MmapResult> memMap(Sys::MmapProps const&) {
     notImplemented();
 }
 
-Res<Sys::MmapResult> memMap(Sys::MmapOptions const&, Rc<Sys::Fd> fd) {
+Res<MmapResult> memMap(Sys::MmapProps const&, Rc<Fd> fd) {
     auto vmoFd = fd.is<Skift::VmoFd>();
     if (not vmoFd)
         return Error::invalidInput("expected VmoFd");
 
     auto& vmo = vmoFd->vmo();
-    auto range = try$(Hj::Space::self().map(vmo, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
+    auto range = try$(Hj::Space::self().map(vmo, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
 
-    return Ok(Sys::MmapResult{
+    return Ok(MmapResult{
         0,
         range.start,
         range.size,
@@ -133,23 +141,23 @@ Res<> memFlush(void*, usize) {
 
 // MARK: System Informations ---------------------------------------------------
 
-Res<> populate(Sys::SysInfo&) {
+Res<> populate(SysInfo&) {
     notImplemented();
 }
 
-Res<> populate(Sys::MemInfo&) {
+Res<> populate(MemInfo&) {
     notImplemented();
 }
 
-Res<> populate(Vec<Sys::CpuInfo>&) {
+Res<> populate(Vec<CpuInfo>&) {
     notImplemented();
 }
 
-Res<> populate(Sys::UserInfo&) {
+Res<> populate(UserInfo&) {
     notImplemented();
 }
 
-Res<> populate(Vec<Sys::UserInfo>&) {
+Res<> populate(Vec<UserInfo>&) {
     notImplemented();
 }
 
@@ -185,6 +193,16 @@ Res<> hardenSandbox() {
 
 Async::Task<Vec<Ip>> ipLookupAsync(Str) {
     co_return Error::notImplemented();
+}
+
+// MARK: Bundle ----------------------------------------------------------------
+
+Res<Vec<String>> installedBundles() {
+    return Error::notImplemented("not implemented");
+}
+
+Res<String> currentBundle() {
+    return Error::notImplemented("not implemented");
 }
 
 } // namespace Karm::Sys::_Embed

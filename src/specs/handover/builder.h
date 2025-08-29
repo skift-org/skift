@@ -1,8 +1,7 @@
 #pragma once
 
-#include <karm-base/range.h>
-#include <karm-base/string.h>
-#include <karm-base/vec.h>
+import Karm.Core;
+
 #include <karm-logger/logger.h>
 
 #include "spec.h"
@@ -135,7 +134,7 @@ struct Builder {
 
     usize add(Str str) {
         _string -= str.len() + 1;
-        memcpy(_string, str.buf(), str.len());
+        std::memcpy(_string, str.buf(), str.len());
         _string[str.len()] = '\0';
         return _string - static_cast<char*>(_buf);
     }

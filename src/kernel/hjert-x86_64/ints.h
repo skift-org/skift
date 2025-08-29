@@ -1,6 +1,8 @@
 #pragma once
 
-#include <karm-base/array.h>
+import Karm.Core;
+
+using namespace Karm;
 
 namespace Hjert::Arch {
 
@@ -31,12 +33,12 @@ struct [[gnu::packed]] Frame {
     u64 ss;
 };
 
-extern "C" Array<uintptr_t, 256> _intVec;
+extern "C" Array<usize, 256> _intVec;
 
-extern "C" void _intDispatch(uintptr_t rsp);
+extern "C" void _intDispatch(usize rsp);
 
 extern "C" void _sysHandler();
 
-extern "C" uintptr_t _sysDispatch(uintptr_t rsp);
+extern "C" usize _sysDispatch(usize rsp);
 
 } // namespace Hjert::Arch

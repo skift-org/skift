@@ -1,3 +1,5 @@
+import Karm.Core;
+
 #include <hal-x86_64/com.h>
 #include <hal-x86_64/gdt.h>
 #include <hal-x86_64/idt.h>
@@ -14,7 +16,6 @@
 #include <hjert-core/space.h>
 #include <hjert-core/syscalls.h>
 #include <hjert-core/task.h>
-#include <karm-base/witty.h>
 
 #include "ints.h"
 
@@ -155,13 +156,13 @@ void uPanic(Frame& frame) {
 }
 
 void kPanic(Frame& frame) {
-    logPrint("{}--- {} {}----------------------------------------------------", Cli::style(Cli::YELLOW_LIGHT), Cli::styled("!!!", Cli::Style(Cli::Color::RED).bold()), Cli::style(Cli::YELLOW_LIGHT));
+    logPrint("{}--- {} {}----------------------------------------------------", Tty::style(Tty::YELLOW_LIGHT), "!!!" | Tty::Style(Tty::RED).bold(), Tty::style(Tty::YELLOW_LIGHT));
     logPrint("");
-    logPrint("    {}", Cli::styled("Kernel Panic", Cli::style(Cli::RED).bold()));
+    logPrint("    {}", "Kernel Panic" | Tty::style(Tty::RED).bold());
     logPrint("    kernel cause a '{}'", _faultMsg[frame.intNo]);
-    logPrint("    {}", Cli::styled(witty(frame.rsp + frame.rip), Cli::GRAY_DARK));
+    logPrint("    {}", witty(frame.rsp + frame.rip) | Tty::GRAY_DARK);
     logPrint("");
-    logPrint("    {}", Cli::styled("Registers", Cli::WHITE));
+    logPrint("    {}", "Registers" | Tty::WHITE);
     logPrint("    int={}", frame.intNo);
     logPrint("    err={}", frame.errNo);
     logPrint("    rip={p}", frame.rip);
@@ -170,12 +171,12 @@ void kPanic(Frame& frame) {
     logPrint("    cr2={p}", x86_64::rdcr2());
     logPrint("    cr3={p}", x86_64::rdcr3());
     logPrint("");
-    logPrint("    {}", Cli::styled("Backtrace", Cli::WHITE));
+    logPrint("    {}", "Backtrace" | Tty::WHITE);
     backtrace(frame.rbp);
     logPrint("");
-    logPrint("    {}", Cli::styled("System halted", Cli::WHITE));
+    logPrint("    {}", "System halted" | Tty::WHITE);
     logPrint("");
-    logPrint("{}", Cli::styled("-----------------------------------------------------------", Cli::YELLOW_LIGHT));
+    logPrint("{}", "-----------------------------------------------------------" | Tty::YELLOW_LIGHT);
 
     panic("cpu exception");
 }

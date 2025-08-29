@@ -1,6 +1,8 @@
 #pragma once
 
-#include <karm-base/string.h>
+import Karm.Core;
+
+using namespace Karm;
 
 namespace Strata::Echo::Api {
 

@@ -1,8 +1,10 @@
-#include <karm-app/inputs.h>
 #include <karm-logger/logger.h>
-#include <karm-rpc/base.h>
+#include <karm-sys/message.h>
+#include <karm-math/vec.h>
 
 #include "ps2.h"
+
+import Karm.App;
 
 namespace Strata::Device::Ps2 {
 
@@ -75,7 +77,7 @@ Res<> I8042::writeCmd(Cmd cmd) {
 
 Res<> I8042::writeConfig(Flags<Configs> cfg) {
     try$(writeCmd(Cmd::WRITE_CONFIG));
-    try$(writeData(cfg.underlying()));
+    try$(writeData(cfg.raw()));
     return Ok();
 }
 
@@ -112,7 +114,8 @@ Res<> Keyboard::event(App::Event& e) {
                     auto event = App::makeEvent<App::KeyboardEvent>(
                         data & 0x80 ? App::KeyboardEvent::PRESS : App::KeyboardEvent::RELEASE,
                         key,
-                        key
+                        key,
+                        NONE
                     );
                     try$(bubble(*event));
                     _esc = false;
@@ -179,7 +182,7 @@ Res<> Mouse::decode() {
     if (_buf[0] & 0x20)
         offy -= 0x100;
 
-    App::MouseButton buttons = App::MouseButton::NONE;
+    Flags<App::MouseButton> buttons = App::MouseButton::NONE;
 
     buttons |= ((_buf[0] >> 0) & 1) ? App::MouseButton::LEFT : App::MouseButton::NONE;
     buttons |= ((_buf[0] >> 1) & 1) ? App::MouseButton::RIGHT : App::MouseButton::NONE;

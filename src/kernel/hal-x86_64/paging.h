@@ -1,7 +1,8 @@
 #pragma once
 
+import Karm.Core;
+
 #include <hal/vmm.h>
-#include <karm-base/opt.h>
 
 namespace x86_64 {
 

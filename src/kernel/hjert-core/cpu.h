@@ -1,14 +1,11 @@
 #pragma once
 
+import Karm.Core;
+
 #include <hal/io.h>
 #include <hal/pmm.h>
 #include <hal/vmm.h>
 #include <hjert-api/types.h>
-#include <karm-base/lock.h>
-#include <karm-base/rc.h>
-#include <karm-base/ring.h>
-#include <karm-base/union.h>
-#include <karm-base/vec.h>
 
 #include "arch.h"
 

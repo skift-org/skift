@@ -4,7 +4,7 @@
 
 namespace Hjert::Core {
 
-Res<Arc<Vmo>> Vmo::alloc(usize size, Hj::VmoFlags flags) {
+Res<Arc<Vmo>> Vmo::alloc(usize size, Flags<Hj::VmoFlags> flags) {
     if (size == 0) {
         return Error::invalidInput("size is zero");
     }

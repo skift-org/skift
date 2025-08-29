@@ -5,7 +5,7 @@
     "description": "The Hjert micro-kernel core",
     "enableIf": {
         "sys": [
-            "hjert"
+            "kernel"
         ]
     },
     "requires": [

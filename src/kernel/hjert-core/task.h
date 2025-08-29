@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-base/func.h>
+import Karm.Core;
 
 #include "context.h"
 #include "object.h"
@@ -60,11 +60,11 @@ struct Task :
                _mode == Mode::USER;
     }
 
-    Res<> ensure(Hj::Pledge pledge);
+    Res<> ensure(Flags<Hj::Pledge> pledge);
 
-    Res<> pledge(Hj::Pledge pledge);
+    Res<> pledge(Flags<Hj::Pledge> pledge);
 
-    Hj::Pledge pledges() {
+    Flags<Hj::Pledge> pledges() {
         ObjectLockScope scope(*this);
         return _pledges;
     }

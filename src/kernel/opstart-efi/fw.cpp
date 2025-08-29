@@ -1,18 +1,19 @@
+import Karm.Core;
+
 #include <efi/base.h>
 #include <hal-x86_64/vmm.h>
-#include <karm-base/align.h>
 #include <opstart/fw.h>
 
 namespace Opstart::Fw {
 
 struct EfiPmm : public Hal::Pmm {
-    Res<Hal::PmmRange> allocRange(usize size, Hal::PmmFlags) override {
+    Res<Hal::PmmRange> allocRange(usize size, Flags<Hal::PmmFlags>) override {
         usize paddr = 0;
         try$(Efi::bs()->allocatePages(Efi::AllocateType::ANY_PAGES, Efi::MemoryType::LOADER_DATA, size / Hal::PAGE_SIZE, &paddr));
         return Ok(Hal::PmmRange{paddr, size});
     }
 
-    Res<> used(Hal::PmmRange range, Hal::PmmFlags) override {
+    Res<> used(Hal::PmmRange range, Flags<Hal::PmmFlags>) override {
         usize paddr = range.start;
         try$(Efi::bs()->allocatePages(Efi::AllocateType::ADDRESS, Efi::MemoryType::LOADER_DATA, paddr / Hal::PAGE_SIZE, &paddr));
         return Ok();
@@ -27,8 +28,8 @@ struct EfiPmm : public Hal::Pmm {
 static EfiPmm pmm{};
 
 Res<Arc<Hal::Vmm>> createVmm() {
-    usize upper = try$(pmm.allocRange(Hal::PAGE_SIZE, Hal::PmmFlags::NONE)).start;
-    memset((void*)upper, 0, Hal::PAGE_SIZE);
+    usize upper = try$(pmm.allocRange(Hal::PAGE_SIZE, {})).start;
+    std::memset((void*)upper, 0, Hal::PAGE_SIZE);
     return Ok(makeArc<x86_64::Vmm<>>(pmm, (x86_64::Pml<4>*)upper));
 }
 

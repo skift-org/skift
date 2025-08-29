@@ -26,9 +26,9 @@ struct VmoFd : public Sys::NullFd {
         return Sys::Handle(_vmo.raw());
     }
 
-    Res<> pack(Io::PackEmit& e) override {
-        try$(Io::pack(e, _FdType::VMO));
-        try$(Io::pack(e, _vmo));
+    Res<> pack(Sys::MessageWriter& e) override {
+        try$(Sys::pack(e, _FdType::VMO));
+        try$(Sys::pack(e, _vmo));
         return Ok();
     }
 };
@@ -54,15 +54,14 @@ struct IpcFd : public Sys::NullFd {
         return Ok<Sys::_Received>(bytes, caps, Sys::Ip4::unspecified(0)); // FIXME: Placeholder address
     }
 
-    Res<> pack(Io::PackEmit& e) override {
-        try$(Io::pack(e, _FdType::IPC));
-
-        try$(Io::pack(e, _in));
-        try$(Io::pack(e, _out));
+    Res<> pack(Sys::MessageWriter& w) override {
+        try$(Sys::pack(w, _FdType::IPC));
+        try$(Sys::pack(w, _in));
+        try$(Sys::pack(w, _out));
         return Ok();
     }
 };
 
-Res<Rc<Sys::Fd>> unpackFd(Io::PackScan& s);
+Res<Rc<Sys::Fd>> unpackFd(Sys::MessageReader& s);
 
 } // namespace Skift

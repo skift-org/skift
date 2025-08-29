@@ -1,8 +1,6 @@
 #pragma once
 
-#include <karm-base/range.h>
-#include <karm-base/slice.h>
-#include <karm-meta/nocopy.h>
+import Karm.Core;
 
 #include "pmm.h"
 

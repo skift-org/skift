@@ -1,7 +1,7 @@
 #pragma once
 
-#include <karm-app/inputs.h>
-#include <karm-base/res.h>
+import Karm.Core;
+import Karm.App;
 
 #include "guid.h"
 
@@ -496,7 +496,8 @@ struct Key {
         return {
             .type = App::KeyboardEvent::PRESS,
             .key = key,
-            .code = key
+            .code = key,
+            .mods = {}
         };
     }
 };

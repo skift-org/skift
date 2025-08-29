@@ -4,6 +4,6 @@
     "type": "lib",
     "description": "Device Tree Specification",
     "requires": [
-        "karm-base"
+        "karm-core"
     ]
 }

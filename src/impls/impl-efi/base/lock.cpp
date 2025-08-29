@@ -1,6 +1,9 @@
+module;
+
 #include <efi/base.h>
 #include <efi/spec.h>
-#include <karm-base/_embed.h>
+
+module Karm.Core;
 
 namespace Karm::_Embed {
 

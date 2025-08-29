@@ -1,7 +1,8 @@
 #pragma once
 
+import Karm.Core;
+
 #include <abi-sysv/abi.h>
-#include <karm-base/res.h>
 
 #include "spec.h"
 

@@ -1,8 +1,8 @@
+import Karm.Core;
+
 #include <elf/image.h>
 #include <hal/mem.h>
 #include <handover/builder.h>
-#include <karm-base/align.h>
-#include <karm-base/size.h>
 #include <karm-logger/logger.h>
 #include <karm-sys/chan.h>
 #include <karm-sys/file.h>
@@ -52,8 +52,8 @@ Res<> loadEntry(Entry const& entry) {
         logInfo("opstart: loading segment: paddr={p}, vaddr={p}, memsz={p}, filesz={p}", paddr, prog.vaddr(), memsz, prog.filez());
 
         usize remaining = prog.memsz() - prog.filez();
-        memcpy((void*)paddr, prog.buf(), prog.filez());
-        memset((void*)(paddr + prog.filez()), 0, remaining);
+        std::memcpy((void*)paddr, prog.buf(), prog.filez());
+        std::memset((void*)(paddr + prog.filez()), 0, remaining);
 
         payload.add(Handover::KERNEL, 0, {paddr, memsz});
     }
@@ -102,14 +102,14 @@ Res<> loadEntry(Entry const& entry) {
     try$(vmm->mapRange(
         {Handover::KERNEL_BASE + Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
         {Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
-        Hal::Vmm::READ | Hal::Vmm::WRITE
+        {Hal::Vmm::READ, Hal::Vmm::WRITE}
     ));
 
     logInfo("opstart: mapping upper half...");
     try$(vmm->mapRange(
         {Handover::UPPER_HALF + Hal::PAGE_SIZE, gib(4) - Hal::PAGE_SIZE},
         {Hal::PAGE_SIZE, gib(4) - Hal::PAGE_SIZE},
-        Hal::Vmm::READ | Hal::Vmm::WRITE
+        {Hal::Vmm::READ, Hal::Vmm::WRITE}
     ));
 
     logInfo("opstart: mapping boot-agent image...");
@@ -118,7 +118,7 @@ Res<> loadEntry(Entry const& entry) {
     try$(vmm->mapRange(
         Hal::identityMapped(loaderImage),
         loaderImage,
-        Hal::Vmm::READ | Hal::Vmm::WRITE
+        {Hal::Vmm::READ, Hal::Vmm::WRITE}
     ));
 
     logInfo("opstart: finalizing and entering kernel, see you on the other side...");

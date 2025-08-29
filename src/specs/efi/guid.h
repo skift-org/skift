@@ -1,6 +1,8 @@
 #pragma once
 
-#include <karm-base/array.h>
+import Karm.Core;
+
+using namespace Karm;
 
 namespace Efi {
 

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <karm-app/event.h>
-#include <karm-base/rc.h>
-#include <karm-base/res.h>
-#include <karm-base/vec.h>
+import Karm.Core;
+import Karm.App;
+
+using namespace Karm;
 
 namespace Strata::Device {
 

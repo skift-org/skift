@@ -22,6 +22,28 @@
                 "bundle://fonts-inter/fonts/Inter-Medium.ttf",
                 "bundle://fonts-inter/fonts/Inter-Bold.ttf"
             ]
+        },
+        {
+            "name": "skiftOS",
+            "kernel": "bundle://hjert/_bin",
+            "blobs": [
+                "bundle://strata-av/_bin",
+                "bundle://strata-conf/_bin",
+                "bundle://strata-device/_bin",
+                "bundle://strata-dhcp/_bin",
+                "bundle://strata-dns/_bin",
+                "bundle://strata-echo/_bin",
+                "bundle://strata-fs/_bin",
+                "bundle://strata-net/_bin",
+                "bundle://strata-seat/_bin",
+                "bundle://strata-shell/_bin",
+                "bundle://strata-bus/_bin",
+                "bundle://hideo-calculator.main/_bin",
+                "bundle://hideo-shell/wallpapers/winter.qoi",
+                "bundle://fonts-inter/fonts/Inter-Regular.ttf",
+                "bundle://fonts-inter/fonts/Inter-Medium.ttf",
+                "bundle://fonts-inter/fonts/Inter-Bold.ttf"
+            ]
         }
     ]
 }

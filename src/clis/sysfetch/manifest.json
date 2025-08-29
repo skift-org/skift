@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "sysfetch",
+    "description": "Do a domain name lookup",
+    "type": "exe",
+    "requires": [
+        "karm-cli",
+        "karm-app"
+    ]
+}

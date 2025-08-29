@@ -1,9 +1,10 @@
 #pragma once
 
-#include <karm-base/cstr.h>
-#include <karm-base/limits.h>
+import Karm.Core;
 
 #include "macros.h"
+
+using namespace Karm;
 
 namespace Handover {
 

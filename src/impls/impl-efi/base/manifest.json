@@ -12,6 +12,6 @@
     },
     "requires": [],
     "provides": [
-        "karm-base-impl"
+        "karm-core-impl"
     ]
 }

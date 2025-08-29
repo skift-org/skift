@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-base/ring.h>
+import Karm.Core;
 
 #include "object.h"
 

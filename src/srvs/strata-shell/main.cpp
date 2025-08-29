@@ -1,11 +1,8 @@
-#include <karm-app/host.h>
 #include <karm-gfx/cpu/canvas.h>
 #include <karm-gfx/icon.h>
-#include <karm-image/loader.h>
-#include <karm-rpc/base.h>
+#include <karm-sys/endpoint.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/time.h>
-#include <karm-app/inputs.h>
 
 #include "../strata-bus/api.h"
 #include "api.h"
@@ -14,7 +11,9 @@
 
 import Mdi;
 import Karm.Ui;
+import Karm.App;
 import Hideo.Shell;
+import Karm.Image;
 
 namespace Strata::Shell {
 
@@ -125,7 +124,7 @@ struct ServiceLauncher : public Hideo::Shell::Launcher {
         : Launcher(icon, name, ramp), componentId(serviceId) {}
 
     void launch(Hideo::Shell::State&) override {
-        Rpc::globalEndpoint().send<Bus::Api::Start>(Rpc::Port::BUS, componentId).unwrap();
+        Sys::globalEndpoint().send<Bus::Api::Start>(Sys::Port::BUS, componentId).unwrap();
     }
 };
 
@@ -142,7 +141,7 @@ Async::Task<> servAsync(Sys::Context& ctx) {
         .instances = {}
     };
 
-    auto endpoint = Rpc::Endpoint::create(ctx);
+    auto endpoint = Sys::Endpoint::create(ctx);
     auto root = makeRc<Root>(
         Hideo::Shell::app(std::move(state)) | inputTranslator,
         co_try$(Framebuffer::open(ctx))
@@ -150,8 +149,8 @@ Async::Task<> servAsync(Sys::Context& ctx) {
 
     Async::detach(root->run());
 
-    co_try$(endpoint.send<Strata::Bus::Api::Listen>(Rpc::Port::BUS, Meta::idOf<App::MouseEvent>()));
-    co_try$(endpoint.send<Strata::Bus::Api::Listen>(Rpc::Port::BUS, Meta::idOf<App::KeyboardEvent>()));
+    co_try$(endpoint.send<Strata::Bus::Api::Listen>(Sys::Port::BUS, Meta::idOf<App::MouseEvent>()));
+    co_try$(endpoint.send<Strata::Bus::Api::Listen>(Sys::Port::BUS, Meta::idOf<App::KeyboardEvent>()));
 
     while (true) {
         auto msg = co_trya$(endpoint.recvAsync());

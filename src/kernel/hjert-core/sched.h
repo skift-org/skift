@@ -1,10 +1,8 @@
 #pragma once
 
+import Karm.Core;
+
 #include <handover/spec.h>
-#include <karm-base/rc.h>
-#include <karm-base/res.h>
-#include <karm-base/time.h>
-#include <karm-base/vec.h>
 
 namespace Hjert::Core {
 

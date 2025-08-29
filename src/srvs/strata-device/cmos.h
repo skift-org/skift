@@ -1,8 +1,9 @@
 #pragma once
 
-#include <hal/io.h>
-#include <karm-base/time.h>
 
+import Karm.Core;
+
+#include <hal/io.h>
 #include "node.h"
 
 namespace Strata::Device::Cmos {

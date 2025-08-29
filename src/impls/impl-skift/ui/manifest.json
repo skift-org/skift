@@ -11,7 +11,7 @@
         ]
     },
     "requires": [
-        "karm-rpc"
+        "karm-sys"
     ],
     "provides": [
         "karm-ui-impl"

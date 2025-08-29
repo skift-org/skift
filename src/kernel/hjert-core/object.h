@@ -1,10 +1,8 @@
 #pragma once
 
+import Karm.Core;
+
 #include <hjert-api/types.h>
-#include <karm-base/atomic.h>
-#include <karm-base/lock.h>
-#include <karm-base/rc.h>
-#include <karm-io/fmt.h>
 
 namespace Hjert::Core {
 

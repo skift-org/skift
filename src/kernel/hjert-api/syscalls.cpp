@@ -89,7 +89,7 @@ Res<> _drop(Cap cap) {
 }
 
 Res<> _pledge(Cap cap, Flags<Pledge> pledges) {
-    return _syscall(Syscall::PLEDGE, cap.raw(), (Arg)pledges.val());
+    return _syscall(Syscall::PLEDGE, cap.raw(), (Arg)pledges.raw());
 }
 
 Res<> _dup(Cap node, Cap* dst, Cap src) {
@@ -100,7 +100,7 @@ Res<> _start(Cap cap, usize ip, usize sp, Args const* args) {
     return _syscall(Syscall::START, cap.raw(), ip, sp, (Arg)args);
 }
 
-Res<> _map(Cap cap, usize* virt, Cap vmo, usize off, usize* len, MapFlags flags) {
+Res<> _map(Cap cap, usize* virt, Cap vmo, usize off, usize* len, Flags<MapFlags> flags) {
     return _syscall(Syscall::MAP, cap.raw(), (Arg)virt, vmo.raw(), off, (Arg)len, (Arg)flags);
 }
 
@@ -129,11 +129,11 @@ Res<> _close(Cap cap) {
 }
 
 Res<> _signal(Cap cap, Flags<Sigs> set, Flags<Sigs> unset) {
-    return _syscall(Syscall::SIGNAL, cap.raw(), (Arg)set.val(), (Arg)unset.val());
+    return _syscall(Syscall::SIGNAL, cap.raw(), (Arg)set.raw(), (Arg)unset.raw());
 }
 
 Res<> _listen(Cap cap, Cap target, Flags<Sigs> set, Flags<Sigs> unset) {
-    return _syscall(Syscall::LISTEN, cap.raw(), target.raw(), (Arg)set.val(), (Arg)unset.val());
+    return _syscall(Syscall::LISTEN, cap.raw(), target.raw(), (Arg)set.raw(), (Arg)unset.raw());
 }
 
 Res<> _poll(Cap cap, Event* ev, usize evCap, usize* evLen, Instant until) {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <karm-math/vec.h>
-#include <karm-rpc/base.h>
+#include <karm-sys/message.h>
 
 namespace Strata::Shell::Api {
 

@@ -1,8 +1,6 @@
 #pragma once
 
-#include <karm-base/array.h>
-#include <karm-base/res.h>
-#include <karm-base/string.h>
+import Karm.Core;
 
 namespace x86_64 {
 

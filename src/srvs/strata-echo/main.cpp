@@ -1,4 +1,4 @@
-#include <karm-rpc/base.h>
+#include <karm-sys/endpoint.h>
 #include <karm-sys/entry.h>
 
 #include "api.h"
@@ -6,7 +6,7 @@
 namespace Strata::Echo {
 
 Async::Task<> servAsync(Sys::Context& ctx) {
-    auto endpoint = Rpc::Endpoint::create(ctx);
+    auto endpoint = Sys::Endpoint::create(ctx);
     while (true) {
         auto msg = co_trya$(endpoint.recvAsync());
         if (msg.is<Echo::Api::Request>()) {

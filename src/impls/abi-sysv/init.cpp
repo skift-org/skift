@@ -1,4 +1,6 @@
-#include <karm-base/base.h>
+import Karm.Core;
+
+using namespace Karm;
 
 using InitFunc = void (*)();
 

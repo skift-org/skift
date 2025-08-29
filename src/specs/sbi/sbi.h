@@ -4,8 +4,7 @@
 // https://github.com/riscv-non-isa/riscv-sbi-doc/blob/master/riscv-sbi.adoc
 // https://github.com/riscv-software-src/opensbi/blob/master/docs/firmware/fw.md
 
-#include <karm-base/res.h>
-#include <karm-base/string.h>
+import Karm.Core;
 
 namespace Sbi {
 

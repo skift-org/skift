@@ -1,7 +1,10 @@
-#include <karm-cli/args.h>
 #include <karm-sys/entry.h>
 #include <karm-sys/lookup.h>
 #include <karm-sys/proc.h>
+
+import Karm.Cli;
+
+using namespace Karm;
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto domainArg = Cli::operand<Str>("domain"s, "Domain name to lookup"s);

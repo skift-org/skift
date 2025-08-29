@@ -13,7 +13,6 @@
     "requires": [
         "strata-base",
         "hideo-shell",
-        "karm-rpc",
         "karm-sys"
     ]
 }

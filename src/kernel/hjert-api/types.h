@@ -1,8 +1,8 @@
 #pragma once
 
+import Karm.Core;
+
 #include <hal/vmm.h>
-#include <karm-base/array.h>
-#include <karm-base/time.h>
 
 namespace Hj {
 
@@ -102,8 +102,6 @@ enum struct Pledge : u32 {
 
 // clang-format on
 
-FlagsEnum$(Pledge);
-
 static inline Str toStr(Pledge pledge) {
     switch (pledge) {
 #define ITER(NAME, VAL) \
@@ -181,11 +179,9 @@ enum struct Sigs : u32 {
     USER7 = 1uz << 31,
 };
 
-FlagsEnum$(Sigs);
-
 struct Event {
     Cap cap;
-    Sigs sig;
+    Flags<Sigs> sigs;
     bool set;
 };
 
@@ -245,7 +241,7 @@ struct VmoProps {
     static constexpr Type TYPE = Type::VMO;
     usize phys;
     usize len;
-    VmoFlags flags;
+    Flags<VmoFlags> flags;
 };
 
 struct IopProps {

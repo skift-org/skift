@@ -5,7 +5,7 @@
     "description": "The Hjert micro-kernel platform layer for x86_64",
     "enableIf": {
         "sys": [
-            "hjert"
+            "kernel"
         ],
         "arch": [
             "x86_64"

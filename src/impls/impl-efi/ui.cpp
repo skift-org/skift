@@ -1,12 +1,13 @@
 module;
 
 #include <efi/base.h>
-#include <karm-async/task.h>
 #include <karm-gfx/canvas.h>
 #include <karm-logger/logger.h>
 
 module Karm.Ui:_embed;
+
 import Karm.Ui;
+import Karm.Core;
 
 namespace Karm::Ui::_Embed {
 

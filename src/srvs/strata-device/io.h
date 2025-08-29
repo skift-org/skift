@@ -1,9 +1,9 @@
 #pragma once
 
+import Karm.Core;
+
 #include <hal/io.h>
 #include <hjert-api/api.h>
-#include <karm-base/rc.h>
-#include <karm-base/vec.h>
 
 namespace Strata::Device {
 
@@ -35,7 +35,7 @@ struct DmaIo : public Hal::Io {
 
     static Res<Rc<Hal::Io>> open(Hal::DmaRange range) {
         auto vmo = try$(Hj::Vmo::create(Hj::ROOT, range.start, range.size, Hj::VmoFlags::DMA));
-        auto mapped = try$(Hj::map(vmo, Hj::MapFlags::READ | Hj::MapFlags::WRITE));
+        auto mapped = try$(Hj::map(vmo, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
         return Ok(makeRc<DmaIo>(std::move(mapped)));
     }
 

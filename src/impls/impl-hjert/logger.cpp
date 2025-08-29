@@ -1,5 +1,6 @@
+import Karm.Core;
+
 #include <hjert-core/arch.h>
-#include <karm-base/lock.h>
 #include <karm-logger/_embed.h>
 
 namespace Karm::Logger::_Embed {

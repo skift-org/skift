@@ -12,7 +12,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
         co_return Error::invalidInput("Usage: handover-dump <elf-file>");
     }
 
-    auto url = Mime::parseUrlOrPath(args[0], co_try$(Sys::pwd()));
+    auto url = Ref::parseUrlOrPath(args[0], co_try$(Sys::pwd()));
     auto kernelFile = co_try$(Sys::File::open(url));
     auto kernelMem = co_try$(Sys::mmap().read().map(kernelFile));
     Elf::Image kernelElf{kernelMem.bytes()};

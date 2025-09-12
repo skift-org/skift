@@ -15,20 +15,20 @@ using namespace Karm;
 namespace Opstart {
 
 struct Blob {
-    Mime::Url url;
+    Ref::Url url;
     Serde::Value props;
 
     static Res<Blob> fromJson(Serde::Value const& json) {
         Blob blob = {};
 
         if (json.isStr()) {
-            blob.url = Mime::Url::parse(json.asStr());
+            blob.url = Ref::Url::parse(json.asStr());
             return Ok(blob);
         }
 
         if (json.isObject()) {
             if (auto it = json.get("url"); it and it.isStr()) {
-                blob.url = Mime::Url::parse(it.asStr());
+                blob.url = Ref::Url::parse(it.asStr());
             } else {
                 return Error::invalidInput("missing url");
             }
@@ -55,7 +55,7 @@ struct Entry {
         Entry entry = {};
 
         if (auto it = json.get("icon"); it and it.isStr()) {
-            auto icon = Image::load(Mime::Url::parse(it.asStr()));
+            auto icon = Image::load(Ref::Url::parse(it.asStr()));
             if (icon)
                 entry.icon = icon.unwrap();
         }

@@ -13,7 +13,7 @@ struct Options {
     bool list = false;
 };
 
-Res<> ls(Mime::Url url, Options const& options) {
+Res<> ls(Ref::Url url, Options const& options) {
     auto dir = try$(Sys::Dir::open(url));
 
     for (auto const& entry : dir.entries()) {
@@ -36,7 +36,7 @@ Res<> ls(Slice<Str> paths, Options const& options) {
     for (auto& path : paths) {
         if (paths.len() > 1)
             Sys::println("{}:", path);
-        auto url = Mime::parseUrlOrPath(path, try$(Sys::pwd()));
+        auto url = Ref::parseUrlOrPath(path, try$(Sys::pwd()));
         try$(ls(url, options));
     }
 
@@ -69,7 +69,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
     if (argsOperands.unwrap())
         co_try$(Ls::ls(argsOperands.unwrap(), options));
     else
-        co_try$(Ls::ls(Mime::parseUrlOrPath(".", co_try$(Sys::pwd())), options));
+        co_try$(Ls::ls(Ref::parseUrlOrPath(".", co_try$(Sys::pwd())), options));
 
     co_return Ok();
 }

@@ -14,7 +14,7 @@ Res<Rc<Fd>> unpackFd(MessageReader& s) {
 
 // MARK: File I/O --------------------------------------------------------------
 
-Res<Rc<Fd>> openFile(Mime::Url const& url) {
+Res<Rc<Fd>> openFile(Ref::Url const& url) {
     auto urlStr = url.str();
     auto* fileRecord = useHandover().fileByName(urlStr.buf());
     if (not fileRecord)
@@ -25,11 +25,11 @@ Res<Rc<Fd>> openFile(Mime::Url const& url) {
     return Ok(makeRc<Skift::VmoFd>(std::move(vmo)));
 }
 
-Res<Rc<Fd>> createFile(Mime::Url const&) {
+Res<Rc<Fd>> createFile(Ref::Url const&) {
     notImplemented();
 }
 
-Res<Rc<Fd>> openOrCreateFile(Mime::Url const&) {
+Res<Rc<Fd>> openOrCreateFile(Ref::Url const&) {
     notImplemented();
 }
 
@@ -49,19 +49,19 @@ Res<Rc<Fd>> createErr() {
     return Ok(makeRc<NullFd>());
 }
 
-Res<Vec<DirEntry>> readDir(Mime::Url const&) {
+Res<Vec<DirEntry>> readDir(Ref::Url const&) {
     notImplemented();
 }
 
-Res<> createDir(Mime::Url const&) {
+Res<> createDir(Ref::Url const&) {
     notImplemented();
 }
 
-Res<Vec<DirEntry>> readDirOrCreate(Mime::Url const&) {
+Res<Vec<DirEntry>> readDirOrCreate(Ref::Url const&) {
     notImplemented();
 }
 
-Res<Stat> stat(Mime::Url const&) {
+Res<Stat> stat(Ref::Url const&) {
     notImplemented();
 }
 
@@ -90,7 +90,7 @@ Res<Rc<Fd>> listenUdp(SocketAddr) {
     notImplemented();
 }
 
-Res<Rc<Fd>> listenIpc(Mime::Url) {
+Res<Rc<Fd>> listenIpc(Ref::Url) {
     notImplemented();
 }
 
@@ -178,7 +178,7 @@ Res<> exit(i32) {
     notImplemented();
 }
 
-Res<Mime::Url> pwd() {
+Res<Ref::Url> pwd() {
     return Ok("file:/"_url);
 }
 

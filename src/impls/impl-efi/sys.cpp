@@ -229,7 +229,7 @@ Res<Rc<Fd>> listenUdp(SocketAddr) {
     notImplemented();
 }
 
-Res<Rc<Fd>> listenIpc(Mime::Url) {
+Res<Rc<Fd>> listenIpc(Ref::Url) {
     notImplemented();
 }
 
@@ -237,7 +237,7 @@ Res<Rc<Fd>> listenIpc(Mime::Url) {
 
 static Opt<Serde::Value> _index = NONE;
 
-static Res<Mime::Path> resolve(Mime::Url url) {
+static Res<Ref::Path> resolve(Ref::Url url) {
     if (url.scheme == "file") {
         return Ok(url.path);
     }
@@ -281,9 +281,9 @@ static Res<Mime::Path> resolve(Mime::Url url) {
 
         auto refStr = ref.asStr();
 
-        auto refUrl = Mime::Url::parse(refStr);
+        auto refUrl = Ref::Url::parse(refStr);
 
-        Mime::Path resolved = try$(resolve(refUrl));
+        Ref::Path resolved = try$(resolve(refUrl));
         logInfo("resolved to: {}", resolved);
         return Ok(resolved);
     } else {
@@ -292,7 +292,7 @@ static Res<Mime::Path> resolve(Mime::Url url) {
     }
 }
 
-Res<Rc<Fd>> openFile(Mime::Url const& url) {
+Res<Rc<Fd>> openFile(Ref::Url const& url) {
     static Efi::SimpleFileSystemProtocol* fileSystem = nullptr;
     if (not fileSystem) {
         fileSystem = try$(Efi::openProtocol<Efi::SimpleFileSystemProtocol>(Efi::li()->deviceHandle));
@@ -322,15 +322,15 @@ Res<Rc<Fd>> openFile(Mime::Url const& url) {
     return Ok(makeRc<FileProto>(file));
 }
 
-Res<Vec<DirEntry>> readDir(Mime::Url const&) {
+Res<Vec<DirEntry>> readDir(Ref::Url const&) {
     return Error::notImplemented();
 }
 
-Res<Rc<Fd>> createFile(Mime::Url const&) {
+Res<Rc<Fd>> createFile(Ref::Url const&) {
     return Error::notImplemented();
 }
 
-Res<Rc<Fd>> openOrCreateFile(Mime::Url const&) {
+Res<Rc<Fd>> openOrCreateFile(Ref::Url const&) {
     return Error::notImplemented();
 }
 
@@ -366,7 +366,7 @@ Res<> memFlush(void*, usize) {
     return Ok();
 }
 
-Res<Stat> stat(Mime::Url const&) {
+Res<Stat> stat(Ref::Url const&) {
     notImplemented();
 }
 
@@ -451,7 +451,7 @@ Res<> exit(i32) {
         ;
 }
 
-Res<Mime::Url> pwd() {
+Res<Ref::Url> pwd() {
     return Ok("file:/"_url);
 }
 

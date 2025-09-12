@@ -20,7 +20,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
 
     co_trya$(cmd.execAsync(ctx));
 
-    auto url = Mime::parseUrlOrPath(urlArg, co_try$(Sys::pwd()));
+    auto url = Ref::parseUrlOrPath(urlArg, co_try$(Sys::pwd()));
     auto header = co_trya$(Http::headAsync(url))->header;
     co_try$(header.unparse(Sys::out()));
 

@@ -9,10 +9,10 @@ namespace Hjert::Core {
 
 struct Pmm : Hal::Pmm {
     Hal::PmmRange _usable;
-    Bits _bits;
+    MutBits _bits;
     Lock _lock;
 
-    Pmm(Hal::PmmRange usable, Bits bits)
+    Pmm(Hal::PmmRange usable, MutBits bits)
         : _usable(usable),
           _bits(bits) {
         clear();

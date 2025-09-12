@@ -81,7 +81,7 @@ Res<Hj::SentRecv> Channel::recv(Domain& dom, MutBytes bytes, MutSlice<Hj::Cap> c
     if (_sr.len() == 0)
         return Error::wouldBlock("no messages available");
 
-    auto& [expectedBytes, expectedCaps] = _sr.peek(0);
+    auto& [expectedBytes, expectedCaps] = _sr.peekFront(0);
     if (bytes.len() < expectedBytes)
         return Error::invalidInput("not enough space for bytes");
 

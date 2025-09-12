@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-shell",
+    "type": "lib",
+    "description": "Graphical user interface for desktop and mobile devices",
+    "requires": [
+        "hideo-keyboard",
+        "karm-kira"
+    ]
+}

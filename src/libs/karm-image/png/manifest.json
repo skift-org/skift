@@ -1,0 +1,13 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-image.png",
+    "type": "lib",
+    "description": "PNG image decoding and encoding",
+    "props": {
+        "cpp-excluded": true
+    },
+    "requires": [
+        "karm-gfx",
+        "karm-archive"
+    ]
+}

@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-counter",
+    "type": "lib",
+    "description": "Keeps track of a counter",
+    "requires": [
+        "karm-kira"
+    ]
+}

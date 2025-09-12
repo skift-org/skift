@@ -1,0 +1,8 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-debug",
+    "type": "lib",
+    "requires": [
+        "karm-core"
+    ]
+}

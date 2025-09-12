@@ -1,0 +1,14 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "vaev-script",
+    "type": "lib",
+    "description": "ECMAScript library & runtime for Vaev",
+    "subdirs": [
+        "lang"
+    ],
+    "requires": [
+        "karm-core",
+        "karm-math",
+        "karm-gc"
+    ]
+}

@@ -1,0 +1,11 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-cli",
+    "type": "lib",
+    "description": "Command line interface parsing library",
+    "requires": [
+        "karm-sys",
+        "karm-tty",
+        "karm-debug"
+    ]
+}

@@ -1,0 +1,14 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-shell.main",
+    "type": "exe",
+    "props": {
+        "cpp-excluded": true
+    },
+    "requires": [
+        "hideo-shell"
+    ],
+    "provides": [
+        "__main__"
+    ]
+}

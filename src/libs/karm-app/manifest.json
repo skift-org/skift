@@ -1,0 +1,11 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-app",
+    "type": "lib",
+    "description": "Application host",
+    "requires": [
+        "karm-core",
+        "karm-math",
+        "karm-app-impl"
+    ]
+}

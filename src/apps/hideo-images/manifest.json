@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-images",
+    "type": "lib",
+    "description": "View and edit images",
+    "requires": [
+        "hideo-files",
+        "karm-kira"
+    ]
+}

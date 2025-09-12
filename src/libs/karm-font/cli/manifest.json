@@ -1,0 +1,10 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-font.cli",
+    "type": "exe",
+    "description": "Dump a TrueType font file to stdout",
+    "requires": [
+        "karm-sys",
+        "karm-font"
+    ]
+}

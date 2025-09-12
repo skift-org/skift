@@ -1,0 +1,12 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-image.bmp",
+    "type": "lib",
+    "description": "BMP image decoding and encoding",
+    "props": {
+        "cpp-excluded": true
+    },
+    "requires": [
+        "karm-gfx"
+    ]
+}

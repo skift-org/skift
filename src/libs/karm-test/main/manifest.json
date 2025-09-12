@@ -1,0 +1,12 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-test.main",
+    "type": "exe",
+    "description": "Test runner",
+    "requires": [
+        "karm-test"
+    ],
+    "provides": [
+        "__tests__"
+    ]
+}

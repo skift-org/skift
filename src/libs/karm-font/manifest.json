@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-font",
+    "type": "lib",
+    "description": "Font loading and matching",
+    "subdirs": [
+        "ttf"
+    ],
+    "requires": [
+        "karm-app",
+        "karm-gfx",
+        "karm-sys",
+        "karm-logger"
+    ]
+}

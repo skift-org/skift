@@ -1,0 +1,11 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-zoo",
+    "type": "lib",
+    "description": "Showcase the beautiful Kira components library",
+    "requires": [
+        "hideo-files",
+        "hideo-printers",
+        "karm-kira"
+    ]
+}

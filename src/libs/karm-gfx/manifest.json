@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-gfx",
+    "type": "lib",
+    "description": "Rich vector based graphic library",
+    "requires": [
+        "karm-math",
+        "karm-core",
+        "mdi"
+    ],
+    "subdirs": [
+        "cpu",
+        "gpu"
+    ]
+}

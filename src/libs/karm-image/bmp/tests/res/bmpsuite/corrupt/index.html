@@ -1,0 +1,453 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <title>Directory Listing</title>
+  </head>
+  <body>
+  <table border="1">
+
+    <tr>
+      <th>Filename</th>
+      <th>Description</th>
+    </tr>
+
+    <tr>
+      <td><a href="1bpp-no-palette.bmp">1bpp-no-palette.bmp</a></td>
+      <td>
+    A bitmap that has 1 bit per pixel and no palette.
+    This is technically invalid, but a bitmap processor could default to black and white.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="1bpp-pixeldata-cropped.bmp">1bpp-pixeldata-cropped.bmp</a></td>
+      <td>
+    A 1 bpp bitmap that ends in the middle of the pixel data.
+    This tests that what happens when a call to fread() fails.
+    This bitmap processor should probably process the data that
+    it does have AND display a diagnostic.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="24bpp-pixeldata-cropped.bmp">24bpp-pixeldata-cropped.bmp</a></td>
+      <td>
+    A 24 bpp bitmap that ends in the middle of the pixel data.
+    This tests that what happens when a call to fread() fails.
+    This bitmap processor should probably process the data that
+    it does have AND display a diagnostic.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="32bpp-pixeldata-cropped.bmp">32bpp-pixeldata-cropped.bmp</a></td>
+      <td>
+    A 32 bpp bitmap that ends in the middle of the pixel data.
+    This tests that what happens when a call to fread() fails.
+    This bitmap processor should probably process the data that
+    it does have AND display a diagnostic.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="4bpp-no-palette.bmp">4bpp-no-palette.bmp</a></td>
+      <td>
+    A bitmap that has 4 bit per pixel and no palette.
+    This is an invalid bitmap, but a bitmap processor could use default colors.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="4bpp-pixeldata-cropped.bmp">4bpp-pixeldata-cropped.bmp</a></td>
+      <td>
+    An 4 bpp bitmap that ends in the middle of the pixel data.
+    This tests that what happens when a call to fread() fails.
+    This bitmap processor should probably process the data that
+    it does have AND display a diagnostic.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="555-pixeldata-cropped.bmp">555-pixeldata-cropped.bmp</a></td>
+      <td>
+    A 5-5-5 16 bpp bitmap that ends in the middle of the pixel data.
+    This tests that what happens when a call to fread() fails.
+    This bitmap processor should probably process the data that
+    it does have AND display a diagnostic.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="8bpp-colorsimportant-large.bmp">8bpp-colorsimportant-large.bmp</a></td>
+      <td>
+    An 8 bpp bitmap with five colors, but a very large 'biColorsImportant' field.
+    This is invalid--biColorsImportant shouldn't exceed biColorsUsed.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="8bpp-colorsimportant-negative.bmp">8bpp-colorsimportant-negative.bmp</a></td>
+      <td>
+    An 8 bpp bitmap with a negative 'biColorsImportant' field.
+    This is invalid--biColorsImportant can't be below 0.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="8bpp-colorsused-large.bmp">8bpp-colorsused-large.bmp</a></td>
+      <td>
+    An 8 bpp bitmap with a very large 'biColorsUsed' field.
+    This is invalid--biColorsImportant shouldn't exceed 256.
+    This attempts to trick the bitmap processor into accessing invalid memory.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="8bpp-colorsused-negative.bmp">8bpp-colorsused-negative.bmp</a></td>
+      <td>
+    An 8 bpp bitmap with a negative 'biColorsUsed' field.
+    This is invalid--biColorsImportant can't be below 0.
+    This attempts to trick the bitmap processor into accessing invalid memory.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="8bpp-no-palette.bmp">8bpp-no-palette.bmp</a></td>
+      <td>
+    A bitmap that has 8 bits per pixel and no palette.
+    This is an invalid bitmap, but a bitmap processor could use default colors.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="8bpp-pixeldata-cropped.bmp">8bpp-pixeldata-cropped.bmp</a></td>
+      <td>
+    An 8 bpp bitmap that ends in the middle of the pixel data.
+    This tests that what happens when a call to fread() fails.
+    This bitmap processor should probably process the data that
+    it does have AND display a diagnostic.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="bitdepth-large.bmp">bitdepth-large.bmp</a></td>
+      <td>
+    A bitmap with a 'biBitCount' field in its BMPINFOHEADER that is very large.
+    This attempts to trick the bitmap processor into thinking the bit depth is negative.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="bitdepth-odd.bmp">bitdepth-odd.bmp</a></td>
+      <td>
+    A bitmap with a 'biBitCount' field in its BMPINFOHEADER that is odd.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="bitdepth-zero.bmp">bitdepth-zero.bmp</a></td>
+      <td>
+    A bitmap with a 'biBitCount' field in its BMPINFOHEADER that is 0.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="colormasks-cropped.bmp">colormasks-cropped.bmp</a></td>
+      <td>
+    A BI_BITFIELDS bitmap that is one byte short of having a complete
+    colormask array.
+    This tests that what happens when fread() returns fewer bytes
+    than expected.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="colormasks-missing.bmp">colormasks-missing.bmp</a></td>
+      <td>
+    A BI_BITFIELDS bitmap file that is so short that it doesn't include the
+    colormask array.
+    This tests that what happens when a call to fread() fails.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="compression-bad-rle4-for-8bpp.bmp">compression-bad-rle4-for-8bpp.bmp</a></td>
+      <td>
+    A 4 bpp bitmap with a 'biCompression' field of BI_RLE8.
+    Only 8 bpp bitmaps may use BI_RLE8.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="compression-bad-rle8-for-4bpp.bmp">compression-bad-rle8-for-4bpp.bmp</a></td>
+      <td>
+    An 8 bpp bitmap with a 'biCompression' field of BI_RLE4.
+    Only 4 bpp bitmaps may use BI_RLE4.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="compression-unknown.bmp">compression-unknown.bmp</a></td>
+      <td>
+    A bitmap with an unrecognized 'biCompression' field.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="directory.bmp">directory.bmp</a></td>
+      <td>
+    A directory that has a '.bmp' extension.
+    This tests what happens when the directory entity exists, 
+    but fopen() fails.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="emptyfile.bmp">emptyfile.bmp</a></td>
+      <td>
+    A zero-byte file.
+    This tests that what happens when the first call to fread() fails.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="fileinfoheader-cropped.bmp">fileinfoheader-cropped.bmp</a></td>
+      <td>
+    A bitmap that is one byte short of having a complete fileinfoheader.
+    This tests that what happens when fread() returns fewer bytes
+    than expected.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="height-zero.bmp">height-zero.bmp</a></td>
+      <td>
+    A bitmap with a 'biHeight' field in its BMPINFOHEADER that is 0.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="infoheader-cropped.bmp">infoheader-cropped.bmp</a></td>
+      <td>
+    A bitmap that is one byte short of having a complete BITMAPINFOHEADER.
+    This tests that what happens when fread() returns fewer bytes
+    than expected.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="infoheader-missing.bmp">infoheader-missing.bmp</a></td>
+      <td>
+    A bitmap file that is so short that it doesn't include a BITMAPINFOHEADER.
+    This tests that what happens when a call to fread() fails.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="infoheadersize-large.bmp">infoheadersize-large.bmp</a></td>
+      <td>
+    A bitmap with a 'biSize' field in its BMPINFOHEADER that is too large.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="infoheadersize-small.bmp">infoheadersize-small.bmp</a></td>
+      <td>
+    A bitmap with a 'biSize' field in its BMPINFOHEADER that is too small.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="infoheadersize-zero.bmp">infoheadersize-zero.bmp</a></td>
+      <td>
+    A bitmap with a 'biSize' field in its BMPINFOHEADER that is 0.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="magicnumber-bad.bmp">magicnumber-bad.bmp</a></td>
+      <td>
+    A bitmap with an invalid magic number (it uses 'Bm' instead of 'BM')
+    A bitmap processor that ignores this field is probably trusting the file extension
+    or doing a case-insensitive compare.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="magicnumber-cropped.bmp">magicnumber-cropped.bmp</a></td>
+      <td>
+    A one byte bitmap that only contains the 'B' of the magic number.
+    This tests that what happens when the first call to fread() returns
+    fewer bytes than expected.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="offbits-large.bmp">offbits-large.bmp</a></td>
+      <td>
+    A bitmap with an 'dwOffBits' field that is larger than the file size.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="offbits-negative.bmp">offbits-negative.bmp</a></td>
+      <td>
+    A bitmap with an 'dwOffBits' field that is -1.
+    This is supposed to be interpreted as an unsigned value, so it will
+    either be understood as a very large (illegal) value,
+    or a negative value (also illegal).
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="offbits-zero.bmp">offbits-zero.bmp</a></td>
+      <td>
+    A bitmap with an 'dwOffBits' field that is 0.
+    A bitmap processor may recover from this by assuming that the pixel data
+    immediately follows the palette.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="palette-cropped.bmp">palette-cropped.bmp</a></td>
+      <td>
+    A bitmap that is one byte short of having a complete palette.
+    This tests that what happens when fread() returns fewer bytes
+    than expected.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="palette-missing.bmp">palette-missing.bmp</a></td>
+      <td>
+    A bitmap file that is so short that it doesn't include the palette.
+    This tests that what happens when a call to fread() fails.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="palette-too-big.bmp">palette-too-big.bmp</a></td>
+      <td>A bitmap that has 1 bit per pixel that has a palette with 5000 colors.</td>
+    </tr>
+
+    <tr>
+      <td><a href="pixeldata-missing.bmp">pixeldata-missing.bmp</a></td>
+      <td>
+    A bitmap file that doesn't include any of the pixel data.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="rle4-absolute-cropped.bmp">rle4-absolute-cropped.bmp</a></td>
+      <td>
+    A simple run-length encoded bitmap that has 4 bits per pixel.
+    The entire bitmap is in 'absolute mode'.
+    The pixel data ends prematurely--in the middle of an absolute
+    escape sequence.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="rle4-delta-cropped.bmp">rle4-delta-cropped.bmp</a></td>
+      <td>
+    A simple run-length encoded bitmap that has 4 bits per pixel.
+    The bitmap uses 'delta escapes'.
+    The file ends in the middle of a delta escape.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="rle4-no-end-of-line-marker.bmp">rle4-no-end-of-line-marker.bmp</a></td>
+      <td>
+    An RLE4 compressed bitmap with no end-of-line sequences.
+    It is unclear if a bitmap processor should implicitly add
+    end-of-line markers when the pixel run the row's width,
+    or if it should ignore all pixel data beyond the row's width.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="rle4-runlength-cropped.bmp">rle4-runlength-cropped.bmp</a></td>
+      <td>
+    A simple run-length encoded bitmap that has 4 bits per pixel.
+    The entire bitmap is in 'encoded mode'.
+    The pixel data ends prematurely--in the middle of an encoded
+    escape sequence.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="rle8-absolute-cropped.bmp">rle8-absolute-cropped.bmp</a></td>
+      <td>
+    A simple run-length encoded bitmap that has 8 bits per pixel.
+    The entire bitmap is in 'absolute mode'.
+    The pixel data ends prematurely--in the middle of an absolute
+    escape sequence.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="rle8-delta-cropped.bmp">rle8-delta-cropped.bmp</a></td>
+      <td>
+    A simple run-length encoded bitmap that has 8 bits per pixel.
+    The bitmap uses 'delta escapes'.
+    The file ends in the middle of a delta escape.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="rle8-deltaleavesimage.bmp">rle8-deltaleavesimage.bmp</a></td>
+      <td>
+    A simple run-length encoded bitmap that has 8 bits per pixel.
+    The bitmap contains 'delta' escape sequences the leave the image.
+    The intent is to trick the processor into accessing invalid memory.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="rle8-no-end-of-line-marker.bmp">rle8-no-end-of-line-marker.bmp</a></td>
+      <td>
+    An RLE8 compressed bitmap with no end-of-line sequences.
+    It is unclear if a bitmap processor should implicitly add
+    end-of-line markers when the pixel run the row's width,
+    or if it should ignore all pixel data beyond the row's width.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="rle8-runlength-cropped.bmp">rle8-runlength-cropped.bmp</a></td>
+      <td>
+    A simple run-length encoded bitmap that has 8 bits per pixel.
+    The entire bitmap is in 'encoded mode'.
+    The pixel data ends prematurely--in the middle of an encoded
+    escape sequence.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="width-negative.bmp">width-negative.bmp</a></td>
+      <td>
+    A bitmap with a negative 'biWidth' field in its BMPINFOHEADER.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="width-times-height-overflow.bmp">width-times-height-overflow.bmp</a></td>
+      <td>
+    A bitmap whose reported width and height cause a 32bit overflow when
+    they are multiplied together.
+    This tries to trick the image processor into allocating a very small
+    buffer that it thinks is very large.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="width-zero.bmp">width-zero.bmp</a></td>
+      <td>
+    A bitmap with a 'biWidth' field in its BMPINFOHEADER that is 0.
+    </td>
+    </tr>
+
+    </table>
+  </body>
+</html>

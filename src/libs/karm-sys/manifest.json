@@ -1,0 +1,14 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-sys",
+    "type": "lib",
+    "description": "System-dependent system abstraction",
+    "requires": [
+        "karm-sys-impl",
+        "karm-sys-async-impl",
+        "karm-sys-sandbox-impl",
+        "karm-ref",
+        "karm-core",
+        "karm-logger"
+    ]
+}

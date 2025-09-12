@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-about",
+    "type": "lib",
+    "description": "About the skift operating system",
+    "requires": [
+        "karm-kira"
+    ]
+}

@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-wear",
+    "type": "exe",
+    "description": "Graphical user interface for wearable devices",
+    "requires": [
+        "karm-kira"
+    ]
+}

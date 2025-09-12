@@ -1,0 +1,12 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "vaev-view",
+    "type": "lib",
+    "description": "Host Vaev web content withing a user interface.",
+    "requires": [
+        "karm-ui",
+        "karm-kira",
+        "vaev-engine",
+        "hideo-printers"
+    ]
+}

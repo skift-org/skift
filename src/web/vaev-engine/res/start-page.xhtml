@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Tab</title>
+</head>
+
+
+<body>
+    <div class="search-container">
+        <div class="search-bar">
+            Search or type a URL…
+        </div>
+
+        <div class="recent">
+            <div class="recent-item">
+                <div class="recent-icon">S</div>
+                Search
+            </div>
+
+            <div class="recent-item">
+                <div class="recent-icon">V</div>
+                Video
+            </div>
+
+            <div class="recent-item">
+                <div class="recent-icon">S</div>
+                Social
+            </div>
+
+            <div class="recent-item">
+                <div class="recent-icon">E</div>
+                Email
+            </div>
+        </div>
+    </div>
+</body>
+<style>
+    body {
+        --k-gray50: #09090b;
+        --k-gray100: #18181b;
+        --k-gray200: #27272a;
+        --k-gray300: #3f3f46;
+        --k-gray400: #52525b;
+        --k-gray500: #71717a;
+        --k-gray600: #a1a1aa;
+        --k-gray700: #d4d4d8;
+        --k-gray800: #e4e4e7;
+        --k-gray900: #f4f4f5;
+        --k-gray950: #fafafa;
+
+        --k-accent50: #172554;
+        --k-accent100: #1e3a8a;
+        --k-accent200: #1e40af;
+        --k-accent300: #1d4ed8;
+        --k-accent400: #2563eb;
+        --k-accent500: #3b82f6;
+        --k-accent600: #60a5fa;
+        --k-accent700: #93c5fd;
+        --k-accent800: #bfdbfe;
+        --k-accent900: #dbeafe;
+        --k-accent950: #eff6ff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        body {
+            --k-gray50: #fafafa;
+            --k-gray100: #f4f4f5;
+            --k-gray200: #e4e4e7;
+            --k-gray300: #d4d4d8;
+            --k-gray400: #a1a1aa;
+            --k-gray500: #71717a;
+            --k-gray600: #52525b;
+            --k-gray700: #3f3f46;
+            --k-gray800: #27272a;
+            --k-gray900: #18181b;
+            --k-gray950: #09090b;
+
+            --k-accent50: #eff6ff;
+            --k-accent100: #dbeafe;
+            --k-accent200: #bfdbfe;
+            --k-accent300: #93c5fd;
+            --k-accent400: #60a5fa;
+            --k-accent500: #3b82f6;
+            --k-accent600: #2563eb;
+            --k-accent700: #1d4ed8;
+            --k-accent800: #1e40af;
+            --k-accent900: #1e3a8a;
+            --k-accent950: #172554;
+        }
+    }
+
+    body {
+        margin: 0;
+        font-family: sans-serif;
+        background-color: var(--k-gray950);
+        height: 100vh;
+        color: var(--k-gray50);
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .search-bar {
+        background-color: var(--k-gray900);
+        border: 1px solid var(--k-gray800);
+        border-radius: 99px;
+        color: var(--k-gray500);
+        padding: 0.6rem 1.2rem;
+        font-size: 1rem;
+    }
+
+
+    .recent {
+        display: flex;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+
+    .recent-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem;
+        font-size: 1rem;
+
+        color: var(--k-gray400);
+    }
+
+    .recent-icon {
+        background-color: var(--k-gray700);
+        color: var(--k-gray400);
+        border-radius: 99px;
+        margin-bottom: 1em;
+        width: 3rem;
+        height: 3rem;
+        font-size: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
+
+</html>

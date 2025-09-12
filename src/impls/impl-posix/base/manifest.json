@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "impl-posix.base",
+    "type": "lib",
+    "props": {
+        "cpp-excluded": true
+    },
+    "enableIf": {
+        "sys": [
+            "linux",
+            "darwin"
+        ]
+    },
+    "requires": [],
+    "provides": [
+        "karm-core-impl"
+    ]
+}

@@ -1,0 +1,11 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-logger",
+    "type": "lib",
+    "description": "A simple logger",
+    "requires": [
+        "karm-logger-impl",
+        "karm-core",
+        "karm-tty"
+    ]
+}

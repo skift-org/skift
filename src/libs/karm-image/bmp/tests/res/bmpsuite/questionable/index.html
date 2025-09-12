@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <title>Directory Listing</title>
+  </head>
+  <body>
+  <table border="1">
+
+    <tr>
+      <th>Filename</th>
+      <th>Description</th>
+    </tr>
+
+    <tr>
+      <td><a href="32bpp-0x0.bmp">32bpp-0x0.bmp</a></td>
+      <td>A bitmap that is 32 bpp uncompressed RGB. The image is 0 pixels wide and 0 pixels high.  Even though this is technically valid, most bitmap procesors consider it to be corrupt.</td>
+    </tr>
+
+    <tr>
+      <td><a href="32bpp-0x240.bmp">32bpp-0x240.bmp</a></td>
+      <td>A bitmap that is 32 bpp uncompressed RGB. The image is 0 pixels wide and 240 pixels high.  This is a sneaky way of making a 0x0 bitmap.  Even though this is technically valid, most bitmap procesors consider it to be corrupt.</td>
+    </tr>
+
+    <tr>
+      <td><a href="32bpp-320x0.bmp">32bpp-320x0.bmp</a></td>
+      <td>A bitmap that is 32 bpp uncompressed RGB. The image is 320 pixels wide and zero pixels high.  This is a sneaky way of making a 0x0 bitmap.  Even though this is technically valid, most bitmap procesors consider it to be corrupt.</td>
+    </tr>
+
+    <tr>
+      <td><a href="8bpp-pixels-not-in-palette.bmp">8bpp-pixels-not-in-palette.bmp</a></td>
+      <td>
+    A bitmap that is 8 bits per pixel uncompressed RGB.
+    Many of the pixels are indexes that don't exist in the palette.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="filesize-bad.bmp">filesize-bad.bmp</a></td>
+      <td>
+    A bitmap with a filesize that's half of what it should be.
+    Most bitmap processors ignore this field.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="filesize-zero.bmp">filesize-zero.bmp</a></td>
+      <td>
+    A bitmap with an filesize of 0.
+    Most bitmap processors ignore this field.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="pels-per-meter-x-large.bmp">pels-per-meter-x-large.bmp</a></td>
+      <td>
+    An 8 bpp bitmap with a large 'biXPelsPerMeter' field.
+    Most bitmap processors ignore this field, but it is most likely used when
+    printing the image.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="pels-per-meter-x-negative.bmp">pels-per-meter-x-negative.bmp</a></td>
+      <td>
+    An 8 bpp bitmap with a negative 'biXPelsPerMeter' field.
+    Most bitmap processors ignore this field, but it is most likely used when
+    printing the image.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="pels-per-meter-x-zero.bmp">pels-per-meter-x-zero.bmp</a></td>
+      <td>
+    An 8 bpp bitmap with a 'biXPelsPerMeter' field of 0.
+    Most bitmap processors ignore this field, but it is most likely used when
+    printing the image.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="pels-per-meter-y-large.bmp">pels-per-meter-y-large.bmp</a></td>
+      <td>
+    An 8 bpp bitmap with a large 'biYPelsPerMeter' field.
+    Most bitmap processors ignore this field, but it is most likely used when
+    printing the image.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="pels-per-meter-y-negative.bmp">pels-per-meter-y-negative.bmp</a></td>
+      <td>
+    An 8 bpp bitmap with a negative 'biYPelsPerMeter' field.
+    Most bitmap processors ignore this field, but it is most likely used when
+    printing the image.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="pels-per-meter-y-zero.bmp">pels-per-meter-y-zero.bmp</a></td>
+      <td>
+    An 8 bpp bitmap with a 'biYPelsPerMeter' field of 0.
+    Most bitmap processors ignore this field, but it is most likely used when
+    printing the image.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="pixeldata-rle8-toomuch.bmp">pixeldata-rle8-toomuch.bmp</a></td>
+      <td>
+    A simple run-length encoded bitmap that has 8 bits per pixel.
+    The entire bitmap is in 'encoded mode'.
+    It has twice as much data as it should.
+    Since the RLE8 format is mostly a series of drawing directives,
+    this tests that the RLE8 processor keeps memory access within
+    the size of the image.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="pixeldata-toomuch.bmp">pixeldata-toomuch.bmp</a></td>
+      <td>
+    A bitmap with twice as much payload as expected.
+    This attempts to overflow an internal buffer.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="planes-large.bmp">planes-large.bmp</a></td>
+      <td>
+    A bitmap with a 'biPlanes' field in its BMPINFOHEADER that is large.
+    This is an invalid bitmap, but many bitmap processors ignore this field.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="planes-zero.bmp">planes-zero.bmp</a></td>
+      <td>
+    A bitmap with a 'biPlanes' field in its BMPINFOHEADER that is zero.
+    This is an invalid bitmap, but many bitmap processors ignore this field.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="reserved1-bad.bmp">reserved1-bad.bmp</a></td>
+      <td>
+    A bitmap with an 'wReserved1' field that is not 0.
+    This is technically illegal, but most bitmap processors ignore this field.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="reserved2-bad.bmp">reserved2-bad.bmp</a></td>
+      <td>
+    A bitmap with an 'wReserved2' field that is not 0.
+    This is technically illegal, but most bitmap processors ignore this field.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="rle4-height-negative.bmp">rle4-height-negative.bmp</a></td>
+      <td>
+    An RLE4 compressed bitmap with a negative height.
+    This is an illegal bitmap: top-down images cannot be compressed.
+    Still, many bitmap processors can understand it.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="rle4-no-end-of-bitmap-marker.bmp">rle4-no-end-of-bitmap-marker.bmp</a></td>
+      <td>
+    An RLE4 compressed bitmap with no end-of-bitmap sequence.
+    This is techinically invalid, but the bitmap processor should
+    be able to treat the end-of-file as an end-of-bitmap.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="rle8-height-negative.bmp">rle8-height-negative.bmp</a></td>
+      <td>
+    An RLE8 compressed bitmap with a negative height.
+    This is an illegal value: top-down images cannot be compressed.
+    However, many bitmap processors allow top-down compressed images.
+    </td>
+    </tr>
+
+    <tr>
+      <td><a href="rle8-no-end-of-bitmap-marker.bmp">rle8-no-end-of-bitmap-marker.bmp</a></td>
+      <td>
+    An RLE8 compressed bitmap with no end-of-bitmap sequence.
+    This is techinically invalid, but the bitmap processor should
+    be able to treat the end-of-file as an end-of-bitmap.
+    </td>
+    </tr>
+
+    </table>
+  </body>
+</html>

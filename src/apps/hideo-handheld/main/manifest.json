@@ -1,0 +1,12 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-handheld.main",
+    "type": "exe",
+    "props": {
+        "cpp-excluded": true
+    },
+    "requires": [
+        "hideo-handheld",
+        "karm-kira"
+    ]
+}

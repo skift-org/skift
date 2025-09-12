@@ -1,0 +1,11 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hideo-camera.main",
+    "props": {
+        "cpp-excluded": true
+    },
+    "type": "exe",
+    "requires": [
+        "hideo-camera"
+    ]
+}

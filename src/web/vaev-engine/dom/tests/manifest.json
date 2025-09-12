@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "vaev-engine.dom.tests",
+    "type": "lib",
+    "props": {
+        "cpp-excluded": true
+    },
+    "requires": [
+        "karm-test",
+        "vaev-engine"
+    ],
+    "injects": [
+        "__tests__"
+    ]
+}

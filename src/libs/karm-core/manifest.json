@@ -1,0 +1,24 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-core",
+    "type": "lib",
+    "description": "The core of the Karm Framework",
+    "subdirs": [
+        "aio",
+        "async",
+        "base",
+        "glob",
+        "icu",
+        "io",
+        "json",
+        "math",
+        "meta",
+        "regex",
+        "serde"
+    ],
+    "requires": [
+        "stdc-ansi",
+        "stdcpp",
+        "karm-core-impl"
+    ]
+}

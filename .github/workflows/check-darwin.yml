@@ -21,7 +21,7 @@ jobs:
         run: ./skift.sh tools setup && ./skift.sh tools doctor
 
       - name: Build Userspace (Host)
-        run: ./skift.sh builder build
+        run: ./skift.sh build
 
       - name: Test Userspace (Host)
-        run: ./skift.sh builder test
+        run: ./skift.sh test

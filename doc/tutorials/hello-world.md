@@ -67,7 +67,7 @@ Async::Res<> entryPointAsync(Sys::Context &) {
 Now, build the project using the `./skift.sh` script:
 
 ```bash
-$ ./skift.sh builder build hello-world
+$ ./skift.sh build hello-world
 ```
 
 ## Run the program
@@ -75,7 +75,7 @@ $ ./skift.sh builder build hello-world
 Finally, run the program using the `./skift.sh` script:
 
 ```bash
-$ ./skift.sh builder run hello-world
+$ ./skift.sh run hello-world
 ```
 
 You should see "Hello, world!" printed to the console.

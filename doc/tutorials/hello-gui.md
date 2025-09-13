@@ -50,7 +50,7 @@ Async::Task<> entryPointAsync(Sys::Context &ctx) {
 Build and run the project:
 
 ```sh
-./skift.sh builder run hello-world
+./skift.sh run hello-world
 ```
 
 You should see a window with the message "Hello, GUI!".

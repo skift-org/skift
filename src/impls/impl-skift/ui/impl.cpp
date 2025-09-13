@@ -1,9 +1,9 @@
 module;
 
+#include <karm-logger/logger.h>
+#include <karm-sys/endpoint.h>
 #include <strata-bus/api.h>
 #include <strata-shell/api.h>
-#include <karm-sys/endpoint.h>
-#include <karm-logger/logger.h>
 
 module Karm.Ui:_embed;
 

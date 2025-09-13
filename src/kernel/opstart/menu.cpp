@@ -36,7 +36,7 @@ static Ui::Task<Action> reduce(State& s, Action a) {
                 s.selected += a.delta;
         },
         [&](SelectAction) {
-            if (s.error){
+            if (s.error) {
                 s.error = NONE;
                 return;
             }
@@ -136,10 +136,10 @@ Ui::Child menu(Configs const& c) {
         [](State const& s) {
             if (s.error)
                 return alert(
-                    "System startup failed."s,
-                    s.error.unwrap()
-                )|
-                   Ui::intent(intent);
+                           "System startup failed."s,
+                           s.error.unwrap()
+                       ) |
+                       Ui::intent(intent);
 
             Ui::Children children;
 

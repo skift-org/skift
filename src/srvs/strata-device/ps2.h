@@ -34,7 +34,6 @@ enum struct Status : u8 {
     PARITY = 1 << 7,
 };
 
-
 enum struct Cmd : u8 {
     READ_CONFIG = 0x20,
     WRITE_CONFIG = 0x60,

@@ -1,5 +1,5 @@
-#include <karm-math/rect.h>
 #include <karm-gfx/canvas.h>
+#include <karm-math/rect.h>
 
 #include "input.h"
 

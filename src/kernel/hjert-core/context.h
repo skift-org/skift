@@ -4,7 +4,6 @@ import Karm.Core;
 
 #include <hal/kmm.h>
 
-
 namespace Hjert::Arch {
 
 struct Frame;

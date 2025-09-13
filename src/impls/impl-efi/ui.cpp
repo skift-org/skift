@@ -72,7 +72,7 @@ Res<Rc<Host>> makeHost(Child root) {
     return Ok(makeRc<EfiHost>(root, stip, front, back));
 }
 
-Async::Task<> runAsync(Sys::Context& , Child root) {
+Async::Task<> runAsync(Sys::Context&, Child root) {
     auto host = co_try$(makeHost(std::move(root)));
     co_return co_await host->runAsync();
 }

@@ -326,6 +326,14 @@ Res<Vec<DirEntry>> readDir(Ref::Url const&) {
     return Error::notImplemented();
 }
 
+Res<> createDir(Ref::Url const&) {
+    return Error::notImplemented();
+}
+
+Res<Vec<DirEntry>> readDirOrCreate(Ref::Url const&) {
+    return Error::notImplemented();
+}
+
 Res<Rc<Fd>> createFile(Ref::Url const&) {
     return Error::notImplemented();
 }

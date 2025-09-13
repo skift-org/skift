@@ -31,6 +31,7 @@ namespace Karm::Sys::_Embed {
 
 Res<Ref::Path> resolve(Ref::Url const& url) {
     Ref::Path resolved;
+
     if (url.scheme == "file") {
         resolved = url.path;
     } else if (url.scheme == "fd") {

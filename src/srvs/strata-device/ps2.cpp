@@ -1,6 +1,6 @@
 #include <karm-logger/logger.h>
-#include <karm-sys/message.h>
 #include <karm-math/vec.h>
+#include <karm-sys/message.h>
 
 #include "ps2.h"
 

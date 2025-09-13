@@ -1,6 +1,6 @@
+#include <karm-logger/logger.h>
 #include <karm-sys/endpoint.h>
 #include <karm-sys/entry.h>
-#include <karm-logger/logger.h>
 
 using namespace Karm;
 

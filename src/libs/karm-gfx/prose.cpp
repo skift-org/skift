@@ -259,8 +259,8 @@ void Prose::paintCaret(Gfx::Canvas& g, usize runeIndex, Gfx::Color color) {
     g.lineTo(ce);
     g.strokeStyle({
         .fill = color,
-        .width = 1.0,
-        .align = Gfx::INSIDE_ALIGN,
+        .width = 2.0,
+        .align = Gfx::CENTER_ALIGN,
     });
     g.stroke();
 }

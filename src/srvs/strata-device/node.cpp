@@ -2,7 +2,6 @@
 
 #include "node.h"
 
-
 namespace Strata::Device {
 
 Node::Node() {

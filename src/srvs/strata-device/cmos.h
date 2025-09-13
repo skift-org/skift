@@ -1,9 +1,9 @@
 #pragma once
 
-
 import Karm.Core;
 
 #include <hal/io.h>
+
 #include "node.h"
 
 namespace Strata::Device::Cmos {

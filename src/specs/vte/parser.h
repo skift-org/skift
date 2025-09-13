@@ -1,6 +1,6 @@
 #pragma once
 
-import Karm.Core;   
+import Karm.Core;
 
 namespace Vte {
 

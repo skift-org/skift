@@ -85,7 +85,7 @@ Res<> enterUserspace(Handover::Payload& payload) {
             auto sectionRange = try$(kmm().pmm2Kmm(sectionVmo->range()));
             logInfo("entry: mapping section: {x}-{x}", sectionRange.start, sectionRange.end());
             copy(prog.bytes(), sectionRange.mutBytes());
-            try$(space->map({prog.vaddr(), size}, sectionVmo, 0, {Hj::MapFlags::READ , Hj::MapFlags::WRITE}));
+            try$(space->map({prog.vaddr(), size}, sectionVmo, 0, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
         } else {
             try$(space->map({prog.vaddr(), size}, elfVmo, prog.offset(), {Hj::MapFlags::READ, Hj::MapFlags::EXEC}));
         }

@@ -97,7 +97,7 @@ export struct Path {
         return path;
     }
 
-    Path join(Str other) const  {
+    Path join(Str other) const {
         return join(parse(other));
     }
 
@@ -126,7 +126,6 @@ export struct Path {
         return true;
     }
 
-
     Res<> unparse(Io::TextWriter& writer) const {
         if (not rooted and len() == 0)
             try$(writer.writeRune('.'));
@@ -151,7 +150,6 @@ export struct Path {
         unparse(writer).unwrap("unparse error");
         return writer.str();
     }
-
 
     auto iter() const {
         return Karm::iter(_parts);

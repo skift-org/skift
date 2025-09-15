@@ -7,4 +7,4 @@ then
     exit 1
 fi
 
-brew install --overwrite ccache libmagic lld llvm nasm ninja pkg-config python3 qemu sdl2
+brew install --overwrite ccache gptfdisk libmagic lld llvm mtools nasm ninja pkg-config python3 qemu sdl2

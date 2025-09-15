@@ -78,7 +78,7 @@ This guide provides instructions for building skiftOS from source.
 
     - In Virtual Machine:
         ```sh
-        ./skift.sh image start
+        ./skift.sh image boot
         ```
         > **🛈 Note**<br> Requires a graphical environment and QEMU with graphics support (SDL or GTK).
         > For headless servers, build a disk image instead: `./skift.sh image build --format=hdd`

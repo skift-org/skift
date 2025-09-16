@@ -139,7 +139,7 @@ export struct KeyboardEvent {
     /// This value is independent of the current keyboard layout
     Key code;
 
-    Flags<KeyMod> mods;
+    Flags<KeyMod> mods = {};
 };
 
 export struct TypeEvent {

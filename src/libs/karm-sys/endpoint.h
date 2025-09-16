@@ -6,17 +6,30 @@
 
 namespace Karm::Sys {
 
+// MARK: Hook to take over the service socket.
+
+struct ChannelHook : Service {
+    IpcConnection con;
+
+    ChannelHook(IpcConnection con)
+        : con(std::move(con)) {}
+};
+
+inline ChannelHook& useChannel(Context& ctx) {
+    return ctx.use<ChannelHook>();
+}
+
 // MARK: Primitive Operations --------------------------------------------------
 
 template <typename T, typename... Args>
-Res<> rpcSend(Sys::IpcConnection& con, Port to, u64 seq, Args&&... args) {
+Res<> rpcSend(IpcConnection& con, Port to, u64 seq, Args&&... args) {
     Message msg = Message::packReq<T>(to, seq, std::forward<Args>(args)...).take();
 
     try$(con.send(msg.bytes(), msg.handles()));
     return Ok();
 }
 
-static inline Async::Task<Message> rpcRecvAsync(Sys::IpcConnection& con) {
+static inline Async::Task<Message> rpcRecvAsync(IpcConnection& con) {
     Message msg;
     auto [bufLen, hndsLen] = co_trya$(con.recvAsync(msg._buf, msg._hnds));
     if (bufLen < sizeof(Header))
@@ -30,16 +43,14 @@ static inline Async::Task<Message> rpcRecvAsync(Sys::IpcConnection& con) {
 // MARK: Rpc -------------------------------------------------------------------
 
 struct Endpoint : Meta::Pinned {
-    Sys::IpcConnection _con;
+    IpcConnection _con;
     Map<u64, Async::_Promise<Message>> _pending{};
     Async::Queue<Message> _incoming{};
     u64 _seq = 1;
 
-    static Res<Endpoint> use(Context& ctx) {}
+    Endpoint(IpcConnection con);
 
-    Endpoint(Sys::IpcConnection con);
-
-    static Endpoint create(Sys::Context& ctx);
+    static Endpoint adopt(Context& ctx);
 
     static Async::Task<> _receiverTask(Endpoint& self) {
         while (true) {

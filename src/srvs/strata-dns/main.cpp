@@ -8,7 +8,7 @@
 namespace Strata::Dns {
 
 Async::Task<> servAsync(Sys::Context& ctx) {
-    auto endpoint = Sys::Endpoint::create(ctx);
+    auto endpoint = Sys::Endpoint::adopt(ctx);
 
     logDebug("sending nonsens to system");
 

@@ -142,7 +142,7 @@ auto _visit(T& v, auto f, std::integral_constant<usize, 8>) {
 
 export template <typename T>
 auto visit(T& t, auto f) {
-    return _visit(t, f, len<T>());
+    return _visit(t, f, std::integral_constant<usize, len<T>()>{});
 }
 
 } // namespace Karm::Meta

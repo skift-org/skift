@@ -21,7 +21,7 @@ struct Host : public Ui::ProxyNode<Host> {
 };
 
 Async::Task<> runAsync(Sys::Context& ctx, Child root) {
-    auto endpoint = Sys::Endpoint::create(ctx);
+    auto endpoint = Sys::Endpoint::adopt(ctx);
     auto shell = co_trya$(endpoint.callAsync<Strata::Bus::Api::Locate>(Sys::Port::BUS, "strata-shell"s));
     auto size = root->size({1024, 720}, Hint::MIN);
     auto surface = co_trya$(endpoint.callAsync<Strata::Shell::Api::CreateInstance>(shell, size));

@@ -295,6 +295,7 @@ template <Meta::Aggregate T>
 struct MessagePacker<T> {
     static Res<> pack(MessageWriter& e, T const& val) {
         return Meta::visit(
+            val,
             [&](auto&&... fields) {
                 Res<> res = Ok();
                 ([&] {
@@ -302,8 +303,7 @@ struct MessagePacker<T> {
                 }(),
                  ...);
                 return res;
-            },
-            val
+            }
         );
     }
 
@@ -311,6 +311,7 @@ struct MessagePacker<T> {
         T object;
         Opt<Error> err = NONE;
         Meta::visit(
+            object,
             [&](auto&&... fields) {
                 ([&] {
                     auto res = Sys::unpack<Meta::RemoveConstVolatileRef<decltype(fields)>>(s);
@@ -321,8 +322,7 @@ struct MessagePacker<T> {
                     fields = res.take();
                 }(),
                  ...);
-            },
-            object
+            }
         );
 
         if (err)

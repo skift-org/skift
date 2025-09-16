@@ -7,7 +7,7 @@ using namespace Karm;
 namespace Strata::Net {
 
 Async::Task<> servAsync(Sys::Context& ctx) {
-    auto endpoint = Sys::Endpoint::create(ctx);
+    auto endpoint = Sys::Endpoint::adopt(ctx);
 
     logInfo("service started");
     while (true) {

@@ -141,7 +141,7 @@ Async::Task<> servAsync(Sys::Context& ctx) {
         .instances = {}
     };
 
-    auto endpoint = Sys::Endpoint::create(ctx);
+    auto endpoint = Sys::Endpoint::adopt(ctx);
     auto root = makeRc<Root>(
         Hideo::Shell::app(std::move(state)) | inputTranslator,
         co_try$(Framebuffer::open(ctx))

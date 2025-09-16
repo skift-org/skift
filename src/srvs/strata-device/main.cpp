@@ -51,7 +51,7 @@ struct RootBus : public Node {
 } // namespace Strata::Device
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
-    auto endpoint = Sys::Endpoint::create(ctx);
+    auto endpoint = Sys::Endpoint::adopt(ctx);
 
     logInfo("devices: building device tree...");
     auto root = makeRc<Strata::Device::RootBus>(endpoint);

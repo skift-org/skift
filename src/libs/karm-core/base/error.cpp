@@ -97,7 +97,7 @@ export struct [[nodiscard]] Error {
     }
 
     constexpr bool operator==(Error const& other) const {
-        return _code == other._code and cstrEq(_msg, other._msg);
+        return _code == other._code;
     }
 
     constexpr bool operator==(Code const& code) const {

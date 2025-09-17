@@ -194,6 +194,13 @@ export struct BScan {
     }
 
     template <typename T>
+    always_inline constexpr T peek() {
+        T r{};
+        peekTo(&r);
+        return r;
+    }
+
+    template <typename T>
     always_inline constexpr T peekBe() {
         Be<T> r{};
         peekTo(&r);
@@ -314,6 +321,10 @@ export struct BScan {
     always_inline constexpr i32 nextI32le() { return nextLe<i32>(); }
 
     always_inline constexpr i64 nextI64le() { return nextLe<i64>(); }
+
+    always_inline constexpr i32 nextF32() { return nextLe<f32>(); }
+
+    always_inline constexpr i64 nextF64() { return nextLe<f64>(); }
 
     always_inline constexpr u8 peekU8be() { return peekBe<u8>(); }
 
@@ -494,6 +505,14 @@ export struct BEmit {
     }
 
     always_inline constexpr void writeI64le(i64le v) {
+        writeFrom(v);
+    }
+
+    always_inline constexpr void writeF32(f32 v) {
+        writeFrom(v);
+    }
+
+    always_inline constexpr void writeF64(f64 v) {
         writeFrom(v);
     }
 

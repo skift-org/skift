@@ -98,9 +98,9 @@ export struct Symbol {
     }
 };
 
-inline Symbol Symbol::EMPTY = Symbol::from("");
+inline Symbol Symbol::EMPTY = from("");
 
-Set<Rc<_SymbolBuf>>& _symboleRegistry() {
+static Set<Rc<_SymbolBuf>>& _symboleRegistry() {
     static Set<Rc<_SymbolBuf>> _registry;
     return _registry;
 }

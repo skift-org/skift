@@ -21,7 +21,6 @@ test$("regex-chain") {
 
 test$("regex-disjunction") {
     auto re = "a|b|c"_regex;
-    yap("regex: {}", re);
     expect$(re.contains("a"));
     expect$(re.contains("b"));
     expect$(re.contains("c"));

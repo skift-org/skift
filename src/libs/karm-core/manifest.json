@@ -13,6 +13,7 @@
         "json",
         "math",
         "meta",
+        "pack",
         "regex",
         "serde"
     ],

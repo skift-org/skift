@@ -253,12 +253,6 @@ struct MessagePacker<Union<Ts...>> {
 
 template <>
 struct MessagePacker<Error> {
-    // TODO: Because the message in the error is a non owning string
-    //       we can't send it over the wire because they will be no one
-    //       to own it at the other end.
-    //
-    //       This should be fine from a technical standpoint since the code
-    //       don't care about the message, but the user does though.
 
     static Res<> pack(MessageWriter& e, Error const& val) {
         return Sys::pack(e, static_cast<u32>(val.code()));

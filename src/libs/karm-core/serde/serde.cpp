@@ -10,6 +10,7 @@ import :base.string;
 import :base.vec;
 import :base.symbol;
 import :base.map;
+import :meta.visit;
 
 namespace Karm::Serde {
 
@@ -37,33 +38,26 @@ SizeHint sizeHintFor() {
         static_assert(false, "unable to infer size hint");
 }
 
-// union
-// enum
-// alt
-
-// tuple
-
-// array
-// vec
-
-// map
-// object
-// field
-
 export struct Type {
     enum struct Kind {
         NIL,
         SOME,
-        FIELD,
 
         UNION,
+        UNION_ITEM,
+
         ENUM,
+        ENUM_ITEM,
 
         ARRAY,
+
         VEC,
 
         MAP,
+        MAP_ITEM,
+
         OBJECT,
+        OBJECT_ITEM,
     };
 
     using enum Kind;
@@ -74,7 +68,7 @@ export struct Type {
     Opt<Symbol> tag = NONE;
 };
 
-template <typename T>
+export template <typename T>
 struct Serde;
 
 export struct Serializer;
@@ -169,7 +163,7 @@ export struct Serializer {
     template <typename T>
     Res<> serializeUnit(Type type, T const& v) {
         auto scope = try$(beginScope(type));
-        scope.serialize(v);
+        try$(scope.serialize(v));
         return scope.end();
     }
 
@@ -228,8 +222,8 @@ export struct Deserializer {
         }
 
         template <typename T>
-        Res<Tuple<Type, T>> deserializeUnit(Type) {
-            return _de->deserializeUnit<Type>(type);
+        Res<Tuple<Type, T>> deserializeUnit(Type type) {
+            return _de->deserializeUnit<T>(type);
         }
 
         template <typename T>
@@ -255,7 +249,7 @@ export struct Deserializer {
         auto scope = try$(beginScope(type));
         auto v = try$(scope.deserialize<T>());
         try$(scope.end());
-        return Ok<Tuple<Type, T>>();
+        return Ok<Tuple<Type, T>>(scope.type, std::move(v));
     }
 
     template <typename T>
@@ -264,7 +258,7 @@ export struct Deserializer {
     }
 };
 
-template <>
+export template <>
 struct Serde<bool> {
     static Res<> serialize(Serializer& ser, bool const& v) {
         return ser.serializeBool(v);
@@ -275,7 +269,7 @@ struct Serde<bool> {
     }
 };
 
-template <>
+export template <>
 struct Serde<None> {
     static Res<> serialize(Serializer& ser, None const&) {
         return ser.serializeUnit({Type::NIL});
@@ -287,22 +281,45 @@ struct Serde<None> {
     }
 };
 
-template <typename T>
+export template <typename T>
 struct Serde<Opt<T>> {
     static Res<> serialize(Serializer& ser, Opt<T> const& v) {
         if (not v)
-            return ser.serialize(NONE);
-        return ser.serializeUnit({Type::SOME}, v);
+            return ser.serializeUnit({Type::NIL});
+        return ser.serializeUnit({Type::SOME}, v.unwrap());
     }
 
     static Res<Opt<T>> deserialize(Deserializer& de) {
-        if (auto res = de.deserializeUnit<T>({Type::SOME}))
-            return std::move(res);
-        return de.deserialize<None>();
+        if (auto res = de.deserializeUnit<T>({Type::SOME})) {
+            auto [_, val] = res.take();
+            return Ok(std::move(val));
+        }
+
+        try$(de.deserializeUnit({Type::NIL}));
+        return Ok(NONE);
     }
 };
 
-template <typename V, typename E>
+export template <>
+struct Serde<Error> {
+    // TODO: Because the message in the error is a non owning string
+    //       we can't send it over the wire because they will be no one
+    //       to own it at the other end.
+    //
+    //       This should be fine from a technical standpoint since the code
+    //       don't care about the message, but the user does though.
+
+    static Res<> serialize(Serializer& ser, Error const& v) {
+        return ser.serialize(toUnderlyingType(v.code()));
+    }
+
+    static Res<Error> deserialize(Deserializer& de) {
+        auto code = static_cast<Error::Code>(try$(de.deserialize<Meta::UnderlyingType<Error::Code>>()));
+        return Ok(Error{code, nullptr});
+    }
+};
+
+export template <typename V, typename E>
 struct Serde<Res<V, E>> {
     static Res<> serialize(Serializer& ser, Res<V, E> const& v) {
         if (not v)
@@ -311,87 +328,123 @@ struct Serde<Res<V, E>> {
     }
 
     static Res<Res<V, E>> deserialize(Deserializer& de) {
-        if (auto res = de.deserializeUnit<V>({Type::SOME}))
-            return std::move(res);
-        return de.deserializeUnit<E>({Type::NIL});
+        if (auto res = de.deserializeUnit<V>({Type::SOME})) {
+            auto [_, value] = res.take();
+            return Ok(Ok(std::move(value)));
+        }
+        auto [_, value] = try$(de.deserializeUnit<E>({Type::NIL}));
+        return Ok(std::move(value));
     }
 };
 
-template <typename... Ts>
+export template <typename... Ts>
 struct Serde<Union<Ts...>> {
-    static Res<> serialize(Serializer& ser, Union<Ts...> const& v) {
+    static Res<> serialize(Serializer& ser, Union<Ts...> const& u) {
         auto scope = try$(ser.beginScope({Type::UNION}));
-        try$(v.visit([&](auto const& v) {
-            return scope.serializeUnit({.kind = Type::FIELD, .index = v.index()}, v);
+        try$(u.visit([&]<typename T>(T const& v) {
+            return scope.serializeUnit<T>(
+                {
+                    .kind = Type::UNION_ITEM,
+                    .index = u.index(),
+                },
+                v
+            );
         }));
         return scope.end();
     }
 
     static Res<Union<Ts...>> deserialize(Deserializer& de) {
         auto scope = try$(de.beginScope({Type::UNION}));
+
         usize index = 0;
         auto res = try$(Meta::any<Ts...>([&]<typename T> -> Res<Union<Ts...>> {
-            return scope.deserializeUnit<T>({.kind = Type::FIELD, .index = index++});
+            auto [_, value] = try$(scope.deserializeUnit<T>({
+                .kind = Type::UNION_ITEM,
+                .index = index++,
+            }));
+            debug("wat");
+            return Ok(std::move(value));
         }));
+
         try$(scope.end());
         return Ok(std::move(res));
     }
 };
 
-template <Meta::Enum T>
+export template <Meta::Enum T>
 struct Serde<T> {
     static Res<> serialize(Serializer& ser, T const& v) {
-        auto scope = try$(ser.beginScope({Type::ENUM}));
-        try$(scope.serializeUnit({.kind = Type::FIELD, .tag = Symbol::from(nameOf(v))}, toUnderlyingType(v)));
+        auto scope = try$(ser.beginScope({
+            Type::ENUM,
+        }));
+
+        try$(scope.serializeUnit(
+            {
+                .kind = Type::ENUM_ITEM,
+                .tag = Symbol::from(nameOf(v)),
+            },
+            toUnderlyingType(v)
+        ));
+
         return scope.end();
     }
 
     static Res<T> deserialize(Deserializer& de) {
-        auto scope = try$(de.beginScope({Type::ENUM}));
+        auto scope = try$(de.beginScope({
+            Type::ENUM,
+        }));
+
         for (auto i : enumItems<T>()) {
-            if (auto res = de.deserializeUnit<Meta::UnderlyingType<T>>({.kind = Type::FIELD, .tag = Symbol::from(i.name)})) {
+            if (auto res = de.deserializeUnit<Meta::UnderlyingType<T>>({
+                    .kind = Type::ENUM_ITEM,
+                    .tag = Symbol::from(i.name),
+                })) {
                 try$(scope.end());
                 return res;
             }
         }
+
         return Error::invalidData("expected enum value");
     }
 };
 
-template <Meta::Unsigned T>
+export template <Meta::UnsignedIntegral T>
 struct Serde<T> {
     static Res<> serialize(Serializer& ser, T const& v) {
         return ser.serializeUnsigned(v, sizeHintFor<T>());
     }
 
     static Res<T> deserialize(Deserializer& de) {
-        return de.deserializeUnsigned(sizeHintFor<T>());
+        auto res = try$(de.deserializeUnsigned(sizeHintFor<T>()));
+        return Ok(static_cast<T>(res));
     }
 };
 
-template <Meta::Signed T>
+export template <Meta::SignedIntegral T>
 struct Serde<T> {
     static Res<> serialize(Serializer& ser, T const& v) {
         return ser.serializeInteger(v, sizeHintFor<T>());
     }
 
     static Res<T> deserialize(Deserializer& de) {
-        return de.deserializeInteger(sizeHintFor<T>());
+        auto res = try$(de.deserializeInteger(sizeHintFor<T>()));
+        return Ok(static_cast<T>(res));
     }
 };
 
-template <Meta::Float T>
+export template <Meta::Float T>
 struct Serde<T> {
     static Res<> serialize(Serializer& ser, T const& v) {
         return ser.serializeFloat(v, sizeHintFor<T>());
     }
 
     static Res<T> deserialize(Deserializer& de) {
-        return de.deserializeFloat(sizeHintFor<T>());
+        auto res = try$(de.deserializeFloat(sizeHintFor<T>()));
+        return Ok(static_cast<T>(res));
     }
 };
 
-template <>
+export template <>
 struct Serde<String> {
     static Res<> serialize(Serializer& ser, String const& v) {
         return ser.serializeString(v);
@@ -402,7 +455,7 @@ struct Serde<String> {
     }
 };
 
-template <>
+export template <>
 struct Serde<Vec<u8>> {
     static Res<> serialize(Serializer& ser, Vec<u8> const& v) {
         return ser.serializeBytes(v);
@@ -413,7 +466,7 @@ struct Serde<Vec<u8>> {
     }
 };
 
-template <typename T, usize N>
+export template <typename T, usize N>
 struct Serde<Array<T, N>> {
     static Res<> serialize(Serializer& ser, Array<T, N> const& v) {
         auto scope = try$(ser.beginScope({Type::ARRAY}));
@@ -433,12 +486,12 @@ struct Serde<Array<T, N>> {
     }
 };
 
-template <typename T>
+export template <typename T>
 struct Serde<Vec<T>> {
     static Res<> serialize(Serializer& ser, Vec<T> const& v) {
         auto scope = try$(ser.beginScope({.kind = Type::VEC, .len = v.len()}));
         for (auto& i : v) {
-            try$(scope->serialize(i));
+            try$(scope.serialize(i));
         }
         return scope.end();
     }
@@ -454,12 +507,18 @@ struct Serde<Vec<T>> {
     }
 };
 
-template <typename T>
+export template <typename T>
 struct Serde<Map<String, T>> {
     static Res<> serialize(Serializer& ser, Map<String, T> const& v) {
         auto scope = try$(ser.beginScope({.kind = Type::MAP, .len = v.len()}));
         for (auto& [k, v] : v.iter())
-            try$(scope->serializeUnit({.kind = Type::FIELD, .tag = Symbol::from(k)}, v));
+            try$(scope->serializeUnit(
+                {
+                    .kind = Type::MAP_ITEM,
+                    .tag = Symbol::from(k),
+                },
+                v
+            ));
         return scope.end();
     }
 
@@ -467,7 +526,9 @@ struct Serde<Map<String, T>> {
         auto scope = try$(de.beginScope({.kind = Type::MAP}));
         Map<String, T> res;
         while (not scope.ended()) {
-            auto [type, value] = try$(scope.deserializeUnit<T>({.kind = Type::FIELD}));
+            auto [type, value] = try$(scope.deserializeUnit<T>({
+                .kind = Type::MAP_ITEM,
+            }));
             res.put(type.tag.unwrap(), value);
         }
         try$(scope.end());
@@ -475,7 +536,7 @@ struct Serde<Map<String, T>> {
     }
 };
 
-template <typename... Ts>
+export template <typename... Ts>
 struct Serde<Tuple<Ts...>> {
     static Res<> serialize(Serializer& ser, Tuple<Ts...> const& v) {
         auto scope = try$(ser.beginScope({.kind = Type::ARRAY}));
@@ -488,20 +549,20 @@ struct Serde<Tuple<Ts...>> {
     static Res<Tuple<Ts...>> deserialize(Deserializer& de) {
         auto scope = try$(de.beginScope({.kind = Type::ARRAY}));
         Tuple<Ts...> res;
-        try$(res.visit([&]<typename I>(I& i) {
+        try$(res.visit([&]<typename I>(I& i) -> Res<> {
             i = try$(de.deserialize<I>());
             return Ok();
         }));
         try$(scope.end());
-        return Ok();
+        return Ok(std::move(res));
     }
 };
 
-template <Meta::Aggregate T>
+export template <Meta::Aggregate T>
 struct Serde<T> {
     static Res<> serialize(Serializer& ser, T const& v) {
         auto scope = try$(ser.beginScope({.kind = Type::ARRAY}));
-        try$(visit(v, [&]<typename I>(I const& i) {
+        try$(Meta::visit(v, [&]<typename I>(I const& i) -> Res<> {
             return ser.serialize<I>(i);
         }));
         return scope.end();
@@ -510,12 +571,12 @@ struct Serde<T> {
     static Res<T> deserialize(Deserializer& de) {
         auto scope = try$(de.beginScope({.kind = Type::ARRAY}));
         T res;
-        try$(visit(res, [&]<typename I>(I& i) {
+        try$(Meta::visit(res, [&]<typename I>(I& i) -> Res<> {
             i = try$(de.deserialize<I>());
             return Ok();
         }));
         try$(scope.end());
-        return Ok();
+        return Ok(std::move(res));
     }
 };
 

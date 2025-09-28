@@ -1,10 +1,13 @@
-import Karm.Core;
+module;
 
 #include <hjert-api/api.h>
 #include <karm-logger/logger.h>
-#include <karm-sys/_embed.h>
 
 #include "fd.h"
+
+module Karm.Sys;
+
+import Karm.Core;
 
 namespace Karm::Sys::_Embed {
 

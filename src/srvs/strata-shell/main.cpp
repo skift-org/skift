@@ -1,8 +1,6 @@
 #include <karm-gfx/cpu/canvas.h>
 #include <karm-gfx/icon.h>
-#include <karm-sys/endpoint.h>
 #include <karm-sys/entry.h>
-#include <karm-sys/time.h>
 
 #include "../strata-bus/api.h"
 #include "api.h"

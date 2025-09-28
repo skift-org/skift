@@ -1,13 +1,9 @@
-import Karm.Core;
 
 #include <abi-sysv/abi.h>
 #include <handover/hook.h>
 #include <hjert-api/api.h>
 #include <karm-logger/logger.h>
-#include <karm-sys/context.h>
-#include <karm-sys/endpoint.h>
-#include <karm-sys/message.h>
-
+#include <karm-sys/entry.h>
 #include "fd.h"
 
 void __panicHandler(Karm::PanicKind kind, char const* msg) {

@@ -1,11 +1,13 @@
+module;
+
 #include <efi/base.h>
 #include <hal/mem.h>
 #include <karm-logger/logger.h>
-#include <karm-sys/_embed.h>
-#include <karm-sys/file.h>
-#include <karm-sys/launch.h>
+
+module Karm.Sys;
 
 import Karm.Core;
+import Karm.Ref;
 
 namespace Karm::Sys::_Embed {
 
@@ -442,6 +444,14 @@ Async::Task<> launchAsync(Sys::Intent) {
 
 Res<> sleep(Duration) {
     return Error::notImplemented();
+}
+
+Res<> sleepUntil(Instant) {
+    return Error::notImplemented();
+}
+
+Duration uptime() {
+    notImplemented();
 }
 
 Res<> exit(i32) {

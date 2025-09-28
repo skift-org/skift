@@ -4,9 +4,9 @@ module;
 #include <karm-gfx/canvas.h>
 #include <karm-logger/logger.h>
 
-module Karm.Ui:_embed;
+module Karm.Ui;
 
-import Karm.Ui;
+import Karm.Sys;
 import Karm.Core;
 
 namespace Karm::Ui::_Embed {

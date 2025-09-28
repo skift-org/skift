@@ -1,5 +1,6 @@
 #include <karm-logger/_embed.h>
-#include <karm-sys/chan.h>
+
+import Karm.Sys;
 
 namespace Karm::Logger::_Embed {
 

@@ -1,12 +1,12 @@
 module;
 
 #include <karm-logger/logger.h>
-#include <karm-sys/endpoint.h>
 #include <strata-bus/api.h>
 #include <strata-shell/api.h>
 
 module Karm.Ui:_embed;
 
+import Karm.Sys;
 import Karm.Ui;
 
 namespace Karm::Ui::_Embed {

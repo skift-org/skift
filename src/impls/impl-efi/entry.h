@@ -1,11 +1,10 @@
 #pragma once
 
 import Karm.Core;
+import Karm.Sys;
 
 #include <abi-ms/abi.h>
 #include <efi/base.h>
-#include <karm-sys/chan.h>
-#include <karm-sys/context.h>
 
 void __panicHandler(Karm::PanicKind kind, char const* msg);
 

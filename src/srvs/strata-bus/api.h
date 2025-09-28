@@ -1,8 +1,7 @@
 #pragma once
 
 import Karm.Core;
-
-#include <karm-sys/message.h>
+import Karm.Sys;
 
 using namespace Karm;
 

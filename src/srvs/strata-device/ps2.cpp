@@ -1,10 +1,10 @@
 #include <karm-logger/logger.h>
 #include <karm-math/vec.h>
-#include <karm-sys/message.h>
 
 #include "ps2.h"
 
 import Karm.App;
+import Karm.Sys;
 
 namespace Strata::Device::Ps2 {
 

@@ -1,9 +1,0 @@
-/* Vaev's SVG User Agent Stylesheet */
-/* https://svgwg.org/svg2-draft/styling.html#UAStyleSheet */
-@namespace "http://www.w3.org/2000/svg";
-@namespace html "http://www.w3.org/1999/xhtml";
-
-*:not(svg),
-*:not(foreignObject)>svg {
-    transform-origin: 0 0;
-}

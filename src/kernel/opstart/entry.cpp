@@ -1,6 +1,5 @@
 #include <karm-logger/logger.h>
 #include <karm-sys/entry.h>
-#include <karm-sys/file.h>
 
 #include "loader.h"
 

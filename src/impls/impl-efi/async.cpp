@@ -1,5 +1,7 @@
 
-#include <karm-sys/_embed.h>
+module Karm.Sys;
+
+import Karm.Core;
 
 namespace Karm::Sys::_Embed {
 

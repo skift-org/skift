@@ -1,9 +1,0 @@
-{
-    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "hideo-spreadsheet",
-    "type": "exe",
-    "description": "View and edit spreadsheets",
-    "requires": [
-        "hideo-files"
-    ]
-}

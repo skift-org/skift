@@ -16,15 +16,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto system = co_try$(Bus::create(ctx));
 
     co_try$(system->attach(makeRc<System>()));
-    co_try$(system->prepareService("strata-av"s));
-    co_try$(system->prepareService("strata-conf"s));
     co_try$(system->prepareService("strata-device"s));
-    co_try$(system->prepareService("strata-dhcp"s));
-    co_try$(system->prepareService("strata-dns"s));
-    co_try$(system->prepareService("strata-echo"s));
-    co_try$(system->prepareService("strata-fs"s));
-    co_try$(system->prepareService("strata-net"s));
-    co_try$(system->prepareService("strata-seat"s));
     co_try$(system->prepareService("strata-shell"s));
 
     for (auto& endpoint : system->_endpoints)

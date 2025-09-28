@@ -1,9 +1,6 @@
 #include <elf/image.h>
 #include <handover/spec.h>
 #include <karm-sys/entry.h>
-#include <karm-sys/file.h>
-#include <karm-sys/mmap.h>
-#include <karm-sys/proc.h>
 
 Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto& args = useArgs(ctx);

@@ -2,7 +2,6 @@
 
 import Karm.Core;
 
-#include <karm-sys/message.h>
 
 #include "syscalls.h"
 
@@ -308,16 +307,3 @@ struct Listener : Object {
 };
 
 } // namespace Hj
-
-template <Meta::Derive<Hj::Object> T>
-struct Karm::Sys::MessagePacker<T> {
-    static Res<> pack(Karm::Sys::MessageWriter& e, T const& val) {
-        e.give(Sys::Handle{val.raw()});
-        return Ok();
-    }
-
-    static Res<T> unpack(Karm::Sys::MessageReader& s) {
-        auto cap = s.take();
-        return Ok(T{Hj::Cap{cap.value()}});
-    }
-};

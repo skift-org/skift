@@ -2,7 +2,21 @@
 
 #include <hjert-api/api.h>
 #include <karm-logger/logger.h>
-#include <karm-sys/fd.h>
+
+import Karm.Sys;
+
+template <Meta::Derive<Hj::Object> T>
+struct Karm::Sys::MessagePacker<T> {
+    static Res<> pack(Karm::Sys::MessageWriter& e, T const& val) {
+        e.give(Sys::Handle{val.raw()});
+        return Ok();
+    }
+
+    static Res<T> unpack(Karm::Sys::MessageReader& s) {
+        auto cap = s.take();
+        return Ok(T{Hj::Cap{cap.value()}});
+    }
+};
 
 namespace Skift {
 

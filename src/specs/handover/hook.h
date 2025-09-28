@@ -1,6 +1,6 @@
 #pragma once
 
-#include <karm-sys/context.h>
+import Karm.Sys;
 
 #include "spec.h"
 

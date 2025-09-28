@@ -3,7 +3,6 @@ import Karm.App;
 
 #include <hjert-api/api.h>
 #include <karm-logger/logger.h>
-#include <karm-sys/endpoint.h>
 #include <karm-sys/entry.h>
 
 #include "cmos.h"

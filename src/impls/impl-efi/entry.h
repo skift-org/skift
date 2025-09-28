@@ -20,6 +20,7 @@ extern "C" Efi::Status efi_main(Efi::Handle handle, Efi::SystemTable* st) {
     char const* argv[] = {self, nullptr};
     Sys::Context ctx;
     ctx.add<Sys::ArgsHook>(1, argv);
+
     Res<> code = Async::run(entryPointAsync(ctx));
     if (not code) {
         Error error = code.none();

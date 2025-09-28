@@ -9,7 +9,7 @@ void loggerLock() {}
 
 void loggerUnlock() {}
 
-struct LoggerOut : public Io::TextEncoderBase<> {
+struct LoggerOut : Io::TextEncoderBase<> {
     Io::BufferWriter _buf;
 
     Res<usize> write(Bytes bytes) override {

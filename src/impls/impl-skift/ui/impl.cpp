@@ -1,13 +1,13 @@
 module;
 
+#include <karm-core/macros.h>
 #include <karm-logger/logger.h>
 #include <strata-bus/api.h>
 #include <strata-shell/api.h>
 
-module Karm.Ui:_embed;
+module Karm.Ui;
 
 import Karm.Sys;
-import Karm.Ui;
 
 namespace Karm::Ui::_Embed {
 

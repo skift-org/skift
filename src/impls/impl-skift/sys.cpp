@@ -12,8 +12,8 @@ import Karm.Ref;
 
 namespace Karm::Sys::_Embed {
 
-Res<Rc<Fd>> unpackFd(MessageReader& s) {
-    return Skift::unpackFd(s);
+Res<Rc<Sys::Fd>> deserializeFd(Serde::Deserializer&) {
+    return Error::notImplemented();
 }
 
 // MARK: File I/O --------------------------------------------------------------

@@ -5,18 +5,7 @@
 
 import Karm.Sys;
 
-template <Meta::Derive<Hj::Object> T>
-struct Karm::Sys::MessagePacker<T> {
-    static Res<> pack(Karm::Sys::MessageWriter& e, T const& val) {
-        e.give(Sys::Handle{val.raw()});
-        return Ok();
-    }
-
-    static Res<T> unpack(Karm::Sys::MessageReader& s) {
-        auto cap = s.take();
-        return Ok(T{Hj::Cap{cap.value()}});
-    }
-};
+using namespace Karm;
 
 namespace Skift {
 
@@ -35,16 +24,6 @@ struct VmoFd : public Sys::NullFd {
 
     VmoFd(Hj::Vmo vmo)
         : _vmo(std::move(vmo)) {}
-
-    Sys::Handle handle() const override {
-        return Sys::Handle(_vmo.raw());
-    }
-
-    Res<> pack(Sys::MessageWriter& e) override {
-        try$(Sys::pack(e, _FdType::VMO));
-        try$(Sys::pack(e, _vmo));
-        return Ok();
-    }
 };
 
 struct IpcFd : public Sys::NullFd {
@@ -53,10 +32,6 @@ struct IpcFd : public Sys::NullFd {
 
     IpcFd(Hj::Channel in, Hj::Channel out)
         : _in(std::move(in)), _out(std::move(out)) {}
-
-    Sys::Handle handle() const override {
-        return Sys::INVALID;
-    }
 
     Res<Sys::_Sent> send(Bytes buf, Slice<Sys::Handle> hnds, Sys::SocketAddr) override {
         auto [bytes, caps] = try$(_out.send(buf, hnds.cast<Hj::Cap>()));
@@ -67,15 +42,6 @@ struct IpcFd : public Sys::NullFd {
         auto [bytes, caps] = try$(_in.recv(buf, hnds.cast<Hj::Cap>()));
         return Ok<Sys::_Received>(bytes, caps, Sys::Ip4::unspecified(0)); // FIXME: Placeholder address
     }
-
-    Res<> pack(Sys::MessageWriter& w) override {
-        try$(Sys::pack(w, _FdType::IPC));
-        try$(Sys::pack(w, _in));
-        try$(Sys::pack(w, _out));
-        return Ok();
-    }
 };
-
-Res<Rc<Sys::Fd>> unpackFd(Sys::MessageReader& s);
 
 } // namespace Skift

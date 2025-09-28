@@ -10,6 +10,7 @@
     },
     "requires": [
         "strata-base",
+        "karm-app",
         "karm-sys",
         "hal"
     ]

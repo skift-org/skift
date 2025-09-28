@@ -27,10 +27,6 @@ struct ConOut : public Fd {
 
     ConOut(Efi::SimpleTextOutputProtocol* proto) : _proto(proto) {}
 
-    Handle handle() const override {
-        return Handle{(usize)_proto};
-    }
-
     Res<usize> read(MutBytes) override {
         notImplemented();
     }
@@ -87,10 +83,6 @@ struct ConOut : public Fd {
     Res<_Received> recv(MutBytes, MutSlice<Handle>) override {
         notImplemented();
     }
-
-    Res<> pack(Sys::MessageWriter&) override {
-        notImplemented();
-    }
 };
 
 struct FileProto : public Fd {
@@ -111,10 +103,6 @@ struct FileProto : public Fd {
     FileProto& operator=(FileProto&& other) {
         std::swap(_proto, other._proto);
         return *this;
-    }
-
-    Handle handle() const override {
-        return Handle((usize)_proto);
     }
 
     Res<usize> read(MutBytes bytes) override {
@@ -195,13 +183,9 @@ struct FileProto : public Fd {
     Res<_Received> recv(MutBytes, MutSlice<Handle>) override {
         notImplemented();
     }
-
-    Res<> pack(Sys::MessageWriter&) override {
-        notImplemented();
-    }
 };
 
-Res<Rc<Fd>> unpackFd(Sys::MessageReader&) {
+Res<Rc<Sys::Fd>> deserializeFd(Serde::Deserializer&) {
     notImplemented();
 }
 

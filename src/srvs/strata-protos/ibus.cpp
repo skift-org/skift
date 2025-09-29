@@ -1,24 +1,26 @@
-#pragma once
+module;
+
+export module Strata.Protos:ibus;
 
 import Karm.Core;
 import Karm.Sys;
 
 using namespace Karm;
 
-namespace Strata::Bus::Api {
+namespace Strata::IBus {
 
-struct Locate {
+export struct Locate {
     using Response = Sys::Port;
     String id;
 };
 
-struct Listen {
+export struct Listen {
     Meta::Id mid;
 };
 
-struct Start {
+export struct Start {
     // FIXME: Handle intent instead of simple id?
     String id;
 };
 
-} // namespace Strata::Bus::Api
+} // namespace Strata::IBus

@@ -2,7 +2,6 @@
 
 import Karm.Core;
 
-
 #include "syscalls.h"
 
 namespace Hj {
@@ -307,3 +306,19 @@ struct Listener : Object {
 };
 
 } // namespace Hj
+
+template <Meta::Derive<Hj::Object> T>
+struct Karm::Serde::Serde<T> {
+    static Res<> serialize(Serializer& ser, T const& v) {
+        auto scope = try$(ser.beginScope({.kind = Type::UNIT, .tag = "__handle__"_sym}));
+        try$(scope.serialize(v._cap.raw()));
+        return scope.end();
+    }
+
+    static Res<T> deserialize(Deserializer& de) {
+        auto scope = try$(de.beginScope({.kind = Type::UNIT, .tag = "__handle__"_sym}));
+        Hj::Cap cap{try$(scope.deserialize<Hj::Arg>())};
+        try$(scope.end());
+        return Ok<T>(cap);
+    }
+};

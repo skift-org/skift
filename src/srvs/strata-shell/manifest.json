@@ -11,7 +11,7 @@
         ]
     },
     "requires": [
-        "strata-base",
+        "strata-protos",
         "hideo-shell",
         "karm-sys"
     ]

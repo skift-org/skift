@@ -1,5 +1,5 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "strata-base",
+    "id": "strata-protos",
     "type": "lib"
 }

@@ -9,7 +9,7 @@
         ]
     },
     "requires": [
-        "strata-base",
+        "strata-protos",
         "karm-sys"
     ]
 }

@@ -11,7 +11,8 @@
         ]
     },
     "requires": [
-        "karm-sys"
+        "karm-sys",
+        "strata-protos"
     ],
     "provides": [
         "karm-ui-impl"

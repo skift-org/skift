@@ -4,8 +4,9 @@ import Karm.Core;
 #include <handover/hook.h>
 #include <karm-logger/logger.h>
 
-#include "api.h"
 #include "bus.h"
+
+import Strata.Protos;
 
 namespace Strata::Bus {
 
@@ -120,8 +121,8 @@ Async::Task<> Service::runAsync() {
     while (true) {
         auto msg = co_trya$(Sys::rpcRecvAsync(_con));
 
-        if (msg.is<Api::Listen>()) {
-            auto listen = co_try$(msg.unpack<Api::Listen>());
+        if (msg.is<IBus::Listen>()) {
+            auto listen = co_try$(msg.unpack<IBus::Listen>());
             _listen.pushBack(listen.mid);
         } else {
             auto res = dispatch(msg);
@@ -155,19 +156,19 @@ Str System::id() const {
 }
 
 Res<> System::send(Sys::Message& msg) {
-    if (msg.is<Api::Locate>()) {
-        auto locate = try$(msg.unpack<Api::Locate>());
+    if (msg.is<IBus::Locate>()) {
+        auto locate = try$(msg.unpack<IBus::Locate>());
         for (auto& endpoint : _bus->_endpoints) {
             if (endpoint->id() == locate.id) {
-                auto resp = try$(msg.packResp<Api::Locate>(endpoint->port()));
+                auto resp = try$(msg.packResp<IBus::Locate>(endpoint->port()));
                 try$(dispatch(resp));
                 return Ok();
             }
         }
 
         return Error::notFound("service not found");
-    } else if (msg.is<Api::Start>()) {
-        auto start = try$(msg.unpack<Api::Start>());
+    } else if (msg.is<IBus::Start>()) {
+        auto start = try$(msg.unpack<IBus::Start>());
         logDebug("starting service '{}'", start.id);
         return _bus->prepareActivateService(start.id);
     }

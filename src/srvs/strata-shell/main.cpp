@@ -2,8 +2,6 @@
 #include <karm-gfx/icon.h>
 #include <karm-sys/entry.h>
 
-#include "../strata-bus/api.h"
-#include "api.h"
 #include "framebuffer.h"
 #include "input.h"
 
@@ -12,6 +10,7 @@ import Karm.Ui;
 import Karm.App;
 import Hideo.Shell;
 import Karm.Image;
+import Strata.Protos;
 
 namespace Strata::Shell {
 
@@ -108,10 +107,19 @@ struct Root : public Ui::ProxyNode<Root> {
 };
 
 struct ServiceInstance : public Hideo::Shell::Instance {
+    Rc<Gfx::Surface> _frontbuffer;
+    Opt<Rc<Protos::Surface>> _backbuffer;
+
+    ServiceInstance(Rc<Gfx::Surface> frontbuffer)
+        : _frontbuffer(frontbuffer) {}
+
     Ui::Child build() const override {
-        return Ui::empty() | Ui::box({
-                                 .backgroundFill = Ui::GRAY950,
-                             });
+        return Ui::image(_frontbuffer, 8) |
+               Ui::box({
+                   .borderRadii = 8,
+                   .borderWidth = 1,
+                   .borderFill = Ui::GRAY800,
+               });
     }
 };
 
@@ -122,7 +130,7 @@ struct ServiceLauncher : public Hideo::Shell::Launcher {
         : Launcher(icon, name, ramp), componentId(serviceId) {}
 
     void launch(Hideo::Shell::State&) override {
-        Sys::globalEndpoint().send<Bus::Api::Start>(Sys::Port::BUS, componentId).unwrap();
+        Sys::globalEndpoint().send<IBus::Start>(Sys::Port::BUS, componentId).unwrap();
     }
 };
 
@@ -133,8 +141,7 @@ Async::Task<> servAsync(Sys::Context& ctx) {
         .background = co_try$(Image::loadOrFallback("bundle://hideo-shell/wallpapers/winter.qoi"_url)),
         .noti = {},
         .launchers = {
-            makeRc<Hideo::Shell::MockLauncher>(Mdi::CALCULATOR, "Calculator (Mocked)"s, Gfx::ORANGE_RAMP),
-            makeRc<Strata::Shell::ServiceLauncher>(Mdi::CALCULATOR, "Calculator (Real)"s, Gfx::ORANGE_RAMP, "hideo-calculator.main"s),
+            makeRc<ServiceLauncher>(Mdi::CALCULATOR, "Calculator"s, Gfx::ORANGE_RAMP, "hideo-calculator.main"s),
         },
         .instances = {}
     };
@@ -147,8 +154,11 @@ Async::Task<> servAsync(Sys::Context& ctx) {
 
     Async::detach(root->run());
 
-    co_try$(endpoint.send<Strata::Bus::Api::Listen>(Sys::Port::BUS, Meta::idOf<App::MouseEvent>()));
-    co_try$(endpoint.send<Strata::Bus::Api::Listen>(Sys::Port::BUS, Meta::idOf<App::KeyboardEvent>()));
+    co_try$(endpoint.send<Strata::IBus::Listen>(Sys::Port::BUS, Meta::idOf<App::MouseEvent>()));
+    co_try$(endpoint.send<Strata::IBus::Listen>(Sys::Port::BUS, Meta::idOf<App::KeyboardEvent>()));
+
+    IShell::WindowId windowIdAllocator = 1;
+    Map<IShell::WindowId, Rc<ServiceInstance>> windows;
 
     while (true) {
         auto msg = co_trya$(endpoint.recvAsync());
@@ -159,13 +169,25 @@ Async::Task<> servAsync(Sys::Context& ctx) {
             root->child().event(*event);
         } else if (msg.is<App::KeyboardEvent>()) {
             auto event = msg.unpack<App::MouseEvent>();
-        } else if (msg.is<Api::CreateInstance>()) {
-            auto call = msg.unpack<Api::CreateInstance>().unwrap();
-            logDebug("create instance {}", call.size);
-            auto instance = makeRc<ServiceInstance>();
-            instance->bound = {100, call.size};
+        } else if (msg.is<IShell::WindowCreate>()) {
+            auto call = msg.unpack<IShell::WindowCreate>().unwrap();
+            logDebug("window create {}", call.want.size);
+            auto id = windowIdAllocator++;
+
+            auto frontbuffer = Gfx::Surface::alloc(call.want.size);
+            frontbuffer->mutPixels().clear(Ui::GRAY950);
+            auto instance = makeRc<ServiceInstance>(frontbuffer);
+            instance->bound = {100, call.want.size};
+
+            windows.put(id, instance);
             Hideo::Shell::Model::event(*root, Hideo::Shell::AddInstance{instance});
-            (void)msg.packResp<Api::CreateInstance>(0uz);
+            (void)endpoint.resp<IShell::WindowCreate>(msg, Ok<IShell::WindowCreate::Response>(id, call.want));
+        } else if (msg.is<IShell::WindowAttach>()) {
+            auto call = msg.unpack<IShell::WindowAttach>().unwrap();
+            auto instance = windows.get(call.window);
+            instance->_backbuffer = call.buffer;
+            Gfx::blitUnsafe(instance->_frontbuffer->mutPixels(), instance->_backbuffer.unwrap()->pixels());
+            Ui::shouldRepaint(*root);
         } else {
             logWarn("unsupported event: {}", msg.header());
         }

@@ -97,9 +97,10 @@ Res<Hj::SentRecv> Channel::recv(Domain& dom, MutBytes bytes, MutSlice<Hj::Cap> c
     for (usize i = 0; i < expectedBytes; i++)
         bytes[i] = _bytes.popFront();
 
-    for (usize i = 0; i < expectedCaps; i++)
+    for (usize i = 0; i < expectedCaps; i++) {
         // NOTE: We unwrap here because we know that the domain has enough space
-        caps[i] = dom.add(Hj::ROOT, _caps.popFront()).unwrap("domain full");
+        caps[i] = dom._addUnlock(Hj::ROOT, _caps.popFront()).unwrap("domain full");
+    }
 
     _updateSignalsUnlock();
     return Ok<Hj::SentRecv>(expectedBytes, expectedCaps);

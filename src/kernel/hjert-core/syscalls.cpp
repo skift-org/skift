@@ -193,7 +193,7 @@ Res<> doOut(Task& self, Hj::Cap cap, Hj::IoLen len, usize port, Hj::Arg val) {
 Res<> doSend(Task& self, Hj::Cap cap, UserSlice<Bytes> buf, UserSlice<Slice<Hj::Cap>> caps) {
     return with(
         self.space(),
-        [&](auto buf, auto caps) -> Res<> {
+        [&](Bytes buf, Slice<Hj::Cap> caps) -> Res<> {
             auto obj = try$(self.domain().get<Channel>(cap));
             try$(obj->send(self.domain(), buf, caps));
             return Ok();

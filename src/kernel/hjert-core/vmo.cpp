@@ -5,11 +5,12 @@
 namespace Hjert::Core {
 
 Res<Arc<Vmo>> Vmo::alloc(usize size, Flags<Hj::VmoFlags> flags) {
-    if (size == 0) {
+    if (size == 0)
         return Error::invalidInput("size is zero");
-    }
 
-    try$(ensureAlign(size, Hal::PAGE_SIZE));
+    if (not isAlign(size, Hal::PAGE_SIZE))
+        return Error::invalidInput("size should be page aligned");
+
     Hal::PmmMem mem = try$(pmm().allocOwned(size, flags | Hal::PmmFlags::UPPER));
     return Ok(makeArc<Vmo>(std::move(mem)));
 }

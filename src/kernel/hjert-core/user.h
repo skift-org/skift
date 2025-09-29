@@ -43,7 +43,7 @@ struct User {
 // This is used to load and store values from userspace safely.
 template <typename Slice>
 struct UserSlice {
-    using Inner = typename Slice::Inner;
+    using Inner = Slice::Inner;
 
     usize _addr;
     usize _len;

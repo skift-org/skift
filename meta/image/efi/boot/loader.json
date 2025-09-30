@@ -4,11 +4,14 @@
         {
             "name": "skiftOS",
             "kernel": "bundle://hjert/_bin",
+            "icon": "file://efi/boot/skift.qoi",
             "blobs": [
                 "bundle://strata-device/_bin",
                 "bundle://strata-shell/_bin",
                 "bundle://strata-bus/_bin",
                 "bundle://hideo-calculator.main/_bin",
+                "bundle://hideo-about.main/_bin",
+                "bundle://hideo-zoo.main/_bin",
                 "bundle://hideo-shell/wallpapers/winter.qoi",
                 "bundle://fonts-inter/fonts/Inter-Regular.ttf",
                 "bundle://fonts-inter/fonts/Inter-Medium.ttf",

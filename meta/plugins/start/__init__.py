@@ -12,7 +12,12 @@ def generateSystem(img: image.Image) -> None:
     img.mkdir("EFI/BOOT")
     img.installTo("opstart", "efi-x86_64", "EFI/BOOT/BOOTX64.EFI")
     img.install("hjert", "kernel-x86_64")
-    img.installAll("skift-x86_64")
+    img.install("strata-device", "skift-x86_64")
+    img.install("strata-bus", "skift-x86_64")
+    img.install("strata-shell", "skift-x86_64")
+    img.install("hideo-calculator.main", "skift-x86_64")
+    img.install("hideo-about.main", "skift-x86_64")
+    img.install("hideo-zoo.main", "skift-x86_64")
 
     img.cpTree("meta/image/efi/boot", "boot")
 

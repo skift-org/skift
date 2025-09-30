@@ -43,7 +43,7 @@ struct Blob {
 };
 
 struct Entry {
-    Union<None, Gfx::Icon, Image::Picture> icon = NONE;
+    Union<None, Gfx::Icon, Rc<Gfx::Surface>> icon = NONE;
     String name;
     Blob kernel;
     Vec<Blob> blobs;

@@ -1,5 +1,3 @@
-#include <karm-gfx/cpu/canvas.h>
-#include <karm-gfx/icon.h>
 #include <karm-sys/entry.h>
 
 #include "framebuffer.h"
@@ -8,6 +6,7 @@
 import Mdi;
 import Karm.Ui;
 import Karm.App;
+import Karm.Gfx;
 import Hideo.Shell;
 import Karm.Image;
 import Strata.Protos;

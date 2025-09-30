@@ -6,8 +6,8 @@ import Karm.Core;
 import Karm.Image;
 import Karm.Sys;
 import Karm.Ref;
+import Karm.Gfx;
 
-#include <karm-gfx/icon.h>
 #include <karm-logger/logger.h>
 
 using namespace Karm;

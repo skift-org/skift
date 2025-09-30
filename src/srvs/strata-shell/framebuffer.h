@@ -1,9 +1,11 @@
 #pragma once
 
+import Karm.Gfx;
+
 #include <handover/hook.h>
 #include <hjert-api/api.h>
-#include <karm-gfx/buffer.h>
 #include <karm-logger/logger.h>
+#include <karm-math/rect.h>
 
 namespace Strata::Shell {
 

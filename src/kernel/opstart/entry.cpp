@@ -1,5 +1,5 @@
-#include <karm-gfx/cpu/canvas.h>
-#include <karm-gfx/prose.h>
+import Karm.Gfx;
+
 #include <karm-logger/logger.h>
 #include <karm-math/align.h>
 #include <karm-math/au.h>

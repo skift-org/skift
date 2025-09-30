@@ -1,9 +1,9 @@
-#include <karm-gfx/canvas.h>
-#include <karm-math/rect.h>
+#include <karm-math/path.h>
 
 #include "input.h"
 
 import Karm.Ui;
+import Karm.Gfx;
 import Karm.App;
 
 namespace Strata::Shell {

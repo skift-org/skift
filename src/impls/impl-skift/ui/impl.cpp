@@ -1,14 +1,15 @@
 module;
 
 #include <karm-core/macros.h>
-#include <karm-gfx/cpu/canvas.h>
 #include <karm-logger/logger.h>
+#include <karm-math/rect.h>
 
 module Karm.Ui;
 
 import Strata.Protos;
 import Karm.Sys;
 import Karm.App;
+import Karm.Gfx;
 
 namespace Karm::Ui::_Embed {
 

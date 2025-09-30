@@ -1,13 +1,14 @@
 module;
 
 #include <efi/base.h>
-#include <karm-gfx/canvas.h>
 #include <karm-logger/logger.h>
+#include <karm-math/rect.h>
 
 module Karm.Ui;
 
 import Karm.Sys;
 import Karm.Core;
+import Karm.Gfx;
 
 namespace Karm::Ui::_Embed {
 

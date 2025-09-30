@@ -1,5 +1,10 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
     "id": "strata-protos",
-    "type": "lib"
+    "type": "lib",
+    "requires": [
+        "karm-core",
+        "karm-app",
+        "karm-gfx"
+    ]
 }

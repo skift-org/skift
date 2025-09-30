@@ -14,7 +14,7 @@ import Strata.Protos;
 
 namespace Strata::Shell {
 
-struct Root : public Ui::ProxyNode<Root> {
+struct Root : Ui::ProxyNode<Root> {
     Vec<Math::Recti> _dirty;
     Rc<Framebuffer> _frontbuffer;
     Rc<Gfx::Surface> _backbuffer;
@@ -36,11 +36,10 @@ struct Root : public Ui::ProxyNode<Root> {
             g.clip(r.cast<f64>());
             paint(g, r);
             g.pop();
-
-            Gfx::blitUnsafe(_frontbuffer->mutPixels(), _backbuffer->pixels());
         }
         g.end();
 
+        Gfx::blitUnsafe(_frontbuffer->mutPixels(), _backbuffer->pixels());
         _dirty.clear();
     }
 
@@ -106,15 +105,27 @@ struct Root : public Ui::ProxyNode<Root> {
     }
 };
 
-struct ServiceInstance : public Hideo::Shell::Instance {
+struct ServiceInstance : Hideo::Shell::Instance {
+    Sys::Endpoint& _endpoint;
+    Sys::Port _client;
+    IShell::WindowId _windowId;
     Rc<Gfx::Surface> _frontbuffer;
     Opt<Rc<Protos::Surface>> _backbuffer;
 
-    ServiceInstance(Rc<Gfx::Surface> frontbuffer)
-        : _frontbuffer(frontbuffer) {}
+    ServiceInstance(Sys::Endpoint& endpoint, Sys::Port client, Rc<Gfx::Surface> frontbuffer)
+        : _endpoint(endpoint), _client(client), _frontbuffer(frontbuffer) {
+    }
 
     Ui::Child build() const override {
         return Ui::image(_frontbuffer, 8) |
+               Ui::intent([this](Ui::Node& n, App::Event& e) {
+                   if (auto it = e.is<App::MouseEvent>(); it and n.bound().contains(it->pos)) {
+                       auto transformedEvent = *it;
+                       transformedEvent.pos = transformedEvent.pos - n.bound().xy;
+                       (void)_endpoint.send<IShell::WindowEvent>(_client, _windowId, transformedEvent);
+                       e.accept();
+                   }
+               }) |
                Ui::box({
                    .borderRadii = 8,
                    .borderWidth = 1,
@@ -123,7 +134,7 @@ struct ServiceInstance : public Hideo::Shell::Instance {
     }
 };
 
-struct ServiceLauncher : public Hideo::Shell::Launcher {
+struct ServiceLauncher : Hideo::Shell::Launcher {
     String componentId;
 
     ServiceLauncher(Gfx::Icon icon, String name, Gfx::ColorRamp ramp, String serviceId)
@@ -141,7 +152,9 @@ Async::Task<> servAsync(Sys::Context& ctx) {
         .background = co_try$(Image::loadOrFallback("bundle://hideo-shell/wallpapers/winter.qoi"_url)),
         .noti = {},
         .launchers = {
+            makeRc<ServiceLauncher>(Mdi::INFORMATION_OUTLINE, "About"s, Gfx::BLUE_RAMP, "hideo-about.main"s),
             makeRc<ServiceLauncher>(Mdi::CALCULATOR, "Calculator"s, Gfx::ORANGE_RAMP, "hideo-calculator.main"s),
+            makeRc<ServiceLauncher>(Mdi::DUCK, "Zoo"s, Gfx::ZINC_RAMP, "hideo-zoo.main"s),
         },
         .instances = {}
     };
@@ -176,7 +189,7 @@ Async::Task<> servAsync(Sys::Context& ctx) {
 
             auto frontbuffer = Gfx::Surface::alloc(call.want.size);
             frontbuffer->mutPixels().clear(Ui::GRAY950);
-            auto instance = makeRc<ServiceInstance>(frontbuffer);
+            auto instance = makeRc<ServiceInstance>(endpoint, msg.header().from, frontbuffer);
             instance->bound = {100, call.want.size};
 
             windows.put(id, instance);
@@ -188,6 +201,12 @@ Async::Task<> servAsync(Sys::Context& ctx) {
             instance->_backbuffer = call.buffer;
             Gfx::blitUnsafe(instance->_frontbuffer->mutPixels(), instance->_backbuffer.unwrap()->pixels());
             Ui::shouldRepaint(*root);
+        } else if (msg.is<IShell::WindowFlip>()) {
+            auto call = msg.unpack<IShell::WindowFlip>().unwrap();
+            auto instance = windows.get(call.window);
+            Gfx::blitUnsafe(instance->_frontbuffer->mutPixels(), instance->_backbuffer.unwrap()->pixels());
+            Ui::shouldRepaint(*root);
+            (void)endpoint.resp<IShell::WindowFlip>(msg, Ok(Protos::ACK));
         } else {
             logWarn("unsupported event: {}", msg.header());
         }

@@ -9,56 +9,11 @@ import Karm.Gfx;
 #include "loader.h"
 
 void drawSplash(Gfx::Canvas& g, Opstart::Entry const& e, Math::Recti size) {
-    g.clear(Gfx::ZINC950);
     if (auto it = e.icon.is<Rc<Gfx::Surface>>()) {
-        auto dest = Math::Align{
-            Math::Align::BOTTOM | Math::Align::HCENTER,
-        }
-                        .apply(Math::Flow::LEFT_TO_RIGHT, (*it)->bound(), size.vsplit(size.height / 2).v0.shrink(32));
+        g.clear(Gfx::ZINC900);
+        auto dest = (*it)->bound().center(size);
         g.blit(dest, (*it)->pixels());
-    } else {
-        g.push();
-        Gfx::Prose prose{
-            {
-                .font = Ui::TextStyles::headlineLarge().font,
-            },
-            e.name
-        };
-        Math::Recti proseSize = prose.layout(Au{size.width}).cast<isize>();
-
-        g.translate(
-            Math::Align{
-                Math::Align::BOTTOM | Math::Align::HCENTER,
-            }
-                .apply(Math::Flow::LEFT_TO_RIGHT, proseSize, size.vsplit(size.height / 2).v0.shrink(32))
-                .topStart()
-                .cast<f64>()
-        );
-
-        g.fill(prose);
-        g.pop();
     }
-
-    g.push();
-    Gfx::Prose prose{
-        {
-            .font = Ui::TextStyles::labelLarge().font,
-        },
-        "Press F8 for boot options"
-    };
-    Math::Recti proseSize = prose.layout(Au{size.width}).cast<isize>();
-
-    g.translate(
-        Math::Align{
-            Math::Align::BOTTOM | Math::Align::HCENTER,
-        }
-            .apply(Math::Flow::LEFT_TO_RIGHT, proseSize, size.shrink(32))
-            .topStart()
-            .cast<f64>()
-    );
-
-    g.fill(prose);
-    g.pop();
 }
 
 Res<> splashScreen(Opstart::Entry const& e) {

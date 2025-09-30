@@ -153,7 +153,12 @@ Async::Task<> servAsync(Sys::Context& ctx) {
         .launchers = {
             makeRc<ServiceLauncher>(Mdi::INFORMATION_OUTLINE, "About"s, Gfx::BLUE_RAMP, "hideo-about.main"s),
             makeRc<ServiceLauncher>(Mdi::CALCULATOR, "Calculator"s, Gfx::ORANGE_RAMP, "hideo-calculator.main"s),
-            makeRc<ServiceLauncher>(Mdi::DUCK, "Zoo"s, Gfx::ZINC_RAMP, "hideo-zoo.main"s),
+            makeRc<ServiceLauncher>(Mdi::CLOCK, "Clock"s, Gfx::INDIGO_RAMP, "hideo-clock.main"s),
+            makeRc<ServiceLauncher>(Mdi::COUNTER, "Counter"s, Gfx::PURPLE_RAMP, "hideo-counter.main"s),
+            makeRc<ServiceLauncher>(Mdi::FOLDER, "Files"s, Gfx::AMBER_RAMP, "hideo-files.main"s),
+            makeRc<ServiceLauncher>(Mdi::COG, "Settings"s, Gfx::SLATE_RAMP, "hideo-settings.main"s),
+            makeRc<ServiceLauncher>(Mdi::VIEW_DASHBOARD, "Sysmon"s, Gfx::GREEN_RAMP, "hideo-sysmon.main"s),
+            makeRc<ServiceLauncher>(Mdi::DUCK, "Zoo"s, Gfx::SLATE_RAMP, "hideo-zoo.main"s),
         },
         .instances = {}
     };

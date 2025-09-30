@@ -28,7 +28,7 @@ struct ConOut : public Fd {
     ConOut(Efi::SimpleTextOutputProtocol* proto) : _proto(proto) {}
 
     Res<usize> read(MutBytes) override {
-        notImplemented();
+        return Error::notImplemented();
     }
 
     Res<usize> write(Bytes bytes) override {
@@ -57,7 +57,7 @@ struct ConOut : public Fd {
     }
 
     Res<usize> seek(Io::Seek) override {
-        notImplemented();
+        return Error::notImplemented();
     }
 
     Res<> flush() override {
@@ -65,11 +65,11 @@ struct ConOut : public Fd {
     }
 
     Res<Rc<Fd>> dup() override {
-        notImplemented();
+        return Error::notImplemented();
     }
 
     Res<_Accepted> accept() override {
-        notImplemented();
+        return Error::notImplemented();
     }
 
     Res<Stat> stat() override {
@@ -77,11 +77,11 @@ struct ConOut : public Fd {
     }
 
     Res<_Sent> send(Bytes, Slice<Handle>, SocketAddr) override {
-        notImplemented();
+        return Error::notImplemented();
     }
 
     Res<_Received> recv(MutBytes, MutSlice<Handle>) override {
-        notImplemented();
+        return Error::notImplemented();
     }
 };
 
@@ -148,11 +148,11 @@ struct FileProto : public Fd {
     }
 
     Res<Rc<Fd>> dup() override {
-        notImplemented();
+        return Error::notImplemented();
     }
 
     Res<_Accepted> accept() override {
-        notImplemented();
+        return Error::notImplemented();
     }
 
     Res<Stat> stat() override {
@@ -177,16 +177,16 @@ struct FileProto : public Fd {
     }
 
     Res<_Sent> send(Bytes, Slice<Handle>, SocketAddr) override {
-        notImplemented();
+        return Error::notImplemented();
     }
 
     Res<_Received> recv(MutBytes, MutSlice<Handle>) override {
-        notImplemented();
+        return Error::notImplemented();
     }
 };
 
 Res<Rc<Sys::Fd>> deserializeFd(Serde::Deserializer&) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<Rc<Fd>> createIn() {
@@ -204,19 +204,19 @@ Res<Rc<Fd>> createErr() {
 // MARK: Sockets ---------------------------------------------------------------
 
 Res<Rc<Fd>> connectTcp(SocketAddr) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<Rc<Fd>> listenTcp(SocketAddr) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<Rc<Fd>> listenUdp(SocketAddr) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<Rc<Fd>> listenIpc(Ref::Url) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 // MARK: Files -----------------------------------------------------------------
@@ -361,7 +361,7 @@ Res<> memFlush(void*, usize) {
 }
 
 Res<Stat> stat(Ref::Url const&) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 // MARK: Time ------------------------------------------------------------------

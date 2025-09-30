@@ -38,7 +38,7 @@ struct Host : ProxyNode<Host> {
         Math::Recti damaged = _dirty[0];
         for (auto& r : _dirty) {
             g.push();
-            g.clear(r, Gfx::GRAY950);
+            g.clear(r, Ui::GRAY950);
             g.fillStyle(Ui::GRAY50);
             g.clip(r.cast<f64>());
             paint(g, r);

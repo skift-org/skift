@@ -30,15 +30,15 @@ Res<Rc<Fd>> openFile(Ref::Url const& url) {
 }
 
 Res<Rc<Fd>> createFile(Ref::Url const&) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<Rc<Fd>> openOrCreateFile(Ref::Url const&) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<Pair<Rc<Fd>, Rc<Fd>>> createPipe() {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<Rc<Fd>> createIn() {
@@ -54,25 +54,25 @@ Res<Rc<Fd>> createErr() {
 }
 
 Res<Vec<DirEntry>> readDir(Ref::Url const&) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<> createDir(Ref::Url const&) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<Vec<DirEntry>> readDirOrCreate(Ref::Url const&) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<Stat> stat(Ref::Url const&) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 // MARK: User interactions -----------------------------------------------------
 
 Res<> launch(Intent) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 [[clang::coro_wrapper]]
@@ -83,19 +83,19 @@ Async::Task<> launchAsync(Intent) {
 // MARK: Sockets ---------------------------------------------------------------
 
 Res<Rc<Fd>> connectTcp(SocketAddr) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<Rc<Fd>> listenTcp(SocketAddr) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<Rc<Fd>> listenUdp(SocketAddr) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<Rc<Fd>> listenIpc(Ref::Url) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 // MARK: Time ------------------------------------------------------------------
@@ -117,7 +117,7 @@ Duration uptime() {
 // MARK: Memory Managment ------------------------------------------------------
 
 Res<MmapResult> memMap(Sys::MmapProps const&) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<MmapResult> memMap(Sys::MmapProps const&, Rc<Fd> fd) {
@@ -140,29 +140,29 @@ Res<> memUnmap(void const* ptr, usize size) {
 }
 
 Res<> memFlush(void*, usize) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 // MARK: System Informations ---------------------------------------------------
 
 Res<> populate(SysInfo&) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<> populate(MemInfo&) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<> populate(Vec<CpuInfo>&) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<> populate(UserInfo&) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<> populate(Vec<UserInfo>&) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 // MARK: Process Managment -----------------------------------------------------
@@ -179,7 +179,7 @@ Res<> sleepUntil(Instant until) {
 }
 
 Res<> exit(i32) {
-    notImplemented();
+    return Error::notImplemented();
 }
 
 Res<Ref::Url> pwd() {

@@ -149,7 +149,7 @@ Async::Task<> servAsync(Sys::Context& ctx) {
     Hideo::Shell::State state = {
         .isMobile = false,
         .dateTime = Sys::dateTime(),
-        .background = co_try$(Image::loadOrFallback("bundle://hideo-shell/wallpapers/winter.qoi"_url)),
+        .background = co_try$(Image::loadOrFallback("bundle://hideo-shell/wallpapers/abstract.qoi"_url)),
         .noti = {},
         .launchers = {
             makeRc<ServiceLauncher>(Mdi::INFORMATION_OUTLINE, "About"s, Gfx::BLUE_RAMP, "hideo-about.main"s),

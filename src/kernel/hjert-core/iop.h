@@ -6,8 +6,7 @@
 
 namespace Hjert::Core {
 
-struct Iop :
-    public BaseObject<Iop, Hj::Type::IOP> {
+struct Iop : BaseObject<Iop, Hj::Type::IOP> {
 
     Hal::PortRange _range;
 

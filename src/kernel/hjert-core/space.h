@@ -7,7 +7,7 @@ import Karm.Core;
 
 namespace Hjert::Core {
 
-struct Space : public BaseObject<Space, Hj::Type::SPACE> {
+struct Space : BaseObject<Space, Hj::Type::SPACE> {
     struct Map {
         Hal::VmmRange vrange;
         usize off;

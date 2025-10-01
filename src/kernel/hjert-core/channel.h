@@ -8,8 +8,7 @@ namespace Hjert::Core {
 
 struct Domain;
 
-struct Channel :
-    public BaseObject<Channel, Hj::Type::CHANNEL> {
+struct Channel : BaseObject<Channel, Hj::Type::CHANNEL> {
 
     bool _closed = false;
 

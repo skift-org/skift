@@ -4,9 +4,7 @@
 
 namespace Hjert::Core {
 
-struct Irq :
-    public BaseObject<Irq, Hj::Type::IRQ> {
-
+struct Irq : BaseObject<Irq, Hj::Type::IRQ> {
     usize _irq;
 
     static Res<Arc<Irq>> create(usize irq);

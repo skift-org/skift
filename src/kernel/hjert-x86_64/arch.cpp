@@ -71,7 +71,7 @@ void stop() {
 
 // MARK: Cpu -------------------------------------------------------------------
 
-struct Cpu : public Core::Cpu {
+struct Cpu : Core::Cpu {
     void enableInterrupts() override {
         x86_64::sti();
     }
@@ -256,7 +256,7 @@ Hal::Vmm& globalVmm() {
     return *_vmm;
 }
 
-struct UserVmm : public x86_64::Vmm<Hal::UpperHalfMapper> {
+struct UserVmm : x86_64::Vmm<Hal::UpperHalfMapper> {
     UserVmm(x86_64::Pml<4>* pml4)
         : x86_64::Vmm<Hal::UpperHalfMapper>{Core::pmm(), pml4} {}
 
@@ -287,7 +287,7 @@ Res<Arc<Hal::Vmm>> createVmm() {
 
 // MARK: Tasking ---------------------------------------------------------------
 
-struct Context : public Core::Context {
+struct Context : Core::Context {
     usize _ksp;
     usize _usp;
 

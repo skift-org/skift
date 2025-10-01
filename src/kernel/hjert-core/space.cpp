@@ -59,19 +59,17 @@ Res<> Space::_validate(Hal::VmmRange vrange) {
 }
 
 Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Arc<Vmo> vmo, usize off, Flags<Hj::MapFlags> flags) {
-    ObjectLockScope scope(*this);
+    ObjectLockScope _{*this};
 
     try$(vrange.ensureAligned(Hal::PAGE_SIZE));
 
-    if (vrange.size == 0) {
+    if (vrange.size == 0)
         vrange.size = vmo->range().size;
-    }
 
     auto end = try$(checkedAdd(off, vrange.size));
 
-    if (end > vmo->range().size) {
+    if (end > vmo->range().size)
         return Error::invalidInput("mapping too large");
-    }
 
     if (vrange.start == 0) {
         vrange = try$(_ranges.take(vrange.size));
@@ -92,7 +90,7 @@ Res<Hal::VmmRange> Space::map(Hal::VmmRange vrange, Arc<Vmo> vmo, usize off, Fla
 }
 
 Res<> Space::unmap(Hal::VmmRange vrange) {
-    ObjectLockScope scope(*this);
+    ObjectLockScope _{*this};
 
     try$(vrange.ensureAligned(Hal::PAGE_SIZE));
 
@@ -112,13 +110,15 @@ void Space::activate() {
 }
 
 void Space::dump() {
-    ObjectLockScope scope(*this);
+    ObjectLockScope _{*this};
+
     for (auto& map : _maps) {
         auto vrange = map.vrange;
         auto prange = map.prange();
         auto size = vrange.size / 1024;
         logDebug("{}: map: {x}-{x} -> {x}-{x} {} {}kib", *this, vrange.start, vrange.end(), prange.start, prange.end(), map.vmo->label(), size);
     }
+
     _vmm->dump();
 }
 

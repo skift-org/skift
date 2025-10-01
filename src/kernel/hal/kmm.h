@@ -8,7 +8,7 @@ namespace Hal {
 
 struct Kmm;
 
-struct KmmRange : public Range<usize, struct KmmRangeTag> {
+struct KmmRange : Range<usize, struct KmmRangeTag> {
     using Range::Range;
 
     Bytes bytes() const {

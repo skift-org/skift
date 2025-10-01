@@ -4,7 +4,7 @@ import Karm.Sys;
 
 #include "spec.h"
 
-struct HandoverHook : public Sys::Service {
+struct HandoverHook : Sys::Service {
     Handover::Payload* payload;
 
     HandoverHook(Handover::Payload* payload)

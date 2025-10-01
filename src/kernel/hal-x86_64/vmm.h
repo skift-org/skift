@@ -11,7 +11,7 @@
 namespace x86_64 {
 
 template <typename Mapper = Hal::IdentityMapper>
-struct Vmm : public Hal::Vmm {
+struct Vmm : Hal::Vmm {
     Hal::Pmm& _pmm;
     Pml<4>* _pml4 = nullptr;
     Mapper _mapper;

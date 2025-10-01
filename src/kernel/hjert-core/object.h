@@ -34,7 +34,7 @@ struct Object : Meta::Pinned {
 };
 
 template <typename Crtp, Hj::Type _TYPE>
-struct BaseObject : public Object {
+struct BaseObject : Object {
     using _Crtp = Crtp;
     static constexpr Hj::Type TYPE = _TYPE;
     using Object::Object;
@@ -44,7 +44,7 @@ struct BaseObject : public Object {
     }
 };
 
-struct [[nodiscard]] ObjectLockScope : public LockScope<Lock> {
+struct [[nodiscard]] ObjectLockScope : LockScope<Lock> {
     ObjectLockScope(Object& obj)
         : LockScope(obj._lock) {
     }

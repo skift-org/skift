@@ -13,14 +13,13 @@ struct Context;
 
 using Blocker = Func<Instant()>;
 
-enum State {
+enum struct State {
     RUNNABLE,
     BLOCKED,
     EXITED,
 };
 
-struct Task :
-    public BaseObject<Task, Hj::Type::TASK> {
+struct Task : BaseObject<Task, Hj::Type::TASK> {
 
     Mode _mode;
     Stack _stack;

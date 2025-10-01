@@ -6,7 +6,7 @@
 
 namespace Hal {
 
-struct RawPortIo : public Io {
+struct RawPortIo : Io {
     PortRange _range;
 
     RawPortIo(PortRange range) : _range(range) {
@@ -88,7 +88,7 @@ struct RawPortIo : public Io {
     }
 };
 
-struct RawDmaIo : public Io {
+struct RawDmaIo : Io {
     DmaRange _range;
 
     RawDmaIo(DmaRange range) : _range(range) {

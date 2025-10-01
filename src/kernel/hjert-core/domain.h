@@ -4,7 +4,7 @@
 
 namespace Hjert::Core {
 
-struct Domain : public BaseObject<Domain, Hj::Type::DOMAIN> {
+struct Domain : BaseObject<Domain, Hj::Type::DOMAIN> {
     using Slot = Opt<Arc<Object>>;
 
     Array<Slot, Hj::Cap::LEN> _slots;

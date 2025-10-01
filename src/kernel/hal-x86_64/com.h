@@ -8,7 +8,7 @@ import Karm.Core;
 
 namespace x86_64 {
 
-struct Com : public Io::TextEncoderBase<> {
+struct Com : Io::TextEncoderBase<> {
     Hal::RawPortIo _io;
 
     Com(Hal::RawPortIo io) : _io(io) {

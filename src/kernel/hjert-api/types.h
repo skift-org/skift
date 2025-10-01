@@ -280,7 +280,7 @@ using _Props = Union<
     IrqProps,
     ListenerProps>;
 
-struct Props : public _Props {
+struct Props : _Props {
     using _Props::_Props;
 
     Type type() const {

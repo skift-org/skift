@@ -30,13 +30,13 @@ Sched::Sched(Arc<Task> boot)
 }
 
 Res<> Sched::enqueue(Arc<Task> task) {
-    LockScope scope(_lock);
+    LockScope _{_lock};
     _tasks.pushBack(std::move(task));
     return Ok();
 }
 
 void Sched::schedule(Duration span) {
-    LockScope scope(_lock);
+    LockScope _{_lock};
 
     _stamp += span;
     _prev = _curr;

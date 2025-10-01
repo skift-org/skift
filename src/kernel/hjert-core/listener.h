@@ -6,8 +6,7 @@ import Karm.Core;
 
 namespace Hjert::Core {
 
-struct Listener :
-    public BaseObject<Listener, Hj::Type::LISTENER> {
+struct Listener : BaseObject<Listener, Hj::Type::LISTENER> {
 
     struct Listened {
         Hj::Cap cap;

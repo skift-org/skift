@@ -147,7 +147,7 @@ struct ConfigurationTable {
     void* table;
 };
 
-struct SystemTable : public Table {
+struct SystemTable : Table {
     u16* firmwareVendor;
     u32 firmwareRevision;
 
@@ -220,7 +220,7 @@ struct MemoryDescriptor {
 #define EFI_OPEN_PROTOCOL_BY_DRIVER 0x00000010
 #define EFI_OPEN_PROTOCOL_EXCLUSIVE 0x00000020
 
-struct BootService : public Table {
+struct BootService : Table {
     // Task Priority Services
     DummyFunction raiseTpl;
     DummyFunction lowerTpl;
@@ -297,7 +297,7 @@ enum struct ResetType {
     RESET_PLATFORM_SPECIFIC
 };
 
-struct RuntimeService : public Table {
+struct RuntimeService : Table {
     // Time Services
     Function<Time*, TimeCapabilities*> getTime;
     Function<Time*> setTime;

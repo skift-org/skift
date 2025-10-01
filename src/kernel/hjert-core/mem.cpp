@@ -80,7 +80,7 @@ struct Pmm : Hal::Pmm {
     }
 };
 
-struct Kmm : public Hal::Kmm {
+struct Kmm : Hal::Kmm {
     Hal::Pmm& _pmm;
 
     Kmm(Hal::Pmm& pmm) : _pmm(pmm) {

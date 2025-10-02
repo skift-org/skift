@@ -16,7 +16,7 @@ struct Cursor {
     virtual void paint(Math::Vec2i pos, Gfx::Canvas& g) const = 0;
 };
 
-struct BlobCursor : public Cursor {
+struct TouchCursor : public Cursor {
     Gfx::Color _fill = Gfx::WHITE;
     f64 _opacity = 0.25;
 
@@ -41,17 +41,18 @@ struct BlobCursor : public Cursor {
     }
 };
 
-struct ClassicCursor : public Cursor {
+struct ClassicCursor : Cursor {
     Gfx::Color _fill = Gfx::BLACK;
     Gfx::Color _stroke = Gfx::WHITE;
     Math::Path _path = Math::Path::fromSvg(
-#include "hideo-shell/cursor.path"
+#include "hideo-shell/defs/classic-cursor.path"
+
     );
 
     Math::Recti bound(Math::Vec2i pos) const override {
         return Math::Recti{
             pos,
-            {16, 26},
+            {28, 28},
         }
             .grow(1);
     }
@@ -72,14 +73,46 @@ struct ClassicCursor : public Cursor {
     }
 };
 
-struct InputTranslator : public Ui::ProxyNode<InputTranslator> {
+struct RoundedCursor : Cursor {
+    Gfx::Color _fill = Gfx::BLACK;
+    Gfx::Color _stroke = Gfx::WHITE;
+    Math::Path _path = Math::Path::fromSvg(
+#include "hideo-shell/defs/rounded-cursor.path"
+
+    );
+
+    Math::Recti bound(Math::Vec2i pos) const override {
+        return Math::Recti{
+            pos,
+            {28, 28},
+        }
+            .grow(1);
+    }
+
+    void paint(Math::Vec2i pos, Gfx::Canvas& g) const override {
+        g.push();
+        g.translate(pos.cast<f64>());
+        g.beginPath();
+        g.path(_path);
+        g.fill(_fill);
+        g.stroke({
+            .fill = _stroke,
+            .width = 1.6,
+            .align = Gfx::CENTER_ALIGN,
+            .join = Gfx::MITER_JOIN,
+        });
+        g.pop();
+    }
+};
+
+struct InputTranslator : Ui::ProxyNode<InputTranslator> {
     App::MouseEvent _mousePrev = {};
     Math::Vec2i _mousePos = {};
     bool _mouseDirty = false;
     Box<Cursor> _cursor;
 
-    InputTranslator(Ui::Child child, Box<Cursor> cursor)
-        : Ui::ProxyNode<InputTranslator>(std::move(child)), _cursor(std::move(cursor)) {}
+    InputTranslator(Ui::Child child, Math::Vec2i mousePos, Box<Cursor> cursor)
+        : Ui::ProxyNode<InputTranslator>(std::move(child)), _mousePos(mousePos), _cursor(std::move(cursor)) {}
 
     void event(App::Event& e) override {
         if (auto m = e.is<App::MouseEvent>()) {
@@ -139,8 +172,8 @@ struct InputTranslator : public Ui::ProxyNode<InputTranslator> {
     }
 };
 
-Ui::Child inputTranslator(Ui::Child child) {
-    return makeRc<InputTranslator>(std::move(child), makeBox<ClassicCursor>());
+Ui::Child inputTranslator(Ui::Child child, Math::Vec2i mousePos) {
+    return makeRc<InputTranslator>(std::move(child), mousePos, makeBox<RoundedCursor>());
 }
 
 } // namespace Strata::Shell

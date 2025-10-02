@@ -24,6 +24,11 @@ export struct WindowCreate {
     WindowProps want;
 };
 
+export struct WindowDestroy {
+    using Response = None;
+    WindowId window;
+};
+
 export struct WindowUpdate {
     WindowId window;
     WindowProps props;
@@ -40,7 +45,7 @@ export struct WindowEvent {
 };
 
 export struct WindowFlip {
-    using Response = Protos::Ack;
+    using Response = None;
 
     WindowId window;
     Math::Recti region;

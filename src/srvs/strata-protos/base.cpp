@@ -13,19 +13,6 @@ using namespace Karm;
 
 namespace Strata::Protos {
 
-export struct Ack{
-    Res<> serialize(Serde::Serializer& ser) const {
-        return ser.serializeUnit({Serde::Type::UNIT});
-    }
-
-    static Res<Ack> deserialize(Serde::Deserializer& de) {
-        try$(de.deserializeUnit({Serde::Type::NIL}));
-        return Ok(Ack{});
-    }
-};
-
-export Ack ACK{};
-
 export struct Surface {
     Hj::Vmo _vmo;
     Hj::Mapped _mapped;

@@ -179,7 +179,7 @@ Res<> sleepUntil(Instant until) {
 }
 
 Res<> exit(i32) {
-    return Error::notImplemented();
+    return Hj::Task::self().ret();
 }
 
 Res<Ref::Url> pwd() {

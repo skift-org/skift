@@ -103,7 +103,9 @@ struct Host : ProxyNode<Host> {
         } else if (auto e = event.is<Node::AnimateEvent>()) {
             event.accept();
         } else if (auto e = event.is<App::RequestExitEvent>()) {
-            event.accept();
+            (void)_endpoint.send<Strata::IShell::WindowDestroy>(_shell, _window);
+            logInfo("application closed");
+            Sys::exit(Ok());
         }
 
         if (not event.accepted()) {

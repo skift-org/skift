@@ -164,9 +164,10 @@ Async::Task<> servAsync(Sys::Context& ctx) {
     };
 
     auto endpoint = Sys::Endpoint::adopt(ctx);
+    auto framebuffer = co_try$(Framebuffer::open(ctx));
     auto root = makeRc<Root>(
-        Hideo::Shell::app(std::move(state)) | inputTranslator,
-        co_try$(Framebuffer::open(ctx))
+        inputTranslator(Hideo::Shell::app(std::move(state)), framebuffer->bound().center()),
+        framebuffer
     );
 
     Async::detach(root->run());
@@ -194,11 +195,17 @@ Async::Task<> servAsync(Sys::Context& ctx) {
             auto frontbuffer = Gfx::Surface::alloc(call.want.size);
             frontbuffer->mutPixels().clear(Ui::GRAY950);
             auto instance = makeRc<ServiceInstance>(endpoint, msg.header().from, frontbuffer);
-            instance->bound = {100, call.want.size};
+            instance->bound = Math::Recti{call.want.size}.center(framebuffer->bound());
 
             windows.put(id, instance);
             Hideo::Shell::Model::event(*root, Hideo::Shell::AddInstance{instance});
             (void)endpoint.resp<IShell::WindowCreate>(msg, Ok<IShell::WindowCreate::Response>(id, call.want));
+        } else if (msg.is<IShell::WindowDestroy>()) {
+            auto call = msg.unpack<IShell::WindowDestroy>().unwrap();
+            auto instance = windows.get(call.window);
+            Hideo::Shell::Model::event(*root, Hideo::Shell::RemoveInstance{instance});
+            windows.del(call.window);
+            (void)endpoint.resp<IShell::WindowDestroy>(msg, Ok());
         } else if (msg.is<IShell::WindowAttach>()) {
             auto call = msg.unpack<IShell::WindowAttach>().unwrap();
             auto instance = windows.get(call.window);
@@ -210,7 +217,7 @@ Async::Task<> servAsync(Sys::Context& ctx) {
             auto instance = windows.get(call.window);
             Gfx::blitUnsafe(instance->_frontbuffer->mutPixels(), instance->_backbuffer.unwrap()->pixels());
             Ui::shouldRepaint(*root);
-            (void)endpoint.resp<IShell::WindowFlip>(msg, Ok(Protos::ACK));
+            (void)endpoint.resp<IShell::WindowFlip>(msg, Ok());
         } else {
             logWarn("unsupported event: {}", msg.header());
         }

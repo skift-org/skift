@@ -54,6 +54,11 @@ struct Root : Ui::ProxyNode<Root> {
                 lastFrame += 16_ms;
             }
 
+            // when exiting lastFrame may be 16ms in the future
+            // clamp it to now to avoid a long sleep
+            
+            lastFrame = frameStart;
+
             if (_shouldLayout) {
                 layout(bound());
                 _shouldLayout = false;

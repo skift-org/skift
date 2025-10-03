@@ -13,6 +13,10 @@
             "git": "https://github.com/skift-org/hideo.git",
             "tag": "main"
         },
+        "skift-org/ambolt": {
+            "git": "https://github.com/skift-org/ambolt",
+            "tag": "main"
+        },
         "skift-org/vaerk": {
             "git": "https://github.com/skift-org/vaerk",
             "tag": "main"

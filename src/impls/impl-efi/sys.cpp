@@ -229,10 +229,7 @@ static Res<Ref::Path> resolve(Ref::Url url) {
     }
 
     if (url.scheme == "bundle") {
-        logInfo("resolving bundle url: {}", url);
         if (not _index) {
-            logInfo("no index, loading");
-
             auto indexFile = try$(File::open("file:/bundles/_index.json"_url));
             auto indexStr = try$(Io::readAllUtf8(indexFile));
             auto indexJson = try$(Json::parse(indexStr));
@@ -266,12 +263,8 @@ static Res<Ref::Path> resolve(Ref::Url url) {
         }
 
         auto refStr = ref.asStr();
-
         auto refUrl = Ref::Url::parse(refStr);
-
-        Ref::Path resolved = try$(resolve(refUrl));
-        logInfo("resolved to: {}", resolved);
-        return Ok(resolved);
+        return resolve(refUrl);
     } else {
         logError("unsupported scheme: {}", url.scheme);
         return Error::notImplemented();

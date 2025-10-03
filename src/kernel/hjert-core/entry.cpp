@@ -14,47 +14,10 @@ import Karm.Core;
 
 namespace Hjert::Core {
 
-Res<> validateAndDump(u64 magic, Handover::Payload& payload) {
-    if (not Handover::valid(magic, payload)) {
-        logInfo("entry: handover: invalid");
-        return Error::invalidInput("Invalid handover payload");
-    }
-
-    logInfo("entry: handover: valid");
-    logInfo("entry: handover: agent: '{}'", payload.agentName());
-
-    usize totalFree = 0;
-    logInfo("entry: dumping handover records...");
-    for (auto const& record : payload) {
-        logInfo(
-            " - {} {x}-{x} ({}kib)",
-            record.name(),
-            record.start,
-            record.end(),
-            record.size / 1024
-        );
-
-        if (record.tag == Handover::FREE) {
-            totalFree += record.size;
-        }
-
-        if (record.tag == Handover::FILE) {
-            auto const* name = payload.stringAt(record.file.name);
-            auto const* props = payload.stringAt(record.file.meta);
-            logInfo("   - file: {:#}", name);
-            logInfo("   - props: {:#}", props);
-        }
-    }
-
-    logInfo("entry: handover: total free: {}mib", toMib(totalFree));
-
-    return Ok();
-}
-
 Res<> enterUserspace(Handover::Payload& payload) {
     auto const* record = payload.fileByName("bundle://strata-bus/_bin");
     if (not record) {
-        logInfo("entry: handover: no init file");
+        logInfo("handover: no init file");
         return Error::invalidInput("No init file");
     }
 
@@ -121,7 +84,13 @@ Res<> init(u64 magic, Handover::Payload& payload) {
 
     logInfo("hjert " stringify$(__ck_version_value));
 
-    try$(validateAndDump(magic, payload));
+    if (not Handover::valid(magic, payload)) {
+        logInfo("handover: invalid");
+        return Error::invalidInput("invalid handover payload");
+    }
+    logInfo("handover: valid");
+    logInfo("handover: agent: '{}'", payload.agentName());
+
     try$(initMem(payload));
     try$(initSched(payload));
 

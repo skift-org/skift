@@ -10,21 +10,24 @@ def generateSystem(img: image.Image) -> None:
 
     img.mkdir("EFI")
     img.mkdir("EFI/BOOT")
+
     img.installTo("opstart", "efi-x86_64", "EFI/BOOT/BOOTX64.EFI")
     img.install("hjert", "kernel-x86_64")
 
-    img.install("strata-device", "skift-x86_64")
-    img.install("strata-bus", "skift-x86_64")
-    img.install("strata-shell", "skift-x86_64")
-
-    img.install("hideo-about.main", "skift-x86_64")
-    img.install("hideo-calculator.main", "skift-x86_64")
-    img.install("hideo-clock.main", "skift-x86_64")
-    img.install("hideo-counter.main", "skift-x86_64")
-    img.install("hideo-files.main", "skift-x86_64")
-    img.install("hideo-settings.main", "skift-x86_64")
-    img.install("hideo-sysmon.main", "skift-x86_64")
-    img.install("hideo-zoo.main", "skift-x86_64")
+    userspace = [
+        "strata-device",
+        "strata-bus",
+        "strata-shell",
+        "hideo-about.main",
+        "hideo-calculator.main",
+        "hideo-clock.main",
+        "hideo-counter.main",
+        "hideo-files.main",
+        "hideo-settings.main",
+        "hideo-sysmon.main",
+        "hideo-zoo.main",
+    ]
+    img.install(userspace, "skift-x86_64")
 
     img.cpTree("meta/image/efi/boot", "boot")
 
@@ -100,6 +103,7 @@ def _(args: StartArgs) -> None:
 
     if args.arch == "x86_64":
         generateSystem(img)
+        print("Booting...")
         machine = runner.Qemu(logError=args.dint, debugger=args.debug)
         machine.boot(img)
     elif args.arch == "riscv32":

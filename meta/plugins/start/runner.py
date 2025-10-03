@@ -65,7 +65,7 @@ class Qemu(Machine):
             "-bios",
             ovmf,
             "-m",
-            "256M",
+            "512M",
             "-smp",
             "4",
             "-drive",

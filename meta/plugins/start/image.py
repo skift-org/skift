@@ -40,7 +40,7 @@ class Image:
         return dest
 
     def installTo(self, componentSpec: str, targetSpec: str, dest: str):
-        product = self.install(componentSpec, targetSpec)
+        product = self.install(componentSpec, targetSpec)[0]
         self.cp(str(product.path), dest=dest)
 
     def _installProduct(self, product: builder.ProductScope):
@@ -64,20 +64,25 @@ class Image:
             self.cpRef("_index", str(product.path), f"{component.id}/_lib")
             self.cpRef(component.id, str(product.path), f"{component.id}/_lib")
 
-    def install(self, componentSpec: str, targetSpec: str) -> builder.ProductScope:
-        self._logger.info(f"Installing {componentSpec}...")
-        component = self._registry.lookup(componentSpec, model.Component)
-        assert component is not None
+    def install(
+        self, componentsSpec: str | list[str], targetSpec: str
+    ) -> list[builder.ProductScope]:
+        if isinstance(componentsSpec, str):
+            componentsSpec = [componentsSpec]
+
+        self._logger.info(f"Installing {componentsSpec}...")
+        components = [self._registry.lookup(c, model.Component) for c in componentsSpec]
 
         target = self._registry.lookup(targetSpec, model.Target)
         assert target is not None
 
         scope = builder.TargetScope(self._registry, target)
-        product = builder.build(scope, component)[0]
+        products = builder.build(scope, components)
 
-        self._installProduct(product)
+        for p in products:
+            self._installProduct(p)
 
-        return product
+        return products
 
     def installAll(self, targetSpec: str) -> list[builder.ProductScope]:
         target = self._registry.lookup(targetSpec, model.Target)

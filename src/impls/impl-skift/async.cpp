@@ -11,7 +11,7 @@ import Karm.Core;
 
 namespace Karm::Sys::_Embed {
 
-struct HjertSched : public Sys::Sched {
+struct HjertSched : Sys::Sched {
     Hj::Listener _listener;
     Map<Hj::Cap, Async::Promise<>> _promises;
     Vec<Pair<Instant, Async::Promise<>>> _sleeps;

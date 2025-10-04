@@ -16,7 +16,7 @@ struct Cursor {
     virtual void paint(Math::Vec2i pos, Gfx::Canvas& g) const = 0;
 };
 
-struct TouchCursor : public Cursor {
+struct TouchCursor : Cursor {
     Gfx::Color _fill = Gfx::WHITE;
     f64 _opacity = 0.25;
 

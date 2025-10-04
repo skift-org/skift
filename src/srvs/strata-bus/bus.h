@@ -11,7 +11,7 @@ namespace Strata::Bus {
 
 struct Bus;
 
-struct Endpoint : public Meta::Pinned {
+struct Endpoint : Meta::Pinned {
     static Sys::Port nextPort() {
         static usize port = 2;
         return Sys::Port{port++};
@@ -37,7 +37,7 @@ struct Endpoint : public Meta::Pinned {
     virtual Res<> activate(Sys::Context&) { return Ok(); }
 };
 
-struct Service : public Endpoint {
+struct Service : Endpoint {
     String _id;
     Vec<Meta::Id> _listen;
     Rc<Skift::IpcFd> _ipc;
@@ -61,7 +61,7 @@ struct Service : public Endpoint {
     bool accept(Sys::Message const& msg) override;
 };
 
-struct System : public Endpoint {
+struct System : Endpoint {
     System();
 
     Str id() const override;
@@ -69,7 +69,7 @@ struct System : public Endpoint {
     Res<> send(Sys::Message& msg) override;
 };
 
-struct Bus : public Meta::Pinned {
+struct Bus : Meta::Pinned {
     Sys::Context& _context;
 
     Vec<Rc<Endpoint>> _endpoints{};

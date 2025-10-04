@@ -1,13 +1,15 @@
-#pragma once
-
-import Karm.Core;
+module;
 
 #include <hal/io.h>
 #include <hjert-api/api.h>
 
+export module Strata.Device:io;
+
+import Karm.Core;
+
 namespace Strata::Device {
 
-struct PortIo : public Hal::Io {
+export struct PortIo : public Hal::Io {
     Hj::Io _io;
 
     PortIo(Hj::Io io)
@@ -27,7 +29,7 @@ struct PortIo : public Hal::Io {
     }
 };
 
-struct DmaIo : public Hal::Io {
+export struct DmaIo : public Hal::Io {
     Hj::Mapped _mapped;
 
     DmaIo(Hj::Mapped mapped)

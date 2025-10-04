@@ -1,8 +1,10 @@
-#pragma once
+module;
 
 #include <hal/io.h>
 
-#include "node.h"
+export module Strata.Device:pci;
+
+import :node;
 
 namespace Strata::Device::Pci {
 

@@ -1,17 +1,15 @@
-import Karm.Core;
-import Karm.App;
-
 #include <hjert-api/api.h>
 #include <karm-logger/logger.h>
 #include <karm-sys/entry.h>
 
-#include "cmos.h"
-#include "io.h"
-#include "ps2.h"
+import Karm.Core;
+import Karm.App;
+import Strata.Device;
+
 
 namespace Strata::Device {
 
-struct IsaRootBus : public Node {
+struct IsaRootBus : Node {
     Res<> init() override {
         auto i18042port = try$(PortIo::open({0x60, 0x8}));
         try$(attach(makeRc<Ps2::I8042>(i18042port)));
@@ -23,7 +21,7 @@ struct IsaRootBus : public Node {
     }
 };
 
-struct RootBus : public Node {
+struct RootBus : Node {
     Sys::Endpoint& rpc;
 
     RootBus(Sys::Endpoint& rpc)

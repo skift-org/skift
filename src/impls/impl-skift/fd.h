@@ -15,7 +15,7 @@ enum struct _FdType : u8 {
     IPC,
 };
 
-struct VmoFd : public Sys::NullFd {
+struct VmoFd : Sys::NullFd {
     Hj::Vmo _vmo;
 
     Hj::Vmo& vmo() {
@@ -26,7 +26,7 @@ struct VmoFd : public Sys::NullFd {
         : _vmo(std::move(vmo)) {}
 };
 
-struct IpcFd : public Sys::NullFd {
+struct IpcFd : Sys::NullFd {
     Hj::Channel _in;
     Hj::Channel _out;
 

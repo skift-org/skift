@@ -48,6 +48,20 @@ class Dir(Storage):
         shell.rmrf(self._root)
 
 
+class BootFs(Dir):
+    _out: str
+
+    def __init__(self, id: str):
+        super().__init__(id)
+        self._out = f"{const.PROJECT_CK_DIR}/images/{id}.bootfs"
+
+    def finalize(self) -> str:
+        print("Generating bootfs...")
+        BOOTFS = ".cutekit/extern/cute-engineering/ce-bootfs/src/bootfs.py"
+        shell.exec("python", BOOTFS, "--dir", self._root, self._out)
+        return self._out
+
+
 class RawHdd(Storage):
     _hdd: str
     _size: int

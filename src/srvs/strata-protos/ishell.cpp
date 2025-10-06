@@ -47,4 +47,8 @@ export struct WindowFlip {
     Math::Recti region;
 };
 
+export struct WindowMove {
+    WindowId window;
+};
+
 } // namespace Strata::IShell

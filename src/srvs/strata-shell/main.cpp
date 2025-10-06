@@ -1,6 +1,7 @@
 #include <karm-sys/entry.h>
 
 #include "framebuffer.h"
+#include "hideo-spreadsheet/model.h"
 #include "input.h"
 
 import Mdi;
@@ -56,7 +57,6 @@ struct Root : Ui::ProxyNode<Root> {
 
             // when exiting lastFrame may be 16ms in the future
             // clamp it to now to avoid a long sleep
-            
             lastFrame = frameStart;
 
             if (_shouldLayout) {
@@ -124,10 +124,23 @@ struct ServiceInstance : Hideo::Shell::Instance {
         return Ui::image(_frontbuffer, 8) |
                Ui::intent([this](Ui::Node& n, App::Event& e) {
                    if (auto it = e.is<App::MouseEvent>(); it and n.bound().contains(it->pos)) {
-                       auto transformedEvent = *it;
-                       transformedEvent.pos = transformedEvent.pos - n.bound().xy;
-                       (void)_endpoint.send<IShell::WindowEvent>(_client, _windowId, transformedEvent);
-                       e.accept();
+                       if (dragged) {
+                           if (it->type == App::MouseEvent::RELEASE) {
+                               Hideo::Shell::Model::bubble<Hideo::Shell::InstanceDragEnd>(n);
+                               Ui::bubble<Ui::DragEvent>(n, Ui::DragEvent::END);
+                           } else if (it->type == App::MouseEvent::MOVE) {
+                               Ui::bubble<Ui::DragEvent>(n, Ui::DragEvent::DRAG, it->delta);
+                               e.accept();
+                               return;
+                           }
+                       }
+
+                       if (focused) {
+                           auto transformedEvent = *it;
+                           transformedEvent.pos = transformedEvent.pos - n.bound().xy;
+                           (void)_endpoint.send<IShell::WindowEvent>(_client, _windowId, transformedEvent);
+                           e.accept();
+                       }
                    }
                }) |
                Ui::box({
@@ -223,6 +236,10 @@ Async::Task<> servAsync(Sys::Context& ctx) {
             Gfx::blitUnsafe(instance->_frontbuffer->mutPixels(), instance->_backbuffer.unwrap()->pixels());
             Ui::shouldRepaint(*root);
             (void)endpoint.resp<IShell::WindowFlip>(msg, Ok());
+        } else if (msg.is<IShell::WindowMove>()) {
+            auto call = msg.unpack<IShell::WindowMove>().unwrap();
+            auto instance = windows.get(call.window);
+            instance->dragged = true;
         } else {
             logWarn("unsupported event: {}", msg.header());
         }

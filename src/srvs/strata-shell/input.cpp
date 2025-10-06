@@ -134,6 +134,13 @@ struct InputTranslator : Ui::ProxyNode<InputTranslator> {
                 Ui::event<App::MouseEvent>(child(), mouseMove);
             }
 
+            if (not Math::epsilonEq(m->scroll, {0, 0})) {
+                App::MouseEvent mouseMove = *m;
+                mouseMove.type = App::MouseEvent::SCROLL;
+                mouseMove.pos = _mousePos;
+                Ui::event<App::MouseEvent>(child(), mouseMove);
+            }
+
             if (_mousePrev.released(App::MouseButton::LEFT) and
                 m->pressed(App::MouseButton::LEFT)) {
                 App::MouseEvent mousePress = *m;

@@ -2,10 +2,10 @@ module;
 
 #include <efi/base.h>
 #include <hal/mem.h>
-#include <karm-logger/logger.h>
 
 module Karm.Sys;
 
+import Karm.Logger;
 import Karm.Core;
 import Karm.Ref;
 

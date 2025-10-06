@@ -2,8 +2,8 @@
 
 #include <hjert-api/api.h>
 #include <impl-skift/fd.h>
-#include <karm-logger/logger.h>
 
+import Karm.Logger;
 import Karm.Ref;
 import Karm.Sys;
 

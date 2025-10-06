@@ -1,8 +1,8 @@
-#include <karm-logger/logger.h>
-
 #include "arch.h"
 #include "context.h"
 #include "mem.h"
+
+import Karm.Logger;
 
 namespace Hjert::Core {
 

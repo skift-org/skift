@@ -1,9 +1,10 @@
 #pragma once
 
+import Karm.Logger;
+
 #include <hal/mem.h>
 #include <hal/pmm.h>
 #include <hal/vmm.h>
-#include <karm-logger/logger.h>
 
 #include "asm.h"
 #include "paging.h"

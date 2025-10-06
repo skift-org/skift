@@ -1,10 +1,10 @@
-#include <karm-math/path.h>
-
 #include "input.h"
 
 import Karm.Ui;
 import Karm.Gfx;
 import Karm.App;
+import Karm.Math;
+import Karm.Core;
 
 namespace Strata::Shell {
 

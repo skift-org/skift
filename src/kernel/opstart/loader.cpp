@@ -1,10 +1,10 @@
 import Karm.Core;
 import Karm.Sys;
+import Karm.Logger;
 
 #include <elf/image.h>
 #include <hal/mem.h>
 #include <handover/builder.h>
-#include <karm-logger/logger.h>
 
 #include "fw.h"
 #include "loader.h"

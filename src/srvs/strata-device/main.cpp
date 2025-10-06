@@ -1,10 +1,10 @@
 #include <hjert-api/api.h>
-#include <karm-logger/logger.h>
 #include <karm-sys/entry.h>
 
 import Karm.Core;
 import Karm.App;
 import Strata.Device;
+import Karm.Logger;
 
 
 namespace Strata::Device {

@@ -1,11 +1,9 @@
 import Karm.Gfx;
+import Karm.Math;
+import Karm.Logger;
 
-#include <karm-logger/logger.h>
-#include <karm-math/align.h>
-#include <karm-math/au.h>
 #include <karm-sys/entry.h>
 
-#include "karm-math/align.h"
 #include "loader.h"
 
 void drawSplash(Gfx::Canvas& g, Opstart::Entry const& e, Math::Recti size) {

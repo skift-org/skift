@@ -1,10 +1,10 @@
 module;
 
 #include <hal/io.h>
-#include <karm-logger/logger.h>
 
 export module Strata.Device:cmos;
 
+import Karm.Logger;
 import Karm.Core;
 import :node;
 

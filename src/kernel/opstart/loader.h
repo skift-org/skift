@@ -1,5 +1,7 @@
 #pragma once
 
+#include <karm-core/macros.h>
+
 import Mdi;
 import Karm.Ui;
 import Karm.Core;
@@ -7,8 +9,7 @@ import Karm.Image;
 import Karm.Sys;
 import Karm.Ref;
 import Karm.Gfx;
-
-#include <karm-logger/logger.h>
+import Karm.Logger;
 
 using namespace Karm;
 

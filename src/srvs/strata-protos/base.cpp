@@ -1,13 +1,13 @@
 module;
 
 #include <hjert-api/api.h>
-#include <karm-logger/logger.h>
-#include <karm-math/rect.h>
 
 export module Strata.Protos:base;
 
 import Karm.Core;
 import Karm.Gfx;
+import Karm.Math;
+import Karm.Logger;
 
 using namespace Karm;
 

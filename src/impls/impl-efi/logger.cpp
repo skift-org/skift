@@ -1,4 +1,4 @@
-#include <karm-logger/_embed.h>
+module Karm.Logger;
 
 import Karm.Sys;
 

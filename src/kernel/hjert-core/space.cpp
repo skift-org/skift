@@ -1,6 +1,5 @@
 import Karm.Core;
-
-#include <karm-logger/logger.h>
+import Karm.Logger;
 
 #include "arch.h"
 #include "space.h"

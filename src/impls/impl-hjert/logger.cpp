@@ -1,7 +1,10 @@
-import Karm.Core;
+module;
 
 #include <hjert-core/arch.h>
-#include <karm-logger/_embed.h>
+
+module Karm.Logger;
+
+import Karm.Core;
 
 namespace Karm::Logger::_Embed {
 

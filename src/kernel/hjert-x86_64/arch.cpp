@@ -1,4 +1,5 @@
 import Karm.Core;
+import Karm.Tty;
 
 #include <hal-x86_64/com.h>
 #include <hal-x86_64/gdt.h>

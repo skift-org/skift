@@ -1,4 +1,4 @@
-#include <karm-logger/logger.h>
+import Karm.Logger;
 
 #include "arch.h"
 #include "sched.h"

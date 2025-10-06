@@ -1,8 +1,7 @@
 #pragma once
 
 import Karm.Core;
-
-#include <karm-logger/logger.h>
+import Karm.Logger;
 
 #include "spec.h"
 

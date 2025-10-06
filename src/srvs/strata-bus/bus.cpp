@@ -1,12 +1,11 @@
 import Karm.Core;
+import Karm.Logger;
+import Strata.Protos;
 
 #include <elf/image.h>
 #include <handover/hook.h>
-#include <karm-logger/logger.h>
 
 #include "bus.h"
-
-import Strata.Protos;
 
 namespace Strata::Bus {
 

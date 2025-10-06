@@ -1,7 +1,8 @@
+import Karm.Logger;
+
 #include <abi-sysv/abi.h>
 #include <handover/hook.h>
 #include <hjert-api/api.h>
-#include <karm-logger/logger.h>
 #include <karm-sys/entry.h>
 
 #include "bus.h"

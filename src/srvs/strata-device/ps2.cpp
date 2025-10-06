@@ -1,12 +1,14 @@
 module;
 
 #include <hal/io.h>
-#include <karm-logger/logger.h>
-#include <karm-math/vec.h>
+
 
 export module Strata.Device:ps2;
 
 import Karm.Core;
+import Karm.Math;
+import Karm.Logger;
+
 import :node;
 
 namespace Strata::Device::Ps2 {

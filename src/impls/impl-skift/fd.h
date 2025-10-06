@@ -1,9 +1,9 @@
 #pragma once
 
 #include <hjert-api/api.h>
-#include <karm-logger/logger.h>
 
 import Karm.Sys;
+import Karm.Logger;
 
 using namespace Karm;
 

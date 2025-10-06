@@ -1,8 +1,8 @@
 import Karm.Core;
+import Karm.Logger;
 
 #include <elf/image.h>
 #include <handover/entry.h>
-#include <karm-logger/logger.h>
 
 #include "arch.h"
 #include "cpu.h"

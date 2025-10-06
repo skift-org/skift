@@ -1,7 +1,3 @@
-import Karm.Core;
-
-#include <karm-logger/logger.h>
-
 #include "arch.h"
 #include "channel.h"
 #include "domain.h"
@@ -13,6 +9,8 @@ import Karm.Core;
 #include "task.h"
 #include "user.h"
 
+import Karm.Core;
+import Karm.Logger;
 import Karm.Tty;
 
 namespace Hjert::Core {

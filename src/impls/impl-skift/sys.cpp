@@ -2,13 +2,13 @@ module;
 
 #include <handover/hook.h>
 #include <hjert-api/api.h>
-#include <karm-logger/logger.h>
 
 #include "fd.h"
 
 module Karm.Sys;
 
 import Karm.Ref;
+import Karm.Logger;
 
 namespace Karm::Sys::_Embed {
 

@@ -2,9 +2,10 @@
 #include <abi-sysv/abi.h>
 #include <handover/hook.h>
 #include <hjert-api/api.h>
-#include <karm-logger/logger.h>
 #include <karm-sys/entry.h>
 #include "fd.h"
+
+import Karm.Logger;
 
 void __panicHandler(Karm::PanicKind kind, char const* msg) {
     Hj::log(msg).unwrap();

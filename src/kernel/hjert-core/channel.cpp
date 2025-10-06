@@ -1,7 +1,7 @@
-#include <karm-logger/logger.h>
-
 #include "channel.h"
 #include "domain.h"
+
+import Karm.Logger;
 
 namespace Hjert::Core {
 

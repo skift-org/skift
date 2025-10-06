@@ -1,10 +1,6 @@
-module;
-
-#include <karm-math/rect.h>
-#include <karm-math/vec.h>
-
 export module Strata.Protos:ishell;
 
+import Karm.Math;
 import Karm.Sys;
 import Karm.App;
 import :base;

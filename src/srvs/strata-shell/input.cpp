@@ -159,6 +159,25 @@ struct InputTranslator : Ui::ProxyNode<InputTranslator> {
                 Ui::event<App::MouseEvent>(child(), mouseRelease);
             }
 
+            if (_mousePrev.released(App::MouseButton::RIGHT) and
+                m->pressed(App::MouseButton::RIGHT)) {
+                App::MouseEvent mousePress = *m;
+                mousePress.type = App::MouseEvent::PRESS;
+                mousePress.pos = _mousePos;
+                mousePress.button = App::MouseButton::RIGHT;
+                Ui::event<App::MouseEvent>(child(), mousePress);
+            }
+
+            if (_mousePrev.pressed(App::MouseButton::RIGHT) and
+                m->released(App::MouseButton::RIGHT)) {
+                App::MouseEvent mouseRelease = *m;
+                mouseRelease.type = App::MouseEvent::RELEASE;
+                mouseRelease.pos = _mousePos;
+                mouseRelease.button = App::MouseButton::RIGHT;
+                Ui::event<App::MouseEvent>(child(), mouseRelease);
+            }
+
+
             _mousePrev = *m;
         } else if (auto k = e.is<Node::AnimateEvent>()) {
             if (_mouseDirty) {

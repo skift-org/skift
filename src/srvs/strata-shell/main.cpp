@@ -123,7 +123,7 @@ struct ServiceInstance : Hideo::Shell::Instance {
     Ui::Child build() const override {
         return Ui::image(_frontbuffer, 8) |
                Ui::intent([this](Ui::Node& n, App::Event& e) {
-                   if (auto it = e.is<App::MouseEvent>(); it and n.bound().contains(it->pos)) {
+                   if (auto it = e.is<App::MouseEvent>(); it) {
                        if (dragged) {
                            if (it->type == App::MouseEvent::RELEASE) {
                                Hideo::Shell::Model::bubble<Hideo::Shell::InstanceDragEnd>(n);
@@ -135,19 +135,18 @@ struct ServiceInstance : Hideo::Shell::Instance {
                            }
                        }
 
-                       if (focused) {
+                       if (n.bound().contains(it->pos) and focused) {
                            auto transformedEvent = *it;
                            transformedEvent.pos = transformedEvent.pos - n.bound().xy;
                            (void)_endpoint.send<IShell::WindowEvent>(_client, _windowId, transformedEvent);
                            e.accept();
                        }
                    }
-               }) |
-               Ui::box({
-                   .borderRadii = 8,
-                   .borderWidth = 1,
-                   .borderFill = Ui::GRAY800,
                });
+    }
+
+    Rc<Gfx::Surface> thumbnail() const override {
+        return _frontbuffer;
     }
 };
 

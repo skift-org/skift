@@ -104,21 +104,27 @@ struct HjertSched : Sys::Sched {
     }
 
     virtual Res<> wait(Instant until) {
-        while (true) {
+        for (;;) {
             auto now = _Embed::instant();
             _wake(now);
-            auto soonest = min(until, _soonest());
+
             if (now >= until)
                 return Ok();
 
-            try$(_listener.poll(soonest));
+            auto nextDeadline = min(until, _soonest());
+            if (nextDeadline <= _Embed::instant())
+                continue;
+
+            try$(_listener.poll(nextDeadline));
+
             while (auto ev = _listener.next()) {
                 auto prop = _promises.take(ev->cap);
                 try$(_listener.mute(ev->cap));
                 prop.resolve(Ok());
+                if (_Embed::instant() >= until)
+                    return Ok();
             }
         }
-        return Ok();
     }
 };
 

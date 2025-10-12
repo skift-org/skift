@@ -17,7 +17,7 @@
 
 > **⚠ Warning**<br> skiftOS is currently in the early stages of development and is not yet ready for daily use. Please do not use it in production environments. Here be dragons! 🐉
 
-**SkiftOS** is a hobbyist operating system built from the ground up with a focus on modularity, simplicity, and modern design principles.  Driven by a dissatisfaction with the fragmented user experiences prevalent in contemporary operating systems, SkiftOS strives for deep integration and a cohesive aesthetic. This project is a labor of love—an artistic pursuit rather than a commercial product.
+**SkiftOS** is an open-source operating system built from the ground up with a focus on modularity, simplicity, and modern design principles.  Driven by a dissatisfaction with the fragmented user experiences prevalent in contemporary operating systems, SkiftOS strives for deep integration and a cohesive aesthetic. This project is a labor of love—an artistic pursuit rather than a commercial product.
 
 
 ## Key Features
@@ -34,10 +34,6 @@
 - **Modularity**: Components are designed to be as self-contained as possible, encouraging customization and experimentation.
 - **Simplicity**: Skift favors clear solutions over complexity, aiming for a system that is understandable and maintainable.
 - **Modernity**: Skift leverages cutting-edge C++ practices and technologies for safety, readability, and efficiency.
-
-## Target Audience
-
-SkiftOS is intended for developers and those interested in the exploration of niche, hobby operating systems.
 
 ## Building
 

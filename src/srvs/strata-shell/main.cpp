@@ -163,27 +163,31 @@ struct ServiceLauncher : Hideo::Shell::Launcher {
 
 Async::Task<> servAsync(Sys::Context& ctx) {
     Hideo::Shell::State state = {
-        .isMobile = false,
         .dateTime = Sys::dateTime(),
         .background = co_try$(Image::loadOrFallback("bundle://hideo-shell/wallpapers/abstract.qoi"_url)),
         .noti = {},
         .launchers = {
             makeRc<ServiceLauncher>(Mdi::INFORMATION_OUTLINE, "About"s, Gfx::BLUE_RAMP, "hideo-about.main"s),
             makeRc<ServiceLauncher>(Mdi::CALCULATOR, "Calculator"s, Gfx::ORANGE_RAMP, "hideo-calculator.main"s),
+            makeRc<ServiceLauncher>(Mdi::MESSAGE, "Chat"s, Gfx::GREEN_RAMP, "hideo-chat.main"s),
+            makeRc<ServiceLauncher>(Mdi::CONSOLE_LINE, "Console"s, Gfx::SLATE_RAMP, "hideo-console.main"s),
             makeRc<ServiceLauncher>(Mdi::CLOCK, "Clock"s, Gfx::INDIGO_RAMP, "hideo-clock.main"s),
-            makeRc<ServiceLauncher>(Mdi::COUNTER, "Counter"s, Gfx::PURPLE_RAMP, "hideo-counter.main"s),
+            makeRc<ServiceLauncher>(Mdi::COUNTER, "Counter"s, Gfx::GREEN_RAMP, "hideo-counter.main"s),
             makeRc<ServiceLauncher>(Mdi::FOLDER, "Files"s, Gfx::AMBER_RAMP, "hideo-files.main"s),
-            makeRc<ServiceLauncher>(Mdi::COG, "Settings"s, Gfx::SLATE_RAMP, "hideo-settings.main"s),
-            makeRc<ServiceLauncher>(Mdi::VIEW_DASHBOARD, "Sysmon"s, Gfx::GREEN_RAMP, "hideo-sysmon.main"s),
-            makeRc<ServiceLauncher>(Mdi::DUCK, "Zoo"s, Gfx::SLATE_RAMP, "hideo-zoo.main"s),
+            makeRc<ServiceLauncher>(Mdi::COG, "Settings"s, Gfx::BLUE_RAMP, "hideo-settings.main"s),
+            makeRc<ServiceLauncher>(Mdi::VIEW_DASHBOARD, "Sysmon"s, Gfx::RED_RAMP, "hideo-sysmon.main"s),
+            makeRc<ServiceLauncher>(Mdi::PEN, "Text"s, Gfx::BLUE_RAMP, "hideo-text.main"s),
+            makeRc<ServiceLauncher>(Mdi::DUCK, "Zoo"s, Gfx::TEAL_RAMP, "hideo-zoo.main"s),
         },
         .instances = {}
     };
 
     auto endpoint = Sys::Endpoint::adopt(ctx);
     auto framebuffer = co_try$(Framebuffer::open(ctx));
+    auto app = Hideo::Shell::app(std::move(state));
+
     auto root = makeRc<Root>(
-        inputTranslator(Hideo::Shell::app(std::move(state)), framebuffer->bound().center()),
+        inputTranslator(app, framebuffer->bound().center()),
         framebuffer
     );
 
@@ -202,44 +206,65 @@ Async::Task<> servAsync(Sys::Context& ctx) {
             auto rawEvent = msg.unpack<App::MouseEvent>().unwrap();
             auto event = App::makeEvent<App::MouseEvent>(rawEvent);
             root->child().event(*event);
-        } else if (msg.is<App::KeyboardEvent>()) {
-            auto event = msg.unpack<App::MouseEvent>();
-        } else if (msg.is<IShell::WindowCreate>()) {
+        }
+
+        else if (msg.is<App::KeyboardEvent>()) {
+            auto event = msg.unpack<App::KeyboardEvent>();
+        }
+
+        else if (msg.is<IShell::WindowCreate>()) {
             auto call = msg.unpack<IShell::WindowCreate>().unwrap();
             logDebug("window create {}", call.want.size);
-            auto id = windowIdAllocator++;
 
+            auto id = windowIdAllocator++;
             auto frontbuffer = Gfx::Surface::alloc(call.want.size);
             frontbuffer->mutPixels().clear(Ui::GRAY950);
             auto instance = makeRc<ServiceInstance>(endpoint, msg.header().from, frontbuffer);
             instance->bound = Math::Recti{call.want.size}.center(framebuffer->bound());
-
             windows.put(id, instance);
             Hideo::Shell::Model::event(*root, Hideo::Shell::AddInstance{instance});
+
+            call.want.formFactor = App::formFactor;
             (void)endpoint.resp<IShell::WindowCreate>(msg, Ok<IShell::WindowCreate::Response>(id, call.want));
-        } else if (msg.is<IShell::WindowDestroy>()) {
+        }
+
+        else if (msg.is<IShell::WindowDestroy>()) {
             auto call = msg.unpack<IShell::WindowDestroy>().unwrap();
+
             auto instance = windows.get(call.window);
             Hideo::Shell::Model::event(*root, Hideo::Shell::RemoveInstance{instance});
             windows.del(call.window);
+
             (void)endpoint.resp<IShell::WindowDestroy>(msg, Ok());
-        } else if (msg.is<IShell::WindowAttach>()) {
+        }
+
+        else if (msg.is<IShell::WindowAttach>()) {
             auto call = msg.unpack<IShell::WindowAttach>().unwrap();
+
             auto instance = windows.get(call.window);
             instance->_backbuffer = call.buffer;
             Gfx::blitUnsafe(instance->_frontbuffer->mutPixels(), instance->_backbuffer.unwrap()->pixels());
             Ui::shouldRepaint(*root);
-        } else if (msg.is<IShell::WindowFlip>()) {
+        }
+
+        else if (msg.is<IShell::WindowFlip>()) {
             auto call = msg.unpack<IShell::WindowFlip>().unwrap();
+
             auto instance = windows.get(call.window);
             Gfx::blitUnsafe(instance->_frontbuffer->mutPixels(), instance->_backbuffer.unwrap()->pixels());
             Ui::shouldRepaint(*root);
+
             (void)endpoint.resp<IShell::WindowFlip>(msg, Ok());
-        } else if (msg.is<IShell::WindowMove>()) {
+        }
+
+        else if (msg.is<IShell::WindowMove>()) {
             auto call = msg.unpack<IShell::WindowMove>().unwrap();
+
             auto instance = windows.get(call.window);
             instance->dragged = true;
-        } else {
+        }
+
+        else {
             logWarn("unsupported event: {}", msg.header());
         }
     }

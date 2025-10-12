@@ -80,6 +80,12 @@ Async::Task<> launchAsync(Intent) {
     notImplemented();
 }
 
+// MARK: Process ---------------------------------------------------------------
+
+Res<Rc<Pid>> run(Command const&) {
+    notImplemented();
+}
+
 // MARK: Sockets ---------------------------------------------------------------
 
 Res<Rc<Fd>> connectTcp(SocketAddr) {

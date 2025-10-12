@@ -124,9 +124,13 @@ Async::Task<> runAsync(Sys::Context& ctx, Child root) {
     auto shell = co_trya$(endpoint.callAsync<Strata::IBus::Locate>(Sys::Port::BUS, "strata-shell"s));
     auto size = root->size({1024, 720}, Hint::MIN);
 
-    auto [window, actual] = co_trya$(endpoint.callAsync<Strata::IShell::WindowCreate>(shell, size));
+    auto [window, actual] = co_trya$(endpoint.callAsync<Strata::IShell::WindowCreate>(
+        shell, size, App::formFactor
+    ));
 
     auto surface = co_try$(Strata::Protos::Surface::create(actual.size));
+    App::formFactor = actual.formFactor;
+
     co_try$(endpoint.send<Strata::IShell::WindowAttach>(shell, window, surface));
 
     auto host = makeRc<Host>(std::move(root), endpoint, shell, window, surface);

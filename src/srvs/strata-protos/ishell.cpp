@@ -11,6 +11,7 @@ namespace Strata::IShell {
 
 struct WindowProps {
     Math::Vec2i size;
+    App::FormFactor formFactor;
 };
 
 export using WindowId = usize;

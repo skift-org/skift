@@ -35,6 +35,10 @@
 - **Simplicity**: Skift favors clear solutions over complexity, aiming for a system that is understandable and maintainable.
 - **Modernity**: Skift leverages cutting-edge C++ practices and technologies for safety, readability, and efficiency.
 
+## Target Audience
+
+SkiftOS is intended for developers and those interested in the exploration of niche, open source operating systems.
+
 ## Building
 
 Building skiftOS from source is easy.

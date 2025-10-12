@@ -14,13 +14,17 @@
                 "bundle://hideo-clock.main/_bin",
                 "bundle://hideo-about.main/_bin",
                 "bundle://hideo-files.main/_bin",
+                "bundle://hideo-console.main/_bin",
                 "bundle://hideo-settings.main/_bin",
                 "bundle://hideo-sysmon.main/_bin",
                 "bundle://hideo-zoo.main/_bin",
+                "bundle://hideo-text.main/_bin",
+                "bundle://hideo-chat.main/_bin",
                 "bundle://hideo-shell/wallpapers/abstract.qoi",
                 "bundle://fonts-inter/fonts/Inter-Regular.ttf",
                 "bundle://fonts-inter/fonts/Inter-Medium.ttf",
-                "bundle://fonts-inter/fonts/Inter-Bold.ttf"
+                "bundle://fonts-inter/fonts/Inter-Bold.ttf",
+                "bundle://fonts-fira-code/fonts/FiraCode-Regular.ttf"
             ]
         }
     ]

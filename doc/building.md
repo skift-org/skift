@@ -52,7 +52,7 @@ This guide provides instructions for building skiftOS from source.
     Look at the build status badge for any potential issues:
 
     [![Checks (Ubuntu)](https://github.com/skift-org/skift/actions/workflows/checks-linux.yml/badge.svg)](https://github.com/skift-org/skift/actions/workflows/checks-linux.yml)
-   
+
     [![Checks (Darwin)](https://github.com/skift-org/skift/actions/workflows/check-darwin.yml/badge.svg)](https://github.com/skift-org/skift/actions/workflows/check-darwin.yml)
 
 3. **Set Up Build Environment:**
@@ -78,18 +78,18 @@ This guide provides instructions for building skiftOS from source.
 
     - In Virtual Machine:
         ```sh
-        ./skift.sh image boot
+        ./skift.sh boot
         ```
         > **🛈 Note**<br> Requires a graphical environment and QEMU with graphics support (SDL or GTK).
-        > For headless servers, build a disk image instead: `./skift.sh image build --format=hdd`
+        > For headless servers, build a disk image instead: `./skift.sh dist --format=hdd`
 
 
     - In simulator:
         ```sh
-        ./skift.sh run --mixins=release hideo-shell
+        ./skift.sh run --release hideo-shell
         ```
 
-        > **🛈 Note**<br> The `--mixins=release` flag is optional and can be omitted for a debug build.
+        > **🛈 Note**<br> The `--release` flag is optional and can be omitted for a debug build.
 
 
     **Enjoy!** You now have a working installation of skiftOS.

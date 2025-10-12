@@ -23,7 +23,10 @@ def generateSystem(img: image.Image) -> None:
         "hideo-clock.main",
         "hideo-counter.main",
         "hideo-files.main",
+        "hideo-console.main",
         "hideo-settings.main",
+        "hideo-text.main",
+        "hideo-chat.main",
         "hideo-sysmon.main",
         "hideo-zoo.main",
     ]
@@ -44,7 +47,7 @@ class BuildArgs(model.RegistryArgs):
     dist: bool = cli.arg(None, "dist", "Copy the image to the dist folder")
 
 
-@cli.command("image/build", "Generate the boot image")
+@cli.command("dist", "Generate the boot image")
 def _(args: BuildArgs) -> None:
     args.mixins.append("release" if not args.debug else "debug")
 
@@ -86,7 +89,7 @@ class StartArgs:
     clean: bool = cli.arg(None, "clean", "Clean the image before starting")
 
 
-@cli.command("image/boot", "Boot the system")
+@cli.command("boot", "Boot the system")
 def _(args: StartArgs) -> None:
     if args.arch not in ["x86_64", "riscv32"]:
         raise RuntimeError("Unknown arch")

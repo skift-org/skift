@@ -9,7 +9,7 @@ using namespace Karm;
 
 namespace Strata::IShell {
 
-struct WindowProps {
+export struct WindowProps {
     Math::Vec2i size;
     App::FormFactor formFactor;
 };

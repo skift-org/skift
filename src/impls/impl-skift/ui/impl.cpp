@@ -106,6 +106,7 @@ struct Host : ProxyNode<Host> {
         } else if (auto e = event.is<Ui::DragEvent>()) {
             if (e->type == Ui::DragEvent::START)
                 (void)_endpoint.send<Strata::IShell::WindowMove>(_shell, _window);
+            event.accept();
         } else if (auto e = event.is<App::RequestExitEvent>()) {
             (void)_endpoint.send<Strata::IShell::WindowDestroy>(_shell, _window);
             logInfo("application closed");

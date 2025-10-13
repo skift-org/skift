@@ -109,7 +109,7 @@ struct Root : Ui::ProxyNode<Root> {
     }
 };
 
-struct ServiceInstance : Hideo::Shell::Instance {
+struct ServiceInstance : Hideo::Shell::Window {
     Sys::Endpoint& _endpoint;
     Sys::Port _client;
     IShell::WindowId _windowId;
@@ -120,33 +120,19 @@ struct ServiceInstance : Hideo::Shell::Instance {
         : _endpoint(endpoint), _client(client), _frontbuffer(frontbuffer) {
     }
 
-    Ui::Child build() const override {
-        return Ui::image(_frontbuffer, 8) |
-               Ui::intent([this](Ui::Node& n, App::Event& e) {
-                   if (auto it = e.is<App::MouseEvent>(); it) {
-                       if (dragged) {
-                           if (it->type == App::MouseEvent::RELEASE) {
-                               Hideo::Shell::Model::bubble<Hideo::Shell::InstanceDragEnd>(n);
-                               Ui::bubble<Ui::DragEvent>(n, Ui::DragEvent::END);
-                           } else if (it->type == App::MouseEvent::MOVE) {
-                               Ui::bubble<Ui::DragEvent>(n, Ui::DragEvent::DRAG, it->delta);
-                               e.accept();
-                               return;
-                           }
-                       }
-
-                       if (n.bound().contains(it->pos) and focused) {
-                           auto transformedEvent = *it;
-                           transformedEvent.pos = transformedEvent.pos - n.bound().xy;
-                           (void)_endpoint.send<IShell::WindowEvent>(_client, _windowId, transformedEvent);
-                           e.accept();
-                       }
-                   }
-               });
+    Rc<Gfx::Surface> surface() const override {
+        return _frontbuffer;
     }
 
-    Rc<Gfx::Surface> thumbnail() const override {
-        return _frontbuffer;
+    void event(App::Event& e) override {
+        if (auto it = e.is<App::MouseEvent>())
+            (void)_endpoint.send<IShell::WindowEvent>(_client, _windowId, *it);
+    }
+
+
+    void attach(Rc<Protos::Surface> backbuffer) {
+        _backbuffer = backbuffer;
+        Gfx::blitUnsafe(_frontbuffer->mutPixels(), _backbuffer.unwrap()->pixels());
     }
 };
 
@@ -242,8 +228,7 @@ Async::Task<> servAsync(Sys::Context& ctx) {
             auto call = msg.unpack<IShell::WindowAttach>().unwrap();
 
             auto instance = windows.get(call.window);
-            instance->_backbuffer = call.buffer;
-            Gfx::blitUnsafe(instance->_frontbuffer->mutPixels(), instance->_backbuffer.unwrap()->pixels());
+            instance->attach(call.buffer.unwrap());
             Ui::shouldRepaint(*root);
         }
 

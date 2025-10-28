@@ -15,7 +15,7 @@ void enterKernel(usize entry, usize payload, usize stack, usize vmm);
 
 Res<> loadEntry(Entry const& entry) {
     logInfo("opstart: preparing payload...");
-    auto payloadMem = try$(Sys::mmap().read().size(kib(16)).mapMut());
+    auto payloadMem = try$(Sys::mutMmap(NONE, {.size = kib(16)}));
     logInfo("opstart: payload at vaddr: {p} paddr: {p}", payloadMem.vaddr(), payloadMem.paddr());
     Handover::Builder payload{payloadMem.mutBytes()};
 
@@ -24,7 +24,7 @@ Res<> loadEntry(Entry const& entry) {
 
     logInfo("opstart: loading kernel file...");
     auto kernelFile = try$(Sys::File::open(entry.kernel.url));
-    auto kernelMem = try$(Sys::mmap().map(kernelFile));
+    auto kernelMem = try$(Sys::mmap(kernelFile));
     Elf::Image image{kernelMem.bytes()};
     payload.add(Handover::FILE, 0, kernelMem.prange());
     logInfo("opstart: kernel at vaddr: {p} paddr: {p}", kernelMem.vaddr(), kernelMem.paddr());
@@ -35,7 +35,7 @@ Res<> loadEntry(Entry const& entry) {
     }
 
     logInfo("opstart: setting up stack...");
-    auto stackMap = try$(Sys::mmap().stack().size(Hal::PAGE_SIZE * 16).mapMut());
+    auto stackMap = try$(Sys::mutMmap(NONE, {.options = Sys::MmapOption::STACK, .size = Hal::PAGE_SIZE * 16}));
     payload.add(Handover::STACK, 0, stackMap.prange());
     logInfo("opstart: stack at vaddr: {p} paddr: {p}", stackMap.vaddr(), stackMap.paddr());
 
@@ -61,7 +61,7 @@ Res<> loadEntry(Entry const& entry) {
         logInfo("opstart: loading blob: {}", blob.url);
 
         auto blobFile = try$(Sys::File::open(blob.url));
-        auto blobMem = try$(Sys::mmap().map(blobFile));
+        auto blobMem = try$(Sys::mmap(blobFile));
         auto blobRange = blobMem.prange();
         auto propStr = try$(Json::unparse(blob.props));
 

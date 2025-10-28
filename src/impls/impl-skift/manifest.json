@@ -18,6 +18,7 @@
         "karm-app-impl",
         "karm-sys-impl",
         "karm-sys-async-impl",
-        "karm-sys-sandbox-impl"
+        "karm-sys-sandbox-impl",
+        "karm-crypto-impl"
     ]
 }

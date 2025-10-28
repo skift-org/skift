@@ -149,6 +149,10 @@ Res<> memFlush(void*, usize) {
     return Error::notImplemented();
 }
 
+usize pageSize() {
+    return Hal::PAGE_SIZE;
+}
+
 // MARK: System Informations ---------------------------------------------------
 
 Res<> populate(SysInfo&) {

@@ -22,7 +22,7 @@ static SystemTime fromEfi(Efi::Time time) {
     return dt.toInstant();
 }
 
-struct ConOut : public Fd {
+struct ConOut : Fd {
     Efi::SimpleTextOutputProtocol* _proto;
 
     ConOut(Efi::SimpleTextOutputProtocol* proto) : _proto(proto) {}
@@ -85,7 +85,7 @@ struct ConOut : public Fd {
     }
 };
 
-struct FileProto : public Fd {
+struct FileProto : Fd {
     Efi::FileProtocol* _proto = nullptr;
 
     FileProto(Efi::FileProtocol* proto) : _proto(proto) {}
@@ -355,6 +355,10 @@ Res<> memFlush(void*, usize) {
 
 Res<Stat> stat(Ref::Url const&) {
     return Error::notImplemented();
+}
+
+usize pageSize() {
+    return Hal::PAGE_SIZE;
 }
 
 // MARK: Time ------------------------------------------------------------------

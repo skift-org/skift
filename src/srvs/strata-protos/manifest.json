@@ -5,6 +5,7 @@
     "requires": [
         "karm-core",
         "karm-app",
-        "karm-gfx"
+        "karm-gfx",
+        "hjert-api"
     ]
 }

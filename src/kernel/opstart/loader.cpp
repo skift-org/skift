@@ -1,8 +1,8 @@
 import Karm.Core;
 import Karm.Sys;
 import Karm.Logger;
+import Vaerk.Elf;
 
-#include <elf/image.h>
 #include <hal/mem.h>
 #include <handover/builder.h>
 
@@ -25,7 +25,7 @@ Res<> loadEntry(Entry const& entry) {
     logInfo("opstart: loading kernel file...");
     auto kernelFile = try$(Sys::File::open(entry.kernel.url));
     auto kernelMem = try$(Sys::mmap(kernelFile));
-    Elf::Image image{kernelMem.bytes()};
+    Vaerk::Elf::Image image{kernelMem.bytes()};
     payload.add(Handover::FILE, 0, kernelMem.prange());
     logInfo("opstart: kernel at vaddr: {p} paddr: {p}", kernelMem.vaddr(), kernelMem.paddr());
 
@@ -41,7 +41,7 @@ Res<> loadEntry(Entry const& entry) {
 
     logInfo("opstart: loading kernel image...");
     for (auto prog : image.programs()) {
-        if (prog.type() != Elf::Program::LOAD) {
+        if (prog.type() != Vaerk::Elf::Program::LOAD) {
             continue;
         }
 

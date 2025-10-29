@@ -1,7 +1,7 @@
 import Karm.Core;
 import Karm.Logger;
+import Vaerk.Elf;
 
-#include <elf/image.h>
 #include <handover/entry.h>
 
 #include "arch.h"
@@ -28,7 +28,7 @@ Res<> enterUserspace(Handover::Payload& payload) {
     auto elfVmo = try$(Vmo::makeDma(record->range<Hal::DmaRange>()));
     elfVmo->label("elf-shared");
     auto elfRange = try$(kmm().pmm2Kmm(elfVmo->range()));
-    Elf::Image image{elfRange.bytes()};
+    Vaerk::Elf::Image image{elfRange.bytes()};
 
     if (not image.valid()) {
         logInfo("entry: invalid elf");
@@ -36,13 +36,13 @@ Res<> enterUserspace(Handover::Payload& payload) {
     }
 
     for (auto prog : image.programs()) {
-        if (prog.type() != Elf::Program::LOAD) {
+        if (prog.type() != Vaerk::Elf::Program::LOAD) {
             continue;
         }
 
         usize size = alignUp(max(prog.memsz(), prog.filez()), Hal::PAGE_SIZE);
 
-        if (prog.flags().has(Elf::ProgramFlags::WRITE)) {
+        if (prog.flags().has(Vaerk::Elf::ProgramFlags::WRITE)) {
             auto sectionVmo = try$(Vmo::alloc(size, Hj::VmoFlags::UPPER));
             sectionVmo->label("elf-writeable");
             auto sectionRange = try$(kmm().pmm2Kmm(sectionVmo->range()));

@@ -1,4 +1,5 @@
-#include <elf/image.h>
+import Vaerk.Elf;
+
 #include <handover/spec.h>
 #include <karm-sys/entry.h>
 

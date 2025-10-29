@@ -10,6 +10,7 @@
     },
     "requires": [
         "strata-protos",
-        "karm-sys"
+        "karm-sys",
+        "vaerk-elf"
     ]
 }

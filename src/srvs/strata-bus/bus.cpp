@@ -1,8 +1,8 @@
 import Karm.Core;
 import Karm.Logger;
 import Strata.Protos;
+import Vaerk.Elf;
 
-#include <elf/image.h>
 #include <handover/hook.h>
 
 #include "bus.h"
@@ -56,18 +56,18 @@ Res<> Service::activate(Sys::Context& ctx) {
     auto elfSpace = try$(Hj::Space::create(Hj::ROOT));
 
     logInfoIf(DEBUG_ELF, "validating elf...");
-    Elf::Image image{elfRange.bytes()};
+    Vaerk::Elf::Image image{elfRange.bytes()};
     if (not image.valid())
         return Error::invalidInput("invalid elf");
 
     logInfoIf(DEBUG_ELF, "mapping the elf...");
     for (auto prog : image.programs()) {
-        if (prog.type() != Elf::Program::LOAD)
+        if (prog.type() != Vaerk::Elf::Program::LOAD)
             continue;
 
         usize size = alignUp(max(prog.memsz(), prog.filez()), Hal::PAGE_SIZE);
         logInfoIf(DEBUG_ELF, "mapping section: {x}-{x}", prog.vaddr(), prog.vaddr() + size);
-        if ((prog.flags() & Elf::ProgramFlags::WRITE) == Elf::ProgramFlags::WRITE) {
+        if ((prog.flags() & Vaerk::Elf::ProgramFlags::WRITE) == Vaerk::Elf::ProgramFlags::WRITE) {
             auto sectionVmo = try$(Hj::Vmo::create(Hj::ROOT, 0, size, Hj::VmoFlags::UPPER));
             try$(sectionVmo.label("elf-writeable"));
             auto sectionRange = try$(Hj::map(sectionVmo, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));

@@ -61,7 +61,7 @@ Res<> Service::activate(Sys::Context& ctx) {
         return Error::invalidInput("invalid elf");
 
     logInfoIf(DEBUG_ELF, "mapping the elf...");
-    for (auto prog : image.programs()) {
+    for (auto const& prog : image.programs()) {
         if (prog.type() != Vaerk::Elf::Program::LOAD)
             continue;
 

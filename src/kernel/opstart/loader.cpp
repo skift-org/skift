@@ -40,7 +40,7 @@ Res<> loadEntry(Entry const& entry) {
     logInfo("opstart: stack at vaddr: {p} paddr: {p}", stackMap.vaddr(), stackMap.paddr());
 
     logInfo("opstart: loading kernel image...");
-    for (auto prog : image.programs()) {
+    for (auto const& prog : image.programs()) {
         if (prog.type() != Vaerk::Elf::Program::LOAD) {
             continue;
         }

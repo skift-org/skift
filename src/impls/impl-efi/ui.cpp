@@ -36,7 +36,7 @@ struct EfiHost :
     }
 
     void flip(Slice<Math::Recti> dirty) override {
-        for (auto d : dirty)
+        for (auto const& d : dirty)
             Gfx::blitUnsafe(_front.clip(d), mutPixels());
     }
 

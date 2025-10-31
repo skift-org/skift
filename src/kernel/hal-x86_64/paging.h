@@ -114,7 +114,7 @@ struct [[gnu::packed]] Pml {
     }
 
     bool empty() const {
-        for (auto page : pages) {
+        for (auto const& page : pages) {
             if (page.present()) {
                 return false;
             }

@@ -27,7 +27,7 @@ Space::~Space() {
 
 Res<usize> Space::_lookup(Hal::VmmRange vrange) {
     for (usize i = 0; i < _maps.len(); i++) {
-        auto& map = _maps[i];
+        auto const& map = _maps[i];
         if (map.vrange == vrange) {
             return Ok(i);
         }
@@ -38,7 +38,7 @@ Res<usize> Space::_lookup(Hal::VmmRange vrange) {
 
 Res<> Space::_ensureNotMapped(Hal::VmmRange vrange) {
     for (usize i = 0; i < _maps.len(); i++) {
-        auto& map = _maps[i];
+        auto const& map = _maps[i];
         if (map.vrange.overlaps(vrange)) {
             return Error::invalidInput("already mapped");
         }
@@ -48,7 +48,7 @@ Res<> Space::_ensureNotMapped(Hal::VmmRange vrange) {
 }
 
 Res<> Space::_validate(Hal::VmmRange vrange) {
-    for (auto& map : _maps) {
+    for (auto const& map : _maps) {
         if (map.vrange.contains(vrange)) {
             return Ok();
         }

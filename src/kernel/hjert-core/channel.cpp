@@ -52,7 +52,7 @@ Res<Hj::SentRecv> Channel::send(Domain& dom, Bytes bytes, Slice<Hj::Cap> caps) {
 
     // Everything is ready, let's send the message
     auto save = _caps.len();
-    for (auto cap : caps) {
+    for (auto const& cap : caps) {
         auto res = dom.get(cap);
         if (not res) {
             // Uh oh, we need to rollback

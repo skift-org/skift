@@ -84,6 +84,9 @@ struct HjertSched : Sys::Sched {
     }
 
     Instant _soonest() {
+        if (_sleeps.len() == 0)
+            return Instant::endOfTime();
+        
         auto soonest = Instant::endOfTime();
         for (auto const& [stamp, _] : _sleeps) {
             if (stamp < soonest)
@@ -93,12 +96,12 @@ struct HjertSched : Sys::Sched {
     }
 
     void _wake(Instant now) {
-        for (usize i = 0; i < _sleeps.len(); i++) {
+        // Iterate backwards to avoid index shifting issues when removing elements
+        for (isize i = _sleeps.len() - 1; i >= 0; i--) {
             auto& [stamp, promise] = _sleeps[i];
             if (stamp <= now) {
                 promise.resolve(Ok());
                 _sleeps.removeAt(i);
-                i--;
             }
         }
     }

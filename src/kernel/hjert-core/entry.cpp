@@ -35,7 +35,7 @@ Res<> enterUserspace(Handover::Payload& payload) {
         return Error::invalidInput("Invalid elf");
     }
 
-    for (auto prog : image.programs()) {
+    for (auto const& prog : image.programs()) {
         if (prog.type() != Vaerk::Elf::Program::LOAD) {
             continue;
         }

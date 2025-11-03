@@ -1,0 +1,60 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.lockfile.v1",
+    "extern": {
+        "cute-engineering/ce-heap": {
+            "commit": "918dd7962dbcd703a883c9fcf658b496f9e3502e",
+            "git": "https://github.com/cute-engineering/ce-heap.git",
+            "tag": "v1.1.0"
+        },
+        "cute-engineering/ce-libc": {
+            "commit": "d5703dc5442bb9460eb7a99368c9c8b71791d629",
+            "git": "https://github.com/cute-engineering/ce-libc.git",
+            "tag": "v1.1.1"
+        },
+        "cute-engineering/ce-libm": {
+            "commit": "f2c6194b1e464c9315fd15e4d9eea06f27995499",
+            "git": "https://github.com/cute-engineering/ce-libm.git",
+            "tag": "v1.0.2"
+        },
+        "cute-engineering/ce-mdi": {
+            "commit": "de730b8fb27b87508ca49324e34d0380885d1203",
+            "git": "https://github.com/cute-engineering/ce-mdi.git",
+            "tag": "v0.6.0"
+        },
+        "cute-engineering/ce-stdcpp": {
+            "commit": "0f591c8ccd2e091b247c09db7166958dff76370a",
+            "git": "https://github.com/cute-engineering/ce-stdcpp.git",
+            "tag": "v1.4.0"
+        },
+        "cute-engineering/ce-targets": {
+            "commit": "eaa19de89b05da7fbbe9320c6f1f24dae1a3b96d",
+            "git": "https://github.com/cute-engineering/ce-targets.git",
+            "tag": "v0.4.0"
+        },
+        "skift-org/ambolt": {
+            "commit": "f2726358d8e6c99a2a25f0a1a33c675b2d166536",
+            "git": "https://github.com/skift-org/ambolt",
+            "tag": "main"
+        },
+        "skift-org/hideo": {
+            "commit": "2eeb98fbeb4210a50acf63321aa6f6f8aea2335a",
+            "git": "https://github.com/skift-org/hideo.git",
+            "tag": "main"
+        },
+        "skift-org/karm": {
+            "commit": "1d80e32ed1b5bbe155cc272f5012ae8393e191f7",
+            "git": "https://github.com/skift-org/karm.git",
+            "tag": "main"
+        },
+        "skift-org/vaerk": {
+            "commit": "c6bb7584fc56d9be845b5b30696c8af23288c470",
+            "git": "https://github.com/skift-org/vaerk",
+            "tag": "main"
+        },
+        "skift-org/vaev": {
+            "commit": "fd655892f4f167afbdb299fbda1351bf6e3bb569",
+            "git": "https://github.com/skift-org/vaev",
+            "tag": "main"
+        }
+    }
+}

@@ -13,7 +13,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto url = Ref::parseUrlOrPath(args[0], co_try$(Sys::pwd()));
     auto kernelFile = co_try$(Sys::File::open(url));
     auto kernelMem = co_try$(Sys::mmap(kernelFile, {.options = Sys::MmapOption::READ}));
-    Elf::Image kernelElf{kernelMem.bytes()};
+    Vaerk::Elf::Image kernelElf{kernelMem.bytes()};
 
     if (not kernelElf.valid())
         co_return Error::invalidData("kernel is not a valid ELF executable");

@@ -421,6 +421,12 @@ Async::Task<> launchAsync(Sys::Intent) {
     co_return Error::notImplemented();
 }
 
+// MARK: Process ---------------------------------------------------------------
+
+Res<Rc<Pid>> run(Command const&) {
+    return Error::notImplemented();
+}
+
 // MARK: Process Managment -----------------------------------------------------
 
 Res<> sleep(Duration) {

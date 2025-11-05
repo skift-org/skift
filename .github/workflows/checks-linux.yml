@@ -20,7 +20,7 @@ jobs:
         run: ./skift.sh tools setup && ./skift.sh tools doctor
 
       - name: Download third-party dependencies
-        run: ./skift.sh model install
+        run: ./skift.sh install
 
       - name: Build Kernel (x86_64)
         run: ./skift.sh build --target=kernel-x86_64

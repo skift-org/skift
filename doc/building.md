@@ -71,7 +71,7 @@ This guide provides instructions for building skiftOS from source.
 5. **Download Dependencies:**
 
    ```sh
-   ./skift.sh model install
+   ./skift.sh install
    ```
 
 6. **Build and Run:**

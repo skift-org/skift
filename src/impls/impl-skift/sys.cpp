@@ -3,6 +3,7 @@ module;
 #include <handover/hook.h>
 #include <hjert-api/api.h>
 
+#include "bootfs.h"
 #include "fd.h"
 
 module Karm.Sys;
@@ -18,14 +19,24 @@ Res<Rc<Sys::Fd>> deserializeFd(Serde::Deserializer&) {
 
 // MARK: File I/O --------------------------------------------------------------
 
-Res<Rc<Fd>> openFile(Ref::Url const& url) {
-    auto urlStr = url.str();
-    auto* fileRecord = useHandover().fileByName(urlStr.buf());
-    if (not fileRecord)
-        return Error::invalidFilename();
-    auto vmo = try$(Hj::Vmo::create(Hj::ROOT, fileRecord->start, fileRecord->size, Hj::VmoFlags::DMA));
-    try$(vmo.label(urlStr));
+static Res<Ref::Path> _resolveUrl(Ref::Url const& url) {
+    if (url.scheme == "file") {
+        return Ok(url.path);
+    } else if (url.scheme == "bundle") {
+        auto path = url.path;
+        path.rooted = false;
+        return Ok("/bundles"_path / url.host.str() / path);
+    } else {
+        logError("unsupported scheme: {}", url.scheme);
+        return Error::notImplemented();
+    }
+}
 
+Res<Rc<Fd>> openFile(Ref::Url const& url) {
+    Ref::Path path = try$(_resolveUrl(url));
+    path.rooted = false;
+    auto bootfs = try$(Bootfs::ensure());
+    auto vmo = try$(bootfs->openVmo(path.str()));
     return Ok(makeRc<Skift::VmoFd>(std::move(vmo)));
 }
 
@@ -65,8 +76,18 @@ Res<Vec<DirEntry>> readDirOrCreate(Ref::Url const&) {
     return Error::notImplemented();
 }
 
-Res<Stat> stat(Ref::Url const&) {
-    return Error::notImplemented();
+Res<Stat> stat(Ref::Url const& url) {
+    Ref::Path path = try$(_resolveUrl(url));
+    path.rooted = false;
+    auto bootfs = try$(Bootfs::ensure());
+    auto dirent = try$(bootfs->openDirent(path.str()));
+    return Ok(Stat{
+        .type = Type::FILE,
+        .size = dirent->length,
+        .accessTime = SystemTime::epoch(),
+        .modifyTime = SystemTime::epoch(),
+        .changeTime = SystemTime::epoch(),
+    });
 }
 
 // MARK: User interactions -----------------------------------------------------

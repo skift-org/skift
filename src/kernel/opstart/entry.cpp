@@ -37,7 +37,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
     logInfo("opstart " stringify$(__ck_version_value));
 
     logInfo("loading configs...");
-    auto file = co_try$(Sys::File::open("file:/boot/loader.json"_url));
+    auto file = co_try$(Sys::File::open("file:/loader.json"_url));
 
     logInfo("parsing configs...");
     auto fileStr = co_try$(Io::readAllUtf8(file));

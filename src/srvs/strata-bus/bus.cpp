@@ -4,6 +4,7 @@ import Strata.Protos;
 import Vaerk.Elf;
 
 #include <handover/hook.h>
+#include <impl-skift/bootfs.h>
 
 #include "bus.h"
 
@@ -38,18 +39,12 @@ Res<Rc<Service>> Service::prepare(Sys::Context&, Str id) {
 
 Res<> Service::activate(Sys::Context& ctx) {
     logInfo("activating service '{}'...", _id);
-
     auto& handover = useHandover(ctx);
-    auto urlStr = Io::format("bundle://{}/_bin", _id);
-    auto* elf = handover.fileByName(urlStr.buf());
-    if (not elf) {
-        logError("service not found: '{}'", _id);
-        return Error::invalidFilename("service not found");
-    }
+    auto bootfs = try$(Bootfs::ensure());
 
     logInfoIf(DEBUG_ELF, "mapping elf...");
-    auto elfVmo = try$(Hj::Vmo::create(Hj::ROOT, elf->start, elf->size, Hj::VmoFlags::DMA));
-    try$(elfVmo.label("elf-shared"));
+    auto elfPath = Io::format("bundles/{}/_bin", id());
+    auto elfVmo = try$(bootfs->openVmo(elfPath.str()));
     auto elfRange = try$(Hj::map(elfVmo, Hj::MapFlags::READ));
 
     logInfoIf(DEBUG_ELF, "creating address space...");

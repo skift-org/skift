@@ -4,15 +4,20 @@ from . import image, store, runner
 from cutekit import cli, model, shell, const
 
 
-def generateSystem(img: image.Image) -> None:
-    img.mkdir("objects")
-    img.mkdir("bundles")
-
+def generateBoot(img: image.Image) -> None:
     img.mkdir("EFI")
     img.mkdir("EFI/BOOT")
 
     img.installTo("opstart", "efi-x86_64", "EFI/BOOT/BOOTX64.EFI")
     img.install("hjert", "kernel-x86_64")
+
+    img.cpTree("meta/image/boot/efi", "")
+
+
+def generateInit(img: image.Image, browser: bool):
+    img.mkdir("bundles")
+    img.mkdir("share")
+    img.mkdir("users/root")
 
     userspace = [
         "strata-device",
@@ -30,9 +35,29 @@ def generateSystem(img: image.Image) -> None:
         "hideo-sysmon.main",
         "hideo-zoo.main",
     ]
+
+    if browser:
+        userspace.append("vaev-browser.main")
+
     img.install(userspace, "skift-x86_64")
 
-    img.cpTree("meta/image/efi/boot", "boot")
+
+def generateSystem(registry: model.Registry, browser: bool = False, hdd: bool = False):
+    bootStore = (
+        store.Dir("image-efi-x86_64")
+        if not hdd
+        else store.RawHdd("image-efi-x86_64", 256)
+    )
+    bootImg = image.Image(registry, bootStore)
+    generateBoot(bootImg)
+
+    initStore = store.BootFs("image-init-x86_64")
+    initImg = image.Image(registry, initStore)
+    generateInit(initImg, browser)
+
+    bootImg.cp(initStore.finalize(), "skift/init.bootfs")
+
+    return bootImg.finalize()
 
 
 @cli.command("image", "Generate the boot image")
@@ -45,6 +70,7 @@ class BuildArgs(model.RegistryArgs):
     fmt: str = cli.arg(None, "format", "The format of the image")
     compress: str = cli.arg(None, "compress", "Compress the image")
     dist: bool = cli.arg(None, "dist", "Copy the image to the dist folder")
+    browser: bool = cli.arg(None, "browser", "Include the browser engine to the build")
 
 
 @cli.command("dist", "Generate the boot image")
@@ -53,15 +79,7 @@ def _(args: BuildArgs) -> None:
 
     registry = model.Registry.use(args)
 
-    s = (
-        store.Dir("image-efi-x86_64")
-        if args.fmt == "dir"
-        else store.RawHdd("image-efi-x86_64", 256)
-    )
-    img = image.Image(registry, s)
-    generateSystem(img)
-
-    file = img.finalize()
+    file = generateSystem(registry, args.browser, args.fmt == "hdd")
     if args.fmt == "hdd" and args.compress:
         zip = shell.compress(file, format=args.compress)
         shell.rmrf(file)
@@ -87,6 +105,7 @@ class StartArgs:
     )
     dint: bool = cli.arg(None, "dint", "Debug interrupts")
     clean: bool = cli.arg(None, "clean", "Clean the image before starting")
+    browser: bool = cli.arg(None, "browser", "Include the browser engine to the build")
 
 
 @cli.command("boot", "Boot the system")
@@ -105,7 +124,7 @@ def _(args: StartArgs) -> None:
     img = image.Image(registry, dirStore)
 
     if args.arch == "x86_64":
-        generateSystem(img)
+        generateSystem(registry, args.browser, False)
         print("Booting...")
         machine = runner.Qemu(logError=args.dint, debugger=args.debug)
         machine.boot(img)

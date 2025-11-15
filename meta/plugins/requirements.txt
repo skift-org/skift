@@ -1,2 +1,1 @@
-python-magic ~= 0.4.27
-cutekit ~= 0.10.1
+cutekit ~= 0.10.2

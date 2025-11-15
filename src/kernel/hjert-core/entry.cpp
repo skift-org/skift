@@ -2,6 +2,7 @@ import Karm.Core;
 import Karm.Logger;
 import Vaerk.Elf;
 
+#include <ce-bootfs/bootfs.h>
 #include <handover/entry.h>
 
 #include "arch.h"
@@ -14,18 +15,38 @@ import Vaerk.Elf;
 
 namespace Hjert::Core {
 
-Res<> enterUserspace(Handover::Payload& payload) {
-    auto const* record = payload.fileByName("bundle://strata-bus/_bin");
+Res<Arc<Vmo>> _locateInit(Handover::Payload& payload, Str path) {
+    logInfo("locating {#}...", path);
+
+    auto const* record = payload.fileByName("file:/skift/init.bootfs");
     if (not record) {
-        logInfo("handover: no init file");
-        return Error::invalidInput("No init file");
+        logError("handover: could not find bootfs");
+        return Error::invalidInput("could not find bootfs");
     }
 
+    auto bootfsRange = try$(kmm().pmm2Kmm(record->range<Hal::PmmRange>()));
+    auto* bootfs = reinterpret_cast<bootfs_header_t*>(bootfsRange.mutBytes().buf());
+
+    auto initFile = bootfs_open(bootfs, path.buf(), path.len());
+    if (not initFile.length) {
+        logError("handover: could not find init");
+        return Error::invalidInput("could not find init");
+    }
+
+    Hal::DmaRange elfRange = {
+        record->start + initFile.dirent->offset,
+        alignUp(initFile.dirent->length, Hal::PAGE_SIZE),
+    };
+
+    return Vmo::makeDma(elfRange);
+}
+
+Res<> enterUserspace(Handover::Payload& payload) {
     auto space = try$(Space::create());
     space->label("init-space");
 
     logInfo("entry: mapping elf...");
-    auto elfVmo = try$(Vmo::makeDma(record->range<Hal::DmaRange>()));
+    auto elfVmo = try$(_locateInit(payload, "bundles/strata-bus/_bin"));
     elfVmo->label("elf-shared");
     auto elfRange = try$(kmm().pmm2Kmm(elfVmo->range()));
     Vaerk::Elf::Image image{elfRange.bytes()};

@@ -221,50 +221,12 @@ Res<Rc<Fd>> listenIpc(Ref::Url) {
 
 // MARK: Files -----------------------------------------------------------------
 
-static Opt<Serde::Value> _index = NONE;
-
 static Res<Ref::Path> resolve(Ref::Url url) {
     if (url.scheme == "file") {
         return Ok(url.path);
-    }
-
-    if (url.scheme == "bundle") {
-        if (not _index) {
-            auto indexFile = try$(File::open("file:/bundles/_index.json"_url));
-            auto indexStr = try$(Io::readAllUtf8(indexFile));
-            auto indexJson = try$(Json::parse(indexStr));
-
-            _index = indexJson.get("objects");
-
-            logInfo("index loaded, might not be valid will check later");
-        }
-
-        if (not _index->isObject()) {
-            logError("invalid index");
-            return Error::invalidData();
-        }
-
-        auto path = url.path;
-        path.rooted = false;
-
-        auto key = url.str();
-        auto object = _index->get(key);
-
-        if (not object.isObject()) {
-            logError("cound not resolve {}: invalid object", url);
-            return Error::invalidData("invalid object");
-        }
-
-        auto ref = object.get("ref");
-
-        if (not ref.isStr()) {
-            logError("invalid ref");
-            return Error::invalidData("invalid ref");
-        }
-
-        auto refStr = ref.asStr();
-        auto refUrl = Ref::Url::parse(refStr);
-        return resolve(refUrl);
+    } else if (url.scheme == "bundle") {
+        url.path.rooted = false;
+        return Ok("/bundles"_path / url.host.str() / url.path);
     } else {
         logError("unsupported scheme: {}", url.scheme);
         return Error::notImplemented();
@@ -284,6 +246,7 @@ Res<Rc<Fd>> openFile(Ref::Url const& url) {
 
     Efi::FileProtocol* file = nullptr;
     auto resolved = try$(resolve(url)).str();
+    logDebug("resolved: {}", resolved);
 
     _StringBuilder<Utf16> b;
     b.ensure(resolved.len());

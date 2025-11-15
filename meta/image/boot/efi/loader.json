@@ -1,0 +1,13 @@
+{
+    "subtitle": "Select an Operating System to boot",
+    "entries": [
+        {
+            "name": "skiftOS",
+            "kernel": "bundle://hjert/_bin",
+            "icon": "file:/skift/logo.qoi",
+            "blobs": [
+                "file:/skift/init.bootfs"
+            ]
+        }
+    ]
+}

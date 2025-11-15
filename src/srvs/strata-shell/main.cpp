@@ -154,6 +154,7 @@ Async::Task<> servAsync(Sys::Context& ctx) {
         .noti = {},
         .launchers = {
             makeRc<ServiceLauncher>(Mdi::INFORMATION_OUTLINE, "About"s, Gfx::BLUE_RAMP, "hideo-about.main"s),
+            makeRc<ServiceLauncher>(Mdi::WEB, "Browser"s, Gfx::BLUE_RAMP, "vaev-browser.main"s),
             makeRc<ServiceLauncher>(Mdi::CALCULATOR, "Calculator"s, Gfx::ORANGE_RAMP, "hideo-calculator.main"s),
             makeRc<ServiceLauncher>(Mdi::MESSAGE, "Chat"s, Gfx::GREEN_RAMP, "hideo-chat.main"s),
             makeRc<ServiceLauncher>(Mdi::CONSOLE_LINE, "Console"s, Gfx::SLATE_RAMP, "hideo-console.main"s),

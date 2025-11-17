@@ -24,6 +24,10 @@
         "skift-org/vaev": {
             "git": "https://github.com/skift-org/vaev",
             "tag": "main"
+        },
+        "skift-org/synk": {
+            "git": "https://github.com/skift-org/synk",
+            "tag": "main"
         }
     }
 }

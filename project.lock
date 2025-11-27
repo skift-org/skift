@@ -32,7 +32,7 @@
             "tag": "v1.4.0"
         },
         "cute-engineering/ce-targets": {
-            "commit": "eaa19de89b05da7fbbe9320c6f1f24dae1a3b96d",
+            "commit": "916ae22a50bd1f4c8a0b4e1d2e82cf05af8a1585",
             "git": "https://github.com/cute-engineering/ce-targets.git",
             "tag": "v0.4.0"
         },
@@ -47,12 +47,12 @@
             "tag": "main"
         },
         "skift-org/hideo": {
-            "commit": "eb9ef17d03ee0abff1e142c467d3b6e04ca1564f",
+            "commit": "41467f2f70bfb1b5b62755d59d876730310170f6",
             "git": "https://github.com/skift-org/hideo.git",
             "tag": "main"
         },
         "skift-org/karm": {
-            "commit": "393d8e793ee3e5d4fc9b97f18dbed0fe352309f2",
+            "commit": "54bb23e14df95bc0234203c20c2635eef6455e1f",
             "git": "https://github.com/skift-org/karm.git",
             "tag": "main"
         },
@@ -67,7 +67,7 @@
             "tag": "main"
         },
         "skift-org/vaev": {
-            "commit": "6c9f9c24f034e294469cbbd7aa354ddbf7ba667d",
+            "commit": "70e8d83dc69612a80cd4c37cdc38a1cc862d5415",
             "git": "https://github.com/skift-org/vaev",
             "tag": "main"
         }

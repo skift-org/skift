@@ -8,7 +8,7 @@ import Karm.Core;
 
 namespace x86_64 {
 
-struct Com : Io::TextEncoderBase<> {
+struct Com : Io::TextWriter {
     Hal::RawPortIo _io;
 
     Com(Hal::RawPortIo io) : _io(io) {
@@ -138,12 +138,20 @@ struct Com : Io::TextEncoderBase<> {
         return readReg(DATA);
     }
 
-    Res<usize> write(Bytes bytes) override {
+    Res<usize> write(Bytes bytes) {
         for (auto b : iter(bytes)) {
             try$(putByte(b));
         }
 
         return Ok(sizeOf(bytes));
+    }
+
+    Res<> writeRune(Rune rune) override {
+        Utf8::One one;
+        if (not Utf8::encodeUnit(rune, one))
+            return Error::invalidInput("encoding error");
+        try$(write(bytes(one)));
+        return Ok();
     }
 };
 

@@ -131,7 +131,7 @@ struct FileProto : Fd {
         Efi::FileInfo* info = (Efi::FileInfo*)buf.buf();
         try$(_proto->getInfo(_proto, &Efi::FileInfo::GUID, &bufSize, info));
 
-        usize pos = seek.apply(current, info->fileSize);
+        usize pos = try$(seek.apply(current, info->fileSize));
 
         if (pos == current) {
             return Ok(current);

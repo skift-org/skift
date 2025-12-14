@@ -6,29 +6,33 @@ module Karm.Logger;
 
 import Karm.Sys;
 
-
 namespace Karm::Logger::_Embed {
 
 void loggerLock() {}
 
 void loggerUnlock() {}
 
-struct LoggerOut : Io::TextEncoderBase<> {
-    Io::BufferWriter _buf;
-
-    Res<usize> write(Bytes bytes) override {
-        return _buf.write(bytes);
-    }
-
-    Res<> flush() override {
-        try$(Hj::log(_buf.bytes()));
-        return _buf.flush();
-    }
-};
-
 Io::TextWriter& loggerOut() {
-    static LoggerOut _loggerOut{};
-    return _loggerOut;
+    struct LoggerOut : Io::TextWriter {
+        StringBuilder _sb;
+
+        Res<> writeRune(Rune rune) override {
+            Utf8::One one;
+            if (not Utf8::encodeUnit(rune, one))
+                return Error::invalidInput("encoding error");
+
+            _sb.append(rune);
+            if (rune == '\n') {
+                try$(Hj::log(_sb.bytes()));
+                _sb.clear();
+            }
+
+            return Ok();
+        }
+    };
+
+    static LoggerOut out;
+    return out;
 }
 
 } // namespace Karm::Logger::_Embed

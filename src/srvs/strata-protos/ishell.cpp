@@ -2,7 +2,7 @@ export module Strata.Protos:ishell;
 
 import Karm.Math;
 import Karm.Sys;
-import Karm.App;
+import Karm.App.Base;
 import :base;
 
 using namespace Karm;

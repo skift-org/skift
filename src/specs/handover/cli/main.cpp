@@ -3,7 +3,7 @@ import Vaerk.Elf;
 #include <handover/spec.h>
 #include <karm-sys/entry.h>
 
-Async::Task<> entryPointAsync(Sys::Context& ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx, Async::CancellationToken) {
     auto& args = useArgs(ctx);
 
     if (args.len() == 0) {

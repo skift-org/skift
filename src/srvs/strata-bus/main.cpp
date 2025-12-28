@@ -9,7 +9,7 @@ import Karm.Logger;
 
 using namespace Strata::Bus;
 
-Async::Task<> entryPointAsync(Sys::Context& ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx, Async::CancellationToken) {
     co_try$(Hj::Task::self().label("strata-bus"));
 
     logInfo("skiftOS " stringify$(__ck_version_value));
@@ -37,7 +37,8 @@ extern "C" void __entryPoint(usize rawHandover) {
     ctx.add<Sys::ArgsHook>(1, argv);
     ctx.add<HandoverHook>((Handover::Payload*)rawHandover);
 
-    auto res = Sys::run(entryPointAsync(ctx));
+    Async::Cancellation cancellation;
+    auto res = Sys::run(entryPointAsync(ctx, cancellation.token()));
 
     auto self = Hj::Task::self();
 

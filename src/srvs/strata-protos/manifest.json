@@ -4,8 +4,8 @@
     "type": "lib",
     "requires": [
         "karm-core",
-        "karm-app",
         "karm-gfx",
-        "hjert-api"
+        "hjert-api",
+        "karm-app.base"
     ]
 }

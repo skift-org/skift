@@ -3,6 +3,7 @@
 #include <handover/hook.h>
 #include <hjert-api/api.h>
 #include <karm-sys/entry.h>
+
 #include "fd.h"
 
 import Karm.Logger;
@@ -24,10 +25,12 @@ extern "C" [[gnu::weak]] void __entryPoint(usize rawHandover, usize rawIn, usize
     char const* argv[] = {"service", nullptr};
     ctx.add<Sys::ArgsHook>(1, argv);
     ctx.add<HandoverHook>(reinterpret_cast<Handover::Payload*>(rawHandover));
+
     auto fd = makeRc<Skift::IpcFd>(Hj::Cap{rawIn}, Hj::Cap{rawOut});
     ctx.add<Sys::ChannelHook>(Sys::IpcConnection{fd, ""_url});
 
-    auto res = Sys::run(entryPointAsync(ctx));
+    Async::Cancellation cancellation;
+    auto res = Sys::run(entryPointAsync(ctx, cancellation.token()));
 
     auto self = Hj::Task::self();
 

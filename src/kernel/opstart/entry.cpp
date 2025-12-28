@@ -33,7 +33,7 @@ Res<> splashScreen(Opstart::Entry const& e) {
     return Ok();
 }
 
-Async::Task<> entryPointAsync(Sys::Context& ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx, Async::CancellationToken ct) {
     logInfo("opstart " stringify$(__ck_version_value));
 
     logInfo("loading configs...");
@@ -49,7 +49,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx) {
     auto configs = co_try$(Opstart::Configs::fromJson(json));
 
     if (configs.entries.len() > 1 or configs.entries.len() == 0)
-        co_return co_await Opstart::showMenuAsync(ctx, configs);
+        co_return co_await Opstart::showMenuAsync(ctx, configs, ct);
     else
         co_try$(splashScreen(configs.entries[0]));
 

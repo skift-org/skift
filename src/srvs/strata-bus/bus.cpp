@@ -111,9 +111,9 @@ Res<> Service::activate(Sys::Context& ctx) {
     return Ok();
 }
 
-Async::Task<> Service::runAsync() {
+Async::Task<> Service::runAsync(Async::CancellationToken ct) {
     while (true) {
-        auto msg = co_trya$(Sys::rpcRecvAsync(_con));
+        auto msg = co_trya$(Sys::rpcRecvAsync(_con, ct));
 
         if (msg.is<IBus::Listen>()) {
             auto listen = co_try$(msg.unpack<IBus::Listen>());
@@ -179,14 +179,14 @@ Res<Rc<Bus>> Bus::create(Sys::Context& ctx) {
 Res<> Bus::prepareService(Str id) {
     auto service = try$(Service::prepare(_context, id));
     try$(attach(service));
-    Async::detach(service->runAsync());
+    Async::detach(service->runAsync(Async::CancellationToken::uninterruptible()));
     return Ok();
 }
 
 Res<> Bus::prepareActivateService(Str id) {
     auto service = try$(Service::prepare(_context, id));
     try$(attach(service));
-    Async::detach(service->runAsync());
+    Async::detach(service->runAsync(Async::CancellationToken::uninterruptible()));
     return service->activate(_context);
 }
 

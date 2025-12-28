@@ -1,20 +1,20 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "impl-skift.ui",
+    "id": "karm-app.efi",
     "type": "lib",
-    "props": {
-        "cpp-excluded": true
-    },
+    "description": "Karm platform embedding layer for EFI.",
     "enableIf": {
         "sys": [
-            "skift"
+            "efi"
         ]
     },
     "requires": [
-        "karm-sys",
-        "strata-protos"
+        "efi",
+        "abi",
+        "karm-sys"
     ],
     "provides": [
-        "karm-ui-impl"
+        "karm-app-impl",
+        "karm-app-app-impl"
     ]
 }

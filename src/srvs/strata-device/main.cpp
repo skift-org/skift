@@ -6,7 +6,6 @@ import Karm.App;
 import Strata.Device;
 import Karm.Logger;
 
-
 namespace Strata::Device {
 
 struct IsaRootBus : Node {
@@ -47,7 +46,7 @@ struct RootBus : Node {
 
 } // namespace Strata::Device
 
-Async::Task<> entryPointAsync(Sys::Context& ctx) {
+Async::Task<> entryPointAsync(Sys::Context& ctx, Async::CancellationToken) {
     auto endpoint = Sys::Endpoint::adopt(ctx);
 
     logInfo("devices: building device tree...");

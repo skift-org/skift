@@ -165,8 +165,8 @@ Ui::Child menu(Configs const& c) {
     );
 }
 
-Async::Task<> showMenuAsync(Sys::Context& ctx, Configs const& c) {
-    co_return co_await Ui::runAsync(ctx, Opstart::menu(c));
+Async::Task<> showMenuAsync(Sys::Context& ctx, Configs const& c, Async::CancellationToken ct) {
+    co_return co_await Ui::runAsync(ctx, Opstart::menu(c), ct);
 }
 
 } // namespace Opstart

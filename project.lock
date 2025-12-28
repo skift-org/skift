@@ -37,7 +37,7 @@
             "tag": "v0.4.0"
         },
         "skift-org/ambolt": {
-            "commit": "3646793142ae72270f120c0f7e080ea7e61b98f8",
+            "commit": "996d65a22c32af31d375423e2429b5aa1b5e272e",
             "git": "https://github.com/skift-org/ambolt",
             "tag": "main"
         },
@@ -47,12 +47,12 @@
             "tag": "main"
         },
         "skift-org/hideo": {
-            "commit": "b6127a8fba2461a67beb64ff97d5b0c1daba3b90",
+            "commit": "49bce7e695d1801c17e3e394010586b6bf99461e",
             "git": "https://github.com/skift-org/hideo.git",
             "tag": "main"
         },
         "skift-org/karm": {
-            "commit": "e650a25d06cfd17348dc96f3e09b44e239a6a80a",
+            "commit": "91b368c73f1f09e313660982d84a37a37b034e21",
             "git": "https://github.com/skift-org/karm.git",
             "tag": "main"
         },
@@ -64,11 +64,6 @@
         "skift-org/vaerk": {
             "commit": "c6bb7584fc56d9be845b5b30696c8af23288c470",
             "git": "https://github.com/skift-org/vaerk",
-            "tag": "main"
-        },
-        "skift-org/vaev": {
-            "commit": "70e8d83dc69612a80cd4c37cdc38a1cc862d5415",
-            "git": "https://github.com/skift-org/vaev",
             "tag": "main"
         }
     }

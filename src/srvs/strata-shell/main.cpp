@@ -43,7 +43,7 @@ struct Root : Ui::ProxyNode<Root> {
         _dirty.clear();
     }
 
-    Async::Task<> run() {
+    Async::Task<> runAsync(Async::CancellationToken ct) {
         _shouldLayout = true;
 
         auto lastFrame = Sys::instant();
@@ -70,7 +70,7 @@ struct Root : Ui::ProxyNode<Root> {
                 _repaint();
             }
 
-            co_trya$(Sys::globalSched().sleepAsync(lastFrame + 16_ms));
+            co_trya$(Sys::globalSched().sleepAsync(lastFrame + 16_ms, ct));
         }
     }
 
@@ -126,9 +126,8 @@ struct ServiceInstance : Hideo::Shell::Window {
 
     void event(App::Event& e) override {
         if (auto it = e.is<App::MouseEvent>())
-            (void)_endpoint.send<IShell::WindowEvent>(_client, _windowId, *it);
+            (void)_endpoint.send(_client, IShell::WindowEvent{_windowId, *it});
     }
-
 
     void attach(Rc<Protos::Surface> backbuffer) {
         _backbuffer = backbuffer;
@@ -143,11 +142,11 @@ struct ServiceLauncher : Hideo::Shell::Launcher {
         : Launcher(icon, name, ramp), componentId(serviceId) {}
 
     void launch(Hideo::Shell::State&) override {
-        Sys::globalEndpoint().send<IBus::Start>(Sys::Port::BUS, componentId).unwrap();
+        Sys::globalEndpoint().send(Sys::Port::BUS, IBus::Start{componentId}).unwrap();
     }
 };
 
-Async::Task<> servAsync(Sys::Context& ctx) {
+Async::Task<> servAsync(Sys::Context& ctx, Async::CancellationToken ct) {
     Hideo::Shell::State state = {
         .dateTime = Sys::dateTime(),
         .background = co_try$(Image::loadOrFallback("bundle://hideo-shell/wallpapers/abstract.qoi"_url)),
@@ -178,10 +177,20 @@ Async::Task<> servAsync(Sys::Context& ctx) {
         framebuffer
     );
 
-    Async::detach(root->run());
+    Async::detach(root->runAsync(ct));
 
-    co_try$(endpoint.send<Strata::IBus::Listen>(Sys::Port::BUS, Meta::idOf<App::MouseEvent>()));
-    co_try$(endpoint.send<Strata::IBus::Listen>(Sys::Port::BUS, Meta::idOf<App::KeyboardEvent>()));
+    co_try$(endpoint.send(
+        Sys::Port::BUS,
+        Strata::IBus::Listen{
+            Meta::idOf<App::MouseEvent>(),
+        }
+    ));
+    co_try$(endpoint.send(
+        Sys::Port::BUS,
+        Strata::IBus::Listen{
+            Meta::idOf<App::KeyboardEvent>()
+        }
+    ));
 
     IShell::WindowId windowIdAllocator = 1;
     Map<IShell::WindowId, Rc<ServiceInstance>> windows;
@@ -258,6 +267,6 @@ Async::Task<> servAsync(Sys::Context& ctx) {
 
 } // namespace Strata::Shell
 
-Async::Task<> entryPointAsync(Sys::Context& ctx) {
-    co_return co_await Strata::Shell::servAsync(ctx);
+Async::Task<> entryPointAsync(Sys::Context& ctx, Async::CancellationToken ct) {
+    co_return co_await Strata::Shell::servAsync(ctx, ct);
 }

@@ -54,7 +54,7 @@ struct Service : Endpoint {
 
     Res<> activate(Sys::Context& ctx) override;
 
-    Async::Task<> runAsync();
+    Async::Task<> runAsync(Async::CancellationToken ct);
 
     Res<> send(Sys::Message& msg) override;
 

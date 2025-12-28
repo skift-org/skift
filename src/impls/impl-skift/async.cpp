@@ -11,12 +11,12 @@ import Karm.Logger;
 
 namespace Karm::Sys::_Embed {
 
-struct HjertSched : Sys::Sched {
+struct SkiftSched : Sys::Sched {
     Hj::Listener _listener;
     Map<Hj::Cap, Async::Promise<>> _promises;
     Vec<Pair<Instant, Async::Promise<>>> _sleeps;
 
-    HjertSched(Hj::Listener listener) : _listener{std::move(listener)} {}
+    SkiftSched(Hj::Listener listener) : _listener{std::move(listener)} {}
 
     Async::Task<> waitFor(Hj::Cap cap, Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset) {
         if (_promises.has(cap))
@@ -32,23 +32,23 @@ struct HjertSched : Sys::Sched {
         co_return co_await future;
     }
 
-    virtual Async::Task<usize> readAsync(Rc<Fd>, MutBytes) {
+    Async::Task<usize> readAsync(Rc<Fd>, MutBytes, Async::CancellationToken) override {
         co_return Error::notImplemented("not implemented");
     }
 
-    virtual Async::Task<usize> writeAsync(Rc<Fd>, Bytes) {
+    Async::Task<usize> writeAsync(Rc<Fd>, Bytes, Async::CancellationToken) override {
         co_return Error::notImplemented("not implemented");
     }
 
-    virtual Async::Task<> flushAsync(Rc<Fd>) {
+    Async::Task<> flushAsync(Rc<Fd>, Async::CancellationToken) override {
         co_return Error::notImplemented("not implemented");
     }
 
-    virtual Async::Task<_Accepted> acceptAsync(Rc<Fd>) {
+    Async::Task<_Accepted> acceptAsync(Rc<Fd>, Async::CancellationToken) override {
         co_return Error::notImplemented("not implemented");
     }
 
-    virtual Async::Task<_Sent> sendAsync(Rc<Fd> fd, Bytes buf, Slice<Handle> hnds, SocketAddr) {
+    Async::Task<_Sent> sendAsync(Rc<Fd> fd, Bytes buf, Slice<Handle> hnds, SocketAddr, Async::CancellationToken) override {
         if (auto ipc = fd.is<Skift::IpcFd>()) {
             auto& chan = ipc->_out;
 
@@ -62,7 +62,7 @@ struct HjertSched : Sys::Sched {
         co_return Error::notImplemented("unsupported fd type");
     }
 
-    virtual Async::Task<_Received> recvAsync(Rc<Fd> fd, MutBytes buf, MutSlice<Handle> hnds) {
+    Async::Task<_Received> recvAsync(Rc<Fd> fd, MutBytes buf, MutSlice<Handle> hnds, Async::CancellationToken) override {
         if (auto ipc = fd.is<Skift::IpcFd>()) {
             auto& chan = ipc->_in;
 
@@ -76,7 +76,11 @@ struct HjertSched : Sys::Sched {
         co_return Error::notImplemented("unsupported fd type");
     }
 
-    virtual Async::Task<> sleepAsync(Instant stamp) {
+    Async::Task<Flags<Poll>> pollAsync(Rc<Fd>, Flags<Poll>, Async::CancellationToken) override {
+        co_return Error::notImplemented();
+    }
+
+    Async::Task<> sleepAsync(Instant stamp, Async::CancellationToken) override {
         Async::Promise<> promise;
         auto future = promise.future();
         _sleeps.pushBack({stamp, std::move(promise)});
@@ -85,10 +89,12 @@ struct HjertSched : Sys::Sched {
 
     Instant _soonest() {
         auto soonest = Instant::endOfTime();
+
         for (auto const& [stamp, _] : _sleeps) {
             if (stamp < soonest)
                 soonest = stamp;
         }
+
         return soonest;
     }
 
@@ -103,7 +109,7 @@ struct HjertSched : Sys::Sched {
         }
     }
 
-    virtual Res<> wait(Instant until) {
+    Res<> wait(Instant until) override {
         for (;;) {
             auto now = _Embed::instant();
             _wake(now);
@@ -129,7 +135,7 @@ struct HjertSched : Sys::Sched {
 };
 
 Sched& globalSched() {
-    static HjertSched sched = [] -> HjertSched {
+    static SkiftSched sched = [] -> SkiftSched {
         return {
             Hj::Listener::create(Hj::ROOT)
                 .take("failed to create listener"),

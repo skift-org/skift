@@ -113,7 +113,7 @@ struct Configs {
     }
 };
 
-Async::Task<> showMenuAsync(Sys::Context& ctx, Configs const& c);
+Async::Task<> showMenuAsync(Sys::Context& ctx, Configs const& c, Async::CancellationToken ct);
 
 Res<> loadEntry(Entry const&);
 

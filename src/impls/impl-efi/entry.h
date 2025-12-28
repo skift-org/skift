@@ -21,7 +21,9 @@ extern "C" Efi::Status efi_main(Efi::Handle handle, Efi::SystemTable* st) {
     Sys::Context ctx;
     ctx.add<Sys::ArgsHook>(1, argv);
 
-    Res<> code = Async::run(entryPointAsync(ctx));
+    Async::Cancellation cancellation;
+
+    Res<> code = Async::run(entryPointAsync(ctx, cancellation.token()));
     if (not code) {
         Error error = code.none();
         (void)Io::format(Sys::err(), "{}: {}\n", self, error.msg());

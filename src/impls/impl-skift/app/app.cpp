@@ -18,6 +18,7 @@ struct SkiftWindow : Window {
     Strata::IShell::WindowId _id;
     Rc<Strata::Protos::Surface> _surface;
     bool _dirty = false;
+    bool _closed = false;
 
     SkiftWindow(SkiftApplication& application, Strata::IShell::WindowId id, Rc<Strata::Protos::Surface> surface)
         : _application(application), _id(id), _surface(surface) {}
@@ -44,6 +45,16 @@ struct SkiftWindow : Window {
     void releaseSurface() override;
 
     void drag(DragEvent) override;
+
+    void resize(Direction) override {}
+
+    void maximize() override {}
+
+    void minimize() override {}
+
+    void close() override {
+        _closed = true;
+    }
 };
 
 struct SkiftApplication : Application {
@@ -56,6 +67,7 @@ struct SkiftApplication : Application {
         : _endpoint(endpoint), _shell(shell) {}
 
     void detachWindow(Strata::IShell::WindowId id) {
+        (void)_endpoint->send(_shell, Strata::IShell::WindowDestroy{id});
         _windows.del((usize)id);
     }
 
@@ -100,7 +112,7 @@ struct SkiftApplication : Application {
 
                     if constexpr (Meta::Contains<T, MouseEvent, KeyboardEvent, TypeEvent>) {
                         handler->handle<T>(windowId, event);
-                    } else if constexpr (Meta::Same<T, RequestExitEvent>) {
+                    } else if constexpr (Meta::Same<T, RequestCloseEvent>) {
                         _exited = true;
                     }
                 });
@@ -108,11 +120,18 @@ struct SkiftApplication : Application {
         }
     }
 
+    bool exited() {
+        for (auto [id, window] : _windows.iterUnordered())
+            if (not window->_closed)
+                return _exited;
+        return true;
+    }
+
     Async::Task<> runAsync(Rc<Handler> handler, Async::CancellationToken ct) override {
         Duration const frameDuration = Duration::fromMSecs(16);
         Instant nextFrameTime = Sys::instant();
 
-        while (not ct.cancelled() and not _exited) {
+        while (not exited()) {
             nextFrameTime = nextFrameTime + frameDuration;
 
             pollMessage(handler);

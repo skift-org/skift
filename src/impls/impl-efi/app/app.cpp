@@ -43,6 +43,22 @@ struct EfiWindow : Window {
     void drag(DragEvent) override {
         // NO-OP
     }
+
+    void resize(App::Direction) override {
+        // NO-OP
+    }
+
+    void maximize() override {
+        // NO-OP
+    }
+
+    void minimize() override {
+        // NO-OP
+    }
+
+    void close() override {
+        // NO-OP
+    }
 };
 
 struct EfiApplication : Application {

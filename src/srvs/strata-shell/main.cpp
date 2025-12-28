@@ -98,7 +98,7 @@ struct Root : Ui::ProxyNode<Root> {
             event.accept();
         } else if (auto e = event.is<Node::AnimateEvent>()) {
             event.accept();
-        } else if (auto e = event.is<App::RequestExitEvent>()) {
+        } else if (auto e = event.is<App::RequestCloseEvent>()) {
             event.accept();
         }
 

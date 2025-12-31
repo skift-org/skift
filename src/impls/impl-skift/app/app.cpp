@@ -42,7 +42,7 @@ struct SkiftWindow : Window {
         return _surface->mutPixels();
     }
 
-    void releaseSurface() override;
+    void releaseSurface(Slice<Math::Recti>) override;
 
     void drag(DragEvent) override;
 
@@ -169,7 +169,7 @@ SkiftWindow::~SkiftWindow() {
     _application.detachWindow(_id);
 }
 
-void SkiftWindow::releaseSurface() {
+void SkiftWindow::releaseSurface(Slice<Math::Recti>) {
 }
 
 void SkiftWindow::drag(DragEvent e) {

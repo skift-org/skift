@@ -36,7 +36,7 @@ struct EfiWindow : Window {
         return _back->mutPixels();
     }
 
-    void releaseSurface() override {
+    void releaseSurface(Slice<Math::Recti>) override {
         Gfx::blitUnsafe(_front, _back->pixels());
     }
 

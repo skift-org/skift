@@ -32,6 +32,8 @@ export struct WindowUpdate {
 };
 
 export struct WindowAttach {
+    using Response = None;
+
     WindowId window;
     Opt<Rc<Protos::Surface>> buffer;
 };

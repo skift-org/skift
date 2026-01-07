@@ -87,13 +87,14 @@ struct SkiftApplication : Application {
 
         auto surface = co_try$(Strata::Protos::Surface::create(actual.size));
 
-        (void)_endpoint->send(
+        co_trya$(_endpoint->callAsync(
             _shell,
             Strata::IShell::WindowAttach{
                 id,
                 surface,
-            }
-        );
+            },
+            ct
+        ));
 
         auto window = makeRc<SkiftWindow>(*this, id, surface);
         _windows.put(id, &*window);

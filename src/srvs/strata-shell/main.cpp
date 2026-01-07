@@ -109,14 +109,14 @@ struct Root : Ui::ProxyNode<Root> {
     }
 };
 
-struct ServiceInstance : Hideo::Shell::Window {
+struct ClientWindow : Hideo::Shell::Window {
     Sys::Endpoint& _endpoint;
     Sys::Port _client;
     IShell::WindowId _windowId;
     Rc<Gfx::Surface> _frontbuffer;
     Opt<Rc<Protos::Surface>> _backbuffer;
 
-    ServiceInstance(Sys::Endpoint& endpoint, Sys::Port client, Rc<Gfx::Surface> frontbuffer)
+    ClientWindow(Sys::Endpoint& endpoint, Sys::Port client, Rc<Gfx::Surface> frontbuffer)
         : _endpoint(endpoint), _client(client), _frontbuffer(frontbuffer) {
     }
 
@@ -135,138 +135,179 @@ struct ServiceInstance : Hideo::Shell::Window {
     }
 };
 
-struct ServiceLauncher : Hideo::Shell::Launcher {
+struct ComponentLauncher : Hideo::Shell::Launcher {
     String componentId;
 
-    ServiceLauncher(Gfx::Icon icon, String name, Gfx::ColorRamp ramp, String serviceId)
-        : Launcher(icon, name, ramp), componentId(serviceId) {}
+    ComponentLauncher(Gfx::Icon icon, String name, Gfx::ColorRamp ramp, String componentId)
+        : Launcher(icon, name, ramp), componentId(componentId) {}
 
     void launch(Hideo::Shell::State&) override {
         Sys::globalEndpoint().send(Sys::Port::BUS, IBus::Start{componentId}).unwrap();
     }
 };
 
-Async::Task<> servAsync(Sys::Context& ctx, Async::CancellationToken ct) {
-    Hideo::Shell::State state = {
-        .dateTime = Sys::dateTime(),
-        .background = co_try$(Image::loadOrFallback("bundle://hideo-shell/wallpapers/abstract.qoi"_url)),
-        .noti = {},
-        .launchers = {
-            makeRc<ServiceLauncher>(Mdi::INFORMATION_OUTLINE, "About"s, Gfx::BLUE_RAMP, "hideo-about.main"s),
-            makeRc<ServiceLauncher>(Mdi::WEB, "Browser"s, Gfx::BLUE_RAMP, "vaev-browser.main"s),
-            makeRc<ServiceLauncher>(Mdi::CALCULATOR, "Calculator"s, Gfx::ORANGE_RAMP, "hideo-calculator.main"s),
-            makeRc<ServiceLauncher>(Mdi::MESSAGE, "Chat"s, Gfx::GREEN_RAMP, "hideo-chat.main"s),
-            makeRc<ServiceLauncher>(Mdi::CONSOLE_LINE, "Console"s, Gfx::SLATE_RAMP, "hideo-console.main"s),
-            makeRc<ServiceLauncher>(Mdi::CLOCK, "Clock"s, Gfx::INDIGO_RAMP, "hideo-clock.main"s),
-            makeRc<ServiceLauncher>(Mdi::COUNTER, "Counter"s, Gfx::GREEN_RAMP, "hideo-counter.main"s),
-            makeRc<ServiceLauncher>(Mdi::FOLDER, "Files"s, Gfx::AMBER_RAMP, "hideo-files.main"s),
-            makeRc<ServiceLauncher>(Mdi::COG, "Settings"s, Gfx::BLUE_RAMP, "hideo-settings.main"s),
-            makeRc<ServiceLauncher>(Mdi::VIEW_DASHBOARD, "Sysmon"s, Gfx::RED_RAMP, "hideo-sysmon.main"s),
-            makeRc<ServiceLauncher>(Mdi::PEN, "Text"s, Gfx::BLUE_RAMP, "hideo-text.main"s),
-            makeRc<ServiceLauncher>(Mdi::DUCK, "Zoo"s, Gfx::TEAL_RAMP, "hideo-zoo.main"s),
-        },
-        .instances = {}
-    };
+struct Server {
+    Sys::Endpoint& _endpoint;
 
-    auto endpoint = Sys::Endpoint::adopt(ctx);
-    auto framebuffer = co_try$(Framebuffer::open(ctx));
-    auto app = Hideo::Shell::app(std::move(state));
+    Rc<Root> _root;
+    Rc<Framebuffer> _framebuffer;
 
-    auto root = makeRc<Root>(
-        inputTranslator(app, framebuffer->bound().center()),
-        framebuffer
-    );
+    IShell::WindowId _windowId = 1;
+    Map<IShell::WindowId, Rc<ClientWindow>> _windows = {};
 
-    Async::detach(root->runAsync(ct));
+    static Res<Server> create(Sys::Context& ctx, Sys::Endpoint& endpoint) {
+        Hideo::Shell::State state = {
+            .dateTime = Sys::dateTime(),
+            .background = try$(Image::loadOrFallback("bundle://hideo-shell/wallpapers/abstract.qoi"_url)),
+            .noti = {},
+            .launchers = {
+                makeRc<ComponentLauncher>(Mdi::INFORMATION_OUTLINE, "About"s, Gfx::BLUE_RAMP, "hideo-about.main"s),
+                makeRc<ComponentLauncher>(Mdi::WEB, "Browser"s, Gfx::BLUE_RAMP, "vaev-browser.main"s),
+                makeRc<ComponentLauncher>(Mdi::CALCULATOR, "Calculator"s, Gfx::ORANGE_RAMP, "hideo-calculator.main"s),
+                makeRc<ComponentLauncher>(Mdi::MESSAGE, "Chat"s, Gfx::GREEN_RAMP, "hideo-chat.main"s),
+                makeRc<ComponentLauncher>(Mdi::CONSOLE_LINE, "Console"s, Gfx::SLATE_RAMP, "hideo-console.main"s),
+                makeRc<ComponentLauncher>(Mdi::CLOCK, "Clock"s, Gfx::INDIGO_RAMP, "hideo-clock.main"s),
+                makeRc<ComponentLauncher>(Mdi::COUNTER, "Counter"s, Gfx::GREEN_RAMP, "hideo-counter.main"s),
+                makeRc<ComponentLauncher>(Mdi::FOLDER, "Files"s, Gfx::AMBER_RAMP, "hideo-files.main"s),
+                makeRc<ComponentLauncher>(Mdi::COG, "Settings"s, Gfx::BLUE_RAMP, "hideo-settings.main"s),
+                makeRc<ComponentLauncher>(Mdi::VIEW_DASHBOARD, "Sysmon"s, Gfx::RED_RAMP, "hideo-sysmon.main"s),
+                makeRc<ComponentLauncher>(Mdi::PEN, "Text"s, Gfx::BLUE_RAMP, "hideo-text.main"s),
+                makeRc<ComponentLauncher>(Mdi::DUCK, "Zoo"s, Gfx::TEAL_RAMP, "hideo-zoo.main"s),
+            },
+            .instances = {}
+        };
 
-    co_try$(endpoint.send(
-        Sys::Port::BUS,
-        Strata::IBus::Listen{
-            Meta::idOf<App::MouseEvent>(),
-        }
-    ));
-    co_try$(endpoint.send(
-        Sys::Port::BUS,
-        Strata::IBus::Listen{
-            Meta::idOf<App::KeyboardEvent>()
-        }
-    ));
+        auto framebuffer = try$(Framebuffer::open(ctx));
+        auto app = Hideo::Shell::app(std::move(state));
 
-    IShell::WindowId windowIdAllocator = 1;
-    Map<IShell::WindowId, Rc<ServiceInstance>> windows;
+        auto root = makeRc<Root>(
+            inputTranslator(app, framebuffer->bound().center()),
+            framebuffer
+        );
 
-    while (true) {
-        auto msg = co_trya$(endpoint.recvAsync());
+        try$(endpoint.send(
+            Sys::Port::BUS,
+            Strata::IBus::Listen{
+                Meta::idOf<App::MouseEvent>(),
+            }
+        ));
+        try$(endpoint.send(
+            Sys::Port::BUS,
+            Strata::IBus::Listen{
+                Meta::idOf<App::KeyboardEvent>()
+            }
+        ));
 
-        if (msg.is<App::MouseEvent>()) {
-            auto rawEvent = msg.unpack<App::MouseEvent>().unwrap();
-            auto event = App::makeEvent<App::MouseEvent>(rawEvent);
-            root->child().event(*event);
-        }
+        return Ok(Server{
+            endpoint,
+            root,
+            framebuffer,
+        });
+    }
 
-        else if (msg.is<App::KeyboardEvent>()) {
-            auto event = msg.unpack<App::KeyboardEvent>();
-        }
+    Res<> _handleMouseEvent(Sys::Message& message) {
+        auto event = try$(message.unpack<App::MouseEvent>());
+        auto e = App::makeEvent<App::MouseEvent>(event);
+        _root->child().event(*e);
+        return Ok();
+    }
 
-        else if (msg.is<IShell::WindowCreate>()) {
-            auto call = msg.unpack<IShell::WindowCreate>().unwrap();
-            logDebug("window create {}", call.want.size);
+    Res<> _handleKeyboardEvent(Sys::Message& message) {
+        auto event = try$(message.unpack<App::KeyboardEvent>());
+        auto e = App::makeEvent<App::KeyboardEvent>(event);
+        _root->child().event(*e);
+        return Ok();
+    }
 
-            auto id = windowIdAllocator++;
-            auto frontbuffer = Gfx::Surface::alloc(call.want.size);
-            frontbuffer->mutPixels().clear(Ui::GRAY950);
-            auto instance = makeRc<ServiceInstance>(endpoint, msg.header().from, frontbuffer);
-            instance->bound = Math::Recti{call.want.size}.center(framebuffer->bound());
-            windows.put(id, instance);
-            Hideo::Shell::Model::event(*root, Hideo::Shell::AddInstance{instance});
+    Res<IShell::WindowCreate::Response> _handleWindowCreate(Sys::Message& message) {
+        auto [want] = try$(message.unpack<IShell::WindowCreate>());
+        logDebug("window create {}", want.size);
 
-            call.want.formFactor = App::formFactor;
-            (void)endpoint.resp<IShell::WindowCreate>(msg, Ok<IShell::WindowCreate::Response>(id, call.want));
-        }
+        auto windowId = _windowId++;
 
-        else if (msg.is<IShell::WindowDestroy>()) {
-            auto call = msg.unpack<IShell::WindowDestroy>().unwrap();
+        auto windowSurface = Gfx::Surface::alloc(want.size);
+        windowSurface->mutPixels().clear(Ui::GRAY950);
 
-            auto instance = windows.get(call.window);
-            Hideo::Shell::Model::event(*root, Hideo::Shell::RemoveInstance{instance});
-            windows.del(call.window);
+        auto instance = makeRc<ClientWindow>(_endpoint, message.header().from, windowSurface);
+        instance->bound = Math::Recti{want.size}.center(_framebuffer->bound());
+        _windows.put(windowId, instance);
+        Hideo::Shell::Model::event(*_root, Hideo::Shell::AddInstance{instance});
 
-            (void)endpoint.resp<IShell::WindowDestroy>(msg, Ok());
-        }
+        auto offer = want;
+        offer.formFactor = App::formFactor;
+        return Ok(IShell::WindowCreate::Response{
+            windowId,
+            offer,
+        });
+    }
 
-        else if (msg.is<IShell::WindowAttach>()) {
-            auto call = msg.unpack<IShell::WindowAttach>().unwrap();
+    Res<IShell::WindowDestroy::Response> _handleWindowDestroy(Sys::Message& message) {
+        auto [windowId] = try$(message.unpack<IShell::WindowDestroy>());
 
-            auto instance = windows.get(call.window);
-            instance->attach(call.buffer.unwrap());
-            Ui::shouldRepaint(*root);
-        }
+        auto instance = _windows.get(windowId);
+        Hideo::Shell::Model::event(*_root, Hideo::Shell::RemoveInstance{instance});
+        _windows.del(windowId);
 
-        else if (msg.is<IShell::WindowFlip>()) {
-            auto call = msg.unpack<IShell::WindowFlip>().unwrap();
+        return Ok();
+    }
 
-            auto instance = windows.get(call.window);
-            Gfx::blitUnsafe(instance->_frontbuffer->mutPixels(), instance->_backbuffer.unwrap()->pixels());
-            Ui::shouldRepaint(*root);
+    Res<IShell::WindowAttach::Response> _handleWindowAttach(Sys::Message& message) {
+        auto [windowId, buffer] = try$(message.unpack<IShell::WindowAttach>());
 
-            (void)endpoint.resp<IShell::WindowFlip>(msg, Ok());
-        }
+        auto instance = _windows.get(windowId);
+        instance->attach(buffer.unwrap());
+        Ui::shouldRepaint(*_root);
 
-        else if (msg.is<IShell::WindowMove>()) {
-            auto call = msg.unpack<IShell::WindowMove>().unwrap();
+        return Ok();
+    }
 
-            auto instance = windows.get(call.window);
-            instance->dragged = true;
-        }
+    Res<> _handleWindowFlip(Sys::Message& message) {
+        auto [windowId, region] = try$(message.unpack<IShell::WindowFlip>());
 
-        else {
-            logWarn("unsupported event: {}", msg.header());
+        auto instance = _windows.get(windowId);
+        // FIXME: Only blit the region that was updated
+        Gfx::blitUnsafe(instance->_frontbuffer->mutPixels(), instance->_backbuffer.unwrap()->pixels());
+        Ui::shouldRepaint(*_root);
+
+        return Ok();
+    }
+
+    Res<> _handleWindowMove(Sys::Message& message) {
+        auto [windowId] = try$(message.unpack<IShell::WindowMove>());
+        auto instance = _windows.get(windowId);
+        instance->dragged = true;
+        return Ok();
+    }
+
+    Async::Task<> servAsync(Async::CancellationToken ct) {
+        Async::detach(_root->runAsync(ct));
+        Map<IShell::WindowId, Rc<ClientWindow>> windows;
+        while (true) {
+            auto msg = co_trya$(_endpoint.recvAsync());
+            if (msg.is<App::MouseEvent>())
+                (void)_handleMouseEvent(msg);
+            else if (msg.is<App::KeyboardEvent>())
+                (void)_handleKeyboardEvent(msg);
+            else if (msg.is<IShell::WindowCreate>())
+                (void)_endpoint.resp<IShell::WindowCreate>(msg, _handleWindowCreate(msg));
+            else if (msg.is<IShell::WindowDestroy>())
+                (void)_endpoint.resp<IShell::WindowDestroy>(msg, _handleWindowDestroy(msg));
+            else if (msg.is<IShell::WindowAttach>())
+                (void)_endpoint.resp<IShell::WindowAttach>(msg, _handleWindowAttach(msg));
+            else if (msg.is<IShell::WindowFlip>())
+                (void)_endpoint.resp<IShell::WindowFlip>(msg, _handleWindowFlip(msg));
+            else if (msg.is<IShell::WindowMove>())
+                (void)_handleWindowMove(msg);
+            else
+                logWarn("unsupported event: {}", msg.header());
         }
     }
-}
+};
 
 } // namespace Strata::Shell
 
 Async::Task<> entryPointAsync(Sys::Context& ctx, Async::CancellationToken ct) {
-    co_return co_await Strata::Shell::servAsync(ctx, ct);
+    auto endpoint = Sys::Endpoint::adopt(ctx);
+    auto server = co_try$(Strata::Shell::Server::create(ctx, endpoint));
+    co_return co_await server.servAsync(ct);
 }

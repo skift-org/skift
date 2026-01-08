@@ -8,6 +8,7 @@ import Karm.Core;
 import Karm.Gfx;
 import Karm.Sys;
 import Strata.Protos;
+import Karm.Logger;
 
 namespace Karm::App::_Embed {
 
@@ -19,6 +20,7 @@ struct SkiftWindow : Window {
     Rc<Strata::Protos::Surface> _surface;
     bool _dirty = false;
     bool _closed = false;
+    Opt<Math::Vec2i> _shouldResize;
 
     SkiftWindow(SkiftApplication& application, Strata::IShell::WindowId id, Rc<Strata::Protos::Surface> surface)
         : _application(application), _id(id), _surface(surface) {}
@@ -72,8 +74,6 @@ struct SkiftApplication : Application {
     }
 
     Async::Task<Rc<Window>> createWindowAsync(WindowProps const& props, Async::CancellationToken ct) override {
-        // NOTE: The Window API is synchronous, but Strata is async.
-        // We use Sys::run to block until the window is created by the shell.
         auto [id, actual] = co_trya$(_endpoint->callAsync(
             _shell,
             Strata::IShell::WindowCreate{
@@ -102,23 +102,38 @@ struct SkiftApplication : Application {
         co_return Ok(window);
     }
 
-    void pollMessage(Rc<Handler> handler) {
-        while (auto maybeMessage = _endpoint->tryRecv()) {
-            if (maybeMessage->is<Strata::IShell::WindowEvent>()) {
-                auto m = maybeMessage->unpack<Strata::IShell::WindowEvent>().unwrap();
-                auto windowId = WindowId{m.window};
+    Res<> _handleWindowEvent(Sys::Message& message, Rc<Handler> handler) {
+        auto [windowId, payload] = try$(message.unpack<Strata::IShell::WindowEvent>());
+        payload.visit([&]<typename E>(E const& event) {
+            using T = Meta::RemoveConstVolatileRef<E>;
 
-                m.event.visit([&](auto const& event) {
-                    using T = Meta::RemoveConstVolatileRef<decltype(event)>;
-
-                    if constexpr (Meta::Contains<T, MouseEvent, KeyboardEvent, TypeEvent>) {
-                        handler->handle<T>(windowId, event);
-                    } else if constexpr (Meta::Same<T, RequestCloseEvent>) {
-                        _exited = true;
-                    }
-                });
+            if constexpr (Meta::Contains<T, MouseEvent, KeyboardEvent, TypeEvent>) {
+                handler->handle<T>(App::WindowId{windowId}, event);
+            } else if constexpr (Meta::Same<T, RequestCloseEvent>) {
+                _exited = true;
             }
+        });
+        return Ok();
+    }
+
+    Res<> _handleWindowUpdate(Sys::Message& message) {
+        auto [windowId, props] = try$(message.unpack<Strata::IShell::WindowUpdate>());
+        auto* window = try$(_windows.tryGet(windowId).okOr(Error::invalidInput("no such window")));
+        // FIXME: We should probably have a separated hello message that pass stuff like color scheme and form factor
+        App::formFactor = props.formFactor;
+        window->_shouldResize = props.size;
+        return Ok();
+    }
+
+    Res<> _pollMessages(Rc<Handler> handler) {
+        while (auto maybeMessage = _endpoint->tryRecv()) {
+            auto& message = maybeMessage.unwrap();
+            if (message.is<Strata::IShell::WindowEvent>())
+                try$(_handleWindowEvent(message, handler));
+            else if (message.is<Strata::IShell::WindowUpdate>())
+                try$(_handleWindowUpdate(message));
         }
+        return Ok();
     }
 
     bool exited() {
@@ -128,6 +143,33 @@ struct SkiftApplication : Application {
         return true;
     }
 
+    Async::Task<> _handleWindowResizeAsync(Rc<Handler> handler, Async::CancellationToken ct) {
+        for (auto [id, window] : _windows.iterUnordered()) {
+            if (not window->_shouldResize)
+                continue;
+
+            auto size = window->_shouldResize.unwrap();
+            logDebug("new size {}", size);
+
+            auto newSurface = co_try$(Strata::Protos::Surface::create(size));
+
+            co_trya$(_endpoint->callAsync(
+                _shell,
+                Strata::IShell::WindowAttach{
+                    id,
+                    newSurface,
+                },
+                ct
+            ));
+
+            window->_surface = newSurface;
+            window->_shouldResize = NONE;
+            handler->handle<ResizeEvent>(window->id(), size);
+        }
+
+        co_return Ok();
+    }
+
     Async::Task<> runAsync(Rc<Handler> handler, Async::CancellationToken ct) override {
         Duration const frameDuration = Duration::fromMSecs(16);
         Instant nextFrameTime = Sys::instant();
@@ -135,8 +177,11 @@ struct SkiftApplication : Application {
         while (not exited()) {
             nextFrameTime = nextFrameTime + frameDuration;
 
-            pollMessage(handler);
+            if (auto res = _pollMessages(handler); not res) {
+                logError("failed to pull message from server: {}", res);
+            }
 
+            co_trya$(_handleWindowResizeAsync(handler, ct));
             handler->update();
 
             for (auto [id, window] : _windows.iterUnordered()) {

@@ -129,9 +129,33 @@ struct ClientWindow : Hideo::Shell::Window {
             (void)_endpoint.send(_client, IShell::WindowEvent{_windowId, *it});
     }
 
+    void resize(Math::Vec2i size) override {
+        if (size != bound.wh) {
+            logDebug("resize: {}", size);
+            _frontbuffer = Gfx::Surface::alloc(size);
+            (void)_endpoint.send(
+                _client,
+                IShell::WindowUpdate{
+                    _windowId,
+                    {
+                        .size = size,
+                        .formFactor = App::formFactor,
+                    },
+                }
+            );
+        }
+        Window::resize(size);
+    }
+
     void attach(Rc<Protos::Surface> backbuffer) {
         _backbuffer = backbuffer;
-        Gfx::blitUnsafe(_frontbuffer->mutPixels(), _backbuffer.unwrap()->pixels());
+        flip();
+    }
+
+    void flip() {
+        // FIXME: Only blit the region that was updated
+        auto region = _frontbuffer->mutPixels().bound().clipTo(_backbuffer.unwrap()->pixels().bound());
+        Gfx::blitUnsafe(_frontbuffer->mutPixels().clip(region), _backbuffer.unwrap()->pixels().clip(region));
     }
 };
 
@@ -230,6 +254,7 @@ struct Server {
 
         auto instance = makeRc<ClientWindow>(_endpoint, message.header().from, windowSurface);
         instance->bound = Math::Recti{want.size}.center(_framebuffer->bound());
+        instance->_windowId = windowId;
         _windows.put(windowId, instance);
         Hideo::Shell::Model::event(*_root, Hideo::Shell::AddInstance{instance});
 
@@ -265,8 +290,7 @@ struct Server {
         auto [windowId, region] = try$(message.unpack<IShell::WindowFlip>());
 
         auto instance = _windows.get(windowId);
-        // FIXME: Only blit the region that was updated
-        Gfx::blitUnsafe(instance->_frontbuffer->mutPixels(), instance->_backbuffer.unwrap()->pixels());
+        instance->flip();
         Ui::shouldRepaint(*_root);
 
         return Ok();

@@ -40,7 +40,7 @@ export struct WindowAttach {
 
 export struct WindowEvent {
     WindowId window;
-    Union<None, App::MouseEvent> event;
+    Union<None, App::MouseEvent, App::KeyboardEvent> event;
 };
 
 export struct WindowFlip {

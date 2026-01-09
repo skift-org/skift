@@ -47,12 +47,12 @@
             "tag": "main"
         },
         "skift-org/hideo": {
-            "commit": "d48f33ae1ed8c43a5c59aed9a3defb107c6fbb4b",
+            "commit": "4990af5cea566dfea566859face41dbfa71d1f4a",
             "git": "https://github.com/skift-org/hideo.git",
             "tag": "main"
         },
         "skift-org/karm": {
-            "commit": "f215f08199b37862d8e95e05a4eceeccba1c1142",
+            "commit": "203aea80cfbb03a7a45ee0015d3aefd6dbfe6a4b",
             "git": "https://github.com/skift-org/karm.git",
             "tag": "main"
         },

@@ -112,7 +112,7 @@ struct Root : Ui::ProxyNode<Root> {
 struct ClientWindow : Hideo::Shell::Window {
     Sys::Endpoint& _endpoint;
     Sys::Port _client;
-    IShell::WindowId _windowId;
+    IShell::WindowId _id;
     Rc<Gfx::Surface> _frontbuffer;
     Opt<Rc<Protos::Surface>> _backbuffer;
 
@@ -126,17 +126,17 @@ struct ClientWindow : Hideo::Shell::Window {
 
     void event(App::Event& e) override {
         if (auto it = e.is<App::MouseEvent>())
-            (void)_endpoint.send(_client, IShell::WindowEvent{_windowId, *it});
+            (void)_endpoint.send(_client, IShell::WindowEvent{_id, *it});
     }
 
-    void resize(Math::Vec2i size) override {
-        if (size != bound.wh) {
+    void resize(App::Snap snap, Math::Vec2i size) override {
+        if (size != activeBound().wh) {
             logDebug("resize: {}", size);
             _frontbuffer = Gfx::Surface::alloc(size);
             (void)_endpoint.send(
                 _client,
                 IShell::WindowUpdate{
-                    _windowId,
+                    _id,
                     {
                         .size = size,
                         .formFactor = App::formFactor,
@@ -144,7 +144,7 @@ struct ClientWindow : Hideo::Shell::Window {
                 }
             );
         }
-        Window::resize(size);
+        Window::resize(snap, size);
     }
 
     void attach(Rc<Protos::Surface> backbuffer) {
@@ -198,7 +198,7 @@ struct Server {
                 makeRc<ComponentLauncher>(Mdi::PEN, "Text"s, Gfx::BLUE_RAMP, "hideo-text.main"s),
                 makeRc<ComponentLauncher>(Mdi::DUCK, "Zoo"s, Gfx::TEAL_RAMP, "hideo-zoo.main"s),
             },
-            .instances = {}
+            .windows = {}
         };
 
         auto framebuffer = try$(Framebuffer::open(ctx));
@@ -252,11 +252,11 @@ struct Server {
         auto windowSurface = Gfx::Surface::alloc(want.size);
         windowSurface->mutPixels().clear(Ui::GRAY950);
 
-        auto instance = makeRc<ClientWindow>(_endpoint, message.header().from, windowSurface);
-        instance->bound = Math::Recti{want.size}.center(_framebuffer->bound());
-        instance->_windowId = windowId;
-        _windows.put(windowId, instance);
-        Hideo::Shell::Model::event(*_root, Hideo::Shell::AddInstance{instance});
+        auto window = makeRc<ClientWindow>(_endpoint, message.header().from, windowSurface);
+        window->_floatingBound = Math::Recti{want.size}.center(_framebuffer->bound());
+        window->_id = windowId;
+        _windows.put(windowId, window);
+        Hideo::Shell::Model::event(*_root, Hideo::Shell::AddWindow{window});
 
         auto offer = want;
         offer.formFactor = App::formFactor;
@@ -269,8 +269,8 @@ struct Server {
     Res<IShell::WindowDestroy::Response> _handleWindowDestroy(Sys::Message& message) {
         auto [windowId] = try$(message.unpack<IShell::WindowDestroy>());
 
-        auto instance = _windows.get(windowId);
-        Hideo::Shell::Model::event(*_root, Hideo::Shell::RemoveInstance{instance});
+        auto window = _windows.get(windowId);
+        Hideo::Shell::Model::event(*_root, Hideo::Shell::RemoveWindow{window});
         _windows.del(windowId);
 
         return Ok();
@@ -279,8 +279,8 @@ struct Server {
     Res<IShell::WindowAttach::Response> _handleWindowAttach(Sys::Message& message) {
         auto [windowId, buffer] = try$(message.unpack<IShell::WindowAttach>());
 
-        auto instance = _windows.get(windowId);
-        instance->attach(buffer.unwrap());
+        auto window = _windows.get(windowId);
+        window->attach(buffer.unwrap());
         Ui::shouldRepaint(*_root);
 
         return Ok();
@@ -289,8 +289,8 @@ struct Server {
     Res<> _handleWindowFlip(Sys::Message& message) {
         auto [windowId, region] = try$(message.unpack<IShell::WindowFlip>());
 
-        auto instance = _windows.get(windowId);
-        instance->flip();
+        auto window = _windows.get(windowId);
+        window->flip();
         Ui::shouldRepaint(*_root);
 
         return Ok();
@@ -298,8 +298,15 @@ struct Server {
 
     Res<> _handleWindowMove(Sys::Message& message) {
         auto [windowId] = try$(message.unpack<IShell::WindowMove>());
-        auto instance = _windows.get(windowId);
-        instance->dragged = true;
+        auto window = _windows.get(windowId);
+        window->dragged = true;
+        return Ok();
+    }
+
+    Res<> _handleWindowSnap(Sys::Message& message) {
+        auto [windowId, snap] = try$(message.unpack<IShell::WindowSnap>());
+        auto window = _windows.get(windowId);
+        Hideo::Shell::Model::event(*_root, Hideo::Shell::SnapWindow{window, snap});
         return Ok();
     }
 
@@ -322,8 +329,10 @@ struct Server {
                 (void)_endpoint.resp<IShell::WindowFlip>(msg, _handleWindowFlip(msg));
             else if (msg.is<IShell::WindowMove>())
                 (void)_handleWindowMove(msg);
+            else if (msg.is<IShell::WindowSnap>())
+                (void)_handleWindowSnap(msg);
             else
-                logWarn("unsupported event: {}", msg.header());
+                logWarn("unsupported message: {}", msg.header());
         }
     }
 };

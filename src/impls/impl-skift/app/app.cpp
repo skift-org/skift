@@ -48,9 +48,7 @@ struct SkiftWindow : Window {
 
     void drag(DragEvent) override;
 
-    void resize(Direction) override {}
-
-    void maximize() override {}
+    void snap(Snap snap) override;
 
     void minimize() override {}
 
@@ -116,11 +114,14 @@ struct SkiftApplication : Application {
         return Ok();
     }
 
-    Res<> _handleWindowUpdate(Sys::Message& message) {
+    Res<> _handleWindowUpdate(Sys::Message& message, Rc<Handler> handler) {
         auto [windowId, props] = try$(message.unpack<Strata::IShell::WindowUpdate>());
         auto* window = try$(_windows.tryGet(windowId).okOr(Error::invalidInput("no such window")));
         // FIXME: We should probably have a separated hello message that pass stuff like color scheme and form factor
-        App::formFactor = props.formFactor;
+        if (App::formFactor != props.formFactor) {
+            App::formFactor = props.formFactor;
+            handler->handle<App::FormfactorEvent>(App::GLOBAL, props.formFactor);
+        }
         window->_shouldResize = props.size;
         return Ok();
     }
@@ -131,7 +132,7 @@ struct SkiftApplication : Application {
             if (message.is<Strata::IShell::WindowEvent>())
                 try$(_handleWindowEvent(message, handler));
             else if (message.is<Strata::IShell::WindowUpdate>())
-                try$(_handleWindowUpdate(message));
+                try$(_handleWindowUpdate(message, handler));
         }
         return Ok();
     }
@@ -221,6 +222,10 @@ void SkiftWindow::releaseSurface(Slice<Math::Recti>) {
 void SkiftWindow::drag(DragEvent e) {
     if (e.type == DragEvent::START)
         (void)_application._endpoint->send(_application._shell, Strata::IShell::WindowMove{_id});
+}
+
+void SkiftWindow::snap(Snap s) {
+    (void)_application._endpoint->send(_application._shell, Strata::IShell::WindowSnap{_id, s});
 }
 
 Async::Task<Rc<Application>> createAppAsync(Sys::Context& ctx, ApplicationProps const&, Async::CancellationToken ct) {

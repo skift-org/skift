@@ -40,22 +40,6 @@ struct EfiWindow : Window {
         Gfx::blitUnsafe(_front, _back->pixels());
     }
 
-    void drag(DragEvent) override {
-        // NO-OP
-    }
-
-    void resize(App::Direction) override {
-        // NO-OP
-    }
-
-    void maximize() override {
-        // NO-OP
-    }
-
-    void minimize() override {
-        // NO-OP
-    }
-
     void close() override {
         // NO-OP
     }

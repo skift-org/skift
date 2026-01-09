@@ -54,4 +54,9 @@ export struct WindowMove {
     WindowId window;
 };
 
+export struct WindowSnap {
+    WindowId window;
+    App::Snap snap;
+};
+
 } // namespace Strata::IShell

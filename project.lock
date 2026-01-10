@@ -47,12 +47,12 @@
             "tag": "main"
         },
         "skift-org/hideo": {
-            "commit": "4990af5cea566dfea566859face41dbfa71d1f4a",
+            "commit": "14d60e69c4ea87d7a20c9bcbc325671e64b8947a",
             "git": "https://github.com/skift-org/hideo.git",
             "tag": "main"
         },
         "skift-org/karm": {
-            "commit": "203aea80cfbb03a7a45ee0015d3aefd6dbfe6a4b",
+            "commit": "0a6a860104d93163a63e2a8907dcfa82d03ff70f",
             "git": "https://github.com/skift-org/karm.git",
             "tag": "main"
         },
@@ -62,7 +62,7 @@
             "tag": "main"
         },
         "skift-org/vaerk": {
-            "commit": "c6bb7584fc56d9be845b5b30696c8af23288c470",
+            "commit": "1e38b5514899337711b07b8632e762848c6d9493",
             "git": "https://github.com/skift-org/vaerk",
             "tag": "main"
         }

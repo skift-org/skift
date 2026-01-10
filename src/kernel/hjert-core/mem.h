@@ -3,7 +3,7 @@
 #include <hal/kmm.h>
 #include <hal/pmm.h>
 #include <hal/vmm.h>
-#include <handover/spec.h>
+#include <vaerk-handover/spec.h>
 
 namespace Hjert::Core {
 

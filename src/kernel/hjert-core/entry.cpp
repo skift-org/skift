@@ -3,7 +3,7 @@ import Karm.Logger;
 import Vaerk.Elf;
 
 #include <ce-bootfs/bootfs.h>
-#include <handover/entry.h>
+#include <vaerk-handover/entry.h>
 
 #include "arch.h"
 #include "cpu.h"

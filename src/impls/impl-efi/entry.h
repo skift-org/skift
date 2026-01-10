@@ -4,7 +4,7 @@ import Karm.Core;
 import Karm.Sys;
 
 #include <abi-ms/abi.h>
-#include <efi/base.h>
+#include <vaerk-efi/base.h>
 
 void __panicHandler(Karm::PanicKind kind, char const* msg);
 

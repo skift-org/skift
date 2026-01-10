@@ -9,7 +9,7 @@
         ]
     },
     "requires": [
-        "efi",
+        "vaerk-efi",
         "abi",
         "karm-sys"
     ],

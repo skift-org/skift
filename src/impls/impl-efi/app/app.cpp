@@ -1,6 +1,6 @@
 module;
 
-#include <efi/base.h>
+#include <vaerk-efi/base.h>
 #include <karm-core/macros.h>
 
 module Karm.App;

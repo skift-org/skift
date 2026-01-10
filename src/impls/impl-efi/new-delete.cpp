@@ -1,5 +1,5 @@
-#include <efi/base.h>
-#include <efi/spec.h>
+#include <vaerk-efi/base.h>
+#include <vaerk-efi/spec.h>
 
 void* __attribute__((weak)) operator new(usize size) {
     void* res = nullptr;

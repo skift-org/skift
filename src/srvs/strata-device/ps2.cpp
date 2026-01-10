@@ -2,7 +2,6 @@ module;
 
 #include <hal/io.h>
 
-
 export module Strata.Device:ps2;
 
 import Karm.Core;
@@ -175,12 +174,12 @@ struct Keyboard : Device {
             if (irq->irq == 1) {
                 auto status = try$(ctrl().readStatus());
                 while (status.has(Status::OUT_BUF) and
-                    not status.has(Status::AUX_BUF)) {
+                       not status.has(Status::AUX_BUF)) {
                     auto data = try$(ctrl().readData());
                     if (_esc) {
                         App::Key key = {App::Key::Code((data & 0x7F) + 0x80)};
                         auto event = App::makeEvent<App::KeyboardEvent>(
-                            data & 0x80 ? App::KeyboardEvent::PRESS : App::KeyboardEvent::RELEASE,
+                            data & 0x80 ? App::KeyboardEvent::RELEASE : App::KeyboardEvent::PRESS,
                             key,
                             key,
                             NONE
@@ -192,7 +191,7 @@ struct Keyboard : Device {
                     } else {
                         App::Key key = {App::Key::Code(data & 0x7F)};
                         auto event = App::makeEvent<App::KeyboardEvent>(
-                            data & 0x80 ? App::KeyboardEvent::PRESS : App::KeyboardEvent::RELEASE,
+                            data & 0x80 ? App::KeyboardEvent::RELEASE : App::KeyboardEvent::PRESS,
                             key,
                             key
                         );
@@ -270,7 +269,7 @@ struct Mouse : Device {
             if (irq->irq == 12) {
                 auto status = try$(ctrl().readStatus());
                 while (status.has(Status::OUT_BUF) and
-                    status.has(Status::AUX_BUF)) {
+                       status.has(Status::AUX_BUF)) {
 
                     auto data = try$(ctrl().readData());
 

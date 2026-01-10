@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "strata-input",
+    "type": "exe",
+    "enableIf": {
+        "sys": [
+            "skift"
+        ]
+    },
+    "requires": [
+        "strata-protos",
+        "karm-app",
+        "karm-sys"
+    ]
+}

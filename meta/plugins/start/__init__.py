@@ -23,6 +23,7 @@ def generateInit(img: image.Image, browser: bool):
         "strata-device",
         "strata-bus",
         "strata-shell",
+        "strata-input",
         "hideo-about.main",
         "hideo-calculator.main",
         "hideo-clock.main",

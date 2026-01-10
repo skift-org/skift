@@ -125,8 +125,16 @@ struct ClientWindow : Hideo::Shell::Window {
     }
 
     void event(App::Event& e) override {
-        if (auto it = e.is<App::MouseEvent>())
+        if (auto it = e.is<App::MouseEvent>()) {
             (void)_endpoint.send(_client, IShell::WindowEvent{_id, *it});
+            e.accept();
+        } else if (auto it = e.is<App::KeyboardEvent>()) {
+            (void)_endpoint.send(_client, IShell::WindowEvent{_id, *it});
+            e.accept();
+        } else if (auto it = e.is<App::TypeEvent>()) {
+            (void)_endpoint.send(_client, IShell::WindowEvent{_id, *it});
+            e.accept();
+        }
     }
 
     void resize(App::Snap snap, Math::Vec2i size) override {
@@ -221,6 +229,12 @@ struct Server {
                 Meta::idOf<App::KeyboardEvent>()
             }
         ));
+        try$(endpoint.send(
+            Sys::Port::BUS,
+            Strata::IBus::Listen{
+                Meta::idOf<App::TypeEvent>()
+            }
+        ));
 
         return Ok(Server{
             endpoint,
@@ -239,6 +253,13 @@ struct Server {
     Res<> _handleKeyboardEvent(Sys::Message& message) {
         auto event = try$(message.unpack<App::KeyboardEvent>());
         auto e = App::makeEvent<App::KeyboardEvent>(event);
+        _root->child().event(*e);
+        return Ok();
+    }
+
+    Res<> _handleTypeEvent(Sys::Message& message) {
+        auto event = try$(message.unpack<App::TypeEvent>());
+        auto e = App::makeEvent<App::TypeEvent>(event);
         _root->child().event(*e);
         return Ok();
     }
@@ -319,6 +340,8 @@ struct Server {
                 (void)_handleMouseEvent(msg);
             else if (msg.is<App::KeyboardEvent>())
                 (void)_handleKeyboardEvent(msg);
+            else if (msg.is<App::TypeEvent>())
+                (void)_handleTypeEvent(msg);
             else if (msg.is<IShell::WindowCreate>())
                 (void)_endpoint.resp<IShell::WindowCreate>(msg, _handleWindowCreate(msg));
             else if (msg.is<IShell::WindowDestroy>())

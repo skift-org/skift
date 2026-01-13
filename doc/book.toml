@@ -8,5 +8,5 @@ title = "SkiftOS Handbook"
 [output.html]
 default-theme = "skift-dark"
 preferred-dark-theme = "skift-dark"
-git-repository-url = "https://github.com/skift-org/skift"
-edit-url-template = "https://github.com/skift-org/skift/edit/main/doc/{path}"
+git-repository-url = "https://codeberg.org/skift/os"
+edit-url-template = "https://codeberg.org/skift/os/edit/main/doc/{path}"

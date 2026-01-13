@@ -73,7 +73,7 @@ In 2023, I started a new job and I didn't have much free time to work on skiftOS
 
 ## 2024 - The first release
 
-I hope to release the first version of skiftOS in 2024
+I hope to release the first version of skiftOS in ~~2024~~ ~~2025~~ 2026
 
 ## Beyond
 

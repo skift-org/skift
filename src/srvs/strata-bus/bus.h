@@ -1,8 +1,8 @@
 #pragma once
 
 #include <hjert-api/api.h>
-#include <impl-skift/fd.h>
 
+import Karm.Sys.Skift;
 import Karm.Logger;
 import Karm.Ref;
 import Karm.Sys;
@@ -40,13 +40,13 @@ struct Endpoint : Meta::Pinned {
 struct Service : Endpoint {
     String _id;
     Vec<Meta::Id> _listen;
-    Rc<Skift::IpcFd> _ipc;
+    Rc<Sys::Skift::IpcFd> _ipc;
     Sys::IpcConnection _con;
     Opt<Hj::Task> _task = NONE;
 
     static Res<Rc<Service>> prepare(Sys::Context& ctx, Str id);
 
-    Service(Str id, Rc<Skift::IpcFd> ipc)
+    Service(Str id, Rc<Sys::Skift::IpcFd> ipc)
         : _id{id}, _ipc{ipc}, _con{ipc, ""_url} {
     }
 

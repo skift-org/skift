@@ -2,8 +2,8 @@ import Karm.Core;
 import Karm.Logger;
 import Strata.Protos;
 import Vaerk.Elf;
+import Karm.Sys.Skift;
 
-#include <impl-skift/bootfs.h>
 #include <vaerk-handover/hook.h>
 
 #include "bus.h"
@@ -29,7 +29,7 @@ Res<Rc<Service>> Service::prepare(Sys::Context&, Str id) {
     auto out = try$(Hj::Channel::create(Hj::Domain::self(), kib(16), 16));
     try$(out.label(Io::format("{}-out", id)));
 
-    auto ipc = makeRc<Skift::IpcFd>(
+    auto ipc = makeRc<Sys::Skift::IpcFd>(
         std::move(in),
         std::move(out)
     );
@@ -40,7 +40,7 @@ Res<Rc<Service>> Service::prepare(Sys::Context&, Str id) {
 Res<> Service::activate(Sys::Context& ctx) {
     logInfo("activating service '{}'...", _id);
     auto& handover = useHandover(ctx);
-    auto bootfs = try$(Bootfs::ensure());
+    auto bootfs = try$(Sys::Skift::Bootfs::ensure());
 
     logInfoIf(DEBUG_ELF, "mapping elf...");
     auto elfPath = Io::format("bundles/{}/_bin", id());

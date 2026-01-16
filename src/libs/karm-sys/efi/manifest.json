@@ -1,0 +1,23 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-sys.efi",
+    "type": "lib",
+    "props" : {
+        "cpp-root-include" : true
+    },
+    "enableIf": {
+        "sys": [
+            "efi"
+        ]
+    },
+    "requires": [
+        "vaerk-efi",
+        "abi",
+        "karm-core"
+    ],
+    "provides": [
+        "karm-sys.impl",
+        "karm-sys.async",
+        "karm-sys.sandbox"
+    ]
+}

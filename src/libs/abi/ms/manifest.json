@@ -1,0 +1,13 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "abi.ms",
+    "type": "lib",
+    "enableIf": {
+        "abi": [
+            "ms"
+        ]
+    },
+    "provides": [
+        "abi"
+    ]
+}

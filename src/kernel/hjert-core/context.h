@@ -21,8 +21,9 @@ enum struct Mode : u8 {
 
 struct Context {
     virtual ~Context() = default;
-    virtual void save(Arch::Frame const&) = 0;
-    virtual void load(Arch::Frame&) = 0;
+
+    virtual void save(Arch::Frame const& from) = 0;
+    virtual void load(Arch::Frame& to) = 0;
 };
 
 struct Stack {

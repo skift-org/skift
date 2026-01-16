@@ -1,0 +1,13 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "karm-logger.hjert",
+    "type": "lib",
+    "enableIf": {
+        "sys": [
+            "kernel"
+        ]
+    },
+    "provides": [
+        "karm-logger.impl"
+    ]
+}

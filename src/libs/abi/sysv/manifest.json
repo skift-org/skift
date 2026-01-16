@@ -1,0 +1,13 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "abi.sysv",
+    "type": "lib",
+    "enableIf": {
+        "abi": [
+            "sysv"
+        ]
+    },
+    "provides": [
+        "abi"
+    ]
+}

@@ -1,0 +1,11 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "strata-fs",
+    "type": "exe",
+    "requires": [
+        "strata-protos",
+        "karm-app",
+        "karm-sys",
+        "karm-fs"
+    ]
+}

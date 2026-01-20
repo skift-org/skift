@@ -48,10 +48,10 @@ struct Server {
         return Ok();
     }
 
-    Async::Task<> servAsync(Async::CancellationToken) {
+    Async::Task<> servAsync(Async::CancellationToken ct) {
         logInfo("service started");
         while (true) {
-            auto msg = co_trya$(_endpoint.recvAsync());
+            auto msg = co_trya$(_endpoint.recvAsync(ct));
             if (msg.is<App::KeyboardEvent>())
                 (void)_handleKeyboardEvent(msg);
             else

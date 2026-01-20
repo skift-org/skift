@@ -335,7 +335,7 @@ struct Server {
         Async::detach(_root->runAsync(ct));
         Map<IShell::WindowId, Rc<ClientWindow>> windows;
         while (true) {
-            auto msg = co_trya$(_endpoint.recvAsync());
+            auto msg = co_trya$(_endpoint.recvAsync(ct));
             if (msg.is<App::MouseEvent>())
                 (void)_handleMouseEvent(msg);
             else if (msg.is<App::KeyboardEvent>())

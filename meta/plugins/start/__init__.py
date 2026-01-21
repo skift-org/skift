@@ -20,21 +20,22 @@ def generateInit(img: image.Image, browser: bool):
     img.mkdir("users/root")
 
     userspace = [
-        "strata-device",
-        "strata-bus",
-        "strata-shell",
-        "strata-input",
         "hideo-about.main",
         "hideo-calculator.main",
+        "hideo-chat.main",
         "hideo-clock.main",
+        "hideo-console.main",
         "hideo-counter.main",
         "hideo-files.main",
-        "hideo-console.main",
         "hideo-settings.main",
-        "hideo-text.main",
-        "hideo-chat.main",
         "hideo-sysmon.main",
+        "hideo-text.main",
         "hideo-zoo.main",
+        "strata-bus",
+        "strata-device",
+        "strata-fs",
+        "strata-input",
+        "strata-shell",
     ]
 
     if browser:

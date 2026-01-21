@@ -1,23 +1,22 @@
+#include <hjert-api/api.h>
 #include <karm-sys/entry.h>
 #include <vaerk-handover/hook.h>
-#include <hjert-api/api.h>
-
 
 import Strata.Protos;
 import Karm.Sys.Skift;
 import Karm.Fs;
+import Karm.Logger;
 
 using namespace Karm;
 
 namespace Strata::Fs {
-
 
 struct Server {
     Rc<Karm::Fs::Node> _root;
     Map<IFs::Fid, Rc<Karm::Fs::Node>> _files = {};
     IFs::Fid _fids = 1;
 
-    static Async::Task<Server> createAsync(Sys::Context& ctx, Async::CancellationToken ) {
+    static Async::Task<Server> createAsync(Sys::Context& ctx, Async::CancellationToken) {
         auto& handover = useHandover(ctx);
 
         auto* bootfsRecord = handover.fileByName("file:/skift/init.bootfs");
@@ -79,6 +78,8 @@ struct Server {
     }
 
     Async::Task<> servAsync(Sys::Context& ctx, Async::CancellationToken ct) {
+        logInfo("service started");
+
         auto endpoint = Sys::Endpoint::adopt(ctx);
 
         while (true) {

@@ -20,6 +20,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx, Async::CancellationToken) {
     co_try$(system->prepareService("strata-device"s));
     co_try$(system->prepareService("strata-shell"s));
     co_try$(system->prepareService("strata-input"s));
+    co_try$(system->prepareService("strata-fs"s));
 
     for (auto& endpoint : system->_endpoints)
         co_try$(endpoint->activate(ctx));

@@ -1,7 +1,7 @@
 export module Strata.Protos:ifs;
 
 import Karm.Core;
-import Karm.Sys;
+import Karm.Sys.Base;
 
 using namespace Karm;
 

@@ -14,7 +14,7 @@ def generateBoot(img: image.Image) -> None:
     img.cpTree("meta/image/boot/efi", "")
 
 
-def generateInit(img: image.Image, browser: bool):
+def generateInit(img: image.Image):
     img.mkdir("bundles")
     img.mkdir("share")
     img.mkdir("users/root")
@@ -31,6 +31,7 @@ def generateInit(img: image.Image, browser: bool):
         "hideo-sysmon.main",
         "hideo-text.main",
         "hideo-zoo.main",
+        "vaev-browser.main",
         "strata-bus",
         "strata-device",
         "strata-fs",
@@ -38,13 +39,10 @@ def generateInit(img: image.Image, browser: bool):
         "strata-shell",
     ]
 
-    if browser:
-        userspace.append("vaev-browser.main")
-
     img.install(userspace, "skift-x86_64")
 
 
-def generateSystem(registry: model.Registry, browser: bool = False, hdd: bool = False):
+def generateSystem(registry: model.Registry, hdd: bool = False):
     bootStore = (
         store.Dir("image-efi-x86_64")
         if not hdd
@@ -55,7 +53,7 @@ def generateSystem(registry: model.Registry, browser: bool = False, hdd: bool = 
 
     initStore = store.BootFs("image-init-x86_64")
     initImg = image.Image(registry, initStore)
-    generateInit(initImg, browser)
+    generateInit(initImg)
 
     bootImg.cp(initStore.finalize(), "skift/init.bootfs")
 
@@ -72,7 +70,6 @@ class BuildArgs(model.RegistryArgs):
     fmt: str = cli.arg(None, "format", "The format of the image")
     compress: str = cli.arg(None, "compress", "Compress the image")
     dist: bool = cli.arg(None, "dist", "Copy the image to the dist folder")
-    browser: bool = cli.arg(None, "browser", "Include the browser engine to the build")
 
 
 @cli.command("dist", "Generate the boot image")
@@ -81,7 +78,7 @@ def _(args: BuildArgs) -> None:
 
     registry = model.Registry.use(args)
 
-    file = generateSystem(registry, args.browser, args.fmt == "hdd")
+    file = generateSystem(registry, args.fmt == "hdd")
     if args.fmt == "hdd" and args.compress:
         zip = shell.compress(file, format=args.compress)
         shell.rmrf(file)
@@ -107,7 +104,6 @@ class StartArgs:
     )
     dint: bool = cli.arg(None, "dint", "Debug interrupts")
     clean: bool = cli.arg(None, "clean", "Clean the image before starting")
-    browser: bool = cli.arg(None, "browser", "Include the browser engine to the build")
 
 
 @cli.command("boot", "Boot the system")
@@ -126,7 +122,7 @@ def _(args: StartArgs) -> None:
     img = image.Image(registry, dirStore)
 
     if args.arch == "x86_64":
-        generateSystem(registry, args.browser, False)
+        generateSystem(registry, False)
         print("Booting...")
         machine = runner.Qemu(logError=args.dint, debugger=args.debug)
         machine.boot(img)

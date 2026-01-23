@@ -20,6 +20,14 @@
         "skift/vaerk": {
             "git": "https://codeberg.org/skift/vaerk",
             "tag": "main"
+        },
+        "skift/luna": {
+            "git": "https://codeberg.org/skift/luna",
+            "tag": "main"
+        },
+        "skift/vaev": {
+            "git": "https://codeberg.org/skift/vaev",
+            "tag": "main"
         }
     }
 }

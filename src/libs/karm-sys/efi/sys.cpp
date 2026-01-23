@@ -1,7 +1,7 @@
 module;
 
-#include <vaerk-efi/base.h>
 #include <hal/mem.h>
+#include <vaerk-efi/base.h>
 
 module Karm.Sys;
 
@@ -316,8 +316,9 @@ Res<> memFlush(void*, usize) {
     return Ok();
 }
 
-Res<Stat> stat(Ref::Url const&) {
-    return Error::notImplemented();
+Res<Stat> stat(Ref::Url const& url) {
+    auto file = try$(openFile(url));
+    return file->stat();
 }
 
 usize pageSize() {

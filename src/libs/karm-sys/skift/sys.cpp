@@ -119,6 +119,10 @@ Res<Rc<Fd>> listenUdp(SocketAddr) {
     return Error::notImplemented();
 }
 
+Res<Rc<Fd>> connectIpc(Ref::Url) {
+    return Error::notImplemented();
+}
+
 Res<Rc<Fd>> listenIpc(Ref::Url) {
     return Error::notImplemented();
 }

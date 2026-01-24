@@ -1,16 +1,20 @@
-#pragma once
+module;
+
+#include <hjert-api/api.h>
+#include <vaerk-handover/hook.h>
+
+export module Strata.Shell:framebuffer;
 
 import Karm.Gfx;
 import Karm.Logger;
 import Karm.Math;
 
-#include <hjert-api/api.h>
-#include <vaerk-handover/hook.h>
+using namespace Karm;
 
 namespace Strata::Shell {
 
-struct Framebuffer {
-    static Res<Rc<Framebuffer>> open(Sys::Context& ctx)  {
+export struct Framebuffer {
+    static Res<Rc<Framebuffer>> open(Sys::Context& ctx) {
         auto& handover = useHandover(ctx);
         auto* record = handover.findTag(Handover::Tag::FB);
         auto vmo = try$(Hj::Vmo::create(Hj::ROOT, record->start, record->size, Hj::VmoFlags::DMA));

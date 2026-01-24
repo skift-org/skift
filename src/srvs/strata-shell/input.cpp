@@ -1,10 +1,12 @@
-#include "input.h"
+export module Strata.Shell:input;
 
 import Karm.Ui;
 import Karm.Gfx;
 import Karm.App;
 import Karm.Math;
 import Karm.Core;
+
+using namespace Karm;
 
 namespace Strata::Shell {
 
@@ -177,7 +179,6 @@ struct InputTranslator : Ui::ProxyNode<InputTranslator> {
                 Ui::event<App::MouseEvent>(child(), mouseRelease);
             }
 
-
             _mousePrev = *m;
         } else if (auto k = e.is<Node::AnimateEvent>()) {
             if (_mouseDirty) {
@@ -198,7 +199,7 @@ struct InputTranslator : Ui::ProxyNode<InputTranslator> {
     }
 };
 
-Ui::Child inputTranslator(Ui::Child child, Math::Vec2i mousePos) {
+export Ui::Child inputTranslator(Ui::Child child, Math::Vec2i mousePos) {
     return makeRc<InputTranslator>(std::move(child), mousePos, makeBox<RoundedCursor>());
 }
 

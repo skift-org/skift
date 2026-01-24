@@ -1,16 +1,18 @@
 #include <karm-sys/entry.h>
 
-#include "framebuffer.h"
-#include "hideo-spreadsheet/model.h"
-#include "input.h"
-
 import Mdi;
-import Karm.Ui;
 import Karm.App;
 import Karm.Gfx;
-import Hideo.Shell;
 import Karm.Image;
+import Karm.Logger;
+import Karm.Math;
+import Karm.Ui;
+
 import Strata.Protos;
+import Hideo.Shell;
+import Strata.Shell;
+
+using namespace Karm;
 
 namespace Strata::Shell {
 

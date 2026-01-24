@@ -52,12 +52,12 @@
             "tag": "main"
         },
         "skift/karm": {
-            "commit": "3de0e66b8f9adc9d42f12cf95acd8ec5e26e8bcb",
+            "commit": "23c0f0d7d000e9c5aa550f519d66edbdc7d1a1e3",
             "git": "https://codeberg.org/skift/karm.git",
             "tag": "main"
         },
         "skift/luna": {
-            "commit": "f07fee751ea0b90e4877c338b6a0b586b1427cea",
+            "commit": "e9eb4694c94c945ec38b0e96d5949318da850fe8",
             "git": "https://codeberg.org/skift/luna",
             "tag": "main"
         },

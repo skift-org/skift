@@ -140,4 +140,12 @@ Res<> _poll(Cap cap, Event* ev, usize evCap, usize* evLen, Instant until) {
     return _syscall(Syscall::POLL, cap.raw(), (Arg)ev, evCap, (usize)evLen, until.val());
 }
 
+Res<> _write(Cap cap, u8 const* buf, usize bufLen) {
+    return _syscall(Syscall::WRITE, cap.raw(), (Arg)buf, bufLen);
+}
+
+Res<> _read(Cap cap, u8* buf, usize* bufLen) {
+    return _syscall(Syscall::READ, cap.raw(), (Arg)buf, (Arg)bufLen);
+}
+
 } //  namespace Hj

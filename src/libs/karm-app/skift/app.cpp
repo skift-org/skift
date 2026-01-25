@@ -150,7 +150,6 @@ struct SkiftApplication : Application {
                 continue;
 
             auto size = window->_shouldResize.unwrap();
-            logDebug("new size {}", size);
 
             auto newSurface = co_try$(Strata::Protos::Surface::create(size));
 

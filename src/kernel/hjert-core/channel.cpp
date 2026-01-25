@@ -1,7 +1,6 @@
 #include "channel.h"
-#include "domain.h"
 
-import Karm.Logger;
+#include "domain.h"
 
 namespace Hjert::Core {
 
@@ -109,6 +108,7 @@ Res<Hj::SentRecv> Channel::recv(Domain& dom, MutBytes bytes, MutSlice<Hj::Cap> c
 Res<> Channel::close() {
     ObjectLockScope scope{*this};
     _closed = true;
+    _updateSignalsUnlock();
     return Ok();
 }
 

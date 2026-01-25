@@ -141,7 +141,6 @@ struct ClientWindow : Hideo::Shell::Window {
 
     void resize(App::Snap snap, Math::Vec2i size) override {
         if (size != activeBound().wh) {
-            logDebug("resize: {}", size);
             _frontbuffer = Gfx::Surface::alloc(size);
             (void)_endpoint.send(
                 _client,
@@ -268,8 +267,6 @@ struct Server {
 
     Res<IShell::WindowCreate::Response> _handleWindowCreate(Sys::Message& message) {
         auto [want] = try$(message.unpack<IShell::WindowCreate>());
-        logDebug("window create {}", want.size);
-
         auto windowId = _windowId++;
 
         auto windowSurface = Gfx::Surface::alloc(want.size);

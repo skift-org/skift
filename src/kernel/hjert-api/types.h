@@ -5,7 +5,6 @@ import Karm.Core;
 #include <hal/vmm.h>
 
 namespace Hj {
-
 #define FOREACH_TYPE(TYPE) \
     TYPE(DOMAIN)           \
     TYPE(TASK)             \
@@ -14,7 +13,8 @@ namespace Hj {
     TYPE(IOP)              \
     TYPE(CHANNEL)          \
     TYPE(IRQ)              \
-    TYPE(LISTENER)
+    TYPE(LISTENER)         \
+    TYPE(PIPE)
 
 // clang-format off
 
@@ -59,7 +59,9 @@ static inline char const* toStr(Type type) {
     SYSCALL(CLOSE)               \
     SYSCALL(SIGNAL)              \
     SYSCALL(LISTEN)              \
-    SYSCALL(POLL)
+    SYSCALL(POLL)                \
+    SYSCALL(READ)                \
+    SYSCALL(WRITE)
 
 // clang-format off
 
@@ -270,6 +272,11 @@ struct ListenerProps {
     static constexpr Type TYPE = Type::LISTENER;
 };
 
+struct PipeProps {
+    static constexpr Type TYPE = Type::PIPE;
+    usize bufCap; //< The capacity of the data buffer (in bytes, must be >= 1)
+};
+
 using _Props = Union<
     DomainProps,
     TaskProps,
@@ -278,7 +285,8 @@ using _Props = Union<
     IopProps,
     ChannelProps,
     IrqProps,
-    ListenerProps>;
+    ListenerProps,
+    PipeProps>;
 
 struct Props : _Props {
     using _Props::_Props;

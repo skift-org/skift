@@ -1,11 +1,13 @@
+#include "syscalls.h"
+
 #include "arch.h"
 #include "channel.h"
 #include "domain.h"
 #include "iop.h"
 #include "irq.h"
 #include "listener.h"
+#include "pipe.h"
 #include "sched.h"
-#include "syscalls.h"
 #include "task.h"
 #include "user.h"
 
@@ -104,6 +106,9 @@ Res<> doCreate(Task& self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
             },
             [&](Hj::ListenerProps&) -> Res<Arc<Object>> {
                 return Ok(try$(Listener::create()));
+            },
+            [&](Hj::PipeProps& props) -> Res<Arc<Object>> {
+                return Ok(try$(Pipe::create(props.bufCap)));
             },
         }
     ));
@@ -261,6 +266,32 @@ Res<> doPoll(Task& self, Hj::Cap cap, UserSlice<MutSlice<Hj::Event>> events, Use
     return Ok();
 }
 
+Res<> doWrite(Task& self, Hj::Cap cap, UserSlice<Bytes> buf, User<Hj::Arg> bufLen) {
+    return with(
+        self.space(),
+        [&](Bytes buf, auto bufLen) -> Res<> {
+            auto obj = try$(self.domain().get<Pipe>(cap));
+            auto written = try$(obj->write(buf));
+            *bufLen = written;
+            return Ok();
+        },
+        buf, bufLen
+    );
+}
+
+Res<> doRead(Task& self, Hj::Cap cap, UserSlice<MutBytes> buf, User<Hj::Arg> bufLen) {
+    return with(
+        self.space(),
+        [&](auto buf, auto bufLen) -> Res<> {
+            auto obj = try$(self.domain().get<Pipe>(cap));
+            auto read = try$(obj->read(buf));
+            *bufLen = read;
+            return Ok();
+        },
+        buf, bufLen
+    );
+}
+
 Res<> dispatchSyscall(Task& self, Hj::Syscall id, Hj::Args args) {
     switch (id) {
     case Hj::Syscall::NOW:
@@ -331,6 +362,28 @@ Res<> dispatchSyscall(Task& self, Hj::Syscall id, Hj::Args args) {
 
     case Hj::Syscall::POLL:
         return doPoll(self, Hj::Cap{args[0]}, {args[1], args[2]}, args[3], args[4]);
+
+    case Hj::Syscall::WRITE: {
+        User<Hj::Arg> bufLen = args[2];
+
+        return doWrite(
+            self,
+            Hj::Cap{args[0]},
+            {args[1], try$(bufLen.load(self.space()))},
+            args[2]
+        );
+    }
+
+    case Hj::Syscall::READ: {
+        User<Hj::Arg> bufLen = args[2];
+
+        return doRead(
+            self,
+            Hj::Cap{args[0]},
+            {args[1], try$(bufLen.load(self.space()))},
+            args[2]
+        );
+    }
 
     default:
         return Error::invalidInput("invalid syscall id");

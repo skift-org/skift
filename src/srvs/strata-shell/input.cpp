@@ -47,7 +47,7 @@ struct ClassicCursor : Cursor {
     Gfx::Color _fill = Gfx::BLACK;
     Gfx::Color _stroke = Gfx::WHITE;
     Math::Path _path = Math::Path::fromSvg(
-#include "hideo-shell/defs/classic-cursor.path"
+#include "defs/classic-cursor.path"
 
     );
 
@@ -79,7 +79,7 @@ struct RoundedCursor : Cursor {
     Gfx::Color _fill = Gfx::BLACK;
     Gfx::Color _stroke = Gfx::WHITE;
     Math::Path _path = Math::Path::fromSvg(
-#include "hideo-shell/defs/rounded-cursor.path"
+#include "defs/rounded-cursor.path"
 
     );
 

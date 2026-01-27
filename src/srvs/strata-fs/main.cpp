@@ -1,5 +1,5 @@
 #include <hjert-api/api.h>
-#include <karm-sys/entry.h>
+#include <karm/entry>
 #include <vaerk-handover/hook.h>
 
 import Strata.Protos;

@@ -1,7 +1,7 @@
 import Karm.Core;
 import Karm.Logger;
 
-#include <ce-heap/libheap.h>
+#include <libheap.h>
 #include <hjert-api/api.h>
 
 // MARK: Heap Implementation ---------------------------------------------------

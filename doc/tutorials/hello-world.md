@@ -50,7 +50,7 @@ Here is a brief explanation of the fields in the manifest:
 Create a `main.cpp` file in the project directory:
 
 ```cpp
-#include <karm-sys/entry.h>
+#include <karm/entry>
 
 // The entry point of the program, skiftOS doesn't use `main` function
 Async::Res<> entryPointAsync(Sys::Context &) {

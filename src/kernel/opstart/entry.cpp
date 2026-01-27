@@ -2,7 +2,7 @@ import Karm.Gfx;
 import Karm.Math;
 import Karm.Logger;
 
-#include <karm-sys/entry.h>
+#include <karm/entry>
 
 #include "loader.h"
 

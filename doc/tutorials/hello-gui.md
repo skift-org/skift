@@ -33,7 +33,7 @@ First, we need to add the GUI library to the project. Open the `manifest.json` f
 Update the `main.cpp` file in the project directory to create a text view with the message "Hello, GUI!".
 
 ```cpp
-#include <karm-sys/entry.h>
+#include <karm/entry>
 import Karm.Ui;
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {
@@ -60,7 +60,7 @@ You should see a window with the message "Hello, GUI!".
 You might have noticed that the text is not centered in the window. To center the text, we can use the `center` function:
 
 ```cpp
-#include <karm-sys/entry.h>
+#include <karm/entry>
 import Karm.Ui;
 
 Async::Task<> entryPointAsync(Sys::Context &ctx) {

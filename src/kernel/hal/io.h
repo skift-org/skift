@@ -2,7 +2,7 @@
 
 import Karm.Core;
 
-#include <karm-core/macros.h>
+#include <karm/macros>
 
 using namespace Karm;
 

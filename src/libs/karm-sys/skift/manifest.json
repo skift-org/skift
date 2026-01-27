@@ -3,7 +3,7 @@
     "id": "karm-sys.skift",
     "type": "lib",
     "props": {
-        "cpp-root-include": true
+        "export-headers": "includes"
     },
     "enableIf": {
         "sys": [

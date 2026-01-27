@@ -1,7 +1,7 @@
 import Karm.Core;
 import Karm.Logger;
 
-#include <ce-heap/libheap.h>
+#include <libheap.h>
 #include <hjert-core/mem.h>
 
 // MARK: Kmm Implementation ---------------------------------------------------

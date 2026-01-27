@@ -3,6 +3,9 @@
     "id": "hal",
     "type": "lib",
     "description": "Hardware Abstraction Layer",
+    "props": {
+        "export-headers": ".."
+    },
     "requires": [
         "hal-impl",
         "karm-core"

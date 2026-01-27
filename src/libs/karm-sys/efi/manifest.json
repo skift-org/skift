@@ -2,8 +2,8 @@
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
     "id": "karm-sys.efi",
     "type": "lib",
-    "props" : {
-        "cpp-root-include" : true
+    "props": {
+        "export-headers": "includes"
     },
     "enableIf": {
         "sys": [

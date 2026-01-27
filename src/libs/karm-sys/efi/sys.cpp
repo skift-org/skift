@@ -387,7 +387,7 @@ Async::Task<> launchAsync(Sys::Intent) {
 
 // MARK: Process ---------------------------------------------------------------
 
-Res<Rc<Pid>> run(Command const&) {
+Res<Rc<Pid>> spawn(Command const&) {
     return Error::notImplemented();
 }
 

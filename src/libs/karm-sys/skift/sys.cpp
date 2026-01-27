@@ -101,7 +101,11 @@ Async::Task<> launchAsync(Intent) {
 
 // MARK: Process ---------------------------------------------------------------
 
-Res<Rc<Pid>> run(Command const&) {
+Res<Rc<Pid>> spawn(Command const&) {
+    notImplemented();
+}
+
+Res<Tuple<Rc<Pid>, Rc<Fd>>> spawnPty(Command const&){
     notImplemented();
 }
 

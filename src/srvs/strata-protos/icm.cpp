@@ -1,6 +1,6 @@
 module;
 
-export module Strata.Protos:ibus;
+export module Strata.Protos:icm;
 
 import Karm.Core;
 import Karm.Sys;
@@ -8,7 +8,7 @@ import Karm.Ref;
 
 using namespace Karm;
 
-namespace Strata::IBus {
+namespace Strata::ICm {
 
 export struct Connect {
     Opt<Rc<Sys::Fd>> fd;
@@ -23,4 +23,4 @@ export struct Launch {
     Ref::Url url;
 };
 
-} // namespace Strata::IBus
+} // namespace Strata::ICm

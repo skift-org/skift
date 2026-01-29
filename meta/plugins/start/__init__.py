@@ -32,7 +32,7 @@ def generateInit(img: image.Image):
         "hideo-text.main",
         "hideo-zoo.main",
         "vaev-browser.main",
-        "strata-bus",
+        "strata-cm",
         "strata-device",
         "strata-fs",
         "strata-input",

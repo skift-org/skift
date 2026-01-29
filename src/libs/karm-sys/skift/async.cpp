@@ -67,7 +67,7 @@ struct SkiftSched : Sys::Sched {
 
         while (true) {
             auto msg = co_trya$(Skift::globalClient().recvAsync(ct));
-            auto incomming = co_try$(msg.unpack<Strata::IBus::Incoming>());
+            auto incomming = co_try$(msg.unpack<Strata::ICm::Incoming>());
 
             if (not incomming.fd)
                 continue;

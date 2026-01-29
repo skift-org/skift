@@ -20,12 +20,14 @@ extern "C" [[gnu::weak]] void __entryPoint(usize rawHandover, usize rawIn, usize
     Karm::registerPanicHandler(__panicHandler);
 
     Sys::Context ctx;
+
     char const* argv[] = {"service", nullptr};
     ctx.add<Sys::ArgsHook>(1, argv);
     ctx.add<HandoverHook>(reinterpret_cast<Handover::Payload*>(rawHandover));
+
     Sys::IpcConnection conn = {
         makeRc<Sys::Skift::DuplexFd>(Hj::Cap{rawIn}, Hj::Cap{rawOut}),
-        "ipc:strata-bus"_url,
+        "ipc:strata-cm"_url,
     };
     Sys::Skift::setupClient(std::move(conn));
 

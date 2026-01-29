@@ -300,12 +300,12 @@ struct Context : Core::Context {
         x86_64::simdInitContext(_simd.buf());
     }
 
-    virtual void save(Arch::Frame const& frame) {
+    void save(Arch::Frame const& frame) override {
         x86_64::simdSaveContext(_simd.buf());
         _frame = frame;
     }
 
-    virtual void load(Arch::Frame& frame) {
+    void load(Arch::Frame& frame) override {
         frame = _frame;
         x86_64::simdLoadContext(_simd.buf());
         x86_64::sysSetGs((usize)&_ksp);

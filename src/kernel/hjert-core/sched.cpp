@@ -1,7 +1,7 @@
 import Karm.Logger;
 
-#include "arch.h"
 #include "sched.h"
+#include "arch.h"
 #include "space.h"
 #include "task.h"
 

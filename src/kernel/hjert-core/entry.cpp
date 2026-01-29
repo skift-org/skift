@@ -46,7 +46,7 @@ Res<> enterUserspace(Handover::Payload& payload) {
     space->label("init-space");
 
     logInfo("entry: mapping elf...");
-    auto elfVmo = try$(_locateInit(payload, "bundles/strata-bus/_bin"));
+    auto elfVmo = try$(_locateInit(payload, "bundles/strata-cm/_bin"));
     elfVmo->label("elf-shared");
     auto elfRange = try$(kmm().pmm2Kmm(elfVmo->range()));
     Vaerk::Elf::Image image{elfRange.bytes()};

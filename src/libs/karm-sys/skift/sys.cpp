@@ -110,7 +110,7 @@ Res<Stat> stat(Ref::Url const& url) {
 
 Res<> launch(Intent intent) {
     auto url = try$(intent.handler.okOr(Error::invalidInput("no handler for intent")));
-    return Skift::globalClient().notify(Strata::IBus::Launch(url));
+    return Skift::globalClient().notify(Strata::ICm::Launch(url));
 }
 
 [[clang::coro_wrapper]]
@@ -144,7 +144,7 @@ Res<Rc<Fd>> listenUdp(SocketAddr) {
 
 Res<Rc<Fd>> connectIpc(Ref::Url url) {
     auto fd = try$(Skift::DuplexFd::create(url.host.str()));
-    try$(Skift::globalClient().notify(Strata::IBus::Connect{try$(fd->swap()), url}));
+    try$(Skift::globalClient().notify(Strata::ICm::Connect{try$(fd->swap()), url}));
     return Ok(fd);
 }
 

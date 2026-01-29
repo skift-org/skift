@@ -46,7 +46,12 @@ static Res<Hj::Task> loadElf(Sys::Context& ctx, String id, Rc<Sys::Skift::Duplex
             auto sectionVmo = try$(Hj::Vmo::create(Hj::ROOT, 0, size, Hj::VmoFlags::UPPER));
             try$(sectionVmo.label("elf-writeable"));
             auto sectionRange = try$(Hj::map(sectionVmo, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
-            copy(prog.bytes(), sectionRange.mutBytes());
+            auto sectionBytes = sectionRange.mutBytes();
+            copy(prog.bytes(), sectionBytes);
+            if (prog.memsz() > prog.filez()) {
+                auto bss = mutNext(sectionBytes, prog.filez());
+                zeroFill(bss);
+            }
             try$(elfSpace.map(prog.vaddr(), sectionVmo, 0, size, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
         } else {
             try$(elfSpace.map(prog.vaddr(), elfVmo, prog.offset(), size, {Hj::MapFlags::READ, Hj::MapFlags::EXEC}));
@@ -101,13 +106,13 @@ struct ComponentManager {
             : _cm(cm), _id(id), _conn(std::move(conn)), _task(std::move(task)) {}
 
         Res<> _handleConnect(Sys::IpcMessage& msg) {
-            auto [fd, url] = try$(msg.unpack<IBus::Connect>());
+            auto [fd, url] = try$(msg.unpack<ICm::Connect>());
             logInfo("'{}' requested connection to '{}'", _id, url);
             return _cm.connect(try$(fd.okOr(Error::invalidHandle("missing "))), url);
         }
 
         Res<> _handleLaunch(Sys::IpcMessage& msg) {
-            auto [url] = try$(msg.unpack<IBus::Launch>());
+            auto [url] = try$(msg.unpack<ICm::Launch>());
             logInfo("'{}' requested launch of '{}'", _id, url);
             try$(_cm.start(url.host.str(), false));
             return Ok();
@@ -118,9 +123,9 @@ struct ComponentManager {
             while (true) {
                 co_try$(ct.errorIfCanceled());
                 auto msg = co_trya$(Sys::rpcRecvAsync(_conn, ct));
-                if (msg.is<IBus::Connect>())
+                if (msg.is<ICm::Connect>())
                     (void)_handleConnect(msg);
-                else if (msg.is<IBus::Launch>()) {
+                else if (msg.is<ICm::Launch>()) {
                     (void)_handleLaunch(msg);
                 }
             }
@@ -133,7 +138,7 @@ struct ComponentManager {
 
         Res<> incoming(Rc<Sys::Fd> fd) {
             logInfo("notifying '{}' of incoming connection", _id);
-            return notify(IBus::Incoming{fd});
+            return notify(ICm::Incoming{fd});
         }
 
         bool operator==(Component const& other) const {
@@ -174,8 +179,10 @@ struct ComponentManager {
         auto component = makeRc<Component>(*this, id, Sys::IpcConnection{fd, "ipc:"_url}, std::move(task));
         _active.pushBack(component);
 
-        if (exported)
+        if (exported) {
             _exported.put(id, component);
+            logDebug("exposed '{}'", id);
+        }
 
         Async::detach(component->runAsync(_cancellation.token()), [this, component](auto const&...) {
             shutdown(component);
@@ -206,7 +213,7 @@ struct ComponentManager {
 } // namespace Strata::Bus
 
 Async::Task<> entryPointAsync(Sys::Context& ctx, Async::CancellationToken) {
-    co_try$(Hj::Task::self().label("strata-bus"));
+    co_try$(Hj::Task::self().label("strata-cm"));
     Strata::Bus::ComponentManager cm{ctx};
     co_return co_await cm.runAsync();
 }
@@ -218,7 +225,7 @@ extern "C" void __entryPoint(usize rawHandover) {
     Karm::registerPanicHandler(__panicHandler);
 
     Sys::Context ctx;
-    char const* argv[] = {"strata-bus", nullptr};
+    char const* argv[] = {"strata-cm", nullptr};
     ctx.add<Sys::ArgsHook>(1, argv);
     ctx.add<HandoverHook>((Handover::Payload*)rawHandover);
 

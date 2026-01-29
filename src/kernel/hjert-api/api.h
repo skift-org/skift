@@ -48,6 +48,12 @@ struct Object {
             _drop(_cap).unwrap();
     }
 
+    Res<Hj::Cap> dup(Hj::Cap dest) {
+        Hj::Cap out;
+        try$(Hj::_dup(dest, &out, _cap));
+        return Ok(out);
+    }
+
     Res<> drop() {
         try$(_drop(_cap));
         _cap = {};
@@ -258,6 +264,28 @@ struct Channel : Object {
     }
 };
 
+struct Pipe : Object {
+    using Props = PipeProps;
+
+    using Object::Object;
+
+    static Res<Pipe> create(Cap dest, usize bufLen) {
+        return create<Pipe>(dest, bufLen);
+    }
+
+    Res<usize> write(Bytes buf) {
+        usize bufLen = buf.len();
+        try$(_write(_cap, buf.buf(), &bufLen));
+        return Ok(bufLen);
+    }
+
+    Res<usize> read(MutBytes buf) {
+        usize bufLen = buf.len();
+        try$(_read(_cap, buf.buf(), &bufLen));
+        return Ok(bufLen);
+    }
+};
+
 struct Irq : Object {
     using Props = IrqProps;
 
@@ -265,6 +293,14 @@ struct Irq : Object {
 
     static Res<Irq> create(Cap dest, usize irq) {
         return create<Irq>(dest, irq);
+    }
+
+    Res<> eoi() {
+        return _eoi(cap());
+    }
+
+    Res<> bind(Cap pipeCap) {
+        return _bind(cap(), pipeCap);
     }
 };
 

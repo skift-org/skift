@@ -7,6 +7,7 @@ module Karm.Sys;
 import Karm.Core;
 import Karm.Logger;
 import Karm.Sys.Skift;
+import Strata.Protos;
 
 namespace Karm::Sys::_Embed {
 
@@ -31,24 +32,52 @@ struct SkiftSched : Sys::Sched {
         co_return co_await future;
     }
 
-    Async::Task<usize> readAsync(Rc<Fd>, MutBytes, Async::CancellationToken) override {
-        co_return Error::notImplemented("not implemented");
+    Async::Task<usize> readAsync(Rc<Fd> fd, MutBytes buf, Async::CancellationToken) override {
+        if (auto ipc = fd.is<Skift::PipeFd>()) {
+            auto& chan = ipc->_pipe;
+
+            co_trya$(waitFor(chan.cap(), Hj::Sigs::READABLE, Hj::Sigs::NONE));
+            static_assert(sizeof(Handle) == sizeof(Hj::Cap) and alignof(Handle) == alignof(Hj::Cap));
+            co_return chan.read(buf);
+        }
+
+        co_return Error::notImplemented("unsupported fd type");
     }
 
-    Async::Task<usize> writeAsync(Rc<Fd>, Bytes, Async::CancellationToken) override {
-        co_return Error::notImplemented("not implemented");
+    Async::Task<usize> writeAsync(Rc<Fd> fd, Bytes buf, Async::CancellationToken) override {
+        if (auto ipc = fd.is<Skift::PipeFd>()) {
+            auto& chan = ipc->_pipe;
+
+            co_trya$(waitFor(chan.cap(), Hj::Sigs::WRITABLE, Hj::Sigs::NONE));
+            static_assert(sizeof(Handle) == sizeof(Hj::Cap) and alignof(Handle) == alignof(Hj::Cap));
+            co_return chan.write(buf);
+        }
+
+        co_return Error::notImplemented("unsupported fd type");
     }
 
     Async::Task<> flushAsync(Rc<Fd>, Async::CancellationToken) override {
         co_return Error::notImplemented("not implemented");
     }
 
-    Async::Task<_Accepted> acceptAsync(Rc<Fd>, Async::CancellationToken) override {
-        co_return Error::notImplemented("not implemented");
+    Async::Task<_Accepted> acceptAsync(Rc<Fd> fd, Async::CancellationToken ct) override {
+        // FIXME: We assume that task can only accept on IpcListenerFd for now
+        if (not fd.is<Skift::IpcListenerFd>())
+            panic("acceptAsync is only supported on Skift::IpcListenerFd");
+
+        while (true) {
+            auto msg = co_trya$(Skift::globalClient().recvAsync(ct));
+            auto incomming = co_try$(msg.unpack<Strata::IBus::Incoming>());
+
+            if (not incomming.fd)
+                continue;
+
+            co_return Ok<_Accepted>(incomming.fd.take(), Ip4::unspecified(0));
+        }
     }
 
     Async::Task<_Sent> sendAsync(Rc<Fd> fd, Bytes buf, Slice<Handle> hnds, SocketAddr, Async::CancellationToken) override {
-        if (auto ipc = fd.is<Skift::IpcFd>()) {
+        if (auto ipc = fd.is<Skift::DuplexFd>()) {
             auto& chan = ipc->_out;
 
             co_trya$(waitFor(chan.cap(), Hj::Sigs::WRITABLE, Hj::Sigs::NONE));
@@ -62,7 +91,7 @@ struct SkiftSched : Sys::Sched {
     }
 
     Async::Task<_Received> recvAsync(Rc<Fd> fd, MutBytes buf, MutSlice<Handle> hnds, Async::CancellationToken) override {
-        if (auto ipc = fd.is<Skift::IpcFd>()) {
+        if (auto ipc = fd.is<Skift::DuplexFd>()) {
             auto& chan = ipc->_in;
 
             co_trya$(waitFor(chan.cap(), Hj::Sigs::READABLE, Hj::Sigs::NONE));

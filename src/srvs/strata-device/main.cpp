@@ -3,10 +3,29 @@
 
 import Karm.Core;
 import Karm.App;
+import Karm.Sys;
+import Karm.Sys.Skift;
 import Strata.Device;
 import Karm.Logger;
 
+using namespace Karm;
+
 namespace Strata::Device {
+
+struct DeviceSession : Sys::IpcSession {
+    explicit DeviceSession(Sys::IpcConnection conn)
+        : Sys::IpcSession(std::move(conn)) {}
+
+    Async::Task<> handleAsync(Sys::IpcMessage&, Async::CancellationToken) override {
+        co_return Ok();
+    }
+};
+
+struct DeviceHandler : Sys::IpcHandler {
+    Async::Task<Rc<Sys::IpcSession>> acceptSessionAsync(Sys::IpcConnection conn, Async::CancellationToken) override {
+        co_return Ok(makeRc<DeviceSession>(std::move(conn)));
+    }
+};
 
 struct IsaRootBus : Node {
     Res<> init() override {
@@ -21,10 +40,10 @@ struct IsaRootBus : Node {
 };
 
 struct RootBus : Node {
-    Sys::Endpoint& rpc;
+    Sys::IpcServer& _server;
 
-    RootBus(Sys::Endpoint& rpc)
-        : rpc{rpc} {}
+    RootBus(Sys::IpcServer& server)
+        : _server(server) {}
 
     Res<> init() override {
         try$(attach(makeRc<IsaRootBus>()));
@@ -33,54 +52,52 @@ struct RootBus : Node {
 
     Res<> bubble(App::Event& e) override {
         if (auto me = e.is<App::MouseEvent>()) {
-            try$(rpc.send<App::MouseEvent>(Sys::Port::BROADCAST, *me));
+            _server.broadcast<App::MouseEvent>(*me);
             e.accept();
         } else if (auto ke = e.is<App::KeyboardEvent>()) {
-            try$(rpc.send<App::KeyboardEvent>(Sys::Port::BROADCAST, *ke));
+            _server.broadcast<App::KeyboardEvent>(*ke);
             e.accept();
         }
 
         return Node::bubble(e);
     }
+
+    Async::Task<> dispatchAsync(Async::CancellationToken ct) {
+        auto pipe = co_try$(Sys::Skift::PipeFd::create());
+        Vec<Hj::Irq> irqs = {};
+        irqs.ensure(16);
+        for (usize i = 0; i < 16; i++) {
+            auto irq = co_try$(Hj::Irq::create(Hj::ROOT, i));
+            co_try$(irq.bind(pipe->_pipe.cap()));
+            irqs.pushBack(std::move(irq));
+        }
+
+        while (true) {
+            Array<u64, 32> incoming;
+            auto n = co_trya$(Sys::globalSched().readAsync(pipe, mutBytes(incoming), ct)) / sizeof(u64);
+            for (auto irq : sub(incoming, 0, n)) {
+                auto e = App::makeEvent<IrqEvent>(irq);
+                auto res = event(*e);
+                if (not res)
+                    logError("an error occurred during irq{} dispatch: {}", irq, res);
+                co_try$(irqs[irq].eoi());
+            }
+        }
+    }
 };
 
 } // namespace Strata::Device
 
-Async::Task<> entryPointAsync(Sys::Context& ctx, Async::CancellationToken) {
-    auto endpoint = Sys::Endpoint::adopt(ctx);
+Async::Task<> entryPointAsync(Sys::Context&, Async::CancellationToken ct) {
+    auto handler = makeRc<Strata::Device::DeviceHandler>();
+    auto server = co_trya$(Sys::IpcServer::createAsync("ipc://strata-device"_url, handler));
 
     logInfo("devices: building device tree...");
-    auto root = makeRc<Strata::Device::RootBus>(endpoint);
+    auto root = makeRc<Strata::Device::RootBus>(server);
     co_try$(root->init());
 
-    logInfo("devices: binding IRQs...");
-    auto listener = co_try$(Hj::Listener::create(Hj::ROOT));
-
-    Map<Hj::Cap, usize> cap2irq = {};
-    Vec<Hj::Irq> irqs = {};
-
-    for (usize i = 0; i < 16; i++) {
-        auto irq = co_try$(Hj::Irq::create(Hj::ROOT, i));
-        co_try$(listener.listen(irq, Hj::Sigs::TRIGGERED, Hj::Sigs::NONE));
-        cap2irq.put(irq.cap(), i);
-        irqs.pushBack(std::move(irq));
-    }
-
-    logInfo("service started");
-
-    while (true) {
-        co_try$(listener.poll(Instant::endOfTime()));
-
-        while (auto ev = listener.next()) {
-            co_try$(Hj::_signal(ev->cap, Hj::Sigs::NONE, Hj::Sigs::TRIGGERED));
-
-            auto irq = cap2irq.tryGet(ev->cap);
-            if (irq) {
-                auto e = App::makeEvent<Strata::Device::IrqEvent>(*irq);
-                co_try$(root->event(*e));
-            }
-        }
-    }
-
-    co_return Ok();
+    co_return co_await Async::join(
+        server.servAsync(ct),
+        root->dispatchAsync(ct)
+    );
 }

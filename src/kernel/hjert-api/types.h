@@ -61,7 +61,9 @@ static inline char const* toStr(Type type) {
     SYSCALL(LISTEN)              \
     SYSCALL(POLL)                \
     SYSCALL(READ)                \
-    SYSCALL(WRITE)
+    SYSCALL(WRITE)               \
+    SYSCALL(BIND)                \
+    SYSCALL(EOI)
 
 // clang-format off
 

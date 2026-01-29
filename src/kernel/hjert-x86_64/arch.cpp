@@ -200,7 +200,7 @@ extern "C" void _intDispatch(usize sp) {
         if (irq == 0)
             switchTask(1_ms, frame);
         else
-            Core::Irq::trigger(irq);
+            Core::Irq::dispatch(irq);
 
         _pic.ack(frame.intNo)
             .unwrap("pic ack failed");

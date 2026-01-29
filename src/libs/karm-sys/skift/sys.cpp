@@ -8,11 +8,29 @@ module Karm.Sys;
 import Karm.Ref;
 import Karm.Logger;
 import Karm.Sys.Skift;
+import Strata.Protos;
 
 namespace Karm::Sys::_Embed {
 
-Res<Rc<Sys::Fd>> deserializeFd(Serde::Deserializer&) {
-    return Error::notImplemented();
+Res<Rc<Fd>> deserializeFd(Serde::Deserializer& de) {
+    auto scope = try$(de.beginScope({.kind = Serde::Type::OBJECT}));
+    auto [_, type] = try$(scope.deserializeUnit<Skift::FdType>({.kind = Serde::Type::OBJECT_ITEM}));
+    Res<Rc<Fd>> result = Error::invalidData("unknow fd type");
+
+    if (type == Skift::FdType::VMO) {
+        auto [_, vmo] = try$(scope.deserializeUnit<Hj::Vmo>({.kind = Serde::Type::OBJECT_ITEM}));
+        result = Ok(makeRc<Skift::VmoFd>(std::move(vmo)));
+    } else if (type == Skift::FdType::DUPLEX) {
+        auto [_, in] = try$(scope.deserializeUnit<Hj::Channel>({.kind = Serde::Type::OBJECT_ITEM}));
+        auto [_, out] = try$(scope.deserializeUnit<Hj::Channel>({.kind = Serde::Type::OBJECT_ITEM}));
+        result = Ok(makeRc<Skift::DuplexFd>(std::move(in), std::move(out)));
+    } else if (type == Skift::FdType::PIPE) {
+        auto [_, pipe] = try$(scope.deserializeUnit<Hj::Pipe>({.kind = Serde::Type::OBJECT_ITEM}));
+        result = Ok(makeRc<Skift::PipeFd>(std::move(pipe)));
+    }
+
+    try$(scope.end());
+    return result;
 }
 
 // MARK: File I/O --------------------------------------------------------------
@@ -90,13 +108,14 @@ Res<Stat> stat(Ref::Url const& url) {
 
 // MARK: User interactions -----------------------------------------------------
 
-Res<> launch(Intent) {
-    return Error::notImplemented();
+Res<> launch(Intent intent) {
+    auto url = try$(intent.handler.okOr(Error::invalidInput("no handler for intent")));
+    return Skift::globalClient().notify(Strata::IBus::Launch(url));
 }
 
 [[clang::coro_wrapper]]
-Async::Task<> launchAsync(Intent) {
-    notImplemented();
+Async::Task<> launchAsync(Intent intent) {
+    co_return _Embed::launch(intent);
 }
 
 // MARK: Process ---------------------------------------------------------------
@@ -105,7 +124,7 @@ Res<Rc<Pid>> spawn(Command const&) {
     notImplemented();
 }
 
-Res<Tuple<Rc<Pid>, Rc<Fd>>> spawnPty(Command const&){
+Res<Tuple<Rc<Pid>, Rc<Fd>>> spawnPty(Command const&) {
     notImplemented();
 }
 
@@ -123,12 +142,14 @@ Res<Rc<Fd>> listenUdp(SocketAddr) {
     return Error::notImplemented();
 }
 
-Res<Rc<Fd>> connectIpc(Ref::Url) {
-    return Error::notImplemented();
+Res<Rc<Fd>> connectIpc(Ref::Url url) {
+    auto fd = try$(Skift::DuplexFd::create(url.host.str()));
+    try$(Skift::globalClient().notify(Strata::IBus::Connect{try$(fd->swap()), url}));
+    return Ok(fd);
 }
 
 Res<Rc<Fd>> listenIpc(Ref::Url) {
-    return Error::notImplemented();
+    return Ok(makeRc<Skift::IpcListenerFd>());
 }
 
 // MARK: Time ------------------------------------------------------------------
@@ -149,11 +170,11 @@ Duration uptime() {
 
 // MARK: Memory Managment ------------------------------------------------------
 
-Res<MmapResult> memMap(Sys::MmapProps const&) {
+Res<MmapResult> memMap(MmapProps const&) {
     return Error::notImplemented();
 }
 
-Res<MmapResult> memMap(Sys::MmapProps const&, Rc<Fd> fd) {
+Res<MmapResult> memMap(MmapProps const&, Rc<Fd> fd) {
     auto vmoFd = fd.is<Skift::VmoFd>();
     if (not vmoFd)
         return Error::invalidInput("expected VmoFd");

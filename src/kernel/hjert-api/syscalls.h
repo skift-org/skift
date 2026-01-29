@@ -40,4 +40,12 @@ Res<> _listen(Cap cap, Cap target, Flags<Sigs> set, Flags<Sigs> unset);
 
 Res<> _poll(Cap cap, Event* ev, usize evCap, usize* evLen, Instant until);
 
+Res<> _write(Cap cap, u8 const* buf, usize* bufLen);
+
+Res<> _read(Cap cap, u8* buf, usize* bufLen);
+
+Res<> _bind(Cap cap, Cap pipeCap);
+
+Res<> _eoi(Cap cap);
+
 } // namespace Hj

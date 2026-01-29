@@ -7,6 +7,7 @@ module Karm.App;
 import Karm.Core;
 import Karm.Gfx;
 import Karm.Sys;
+import Karm.Ref;
 import Strata.Protos;
 import Karm.Logger;
 
@@ -58,22 +59,20 @@ struct SkiftWindow : Window {
 };
 
 struct SkiftApplication : Application {
-    Rc<Sys::Endpoint> _endpoint;
-    Sys::Port _shell;
+    Sys::IpcClient _shell;
     Map<usize, SkiftWindow*> _windows;
     bool _exited = false;
 
-    explicit SkiftApplication(Rc<Sys::Endpoint> endpoint, Sys::Port shell)
-        : _endpoint(endpoint), _shell(shell) {}
+    explicit SkiftApplication(Sys::IpcClient shell)
+        : _shell(std::move(shell)) {}
 
     void detachWindow(Strata::IShell::WindowId id) {
-        (void)_endpoint->send(_shell, Strata::IShell::WindowDestroy{id});
+        (void)_shell.notify(Strata::IShell::WindowDestroy{id});
         _windows.del((usize)id);
     }
 
     Async::Task<Rc<Window>> createWindowAsync(WindowProps const& props, Async::CancellationToken ct) override {
-        auto [id, actual] = co_trya$(_endpoint->callAsync(
-            _shell,
+        auto [id, actual] = co_trya$(_shell.callAsync(
             Strata::IShell::WindowCreate{
                 props.size,
                 App::formFactor
@@ -85,8 +84,7 @@ struct SkiftApplication : Application {
 
         auto surface = co_try$(Strata::Protos::Surface::create(actual.size));
 
-        co_trya$(_endpoint->callAsync(
-            _shell,
+        co_trya$(_shell.callAsync(
             Strata::IShell::WindowAttach{
                 id,
                 surface,
@@ -100,7 +98,7 @@ struct SkiftApplication : Application {
         co_return Ok(window);
     }
 
-    Res<> _handleWindowEvent(Sys::Message& message, Rc<Handler> handler) {
+    Res<> _handleWindowEvent(Sys::IpcMessage& message, Rc<Handler> handler) {
         auto [windowId, payload] = try$(message.unpack<Strata::IShell::WindowEvent>());
         payload.visit([&]<typename E>(E const& event) {
             using T = Meta::RemoveConstVolatileRef<E>;
@@ -114,7 +112,7 @@ struct SkiftApplication : Application {
         return Ok();
     }
 
-    Res<> _handleWindowUpdate(Sys::Message& message, Rc<Handler> handler) {
+    Res<> _handleWindowUpdate(Sys::IpcMessage& message, Rc<Handler> handler) {
         auto [windowId, props] = try$(message.unpack<Strata::IShell::WindowUpdate>());
         auto* window = try$(_windows.tryGet(windowId).okOr(Error::invalidInput("no such window")));
         // FIXME: We should probably have a separated hello message that pass stuff like color scheme and form factor
@@ -127,7 +125,7 @@ struct SkiftApplication : Application {
     }
 
     Res<> _pollMessages(Rc<Handler> handler) {
-        while (auto maybeMessage = _endpoint->tryRecv()) {
+        while (auto maybeMessage = _shell.poll()) {
             auto& message = maybeMessage.unwrap();
             if (message.is<Strata::IShell::WindowEvent>())
                 try$(_handleWindowEvent(message, handler));
@@ -153,8 +151,7 @@ struct SkiftApplication : Application {
 
             auto newSurface = co_try$(Strata::Protos::Surface::create(size));
 
-            co_trya$(_endpoint->callAsync(
-                _shell,
+            co_trya$(_shell.callAsync(
                 Strata::IShell::WindowAttach{
                     id,
                     newSurface,
@@ -188,8 +185,7 @@ struct SkiftApplication : Application {
                 if (not window->_dirty)
                     continue;
 
-                co_trya$(_endpoint->callAsync(
-                    _shell,
+                co_trya$(_shell.callAsync(
                     Strata::IShell::WindowFlip{
                         id,
                         window->bound(),
@@ -220,30 +216,16 @@ void SkiftWindow::releaseSurface(Slice<Math::Recti>) {
 
 void SkiftWindow::drag(DragEvent e) {
     if (e.type == DragEvent::START)
-        (void)_application._endpoint->send(_application._shell, Strata::IShell::WindowMove{_id});
+        (void)_application._shell.notify(Strata::IShell::WindowMove{_id});
 }
 
 void SkiftWindow::snap(Snap s) {
-    (void)_application._endpoint->send(_application._shell, Strata::IShell::WindowSnap{_id, s});
+    (void)_application._shell.notify(Strata::IShell::WindowSnap{_id, s});
 }
 
-Async::Task<Rc<Application>> createAppAsync(Sys::Context& ctx, ApplicationProps const&, Async::CancellationToken ct) {
-    auto endpoint = makeRc<Sys::Endpoint>(
-        std::move(Sys::useChannel(ctx).con)
-    );
-
-    auto maybeShellPort = co_await endpoint->callAsync(
-        Sys::Port::BUS,
-        Strata::IBus::Locate{
-            "strata-shell"s,
-        },
-        ct
-    );
-
-    if (not maybeShellPort)
-        co_return maybeShellPort.none();
-
-    co_return Ok(makeRc<SkiftApplication>(endpoint, maybeShellPort.unwrap()));
+Async::Task<Rc<Application>> createAppAsync(Sys::Context&, ApplicationProps const&, Async::CancellationToken ct) {
+    auto shell = co_trya$(Sys::IpcClient::connectAsync("ipc://strata-shell"_url, ct));
+    co_return Ok(makeRc<SkiftApplication>(std::move(shell)));
 }
 
 } // namespace Karm::App::_Embed

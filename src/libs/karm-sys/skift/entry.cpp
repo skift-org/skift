@@ -23,9 +23,11 @@ extern "C" [[gnu::weak]] void __entryPoint(usize rawHandover, usize rawIn, usize
     char const* argv[] = {"service", nullptr};
     ctx.add<Sys::ArgsHook>(1, argv);
     ctx.add<HandoverHook>(reinterpret_cast<Handover::Payload*>(rawHandover));
-
-    auto fd = makeRc<Sys::Skift::IpcFd>(Hj::Cap{rawIn}, Hj::Cap{rawOut});
-    ctx.add<Sys::ChannelHook>(Sys::IpcConnection{fd, ""_url});
+    Sys::IpcConnection conn = {
+        makeRc<Sys::Skift::DuplexFd>(Hj::Cap{rawIn}, Hj::Cap{rawOut}),
+        "ipc:strata-bus"_url,
+    };
+    Sys::Skift::setupClient(std::move(conn));
 
     Async::Cancellation cancellation;
     auto res = Sys::run(entryPointAsync(ctx, cancellation.token()));
@@ -33,7 +35,7 @@ extern "C" [[gnu::weak]] void __entryPoint(usize rawHandover, usize rawIn, usize
     auto self = Hj::Task::self();
 
     if (not res) {
-        logError("{}: {}", argv[0], res.none().msg());
+        logError("{}: {}", argv[0], res);
         self.crash().unwrap();
     }
 

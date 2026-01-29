@@ -111,15 +111,14 @@ struct Root : Ui::ProxyNode<Root> {
     }
 };
 
-struct ClientWindow : Hideo::Shell::Window {
-    Sys::Endpoint& _endpoint;
-    Sys::Port _client;
+struct SessionWindow : Hideo::Shell::Window {
+    Sys::IpcSession& _session;
     IShell::WindowId _id;
     Rc<Gfx::Surface> _frontbuffer;
     Opt<Rc<Protos::Surface>> _backbuffer;
 
-    ClientWindow(Sys::Endpoint& endpoint, Sys::Port client, Rc<Gfx::Surface> frontbuffer)
-        : _endpoint(endpoint), _client(client), _frontbuffer(frontbuffer) {
+    SessionWindow(Sys::IpcSession& session, Rc<Gfx::Surface> frontbuffer)
+        : _session(session), _frontbuffer(frontbuffer) {
     }
 
     Rc<Gfx::Surface> surface() const override {
@@ -128,13 +127,13 @@ struct ClientWindow : Hideo::Shell::Window {
 
     void event(App::Event& e) override {
         if (auto it = e.is<App::MouseEvent>()) {
-            (void)_endpoint.send(_client, IShell::WindowEvent{_id, *it});
+            (void)_session.notify(IShell::WindowEvent{_id, *it});
             e.accept();
         } else if (auto it = e.is<App::KeyboardEvent>()) {
-            (void)_endpoint.send(_client, IShell::WindowEvent{_id, *it});
+            (void)_session.notify(IShell::WindowEvent{_id, *it});
             e.accept();
         } else if (auto it = e.is<App::TypeEvent>()) {
-            (void)_endpoint.send(_client, IShell::WindowEvent{_id, *it});
+            (void)_session.notify(IShell::WindowEvent{_id, *it});
             e.accept();
         }
     }
@@ -142,8 +141,7 @@ struct ClientWindow : Hideo::Shell::Window {
     void resize(App::Snap snap, Math::Vec2i size) override {
         if (size != activeBound().wh) {
             _frontbuffer = Gfx::Surface::alloc(size);
-            (void)_endpoint.send(
-                _client,
+            (void)_session.notify(
                 IShell::WindowUpdate{
                     _id,
                     {
@@ -175,23 +173,22 @@ struct ComponentLauncher : Hideo::Shell::Launcher {
         : Launcher(icon, name, ramp), componentId(componentId) {}
 
     void launch(Hideo::Shell::State&) override {
-        Sys::globalEndpoint().send(Sys::Port::BUS, IBus::Start{componentId}).unwrap();
+        (void)Sys::launch({
+            .action = Ref::Uti::PUBLIC_OPEN,
+            .handler = Ref::Url::parse(Io::format("bundle://{}", componentId)),
+        });
     }
 };
 
-struct Server {
-    Sys::Endpoint& _endpoint;
-
+struct Compositor {
     Rc<Root> _root;
     Rc<Framebuffer> _framebuffer;
-
     IShell::WindowId _windowId = 1;
-    Map<IShell::WindowId, Rc<ClientWindow>> _windows = {};
 
-    static Res<Server> create(Sys::Context& ctx, Sys::Endpoint& endpoint) {
+    static Async::Task<Rc<Compositor>> createAsync(Sys::Context& ctx) {
         Hideo::Shell::State state = {
             .dateTime = Sys::dateTime(),
-            .background = try$(Image::loadOrFallback("bundle://hideo-shell/wallpapers/abstract.qoi"_url)),
+            .background = co_try$(Image::loadOrFallback("bundle://hideo-shell/wallpapers/abstract.qoi"_url)),
             .noti = {},
             .launchers = {
                 makeRc<ComponentLauncher>(Mdi::INFORMATION_OUTLINE, "About"s, Gfx::BLUE_RAMP, "hideo-about.main"s),
@@ -210,7 +207,7 @@ struct Server {
             .windows = {}
         };
 
-        auto framebuffer = try$(Framebuffer::open(ctx));
+        auto framebuffer = co_try$(Framebuffer::open(ctx));
         auto app = Hideo::Shell::app(std::move(state));
 
         auto root = makeRc<Root>(
@@ -218,141 +215,160 @@ struct Server {
             framebuffer
         );
 
-        try$(endpoint.send(
-            Sys::Port::BUS,
-            Strata::IBus::Listen{
-                Meta::idOf<App::MouseEvent>(),
-            }
-        ));
-        try$(endpoint.send(
-            Sys::Port::BUS,
-            Strata::IBus::Listen{
-                Meta::idOf<App::KeyboardEvent>()
-            }
-        ));
-        try$(endpoint.send(
-            Sys::Port::BUS,
-            Strata::IBus::Listen{
-                Meta::idOf<App::TypeEvent>()
-            }
-        ));
-
-        return Ok(Server{
-            endpoint,
-            root,
-            framebuffer,
-        });
+        co_return Ok(makeRc<Compositor>(root, framebuffer));
     }
 
-    Res<> _handleMouseEvent(Sys::Message& message) {
-        auto event = try$(message.unpack<App::MouseEvent>());
-        auto e = App::makeEvent<App::MouseEvent>(event);
-        _root->child().event(*e);
-        return Ok();
-    }
-
-    Res<> _handleKeyboardEvent(Sys::Message& message) {
-        auto event = try$(message.unpack<App::KeyboardEvent>());
-        auto e = App::makeEvent<App::KeyboardEvent>(event);
-        _root->child().event(*e);
-        return Ok();
-    }
-
-    Res<> _handleTypeEvent(Sys::Message& message) {
-        auto event = try$(message.unpack<App::TypeEvent>());
-        auto e = App::makeEvent<App::TypeEvent>(event);
-        _root->child().event(*e);
-        return Ok();
-    }
-
-    Res<IShell::WindowCreate::Response> _handleWindowCreate(Sys::Message& message) {
-        auto [want] = try$(message.unpack<IShell::WindowCreate>());
+    Tuple<IShell::WindowId, Rc<SessionWindow>> createWindow(Sys::IpcSession& session, IShell::WindowProps props) {
         auto windowId = _windowId++;
-
-        auto windowSurface = Gfx::Surface::alloc(want.size);
+        auto windowSurface = Gfx::Surface::alloc(props.size);
         windowSurface->mutPixels().clear(Ui::GRAY950);
-
-        auto window = makeRc<ClientWindow>(_endpoint, message.header().from, windowSurface);
-        window->_floatingBound = Math::Recti{want.size}.center(_framebuffer->bound());
+        auto window = makeRc<SessionWindow>(session, windowSurface);
+        window->_floatingBound = Math::Recti{props.size}.center(_framebuffer->bound());
         window->_id = windowId;
-        _windows.put(windowId, window);
         Hideo::Shell::Model::event(*_root, Hideo::Shell::AddWindow{window});
+        return {windowId, window};
+    }
+
+    void destroyWindow(Rc<SessionWindow> window) {
+        Hideo::Shell::Model::event(*_root, Hideo::Shell::RemoveWindow{window});
+    }
+
+    void snapWindow(Rc<SessionWindow> window, App::Snap snap) {
+        Hideo::Shell::Model::event(*_root, Hideo::Shell::SnapWindow{window, snap});
+    }
+
+    void shouldRepaint() {
+        Ui::shouldRepaint(*_root);
+    }
+};
+
+struct CompositorSession : Sys::IpcSession {
+    Rc<Compositor> _compositor;
+    Map<IShell::WindowId, Rc<SessionWindow>> _windows = {};
+
+    CompositorSession(Sys::IpcConnection conn, Rc<Compositor> compositor)
+        : IpcSession(std::move(conn)),
+          _compositor(compositor) {}
+
+    Res<IShell::WindowCreate::Response> _handleWindowCreate(Sys::IpcMessage& message) {
+        auto [want] = try$(message.unpack<IShell::WindowCreate>());
+
+        auto [id, window] = _compositor->createWindow(*this, want);
+        _windows.put(id, window);
 
         auto offer = want;
         offer.formFactor = App::formFactor;
-        return Ok(IShell::WindowCreate::Response{
-            windowId,
-            offer,
-        });
+        return Ok<IShell::WindowCreate::Response>(id, offer);
     }
 
-    Res<IShell::WindowDestroy::Response> _handleWindowDestroy(Sys::Message& message) {
+    Res<IShell::WindowDestroy::Response> _handleWindowDestroy(Sys::IpcMessage& message) {
         auto [windowId] = try$(message.unpack<IShell::WindowDestroy>());
-
         auto window = _windows.get(windowId);
-        Hideo::Shell::Model::event(*_root, Hideo::Shell::RemoveWindow{window});
+        _compositor->destroyWindow(window);
         _windows.del(windowId);
-
         return Ok();
     }
 
-    Res<IShell::WindowAttach::Response> _handleWindowAttach(Sys::Message& message) {
+    Res<IShell::WindowAttach::Response> _handleWindowAttach(Sys::IpcMessage& message) {
         auto [windowId, buffer] = try$(message.unpack<IShell::WindowAttach>());
 
         auto window = _windows.get(windowId);
         window->attach(buffer.unwrap());
-        Ui::shouldRepaint(*_root);
+        _compositor->shouldRepaint();
 
         return Ok();
     }
 
-    Res<> _handleWindowFlip(Sys::Message& message) {
+    Res<> _handleWindowFlip(Sys::IpcMessage& message) {
         auto [windowId, region] = try$(message.unpack<IShell::WindowFlip>());
 
         auto window = _windows.get(windowId);
         window->flip();
-        Ui::shouldRepaint(*_root);
+        _compositor->shouldRepaint();
 
         return Ok();
     }
 
-    Res<> _handleWindowMove(Sys::Message& message) {
+    Res<> _handleWindowMove(Sys::IpcMessage& message) {
         auto [windowId] = try$(message.unpack<IShell::WindowMove>());
         auto window = _windows.get(windowId);
         window->dragged = true;
         return Ok();
     }
 
-    Res<> _handleWindowSnap(Sys::Message& message) {
+    Res<> _handleWindowSnap(Sys::IpcMessage& message) {
         auto [windowId, snap] = try$(message.unpack<IShell::WindowSnap>());
         auto window = _windows.get(windowId);
-        Hideo::Shell::Model::event(*_root, Hideo::Shell::SnapWindow{window, snap});
+        _compositor->snapWindow(window, snap);
+        return Ok();
+    }
+
+    Async::Task<> handleAsync(Sys::IpcMessage& msg, Async::CancellationToken) override {
+        if (msg.is<IShell::WindowCreate>())
+            co_try$(resp<IShell::WindowCreate>(msg, _handleWindowCreate(msg)));
+        else if (msg.is<IShell::WindowDestroy>())
+            co_try$(resp<IShell::WindowDestroy>(msg, _handleWindowDestroy(msg)));
+        else if (msg.is<IShell::WindowAttach>())
+            co_try$(resp<IShell::WindowAttach>(msg, _handleWindowAttach(msg)));
+        else if (msg.is<IShell::WindowFlip>())
+            co_try$(resp<IShell::WindowFlip>(msg, _handleWindowFlip(msg)));
+        else if (msg.is<IShell::WindowMove>())
+            co_try$(_handleWindowMove(msg));
+        else if (msg.is<IShell::WindowSnap>())
+            co_try$(_handleWindowSnap(msg));
+        else
+            logWarn("unsupported message: {}", msg.header());
+
+        co_return Ok();
+    }
+};
+
+struct CompositorHandler : Sys::IpcHandler {
+    Rc<Compositor> _compositor;
+
+    explicit CompositorHandler(Rc<Compositor> compositor)
+        : _compositor(compositor) {}
+
+    Async::Task<Rc<Sys::IpcSession>> acceptSessionAsync(Sys::IpcConnection conn, Async::CancellationToken) override {
+        co_return Ok(makeRc<CompositorSession>(std::move(conn), _compositor));
+    }
+};
+
+struct InputHandler {
+    Rc<Ui::Node> _root;
+
+    Res<> _handleMouseEvent(Sys::IpcMessage& message) {
+        auto event = try$(message.unpack<App::MouseEvent>());
+        auto e = App::makeEvent<App::MouseEvent>(event);
+        _root->event(*e);
+        return Ok();
+    }
+
+    Res<> _handleKeyboardEvent(Sys::IpcMessage& message) {
+        auto event = try$(message.unpack<App::KeyboardEvent>());
+        auto e = App::makeEvent<App::KeyboardEvent>(event);
+        _root->event(*e);
+        return Ok();
+    }
+
+    Res<> _handleTypeEvent(Sys::IpcMessage& message) {
+        auto event = try$(message.unpack<App::TypeEvent>());
+        auto e = App::makeEvent<App::TypeEvent>(event);
+        _root->event(*e);
         return Ok();
     }
 
     Async::Task<> servAsync(Async::CancellationToken ct) {
-        Async::detach(_root->runAsync(ct));
-        Map<IShell::WindowId, Rc<ClientWindow>> windows;
+        auto client = co_trya$(Sys::IpcClient::connectAsync("ipc://strata-input"_url, ct));
         while (true) {
-            auto msg = co_trya$(_endpoint.recvAsync(ct));
+            co_try$(ct.errorIfCanceled());
+            auto msg = co_trya$(client.recvAsync(ct));
             if (msg.is<App::MouseEvent>())
                 (void)_handleMouseEvent(msg);
             else if (msg.is<App::KeyboardEvent>())
                 (void)_handleKeyboardEvent(msg);
             else if (msg.is<App::TypeEvent>())
                 (void)_handleTypeEvent(msg);
-            else if (msg.is<IShell::WindowCreate>())
-                (void)_endpoint.resp<IShell::WindowCreate>(msg, _handleWindowCreate(msg));
-            else if (msg.is<IShell::WindowDestroy>())
-                (void)_endpoint.resp<IShell::WindowDestroy>(msg, _handleWindowDestroy(msg));
-            else if (msg.is<IShell::WindowAttach>())
-                (void)_endpoint.resp<IShell::WindowAttach>(msg, _handleWindowAttach(msg));
-            else if (msg.is<IShell::WindowFlip>())
-                (void)_endpoint.resp<IShell::WindowFlip>(msg, _handleWindowFlip(msg));
-            else if (msg.is<IShell::WindowMove>())
-                (void)_handleWindowMove(msg);
-            else if (msg.is<IShell::WindowSnap>())
-                (void)_handleWindowSnap(msg);
             else
                 logWarn("unsupported message: {}", msg.header());
         }
@@ -362,7 +378,14 @@ struct Server {
 } // namespace Strata::Shell
 
 Async::Task<> entryPointAsync(Sys::Context& ctx, Async::CancellationToken ct) {
-    auto endpoint = Sys::Endpoint::adopt(ctx);
-    auto server = co_try$(Strata::Shell::Server::create(ctx, endpoint));
-    co_return co_await server.servAsync(ct);
+    auto compositor = co_trya$(Strata::Shell::Compositor::createAsync(ctx));
+    auto handler = makeRc<Strata::Shell::CompositorHandler>(compositor);
+    Strata::Shell::InputHandler inputHandler{compositor->_root};
+    auto server = co_trya$(Sys::IpcServer::createAsync("ipc://strata-shell"_url, handler));
+
+    co_return co_await Async::join(
+        compositor->_root->runAsync(ct),
+        inputHandler.servAsync(ct),
+        server.servAsync(ct)
+    );
 }

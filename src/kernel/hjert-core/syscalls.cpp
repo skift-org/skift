@@ -292,6 +292,19 @@ Res<> doRead(Task& self, Hj::Cap cap, UserSlice<MutBytes> buf, User<Hj::Arg> buf
     );
 }
 
+Res<> doBind(Task& self, Hj::Cap cap, Hj::Cap pipeCap) {
+    auto irq = try$(self.domain().get<Irq>(cap));
+    auto pipe = try$(self.domain().get<Pipe>(pipeCap));
+    irq->bind(pipe);
+    return Ok();
+}
+
+Res<> doEoi(Task& self, Hj::Cap cap) {
+    auto irq = try$(self.domain().get<Irq>(cap));
+    irq->eoi();
+    return Ok();
+}
+
 Res<> dispatchSyscall(Task& self, Hj::Syscall id, Hj::Args args) {
     switch (id) {
     case Hj::Syscall::NOW:
@@ -382,6 +395,21 @@ Res<> dispatchSyscall(Task& self, Hj::Syscall id, Hj::Args args) {
             Hj::Cap{args[0]},
             {args[1], try$(bufLen.load(self.space()))},
             args[2]
+        );
+    }
+
+    case Hj::Syscall::BIND: {
+        return doBind(
+            self,
+            Hj::Cap{args[0]},
+            Hj::Cap{args[1]}
+        );
+    }
+
+    case Hj::Syscall::EOI: {
+        return doEoi(
+            self,
+            Hj::Cap{args[0]}
         );
     }
 

@@ -12,7 +12,7 @@
             "tag": "v1.3.0"
         },
         "cute-engineering/ce-libc": {
-            "commit": "9202591efc1effd15d4731db4dfdc1001b7d19d3",
+            "commit": "2e8e4b6eedb25b12f3f0a662b01d40583bbf7730",
             "git": "https://codeberg.org/cute-engineering/ce-libc.git",
             "tag": "v1.3.0"
         },
@@ -27,7 +27,7 @@
             "tag": "v0.7.0"
         },
         "cute-engineering/ce-stdcpp": {
-            "commit": "42858ee47b9f58d91b818fa6f6ef469bcbf3aa24",
+            "commit": "868a2ad4a2b1742e9c1684ca9aab02cd3a5bb6ce",
             "git": "https://codeberg.org/cute-engineering/ce-stdcpp.git",
             "tag": "v1.6.0"
         },
@@ -35,6 +35,11 @@
             "commit": "9c0064dc613d43c40e5f00bb972ed54977a82e00",
             "git": "https://codeberg.org/cute-engineering/ce-targets.git",
             "tag": "v0.6.0"
+        },
+        "skift-org/karm": {
+            "commit": "b6a688790ea823aa0512cdfb67123486973e9afe",
+            "git": "https://github.com/skift-org/karm.git",
+            "tag": "main"
         },
         "skift/ambolt": {
             "commit": "c277d5d06c5041fd1ff1a144d9e45de1f9d6ae4a",
@@ -46,13 +51,18 @@
             "git": "https://codeberg.org/skift/assets.git",
             "tag": "main"
         },
+        "skift/games": {
+            "commit": "ebd10ee6092d29c5230c571dae04ff56e84ba78d",
+            "git": "https://codeberg.org/skift/games",
+            "tag": "main"
+        },
         "skift/hideo": {
             "commit": "9f67bf483f0c2c2e4d4c91765d74f6a08d4d5184",
             "git": "https://codeberg.org/skift/hideo.git",
             "tag": "main"
         },
         "skift/karm": {
-            "commit": "b6a688790ea823aa0512cdfb67123486973e9afe",
+            "commit": "f25d2d6d7179a062cb5a853221a38730dbe4ca02",
             "git": "https://codeberg.org/skift/karm.git",
             "tag": "main"
         },

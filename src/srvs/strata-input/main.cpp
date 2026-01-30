@@ -40,7 +40,7 @@ struct Service {
     Res<> _handleKey(App::Key key) {
         auto chr = _keymap.handle(key, _mods).unwrapOr("");
         if (chr) {
-            logDebug("translated {} to {#}", key.name(), chr);
+            // logDebug("translated {} to {#}", key.name(), chr);
             for (auto r : iterRunes(chr))
                 _server.broadcast(App::TypeEvent{r, _mods});
         }

@@ -20,12 +20,16 @@ def generateInit(img: image.Image):
     img.mkdir("users/root")
 
     userspace = [
+        "hideo-2048",
+        "hideo-snake",
+        "hideo-bunnymark",
         "hideo-about.main",
         "hideo-calculator.main",
         "hideo-chat.main",
         "hideo-clock.main",
         "hideo-console.main",
         "hideo-counter.main",
+        "hideo-doom",
         "hideo-files.main",
         "hideo-settings.main",
         "hideo-sysmon.main",

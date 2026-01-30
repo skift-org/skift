@@ -50,6 +50,11 @@ export struct VmoFd : NullFd {
         _off += read;
         return Ok(read);
     }
+
+    Res<usize> seek(Io::Seek s) override {
+        _off = try$(s.apply(_off, _ensureMapped().bytes().len()));
+        return Ok(_off);
+    }
 };
 
 export struct DuplexFd : NullFd {

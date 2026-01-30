@@ -17,7 +17,7 @@
             "tag": "v1.3.0"
         },
         "cute-engineering/ce-libm": {
-            "commit": "93782e9a29faab85eae00d9fb97342dff00f7a8d",
+            "commit": "24a1b42a44db053bcb332675a9a3f82690362f4c",
             "git": "https://codeberg.org/cute-engineering/ce-libm.git",
             "tag": "v1.2.0"
         },
@@ -62,7 +62,7 @@
             "tag": "main"
         },
         "skift/karm": {
-            "commit": "f25d2d6d7179a062cb5a853221a38730dbe4ca02",
+            "commit": "87fb3f7762ded248e8c2048d3290ab5832a72d24",
             "git": "https://codeberg.org/skift/karm.git",
             "tag": "main"
         },

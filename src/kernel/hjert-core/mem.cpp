@@ -1,8 +1,9 @@
 import Karm.Core;
 import Karm.Logger;
 
-#include "arch.h"
 #include "mem.h"
+
+#include "arch.h"
 
 namespace Hjert::Core {
 
@@ -44,7 +45,8 @@ struct Pmm : Hal::Pmm {
         }
 
         LockScope scope(_lock);
-        try$(prange.ensureAligned(Hal::PAGE_SIZE));
+        try$(prange.ensureAligned(Hal::PAGE_SIZE)
+                 .okOr(Error::invalidInput("range is not page aligned")));
         _bits.set(pmm2Bits(prange), false);
         return Ok();
     }
@@ -122,10 +124,10 @@ Hal::PmmRange _findBitmapSpace(Handover::Payload& payload, usize bitmapSize) {
             continue;
 
         if (record.start == 0 and (record.size >= bitmapSize + Hal::PAGE_SIZE))
-            return {static_cast<usize>(record.start) + Hal::PAGE_SIZE, bitmapSize};
+            return {record.start + Hal::PAGE_SIZE, bitmapSize};
 
         if (record.size >= bitmapSize)
-            return {static_cast<usize>(record.start), bitmapSize};
+            return {record.start, bitmapSize};
     }
 
     logFatal("mem: no usable memory for bitmap");

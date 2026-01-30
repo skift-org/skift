@@ -39,6 +39,8 @@ struct SkiftSched : Sys::Sched {
             co_trya$(waitFor(chan.cap(), Hj::Sigs::READABLE, Hj::Sigs::NONE));
             static_assert(sizeof(Handle) == sizeof(Hj::Cap) and alignof(Handle) == alignof(Hj::Cap));
             co_return chan.read(buf);
+        } else if (auto vmo = fd.is<Skift::VmoFd>()) {
+            co_return vmo->read(buf);
         }
 
         co_return Error::notImplemented("unsupported fd type");

@@ -21,6 +21,8 @@ export enum struct FdType {
 
 export struct VmoFd : NullFd {
     Hj::Vmo _vmo;
+    Opt<Hj::Mapped> _mapped;
+    usize _off = 0;
 
     Hj::Vmo& vmo() {
         return _vmo;
@@ -34,6 +36,19 @@ export struct VmoFd : NullFd {
         try$(scope.serializeUnit({.kind = Serde::Type::OBJECT_ITEM}, FdType::VMO));
         try$(scope.serializeUnit({.kind = Serde::Type::OBJECT_ITEM}, _vmo));
         return scope.end();
+    }
+
+    Hj::Mapped& _ensureMapped() {
+        if (not _mapped) {
+            _mapped = Hj::map(_vmo, {Hj::MapFlags::READ}).take();
+        }
+        return _mapped.unwrap();
+    }
+
+    Res<usize> read(MutBytes buf) override {
+        auto read = copy(next(_ensureMapped().bytes(), _off), buf);
+        _off += read;
+        return Ok(read);
     }
 };
 

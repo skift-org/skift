@@ -6,6 +6,8 @@ module;
 
 export module Karm.Sys.Skift:bootfs;
 
+import Karm.Logger;
+
 namespace Karm::Sys::Skift {
 
 export struct Bootfs {
@@ -55,6 +57,7 @@ export struct Bootfs {
         if (not fileDirent)
             return Error::notFound("elf not found");
 
+        logDebug("opening {}: {:x} {:x}", path, _physStart + fileDirent->offset, alignUp(fileDirent->length, Sys::pageSize()));
         auto fileVmo = try$(
             Hj::Vmo::create(
                 Hj::ROOT,

@@ -56,12 +56,12 @@ Res<Rc<Fd>> openFile(Ref::Url const& url) {
     return Ok(makeRc<Skift::VmoFd>(std::move(vmo)));
 }
 
-Res<Rc<Fd>> createFile(Ref::Url const&) {
-    return Error::notImplemented();
+Res<Rc<Fd>> createFile(Ref::Url const& url) {
+    return openFile(url);
 }
 
-Res<Rc<Fd>> openOrCreateFile(Ref::Url const&) {
-    return Error::notImplemented();
+Res<Rc<Fd>> openOrCreateFile(Ref::Url const& url) {
+    return openFile(url);
 }
 
 Res<Pair<Rc<Fd>, Rc<Fd>>> createPipe() {

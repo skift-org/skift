@@ -1,1 +1,1 @@
-cutekit ~= 0.10.2
+cutekit ~= 0.11.0

@@ -52,12 +52,11 @@ export struct Bootfs {
         return Ok(fileDirent);
     }
 
-    Res<Hj::Vmo> openVmo(Str path) {
+    Res<Tuple<Hj::Vmo, usize>> openVmo(Str path) {
         auto* fileDirent = bootfs_open(header(), path.buf(), path.len()).dirent;
         if (not fileDirent)
             return Error::notFound("elf not found");
 
-        logDebug("opening {}: {:x} {:x}", path, _physStart + fileDirent->offset, alignUp(fileDirent->length, Sys::pageSize()));
         auto fileVmo = try$(
             Hj::Vmo::create(
                 Hj::ROOT,
@@ -68,7 +67,7 @@ export struct Bootfs {
         );
         try$(fileVmo.label(path));
 
-        return Ok(std::move(fileVmo));
+        return Ok<Tuple<Hj::Vmo, usize>>(std::move(fileVmo), fileDirent->length);
     }
 };
 

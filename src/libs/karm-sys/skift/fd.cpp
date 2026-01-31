@@ -23,13 +23,14 @@ export struct VmoFd : NullFd {
     Hj::Vmo _vmo;
     Opt<Hj::Mapped> _mapped;
     usize _off = 0;
+    usize _len = 0;
 
     Hj::Vmo& vmo() {
         return _vmo;
     }
 
-    VmoFd(Hj::Vmo vmo)
-        : _vmo(std::move(vmo)) {}
+    VmoFd(Hj::Vmo vmo, usize len)
+        : _vmo(std::move(vmo)), _len(len) {}
 
     Res<> serialize(Serde::Serializer& ser) const override {
         auto scope = try$(ser.beginScope({.kind = Serde::Type::OBJECT}));
@@ -46,13 +47,13 @@ export struct VmoFd : NullFd {
     }
 
     Res<usize> read(MutBytes buf) override {
-        auto read = copy(next(_ensureMapped().bytes(), _off), buf);
+        auto read = copy(sub(_ensureMapped().bytes(), _off, _len), buf);
         _off += read;
         return Ok(read);
     }
 
     Res<usize> seek(Io::Seek s) override {
-        _off = try$(s.apply(_off, _ensureMapped().bytes().len()));
+        _off = try$(s.apply(_off, _len));
         return Ok(_off);
     }
 };

@@ -58,7 +58,7 @@ Ui::Child icon(Entry const& e) {
             return Ui::icon(i, 64);
         },
         [&](Rc<Gfx::Surface> i) {
-            return Ui::pinSize(64, Ui::image(i));
+            return Ui::maxSize(96, Ui::image(i));
         },
         [&](None) {
             return Ui::empty();

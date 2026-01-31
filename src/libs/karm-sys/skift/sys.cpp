@@ -19,7 +19,7 @@ Res<Rc<Fd>> deserializeFd(Serde::Deserializer& de) {
 
     if (type == Skift::FdType::VMO) {
         auto [_, vmo] = try$(scope.deserializeUnit<Hj::Vmo>({.kind = Serde::Type::OBJECT_ITEM}));
-        result = Ok(makeRc<Skift::VmoFd>(std::move(vmo)));
+        result = Ok(makeRc<Skift::VmoFd>(std::move(vmo), 0));
     } else if (type == Skift::FdType::DUPLEX) {
         auto [_, in] = try$(scope.deserializeUnit<Hj::Channel>({.kind = Serde::Type::OBJECT_ITEM}));
         auto [_, out] = try$(scope.deserializeUnit<Hj::Channel>({.kind = Serde::Type::OBJECT_ITEM}));
@@ -52,8 +52,8 @@ Res<Rc<Fd>> openFile(Ref::Url const& url) {
     Ref::Path path = try$(_resolveUrl(url));
     path.rooted = false;
     auto bootfs = try$(Skift::Bootfs::ensure());
-    auto vmo = try$(bootfs->openVmo(path.str()));
-    return Ok(makeRc<Skift::VmoFd>(std::move(vmo)));
+    auto [vmo, size] = try$(bootfs->openVmo(path.str()));
+    return Ok(makeRc<Skift::VmoFd>(std::move(vmo), size));
 }
 
 Res<Rc<Fd>> createFile(Ref::Url const& url) {

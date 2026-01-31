@@ -72,9 +72,9 @@ class Qemu(Machine):
             f"file=fat:rw:{image.finalize()},media=disk,format=raw",
         ]
 
+
         if sdlAvailable():
             qemuCmd += ["-display", "sdl"]
-
         if self.logError:
             qemuCmd += ["-d", "int,guest_errors,cpu_reset"]
 

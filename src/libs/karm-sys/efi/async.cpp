@@ -40,7 +40,7 @@ struct EfiSched : Sched {
     }
 
     Async::Task<> sleepAsync(Instant, Async::CancellationToken) override {
-        co_return Error::notImplemented();
+        co_return Ok();
     }
 };
 

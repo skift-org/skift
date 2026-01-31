@@ -110,7 +110,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx, Async::CancellationToken ct) {
     auto vmo = co_try$(Hj::Vmo::create(Hj::ROOT, bootfsRecord->start, bootfsRecord->size, Hj::VmoFlags::DMA));
     co_try$(vmo.label("bootfs"));
 
-    auto fd = makeRc<Sys::Skift::VmoFd>(std::move(vmo));
+    auto fd = makeRc<Sys::Skift::VmoFd>(std::move(vmo), 0);
     auto root = co_trya$(Karm::Fs::mountBootfsAsync(fd));
 
     auto handler = makeRc<Strata::Fs::FsHandler>(root);

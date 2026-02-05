@@ -83,7 +83,7 @@ Res<> enterUserspace(Handover::Payload& payload) {
     auto handoverRange = try$(space->map({}, handoverVmo, 0, Hj::MapFlags::READ));
 
     logInfo("entry: mapping stack...");
-    auto stackVmo = try$(Vmo::alloc(kib(64), Hj::VmoFlags::UPPER));
+    auto stackVmo = try$(Vmo::alloc(64_KiB, Hj::VmoFlags::UPPER));
     stackVmo->label("stack");
     auto stackRange = try$(space->map({}, stackVmo, 0, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
     logInfo("entry: stack: {x}-{x}", stackRange.start, stackRange.end());

@@ -59,7 +59,7 @@ static Res<Hj::Task> loadElf(Sys::Context& ctx, String id, Rc<Sys::Skift::Duplex
     }
 
     logInfoIf(DEBUG_ELF, "mapping the stack...");
-    auto stackVmo = try$(Hj::Vmo::create(Hj::ROOT, 0, kib(64), Hj::VmoFlags::UPPER));
+    auto stackVmo = try$(Hj::Vmo::create(Hj::ROOT, 0, 64_KiB, Hj::VmoFlags::UPPER));
     try$(stackVmo.label("stack"));
     auto stackRange = try$(elfSpace.map(0, stackVmo, 0, 0, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
 

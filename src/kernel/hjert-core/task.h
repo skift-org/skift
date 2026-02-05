@@ -20,7 +20,6 @@ enum struct State {
 };
 
 struct Task : BaseObject<Task, Hj::Type::TASK> {
-
     Mode _mode;
     Stack _stack;
     Opt<Box<Context>> _ctx;

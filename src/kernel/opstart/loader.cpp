@@ -15,7 +15,7 @@ void enterKernel(usize entry, usize payload, usize stack, usize vmm);
 
 Res<> loadEntry(Entry const& entry) {
     logInfo("opstart: preparing payload...");
-    auto payloadMem = try$(Sys::mutMmap(NONE, {.size = kib(16)}));
+    auto payloadMem = try$(Sys::mutMmap(NONE, {.size = 16_KiB}));
     logInfo("opstart: payload at vaddr: {p} paddr: {p}", payloadMem.vaddr(), payloadMem.paddr());
     Handover::Builder payload{payloadMem.mutBytes()};
 
@@ -98,15 +98,15 @@ Res<> loadEntry(Entry const& entry) {
 
     logInfo("opstart: mapping kernel...");
     try$(vmm->mapRange(
-        {Handover::KERNEL_BASE + Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
-        {Hal::PAGE_SIZE, gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
+        {Handover::KERNEL_BASE + Hal::PAGE_SIZE, 2_GiB - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
+        {Hal::PAGE_SIZE, 2_GiB - Hal::PAGE_SIZE - Hal::PAGE_SIZE},
         {Hal::Vmm::READ, Hal::Vmm::WRITE}
     ));
 
     logInfo("opstart: mapping upper half...");
     try$(vmm->mapRange(
-        {Handover::UPPER_HALF + Hal::PAGE_SIZE, gib(4) - Hal::PAGE_SIZE},
-        {Hal::PAGE_SIZE, gib(4) - Hal::PAGE_SIZE},
+        {Handover::UPPER_HALF + Hal::PAGE_SIZE, 4_GiB - Hal::PAGE_SIZE},
+        {Hal::PAGE_SIZE, 4_GiB - Hal::PAGE_SIZE},
         {Hal::Vmm::READ, Hal::Vmm::WRITE}
     ));
 

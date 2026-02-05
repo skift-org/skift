@@ -60,6 +60,10 @@ struct ConOut : Fd {
         return Error::notImplemented();
     }
 
+    Res<> truncate(usize) override {
+        return Error::notImplemented();
+    }
+
     Res<> flush() override {
         return Ok();
     }
@@ -142,6 +146,10 @@ struct FileProto : Fd {
         return Ok(pos);
     }
 
+    Res<> truncate(usize) override {
+        return Error::notImplemented();
+    }
+
     Res<> flush() override {
         try$(_proto->flush(_proto));
         return Ok();
@@ -215,7 +223,7 @@ Res<Rc<Fd>> listenUdp(SocketAddr) {
     return Error::notImplemented();
 }
 
-Res<Rc<Fd>> connectIpc(Ref::Url){
+Res<Rc<Fd>> connectIpc(Ref::Url) {
     return Error::notImplemented();
 }
 
@@ -395,7 +403,7 @@ Res<Rc<Pid>> spawn(Command const&) {
     return Error::notImplemented();
 }
 
-Res<Tuple<Rc<Pid>, Rc<Fd>>> spawnPty(Command const& ) {
+Res<Tuple<Rc<Pid>, Rc<Fd>>> spawnPty(Command const&) {
     return Error::notImplemented();
 }
 

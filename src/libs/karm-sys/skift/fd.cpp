@@ -63,10 +63,10 @@ export struct DuplexFd : NullFd {
     Hj::Channel _out;
 
     static Res<Rc<DuplexFd>> create(Str label) {
-        auto in = try$(Hj::Channel::create(Hj::Domain::self(), kib(16), 16));
+        auto in = try$(Hj::Channel::create(Hj::Domain::self(), 16_KiB, 16));
         try$(in.label(Io::format("{}-in", label)));
 
-        auto out = try$(Hj::Channel::create(Hj::Domain::self(), kib(16), 16));
+        auto out = try$(Hj::Channel::create(Hj::Domain::self(), 16_KiB, 16));
         try$(out.label(Io::format("{}-out", label)));
 
         return Ok(makeRc<DuplexFd>(std::move(in), std::move(out)));
@@ -107,7 +107,7 @@ export struct PipeFd : NullFd {
     Hj::Pipe _pipe;
 
     static Res<Rc<PipeFd>> create() {
-        auto pipe = try$(Hj::Pipe::create(Hj::ROOT, kib(16)));
+        auto pipe = try$(Hj::Pipe::create(Hj::ROOT, 16_KiB));
         return Ok(makeRc<PipeFd>(std::move(pipe)));
     }
 

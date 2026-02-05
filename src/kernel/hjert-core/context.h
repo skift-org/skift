@@ -27,7 +27,7 @@ struct Context {
 };
 
 struct Stack {
-    static constexpr usize DEFAULT_SIZE = kib(64);
+    static constexpr usize DEFAULT_SIZE = 64_KiB;
 
     static Res<Stack> create();
 

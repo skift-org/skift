@@ -60,7 +60,7 @@ struct Pmm : Hal::Pmm {
         logInfo(" mem: physical memory layout:");
         _bits.visit([this](auto range) {
             auto prange = bits2Pmm(range);
-            logInfo("    {x} - {x} ({}kib)", prange.start, prange.end(), prange.size / kib(1));
+            logInfo("    {x} - {x} ({}kib)", prange.start, prange.end(), prange.size / 1_KiB);
         });
     }
 
@@ -167,7 +167,7 @@ Res<> initMem(Handover::Payload& payload) {
     logInfo("mem: marking free memory as free...");
     for (auto& record : payload) {
         if (record.tag == Handover::Tag::FREE) {
-            logInfo("mem: free memory at {p} {p} ({}kib)", record.start, record.start + record.size, record.size / kib(1));
+            logInfo("mem: free memory at {p} {p} ({}kib)", record.start, record.start + record.size, record.size / 1_KiB);
             try$(pmm().free({record.start, record.size}));
         }
     }
@@ -188,11 +188,11 @@ Res<> initMem(Handover::Payload& payload) {
         Arch::globalVmm().mapRange(
             {
                 Handover::KERNEL_BASE + Hal::PAGE_SIZE,
-                gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE,
+                2_GiB - Hal::PAGE_SIZE - Hal::PAGE_SIZE,
             },
             {
                 Hal::PAGE_SIZE,
-                gib(2) - Hal::PAGE_SIZE - Hal::PAGE_SIZE,
+                2_GiB - Hal::PAGE_SIZE - Hal::PAGE_SIZE,
             },
             {Hal::Vmm::READ, Hal::Vmm::WRITE}
         )
@@ -203,11 +203,11 @@ Res<> initMem(Handover::Payload& payload) {
         Arch::globalVmm().mapRange(
             {
                 Handover::UPPER_HALF + Hal::PAGE_SIZE,
-                gib(4) - Hal::PAGE_SIZE,
+                4_GiB - Hal::PAGE_SIZE,
             },
             {
                 Hal::PAGE_SIZE,
-                gib(4) - Hal::PAGE_SIZE,
+                4_GiB - Hal::PAGE_SIZE,
             },
             {Hal::Vmm::READ, Hal::Vmm::WRITE}
         )

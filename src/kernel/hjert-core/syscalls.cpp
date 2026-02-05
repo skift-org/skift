@@ -87,7 +87,7 @@ Res<> doCreate(Task& self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
                     return Ok(try$(Vmo::makeDma({props.phys, props.len})));
                 }
 
-                if (props.len > gib(2)) {
+                if (props.len > 2_GiB) {
                     return Error::invalidInput("Vmo size too large");
                 }
 

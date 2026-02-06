@@ -57,7 +57,7 @@ export struct Node :
     }
 
     virtual Res<> bubble(App::Event& e) {
-        if (_parent and not e.accepted()) 
+        if (_parent and not e.accepted())
             try$(_parent->bubble(e));
         return Ok();
     }

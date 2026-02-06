@@ -1,8 +1,10 @@
 import Karm.Core;
 import Karm.Logger;
+import Hjert.Api;
 
 #include <libheap.h>
-#include <hjert-api/api.h>
+
+using namespace Karm;
 
 // MARK: Heap Implementation ---------------------------------------------------
 

@@ -1,10 +1,9 @@
 module;
 
-#include <hjert-core/arch.h>
-
 module Karm.Logger;
 
 import Karm.Core;
+import Hjert.Core;
 
 namespace Karm::Logger::_Embed {
 

@@ -1,6 +1,6 @@
 module;
 
-#include <hjert-api/api.h>
+#include <karm/macros>
 
 module Karm.Sys;
 
@@ -8,6 +8,7 @@ import Karm.Core;
 import Karm.Logger;
 import Karm.Sys.Skift;
 import Strata.Protos;
+import Hjert.Api;
 
 namespace Karm::Sys::_Embed {
 

@@ -1,6 +1,6 @@
 module;
 
-#include <hjert-api/api.h>
+#include <karm/macros>
 
 export module Strata.Protos:base;
 
@@ -8,6 +8,7 @@ import Karm.Core;
 import Karm.Gfx;
 import Karm.Math;
 import Karm.Logger;
+import Hjert.Api;
 
 using namespace Karm;
 

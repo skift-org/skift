@@ -1,12 +1,13 @@
 module;
 
 #include <ce-bootfs/bootfs.h>
-#include <hjert-api/api.h>
 #include <vaerk-handover/hook.h>
+#include <karm/macros>
 
 export module Karm.Sys.Skift:bootfs;
 
 import Karm.Logger;
+import Hjert.Api;
 
 namespace Karm::Sys::Skift {
 

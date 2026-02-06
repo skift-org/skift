@@ -1,8 +1,8 @@
 import Abi.SysV;
 import Karm.Sys.Skift;
 import Karm.Logger;
+import Hjert.Api;
 
-#include <hjert-api/api.h>
 #include <karm/entry>
 #include <vaerk-handover/hook.h>
 

@@ -1,8 +1,11 @@
 import Karm.Core;
 import Karm.Logger;
+import Hjert.Core;
 
+#include <hal/kmm.h>
 #include <libheap.h>
-#include <hjert-core/mem.h>
+
+using namespace Karm;
 
 // MARK: Kmm Implementation ---------------------------------------------------
 

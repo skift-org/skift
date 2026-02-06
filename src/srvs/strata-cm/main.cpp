@@ -1,5 +1,6 @@
-#include <hjert-api/api.h>
+#include <karm/macros>
 #include <vaerk-handover/hook.h>
+#include <hal/mem.h>
 
 import Karm.Ref;
 import Karm.Sys;
@@ -7,6 +8,7 @@ import Vaerk.Elf;
 import Karm.Logger;
 import Karm.Sys.Skift;
 import Abi.SysV;
+import Hjert.Api;
 
 import Strata.Protos;
 

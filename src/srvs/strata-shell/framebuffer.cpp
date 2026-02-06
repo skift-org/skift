@@ -1,6 +1,6 @@
 module;
 
-#include <hjert-api/api.h>
+#include <karm/macros>
 #include <vaerk-handover/hook.h>
 
 export module Strata.Shell:framebuffer;
@@ -8,6 +8,7 @@ export module Strata.Shell:framebuffer;
 import Karm.Gfx;
 import Karm.Logger;
 import Karm.Math;
+import Hjert.Api;
 
 using namespace Karm;
 

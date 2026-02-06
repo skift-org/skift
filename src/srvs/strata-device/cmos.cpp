@@ -103,7 +103,6 @@ struct Rtc : Device {
     }
 };
 
-
 Res<> Cmos::init() {
     logInfo("cmos: initializing...");
 

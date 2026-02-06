@@ -1,9 +1,10 @@
 module;
 
-#include <hjert-api/api.h>
+#include <karm/macros>
 
 module Karm.Logger;
 
+import Hjert.Api;
 import Karm.Sys;
 
 namespace Karm::Logger::_Embed {

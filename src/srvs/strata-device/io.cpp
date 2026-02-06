@@ -1,11 +1,11 @@
 module;
 
 #include <hal/io.h>
-#include <hjert-api/api.h>
 
 export module Strata.Device:io;
 
 import Karm.Core;
+import Hjert.Api;
 
 namespace Strata::Device {
 

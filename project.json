@@ -1,6 +1,6 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.project.v1",
-    "id": "skift/skift",
+    "id": "skift/os",
     "version": "v0.1.0",
     "type": "project",
     "description": "The Skift Operating System",

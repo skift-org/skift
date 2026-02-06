@@ -1,11 +1,12 @@
 module;
 
-#include <hjert-api/api.h>
+#include <karm/entry>
 
 export module Karm.Sys.Skift:fd;
 
 import Karm.Sys;
 import Karm.Logger;
+import Hjert.Api;
 
 using namespace Karm;
 

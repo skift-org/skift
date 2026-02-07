@@ -11,6 +11,7 @@
     "requires": [
         "hal",
         "karm-logger",
-        "vaerk-elf"
+        "vaerk-elf",
+        "hjert-api"
     ]
 }

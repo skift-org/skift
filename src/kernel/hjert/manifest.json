@@ -2,10 +2,5 @@
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
     "id": "hjert",
     "description": "The hjert micro-kernel",
-    "type": "exe",
-    "requires": [
-        "hjert-core",
-        "hjert-arch",
-        "hjert-api"
-    ]
+    "type": "exe"
 }

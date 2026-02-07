@@ -14,7 +14,7 @@ def generateBoot(img: image.Image) -> None:
     img.cpTree("meta/image/boot/efi", "")
 
 
-def generateInit(img: image.Image):
+def generateInit(img: image.Image, arch : str = "x86_64") -> None:
     img.mkdir("bundles")
     img.mkdir("share")
     img.mkdir("users/root")
@@ -43,7 +43,7 @@ def generateInit(img: image.Image):
         "strata-shell",
     ]
 
-    img.install(userspace, "skift-x86_64")
+    img.install(userspace, f"skift-{arch}")
 
 
 def generateSystem(registry: model.Registry, hdd: bool = False):
@@ -103,7 +103,7 @@ class StartArgs:
     arch: str = cli.arg(
         None,
         "arch",
-        "The architecture of the image (x86_64 or riscv32)",
+        "The architecture of the image (x86_64 or riscv64)",
         default="x86_64",
     )
     dint: bool = cli.arg(None, "dint", "Debug interrupts")
@@ -112,7 +112,7 @@ class StartArgs:
 
 @cli.command("boot", "Boot the system")
 def _(args: StartArgs) -> None:
-    if args.arch not in ["x86_64", "riscv32"]:
+    if args.arch not in ["x86_64", "riscv64"]:
         raise RuntimeError("Unknown arch")
     rargs = cli.defaults(model.RegistryArgs)
     rargs.mixins.append("release" if not args.debug else "debug")
@@ -130,19 +130,30 @@ def _(args: StartArgs) -> None:
         print("Booting...")
         machine = runner.Qemu(logError=args.dint, debugger=args.debug)
         machine.boot(img)
-    elif args.arch == "riscv32":
-        kernel = img.install("hjert-riscv", "kernel-riscv32")
+    elif args.arch == "riscv64":
+        initStore = store.BootFs(f"image-init-{args.arch}")
+        initImg = image.Image(registry, initStore)
+        generateInit(initImg, arch=args.arch)
+
+        kernel = img.install("hjert", f"kernel-{args.arch}")[0]
         qemu = [
-            "qemu-system-riscv32",
+            "qemu-system-riscv64",
+            "-m", "512M",
             "-machine",
             "virt",
             "-bios",
             "default",
-            "-nographic",
             "-serial",
             "mon:stdio",
             "--no-reboot",
+            "-device", "virtio-gpu-device",
+            "-device", "virtio-keyboard-device",
+            "-device", "virtio-mouse-device",
+            "-display",
+            "sdl",
             "-kernel",
             kernel.path,
+            "-initrd",
+            initStore.finalize(),
         ]
         shell.exec(*qemu)

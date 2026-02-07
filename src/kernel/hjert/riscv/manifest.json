@@ -1,19 +1,21 @@
 {
     "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
-    "id": "hjert-x86_64",
+    "id": "hjert-riscv",
     "type": "lib",
-    "description": "The Hjert micro-kernel platform layer for x86_64",
+    "description": "The Hjert micro-kernel platform layer for riscv",
     "enableIf": {
         "sys": [
             "kernel"
         ],
         "arch": [
-            "x86_64"
+            "riscv32",
+            "riscv64"
         ]
     },
     "requires": [
-        "hal-x86_64",
-        "hjert-core"
+        "hal-riscv",
+        "hjert-core",
+        "vaerk-dtb"
     ],
     "injects": [
         "hjert"

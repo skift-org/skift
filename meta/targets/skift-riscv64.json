@@ -1,0 +1,63 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.target.v1",
+    "id": "skift-riscv64",
+    "type": "target",
+    "props": {
+        "toolchain": "clang",
+        "arch": "riscv64",
+        "sys": "skift",
+        "abi": "sysv",
+        "bits": "64",
+        "freestanding": false,
+        "host": false,
+        "sys-encoding": "utf8",
+        "sys-line-ending": "lf",
+        "sys-path-separator": "slash",
+        "sys-terminal": "ansi"
+    },
+    "tools": {
+        "cc": {
+            "cmd": "{shell.latest('clang')}",
+            "args": [
+                "--target=riscv64-none-elf",
+                "-march=rv64gc"
+            ]
+        },
+        "cxx": {
+            "cmd": "{shell.latest('clang++')}",
+            "args": [
+                "--target=riscv64-none-elf",
+                "-march=rv64gc",
+                "-fno-exceptions",
+                "-fno-rtti"
+            ]
+        },
+        "ld": {
+            "cmd": "{shell.latest('ld.lld')}",
+            "args": [
+                "-m",
+                "elf64lriscv",
+                "-T{utils.relpath('skift-riscv64.ld')}",
+                "-z",
+                "max-page-size=0x1000"
+            ],
+            "files": [
+                "{utils.relpath('skift-riscv64.ld')}"
+            ]
+        },
+        "ar": {
+            "cmd": "{shell.latest('llvm-ar')}",
+            "args": [
+                "rcs"
+            ]
+        },
+        "as": {
+            "cmd": "{shell.env('AS', shell.latest('clang'))}",
+            "args": [
+                "--target=riscv64",
+                "-march=rv64gc",
+                "-c"
+            ]
+        }
+    }
+}

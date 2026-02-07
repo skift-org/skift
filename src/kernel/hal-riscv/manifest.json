@@ -1,0 +1,20 @@
+{
+    "$schema": "https://schemas.cute.engineering/stable/cutekit.manifest.component.v1",
+    "id": "hal-riscv",
+    "type": "lib",
+    "description": "Definitions for riscv architecture",
+    "enableIf": {
+        "arch": [
+            "riscv32",
+            "riscv64"
+        ]
+    },
+    "requires": [
+        "karm-core",
+        "vaerk-riscv",
+        "vaerk-sbi"
+    ],
+    "provides": [
+        "hal-impl"
+    ]
+}

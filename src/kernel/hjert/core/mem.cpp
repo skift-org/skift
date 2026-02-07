@@ -67,7 +67,7 @@ struct Pmm : Hal::Pmm {
         logInfo(" mem: physical memory layout:");
         _bits.visit([this](auto range) {
             auto prange = bits2Pmm(range);
-            logInfo("    {x} - {x} ({}kib)", prange.start, prange.end(), prange.size / 1_KiB);
+            logInfo("    {x} - {x} ({})", prange.start, prange.end(), DataSize{prange.size});
         });
     }
 
@@ -186,7 +186,7 @@ export Res<> initMem(Handover::Payload& payload) {
     logInfo("mem: marking free memory as free...");
     for (auto& record : payload) {
         if (record.tag == Handover::Tag::FREE) {
-            logInfo("mem: free memory at {p} {p} ({}kib)", record.start, record.start + record.size, record.size / 1_KiB);
+            logInfo("mem: free memory at {p} {p} ({})", record.start, record.start + record.size, DataSize{record.size});
             try$(pmm().free({record.start, record.size}));
         }
     }

@@ -1,8 +1,8 @@
 module;
 
+#include <hal/mem.h>
 #include <karm/macros>
 #include <vaerk-handover/hook.h>
-#include <hal/mem.h>
 
 module Karm.Sys;
 
@@ -205,8 +205,13 @@ usize pageSize() {
 
 // MARK: System Informations ---------------------------------------------------
 
-Res<> populate(SysInfo&) {
-    return Error::notImplemented();
+Res<> populate(SysInfo& infos) {
+    infos.sysName = "skiftOS"s;
+    infos.sysVersion = "0.1"s;
+    infos.kernelName = "hjert"s;
+    infos.kernelVersion = "0.1"s;
+    infos.hostname = "localhost"s;
+    return Ok();
 }
 
 Res<> populate(MemInfo&) {
@@ -217,8 +222,11 @@ Res<> populate(Vec<CpuInfo>&) {
     return Error::notImplemented();
 }
 
-Res<> populate(UserInfo&) {
-    return Error::notImplemented();
+Res<> populate(UserInfo& info) {
+    info.name = "Root"s;
+    info.shell = "bundle://luna"_url;
+    info.home = "location://home"_url;
+    return Ok();
 }
 
 Res<> populate(Vec<UserInfo>&) {

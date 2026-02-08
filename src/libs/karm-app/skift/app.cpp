@@ -47,7 +47,7 @@ struct SkiftWindow : Window {
 
     void releaseSurface(Slice<Math::Recti>) override;
 
-    void drag(DragEvent) override;
+    void drag() override;
 
     void snap(Snap snap) override;
 
@@ -214,9 +214,8 @@ SkiftWindow::~SkiftWindow() {
 void SkiftWindow::releaseSurface(Slice<Math::Recti>) {
 }
 
-void SkiftWindow::drag(DragEvent e) {
-    if (e.type == DragEvent::START)
-        (void)_application._shell.notify(Strata::IShell::WindowMove{_id});
+void SkiftWindow::drag() {
+    (void)_application._shell.notify(Strata::IShell::WindowMove{_id});
 }
 
 void SkiftWindow::snap(Snap s) {

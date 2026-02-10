@@ -132,9 +132,6 @@ struct SessionWindow : Hideo::Shell::Window {
         } else if (auto it = e.is<App::KeyboardEvent>()) {
             (void)_session.notify(IShell::WindowEvent{_id, *it});
             e.accept();
-        } else if (auto it = e.is<App::TypeEvent>()) {
-            (void)_session.notify(IShell::WindowEvent{_id, *it});
-            e.accept();
         }
     }
 
@@ -208,6 +205,7 @@ struct Compositor {
                 makeRc<ComponentLauncher>(Mdi::PEN, "Text"s, Gfx::BLUE_RAMP, "hideo-text.main"s),
                 makeRc<ComponentLauncher>(Mdi::DUCK, "Zoo"s, Gfx::TEAL_RAMP, "hideo-zoo.main"s),
             },
+            .filtered = {},
             .windows = {}
         };
 
@@ -355,13 +353,6 @@ struct InputHandler {
         return Ok();
     }
 
-    Res<> _handleTypeEvent(Sys::IpcMessage& message) {
-        auto event = try$(message.unpack<App::TypeEvent>());
-        auto e = App::makeEvent<App::TypeEvent>(event);
-        _root->event(*e);
-        return Ok();
-    }
-
     Async::Task<> servAsync(Async::CancellationToken ct) {
         auto client = co_trya$(Sys::IpcClient::connectAsync("ipc://strata-input"_url, ct));
         while (true) {
@@ -371,8 +362,6 @@ struct InputHandler {
                 (void)_handleMouseEvent(msg);
             else if (msg.is<App::KeyboardEvent>())
                 (void)_handleKeyboardEvent(msg);
-            else if (msg.is<App::TypeEvent>())
-                (void)_handleTypeEvent(msg);
             else
                 logWarn("unsupported message: {}", msg.header());
         }

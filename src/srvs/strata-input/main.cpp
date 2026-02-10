@@ -37,17 +37,6 @@ struct Service {
         co_return Ok(Service{std::move(server), std::move(client), std::move(keymap)});
     }
 
-    Res<> _handleKey(App::Key key) {
-        auto chr = _keymap.handle(key, _mods).unwrapOr("");
-        if (chr) {
-            // logDebug("translated {} to {#}", key.name(), chr);
-            for (auto r : iterRunes(chr))
-                _server.broadcast(App::TypeEvent{r, _mods});
-        }
-
-        return Ok();
-    }
-
     Res<> _handleKeyboardEvent(Sys::IpcMessage& message) {
         auto event = try$(message.unpack<App::KeyboardEvent>());
 
@@ -58,11 +47,15 @@ struct Service {
         }
 
         event.mods = _mods;
-        _server.broadcast(event);
 
-        if (event.type == App::KeyboardEvent::PRESS or
-            event.type == App::KeyboardEvent::REPEATE) {
-            try$(_handleKey(event.key));
+        auto chr = _keymap.handle(event.key, _mods).unwrapOr("");
+        if (chr) {
+            for (auto r : iterRunes(chr)) {
+                event.rune = r;
+                _server.broadcast(event);
+            }
+        } else {
+            _server.broadcast(event);
         }
 
         return Ok();

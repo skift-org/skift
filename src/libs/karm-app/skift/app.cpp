@@ -103,7 +103,7 @@ struct SkiftApplication : Application {
         payload.visit([&]<typename E>(E const& event) {
             using T = Meta::RemoveConstVolatileRef<E>;
 
-            if constexpr (Meta::Contains<T, MouseEvent, KeyboardEvent, TypeEvent>) {
+            if constexpr (Meta::Contains<T, MouseEvent, KeyboardEvent>) {
                 handler->handle<T>(App::WindowId{windowId}, event);
             } else if constexpr (Meta::Same<T, RequestCloseEvent>) {
                 _exited = true;

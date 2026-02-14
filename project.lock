@@ -52,17 +52,17 @@
             "tag": "main"
         },
         "skift/games": {
-            "commit": "ebd10ee6092d29c5230c571dae04ff56e84ba78d",
+            "commit": "b35468e472d993d55a1fa08bc2053fe7c367a76a",
             "git": "https://codeberg.org/skift/games",
             "tag": "main"
         },
         "skift/hideo": {
-            "commit": "9f67bf483f0c2c2e4d4c91765d74f6a08d4d5184",
+            "commit": "b95d33a4600fe01301b53d4689d1b00a0b5298b8",
             "git": "https://codeberg.org/skift/hideo.git",
             "tag": "main"
         },
         "skift/karm": {
-            "commit": "87fb3f7762ded248e8c2048d3290ab5832a72d24",
+            "commit": "2b80fbc69879a8bc53be402f543af73dd37984fd",
             "git": "https://codeberg.org/skift/karm.git",
             "tag": "main"
         },
@@ -72,12 +72,12 @@
             "tag": "main"
         },
         "skift/vaerk": {
-            "commit": "33ac030fd324ba381bdd4c9ed3d30a1609d46476",
+            "commit": "b8b8460039b3797bb11de73afdf18ce717d58d42",
             "git": "https://codeberg.org/skift/vaerk",
             "tag": "main"
         },
         "skift/vaev": {
-            "commit": "dd5d988bfe2172a73e6c3a010669e493d03c59ef",
+            "commit": "bf80875d003363c351f55476c539aae22ff8a63b",
             "git": "https://codeberg.org/skift/vaev",
             "tag": "main"
         }

@@ -89,11 +89,11 @@ Ui::Child entry(State const& s, Entry const& e, usize i) {
 Ui::Child list(State const& s) {
 
     auto items =
-        iter(s.configs.entries)
-            .mapi([&](Entry const& e, usize i) {
-                return entry(s, e, i);
-            })
-            .collect<Vec<Ui::Child>>();
+        iter(s.configs.entries) |
+        Selecti([&](Entry const& e, usize i) {
+            return entry(s, e, i);
+        }) |
+        Collect<Vec<Ui::Child>>();
 
     return Ui::hflow(16, items);
 }

@@ -19,7 +19,7 @@ struct SkiftWindow : Window {
     SkiftApplication& _application;
     Strata::IShell::WindowId _id;
     Rc<Strata::Protos::Surface> _surface;
-    bool _dirty = false;
+    Opt<Math::Recti> _dirty = NONE;
     bool _closed = false;
     Opt<Math::Vec2i> _shouldResize;
 
@@ -41,11 +41,17 @@ struct SkiftWindow : Window {
     }
 
     Gfx::MutPixels acquireSurface() override {
-        _dirty = true;
         return _surface->mutPixels();
     }
 
-    void releaseSurface(Slice<Math::Recti>) override;
+    void releaseSurface(Slice<Math::Recti> dirty) override {
+        if (dirty.len() == 0)
+            return;
+        Math::Recti merged = dirty[0];
+        for (auto r : next(dirty, 1))
+            merged = merged.mergeWith(r);
+        _dirty = merged;
+    }
 
     void drag() override;
 
@@ -188,12 +194,12 @@ struct SkiftApplication : Application {
                 co_trya$(_shell.callAsync(
                     Strata::IShell::WindowFlip{
                         id,
-                        window->bound(),
+                        window->_dirty.unwrap(),
                     },
                     ct
                 ));
 
-                window->_dirty = false;
+                window->_dirty = NONE;
             }
 
             co_trya$(Sys::globalSched().sleepAsync(nextFrameTime, ct));
@@ -209,9 +215,6 @@ struct SkiftApplication : Application {
 
 SkiftWindow::~SkiftWindow() {
     _application.detachWindow(_id);
-}
-
-void SkiftWindow::releaseSurface(Slice<Math::Recti>) {
 }
 
 void SkiftWindow::drag() {

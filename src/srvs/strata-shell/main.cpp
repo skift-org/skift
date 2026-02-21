@@ -41,7 +41,13 @@ struct Root : Ui::ProxyNode<Root> {
         }
         g.end();
 
-        Gfx::blitUnsafe(_frontbuffer->mutPixels(), _backbuffer->pixels());
+        for (auto& r : _dirty) {
+            Gfx::blitUnsafe(
+                _frontbuffer->mutPixels().clip(r),
+                _backbuffer->pixels().clip(r)
+            );
+        }
+
         _dirty.clear();
     }
 
@@ -65,7 +71,7 @@ struct Root : Ui::ProxyNode<Root> {
                 layout(bound());
                 _shouldLayout = false;
                 _dirty.clear();
-                _dirty.pushBack(_backbuffer->bound());
+                _dirty.pushBack(bound());
             }
 
             if (_dirty.len() > 0) {
@@ -153,13 +159,14 @@ struct SessionWindow : Hideo::Shell::Window {
 
     void attach(Rc<Protos::Surface> backbuffer) {
         _backbuffer = backbuffer;
-        flip();
     }
 
-    void flip() {
-        // FIXME: Only blit the region that was updated
-        auto region = _frontbuffer->mutPixels().bound().clipTo(_backbuffer.unwrap()->pixels().bound());
-        Gfx::blitUnsafe(_frontbuffer->mutPixels().clip(region), _backbuffer.unwrap()->pixels().clip(region));
+    void flip(Math::Recti region) {
+        region = region.clipTo(_frontbuffer->mutPixels().bound().clipTo(_backbuffer.unwrap()->pixels().bound()));
+        Gfx::blitUnsafe(
+            _frontbuffer->mutPixels().clip(region),
+            _backbuffer.unwrap()->pixels().clip(region)
+        );
     }
 };
 
@@ -239,6 +246,10 @@ struct Compositor {
         Hideo::Shell::Model::event(*_root, Hideo::Shell::SnapWindow{window, snap});
     }
 
+    void flipWindow(Rc<SessionWindow> window, Math::Recti region) {
+        Ui::event<Hideo::Shell::WindowFlipEvent>(*_root, window, region);
+    }
+
     void shouldRepaint() {
         Ui::shouldRepaint(*_root);
     }
@@ -285,8 +296,8 @@ struct CompositorSession : Sys::IpcSession {
         auto [windowId, region] = try$(message.unpack<IShell::WindowFlip>());
 
         auto window = _windows.get(windowId);
-        window->flip();
-        _compositor->shouldRepaint();
+        window->flip(region);
+        _compositor->flipWindow(window, region);
 
         return Ok();
     }

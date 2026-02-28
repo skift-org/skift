@@ -156,7 +156,13 @@ export struct Cap {
         return _raw != 0;
     }
 
-    std::strong_ordering operator<=>(Cap const& other) const = default;
+    u64 hash() const {
+        return Karm::hash(_raw);
+    }
+
+    bool operator==(Cap const&) const = default;
+
+    auto operator<=>(Cap const& other) const = default;
 
     usize slot() const {
         auto curr = _raw & MASK;

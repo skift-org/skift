@@ -1,6 +1,6 @@
+#include <hal/mem.h>
 #include <karm/macros>
 #include <vaerk-handover/hook.h>
-#include <hal/mem.h>
 
 import Karm.Ref;
 import Karm.Sys;
@@ -163,7 +163,7 @@ struct ComponentManager {
     void shutdown(Rc<Component> component) {
         logInfo("shutting down component '{}'", component->_id);
 
-        _exported.removeAll(component);
+        _exported.removeValue(component);
         _active.removeAll(component);
 
         if (_active.len() == 0) {
@@ -195,7 +195,7 @@ struct ComponentManager {
 
     Res<> connect(Rc<Sys::Fd> fd, Ref::Url url) {
         auto component = try$(
-            _exported.tryGet(url.host.str())
+            _exported.lookup(url.host.str())
                 .okOr(Error::notFound("component not found"))
         );
         return component->incoming(fd);

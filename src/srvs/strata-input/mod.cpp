@@ -1,3 +1,7 @@
+module;
+
+#include <karm/macros>
+
 export module Strata.Input;
 
 import Karm.Core;
@@ -17,7 +21,7 @@ export struct Keymap {
     Map<App::Key, Vec<Action>> _mappings;
 
     void bind(App::Key key, Str out, Flags<App::KeyMod> mods = {}) {
-        auto& actions = _mappings.getOrDefault(key);
+        auto& actions = _mappings.lookupOrPutDefault(key);
         actions.pushBack({mods, out});
     }
 
@@ -112,10 +116,7 @@ export struct Keymap {
     }
 
     Opt<Str> handle(App::Key key, Flags<App::KeyMod> mods) {
-        if (not _mappings.has(key))
-            return NONE;
-
-        auto& actions = _mappings.get(key);
+        auto const& actions = try$(_mappings.lookup(key));
         for (auto& action : actions)
             if (App::match(mods, action.mods))
                 return action.out;

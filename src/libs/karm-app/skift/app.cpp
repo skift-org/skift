@@ -74,7 +74,7 @@ struct SkiftApplication : Application {
 
     void detachWindow(Strata::IShell::WindowId id) {
         (void)_shell.notify(Strata::IShell::WindowDestroy{id});
-        _windows.del((usize)id);
+        (void)_windows.remove((usize)id);
     }
 
     Async::Task<Rc<Window>> createWindowAsync(WindowProps const& props, Async::CancellationToken ct) override {
@@ -120,7 +120,7 @@ struct SkiftApplication : Application {
 
     Res<> _handleWindowUpdate(Sys::IpcMessage& message, Rc<Handler> handler) {
         auto [windowId, props] = try$(message.unpack<Strata::IShell::WindowUpdate>());
-        auto* window = try$(_windows.tryGet(windowId).okOr(Error::invalidInput("no such window")));
+        auto* window = try$(_windows.lookup(windowId).okOr(Error::invalidInput("no such window")));
         // FIXME: We should probably have a separated hello message that pass stuff like color scheme and form factor
         if (App::formFactor != props.formFactor) {
             App::formFactor = props.formFactor;
@@ -142,14 +142,14 @@ struct SkiftApplication : Application {
     }
 
     bool exited() {
-        for (auto [id, window] : _windows.iterUnordered())
+        for (auto [id, window] : _windows.iterItems())
             if (not window->_closed)
                 return _exited;
         return true;
     }
 
     Async::Task<> _handleWindowResizeAsync(Rc<Handler> handler, Async::CancellationToken ct) {
-        for (auto [id, window] : _windows.iterUnordered()) {
+        for (auto [id, window] : _windows.iterItems()) {
             if (not window->_shouldResize)
                 continue;
 
@@ -187,7 +187,7 @@ struct SkiftApplication : Application {
             co_trya$(_handleWindowResizeAsync(handler, ct));
             handler->update();
 
-            for (auto [id, window] : _windows.iterUnordered()) {
+            for (auto [id, window] : _windows.iterItems()) {
                 if (not window->_dirty)
                     continue;
 

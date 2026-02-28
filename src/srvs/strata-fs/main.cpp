@@ -22,7 +22,7 @@ struct FsSession : Sys::IpcSession {
           _root(root) {}
 
     Res<Rc<Karm::Fs::Node>> _resolveFid(IFs::Fid fid) {
-        return _files.tryGet(fid).okOr(Error::invalidInput());
+        return _files.lookup(fid).okOr(Error::invalidInput());
     }
 
     Async::Task<IFs::Open::Response> _handleOpenAsync(Sys::IpcMessage& message) {
@@ -35,9 +35,7 @@ struct FsSession : Sys::IpcSession {
 
     Async::Task<IFs::Close::Response> _handleCloseAsync(Sys::IpcMessage& message) {
         auto request = co_try$(message.unpack<IFs::Close>());
-        if (not _files.has(request.fid))
-            co_return Error::invalidInput();
-        _files.del(request.fid);
+        co_try$(_files.remove(request.fid).okOr(Error::invalidInput()));
         co_return Ok();
     }
 

@@ -20,7 +20,7 @@ struct SkiftSched : Sys::Sched {
     SkiftSched(Hj::Listener listener) : _listener{std::move(listener)} {}
 
     Async::Task<> waitFor(Hj::Cap cap, Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset) {
-        if (_promises.has(cap))
+        if (_promises.contains(cap))
             // FIXME: We only support one waiter per cap
             panic("already waiting for this cap");
 
@@ -155,7 +155,7 @@ struct SkiftSched : Sys::Sched {
             try$(_listener.poll(nextDeadline));
 
             while (auto ev = _listener.next()) {
-                auto prop = _promises.take(ev->cap);
+                auto prop = _promises.remove(ev->cap).take();
                 try$(_listener.mute(ev->cap));
                 prop.resolve(Ok());
                 if (_Embed::instant() >= until)

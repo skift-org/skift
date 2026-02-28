@@ -276,17 +276,15 @@ struct CompositorSession : Sys::IpcSession {
 
     Res<IShell::WindowDestroy::Response> _handleWindowDestroy(Sys::IpcMessage& message) {
         auto [windowId] = try$(message.unpack<IShell::WindowDestroy>());
-        auto window = _windows.get(windowId);
-        _compositor->destroyWindow(window);
-        _windows.del(windowId);
+        _compositor->destroyWindow(try$(_windows.remove(windowId).okOr(Error::invalidInput("invalid window id"))));
         return Ok();
     }
 
     Res<IShell::WindowAttach::Response> _handleWindowAttach(Sys::IpcMessage& message) {
         auto [windowId, buffer] = try$(message.unpack<IShell::WindowAttach>());
 
-        auto window = _windows.get(windowId);
-        window->attach(buffer.unwrap());
+        auto window = try$(_windows.lookup(windowId).okOr(Error::invalidInput("invalid window id")));
+        window->attach(try$(buffer.okOr(Error::invalidInput("expected buffer"))));
         _compositor->shouldRepaint();
 
         return Ok();
@@ -295,7 +293,7 @@ struct CompositorSession : Sys::IpcSession {
     Res<> _handleWindowFlip(Sys::IpcMessage& message) {
         auto [windowId, region] = try$(message.unpack<IShell::WindowFlip>());
 
-        auto window = _windows.get(windowId);
+        auto window = try$(_windows.lookup(windowId).okOr(Error::invalidInput("invalid window id")));
         window->flip(region);
         _compositor->flipWindow(window, region);
 
@@ -304,15 +302,17 @@ struct CompositorSession : Sys::IpcSession {
 
     Res<> _handleWindowMove(Sys::IpcMessage& message) {
         auto [windowId] = try$(message.unpack<IShell::WindowMove>());
-        auto window = _windows.get(windowId);
+        auto window = try$(_windows.lookup(windowId).okOr(Error::invalidInput("invalid window id")));
         window->dragged = true;
         return Ok();
     }
 
     Res<> _handleWindowSnap(Sys::IpcMessage& message) {
         auto [windowId, snap] = try$(message.unpack<IShell::WindowSnap>());
-        auto window = _windows.get(windowId);
+
+        auto window = try$(_windows.lookup(windowId).okOr(Error::invalidInput("invalid window id")));
         _compositor->snapWindow(window, snap);
+
         return Ok();
     }
 

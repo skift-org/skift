@@ -6,8 +6,8 @@ import Hjert.Api;
 #include <karm/entry>
 #include <vaerk-handover/hook.h>
 
-void __panicHandler(Karm::PanicKind kind, char const* msg) {
-    Hj::log(msg).unwrap();
+void __panicHandler(Karm::PanicKind kind, char const* msg, usize len) {
+    Hj::log({msg, len}).unwrap();
 
     if (kind == Karm::PanicKind::PANIC) {
         Hj::Task::self().crash().unwrap();

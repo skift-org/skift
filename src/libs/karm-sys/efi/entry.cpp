@@ -18,10 +18,10 @@ struct DebugOut : Io::TextWriter {
     }
 };
 
-void __panicHandler(Karm::PanicKind kind, char const* msg) {
+void __panicHandler(Karm::PanicKind kind, char const* msg, usize len) {
     Efi::st()->conOut->outputString(Efi::st()->conOut, kind == Karm::PanicKind::PANIC ? (u16 const*)L"PANIC: " : (u16 const*)L"DEBUG: ").unwrap();
     DebugOut out{};
-    (void)out.writeStr(Str{msg});
+    (void)out.writeStr(Str{msg, len});
     Efi::st()->conOut->outputString(Efi::st()->conOut, (u16 const*)L"\r\n").unwrap();
 
     if (kind == Karm::PanicKind::PANIC) {

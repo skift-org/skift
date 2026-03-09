@@ -220,7 +220,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx, Async::CancellationToken) {
     co_return co_await cm.runAsync();
 }
 
-void __panicHandler(Karm::PanicKind kind, char const* msg);
+void __panicHandler(Karm::PanicKind kind, char const* msg, usize len);
 
 extern "C" void __entryPoint(usize rawHandover) {
     Abi::SysV::init();

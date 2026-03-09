@@ -9,14 +9,13 @@ HandoverRequests$(
     Handover::requestFiles()
 );
 
-void __panicHandler(PanicKind kind, char const* buf) {
+void __panicHandler(PanicKind kind, char const* buf, usize len) {
     if (kind == PanicKind::PANIC) {
-        (void)Io::format(Hjert::Arch::globalOut(), "PANIC: {}\n", buf);
+        (void)Io::format(Hjert::Arch::globalOut(), "PANIC: {}\n", Str{buf, len});
         Hjert::Arch::stop();
         __builtin_unreachable();
-    } else {
-        (void)Io::format(Hjert::Arch::globalOut(), "DEBUG: {}\n", buf);
     }
+    (void)Io::format(Hjert::Arch::globalOut(), "DEBUG: {}\n", Str{buf, len});
 }
 
 Res<> entryPoint(u64 magic, Handover::Payload& payload) {

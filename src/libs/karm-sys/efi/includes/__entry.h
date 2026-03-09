@@ -6,7 +6,7 @@ import Abi.Ms;
 
 #include <vaerk-efi/base.h>
 
-void __panicHandler(Karm::PanicKind kind, char const* msg);
+void __panicHandler(Karm::PanicKind kind, char const* msg, usize len);
 
 extern "C" Efi::Status efi_main(Efi::Handle handle, Efi::SystemTable* st) {
     Efi::init(handle, st);

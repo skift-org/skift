@@ -85,8 +85,12 @@ Res<> doCreate(Task& self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
             [&](Hj::VmoProps& props) -> Res<Arc<Object>> {
                 try$(self.ensure(Hj::Pledge::MEM));
 
-                bool isDma = props.flags.has(Hj::VmoFlags::DMA);
+                if (not props.vmo.isRoot()) {
+                    auto vmo = try$(self.domain().get<Vmo>(props.vmo));
+                    return Ok(try$(Vmo::makeSlice(vmo, {props.phys, props.len})));
+                }
 
+                bool isDma = props.flags.has(Hj::VmoFlags::DMA);
                 if (isDma) {
                     try$(self.ensure(Hj::Pledge::HW));
                     return Ok(try$(Vmo::makeDma({props.phys, props.len})));

@@ -10,8 +10,15 @@ import :object;
 
 namespace Hjert::Core {
 
+export struct Vmo;
+
 export struct Vmo : BaseObject<Vmo, Hj::Type::VMO> {
-    using _Mem = Union<Hal::PmmMem, Hal::DmaRange>;
+    struct _Slice {
+        Arc<Vmo> vmo;
+        urange range;
+    };
+
+    using _Mem = Union<Hal::PmmMem, Hal::DmaRange, _Slice>;
     _Mem _mem;
 
     static Res<Arc<Vmo>> alloc(usize size, Flags<Hj::VmoFlags> flags) {
@@ -26,18 +33,21 @@ export struct Vmo : BaseObject<Vmo, Hj::Type::VMO> {
     }
 
     static Res<Arc<Vmo>> makeDma(Hal::DmaRange prange) {
-        if (prange.size == 0) {
+        if (prange.size == 0)
             return Error::invalidInput("size is zero");
-        }
 
         try$(prange.ensureAligned(Hal::PAGE_SIZE)
                  .okOr(Error::invalidInput("range is not page aligned")));
         return Ok(makeArc<Vmo>(prange));
     }
 
+    static Res<Arc<Vmo>> makeSlice(Arc<Vmo> vmo, urange slice) {
+        return Ok(makeArc<Vmo>(_Slice{vmo, slice}));
+    }
+
     Vmo(_Mem mem) : _mem(std::move(mem)) {}
 
-    Hal::PmmRange range() {
+    Hal::PmmRange range() const {
         return _mem.visit(
             Visitor{
                 [](Hal::PmmMem const& mem) {
@@ -46,6 +56,10 @@ export struct Vmo : BaseObject<Vmo, Hj::Type::VMO> {
                 [](Hal::DmaRange const& range) {
                     return range.into<Hal::PmmRange>();
                 },
+                [](_Slice const& slice) {
+                    auto range = slice.range.into<Hal::PmmRange>();
+                    return slice.vmo->range().slice(range);
+                }
             }
         );
     }

@@ -262,6 +262,7 @@ export struct VmoProps {
     usize phys;
     usize len;
     Flags<VmoFlags> flags;
+    Cap vmo = ROOT;
 };
 
 export struct IopProps {

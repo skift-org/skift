@@ -44,8 +44,8 @@ struct FsSession : Sys::IpcSession {
         auto node = co_try$(_resolveFid(request.fid));
         Vec<u8> buf;
         buf.resize(request.len);
-        co_trya$(node->readAsync(buf, request.off));
-        co_return Ok(std::move(buf));
+        auto read = co_trya$(node->readAsync(buf, request.off));
+        co_return Ok<IFs::Read::Response>(std::move(buf), read);
     }
 
     Async::Task<IFs::Write::Response> _handleWriteAsync(Sys::IpcMessage& message) {
@@ -66,6 +66,12 @@ struct FsSession : Sys::IpcSession {
         co_return co_await node->statAsync();
     }
 
+    Async::Task<IFs::Mmap::Response> _handleMmapAsync(Sys::IpcMessage& message) {
+        auto request = co_try$(message.unpack<IFs::Mmap>());
+        auto node = co_try$(_resolveFid(request.fid));
+        co_return node->underlying();
+    }
+
     Async::Task<> handleAsync(Sys::IpcMessage& msg, Async::CancellationToken) override {
         if (msg.is<IFs::Open>()) {
             co_try$(resp<IFs::Open>(msg, co_await _handleOpenAsync(msg)));
@@ -79,6 +85,8 @@ struct FsSession : Sys::IpcSession {
             co_try$(resp<IFs::ReadDir>(msg, co_await _handleReadDirAsync(msg)));
         } else if (msg.is<IFs::Stat>()) {
             co_try$(resp<IFs::Stat>(msg, co_await _handleStatAsync(msg)));
+        } else if (msg.is<IFs::Mmap>()) {
+            co_try$(resp<IFs::Mmap>(msg, co_await _handleMmapAsync(msg)));
         }
 
         co_return Ok();

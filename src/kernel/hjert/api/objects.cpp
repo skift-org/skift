@@ -141,8 +141,8 @@ export struct Vmo : Object {
 
     using Object::Object;
 
-    static Res<Vmo> create(Cap dest, usize phys, usize len, Flags<VmoFlags> flags = {}) {
-        return create<Vmo>(dest, phys, len, flags);
+    static Res<Vmo> create(Cap dest, usize phys, usize len, Flags<VmoFlags> flags = {}, Cap parent = ROOT) {
+        return create<Vmo>(dest, phys, len, flags, parent);
     }
 };
 

@@ -225,19 +225,32 @@ Res<MmapResult> memMap(MmapProps const&) {
     return Error::notImplemented();
 }
 
-Res<MmapResult> memMap(MmapProps const&, Rc<Fd> fd) {
-    auto vmoFd = fd.is<Skift::VmoFd>();
-    if (not vmoFd)
-        return Error::invalidInput("expected VmoFd");
+Res<MmapResult> memMap(MmapProps const& props, Rc<Fd> fd) {
+    if (auto it = fd.is<Skift::FsFd>()) {
+        auto vmoFd = try$(
+            Sys::run(
+                Skift::globalFsClient()
+                    .callAsync<Strata::IFs::Mmap>(
+                        {
+                            it->_fid,
+                        },
+                        Async::CancellationToken::uninterruptible()
+                    )
+            )
+        );
+        return memMap(props, vmoFd);
+    } else if (auto it = fd.is<Skift::VmoFd>()) {
+        auto& vmo = it->vmo();
+        auto range = try$(Hj::Space::self().map(vmo, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
 
-    auto& vmo = vmoFd->vmo();
-    auto range = try$(Hj::Space::self().map(vmo, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
-
-    return Ok(MmapResult{
-        0,
-        range.start,
-        range.size,
-    });
+        return Ok(MmapResult{
+            0,
+            range.start,
+            range.size,
+        });
+    } else {
+        return Error::unsupported("fd is not mappable");
+    }
 }
 
 Res<> memUnmap(void const* ptr, usize size) {

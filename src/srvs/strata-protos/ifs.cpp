@@ -1,6 +1,7 @@
 export module Strata.Protos:ifs;
 
 import Karm.Core;
+import Karm.Sys;
 import Karm.Sys.Base;
 
 using namespace Karm;
@@ -23,13 +24,13 @@ export struct Open {
 
 export struct Close {
     using Response = None;
-
     Fid fid;
 };
 
 export struct Read {
     struct Response {
         Vec<u8> buf;
+        usize len;
     };
 
     Fid fid;
@@ -55,6 +56,11 @@ export struct ReadDir {
 export struct Stat {
     using Response = Sys::Stat;
 
+    Fid fid;
+};
+
+export struct Mmap {
+    using Response = Rc<Sys::Fd>;
     Fid fid;
 };
 

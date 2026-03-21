@@ -58,6 +58,11 @@ export struct VmoFd : NullFd {
         _off = try$(s.apply(_off, _len));
         return Ok(_off);
     }
+
+    Res<Rc<Fd>> slice(urange range) override {
+        auto vmo = try$(Hj::Vmo::create(Hj::ROOT, range.start, range.size, {}, _vmo.cap()));
+        return Ok(makeRc<VmoFd>(std::move(vmo), range.size));
+    }
 };
 
 export struct DuplexFd : NullFd {
@@ -133,13 +138,14 @@ export struct FsFd : Fd {
     ~FsFd() {
         (void)Sys::run(
             globalFsClient().callAsync<Strata::IFs::Close>({_fid}, Async::CancellationToken::uninterruptible())
-        );
+        )
+            .unwrap();
     }
 
     Async::Task<usize> readAsync(MutBytes buf, Async::CancellationToken ct) {
         auto response = co_trya$(globalFsClient().callAsync<Strata::IFs::Read>({_fid, _off, buf.len()}, ct));
         _off += copy(bytes(response.buf), buf);
-        co_return Ok(response.buf.len());
+        co_return Ok(response.len);
     }
 
     Res<usize> read(MutBytes buf) override {

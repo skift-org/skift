@@ -42,6 +42,10 @@ export struct Vmo : BaseObject<Vmo, Hj::Type::VMO> {
     }
 
     static Res<Arc<Vmo>> makeSlice(Arc<Vmo> vmo, urange slice) {
+        if (slice.size == 0)
+            return Error::invalidInput("size is zero");
+        try$(slice.ensureAligned(Hal::PAGE_SIZE)
+                 .okOr(Error::invalidInput("range is not page aligned")));
         return Ok(makeArc<Vmo>(_Slice{vmo, slice}));
     }
 

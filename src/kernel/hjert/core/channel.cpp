@@ -16,7 +16,7 @@ export struct Channel : BaseObject<Channel, Hj::Type::CHANNEL> {
     Ring<u8> _bytes;
     Ring<Arc<Object>> _caps;
 
-    static Res<Arc<Channel>> create(usize bufCap = 4096, usize capsCap = 16) {
+    static Res<Arc<Channel>> create(usize bufCap = 256_KiB, usize capsCap = 512) {
         return Ok(makeArc<Channel>(bufCap, capsCap));
     }
 

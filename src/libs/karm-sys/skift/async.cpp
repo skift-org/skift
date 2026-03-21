@@ -13,9 +13,14 @@ import Hjert.Api;
 namespace Karm::Sys::_Embed {
 
 struct SkiftSched : Sys::Sched {
+    struct Sleep {
+        Instant until;
+        Async::Promise<> promise;
+    };
+
     Hj::Listener _listener;
     Map<Hj::Cap, Async::Promise<>> _promises;
-    Vec<Pair<Instant, Async::Promise<>>> _sleeps;
+    Vec<Sleep> _sleeps;
 
     SkiftSched(Hj::Listener listener) : _listener{std::move(listener)} {}
 
@@ -33,8 +38,10 @@ struct SkiftSched : Sys::Sched {
         co_return co_await future;
     }
 
-    Async::Task<usize> readAsync(Rc<Fd> fd, MutBytes buf, Async::CancellationToken) override {
-        if (auto ipc = fd.is<Skift::PipeFd>()) {
+    Async::Task<usize> readAsync(Rc<Fd> fd, MutBytes buf, Async::CancellationToken ct) override {
+        if (auto fs = fd.is<Skift::FsFd>()) {
+            co_return co_await fs->readAsync(buf, ct);
+        } else if (auto ipc = fd.is<Skift::PipeFd>()) {
             auto& chan = ipc->_pipe;
 
             co_trya$(waitFor(chan.cap(), Hj::Sigs::READABLE, Hj::Sigs::NONE));
@@ -47,8 +54,10 @@ struct SkiftSched : Sys::Sched {
         co_return Error::notImplemented("unsupported fd type");
     }
 
-    Async::Task<usize> writeAsync(Rc<Fd> fd, Bytes buf, Async::CancellationToken) override {
-        if (auto ipc = fd.is<Skift::PipeFd>()) {
+    Async::Task<usize> writeAsync(Rc<Fd> fd, Bytes buf, Async::CancellationToken ct) override {
+        if (auto fs = fd.is<Skift::FsFd>()) {
+            co_return co_await fs->writeAsync(buf, ct);
+        } else if (auto ipc = fd.is<Skift::PipeFd>()) {
             auto& chan = ipc->_pipe;
 
             co_trya$(waitFor(chan.cap(), Hj::Sigs::WRITABLE, Hj::Sigs::NONE));
@@ -131,37 +140,33 @@ struct SkiftSched : Sys::Sched {
 
     void _wake(Instant now) {
         for (usize i = 0; i < _sleeps.len(); i++) {
-            auto& [stamp, promise] = _sleeps[i];
-            if (stamp <= now) {
-                promise.resolve(Ok());
-                _sleeps.removeAt(i);
-                i--;
+            if (_sleeps[i].until <= now) {
+                _sleeps.removeAt(i).promise.resolve(Ok());
+                --i;
             }
         }
     }
 
     Res<> wait(Instant until) override {
-        for (;;) {
-            auto now = _Embed::instant();
-            _wake(now);
+        auto now = _Embed::instant();
+        _wake(now);
 
-            if (now >= until)
-                return Ok();
+        if (now >= until)
+            return Ok();
 
-            auto nextDeadline = min(until, _soonest());
-            if (nextDeadline <= _Embed::instant())
-                continue;
+        auto nextDeadline = min(until, _soonest());
+        if (nextDeadline <= _Embed::instant())
+            return Error::timedOut();
 
-            try$(_listener.poll(nextDeadline));
+        try$(_listener.poll(nextDeadline));
 
-            while (auto ev = _listener.next()) {
-                auto prop = _promises.remove(ev->cap).take();
-                try$(_listener.mute(ev->cap));
-                prop.resolve(Ok());
-                if (_Embed::instant() >= until)
-                    return Ok();
-            }
+        while (auto ev = _listener.next()) {
+            auto prop = _promises.remove(ev->cap).take();
+            try$(_listener.mute(ev->cap));
+            prop.resolve(Ok());
         }
+
+        return Ok();
     }
 };
 

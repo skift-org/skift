@@ -7,6 +7,8 @@ export module Karm.Sys.Skift:fd;
 import Karm.Sys;
 import Karm.Logger;
 import Hjert.Api;
+import Strata.Protos;
+import :client;
 
 using namespace Karm;
 
@@ -41,9 +43,8 @@ export struct VmoFd : NullFd {
     }
 
     Hj::Mapped& _ensureMapped() {
-        if (not _mapped) {
+        if (not _mapped)
             _mapped = Hj::map(_vmo, {Hj::MapFlags::READ}).take();
-        }
         return _mapped.unwrap();
     }
 
@@ -120,6 +121,91 @@ export struct PipeFd : NullFd {
         try$(scope.serializeUnit({.kind = Serde::Type::OBJECT_ITEM}, FdType::PIPE));
         try$(scope.serializeUnit({.kind = Serde::Type::OBJECT_ITEM}, _pipe));
         return scope.end();
+    }
+};
+
+export struct FsFd : Fd {
+    Strata::IFs::Fid _fid;
+    usize _off = 0;
+
+    FsFd(Strata::IFs::Fid fid) : _fid(fid) {}
+
+    ~FsFd() {
+        (void)Sys::run(
+            globalFsClient().callAsync<Strata::IFs::Close>({_fid}, Async::CancellationToken::uninterruptible())
+        );
+    }
+
+    Async::Task<usize> readAsync(MutBytes buf, Async::CancellationToken ct) {
+        auto response = co_trya$(globalFsClient().callAsync<Strata::IFs::Read>({_fid, _off, buf.len()}, ct));
+        _off += copy(bytes(response.buf), buf);
+        co_return Ok(response.buf.len());
+    }
+
+    Res<usize> read(MutBytes buf) override {
+        return Sys::run(
+            readAsync(buf, Async::CancellationToken::uninterruptible())
+        );
+    }
+
+    Async::Task<usize> writeAsync(Bytes buf, Async::CancellationToken ct) {
+        auto response = co_trya$(globalFsClient().callAsync<Strata::IFs::Write>({_fid, _off, buf}, ct));
+        _off += response;
+        co_return Ok(response);
+    }
+
+    Res<usize> write(Bytes buf) override {
+        return Sys::run(
+            writeAsync(buf, Async::CancellationToken::uninterruptible())
+        );
+    }
+
+    Res<usize> seek(Io::Seek seek) override {
+        auto size = try$(stat()).size;
+        _off = try$(seek.apply(_off, size));
+        return Ok(_off);
+    }
+
+    Res<> truncate(usize) override {
+        return Error::unsupported();
+    }
+
+    Async::Task<> flushAsync(Async::CancellationToken) {
+        co_return Ok();
+    }
+
+    Res<> flush() override {
+        return Ok();
+    }
+
+    Res<Rc<Fd>> dup() override {
+        return Error::unsupported();
+    }
+
+    Res<_Accepted> accept() override {
+        return Error::unsupported();
+    }
+
+    Async::Task<Stat> statAsync(Async::CancellationToken ct) {
+        co_return co_await globalFsClient().callAsync(Strata::IFs::Stat{_fid}, ct);
+    }
+
+    Res<Stat> stat() override {
+        return Sys::run(
+            statAsync(Async::CancellationToken::uninterruptible())
+        );
+    }
+
+    Res<_Sent> send(Bytes, Slice<Handle>, SocketAddr) override {
+        return Error::unsupported();
+    }
+
+    Res<_Received> recv(MutBytes, MutSlice<Handle>) override {
+        return Error::unsupported();
+    }
+
+    Res<> serialize(Serde::Serializer&) const override {
+        return Error::unsupported();
     }
 };
 

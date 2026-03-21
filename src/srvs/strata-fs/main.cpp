@@ -27,7 +27,7 @@ struct FsSession : Sys::IpcSession {
 
     Async::Task<IFs::Open::Response> _handleOpenAsync(Sys::IpcMessage& message) {
         auto request = co_try$(message.unpack<IFs::Open>());
-        auto file = co_trya$(_root->lookupAsync(Ref::Path{true, request.path}));
+        auto file = request.path.len() ? co_trya$(_root->lookupAsync(Ref::Path{true, request.path})) : _root;
         auto fid = _fids++;
         _files.put(fid, file);
         co_return Ok(fid);
@@ -61,7 +61,7 @@ struct FsSession : Sys::IpcSession {
     }
 
     Async::Task<IFs::Stat::Response> _handleStatAsync(Sys::IpcMessage& message) {
-        auto request = co_try$(message.unpack<IFs::Write>());
+        auto request = co_try$(message.unpack<IFs::Stat>());
         auto node = co_try$(_resolveFid(request.fid));
         co_return co_await node->statAsync();
     }

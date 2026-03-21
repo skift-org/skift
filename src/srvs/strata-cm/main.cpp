@@ -205,7 +205,7 @@ struct ComponentManager {
         logInfo("initializing system services...");
 
         co_try$(start("strata-device"s, true));
-        // co_try$(start("strata-fs"s, true));
+        co_try$(start("strata-fs"s, true));
         co_try$(start("strata-input"s, true));
         co_try$(start("strata-shell"s, true));
         co_return co_await _exit.future();

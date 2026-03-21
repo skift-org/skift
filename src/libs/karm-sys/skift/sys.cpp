@@ -40,6 +40,14 @@ Res<Rc<Fd>> deserializeFd(Serde::Deserializer& de) {
 static Res<Ref::Path> _resolveUrl(Ref::Url const& url) {
     if (url.scheme == "file") {
         return Ok(url.path);
+    } else if (url.scheme == "location") {
+        auto path = url.path;
+        path.rooted = false;
+
+        if (url.host == "home")
+            return Ok("/home"_path / path);
+
+        return Ok("/home"_path / try$(Io::toPascalCase(url.host.str())) / path);
     } else if (url.scheme == "bundle") {
         auto path = url.path;
         path.rooted = false;
@@ -51,19 +59,54 @@ static Res<Ref::Path> _resolveUrl(Ref::Url const& url) {
 }
 
 Res<Rc<Fd>> openFile(Ref::Url const& url) {
-    Ref::Path path = try$(_resolveUrl(url));
-    path.rooted = false;
-    auto bootfs = try$(Skift::Bootfs::ensure());
-    auto [vmo, size] = try$(bootfs->openVmo(path.str()));
-    return Ok(makeRc<Skift::VmoFd>(std::move(vmo), size));
+    auto path = try$(_resolveUrl(url));
+    auto fid = try$(
+        Sys::run(
+            Skift::globalFsClient()
+                .callAsync<Strata::IFs::Open>(
+                    {
+                        path._segs,
+                        {Strata::IFs::Open::OPEN},
+                    },
+                    Async::CancellationToken::uninterruptible()
+                )
+        )
+    );
+    return Ok(makeRc<Skift::FsFd>(fid));
 }
 
 Res<Rc<Fd>> createFile(Ref::Url const& url) {
-    return openFile(url);
+    auto path = try$(_resolveUrl(url));
+    auto fid = try$(
+        Sys::run(
+            Skift::globalFsClient()
+                .callAsync<Strata::IFs::Open>(
+                    {
+                        path._segs,
+                        {Strata::IFs::Open::CREATE},
+                    },
+                    Async::CancellationToken::uninterruptible()
+                )
+        )
+    );
+    return Ok(makeRc<Skift::FsFd>(fid));
 }
 
 Res<Rc<Fd>> openOrCreateFile(Ref::Url const& url) {
-    return openFile(url);
+    auto path = try$(_resolveUrl(url));
+    auto fid = try$(
+        Sys::run(
+            Skift::globalFsClient()
+                .callAsync<Strata::IFs::Open>(
+                    {
+                        path._segs,
+                        {Strata::IFs::Open::OPEN, Strata::IFs::Open::CREATE},
+                    },
+                    Async::CancellationToken::uninterruptible()
+                )
+        )
+    );
+    return Ok(makeRc<Skift::FsFd>(fid));
 }
 
 Res<Pair<Rc<Fd>, Rc<Fd>>> createPipe() {
@@ -82,8 +125,23 @@ Res<Rc<Fd>> createErr() {
     return Ok(makeRc<NullFd>());
 }
 
-Res<Vec<DirEntry>> readDir(Ref::Url const&) {
-    return Error::notImplemented();
+Async::Task<Vec<DirEntry>> readDirAsync(Ref::Url const& url, Async::CancellationToken ct) {
+    auto path = co_try$(_resolveUrl(url));
+    auto& fs = Skift::globalFsClient();
+    auto fid = co_trya$(fs.callAsync<Strata::IFs::Open>(
+        {
+            path._segs,
+            {Strata::IFs::Open::OPEN},
+        },
+        ct
+    ));
+    auto result = co_await fs.callAsync<Strata::IFs::ReadDir>({fid}, ct);
+    co_trya$(fs.callAsync<Strata::IFs::Close>({fid}, ct));
+    co_return result;
+}
+
+Res<Vec<DirEntry>> readDir(Ref::Url const& url) {
+    return Sys::run(readDirAsync(url, Async::CancellationToken::uninterruptible()));
 }
 
 Res<> createDir(Ref::Url const&) {
@@ -95,17 +153,8 @@ Res<Vec<DirEntry>> readDirOrCreate(Ref::Url const&) {
 }
 
 Res<Stat> stat(Ref::Url const& url) {
-    Ref::Path path = try$(_resolveUrl(url));
-    path.rooted = false;
-    auto bootfs = try$(Skift::Bootfs::ensure());
-    auto dirent = try$(bootfs->openDirent(path.str()));
-    return Ok(Stat{
-        .type = Type::FILE,
-        .size = dirent->length,
-        .accessTime = SystemTime::epoch(),
-        .modifyTime = SystemTime::epoch(),
-        .changeTime = SystemTime::epoch(),
-    });
+    auto fd = try$(openFile(url));
+    return fd->stat();
 }
 
 // MARK: User interactions -----------------------------------------------------

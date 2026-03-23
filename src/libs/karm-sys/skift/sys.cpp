@@ -58,7 +58,7 @@ static Res<Ref::Path> _resolveUrl(Ref::Url const& url) {
     }
 }
 
-Res<Rc<Fd>> openFile(Ref::Url const& url) {
+Res<Rc<Fd>> openFile(Ref::Url const& url, Flags<OpenOption> options) {
     auto path = try$(_resolveUrl(url));
     auto fid = try$(
         Sys::run(
@@ -66,41 +66,7 @@ Res<Rc<Fd>> openFile(Ref::Url const& url) {
                 .callAsync<Strata::IFs::Open>(
                     {
                         path._segs,
-                        {Strata::IFs::Open::OPEN},
-                    },
-                    Async::CancellationToken::uninterruptible()
-                )
-        )
-    );
-    return Ok(makeRc<Skift::FsFd>(fid));
-}
-
-Res<Rc<Fd>> createFile(Ref::Url const& url) {
-    auto path = try$(_resolveUrl(url));
-    auto fid = try$(
-        Sys::run(
-            Skift::globalFsClient()
-                .callAsync<Strata::IFs::Open>(
-                    {
-                        path._segs,
-                        {Strata::IFs::Open::CREATE},
-                    },
-                    Async::CancellationToken::uninterruptible()
-                )
-        )
-    );
-    return Ok(makeRc<Skift::FsFd>(fid));
-}
-
-Res<Rc<Fd>> openOrCreateFile(Ref::Url const& url) {
-    auto path = try$(_resolveUrl(url));
-    auto fid = try$(
-        Sys::run(
-            Skift::globalFsClient()
-                .callAsync<Strata::IFs::Open>(
-                    {
-                        path._segs,
-                        {Strata::IFs::Open::OPEN, Strata::IFs::Open::CREATE},
+                        options,
                     },
                     Async::CancellationToken::uninterruptible()
                 )
@@ -131,7 +97,7 @@ Async::Task<Vec<DirEntry>> readDirAsync(Ref::Url const& url, Async::Cancellation
     auto fid = co_trya$(fs.callAsync<Strata::IFs::Open>(
         {
             path._segs,
-            {Strata::IFs::Open::OPEN},
+            {OpenOption::READ},
         },
         ct
     ));
@@ -153,7 +119,7 @@ Res<Vec<DirEntry>> readDirOrCreate(Ref::Url const&) {
 }
 
 Res<Stat> stat(Ref::Url const& url) {
-    auto fd = try$(openFile(url));
+    auto fd = try$(openFile(url, OpenOption::READ));
     return fd->stat();
 }
 

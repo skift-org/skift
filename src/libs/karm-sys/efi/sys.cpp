@@ -245,7 +245,8 @@ static Res<Ref::Path> resolve(Ref::Url url) {
     }
 }
 
-Res<Rc<Fd>> openFile(Ref::Url const& url) {
+Res<Rc<Fd>> openFile(Ref::Url const& url, Flags<OpenOption> options) {
+    (void)options;
     static Efi::SimpleFileSystemProtocol* fileSystem = nullptr;
     if (not fileSystem) {
         fileSystem = try$(Efi::openProtocol<Efi::SimpleFileSystemProtocol>(Efi::li()->deviceHandle));
@@ -288,14 +289,6 @@ Res<Vec<DirEntry>> readDirOrCreate(Ref::Url const&) {
     return Error::notImplemented();
 }
 
-Res<Rc<Fd>> createFile(Ref::Url const&) {
-    return Error::notImplemented();
-}
-
-Res<Rc<Fd>> openOrCreateFile(Ref::Url const&) {
-    return Error::notImplemented();
-}
-
 Res<MmapResult> memMap(MmapProps const& options) {
     usize vaddr = 0;
 
@@ -329,7 +322,7 @@ Res<> memFlush(void*, usize) {
 }
 
 Res<Stat> stat(Ref::Url const& url) {
-    auto file = try$(openFile(url));
+    auto file = try$(openFile(url, OpenOption::READ));
     return file->stat();
 }
 

@@ -3,7 +3,7 @@
     "entries": [
         {
             "name": "skiftOS",
-            "kernel": "bundle://hjert/_bin",
+            "kernel": "bundle://hjert/bin/hjert.elf",
             "icon": "file:/skift/logo.qoi",
             "blobs": [
                 "file:/skift/init.bootfs"

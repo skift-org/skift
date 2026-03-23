@@ -12,14 +12,8 @@ export using Fid = usize;
 
 export struct Open {
     using Response = Fid;
-    enum struct Option {
-        OPEN,
-        CREATE
-    };
-    using enum Option;
-
     Vec<String> path;
-    Flags<Option> options;
+    Flags<Sys::OpenOption> options;
 };
 
 export struct Close {

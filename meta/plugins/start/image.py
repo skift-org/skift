@@ -47,9 +47,9 @@ class Image:
 
         # Copy the product binary/library
         if component.type == model.Kind.EXE:
-            dest = f"{base}/_bin"
+            dest = f"{base}/bin/{component.id}.elf"
         else:
-            dest = f"{base}/_lib"
+            dest = f"{base}/lib"
 
         self.cp(str(product.path), f"{dest}")
 

@@ -25,7 +25,7 @@ static Res<Hj::Task> loadElf(Sys::Context& ctx, String id, Rc<Sys::Skift::Duplex
     auto bootfs = try$(Sys::Skift::Bootfs::ensure());
 
     logInfoIf(DEBUG_ELF, "mapping elf...");
-    auto elfPath = Io::format("bundles/{}/_bin", id);
+    auto elfPath = Io::format("bundles/{}/bin/{}.elf", id, id);
     auto [elfVmo, _] = try$(bootfs->openVmo(elfPath.str()));
     auto elfRange = try$(Hj::map(elfVmo, Hj::MapFlags::READ));
 

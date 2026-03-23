@@ -105,7 +105,7 @@ export Res<> _start(Cap cap, usize ip, usize sp, Args const* args) {
 }
 
 export Res<> _map(Cap cap, usize* virt, Cap vmo, usize off, usize* len, Flags<MapFlags> flags) {
-    return _syscall(Syscall::MAP, cap.raw(), (Arg)virt, vmo.raw(), off, (Arg)len, (Arg)flags);
+    return _syscall(Syscall::MAP, cap.raw(), (Arg)virt, vmo.raw(), off, (Arg)len, flags.raw());
 }
 
 export Res<> _unmap(Cap cap, usize virt, usize len) {

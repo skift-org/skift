@@ -156,8 +156,8 @@ export struct Cap {
         return _raw != 0;
     }
 
-    u64 hash() const {
-        return Karm::hash(_raw);
+    void hash(Hasher& h) const {
+        Karm::hash(h, _raw);
     }
 
     bool operator==(Cap const&) const = default;

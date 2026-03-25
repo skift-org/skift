@@ -149,15 +149,15 @@ def _():
     everythingIsOk = everythingIsOk & moduleIsAvailable("magic")
     everythingIsOk = everythingIsOk & moduleIsAvailable("cutekit")
     everythingIsOk = everythingIsOk & commandIsAvailable("qemu-system-x86_64")
-    everythingIsOk = everythingIsOk & commandIsAvailable("clang", versionExpected=(18,))
+    everythingIsOk = everythingIsOk & commandIsAvailable("clang", versionExpected=(22,))
     everythingIsOk = everythingIsOk & commandIsAvailable(
-        "clang++", versionExpected=(16,)
+        "clang++", versionExpected=(22,)
     )
     everythingIsOk = everythingIsOk & commandIsAvailable(
-        "llvm-ar", versionExpected=(16,)
+        "llvm-ar", versionExpected=(22,)
     )
     everythingIsOk = everythingIsOk & commandIsAvailable(
-        "ld.lld", versionExpected=(16,)
+        "ld.lld", versionExpected=(22,)
     )
     everythingIsOk = everythingIsOk & commandIsAvailable("nasm")
     everythingIsOk = everythingIsOk & commandIsAvailable("ninja")

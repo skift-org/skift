@@ -24,7 +24,7 @@ This guide provides instructions for building skiftOS from source.
 
     apt install build-essential git ninja-build libsdl2-dev nasm gcc-multilib qemu-system-x86 mtools liburing-dev
 
-    bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" llvm 17
+    bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" llvm 22
     ```
 
     </details>

@@ -35,7 +35,7 @@ def generateInit(img: image.Image, arch : str = "x86_64") -> None:
         "hideo-sysmon.main",
         "hideo-text.main",
         "hideo-zoo.main",
-        "vaev-browser.main",
+        "hideo-browser.main",
         "strata-cm",
         "strata-device",
         "strata-fs",

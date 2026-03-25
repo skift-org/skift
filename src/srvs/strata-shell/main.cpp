@@ -197,7 +197,7 @@ struct Compositor {
             .launchers = {
                 makeRc<ComponentLauncher>(Mdi::GRID_LARGE, "2048"s, Gfx::YELLOW_RAMP, "hideo-2048"s),
                 makeRc<ComponentLauncher>(Mdi::INFORMATION_OUTLINE, "About"s, Gfx::BLUE_RAMP, "hideo-about.main"s),
-                makeRc<ComponentLauncher>(Mdi::WEB, "Browser"s, Gfx::BLUE_RAMP, "vaev-browser.main"s),
+                makeRc<ComponentLauncher>(Mdi::WEB, "Browser"s, Gfx::BLUE_RAMP, "hideo-browser.main"s),
                 makeRc<ComponentLauncher>(Mdi::RABBIT_VARIANT, "Bunnymark"s, Gfx::GRAY_RAMP, "hideo-bunnymark"s),
                 makeRc<ComponentLauncher>(Mdi::CALCULATOR, "Calculator"s, Gfx::ORANGE_RAMP, "hideo-calculator.main"s),
                 makeRc<ComponentLauncher>(Mdi::MESSAGE, "Chat"s, Gfx::GREEN_RAMP, "hideo-chat.main"s),

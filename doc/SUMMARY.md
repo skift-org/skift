@@ -5,11 +5,6 @@
 - [Running](running.md)
 - [Contributing](contributing.md)
 
-# Tutorials
-
-- [Hello, world!](tutorials/hello-world.md)
-- [Hello, GUI!](tutorials/hello-gui.md)
-
 # Tooling
 
 - [Chatty](tooling/chatty.md)

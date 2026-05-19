@@ -95,7 +95,7 @@ struct EfiApplication : Application {
     }
 };
 
-Async::Task<Rc<Application>> createAppAsync(Sys::Context&, ApplicationProps const&, Async::CancellationToken) {
+Async::Task<Rc<Application>> createAppAsync(Sys::Env&, ApplicationProps const&, Async::CancellationToken) {
     auto* stip = co_try$(Efi::locateProtocol<Efi::SimpleTextInputProtocol>());
     co_return Ok(makeRc<EfiApplication>(stip));
 }

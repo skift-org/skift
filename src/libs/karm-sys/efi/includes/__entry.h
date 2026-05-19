@@ -18,12 +18,10 @@ extern "C" Efi::Status efi_main(Efi::Handle handle, Efi::SystemTable* st) {
 
     char const* self = "efi-app";
     char const* argv[] = {self, nullptr};
-    Sys::Context ctx;
-    ctx.add<Sys::ArgsHook>(1, argv);
-
+    char const* argvp[] = {nullptr};
+    Sys::Env env{1, argv, argvp, Ref::Url::parse("file:")};
     Async::Cancellation cancellation;
-
-    Res<> code = Async::run(entryPointAsync(ctx, cancellation.token()));
+    Res<> code = Async::run(entryPointAsync(env, cancellation.token()));
     if (not code) {
         Error error = code.none();
         (void)Io::format(Sys::err(), "{}: {}\n", self, error.msg());

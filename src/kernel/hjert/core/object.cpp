@@ -4,6 +4,7 @@ import Karm.Core;
 import Hjert.Api;
 
 using namespace Karm;
+using namespace Karm::Literals;
 
 namespace Hjert::Core {
 

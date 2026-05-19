@@ -2,7 +2,6 @@ module;
 
 #include <hal/mem.h>
 #include <karm/macros>
-#include <vaerk-handover/hook.h>
 
 module Karm.Sys;
 

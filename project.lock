@@ -27,7 +27,7 @@
             "tag": "v0.7.0"
         },
         "cute-engineering/ce-stdcpp": {
-            "commit": "868a2ad4a2b1742e9c1684ca9aab02cd3a5bb6ce",
+            "commit": "54a1c8783805930d3e8f1107dda877fbb6b61b67",
             "git": "https://codeberg.org/cute-engineering/ce-stdcpp.git",
             "tag": "v1.6.0"
         },
@@ -42,7 +42,7 @@
             "tag": "main"
         },
         "skift/ambolt": {
-            "commit": "c277d5d06c5041fd1ff1a144d9e45de1f9d6ae4a",
+            "commit": "649ab69b3c09bda84325b780f9249c446d310cb0",
             "git": "https://codeberg.org/skift/ambolt",
             "tag": "main"
         },
@@ -52,32 +52,32 @@
             "tag": "main"
         },
         "skift/games": {
-            "commit": "04d8b444fef3e5fcd48e7280acc05af629a5a590",
+            "commit": "0aeb6ed3f02b36123990d06253e5ae52d886033e",
             "git": "https://codeberg.org/skift/games",
             "tag": "main"
         },
         "skift/hideo": {
-            "commit": "695c0aa523a24c6079838403fa7131dab0c704bf",
+            "commit": "10d14817b6223d62c079d821d7c5e67200c984cc",
             "git": "https://codeberg.org/skift/hideo.git",
             "tag": "main"
         },
         "skift/karm": {
-            "commit": "2a88e853eb366987f49990cce5a7169518bd565c",
+            "commit": "4bd6bc2c92e936ec758962cdee69f3b97a60a9dd",
             "git": "https://codeberg.org/skift/karm.git",
             "tag": "main"
         },
         "skift/luna": {
-            "commit": "985f9728634f1efd1d53e80831bd575ad74f6578",
+            "commit": "c9bc1ce86ff7eddd90f97b25372d5d0a5d285360",
             "git": "https://codeberg.org/skift/luna",
             "tag": "main"
         },
         "skift/vaerk": {
-            "commit": "f29305934c50a19e6b70c6281517e8a7683d9fba",
+            "commit": "07923c37cf1aed9f8f74c940ece77425e1bff818",
             "git": "https://codeberg.org/skift/vaerk",
             "tag": "main"
         },
         "skift/vaev": {
-            "commit": "a31e47f4a3ace84f945eeaaaa204b0fd86c61518",
+            "commit": "b178d2085166d94d6bba953f53bb01f9f8b6c6ff",
             "git": "https://codeberg.org/skift/vaev",
             "tag": "main"
         }

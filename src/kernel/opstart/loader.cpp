@@ -9,6 +9,8 @@ import Vaerk.Elf;
 #include "fw.h"
 #include "loader.h"
 
+using namespace Karm::Literals;
+
 namespace Opstart {
 
 void enterKernel(usize entry, usize payload, usize stack, usize vmm);

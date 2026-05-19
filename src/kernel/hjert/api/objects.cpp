@@ -8,6 +8,8 @@ import Karm.Core;
 import :syscalls;
 import :types;
 
+using namespace Karm::Literals;
+
 namespace Hj {
 
 export Res<Instant> now() {

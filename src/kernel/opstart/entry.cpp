@@ -6,6 +6,10 @@ import Karm.Logger;
 
 #include "loader.h"
 
+using namespace Karm;
+using namespace Karm::Literals;
+using namespace Karm::Ref::Literals;
+
 void drawSplash(Gfx::Canvas& g, Opstart::Entry const& e, Math::Recti size) {
     if (auto it = e.icon.is<Rc<Gfx::Surface>>()) {
         g.clear(Gfx::ZINC950);
@@ -33,7 +37,7 @@ Res<> splashScreen(Opstart::Entry const& e) {
     return Ok();
 }
 
-Async::Task<> entryPointAsync(Sys::Context& ctx, Async::CancellationToken ct) {
+Async::Task<> entryPointAsync(Sys::Env& env, Async::CancellationToken ct) {
     logInfo("opstart " stringify$(__ck_version_value));
 
     logInfo("loading configs...");
@@ -49,7 +53,7 @@ Async::Task<> entryPointAsync(Sys::Context& ctx, Async::CancellationToken ct) {
     auto configs = co_try$(Opstart::Configs::fromJson(json));
 
     if (configs.entries.len() > 1 or configs.entries.len() == 0)
-        co_return co_await Opstart::showMenuAsync(ctx, configs, ct);
+        co_return co_await Opstart::showMenuAsync(env, configs, ct);
     else
         co_try$(splashScreen(configs.entries[0]));
 

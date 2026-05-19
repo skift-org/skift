@@ -9,6 +9,7 @@ import Karm.Logger;
 import Hjert.Api;
 
 using namespace Karm;
+using namespace Karm::Ref::Literals;
 
 namespace Strata::Device {
 
@@ -88,7 +89,7 @@ struct RootBus : Node {
 
 } // namespace Strata::Device
 
-Async::Task<> entryPointAsync(Sys::Context&, Async::CancellationToken ct) {
+Async::Task<> entryPointAsync(Sys::Env&, Async::CancellationToken ct) {
     auto handler = makeRc<Strata::Device::DeviceHandler>();
     auto server = co_trya$(Sys::IpcServer::createAsync("ipc://strata-device"_url, handler));
 

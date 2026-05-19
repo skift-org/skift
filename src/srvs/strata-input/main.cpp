@@ -6,6 +6,7 @@ import Strata.Protos;
 import Karm.App;
 
 using namespace Karm;
+using namespace Karm::Ref::Literals;
 
 namespace Strata::Input {
 
@@ -91,7 +92,7 @@ struct Service {
 
 } // namespace Strata::Input
 
-Async::Task<> entryPointAsync(Sys::Context&, Async::CancellationToken ct) {
+Async::Task<> entryPointAsync(Sys::Env&, Async::CancellationToken ct) {
     auto server = co_trya$(Strata::Input::Service::createAsync(ct));
     co_return co_await server.servAsync(ct);
 }

@@ -1,6 +1,6 @@
 #include <hal/mem.h>
 #include <karm/macros>
-#include <vaerk-handover/hook.h>
+#include <vaerk-handover/spec.h>
 
 import Karm.Ref;
 import Karm.Sys;
@@ -13,15 +13,17 @@ import Hjert.Api;
 import Strata.Protos;
 
 using namespace Karm;
+using namespace Karm::Literals;
+using namespace Karm::Ref::Literals;
 
 static constexpr bool DEBUG_TASK = false;
 static constexpr bool DEBUG_ELF = false;
 
 namespace Strata::Bus {
 
-static Res<Hj::Task> loadElf(Sys::Context& ctx, String id, Rc<Sys::Skift::DuplexFd> fd) {
+static Res<Hj::Task> loadElf(String id, Rc<Sys::Skift::DuplexFd> fd) {
     logInfo("activating service '{}'...", id);
-    auto& handover = useHandover(ctx);
+    auto& handover = Sys::Skift::useHandover();
     auto bootfs = try$(Sys::Skift::Bootfs::ensure());
 
     logInfoIf(DEBUG_ELF, "mapping elf...");
@@ -148,13 +150,12 @@ struct ComponentManager {
         }
     };
 
-    Sys::Context& _context;
     Map<String, Rc<Component>> _exported = {};
     Vec<Rc<Component>> _active;
     Async::Promise<> _exit;
     Async::Cancellation _cancellation;
 
-    ComponentManager(Sys::Context& ctx) : _context(ctx) {}
+    ComponentManager() {}
 
     ~ComponentManager() {
         _cancellation.cancel();
@@ -176,7 +177,7 @@ struct ComponentManager {
         logInfo("starting '{}' (exported: {})...", id, exported);
 
         auto fd = try$(Sys::Skift::DuplexFd::create(id));
-        auto task = try$(loadElf(_context, id, fd));
+        auto task = try$(loadElf(id, fd));
 
         auto component = makeRc<Component>(*this, id, Sys::IpcConnection{fd, "ipc:"_url}, std::move(task));
         _active.pushBack(component);
@@ -214,9 +215,9 @@ struct ComponentManager {
 
 } // namespace Strata::Bus
 
-Async::Task<> entryPointAsync(Sys::Context& ctx, Async::CancellationToken) {
+Async::Task<> entryPointAsync(Sys::Env&, Async::CancellationToken) {
     co_try$(Hj::Task::self().label("strata-cm"));
-    Strata::Bus::ComponentManager cm{ctx};
+    Strata::Bus::ComponentManager cm{};
     co_return co_await cm.runAsync();
 }
 
@@ -226,13 +227,18 @@ extern "C" void __entryPoint(usize rawHandover) {
     Abi::SysV::init();
     Karm::registerPanicHandler(__panicHandler);
 
-    Sys::Context ctx;
+    Sys::Skift::globalPayload = reinterpret_cast<Handover::Payload*>(rawHandover);
+    
     char const* argv[] = {"strata-cm", nullptr};
-    ctx.add<Sys::ArgsHook>(1, argv);
-    ctx.add<HandoverHook>((Handover::Payload*)rawHandover);
-
+    char const* envp[] = {nullptr};
+    Sys::Env env{
+        1,
+        argv,
+        envp,
+        "file:"_url,
+    };
     Async::Cancellation cancellation;
-    auto res = Sys::run(entryPointAsync(ctx, cancellation.token()));
+    auto res = Sys::run(entryPointAsync(env, cancellation.token()));
 
     auto self = Hj::Task::self();
 

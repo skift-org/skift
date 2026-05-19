@@ -1,5 +1,4 @@
 #include <karm/entry>
-#include <vaerk-handover/hook.h>
 
 import Strata.Protos;
 import Karm.Sys.Skift;
@@ -9,6 +8,7 @@ import Karm.Logger;
 import Hjert.Api;
 
 using namespace Karm;
+using namespace Karm::Ref::Literals;
 
 namespace Strata::Fs {
 
@@ -106,8 +106,8 @@ struct FsHandler : Sys::IpcHandler {
 
 } // namespace Strata::Fs
 
-Async::Task<> entryPointAsync(Sys::Context& ctx, Async::CancellationToken ct) {
-    auto& handover = useHandover(ctx);
+Async::Task<> entryPointAsync(Sys::Env&, Async::CancellationToken ct) {
+    auto& handover = Sys::Skift::useHandover();
 
     auto* bootfsRecord = handover.fileByName("file:/skift/init.bootfs");
     if (not bootfsRecord)

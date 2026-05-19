@@ -13,6 +13,8 @@ import Hideo.Shell;
 import Strata.Shell;
 
 using namespace Karm;
+using namespace Karm::Literals;
+using namespace Karm::Ref::Literals;
 
 namespace Strata::Shell {
 
@@ -189,7 +191,7 @@ struct Compositor {
     Rc<Framebuffer> _framebuffer;
     IShell::WindowId _windowId = 1;
 
-    static Async::Task<Rc<Compositor>> createAsync(Sys::Context& ctx) {
+    static Async::Task<Rc<Compositor>> createAsync(Sys::Env& env) {
         Hideo::Shell::State state = {
             .dateTime = Sys::dateTime(),
             .background = co_try$(Image::loadOrFallback("bundle://hideo-shell/wallpapers/abstract.qoi"_url)),
@@ -216,7 +218,7 @@ struct Compositor {
             .windows = {}
         };
 
-        auto framebuffer = co_try$(Framebuffer::open(ctx));
+        auto framebuffer = co_try$(Framebuffer::open(env));
         auto app = Hideo::Shell::app(std::move(state));
 
         auto root = makeRc<Root>(
@@ -381,8 +383,8 @@ struct InputHandler {
 
 } // namespace Strata::Shell
 
-Async::Task<> entryPointAsync(Sys::Context& ctx, Async::CancellationToken ct) {
-    auto compositor = co_trya$(Strata::Shell::Compositor::createAsync(ctx));
+Async::Task<> entryPointAsync(Sys::Env& env, Async::CancellationToken ct) {
+    auto compositor = co_trya$(Strata::Shell::Compositor::createAsync(env));
     auto handler = makeRc<Strata::Shell::CompositorHandler>(compositor);
     Strata::Shell::InputHandler inputHandler{compositor->_root};
     auto server = co_trya$(Sys::IpcServer::createAsync("ipc://strata-shell"_url, handler));

@@ -6,10 +6,12 @@ module Karm.App;
 
 import Karm.Core;
 import Karm.Gfx;
-import Karm.Sys;
-import Karm.Ref;
-import Strata.Protos;
 import Karm.Logger;
+import Karm.Ref;
+import Karm.Sys;
+import Strata.Protos;
+
+using namespace Karm::Ref::Literals;
 
 namespace Karm::App::_Embed {
 
@@ -225,7 +227,7 @@ void SkiftWindow::snap(Snap s) {
     (void)_application._shell.notify(Strata::IShell::WindowSnap{_id, s});
 }
 
-Async::Task<Rc<Application>> createAppAsync(Sys::Context&, ApplicationProps const&, Async::CancellationToken ct) {
+Async::Task<Rc<Application>> createAppAsync(Sys::Env&, ApplicationProps const&, Async::CancellationToken ct) {
     auto shell = co_trya$(Sys::IpcClient::connectAsync("ipc://strata-shell"_url, ct));
     co_return Ok(makeRc<SkiftApplication>(std::move(shell)));
 }

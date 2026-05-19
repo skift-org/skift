@@ -14,7 +14,7 @@ def generateBoot(img: image.Image) -> None:
     img.cpTree("meta/image/boot/efi", "")
 
 
-def generateInit(img: image.Image, arch : str = "x86_64") -> None:
+def generateInit(img: image.Image, arch: str = "x86_64") -> None:
     img.mkdir("bundles")
     img.mkdir("share")
     img.mkdir("users/root")
@@ -35,7 +35,7 @@ def generateInit(img: image.Image, arch : str = "x86_64") -> None:
         "hideo-sysmon.main",
         "hideo-text.main",
         "hideo-zoo.main",
-        "hideo-browser.main",
+        "vaev-browser",
         "strata-cm",
         "strata-device",
         "strata-fs",

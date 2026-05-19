@@ -9,6 +9,7 @@ import Karm.App;
 import Karm.Logger;
 
 using namespace Karm;
+using namespace Karm::Literals;
 
 namespace Strata::Input {
 

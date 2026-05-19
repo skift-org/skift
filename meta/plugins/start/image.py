@@ -3,7 +3,7 @@ import json
 
 from pathlib import Path
 from typing import Any
-from cutekit import model, builder, shell
+from cutekit import model, builder, shell, vt100
 from .store import Storage
 
 
@@ -54,13 +54,18 @@ class Image:
         self.cp(str(product.path), f"{dest}")
 
     def install(
-        self, componentsSpec: str | list[str], targetSpec: str
+            self, componentsSpec: str | list[str], targetSpec: str
     ) -> list[builder.ProductScope]:
         if isinstance(componentsSpec, str):
             componentsSpec = [componentsSpec]
 
         self._logger.info(f"Installing {componentsSpec}...")
-        components = [self._registry.lookup(c, model.Component) for c in componentsSpec]
+        components = []
+        for c in componentsSpec:
+            component = self._registry.lookup(c, model.Component)
+            if component is None:
+                raise RuntimeError(f"no component named {c}")
+            components.append(component)
 
         target = self._registry.lookup(targetSpec, model.Target)
         assert target is not None

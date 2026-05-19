@@ -6,6 +6,9 @@ import Karm.Kira;
 import Karm.App;
 import Karm.Math;
 
+using namespace Karm;
+using namespace Karm::Literals;
+
 namespace Opstart {
 
 // MARK: Model -----------------------------------------------------------------
@@ -165,8 +168,8 @@ Ui::Child menu(Configs const& c) {
     );
 }
 
-Async::Task<> showMenuAsync(Sys::Context& ctx, Configs const& c, Async::CancellationToken ct) {
-    co_return co_await Ui::runAsync(ctx, Opstart::menu(c), ct);
+Async::Task<> showMenuAsync(Sys::Env& env, Configs const& c, Async::CancellationToken ct) {
+    co_return co_await Ui::runAsync(env, menu(c), ct);
 }
 
 } // namespace Opstart

@@ -12,6 +12,8 @@ import Karm.Core;
 import Karm.Logger;
 import :arch;
 
+using namespace Karm::Literals;
+
 namespace Hjert::Core {
 
 struct Pmm : Hal::Pmm {

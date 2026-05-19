@@ -1,13 +1,15 @@
 module;
 
 #include <karm/macros>
-#include <vaerk-handover/hook.h>
+#include <vaerk-handover/spec.h>
 
 export module Strata.Shell:framebuffer;
 
 import Karm.Gfx;
 import Karm.Logger;
 import Karm.Math;
+import Karm.Sys;
+import Karm.Sys.Skift;
 import Hjert.Api;
 
 using namespace Karm;
@@ -15,8 +17,8 @@ using namespace Karm;
 namespace Strata::Shell {
 
 export struct Framebuffer {
-    static Res<Rc<Framebuffer>> open(Sys::Context& ctx) {
-        auto& handover = useHandover(ctx);
+    static Res<Rc<Framebuffer>> open(Sys::Env&) {
+        auto& handover = Sys::Skift::useHandover();
         auto* record = handover.findTag(Handover::Tag::FB);
         auto vmo = try$(Hj::Vmo::create(Hj::ROOT, record->start, record->size, Hj::VmoFlags::DMA));
         try$(vmo.label("framebuffer"));

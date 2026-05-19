@@ -2,12 +2,12 @@ module;
 
 #include <ce-bootfs/bootfs.h>
 #include <karm/macros>
-#include <vaerk-handover/hook.h>
 
 export module Karm.Sys.Skift:bootfs;
 
 import Karm.Logger;
 import Hjert.Api;
+import :handover;
 
 namespace Karm::Sys::Skift {
 
@@ -20,13 +20,13 @@ export struct Bootfs {
         return reinterpret_cast<bootfs_header_t*>(_range.mutBytes().buf());
     }
 
-    static Res<Bootfs*> ensure(Sys::Context& ctx = Sys::rootContext()) {
+    static Res<Bootfs*> ensure() {
         static Opt<Bootfs> bootfs;
 
         if (bootfs)
             return Ok(&bootfs.unwrap());
 
-        auto& handover = useHandover(ctx);
+        auto& handover = useHandover();
 
         auto* bootfsRecord = handover.fileByName("file:/skift/init.bootfs");
         if (not bootfsRecord)

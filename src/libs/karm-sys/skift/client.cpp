@@ -4,6 +4,8 @@ import Karm.Core;
 import Karm.Ref;
 import Karm.Sys;
 
+using namespace Karm::Ref::Literals;
+
 namespace Karm::Sys::Skift {
 
 static Opt<IpcClient> _globalClient = NONE;

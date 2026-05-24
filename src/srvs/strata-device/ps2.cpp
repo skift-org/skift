@@ -152,7 +152,7 @@ struct Keyboard : Device {
         GET_SET_SCAN_CODE_SET = 0xF0,
     };
 
-    bool _esc;
+    bool _esc = false;
 
     using Device::Device;
 
@@ -225,9 +225,9 @@ struct Mouse : Device {
         SET_DEFAULT = 0xF6,
     };
 
-    u8 _cycle;
-    Array<u8, 4> _buf;
-    bool _hasWheel;
+    u8 _cycle = 0;
+    Array<u8, 4> _buf = {};
+    bool _hasWheel = false;
 
     using Device::Device;
 
@@ -244,13 +244,13 @@ struct Mouse : Device {
 
         // enable scroll wheel
         logInfo("ps2: mouse enabling scroll wheel...");
-        try$(getDeiceId());
+        try$(getDeviceId());
 
         try$(sendCmd(SET_SAMPLE_RATE, 200));
         try$(sendCmd(SET_SAMPLE_RATE, 100));
         try$(sendCmd(SET_SAMPLE_RATE, 80));
 
-        auto status = try$(getDeiceId());
+        auto status = try$(getDeviceId());
         if (status == 0x03) {
             logInfo("ps2: mouse scroll wheel enabled");
             _hasWheel = true;
@@ -354,7 +354,7 @@ struct Mouse : Device {
         return Ok(try$(ctrl().readData()));
     }
 
-    Res<u8> getDeiceId() {
+    Res<u8> getDeviceId() {
         try$(sendCmd(GET_DEVICE_ID));
         return ctrl().readData();
     }

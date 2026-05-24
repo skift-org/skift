@@ -5,7 +5,8 @@ import Karm.Core;
 namespace Karm::Crypto::_Embed {
 
 Res<> entropy(MutBytes) {
-    notImplemented();
+    // FIXME: Implement a proper entropy source
+    return Ok();
 }
 
 } // namespace Karm::Crypto::_Embed

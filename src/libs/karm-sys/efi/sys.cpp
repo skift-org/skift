@@ -259,7 +259,6 @@ Res<Rc<Fd>> openFile(Ref::Url const& url, Flags<OpenOption> options) {
 
     Efi::FileProtocol* file = nullptr;
     auto resolved = try$(resolve(url)).str();
-    logDebug("resolved: {}", resolved);
 
     _StringBuilder<Utf16> b;
     b.ensure(resolved.len());

@@ -1,29 +1,31 @@
 #include <karm/entry>
 
-import Karm.Core;
 import Karm.App;
-import Karm.Sys;
-import Karm.Sys.Skift;
-import Strata.Device;
+import Karm.Core;
+import Karm.Ipc;
 import Karm.Logger;
+import Karm.Sys.Skift;
+import Karm.Sys;
+
 import Hjert.Api;
+import Strata.Device;
 
 using namespace Karm;
 using namespace Karm::Ref::Literals;
 
 namespace Strata::Device {
 
-struct DeviceSession : Sys::IpcSession {
+struct DeviceSession : Ipc::Session {
     explicit DeviceSession(Sys::IpcConnection conn)
-        : Sys::IpcSession(std::move(conn)) {}
+        : Session(std::move(conn)) {}
 
-    Async::Task<> handleAsync(Sys::IpcMessage&, Async::CancellationToken) override {
+    Async::Task<> handleAsync(Ipc::Message&, Async::CancellationToken) override {
         co_return Ok();
     }
 };
 
-struct DeviceHandler : Sys::IpcHandler {
-    Async::Task<Rc<Sys::IpcSession>> acceptSessionAsync(Sys::IpcConnection conn, Async::CancellationToken) override {
+struct DeviceHandler : Ipc::Handler {
+    Async::Task<Rc<Ipc::Session>> acceptSessionAsync(Sys::IpcConnection conn, Async::CancellationToken) override {
         co_return Ok(makeRc<DeviceSession>(std::move(conn)));
     }
 };
@@ -41,9 +43,9 @@ struct IsaRootBus : Node {
 };
 
 struct RootBus : Node {
-    Sys::IpcServer& _server;
+    Ipc::Server& _server;
 
-    RootBus(Sys::IpcServer& server)
+    RootBus(Ipc::Server& server)
         : _server(server) {}
 
     Res<> init() override {
@@ -91,7 +93,7 @@ struct RootBus : Node {
 
 Async::Task<> entryPointAsync(Sys::Env&, Async::CancellationToken ct) {
     auto handler = makeRc<Strata::Device::DeviceHandler>();
-    auto server = co_trya$(Sys::IpcServer::createAsync("ipc://strata-device"_url, handler));
+    auto server = co_trya$(Ipc::Server::createAsync("ipc://strata-device"_url, handler));
 
     logInfo("devices: building device tree...");
     auto root = makeRc<Strata::Device::RootBus>(server);

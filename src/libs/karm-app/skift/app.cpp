@@ -9,6 +9,7 @@ import Karm.Gfx;
 import Karm.Logger;
 import Karm.Ref;
 import Karm.Sys;
+import Karm.Ipc;
 import Strata.Protos;
 
 using namespace Karm::Ref::Literals;
@@ -67,11 +68,11 @@ struct SkiftWindow : Window {
 };
 
 struct SkiftApplication : Application {
-    Sys::IpcClient _shell;
+    Ipc::Client _shell;
     Map<usize, SkiftWindow*> _windows;
     bool _exited = false;
 
-    explicit SkiftApplication(Sys::IpcClient shell)
+    explicit SkiftApplication(Ipc::Client shell)
         : _shell(std::move(shell)) {}
 
     void detachWindow(Strata::IShell::WindowId id) {
@@ -106,7 +107,7 @@ struct SkiftApplication : Application {
         co_return Ok(window);
     }
 
-    Res<> _handleWindowEvent(Sys::IpcMessage& message, Rc<Handler> handler) {
+    Res<> _handleWindowEvent(Ipc::Message& message, Rc<Handler> handler) {
         auto [windowId, payload] = try$(message.unpack<Strata::IShell::WindowEvent>());
         payload.visit([&]<typename E>(E const& event) {
             using T = Meta::RemoveConstVolatileRef<E>;
@@ -120,7 +121,7 @@ struct SkiftApplication : Application {
         return Ok();
     }
 
-    Res<> _handleWindowUpdate(Sys::IpcMessage& message, Rc<Handler> handler) {
+    Res<> _handleWindowUpdate(Ipc::Message& message, Rc<Handler> handler) {
         auto [windowId, props] = try$(message.unpack<Strata::IShell::WindowUpdate>());
         auto* window = try$(_windows.lookup(windowId).okOr(Error::invalidInput("no such window")));
         // FIXME: We should probably have a separated hello message that pass stuff like color scheme and form factor
@@ -228,7 +229,7 @@ void SkiftWindow::snap(Snap s) {
 }
 
 Async::Task<Rc<Application>> createAppAsync(Sys::Env&, ApplicationProps const&, Async::CancellationToken ct) {
-    auto shell = co_trya$(Sys::IpcClient::connectAsync("ipc://strata-shell"_url, ct));
+    auto shell = co_trya$(Ipc::Client::connectAsync("ipc://strata-shell"_url, ct));
     co_return Ok(makeRc<SkiftApplication>(std::move(shell)));
 }
 

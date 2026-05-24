@@ -3,23 +3,24 @@ export module Karm.Sys.Skift:client;
 import Karm.Core;
 import Karm.Ref;
 import Karm.Sys;
+import Karm.Ipc;
 
 using namespace Karm::Ref::Literals;
 
 namespace Karm::Sys::Skift {
 
-static Opt<IpcClient> _globalClient = NONE;
-static Opt<IpcClient> _globalFsClient = NONE;
+static Opt<Ipc::Client> _globalClient = NONE;
+static Opt<Ipc::Client> _globalFsClient = NONE;
 
 export void setupClient(IpcConnection conn) {
     _globalClient.emplace(std::move(conn));
 }
 
-export IpcClient& globalClient() {
+export Ipc::Client& globalClient() {
     return _globalClient.unwrap();
 }
 
-export IpcClient& globalFsClient() {
+export Ipc::Client& globalFsClient() {
     if (not _globalFsClient) {
         _globalFsClient.emplace(
             IpcConnection::connect("ipc://strata-fs"_url)

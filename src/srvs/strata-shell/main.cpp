@@ -4,6 +4,7 @@ import Mdi;
 import Karm.App;
 import Karm.Gfx;
 import Karm.Image;
+import Karm.Ipc;
 import Karm.Logger;
 import Karm.Math;
 import Karm.Ui;
@@ -120,12 +121,12 @@ struct Root : Ui::ProxyNode<Root> {
 };
 
 struct SessionWindow : Hideo::Shell::Window {
-    Sys::IpcSession& _session;
+    Ipc::Session& _session;
     IShell::WindowId _id;
     Rc<Gfx::Surface> _frontbuffer;
     Opt<Rc<Protos::Surface>> _backbuffer;
 
-    SessionWindow(Sys::IpcSession& session, Rc<Gfx::Surface> frontbuffer)
+    SessionWindow(Ipc::Session& session, Rc<Gfx::Surface> frontbuffer)
         : _session(session), _frontbuffer(frontbuffer) {
     }
 
@@ -229,7 +230,7 @@ struct Compositor {
         co_return Ok(makeRc<Compositor>(root, framebuffer));
     }
 
-    Tuple<IShell::WindowId, Rc<SessionWindow>> createWindow(Sys::IpcSession& session, IShell::WindowProps props) {
+    Tuple<IShell::WindowId, Rc<SessionWindow>> createWindow(Ipc::Session& session, IShell::WindowProps props) {
         auto windowId = _windowId++;
         auto windowSurface = Gfx::Surface::alloc(props.size);
         windowSurface->mutPixels().clear(Ui::GRAY950);
@@ -257,15 +258,15 @@ struct Compositor {
     }
 };
 
-struct CompositorSession : Sys::IpcSession {
+struct CompositorSession : Ipc::Session {
     Rc<Compositor> _compositor;
     Map<IShell::WindowId, Rc<SessionWindow>> _windows = {};
 
     CompositorSession(Sys::IpcConnection conn, Rc<Compositor> compositor)
-        : IpcSession(std::move(conn)),
+        : Session(std::move(conn)),
           _compositor(compositor) {}
 
-    Res<IShell::WindowCreate::Response> _handleWindowCreate(Sys::IpcMessage& message) {
+    Res<IShell::WindowCreate::Response> _handleWindowCreate(Ipc::Message& message) {
         auto [want] = try$(message.unpack<IShell::WindowCreate>());
 
         auto [id, window] = _compositor->createWindow(*this, want);
@@ -276,13 +277,13 @@ struct CompositorSession : Sys::IpcSession {
         return Ok<IShell::WindowCreate::Response>(id, offer);
     }
 
-    Res<IShell::WindowDestroy::Response> _handleWindowDestroy(Sys::IpcMessage& message) {
+    Res<IShell::WindowDestroy::Response> _handleWindowDestroy(Ipc::Message& message) {
         auto [windowId] = try$(message.unpack<IShell::WindowDestroy>());
         _compositor->destroyWindow(try$(_windows.remove(windowId).okOr(Error::invalidInput("invalid window id"))));
         return Ok();
     }
 
-    Res<IShell::WindowAttach::Response> _handleWindowAttach(Sys::IpcMessage& message) {
+    Res<IShell::WindowAttach::Response> _handleWindowAttach(Ipc::Message& message) {
         auto [windowId, buffer] = try$(message.unpack<IShell::WindowAttach>());
 
         auto window = try$(_windows.lookup(windowId).okOr(Error::invalidInput("invalid window id")));
@@ -292,7 +293,7 @@ struct CompositorSession : Sys::IpcSession {
         return Ok();
     }
 
-    Res<> _handleWindowFlip(Sys::IpcMessage& message) {
+    Res<> _handleWindowFlip(Ipc::Message& message) {
         auto [windowId, region] = try$(message.unpack<IShell::WindowFlip>());
 
         auto window = try$(_windows.lookup(windowId).okOr(Error::invalidInput("invalid window id")));
@@ -302,14 +303,14 @@ struct CompositorSession : Sys::IpcSession {
         return Ok();
     }
 
-    Res<> _handleWindowMove(Sys::IpcMessage& message) {
+    Res<> _handleWindowMove(Ipc::Message& message) {
         auto [windowId] = try$(message.unpack<IShell::WindowMove>());
         auto window = try$(_windows.lookup(windowId).okOr(Error::invalidInput("invalid window id")));
         window->dragged = true;
         return Ok();
     }
 
-    Res<> _handleWindowSnap(Sys::IpcMessage& message) {
+    Res<> _handleWindowSnap(Ipc::Message& message) {
         auto [windowId, snap] = try$(message.unpack<IShell::WindowSnap>());
 
         auto window = try$(_windows.lookup(windowId).okOr(Error::invalidInput("invalid window id")));
@@ -318,7 +319,7 @@ struct CompositorSession : Sys::IpcSession {
         return Ok();
     }
 
-    Async::Task<> handleAsync(Sys::IpcMessage& msg, Async::CancellationToken) override {
+    Async::Task<> handleAsync(Ipc::Message& msg, Async::CancellationToken) override {
         if (msg.is<IShell::WindowCreate>())
             co_try$(resp<IShell::WindowCreate>(msg, _handleWindowCreate(msg)));
         else if (msg.is<IShell::WindowDestroy>())
@@ -338,13 +339,13 @@ struct CompositorSession : Sys::IpcSession {
     }
 };
 
-struct CompositorHandler : Sys::IpcHandler {
+struct CompositorHandler : Ipc::Handler {
     Rc<Compositor> _compositor;
 
     explicit CompositorHandler(Rc<Compositor> compositor)
         : _compositor(compositor) {}
 
-    Async::Task<Rc<Sys::IpcSession>> acceptSessionAsync(Sys::IpcConnection conn, Async::CancellationToken) override {
+    Async::Task<Rc<Ipc::Session>> acceptSessionAsync(Sys::IpcConnection conn, Async::CancellationToken) override {
         co_return Ok(makeRc<CompositorSession>(std::move(conn), _compositor));
     }
 };
@@ -352,14 +353,14 @@ struct CompositorHandler : Sys::IpcHandler {
 struct InputHandler {
     Rc<Ui::Node> _root;
 
-    Res<> _handleMouseEvent(Sys::IpcMessage& message) {
+    Res<> _handleMouseEvent(Ipc::Message& message) {
         auto event = try$(message.unpack<App::MouseEvent>());
         auto e = App::makeEvent<App::MouseEvent>(event);
         _root->event(*e);
         return Ok();
     }
 
-    Res<> _handleKeyboardEvent(Sys::IpcMessage& message) {
+    Res<> _handleKeyboardEvent(Ipc::Message& message) {
         auto event = try$(message.unpack<App::KeyboardEvent>());
         auto e = App::makeEvent<App::KeyboardEvent>(event);
         _root->event(*e);
@@ -367,7 +368,7 @@ struct InputHandler {
     }
 
     Async::Task<> servAsync(Async::CancellationToken ct) {
-        auto client = co_trya$(Sys::IpcClient::connectAsync("ipc://strata-input"_url, ct));
+        auto client = co_trya$(Ipc::Client::connectAsync("ipc://strata-input"_url, ct));
         while (true) {
             co_try$(ct.errorIfCanceled());
             auto msg = co_trya$(client.recvAsync(ct));
@@ -387,7 +388,7 @@ Async::Task<> entryPointAsync(Sys::Env& env, Async::CancellationToken ct) {
     auto compositor = co_trya$(Strata::Shell::Compositor::createAsync(env));
     auto handler = makeRc<Strata::Shell::CompositorHandler>(compositor);
     Strata::Shell::InputHandler inputHandler{compositor->_root};
-    auto server = co_trya$(Sys::IpcServer::createAsync("ipc://strata-shell"_url, handler));
+    auto server = co_trya$(Ipc::Server::createAsync("ipc://strata-shell"_url, handler));
 
     co_return co_await Async::join(
         compositor->_root->runAsync(ct),

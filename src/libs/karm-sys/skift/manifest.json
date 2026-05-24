@@ -13,7 +13,8 @@
     "requires": [
         "crts",
         "abi",
-        "hjert-api"
+        "hjert-api",
+        "karm-ipc"
     ],
     "provides": [
         "karm-sys.impl",

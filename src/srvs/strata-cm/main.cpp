@@ -2,13 +2,15 @@
 #include <karm/macros>
 #include <vaerk-handover/spec.h>
 
+import Karm.Ipc;
+import Karm.Logger;
 import Karm.Ref;
 import Karm.Sys;
-import Vaerk.Elf;
-import Karm.Logger;
 import Karm.Sys.Skift;
+
 import Abi.SysV;
 import Hjert.Api;
+import Vaerk.Elf;
 
 import Strata.Protos;
 
@@ -109,13 +111,13 @@ struct ComponentManager {
         Component(ComponentManager& cm, String id, Sys::IpcConnection conn, Hj::Task task)
             : _cm(cm), _id(id), _conn(std::move(conn)), _task(std::move(task)) {}
 
-        Res<> _handleConnect(Sys::IpcMessage& msg) {
+        Res<> _handleConnect(Ipc::Message& msg) {
             auto [fd, url] = try$(msg.unpack<ICm::Connect>());
             logInfo("'{}' requested connection to '{}'", _id, url);
             return _cm.connect(try$(fd.okOr(Error::invalidHandle("missing "))), url);
         }
 
-        Res<> _handleLaunch(Sys::IpcMessage& msg) {
+        Res<> _handleLaunch(Ipc::Message& msg) {
             auto [url] = try$(msg.unpack<ICm::Launch>());
             logInfo("'{}' requested launch of '{}'", _id, url);
             try$(_cm.start(url.host.str(), false));
@@ -126,7 +128,7 @@ struct ComponentManager {
             logInfo("component '{}' attached", _id);
             while (true) {
                 co_try$(ct.errorIfCanceled());
-                auto msg = co_trya$(Sys::rpcRecvAsync(_conn, ct));
+                auto msg = co_trya$(Ipc::recvAsync(_conn, ct));
                 if (msg.is<ICm::Connect>())
                     (void)_handleConnect(msg);
                 else if (msg.is<ICm::Launch>()) {
@@ -137,7 +139,7 @@ struct ComponentManager {
 
         template <typename T>
         Res<> notify(T const& payload) {
-            return rpcSend<T>(_conn, Sys::SEQ_EVENT, payload);
+            return Ipc::send<T>(_conn, Ipc::SEQ_EVENT, payload);
         }
 
         Res<> incoming(Rc<Sys::Fd> fd) {
@@ -228,7 +230,7 @@ extern "C" void __entryPoint(usize rawHandover) {
     Karm::registerPanicHandler(__panicHandler);
 
     Sys::Skift::globalPayload = reinterpret_cast<Handover::Payload*>(rawHandover);
-    
+
     char const* argv[] = {"strata-cm", nullptr};
     char const* envp[] = {nullptr};
     Sys::Env env{

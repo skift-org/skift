@@ -1,44 +1,45 @@
 #include <karm/entry>
 
 import Karm.Logger;
+import Karm.App;
+import Karm.Ipc;
 import Strata.Input;
 import Strata.Protos;
-import Karm.App;
 
 using namespace Karm;
 using namespace Karm::Ref::Literals;
 
 namespace Strata::Input {
 
-struct InputSession : Sys::IpcSession {
+struct InputSession : Ipc::Session {
     explicit InputSession(Sys::IpcConnection conn)
-        : IpcSession(std::move(conn)) {}
+        : Session(std::move(conn)) {}
 
-    Async::Task<> handleAsync(Sys::IpcMessage&, Async::CancellationToken) override {
+    Async::Task<> handleAsync(Ipc::Message&, Async::CancellationToken) override {
         co_return Ok();
     }
 };
 
-struct InputHandler : Sys::IpcHandler {
-    Async::Task<Rc<Sys::IpcSession>> acceptSessionAsync(Sys::IpcConnection conn, Async::CancellationToken) override {
+struct InputHandler : Ipc::Handler {
+    Async::Task<Rc<Ipc::Session>> acceptSessionAsync(Sys::IpcConnection conn, Async::CancellationToken) override {
         co_return Ok(makeRc<InputSession>(std::move(conn)));
     }
 };
 
 struct Service {
-    Sys::IpcServer _server;
-    Sys::IpcClient _client;
+    Ipc::Server _server;
+    Ipc::Client _client;
     Keymap _keymap;
     Flags<App::KeyMod> _mods = {};
 
     static Async::Task<Service> createAsync(Async::CancellationToken ct) {
         auto keymap = Keymap::qwerty();
-        auto server = co_trya$(Sys::IpcServer::createAsync("ipc://strata-input"_url, makeRc<Strata::Input::InputHandler>()));
-        auto client = co_trya$(Sys::IpcClient::connectAsync("ipc://strata-device"_url, ct));
+        auto server = co_trya$(Ipc::Server::createAsync("ipc://strata-input"_url, makeRc<Strata::Input::InputHandler>()));
+        auto client = co_trya$(Ipc::Client::connectAsync("ipc://strata-device"_url, ct));
         co_return Ok(Service{std::move(server), std::move(client), std::move(keymap)});
     }
 
-    Res<> _handleKeyboardEvent(Sys::IpcMessage& message) {
+    Res<> _handleKeyboardEvent(Ipc::Message& message) {
         auto event = try$(message.unpack<App::KeyboardEvent>());
 
         if (event.type == App::KeyboardEvent::PRESS) {
@@ -62,7 +63,7 @@ struct Service {
         return Ok();
     }
 
-    Res<> _handleMouseEvent(Sys::IpcMessage& message) {
+    Res<> _handleMouseEvent(Ipc::Message& message) {
         auto event = try$(message.unpack<App::MouseEvent>());
         event.mods = _mods;
         _server.broadcast(event);

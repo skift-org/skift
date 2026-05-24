@@ -1,31 +1,33 @@
 #include <karm/entry>
 
-import Strata.Protos;
+import Karm.Fs;
+import Karm.Ipc;
+import Karm.Logger;
 import Karm.Sys.Skift;
 import Karm.Sys;
-import Karm.Fs;
-import Karm.Logger;
+
 import Hjert.Api;
+import Strata.Protos;
 
 using namespace Karm;
 using namespace Karm::Ref::Literals;
 
 namespace Strata::Fs {
 
-struct FsSession : Sys::IpcSession {
+struct FsSession : Ipc::Session {
     Rc<Karm::Fs::Node> _root;
     Map<IFs::Fid, Rc<Karm::Fs::Node>> _files = {};
     IFs::Fid _fids = 1;
 
     FsSession(Sys::IpcConnection conn, Rc<Karm::Fs::Node> root)
-        : IpcSession(std::move(conn)),
+        : Session(std::move(conn)),
           _root(root) {}
 
     Res<Rc<Karm::Fs::Node>> _resolveFid(IFs::Fid fid) {
         return _files.lookup(fid).okOr(Error::invalidInput());
     }
 
-    Async::Task<IFs::Open::Response> _handleOpenAsync(Sys::IpcMessage& message) {
+    Async::Task<IFs::Open::Response> _handleOpenAsync(Ipc::Message& message) {
         auto request = co_try$(message.unpack<IFs::Open>());
         auto file = request.path.len() ? co_trya$(_root->lookupAsync(Ref::Path{true, request.path})) : _root;
         auto fid = _fids++;
@@ -33,13 +35,13 @@ struct FsSession : Sys::IpcSession {
         co_return Ok(fid);
     }
 
-    Async::Task<IFs::Close::Response> _handleCloseAsync(Sys::IpcMessage& message) {
+    Async::Task<IFs::Close::Response> _handleCloseAsync(Ipc::Message& message) {
         auto request = co_try$(message.unpack<IFs::Close>());
         co_try$(_files.remove(request.fid).okOr(Error::invalidInput()));
         co_return Ok();
     }
 
-    Async::Task<IFs::Read::Response> _handleReadAsync(Sys::IpcMessage& message) {
+    Async::Task<IFs::Read::Response> _handleReadAsync(Ipc::Message& message) {
         auto request = co_try$(message.unpack<IFs::Read>());
         auto node = co_try$(_resolveFid(request.fid));
         Vec<u8> buf;
@@ -48,31 +50,31 @@ struct FsSession : Sys::IpcSession {
         co_return Ok<IFs::Read::Response>(std::move(buf), read);
     }
 
-    Async::Task<IFs::Write::Response> _handleWriteAsync(Sys::IpcMessage& message) {
+    Async::Task<IFs::Write::Response> _handleWriteAsync(Ipc::Message& message) {
         auto request = co_try$(message.unpack<IFs::Write>());
         auto node = co_try$(_resolveFid(request.fid));
         co_return co_await node->writeAsync(request.buf, request.off);
     }
 
-    Async::Task<IFs::ReadDir::Response> _handleReadDirAsync(Sys::IpcMessage& message) {
+    Async::Task<IFs::ReadDir::Response> _handleReadDirAsync(Ipc::Message& message) {
         auto request = co_try$(message.unpack<IFs::ReadDir>());
         auto node = co_try$(_resolveFid(request.fid));
         co_return co_await node->listAsync();
     }
 
-    Async::Task<IFs::Stat::Response> _handleStatAsync(Sys::IpcMessage& message) {
+    Async::Task<IFs::Stat::Response> _handleStatAsync(Ipc::Message& message) {
         auto request = co_try$(message.unpack<IFs::Stat>());
         auto node = co_try$(_resolveFid(request.fid));
         co_return co_await node->statAsync();
     }
 
-    Async::Task<IFs::Mmap::Response> _handleMmapAsync(Sys::IpcMessage& message) {
+    Async::Task<IFs::Mmap::Response> _handleMmapAsync(Ipc::Message& message) {
         auto request = co_try$(message.unpack<IFs::Mmap>());
         auto node = co_try$(_resolveFid(request.fid));
         co_return node->underlying();
     }
 
-    Async::Task<> handleAsync(Sys::IpcMessage& msg, Async::CancellationToken) override {
+    Async::Task<> handleAsync(Ipc::Message& msg, Async::CancellationToken) override {
         if (msg.is<IFs::Open>()) {
             co_try$(resp<IFs::Open>(msg, co_await _handleOpenAsync(msg)));
         } else if (msg.is<IFs::Close>()) {
@@ -93,13 +95,13 @@ struct FsSession : Sys::IpcSession {
     }
 };
 
-struct FsHandler : Sys::IpcHandler {
+struct FsHandler : Ipc::Handler {
     Rc<Karm::Fs::Node> _root;
 
     FsHandler(Rc<Karm::Fs::Node> root)
         : _root(root) {}
 
-    Async::Task<Rc<Sys::IpcSession>> acceptSessionAsync(Sys::IpcConnection conn, Async::CancellationToken) override {
+    Async::Task<Rc<Ipc::Session>> acceptSessionAsync(Sys::IpcConnection conn, Async::CancellationToken) override {
         co_return Ok(makeRc<FsSession>(std::move(conn), _root));
     }
 };
@@ -120,6 +122,6 @@ Async::Task<> entryPointAsync(Sys::Env&, Async::CancellationToken ct) {
     auto root = co_trya$(Karm::Fs::mountBootfsAsync(fd));
 
     auto handler = makeRc<Strata::Fs::FsHandler>(root);
-    auto server = co_trya$(Sys::IpcServer::createAsync("ipc://strata-fs"_url, handler));
+    auto server = co_trya$(Ipc::Server::createAsync("ipc://strata-fs"_url, handler));
     co_return co_await server.servAsync(ct);
 }

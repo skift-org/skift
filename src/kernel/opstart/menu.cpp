@@ -1,10 +1,13 @@
-#include "loader.h"
+export module Opstart:menu;
 
 import Mdi;
 import Karm.Ui;
 import Karm.Kira;
 import Karm.App;
 import Karm.Math;
+
+import :config;
+import :loader;
 
 using namespace Karm;
 using namespace Karm::Literals;
@@ -42,7 +45,7 @@ static Ui::Task<Action> reduce(State& s, Action a) {
                 s.error = NONE;
                 return;
             }
-            auto res = Opstart::loadEntry(s.configs.entries[s.selected]);
+            auto res = loadEntry(s.configs.entries[s.selected]);
             if (not res)
                 s.error = String{res.none().msg()};
         },
@@ -168,7 +171,7 @@ Ui::Child menu(Configs const& c) {
     );
 }
 
-Async::Task<> showMenuAsync(Sys::Env& env, Configs const& c, Async::CancellationToken ct) {
+export Async::Task<> showMenuAsync(Sys::Env& env, Configs const& c, Async::CancellationToken ct) {
     co_return co_await Ui::runAsync(env, menu(c), ct);
 }
 

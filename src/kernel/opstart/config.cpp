@@ -1,21 +1,19 @@
-#pragma once
+module;
 
 #include <karm/macros>
 
-import Mdi;
-import Karm.Ui;
+export module Opstart:config;
+
 import Karm.Core;
-import Karm.Image;
-import Karm.Sys;
 import Karm.Ref;
 import Karm.Gfx;
-import Karm.Logger;
+import Karm.Image;
 
 using namespace Karm;
 
 namespace Opstart {
 
-struct Blob {
+export struct Blob {
     Ref::Url url;
     Serde::Value props;
 
@@ -43,7 +41,7 @@ struct Blob {
     }
 };
 
-struct Entry {
+export struct Entry {
     Union<None, Gfx::Icon, Rc<Gfx::Surface>> icon = NONE;
     String name;
     Blob kernel;
@@ -84,7 +82,7 @@ struct Entry {
     }
 };
 
-struct Configs {
+export struct Configs {
     Opt<String> title;
     Opt<String> subtitle;
     Vec<Entry> entries;
@@ -112,9 +110,5 @@ struct Configs {
         return Ok(configs);
     }
 };
-
-Async::Task<> showMenuAsync(Sys::Env& env, Configs const& c, Async::CancellationToken ct);
-
-Res<> loadEntry(Entry const&);
 
 } // namespace Opstart

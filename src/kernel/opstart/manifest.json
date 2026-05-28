@@ -11,7 +11,7 @@
     "requires": [
         "karm-kira",
         "karm-sys",
-        "opstart-impl",
-        "karm-dl.elf"
+        "karm-dl.elf",
+        "opstart.arch"
     ]
 }

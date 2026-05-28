@@ -1,13 +1,21 @@
+module;
+
+#include <hal/mem.h>
+#include <hal/vmm.h>
+#include <karm/macros>
+#include <vaerk-handover/builder.h>
+
+export module Opstart:loader;
+
 import Karm.Core;
 import Karm.Sys;
 import Karm.Logger;
 import Karm.Dl.Elf;
 
-#include <hal/mem.h>
-#include <vaerk-handover/builder.h>
-
-#include "fw.h"
-#include "loader.h"
+import :config;
+import :arch;
+import :mem;
+import :handover;
 
 using namespace Karm::Literals;
 
@@ -15,7 +23,7 @@ namespace Opstart {
 
 void enterKernel(usize entry, usize payload, usize stack, usize vmm);
 
-Res<> loadEntry(Entry const& entry) {
+export Res<> loadEntry(Entry const& entry) {
     logInfo("opstart: preparing payload...");
     auto payloadMem = try$(Sys::mutMmap(NONE, {.size = 16_KiB}));
     logInfo("opstart: payload at vaddr: {p} paddr: {p}", payloadMem.vaddr(), payloadMem.paddr());
@@ -92,7 +100,7 @@ Res<> loadEntry(Entry const& entry) {
         logInfo(" - {}", request.name());
     }
 
-    auto vmm = try$(Fw::createVmm());
+    auto vmm = try$(createVmm());
 
     logInfo("opstart: mapping kernel...");
     try$(vmm->mapRange(
@@ -109,7 +117,7 @@ Res<> loadEntry(Entry const& entry) {
     ));
 
     logInfo("opstart: mapping boot-agent image...");
-    auto loaderImage = Fw::imageRange();
+    auto loaderImage = imageRange();
 
     try$(vmm->mapRange(
         Hal::identityMapped(loaderImage),
@@ -123,8 +131,8 @@ Res<> loadEntry(Entry const& entry) {
     usize sp = Handover::KERNEL_BASE + (usize)stackMap.mutBytes().end();
     logInfo("opstart: ip:{x} sp:{x} payload:{}", ip, sp, (usize)&payload.finalize());
 
-    try$(Fw::finalizeHandover(payload));
-    Fw::enterKernel(ip, payload.finalize(), sp, *vmm);
+    try$(finalizeHandover(payload));
+    Arch::enterKernel(ip, payload.finalize(), sp, *vmm);
 
     unreachable();
 }

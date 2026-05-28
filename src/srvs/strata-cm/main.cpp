@@ -2,6 +2,7 @@
 #include <karm/macros>
 #include <vaerk-handover/spec.h>
 
+import Karm.Dl.Elf;
 import Karm.Ipc;
 import Karm.Logger;
 import Karm.Ref;
@@ -10,7 +11,6 @@ import Karm.Sys.Skift;
 
 import Abi.SysV;
 import Hjert.Api;
-import Vaerk.Elf;
 
 import Strata.Protos;
 
@@ -37,30 +37,30 @@ static Res<Hj::Task> loadElf(String id, Rc<Sys::Skift::DuplexFd> fd) {
     auto elfSpace = try$(Hj::Space::create(Hj::ROOT));
 
     logInfoIf(DEBUG_ELF, "validating elf...");
-    Vaerk::Elf::Image image{elfRange.bytes()};
-    if (not image.valid())
-        return Error::invalidInput("invalid elf");
+    Elf::ElfObject<Elf::Elf64LeAbi> object{elfRange.bytes()};
+    try$(object.validate());
 
     logInfoIf(DEBUG_ELF, "mapping the elf...");
-    for (auto prog : image.programs()) {
-        if (prog.type() != Vaerk::Elf::Program::LOAD)
+    for (Elf::ElfProgram prog : object.iterProgram()) {
+        if (prog.type() != Elf::ElfPhdrType::PT_LOAD)
             continue;
 
-        usize size = alignUp(max(prog.memsz(), prog.filez()), Hal::PAGE_SIZE);
-        logInfoIf(DEBUG_ELF, "mapping section: {x}-{x}", prog.vaddr(), prog.vaddr() + size);
-        if ((prog.flags() & Vaerk::Elf::ProgramFlags::WRITE) == Vaerk::Elf::ProgramFlags::WRITE) {
+        usize size = alignUp(max(prog.p_memsz, prog.p_filesz), Hal::PAGE_SIZE);
+        logInfoIf(DEBUG_ELF, "mapping section: {x}-{x}", prog.p_vaddr, prog.p_vaddr + size);
+
+        if (prog.p_flags.has(Elf::ElfPhdrFlags::PF_W)) {
             auto sectionVmo = try$(Hj::Vmo::create(Hj::ROOT, 0, size, Hj::VmoFlags::UPPER));
             try$(sectionVmo.label("elf-writeable"));
             auto sectionRange = try$(Hj::map(sectionVmo, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
             auto sectionBytes = sectionRange.mutBytes();
-            copy(prog.bytes(), sectionBytes);
-            if (prog.memsz() > prog.filez()) {
-                auto bss = mutNext(sectionBytes, prog.filez());
+            copy(prog.data, sectionBytes);
+            if (prog.p_memsz > prog.p_filesz) {
+                auto bss = mutNext(sectionBytes, prog.p_filesz);
                 zeroFill(bss);
             }
-            try$(elfSpace.map(prog.vaddr(), sectionVmo, 0, size, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
+            try$(elfSpace.map(prog.p_vaddr, sectionVmo, 0, size, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
         } else {
-            try$(elfSpace.map(prog.vaddr(), elfVmo, prog.offset(), size, {Hj::MapFlags::READ, Hj::MapFlags::EXEC}));
+            try$(elfSpace.map(prog.p_vaddr, elfVmo, prog.p_offset, size, {Hj::MapFlags::READ, Hj::MapFlags::EXEC}));
         }
     }
 
@@ -86,7 +86,7 @@ static Res<Hj::Task> loadElf(String id, Rc<Sys::Skift::DuplexFd> fd) {
 
     logInfoIf(DEBUG_TASK, "starting the task...");
     try$(task.start(
-        image.header().entry,
+        object.header().e_entry,
         stackRange.end(),
         {
             handoverVrange.start,

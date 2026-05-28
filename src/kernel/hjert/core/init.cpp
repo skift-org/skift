@@ -9,7 +9,8 @@ module;
 
 export module Hjert.Core:init;
 
-import Vaerk.Elf;
+import Karm.Dl.Elf;
+
 import :arch;
 import :cpu;
 import :sched;
@@ -51,29 +52,24 @@ Res<> enterUserspace(Handover::Payload& payload) {
     auto elfVmo = try$(_locateInit(payload, "bundles/strata-cm/bin/strata-cm.elf"));
     elfVmo->label("elf-shared");
     auto elfRange = try$(kmm().pmm2Kmm(elfVmo->range()));
-    Vaerk::Elf::Image image{elfRange.bytes()};
+    Elf::ElfObject<Elf::Elf64LeAbi> object{elfRange.bytes()};
+    try$(object.validate());
 
-    if (not image.valid()) {
-        logInfo("entry: invalid elf");
-        return Error::invalidInput("Invalid elf");
-    }
-
-    for (auto prog : image.programs()) {
-        if (prog.type() != Vaerk::Elf::Program::LOAD) {
+    for (Elf::ElfProgram prog : object.iterProgram()) {
+        if (prog.type() != Elf::ElfPhdrType::PT_LOAD)
             continue;
-        }
 
-        usize size = alignUp(max(prog.memsz(), prog.filez()), Hal::PAGE_SIZE);
+        usize size = alignUp(max(prog.p_memsz, prog.p_filesz), Hal::PAGE_SIZE);
 
-        if (prog.flags().has(Vaerk::Elf::ProgramFlags::WRITE)) {
+        if (prog.p_flags.has(Elf::ElfPhdrFlags::PF_W)) {
             auto sectionVmo = try$(Vmo::alloc(size, Hj::VmoFlags::UPPER));
             sectionVmo->label("elf-writeable");
             auto sectionRange = try$(kmm().pmm2Kmm(sectionVmo->range()));
             logInfo("entry: mapping section: {x}-{x}", sectionRange.start, sectionRange.end());
-            copy(prog.bytes(), sectionRange.mutBytes());
-            try$(space->map({prog.vaddr(), size}, sectionVmo, 0, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
+            copy(prog.data, sectionRange.mutBytes());
+            try$(space->map({prog.p_vaddr, size}, sectionVmo, 0, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
         } else {
-            try$(space->map({prog.vaddr(), size}, elfVmo, prog.offset(), {Hj::MapFlags::READ, Hj::MapFlags::EXEC}));
+            try$(space->map({prog.p_vaddr, size}, elfVmo, prog.p_offset, {Hj::MapFlags::READ, Hj::MapFlags::EXEC}));
         }
     }
 
@@ -96,7 +92,7 @@ Res<> enterUserspace(Handover::Payload& payload) {
     auto task = try$(Task::create(Hj::Mode::USER, space, domain));
     task->label("init-task");
 
-    try$(task->ready(image.header().entry, stackRange.end(), {handoverRange.start}));
+    try$(task->ready(object.header().e_entry, stackRange.end(), {handoverRange.start}));
     try$(globalSched().enqueue(task));
 
     return Ok();

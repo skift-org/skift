@@ -1,7 +1,7 @@
 import Karm.Core;
 import Karm.Sys;
 import Karm.Logger;
-import Vaerk.Elf;
+import Karm.Dl.Elf;
 
 #include <hal/mem.h>
 #include <vaerk-handover/builder.h>
@@ -27,14 +27,11 @@ Res<> loadEntry(Entry const& entry) {
     logInfo("opstart: loading kernel file...");
     auto kernelFile = try$(Sys::File::open(entry.kernel.url));
     auto kernelMem = try$(Sys::mmap(kernelFile));
-    Vaerk::Elf::Image image{kernelMem.bytes()};
+    Elf::ElfObject<Elf::Elf64LeAbi> object{kernelMem.bytes()};
+    try$(object.validate());
+
     payload.add(Handover::FILE, 0, kernelMem.prange());
     logInfo("opstart: kernel at vaddr: {p} paddr: {p}", kernelMem.vaddr(), kernelMem.paddr());
-
-    if (not image.valid()) {
-        logError("opstart: invalid kernel image");
-        return Error::invalidData("invalid kernel image");
-    }
 
     logInfo("opstart: setting up stack...");
     auto stackMap = try$(Sys::mutMmap(NONE, {.options = Sys::MmapOption::STACK, .size = Hal::PAGE_SIZE * 16}));
@@ -42,18 +39,17 @@ Res<> loadEntry(Entry const& entry) {
     logInfo("opstart: stack at vaddr: {p} paddr: {p}", stackMap.vaddr(), stackMap.paddr());
 
     logInfo("opstart: loading kernel image...");
-    for (auto prog : image.programs()) {
-        if (prog.type() != Vaerk::Elf::Program::LOAD) {
+    for (Elf::ElfProgram prog : object.iterProgram()) {
+        if (prog.type() != Elf::ElfPhdrType::PT_LOAD)
             continue;
-        }
 
-        usize paddr = prog.vaddr() - Handover::KERNEL_BASE;
-        usize memsz = Hal::pageAlignUp(prog.memsz());
-        logInfo("opstart: loading segment: paddr={p}, vaddr={p}, memsz={p}, filesz={p}", paddr, prog.vaddr(), memsz, prog.filez());
+        usize paddr = prog.p_vaddr - Handover::KERNEL_BASE;
+        usize memsz = Hal::pageAlignUp(prog.p_memsz);
+        logInfo("opstart: loading segment: paddr={p}, vaddr={p}, memsz={p}, filesz={p}", paddr, prog.p_vaddr, memsz, prog.p_filesz);
 
-        usize remaining = prog.memsz() - prog.filez();
-        std::memcpy((void*)paddr, prog.buf(), prog.filez());
-        std::memset((void*)(paddr + prog.filez()), 0, remaining);
+        usize remaining = prog.p_memsz - prog.p_filesz;
+        std::memcpy((void*)paddr, prog.data.buf(), prog.p_filesz);
+        std::memset((void*)(paddr + prog.p_filesz), 0, remaining);
 
         payload.add(Handover::KERNEL, 0, {paddr, memsz});
     }
@@ -83,14 +79,14 @@ Res<> loadEntry(Entry const& entry) {
     }
 
     logInfo("opstart: handling kernel requests...");
-    auto maybeSection = image.sectionByName(Handover::REQUEST_SECTION);
+    auto maybeSection = object.section(Handover::REQUEST_SECTION);
 
     if (not maybeSection) {
         logError("opstart: missing .handover section");
         return Error::invalidData("missing .handover section");
     }
 
-    auto requests = try$(maybeSection).slice<Handover::Request>();
+    auto requests = try$(maybeSection).data.cast<Handover::Request>();
 
     for (auto const& request : requests) {
         logInfo(" - {}", request.name());
@@ -123,7 +119,7 @@ Res<> loadEntry(Entry const& entry) {
 
     logInfo("opstart: finalizing and entering kernel, see you on the other side...");
 
-    usize ip = image.header().entry;
+    usize ip = object.header().e_entry;
     usize sp = Handover::KERNEL_BASE + (usize)stackMap.mutBytes().end();
     logInfo("opstart: ip:{x} sp:{x} payload:{}", ip, sp, (usize)&payload.finalize());
 

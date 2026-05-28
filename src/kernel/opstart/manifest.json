@@ -12,6 +12,6 @@
         "karm-kira",
         "karm-sys",
         "opstart-impl",
-        "vaerk-elf"
+        "karm-dl.elf"
     ]
 }

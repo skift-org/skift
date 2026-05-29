@@ -25,7 +25,7 @@ namespace Hjert::Core {
 static constexpr bool DEBUG_SYSCALLS = false;
 
 Res<> doNow(Task& self, User<Instant> ts) {
-    return ts.store(self.space(), clockNow());
+    return ts.store(self.space(), Clock::monotonicInstant());
 }
 
 Res<> doLog(Task& self, UserSlice<Str> msg) {
@@ -55,70 +55,70 @@ Res<> doCreate(Task& self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
         return Error::invalidInput("invalid props");
 
     auto obj = try$(props.visit(
-        Visitor{
-            [&](Hj::DomainProps&) -> Res<Arc<Object>> {
-                return Ok(try$(Domain::create()));
-            },
-            [&](Hj::TaskProps& props) -> Res<Arc<Object>> {
-                try$(self.ensure(Hj::Pledge::TASK));
+        [&](Hj::DomainProps&) -> Res<Arc<Object>> {
+            return Ok(try$(Domain::create()));
+        },
+        [&](Hj::TaskProps& props) -> Res<Arc<Object>> {
+            try$(self.ensure(Hj::Pledge::TASK));
 
-                auto dom = props.domain.isRoot()
-                               ? try$(self._domain)
-                               : try$(self.domain().get<Domain>(props.domain));
+            auto dom = props.domain.isRoot()
+                           ? try$(self._domain)
+                           : try$(self.domain().get<Domain>(props.domain));
 
-                auto spa = props.space.isRoot()
-                               ? try$(self._space)
-                               : try$(self.domain().get<Space>(props.space));
+            auto spa = props.space.isRoot()
+                           ? try$(self._space)
+                           : try$(self.domain().get<Space>(props.space));
 
-                auto obj = try$(Task::create(Hj::Mode::USER, spa, dom));
+            auto obj = try$(Task::create(Hj::Mode::USER, spa, dom));
 
-                auto pledges = self.pledges();
-                try$(obj->pledge(pledges));
+            auto pledges = self.pledges();
+            try$(obj->pledge(pledges));
 
-                return Ok(obj);
-            },
-            [&](Hj::SpaceProps&) -> Res<Arc<Object>> {
-                try$(self.ensure(Hj::Pledge::MEM));
+            return Ok(obj);
+        },
+        [&](Hj::SpaceProps&) -> Res<Arc<Object>> {
+            try$(self.ensure(Hj::Pledge::MEM));
 
-                return Ok(try$(Space::create()));
-            },
-            [&](Hj::VmoProps& props) -> Res<Arc<Object>> {
-                try$(self.ensure(Hj::Pledge::MEM));
+            return Space::create();
+        },
+        [&](Hj::VmoProps& props) -> Res<Arc<Object>> {
+            try$(self.ensure(Hj::Pledge::MEM));
 
-                if (not props.vmo.isRoot()) {
-                    auto vmo = try$(self.domain().get<Vmo>(props.vmo));
-                    return Ok(try$(Vmo::makeSlice(vmo, {props.phys, props.len})));
-                }
+            if (not props.vmo.isRoot()) {
+                auto vmo = try$(self.domain().get<Vmo>(props.vmo));
+                return Vmo::makeSlice(vmo, {props.phys, props.len});
+            }
 
-                bool isDma = props.flags.has(Hj::VmoFlags::DMA);
-                if (isDma) {
-                    try$(self.ensure(Hj::Pledge::HW));
-                    return Ok(try$(Vmo::makeDma({props.phys, props.len})));
-                }
-
-                if (props.len > 2_GiB) {
-                    return Error::invalidInput("Vmo size too large");
-                }
-
-                return Ok(try$(Vmo::alloc(props.len, props.flags)));
-            },
-            [&](Hj::IopProps& props) -> Res<Arc<Object>> {
+            bool isDma = props.flags.has(Hj::VmoFlags::DMA);
+            if (isDma) {
                 try$(self.ensure(Hj::Pledge::HW));
-                return Ok(try$(Iop::create({props.base, props.len})));
-            },
-            [&](Hj::ChannelProps& props) -> Res<Arc<Object>> {
-                return Ok(try$(Channel::create(props.bufCap, props.capsCap)));
-            },
-            [&](Hj::IrqProps& props) -> Res<Arc<Object>> {
-                try$(self.ensure(Hj::Pledge::HW));
-                return Ok(try$(Irq::create(props.irq)));
-            },
-            [&](Hj::ListenerProps&) -> Res<Arc<Object>> {
-                return Ok(try$(Listener::create()));
-            },
-            [&](Hj::PipeProps& props) -> Res<Arc<Object>> {
-                return Ok(try$(Pipe::create(props.bufCap)));
-            },
+                return Vmo::makeDma({props.phys, props.len});
+            }
+
+            if (props.len > 2_GiB)
+                return Error::invalidInput("Vmo size too large");
+
+            return Vmo::alloc(props.len, props.flags);
+        },
+        [&](Hj::IopProps& props) -> Res<Arc<Object>> {
+            try$(self.ensure(Hj::Pledge::HW));
+            return Iop::create({props.base, props.len});
+        },
+        [&](Hj::ChannelProps& props) -> Res<Arc<Object>> {
+            return Channel::create(props.bufCap, props.capsCap);
+        },
+        [&](Hj::IrqProps& props) -> Res<Arc<Object>> {
+            try$(self.ensure(Hj::Pledge::HW));
+            return Irq::create(props.irq);
+        },
+        [&](Hj::ListenerProps&) -> Res<Arc<Object>> {
+            return Listener::create();
+        },
+        [&](Hj::PipeProps& props) -> Res<Arc<Object>> {
+            return Pipe::create(props.bufCap);
+        },
+        [&](Hj::ClockProps&) -> Res<Arc<Object>> {
+            return Clock::create();
         }
     ));
 
@@ -141,9 +141,8 @@ Res<> doDrop(Task& self, Hj::Cap cap) {
 }
 
 Res<> doPledge(Task& self, Hj::Cap cap, Flags<Hj::Pledge> pledges) {
-    if (cap.isRoot()) {
+    if (cap.isRoot())
         return self.pledge(pledges);
-    }
 
     auto obj = try$(self.domain().get<Task>(cap));
     return obj->pledge(pledges);

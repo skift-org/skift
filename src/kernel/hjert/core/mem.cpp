@@ -106,9 +106,8 @@ struct Kmm : Hal::Kmm {
     }
 
     Res<Hal::PmmRange> kmm2Pmm(Hal::KmmRange range) override {
-        if (range.start < Hal::UPPER_HALF) {
+        if (range.start < Hal::UPPER_HALF)
             return Error::invalidInput("Invalid heap range");
-        }
 
         return Ok(Hal::PmmRange{
             range.start - Hal::UPPER_HALF,

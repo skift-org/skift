@@ -21,7 +21,7 @@ namespace Hjert::Core {
 Res<Arc<Vmo>> _locateInit(Handover::Payload& payload, Str path) {
     logInfo("locating {#}...", path);
 
-    auto const* record = payload.fileByName("file:/skift/init.bootfs");
+    auto const* record = payload.blobByName("file:/skift/init.bootfs");
     if (not record) {
         logError("handover: could not find bootfs");
         return Error::invalidInput("could not find bootfs");
@@ -52,7 +52,7 @@ Res<> enterUserspace(Handover::Payload& payload) {
     auto elfVmo = try$(_locateInit(payload, "bundles/strata-cm/bin/strata-cm.elf"));
     elfVmo->label("elf-shared");
     auto elfRange = try$(kmm().pmm2Kmm(elfVmo->range()));
-    Elf::ElfObject<Elf::Elf64LeAbi> object{elfRange.bytes()};
+    Elf::ElfObject<Elf::CurrentAbi> object{elfRange.bytes()};
     try$(object.validate());
 
     for (Elf::ElfProgram prog : object.iterProgram()) {

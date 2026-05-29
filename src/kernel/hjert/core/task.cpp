@@ -95,7 +95,7 @@ export struct Task : BaseObject<Task, Hj::Type::TASK> {
 
     Res<> block(Blocker blocker) {
         // NOTE: If the blocker is already expired, don't block.
-        if (blocker() <= clockNow())
+        if (blocker() <= Clock::monotonicInstant())
             return Ok();
 
         // NOTE: Can't use ObjectLockScope here because

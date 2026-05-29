@@ -31,7 +31,7 @@ struct SelectAction {};
 using Action = Union<MoveSelectionAction, SelectAction>;
 
 static Ui::Task<Action> reduce(State& s, Action a) {
-    a.visit(Visitor{
+    a.visit(
         [&](MoveSelectionAction a) {
             if (s.selected == 0 and a.delta < 0)
                 s.selected = s.configs.entries.len() - 1;
@@ -48,8 +48,8 @@ static Ui::Task<Action> reduce(State& s, Action a) {
             auto res = loadEntry(s.configs.entries[s.selected]);
             if (not res)
                 s.error = String{res.none().msg()};
-        },
-    });
+        }
+    );
 
     return NONE;
 }
@@ -59,7 +59,7 @@ using Model = Ui::Model<State, Action, reduce>;
 // MARK: Views -----------------------------------------------------------------
 
 Ui::Child icon(Entry const& e) {
-    return e.icon.visit(Visitor{
+    return e.icon.visit(
         [&](Gfx::Icon i) {
             return Ui::icon(i, 64);
         },
@@ -68,8 +68,8 @@ Ui::Child icon(Entry const& e) {
         },
         [&](None) {
             return Ui::empty();
-        },
-    });
+        }
+    );
 }
 
 Ui::Child entry(State const& s, Entry const& e, usize i) {

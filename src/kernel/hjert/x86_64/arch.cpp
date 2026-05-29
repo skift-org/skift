@@ -174,7 +174,7 @@ void backtrace(usize rbp) {
 
 void switchTask(Duration span, Frame& frame) {
     Core::globalSched().currentTask().save(frame);
-    Core::clockTick(span);
+    Core::Clock::monotonicTick(span);
     Core::globalSched().schedule();
     Core::globalSched().currentTask().load(frame);
 }

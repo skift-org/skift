@@ -16,15 +16,16 @@ export enum struct Mode : u8 {
 };
 
 #define FOREACH_TYPE(TYPE) \
-    TYPE(DOMAIN)           \
-    TYPE(TASK)             \
-    TYPE(SPACE)            \
-    TYPE(VMO)              \
-    TYPE(IOP)              \
     TYPE(CHANNEL)          \
+    TYPE(CLOCK)            \
+    TYPE(DOMAIN)           \
+    TYPE(IOP)              \
     TYPE(IRQ)              \
     TYPE(LISTENER)         \
-    TYPE(PIPE)
+    TYPE(PIPE)             \
+    TYPE(SPACE)            \
+    TYPE(TASK)             \
+    TYPE(VMO)
 
 // clang-format off
 
@@ -296,6 +297,10 @@ export struct PipeProps {
     usize bufCap; //< The capacity of the data buffer (in bytes, must be >= 1)
 };
 
+export struct ClockProps {
+    static constexpr Type TYPE = Type::CLOCK;
+};
+
 export using _Props = Union<
     DomainProps,
     TaskProps,
@@ -305,7 +310,8 @@ export using _Props = Union<
     ChannelProps,
     IrqProps,
     ListenerProps,
-    PipeProps>;
+    PipeProps,
+    ClockProps>;
 
 export struct Props : _Props {
     using _Props::_Props;

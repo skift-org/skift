@@ -41,7 +41,7 @@ struct Sched {
     void schedule() {
         LockScope _{_lock};
 
-        auto now = clockNow();
+        auto now = Clock::monotonicInstant();
         _prev = _curr;
         _curr->_sliceEnd = now;
 

@@ -53,17 +53,15 @@ export struct Vmo : BaseObject<Vmo, Hj::Type::VMO> {
 
     Hal::PmmRange range() const {
         return _mem.visit(
-            Visitor{
-                [](Hal::PmmMem const& mem) {
-                    return mem.range();
-                },
-                [](Hal::DmaRange const& range) {
-                    return range.into<Hal::PmmRange>();
-                },
-                [](_Slice const& slice) {
-                    auto range = slice.range.into<Hal::PmmRange>();
-                    return slice.vmo->range().slice(range);
-                }
+            [](Hal::PmmMem const& mem) {
+                return mem.range();
+            },
+            [](Hal::DmaRange const& range) {
+                return range.into<Hal::PmmRange>();
+            },
+            [](_Slice const& slice) {
+                auto range = slice.range.into<Hal::PmmRange>();
+                return slice.vmo->range().slice(range);
             }
         );
     }

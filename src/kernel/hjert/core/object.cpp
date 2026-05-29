@@ -66,7 +66,7 @@ struct BaseObject : Object {
     }
 };
 
-export struct [[nodiscard]] ObjectLockScope : LockScope<Lock> {
+export struct [[nodiscard]] ObjectLockScope : LockScope<> {
     ObjectLockScope(Object& obj)
         : LockScope(obj._lock) {
     }

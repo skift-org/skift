@@ -6,7 +6,7 @@ import Hjert.Core;
 HandoverRequests$(
     Handover::requestStack(),
     Handover::requestFb(),
-    Handover::requestFiles()
+    Handover::requestBlobs()
 );
 
 void __panicHandler(PanicKind kind, char const* buf, usize len) {

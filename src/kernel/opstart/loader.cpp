@@ -35,10 +35,10 @@ export Res<> loadEntry(Entry const& entry) {
     logInfo("opstart: loading kernel file...");
     auto kernelFile = try$(Sys::File::open(entry.kernel.url));
     auto kernelMem = try$(Sys::mmap(kernelFile));
-    Elf::ElfObject<Elf::Elf64LeAbi> object{kernelMem.bytes()};
+    Elf::ElfObject<Elf::CurrentAbi> object{kernelMem.bytes()};
     try$(object.validate());
 
-    payload.add(Handover::FILE, 0, kernelMem.prange());
+    payload.add(Handover::BLOB, 0, kernelMem.prange());
     logInfo("opstart: kernel at vaddr: {p} paddr: {p}", kernelMem.vaddr(), kernelMem.paddr());
 
     logInfo("opstart: setting up stack...");
@@ -72,10 +72,10 @@ export Res<> loadEntry(Entry const& entry) {
         auto propStr = try$(Json::unparse(blob.props));
 
         payload.add({
-            .tag = Handover::FILE,
+            .tag = Handover::BLOB,
             .start = blobRange.start,
             .size = blobRange.size,
-            .file = {
+            .blob = {
                 .name = (u32)payload.add(blob.url.str()),
                 .meta = (u32)payload.add(propStr),
             },

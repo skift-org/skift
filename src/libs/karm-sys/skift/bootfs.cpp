@@ -28,7 +28,7 @@ export struct Bootfs {
 
         auto& handover = useHandover();
 
-        auto* bootfsRecord = handover.fileByName("file:/skift/init.bootfs");
+        auto* bootfsRecord = handover.blobByName("file:/skift/init.bootfs");
         if (not bootfsRecord)
             return Error::notFound("no bootfs");
 

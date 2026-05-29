@@ -37,7 +37,7 @@ static Res<Hj::Task> loadElf(String id, Rc<Sys::Skift::DuplexFd> fd) {
     auto elfSpace = try$(Hj::Space::create(Hj::ROOT));
 
     logInfoIf(DEBUG_ELF, "validating elf...");
-    Elf::ElfObject<Elf::Elf64LeAbi> object{elfRange.bytes()};
+    Elf::ElfObject<Elf::CurrentAbi> object{elfRange.bytes()};
     try$(object.validate());
 
     logInfoIf(DEBUG_ELF, "mapping the elf...");

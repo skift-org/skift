@@ -57,22 +57,22 @@
             "tag": "main"
         },
         "skift/hideo": {
-            "commit": "94acb4d51197138ce5d44e2798371c9e3958c5f3",
+            "commit": "4067ebc75c9a3eb482787b72ea1e518f3bc7c8a8",
             "git": "https://codeberg.org/skift/hideo.git",
             "tag": "main"
         },
         "skift/karm": {
-            "commit": "fcef58f407f1799df48353560927bf90694c0473",
+            "commit": "ee04265e84d30cd6d081a945edb1d8442ff8c9d5",
             "git": "https://codeberg.org/skift/karm.git",
             "tag": "main"
         },
         "skift/luna": {
-            "commit": "c9bc1ce86ff7eddd90f97b25372d5d0a5d285360",
+            "commit": "cdd6d8be3ded5eda997ba240c2843e4df8ca26a4",
             "git": "https://codeberg.org/skift/luna",
             "tag": "main"
         },
         "skift/vaerk": {
-            "commit": "bc0f9dea9390462ffe7ab9cf44b569703337876e",
+            "commit": "2c3832534c11b32f4b4398c11f1ba1db5ddd85dc",
             "git": "https://codeberg.org/skift/vaerk",
             "tag": "main"
         },

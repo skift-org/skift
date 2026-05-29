@@ -111,7 +111,7 @@ struct FsHandler : Ipc::Handler {
 Async::Task<> entryPointAsync(Sys::Env&, Async::CancellationToken ct) {
     auto& handover = Sys::Skift::useHandover();
 
-    auto* bootfsRecord = handover.fileByName("file:/skift/init.bootfs");
+    auto* bootfsRecord = handover.blobByName("file:/skift/init.bootfs");
     if (not bootfsRecord)
         co_return Error::notFound("no bootfs");
 

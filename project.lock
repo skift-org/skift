@@ -32,7 +32,7 @@
             "tag": "v1.6.0"
         },
         "cute-engineering/ce-targets": {
-            "commit": "9c0064dc613d43c40e5f00bb972ed54977a82e00",
+            "commit": "54fc9441b676200f106da06d0c8ec4a2b1ddef41",
             "git": "https://codeberg.org/cute-engineering/ce-targets.git",
             "tag": "v0.6.0"
         },
@@ -57,12 +57,12 @@
             "tag": "main"
         },
         "skift/hideo": {
-            "commit": "4067ebc75c9a3eb482787b72ea1e518f3bc7c8a8",
+            "commit": "2fec42ad51e8d2a47b283b0106b508f13b3958b5",
             "git": "https://codeberg.org/skift/hideo.git",
             "tag": "main"
         },
         "skift/karm": {
-            "commit": "ee04265e84d30cd6d081a945edb1d8442ff8c9d5",
+            "commit": "a73de383304ca7bdea783561317f950415b54807",
             "git": "https://codeberg.org/skift/karm.git",
             "tag": "main"
         },

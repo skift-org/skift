@@ -52,7 +52,7 @@
             "tag": "main"
         },
         "skift/games": {
-            "commit": "0aeb6ed3f02b36123990d06253e5ae52d886033e",
+            "commit": "fae4ce83b7c9ec62f3e59f03500dcbbc5cd2b94c",
             "git": "https://codeberg.org/skift/games",
             "tag": "main"
         },
@@ -62,7 +62,7 @@
             "tag": "main"
         },
         "skift/karm": {
-            "commit": "a73de383304ca7bdea783561317f950415b54807",
+            "commit": "d0f734d14f750adac8a9546c75ff4c6237dc95ba",
             "git": "https://codeberg.org/skift/karm.git",
             "tag": "main"
         },

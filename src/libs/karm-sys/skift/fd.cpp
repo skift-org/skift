@@ -145,9 +145,29 @@ export struct FsFd : Fd {
     }
 
     Async::Task<usize> readAsync(MutBytes buf, Async::CancellationToken ct) {
-        auto response = co_trya$(globalFsClient().callAsync<Strata::IFs::Read>({_fid, _off, buf.len()}, ct));
-        _off += copy(bytes(response.buf), buf);
-        co_return Ok(response.len);
+        usize total = 0;
+
+        while (total < buf.len()) {
+            auto chunk = min(buf.len() - total, Ipc::MAX_TRANSFER_SIZE);
+            auto response = co_trya$(
+                globalFsClient().callAsync(
+                    Strata::IFs::Read{
+                        _fid,
+                        _off,
+                        chunk,
+                    },
+                    ct
+                )
+            );
+            auto read = copy(bytes(response.buf), mutSub(buf, total, total + chunk));
+            _off += read;
+            total += read;
+
+            if (read < chunk)
+                break;
+        }
+
+        co_return Ok(total);
     }
 
     Res<usize> read(MutBytes buf) override {
@@ -157,9 +177,27 @@ export struct FsFd : Fd {
     }
 
     Async::Task<usize> writeAsync(Bytes buf, Async::CancellationToken ct) {
-        auto response = co_trya$(globalFsClient().callAsync<Strata::IFs::Write>({_fid, _off, buf}, ct));
-        _off += response;
-        co_return Ok(response);
+        usize total = 0;
+        while (total < buf.len()) {
+            auto chunk = min(buf.len() - total, Ipc::MAX_TRANSFER_SIZE);
+            auto written = co_trya$(
+                globalFsClient().callAsync(
+                    Strata::IFs::Write{
+                        _fid,
+                        _off,
+                        sub(buf, total, total + chunk),
+                    },
+                    ct
+                )
+            );
+            _off += written;
+            total += written;
+
+            if (written < chunk)
+                break;
+        }
+
+        co_return Ok(total);
     }
 
     Res<usize> write(Bytes buf) override {

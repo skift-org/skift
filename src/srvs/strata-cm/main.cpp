@@ -129,10 +129,10 @@ struct ComponentManager {
             while (true) {
                 co_try$(ct.errorIfCanceled());
                 auto msg = co_trya$(Ipc::recvAsync(_conn, ct));
-                if (msg.is<ICm::Connect>())
-                    (void)_handleConnect(msg);
-                else if (msg.is<ICm::Launch>()) {
-                    (void)_handleLaunch(msg);
+                if (msg->is<ICm::Connect>())
+                    (void)_handleConnect(*msg);
+                else if (msg->is<ICm::Launch>()) {
+                    (void)_handleLaunch(*msg);
                 }
             }
         }

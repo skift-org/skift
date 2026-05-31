@@ -45,9 +45,10 @@ struct FsSession : Ipc::Session {
         auto request = co_try$(message.unpack<IFs::Read>());
         auto node = co_try$(_resolveFid(request.fid));
         Vec<u8> buf;
-        buf.resize(request.len);
+        buf.resize(min(request.len, Ipc::MAX_TRANSFER_SIZE));
         auto read = co_trya$(node->readAsync(buf, request.off));
-        co_return Ok<IFs::Read::Response>(std::move(buf), read);
+        buf.trunc(read);
+        co_return Ok<IFs::Read::Response>(std::move(buf));
     }
 
     Async::Task<IFs::Write::Response> _handleWriteAsync(Ipc::Message& message) {

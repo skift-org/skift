@@ -73,12 +73,12 @@ struct Service {
     Async::Task<> dispatchEventAsync(Async::CancellationToken ct) {
         while (true) {
             auto msg = co_trya$(_client.recvAsync(ct));
-            if (msg.is<App::KeyboardEvent>())
-                (void)_handleKeyboardEvent(msg);
-            else if (msg.is<App::MouseEvent>())
-                (void)_handleMouseEvent(msg);
+            if (msg->is<App::KeyboardEvent>())
+                (void)_handleKeyboardEvent(*msg);
+            else if (msg->is<App::MouseEvent>())
+                (void)_handleMouseEvent(*msg);
             else
-                logWarn("unsupported message: {}", msg.header());
+                logWarn("unsupported message: {}", msg->header());
         }
     }
 

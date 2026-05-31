@@ -136,10 +136,10 @@ struct SkiftApplication : Application {
     Res<> _pollMessages(Rc<Handler> handler) {
         while (auto maybeMessage = _shell.poll()) {
             auto& message = maybeMessage.unwrap();
-            if (message.is<Strata::IShell::WindowEvent>())
-                try$(_handleWindowEvent(message, handler));
-            else if (message.is<Strata::IShell::WindowUpdate>())
-                try$(_handleWindowUpdate(message, handler));
+            if (message->is<Strata::IShell::WindowEvent>())
+                try$(_handleWindowEvent(*message, handler));
+            else if (message->is<Strata::IShell::WindowUpdate>())
+                try$(_handleWindowUpdate(*message, handler));
         }
         return Ok();
     }

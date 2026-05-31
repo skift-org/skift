@@ -24,7 +24,6 @@ export struct Close {
 export struct Read {
     struct Response {
         Vec<u8> buf;
-        usize len;
     };
 
     Fid fid;

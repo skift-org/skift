@@ -372,12 +372,12 @@ struct InputHandler {
         while (true) {
             co_try$(ct.errorIfCanceled());
             auto msg = co_trya$(client.recvAsync(ct));
-            if (msg.is<App::MouseEvent>())
-                (void)_handleMouseEvent(msg);
-            else if (msg.is<App::KeyboardEvent>())
-                (void)_handleKeyboardEvent(msg);
+            if (msg->is<App::MouseEvent>())
+                (void)_handleMouseEvent(*msg);
+            else if (msg->is<App::KeyboardEvent>())
+                (void)_handleKeyboardEvent(*msg);
             else
-                logWarn("unsupported message: {}", msg.header());
+                logWarn("unsupported message: {}", msg->header());
         }
     }
 };

@@ -16,6 +16,8 @@ using namespace Karm::Literals;
 
 namespace Hjert::Core {
 
+static constexpr bool DEBUG_MEM = false;
+
 struct Pmm : Hal::Pmm {
     Hal::PmmRange _usable;
     MutBits _bits;
@@ -66,10 +68,10 @@ struct Pmm : Hal::Pmm {
     }
 
     void dump() {
-        logInfo(" mem: physical memory layout:");
+        logDebugIf(DEBUG_MEM, " mem: physical memory layout:");
         _bits.visit([this](auto range) {
             auto prange = bits2Pmm(range);
-            logInfo("    {x} - {x} ({})", prange.start, prange.end(), DataSize{prange.size});
+            logDebugIf(DEBUG_MEM, "    {x} - {x} ({})", prange.start, prange.end(), DataSize{prange.size});
         });
     }
 
@@ -161,7 +163,7 @@ export Res<> initMem(Handover::Payload& payload) {
         return Error::outOfMemory("no usable memory");
     }
 
-    logInfo("mem: usable range: {x}-{x}", usableRange.start, usableRange.end());
+    logDebugIf(DEBUG_MEM, "mem: usable range: {x}-{x}", usableRange.start, usableRange.end());
 
     usize bitsSize = Hal::pageAlignUp(usableRange.size / Hal::PAGE_SIZE / 8);
 
@@ -172,7 +174,7 @@ export Res<> initMem(Handover::Payload& payload) {
         return Error::outOfMemory("no usable memory for pmm");
     }
 
-    logInfo("mem: pmm bitmap range: {p}-{p}", pmmBits.start, pmmBits.end());
+    logDebugIf(DEBUG_MEM, "mem: pmm bitmap range: {p}-{p}", pmmBits.start, pmmBits.end());
 
     _pmm.emplace(
         usableRange,
@@ -184,10 +186,10 @@ export Res<> initMem(Handover::Payload& payload) {
 
     _kmm.emplace(_pmm.unwrap());
 
-    logInfo("mem: marking free memory as free...");
+    logDebugIf(DEBUG_MEM, "mem: marking free memory as free...");
     for (auto& record : payload) {
         if (record.tag == Handover::Tag::FREE) {
-            logInfo("mem: free memory at {p} {p} ({})", record.start, record.start + record.size, DataSize{record.size});
+            logDebugIf(DEBUG_MEM, "mem: free memory at {p} {p} ({})", record.start, record.start + record.size, DataSize{record.size});
             try$(pmm().free({record.start, record.size}));
         }
     }
@@ -195,7 +197,7 @@ export Res<> initMem(Handover::Payload& payload) {
     Hal::PmmRange firstPage = {0, Hal::PAGE_SIZE};
 
     if (firstPage.overlaps(usableRange)) {
-        logInfo("mem: marking first page as used...");
+        logDebugIf(DEBUG_MEM, "mem: marking first page as used...");
         try$(pmm().used(firstPage));
     }
 
@@ -203,7 +205,7 @@ export Res<> initMem(Handover::Payload& payload) {
 
     _pmm->dump();
 
-    logInfo("mem: mapping kernel...");
+    logDebugIf(DEBUG_MEM, "mem: mapping kernel...");
     try$(
         Arch::globalVmm().mapRange(
             {
@@ -218,7 +220,7 @@ export Res<> initMem(Handover::Payload& payload) {
         )
     );
 
-    logInfo("mem: mapping upper half...");
+    logDebugIf(DEBUG_MEM, "mem: mapping upper half...");
     try$(
         Arch::globalVmm().mapRange(
             {

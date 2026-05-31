@@ -7,10 +7,39 @@ module;
 export module Opstart:handover;
 
 import Karm.Core;
+import Karm.Sys;
+import :config;
 
 namespace Opstart {
 
-Res<> parseGop(Handover::Builder& builder) {
+static Res<> _handleBlobRequest(Entry const& entry, Handover::Builder& builder) {
+    for (auto const& blob : entry.blobs) {
+        logInfo("blob: {}", blob.url);
+
+        auto blobFile = try$(Sys::File::open(blob.url));
+        auto blobMem = try$(Sys::mmap(blobFile));
+        auto blobRange = blobMem.prange();
+        auto propStr = try$(Json::unparse(blob.props));
+
+        builder.add({
+            .tag = Handover::BLOB,
+            .start = blobRange.start,
+            .size = blobRange.size,
+            .blob = {
+                .name = (u32)builder.add(blob.url.str()),
+                .meta = (u32)builder.add(propStr),
+            },
+        });
+
+        // NOTE: We leak the blob memory here because we don't want to
+        //       want raii to unmap the blob before we enter the kernel.
+        blobMem.leak();
+    }
+
+    return Ok();
+}
+
+static Res<> _handleFramebufferRequest(Handover::Builder& builder) {
     auto* gop = try$(Efi::locateProtocol<Efi::GraphicsOutputProtocol>());
     auto* mode = gop->mode;
 
@@ -18,7 +47,7 @@ Res<> parseGop(Handover::Builder& builder) {
         return Error::invalidInput("unsupported pixel format");
     }
 
-    logInfo("efi: gop: {}x{}, {} stride, {} modes", mode->info->horizontalResolution, mode->info->verticalResolution, mode->info->pixelsPerScanLine * 4, mode->maxMode);
+    logInfo("framebuffer: {}x{}, {} stride, {} modes", mode->info->horizontalResolution, mode->info->verticalResolution, mode->info->pixelsPerScanLine * 4, mode->maxMode);
 
     Handover::Record record = {
         .tag = Handover::FB,
@@ -37,20 +66,20 @@ Res<> parseGop(Handover::Builder& builder) {
     return Ok();
 }
 
-Res<> parseAcpi(Handover::Builder& builder) {
+static Res<> _handleRsdpRequest(Handover::Builder& builder) {
     auto* acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI_TABLE_GUID);
     if (not acpiTable)
         acpiTable = Efi::st()->lookupConfigurationTable(Efi::ConfigurationTable::ACPI2_TABLE_GUID);
 
     if (acpiTable) {
         builder.add(Handover::Tag::RSDP, 0, {(usize)acpiTable->table, 0x1000});
-        logInfo("efi: acpi: rsdp at {x}", (usize)acpiTable->table);
+        logInfo("rsdp: {x}", (usize)acpiTable->table);
     }
 
     return Ok();
 }
 
-Res<> parseMemoryMap(Handover::Builder& builder) {
+static Res<> _handleMemoryMapRequest(Handover::Builder& builder) {
     usize mmapSize = 0;
     usize key = 0;
     usize descSize = 0;
@@ -59,9 +88,8 @@ Res<> parseMemoryMap(Handover::Builder& builder) {
     // NOTE: This is expectected to fail
     (void)Efi::bs()->getMemoryMap(&mmapSize, nullptr, &key, &descSize, &descVersion);
 
-    if (descSize < sizeof(Efi::MemoryDescriptor)) {
+    if (descSize < sizeof(Efi::MemoryDescriptor))
         return Error::invalidInput("invalid memory descriptor size");
-    }
 
     // NOTE: Allocating on the pool might creates at least one new descriptor
     // https://stackoverflow.com/questions/39407280/uefi-simple-example-of-using-exitbootservices-with-gnu-efi
@@ -105,10 +133,31 @@ Res<> parseMemoryMap(Handover::Builder& builder) {
     return Ok();
 }
 
-Res<> finalizeHandover(Handover::Builder& builder) {
-    try$(parseGop(builder));
-    try$(parseAcpi(builder));
-    try$(parseMemoryMap(builder));
+Res<> finalizeHandover(Entry const& entry, Handover::Builder& builder, Slice<Handover::Request> requests) {
+    for (auto r : requests) {
+        switch (r.tag) {
+        case Handover::FB:
+            try$(_handleFramebufferRequest(builder));
+            break;
+        case Handover::RSDP:
+            try$(_handleRsdpRequest(builder));
+            break;
+        case Handover::BLOB:
+            try$(_handleBlobRequest(entry, builder));
+            break;
+
+        case Handover::MAGIC:
+        case Handover::END:
+            // ignore
+            break;
+
+        default:
+            logWarn("unknown or unsupported request: {}", r.name());
+            break;
+        }
+    }
+
+    try$(_handleMemoryMapRequest(builder));
 
     return Ok();
 }

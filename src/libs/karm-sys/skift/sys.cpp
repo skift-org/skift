@@ -75,7 +75,7 @@ Res<Rc<Fd>> openFile(Ref::Url const& url, Flags<OpenOption> options) {
 }
 
 Res<Pair<Rc<Fd>, Rc<Fd>>> createPipe() {
-    return Error::notImplemented();
+    return Error::notImplemented("createPipe() not implemented");
 }
 
 Res<Rc<Fd>> createIn() {
@@ -110,11 +110,11 @@ Res<Vec<DirEntry>> readDir(Ref::Url const& url) {
 }
 
 Res<> createDir(Ref::Url const&) {
-    return Error::notImplemented();
+    return Error::notImplemented("createDir() not implemented");
 }
 
 Res<Vec<DirEntry>> readDirOrCreate(Ref::Url const&) {
-    return Error::notImplemented();
+    return Error::notImplemented("readDirOrCreate() not implemented");
 }
 
 Res<Stat> stat(Ref::Url const& url) {
@@ -137,25 +137,25 @@ Async::Task<> launchAsync(Intent intent) {
 // MARK: Process ---------------------------------------------------------------
 
 Res<Rc<Pid>> spawn(Command const&) {
-    notImplemented();
+    return Error::notImplemented("spawn() not implemented");
 }
 
 Res<Tuple<Rc<Pid>, Rc<Fd>>> spawnPty(Command const&) {
-    notImplemented();
+    return Error::notImplemented("spawnPty() not implemented");
 }
 
 // MARK: Sockets ---------------------------------------------------------------
 
 Res<Rc<Fd>> connectTcp(SocketAddr) {
-    return Error::notImplemented();
+    return Error::notImplemented("connectTcp() not implemented");
 }
 
 Res<Rc<Fd>> listenTcp(SocketAddr) {
-    return Error::notImplemented();
+    return Error::notImplemented("listenTcp() not implemented");
 }
 
 Res<Rc<Fd>> listenUdp(SocketAddr) {
-    return Error::notImplemented();
+    return Error::notImplemented("listenUdp() not implemented");
 }
 
 Res<Rc<Fd>> connectIpc(Ref::Url url) {
@@ -187,7 +187,7 @@ Duration uptime() {
 // MARK: Memory Managment ------------------------------------------------------
 
 Res<MmapResult> memMap(MmapProps const&) {
-    return Error::notImplemented();
+    return Error::notImplemented("memMap() not implemented");
 }
 
 Res<MmapResult> memMap(MmapProps const& props, Rc<Fd> fd) {
@@ -223,7 +223,7 @@ Res<> memUnmap(void const* ptr, usize size) {
 }
 
 Res<> memFlush(void*, usize) {
-    return Error::notImplemented();
+    return Error::notImplemented("memFlush() not implemented");
 }
 
 usize pageSize() {
@@ -242,11 +242,11 @@ Res<> populate(SysInfo& infos) {
 }
 
 Res<> populate(MemInfo&) {
-    return Error::notImplemented();
+    return Error::notImplemented("populate() not implemented");
 }
 
 Res<> populate(Vec<CpuInfo>&) {
-    return Error::notImplemented();
+    return Error::notImplemented("populate() not implemented");
 }
 
 Res<> populate(UserInfo& info) {
@@ -257,7 +257,7 @@ Res<> populate(UserInfo& info) {
 }
 
 Res<> populate(Vec<UserInfo>&) {
-    return Error::notImplemented();
+    return Error::notImplemented("populate() not implemented");
 }
 
 // MARK: Process Managment -----------------------------------------------------
@@ -291,17 +291,17 @@ Res<> hardenSandbox() {
 // MARK: Addr ------------------------------------------------------------------
 
 Async::Task<Vec<Ip>> ipLookupAsync(Str) {
-    co_return Error::notImplemented();
+    co_return Error::notImplemented("ipLookupAsync() not implemented");
 }
 
 // MARK: Bundle ----------------------------------------------------------------
 
 Res<Vec<String>> installedBundles() {
-    return Error::notImplemented("not implemented");
+    return Error::notImplemented("installedBundles() not implemented");
 }
 
 Res<String> currentBundle() {
-    return Error::notImplemented("not implemented");
+    return Error::notImplemented("currentBundle() not implemented");
 }
 
 } // namespace Karm::Sys::_Embed

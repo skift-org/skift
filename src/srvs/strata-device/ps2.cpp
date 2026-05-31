@@ -12,6 +12,8 @@ import :node;
 
 namespace Strata::Device::Ps2 {
 
+static constexpr bool DEBUG_PS2 = false;
+
 export struct I8042;
 
 struct Device : Node {
@@ -78,7 +80,7 @@ struct I8042 : Node {
     Res<> init();
 
     Res<> flush() {
-        logInfo("ps2: flushing...");
+        logDebugIf(DEBUG_PS2, "ps2: flushing...");
         auto status = try$(readStatus());
         while (status.has(Status::OUT_BUF)) {
             try$(readData());
@@ -157,14 +159,14 @@ struct Keyboard : Device {
     using Device::Device;
 
     Res<> init() {
-        logInfo("ps2: keyboard initializing...");
+        logDebugIf(DEBUG_PS2, "ps2: keyboard initializing...");
         try$(ctrl().writeCmd(Cmd::ENABLE_MAIN));
 
         auto cfgs = try$(ctrl().readConfig());
         cfgs.set(Configs::FIRST_PORT_INTERRUPT_ENABLE);
         try$(ctrl().writeConfig(cfgs));
 
-        logInfo("ps2: keyboard initialized");
+        logDebugIf(DEBUG_PS2, "ps2: keyboard initialized");
 
         return Ok();
     }
@@ -232,7 +234,7 @@ struct Mouse : Device {
     using Device::Device;
 
     Res<> init() {
-        logInfo("ps2: mouse initializing...");
+        logDebugIf(DEBUG_PS2, "ps2: mouse initializing...");
         try$(ctrl().writeCmd(Cmd::ENABLE_AUX));
 
         auto cfgs = try$(ctrl().readConfig());
@@ -243,7 +245,7 @@ struct Mouse : Device {
         try$(sendCmd(ENABLE_REPORT));
 
         // enable scroll wheel
-        logInfo("ps2: mouse enabling scroll wheel...");
+        logDebugIf(DEBUG_PS2, "ps2: mouse enabling scroll wheel...");
         try$(getDeviceId());
 
         try$(sendCmd(SET_SAMPLE_RATE, 200));
@@ -252,14 +254,14 @@ struct Mouse : Device {
 
         auto status = try$(getDeviceId());
         if (status == 0x03) {
-            logInfo("ps2: mouse scroll wheel enabled");
+            logDebugIf(DEBUG_PS2, "ps2: mouse scroll wheel enabled");
             _hasWheel = true;
         } else {
-            logInfo("ps2: mouse scroll wheel not supported");
+            logDebugIf(DEBUG_PS2, "ps2: mouse scroll wheel not supported");
             _hasWheel = false;
         }
 
-        logInfo("ps2: mouse initialized");
+        logDebugIf(DEBUG_PS2, "ps2: mouse initialized");
 
         return Ok();
     }

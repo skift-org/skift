@@ -67,7 +67,6 @@ struct Sched {
 static Opt<Sched> _sched;
 
 Res<> initSched() {
-    logInfo("sched: initializing...");
     auto bootTask = try$(Task::create(Hj::Mode::SUPER, try$(Space::create())));
     bootTask->label("entry");
     try$(bootTask->ready(0, 0, {}));

@@ -26,13 +26,6 @@ void drawSplash(Gfx::Canvas& g, Opstart::Entry const& e, Math::Recti size) {
 export Res<> splashScreen(Opstart::Entry const& e) {
     auto* gop = try$(Efi::locateProtocol<Efi::GraphicsOutputProtocol>());
     auto* mode = gop->mode;
-    logInfo(
-        "efi: gop: {}x{}, {} stride, {} modes",
-        mode->info->horizontalResolution,
-        mode->info->verticalResolution,
-        mode->info->pixelsPerScanLine * 4,
-        mode->maxMode
-    );
 
     Gfx::MutPixels framebuffer = {
         reinterpret_cast<void*>(mode->frameBufferBase),

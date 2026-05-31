@@ -19,8 +19,6 @@ import :space;
 namespace Hjert::Core {
 
 Res<Arc<Vmo>> _locateInit(Handover::Payload& payload, Str path) {
-    logInfo("locating {#}...", path);
-
     auto const* record = payload.blobByName("file:/skift/init.bootfs");
     if (not record) {
         logError("handover: could not find bootfs");
@@ -44,17 +42,17 @@ Res<Arc<Vmo>> _locateInit(Handover::Payload& payload, Str path) {
     return Vmo::makeDma(elfRange);
 }
 
-Res<> enterUserspace(Handover::Payload& payload) {
+Res<> enterUserspace(Handover::Payload& payload, Str init) {
     auto space = try$(Space::create());
     space->label("init-space");
 
-    logInfo("entry: mapping elf...");
-    auto elfVmo = try$(_locateInit(payload, "bundles/strata-cm/bin/strata-cm.elf"));
+    auto elfVmo = try$(_locateInit(payload, init));
     elfVmo->label("elf-shared");
     auto elfRange = try$(kmm().pmm2Kmm(elfVmo->range()));
     Elf::ElfObject<Elf::CurrentAbi> object{elfRange.bytes()};
     try$(object.validate());
 
+    // Loading the ELF segments
     for (Elf::ElfProgram prog : object.iterProgram()) {
         if (prog.type() != Elf::ElfPhdrType::PT_LOAD)
             continue;
@@ -65,7 +63,6 @@ Res<> enterUserspace(Handover::Payload& payload) {
             auto sectionVmo = try$(Vmo::alloc(size, Hj::VmoFlags::UPPER));
             sectionVmo->label("elf-writeable");
             auto sectionRange = try$(kmm().pmm2Kmm(sectionVmo->range()));
-            logInfo("entry: mapping section: {x}-{x}", sectionRange.start, sectionRange.end());
             copy(prog.data, sectionRange.mutBytes());
             try$(space->map({prog.p_vaddr, size}, sectionVmo, 0, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
         } else {
@@ -73,25 +70,25 @@ Res<> enterUserspace(Handover::Payload& payload) {
         }
     }
 
-    logInfo("entry: mapping handover...");
+    // mapping handover
     auto handoverBase = ((usize)&payload) - Handover::KERNEL_BASE;
     auto handoverSize = payload.size;
     auto handoverVmo = try$(Vmo::makeDma({handoverBase, handoverSize}));
     handoverVmo->label("handover");
     auto handoverRange = try$(space->map({}, handoverVmo, 0, Hj::MapFlags::READ));
 
-    logInfo("entry: mapping stack...");
+    // mapping stack
     auto stackVmo = try$(Vmo::alloc(64_KiB, Hj::VmoFlags::UPPER));
     stackVmo->label("stack");
     auto stackRange = try$(space->map({}, stackVmo, 0, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
-    logInfo("entry: stack: {x}-{x}", stackRange.start, stackRange.end());
 
-    logInfo("entry: creating task...");
+    // creating task...
     auto domain = try$(Domain::create());
     domain->label("init-domain");
     auto task = try$(Task::create(Hj::Mode::USER, space, domain));
     task->label("init-task");
 
+    // starting the task...
     try$(task->ready(object.header().e_entry, stackRange.end(), {handoverRange.start}));
     try$(globalSched().enqueue(task));
 
@@ -104,21 +101,17 @@ export Res<> init(u64 magic, Handover::Payload& payload) {
     logInfo("hjert " stringify$(__ck_version_value));
 
     if (not Handover::valid(magic, payload)) {
-        logInfo("handover: invalid");
+        logError("handover: invalid handover payload");
         return Error::invalidInput("invalid handover payload");
     }
-    logInfo("handover: valid");
-    logInfo("handover: agent: '{}'", payload.agentName());
+    logInfo("boot-agent: '{}'", payload.agentName());
 
     try$(initMem(payload));
     try$(initSched());
-
-    logInfo("entry: everything is ready, enabling interrupts...");
     Arch::globalCpu().retainEnable();
     Arch::globalCpu().enableInterrupts();
 
-    logInfo("entry: entering userspace...");
-    try$(enterUserspace(payload));
+    try$(enterUserspace(payload, "bundles/strata-cm/bin/strata-cm.elf"));
 
     logInfo("entry: entering idle loop...");
     globalSched().currentTask().label("idle");

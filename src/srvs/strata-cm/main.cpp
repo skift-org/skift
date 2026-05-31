@@ -20,33 +20,33 @@ using namespace Karm::Ref::Literals;
 
 static constexpr bool DEBUG_TASK = false;
 static constexpr bool DEBUG_ELF = false;
+static constexpr bool DEBUG_COMPONENT = false;
 
 namespace Strata::Bus {
 
 static Res<Hj::Task> loadElf(String id, Rc<Sys::Skift::DuplexFd> fd) {
-    logInfo("activating service '{}'...", id);
     auto& handover = Sys::Skift::useHandover();
     auto bootfs = try$(Sys::Skift::Bootfs::ensure());
 
-    logInfoIf(DEBUG_ELF, "mapping elf...");
+    logDebugIf(DEBUG_ELF, "mapping elf...");
     auto elfPath = Io::format("bundles/{}/bin/{}.elf", id, id);
     auto [elfVmo, _] = try$(bootfs->openVmo(elfPath.str()));
     auto elfRange = try$(Hj::map(elfVmo, Hj::MapFlags::READ));
 
-    logInfoIf(DEBUG_ELF, "creating address space...");
+    logDebugIf(DEBUG_ELF, "creating address space...");
     auto elfSpace = try$(Hj::Space::create(Hj::ROOT));
 
-    logInfoIf(DEBUG_ELF, "validating elf...");
+    logDebugIf(DEBUG_ELF, "validating elf...");
     Elf::ElfObject<Elf::CurrentAbi> object{elfRange.bytes()};
     try$(object.validate());
 
-    logInfoIf(DEBUG_ELF, "mapping the elf...");
+    logDebugIf(DEBUG_ELF, "mapping the elf...");
     for (Elf::ElfProgram prog : object.iterProgram()) {
         if (prog.type() != Elf::ElfPhdrType::PT_LOAD)
             continue;
 
         usize size = alignUp(max(prog.p_memsz, prog.p_filesz), Hal::PAGE_SIZE);
-        logInfoIf(DEBUG_ELF, "mapping section: {x}-{x}", prog.p_vaddr, prog.p_vaddr + size);
+        logDebugIf(DEBUG_ELF, "mapping section: {x}-{x}", prog.p_vaddr, prog.p_vaddr + size);
 
         if (prog.p_flags.has(Elf::ElfPhdrFlags::PF_W)) {
             auto sectionVmo = try$(Hj::Vmo::create(Hj::ROOT, 0, size, Hj::VmoFlags::UPPER));
@@ -64,27 +64,27 @@ static Res<Hj::Task> loadElf(String id, Rc<Sys::Skift::DuplexFd> fd) {
         }
     }
 
-    logInfoIf(DEBUG_ELF, "mapping the stack...");
+    logDebugIf(DEBUG_ELF, "mapping the stack...");
     auto stackVmo = try$(Hj::Vmo::create(Hj::ROOT, 0, 64_KiB, Hj::VmoFlags::UPPER));
     try$(stackVmo.label("stack"));
     auto stackRange = try$(elfSpace.map(0, stackVmo, 0, 0, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
 
-    logInfoIf(DEBUG_TASK, "creating the task...");
+    logDebugIf(DEBUG_TASK, "creating the task...");
     auto domain = try$(Hj::Domain::create(Hj::ROOT));
     auto task = try$(Hj::Task::create(Hj::ROOT, domain, elfSpace));
     try$(task.label(id));
 
-    logInfoIf(DEBUG_TASK, "mapping handover...");
+    logDebugIf(DEBUG_TASK, "mapping handover...");
     auto const* handoverRecord = handover.findTag(Handover::Tag::SELF);
     auto handoverVmo = try$(Hj::Vmo::create(Hj::ROOT, handoverRecord->start, handoverRecord->size, Hj::VmoFlags::DMA));
     try$(handoverVmo.label("handover"));
     auto handoverVrange = try$(elfSpace.map(0, handoverVmo, 0, 0, Hj::MapFlags::READ));
 
-    logInfoIf(DEBUG_TASK, "attaching channels...");
+    logDebugIf(DEBUG_TASK, "attaching channels...");
     auto inCap = try$(domain.attach(fd->_in));
     auto outCap = try$(domain.attach(fd->_out));
 
-    logInfoIf(DEBUG_TASK, "starting the task...");
+    logDebugIf(DEBUG_TASK, "starting the task...");
     try$(task.start(
         object.header().e_entry,
         stackRange.end(),
@@ -113,19 +113,19 @@ struct ComponentManager {
 
         Res<> _handleConnect(Ipc::Message& msg) {
             auto [fd, url] = try$(msg.unpack<ICm::Connect>());
-            logInfo("'{}' requested connection to '{}'", _id, url);
+            logDebugIf(DEBUG_COMPONENT, "'{}' requested connection to '{}'", _id, url);
             return _cm.connect(try$(fd.okOr(Error::invalidHandle("missing "))), url);
         }
 
         Res<> _handleLaunch(Ipc::Message& msg) {
             auto [url] = try$(msg.unpack<ICm::Launch>());
-            logInfo("'{}' requested launch of '{}'", _id, url);
+            logDebugIf(DEBUG_COMPONENT, "'{}' requested launch of '{}'", _id, url);
             try$(_cm.start(url.host.str(), false));
             return Ok();
         }
 
         Async::Task<> runAsync(Async::CancellationToken ct) {
-            logInfo("component '{}' attached", _id);
+            logDebugIf(DEBUG_COMPONENT, "component '{}' attached", _id);
             while (true) {
                 co_try$(ct.errorIfCanceled());
                 auto msg = co_trya$(Ipc::recvAsync(_conn, ct));
@@ -143,7 +143,7 @@ struct ComponentManager {
         }
 
         Res<> incoming(Rc<Sys::Fd> fd) {
-            logInfo("notifying '{}' of incoming connection", _id);
+            logDebugIf(DEBUG_COMPONENT, "notifying '{}' of incoming connection", _id);
             return notify(ICm::Incoming{fd});
         }
 
@@ -164,19 +164,19 @@ struct ComponentManager {
     }
 
     void shutdown(Rc<Component> component) {
-        logInfo("shutting down component '{}'", component->_id);
+        logDebugIf(DEBUG_COMPONENT, "shutting down component '{}'", component->_id);
 
         _exported.removeValue(component);
         _active.removeAll(component);
 
         if (_active.len() == 0) {
-            logInfo("no active components, exiting...");
+            logDebugIf(DEBUG_COMPONENT, "no active components, exiting...");
             _exit.resolve(Ok());
         }
     }
 
     Res<> start(Str id, bool exported) {
-        logInfo("starting '{}' (exported: {})...", id, exported);
+        logDebugIf(DEBUG_COMPONENT, "starting '{}' (exported: {})...", id, exported);
 
         auto fd = try$(Sys::Skift::DuplexFd::create(id));
         auto task = try$(loadElf(id, fd));
@@ -186,7 +186,7 @@ struct ComponentManager {
 
         if (exported) {
             _exported.put(id, component);
-            logDebug("exposed '{}'", id);
+            logDebugIf(DEBUG_COMPONENT, "exposed '{}'", id);
         }
 
         Async::detach(component->runAsync(_cancellation.token()), [this, component](auto const&...) {

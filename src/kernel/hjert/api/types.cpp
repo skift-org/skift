@@ -12,7 +12,7 @@ export enum struct Mode : u8 {
     EMBRYO, // The task is being created
     IDLE,   // The task is only run when there is no other task to run
     USER,   // The task is running in user mode
-    SUPER,  // The task is running in supervisor mode propably serving a syscall
+    SUPER,  // The task is running in supervisor mode probably serving a syscall
 };
 
 #define FOREACH_TYPE(TYPE) \
@@ -21,6 +21,7 @@ export enum struct Mode : u8 {
     TYPE(DOMAIN)           \
     TYPE(IOP)              \
     TYPE(IRQ)              \
+    TYPE(JOB)              \
     TYPE(LISTENER)         \
     TYPE(PIPE)             \
     TYPE(SPACE)            \
@@ -250,6 +251,7 @@ export struct DomainProps {
 
 export struct TaskProps {
     static constexpr Type TYPE = Type::TASK;
+    Cap job;
     Cap domain;
     Cap space;
 };
@@ -301,6 +303,11 @@ export struct ClockProps {
     static constexpr Type TYPE = Type::CLOCK;
 };
 
+export struct JobProps {
+    static constexpr Type TYPE = Type::JOB;
+    Cap parent;
+};
+
 export using _Props = Union<
     DomainProps,
     TaskProps,
@@ -311,7 +318,8 @@ export using _Props = Union<
     IrqProps,
     ListenerProps,
     PipeProps,
-    ClockProps>;
+    ClockProps,
+    JobProps>;
 
 export struct Props : _Props {
     using _Props::_Props;

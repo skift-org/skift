@@ -9,6 +9,7 @@ import :space;
 import :domain;
 import :context;
 import :clock;
+import :job;
 
 namespace Hjert::Core {
 
@@ -25,6 +26,7 @@ export struct Task : BaseObject<Task, Hj::Type::TASK> {
     Stack _stack;
     Opt<Box<Context>> _ctx;
 
+    Arc<Job> _job;
     Opt<Arc<Space>> _space;
     Opt<Arc<Domain>> _domain;
     Opt<Blocker> _block;
@@ -35,24 +37,34 @@ export struct Task : BaseObject<Task, Hj::Type::TASK> {
 
     static Res<Arc<Task>> create(
         Hj::Mode mode,
+        Arc<Job> job,
         Opt<Arc<Space>> space = NONE,
         Opt<Arc<Domain>> domain = NONE
     ) {
         auto stack = try$(Stack::create());
-        auto task = makeArc<Task>(mode, std::move(stack), space, domain);
+        auto task = makeArc<Task>(mode, std::move(stack), job, space, domain);
         return Ok(task);
     }
 
     Task(
         Hj::Mode mode,
         Stack stack,
+        Arc<Job> job,
         Opt<Arc<Space>> space,
         Opt<Arc<Domain>> domain
     ) : _mode(mode),
         _stack(std::move(stack)),
+        _job(job),
         _space(space),
         _domain(domain) {
+        _job->addChild(this);
     }
+
+    ~Task() {
+        _job->removeChild(this);
+    }
+
+    Arc<Job> job() { return _job; }
 
     Stack& stack() { return _stack; }
 

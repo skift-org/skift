@@ -61,6 +61,10 @@ Res<> doCreate(Task& self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
         [&](Hj::TaskProps& props) -> Res<Arc<Object>> {
             try$(self.ensure(Hj::Pledge::TASK));
 
+            auto job = props.job.isRoot()
+                           ? self._job
+                           : try$(self.domain().get<Job>(props.job));
+
             auto dom = props.domain.isRoot()
                            ? try$(self._domain)
                            : try$(self.domain().get<Domain>(props.domain));
@@ -69,7 +73,7 @@ Res<> doCreate(Task& self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
                            ? try$(self._space)
                            : try$(self.domain().get<Space>(props.space));
 
-            auto obj = try$(Task::create(Hj::Mode::USER, spa, dom));
+            auto obj = try$(Task::create(Hj::Mode::USER, job, spa, dom));
 
             auto pledges = self.pledges();
             try$(obj->pledge(pledges));
@@ -119,6 +123,13 @@ Res<> doCreate(Task& self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
         },
         [&](Hj::ClockProps&) -> Res<Arc<Object>> {
             return Clock::create();
+        },
+        [&](Hj::JobProps& props) -> Res<Arc<Object>> {
+            try$(self.ensure(Hj::Pledge::TASK));
+            auto parent = props.parent.isRoot()
+                              ? self._job
+                              : try$(self.domain().get<Job>(props.parent));
+            return Job::create(parent);
         }
     ));
 
@@ -164,8 +175,17 @@ Res<> doStart(Task& self, Hj::Cap cap, usize ip, usize sp, User<Hj::Args const> 
     return Ok();
 }
 
+static Res<Arc<Vmo>> _toVmo(Arc<Object> obj) {
+    if (auto const [vmo] = obj.cast<Vmo>())
+        return Ok(vmo);
+    if (auto const [clock] = obj.cast<Clock>())
+        return Ok(clock->_vmo);
+    return Error::invalidInput("expected clock or vmo");
+}
+
 Res<> doMap(Task& self, Hj::Cap cap, User<usize> virt, Hj::Cap vmo, usize off, User<usize> len, Hj::MapFlags flags) {
-    auto vmoObj = try$(self.domain().get<Vmo>(vmo));
+    auto vmoObj = try$(_toVmo(try$(self.domain().get(vmo))));
+
     auto spaceObj = cap.isRoot()
                         ? try$(self._space)
                         : try$(self.domain().get<Space>(cap));

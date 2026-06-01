@@ -15,6 +15,7 @@ import :arch;
 import :cpu;
 import :sched;
 import :space;
+import :task;
 
 namespace Hjert::Core {
 
@@ -85,7 +86,11 @@ Res<> enterUserspace(Handover::Payload& payload, Str init) {
     // creating task...
     auto domain = try$(Domain::create());
     domain->label("init-domain");
-    auto task = try$(Task::create(Hj::Mode::USER, space, domain));
+
+    auto job = try$(Job::create(globalSched().currentTask().job()));
+    job->label("init-job");
+
+    auto task = try$(Task::create(Hj::Mode::USER, job, space, domain));
     task->label("init-task");
 
     // starting the task...

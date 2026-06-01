@@ -33,7 +33,7 @@ export struct Object : Meta::Pinned {
         return *_label;
     }
 
-    void _signalUnlock(Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset) {
+    virtual void _signalUnlock(Flags<Hj::Sigs> set, Flags<Hj::Sigs> unset) {
         _signals |= set;
         _signals &= ~unset;
     }

@@ -71,7 +71,8 @@ static Res<Hj::Task> loadElf(String id, Rc<Sys::Skift::DuplexFd> fd) {
 
     logDebugIf(DEBUG_TASK, "creating the task...");
     auto domain = try$(Hj::Domain::create(Hj::ROOT));
-    auto task = try$(Hj::Task::create(Hj::ROOT, domain, elfSpace));
+    auto job = try$(Hj::Job::create(Hj::ROOT, Hj::ROOT));
+    auto task = try$(Hj::Task::create(Hj::ROOT, job, domain, elfSpace));
     try$(task.label(id));
 
     logDebugIf(DEBUG_TASK, "mapping handover...");

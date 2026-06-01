@@ -121,8 +121,8 @@ export struct Task : Object {
         return Task{ROOT};
     }
 
-    static Res<Task> create(Cap dest, Cap node, Cap space) {
-        return create<Task>(dest, node, space);
+    static Res<Task> create(Cap dest, Cap job, Cap domain, Cap space) {
+        return create<Task>(dest, job, domain, space);
     }
 
     Res<> start(usize ip, usize sp, Args args) {
@@ -344,6 +344,26 @@ export struct Listener : Object {
         }
 
         return NONE;
+    }
+};
+
+export struct Clock : Object {
+    using Props = ClockProps;
+
+    using Object::Object;
+
+    static Res<Clock> create(Cap dest) {
+        return create<Clock>(dest);
+    }
+};
+
+export struct Job : Object {
+    using Props = JobProps;
+
+    using Object::Object;
+
+    static Res<Job> create(Cap dest, Cap parent) {
+        return create<Job>(dest, parent);
     }
 };
 

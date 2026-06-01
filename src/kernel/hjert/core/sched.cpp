@@ -67,7 +67,8 @@ struct Sched {
 static Opt<Sched> _sched;
 
 Res<> initSched() {
-    auto bootTask = try$(Task::create(Hj::Mode::SUPER, try$(Space::create())));
+    auto rootJob = try$(Job::createRoot());
+    auto bootTask = try$(Task::create(Hj::Mode::SUPER, rootJob, try$(Space::create())));
     bootTask->label("entry");
     try$(bootTask->ready(0, 0, {}));
     _sched.emplace(std::move(bootTask));

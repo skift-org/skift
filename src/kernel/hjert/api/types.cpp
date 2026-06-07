@@ -56,7 +56,17 @@ export Str toStr(Type type) {
     SYSCALL(NONE)                \
     SYSCALL(NOW)                 \
     SYSCALL(LOG)                 \
-    SYSCALL(CREATE)              \
+    SYSCALL(CREATE_DOMAIN)       \
+    SYSCALL(CREATE_TASK)         \
+    SYSCALL(CREATE_SPACE)        \
+    SYSCALL(CREATE_VMO)          \
+    SYSCALL(CREATE_IOP)          \
+    SYSCALL(CREATE_CHANNEL)      \
+    SYSCALL(CREATE_IRQ)          \
+    SYSCALL(CREATE_LISTENER)     \
+    SYSCALL(CREATE_PIPE)         \
+    SYSCALL(CREATE_CLOCK)        \
+    SYSCALL(CREATE_JOB)          \
     SYSCALL(LABEL)               \
     SYSCALL(DROP)                \
     SYSCALL(PLEDGE)              \
@@ -245,94 +255,9 @@ export IoLen bytes2IoLen(usize bytes) {
 export using VmoFlags = Hal::PmmFlags;
 export using MapFlags = Hal::VmmFlags;
 
-export struct DomainProps {
-    static constexpr Type TYPE = Type::DOMAIN;
-};
-
-export struct TaskProps {
-    static constexpr Type TYPE = Type::TASK;
-    Cap job;
-    Cap domain;
-    Cap space;
-};
-
-export struct SpaceProps {
-    static constexpr Type TYPE = Type::SPACE;
-};
-
-export struct VmoProps {
-    static constexpr Type TYPE = Type::VMO;
-    usize phys;
-    usize len;
-    Flags<VmoFlags> flags;
-    Cap vmo = ROOT;
-};
-
-export struct IopProps {
-    static constexpr Type TYPE = Type::IOP;
-    usize base;
-    usize len;
-};
-
 export struct SentRecv {
     usize bytes;
     usize caps;
-};
-
-export struct ChannelProps {
-    static constexpr Type TYPE = Type::CHANNEL;
-    usize bufCap;  //< The capacity of the data buffer (in bytes, must be >= 1)
-    usize capsCap; //< The capacity of the caps buffer (in caps, 0 zero means the channel can't carry caps)
-};
-
-export struct IrqProps {
-    static constexpr Type TYPE = Type::IRQ;
-    usize irq;
-};
-
-export struct ListenerProps {
-    static constexpr Type TYPE = Type::LISTENER;
-};
-
-export struct PipeProps {
-    static constexpr Type TYPE = Type::PIPE;
-    usize bufCap; //< The capacity of the data buffer (in bytes, must be >= 1)
-};
-
-export struct ClockProps {
-    static constexpr Type TYPE = Type::CLOCK;
-};
-
-export struct JobProps {
-    static constexpr Type TYPE = Type::JOB;
-    Cap parent;
-};
-
-export using _Props = Union<
-    DomainProps,
-    TaskProps,
-    SpaceProps,
-    VmoProps,
-    IopProps,
-    ChannelProps,
-    IrqProps,
-    ListenerProps,
-    PipeProps,
-    ClockProps,
-    JobProps>;
-
-export struct Props : _Props {
-    using _Props::_Props;
-
-    Type type() const {
-        return visit([](auto const& props) {
-            return props.TYPE;
-        });
-    }
-
-    Str typeStr() const {
-        return toStr(type());
-    }
 };
 
 } // namespace Hj

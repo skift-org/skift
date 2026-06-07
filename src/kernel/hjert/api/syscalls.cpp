@@ -80,8 +80,48 @@ export Res<> _log(char const* msg, usize len) {
     return _syscall(Syscall::LOG, (Arg)msg, len);
 }
 
-export Res<> _create(Cap dest, Cap* cap, Props const* props) {
-    return _syscall(Syscall::CREATE, dest.raw(), (Arg)cap, (Arg)props);
+export Res<> _createDomain(Cap dest, Cap* cap) {
+    return _syscall(Syscall::CREATE_DOMAIN, dest.raw(), (Arg)cap);
+}
+
+export Res<> _createTask(Cap dest, Cap* cap, Cap job, Cap domain, Cap space) {
+    return _syscall(Syscall::CREATE_TASK, dest.raw(), (Arg)cap, job.raw(), domain.raw(), space.raw());
+}
+
+export Res<> _createSpace(Cap dest, Cap* cap) {
+    return _syscall(Syscall::CREATE_SPACE, dest.raw(), (Arg)cap);
+}
+
+export Res<> _createVmo(Cap dest, Cap* cap, usize phys, usize len, Flags<VmoFlags> flags, Cap parent) {
+    return _syscall(Syscall::CREATE_VMO, dest.raw(), (Arg)cap, phys, len, flags.raw(), parent.raw());
+}
+
+export Res<> _createIop(Cap dest, Cap* cap, usize base, usize len) {
+    return _syscall(Syscall::CREATE_IOP, dest.raw(), (Arg)cap, base, len);
+}
+
+export Res<> _createChannel(Cap dest, Cap* cap, usize bufCap, usize capsCap) {
+    return _syscall(Syscall::CREATE_CHANNEL, dest.raw(), (Arg)cap, bufCap, capsCap);
+}
+
+export Res<> _createIrq(Cap dest, Cap* cap, usize irq) {
+    return _syscall(Syscall::CREATE_IRQ, dest.raw(), (Arg)cap, irq);
+}
+
+export Res<> _createListener(Cap dest, Cap* cap) {
+    return _syscall(Syscall::CREATE_LISTENER, dest.raw(), (Arg)cap);
+}
+
+export Res<> _createPipe(Cap dest, Cap* cap, usize bufCap) {
+    return _syscall(Syscall::CREATE_PIPE, dest.raw(), (Arg)cap, bufCap);
+}
+
+export Res<> _createClock(Cap dest, Cap* cap) {
+    return _syscall(Syscall::CREATE_CLOCK, dest.raw(), (Arg)cap);
+}
+
+export Res<> _createJob(Cap dest, Cap* cap, Cap parent) {
+    return _syscall(Syscall::CREATE_JOB, dest.raw(), (Arg)cap, parent.raw());
 }
 
 export Res<> _label(Cap cap, char const* label, usize len) {

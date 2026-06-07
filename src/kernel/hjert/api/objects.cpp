@@ -28,15 +28,6 @@ export Res<usize> log(Bytes bytes) {
     return Ok(bytes.len());
 }
 
-export template <typename O, typename... Args>
-Res<O> create(Cap dest, Args&&... args) {
-    Cap c;
-    typename O::Props props{std::forward<Args>(args)...};
-    Props p = props;
-    try$(_create(dest, &c, &p));
-    return Ok(O{c});
-}
-
 export struct Object {
     Cap _cap;
 
@@ -88,8 +79,6 @@ export struct Object {
 };
 
 export struct Domain : Object {
-    using Props = DomainProps;
-
     using Object::Object;
 
     static Domain self() {
@@ -97,12 +86,9 @@ export struct Domain : Object {
     }
 
     static Res<Domain> create(Cap dest) {
-        return Hj::create<Domain>(dest);
-    }
-
-    template <typename O, typename... Args>
-    Res<O> create(Args&&... args) {
-        return Hj::create<O>(_cap, std::forward<Args>(args)...);
+        Cap cap;
+        try$(_createDomain(dest, &cap));
+        return Ok(Domain{cap});
     }
 
     Res<Cap> attach(Object& obj) {
@@ -113,8 +99,6 @@ export struct Domain : Object {
 };
 
 export struct Task : Object {
-    using Props = TaskProps;
-
     using Object::Object;
 
     static Task self() {
@@ -122,7 +106,9 @@ export struct Task : Object {
     }
 
     static Res<Task> create(Cap dest, Cap job, Cap domain, Cap space) {
-        return create<Task>(dest, job, domain, space);
+        Cap cap;
+        try$(_createTask(dest, &cap, job, domain, space));
+        return Ok(Task{cap});
     }
 
     Res<> start(usize ip, usize sp, Args args) {
@@ -139,18 +125,16 @@ export struct Task : Object {
 };
 
 export struct Vmo : Object {
-    using Props = VmoProps;
-
     using Object::Object;
 
     static Res<Vmo> create(Cap dest, usize phys, usize len, Flags<VmoFlags> flags = {}, Cap parent = ROOT) {
-        return create<Vmo>(dest, phys, len, flags, parent);
+        Cap cap;
+        try$(_createVmo(dest, &cap, phys, len, flags, parent));
+        return Ok(Vmo{cap});
     }
 };
 
 export struct Space : Object {
-    using Props = SpaceProps;
-
     using Object::Object;
 
     static Space self() {
@@ -158,7 +142,9 @@ export struct Space : Object {
     }
 
     static Res<Space> create(Cap dest) {
-        return create<Space>(dest);
+        Cap cap;
+        try$(_createSpace(dest, &cap));
+        return Ok(Space{cap});
     }
 
     Res<urange> map(usize virt, Vmo& vmo, usize off, usize len, Flags<MapFlags> flags = {}) {
@@ -229,12 +215,12 @@ export Res<Mapped> map(Vmo& vmo, Flags<MapFlags> flags = {}) {
 }
 
 export struct Io : Object {
-    using Props = IopProps;
-
     using Object::Object;
 
     static Res<Io> create(Cap dest, usize base, usize len) {
-        return create<Io>(dest, base, len);
+        Cap cap;
+        try$(_createIop(dest, &cap, base, len));
+        return Ok(Io{cap});
     }
 
     Res<Arg> in(IoLen len, usize port) {
@@ -249,12 +235,12 @@ export struct Io : Object {
 };
 
 export struct Channel : Object {
-    using Props = ChannelProps;
-
     using Object::Object;
 
     static Res<Channel> create(Cap dest, usize bufLen, usize capLen) {
-        return create<Channel>(dest, bufLen, capLen);
+        Cap cap;
+        try$(_createChannel(dest, &cap, bufLen, capLen));
+        return Ok(Channel{cap});
     }
 
     Res<SentRecv> send(Bytes buf, Slice<Cap> caps) {
@@ -271,12 +257,12 @@ export struct Channel : Object {
 };
 
 export struct Pipe : Object {
-    using Props = PipeProps;
-
     using Object::Object;
 
     static Res<Pipe> create(Cap dest, usize bufLen) {
-        return create<Pipe>(dest, bufLen);
+        Cap cap;
+        try$(_createPipe(dest, &cap, bufLen));
+        return Ok(Pipe{cap});
     }
 
     Res<usize> write(Bytes buf) {
@@ -293,12 +279,12 @@ export struct Pipe : Object {
 };
 
 export struct Irq : Object {
-    using Props = IrqProps;
-
     using Object::Object;
 
     static Res<Irq> create(Cap dest, usize irq) {
-        return create<Irq>(dest, irq);
+        Cap cap;
+        try$(_createIrq(dest, &cap, irq));
+        return Ok(Irq{cap});
     }
 
     Res<> eoi() {
@@ -311,15 +297,15 @@ export struct Irq : Object {
 };
 
 export struct Listener : Object {
-    using Props = ListenerProps;
-
     using Object::Object;
 
     Buf<Event> _evs = {};
     usize _len = {};
 
     static Res<Listener> create(Cap dest) {
-        return create<Listener>(dest);
+        Cap cap;
+        try$(_createListener(dest, &cap));
+        return Ok(Listener{cap});
     }
 
     Res<> listen(Cap cap, Flags<Sigs> set, Flags<Sigs> unset) {
@@ -348,22 +334,22 @@ export struct Listener : Object {
 };
 
 export struct Clock : Object {
-    using Props = ClockProps;
-
     using Object::Object;
 
     static Res<Clock> create(Cap dest) {
-        return create<Clock>(dest);
+        Cap cap;
+        try$(_createClock(dest, &cap));
+        return Ok(Clock{cap});
     }
 };
 
 export struct Job : Object {
-    using Props = JobProps;
-
     using Object::Object;
 
     static Res<Job> create(Cap dest, Cap parent) {
-        return create<Job>(dest, parent);
+        Cap cap;
+        try$(_createJob(dest, &cap, parent));
+        return Ok(Job{cap});
     }
 };
 

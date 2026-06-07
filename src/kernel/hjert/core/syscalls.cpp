@@ -47,93 +47,117 @@ Res<> doLog(Task& self, UserSlice<Str> msg) {
     });
 }
 
-Res<> doCreate(Task& self, Hj::Cap dest, User<Hj::Cap> out, User<Hj::Props> p) {
-    auto props = try$(p.load(self.space()));
+Res<> doCreateDomain(Task& self, Hj::Cap dest, User<Hj::Cap> out) {
+    auto object = try$(Domain::create());
+    auto cap = try$(self.domain().add(dest, object));
+    return out.store(self.space(), cap);
+}
 
-    // Ensure that the index of the union is valid
-    if (not props.valid())
-        return Error::invalidInput("invalid props");
+Res<> doCreateTask(Task& self, Hj::Cap dest, User<Hj::Cap> out, Hj::Cap jobCap, Hj::Cap domainCap, Hj::Cap spaceCap) {
+    try$(self.ensure(Hj::Pledge::TASK));
 
-    auto obj = try$(props.visit(
-        [&](Hj::DomainProps&) -> Res<Arc<Object>> {
-            return Ok(try$(Domain::create()));
-        },
-        [&](Hj::TaskProps& props) -> Res<Arc<Object>> {
-            try$(self.ensure(Hj::Pledge::TASK));
+    auto job = jobCap.isRoot()
+                   ? self._job
+                   : try$(self.domain().get<Job>(jobCap));
 
-            auto job = props.job.isRoot()
-                           ? self._job
-                           : try$(self.domain().get<Job>(props.job));
+    auto dom = domainCap.isRoot()
+                   ? try$(self._domain)
+                   : try$(self.domain().get<Domain>(domainCap));
 
-            auto dom = props.domain.isRoot()
-                           ? try$(self._domain)
-                           : try$(self.domain().get<Domain>(props.domain));
+    auto spa = spaceCap.isRoot()
+                   ? try$(self._space)
+                   : try$(self.domain().get<Space>(spaceCap));
 
-            auto spa = props.space.isRoot()
-                           ? try$(self._space)
-                           : try$(self.domain().get<Space>(props.space));
+    auto obj = try$(Task::create(Hj::Mode::USER, job, spa, dom));
 
-            auto obj = try$(Task::create(Hj::Mode::USER, job, spa, dom));
+    auto pledges = self.pledges();
+    try$(obj->pledge(pledges));
 
-            auto pledges = self.pledges();
-            try$(obj->pledge(pledges));
+    auto cap = try$(self.domain().add(dest, obj));
+    return out.store(self.space(), cap);
+}
 
-            return Ok(obj);
-        },
-        [&](Hj::SpaceProps&) -> Res<Arc<Object>> {
-            try$(self.ensure(Hj::Pledge::MEM));
+Res<> doCreateSpace(Task& self, Hj::Cap dest, User<Hj::Cap> out) {
+    try$(self.ensure(Hj::Pledge::MEM));
+    auto object = try$(Space::create());
+    auto cap = try$(self.domain().add(dest, object));
+    return out.store(self.space(), cap);
+}
 
-            return Space::create();
-        },
-        [&](Hj::VmoProps& props) -> Res<Arc<Object>> {
-            try$(self.ensure(Hj::Pledge::MEM));
+Res<> doCreateVmo(Task& self, Hj::Cap dest, User<Hj::Cap> out, usize phys, usize len, Flags<Hj::VmoFlags> flags, Hj::Cap vmoCap) {
+    try$(self.ensure(Hj::Pledge::MEM));
 
-            if (not props.vmo.isRoot()) {
-                auto vmo = try$(self.domain().get<Vmo>(props.vmo));
-                return Vmo::makeSlice(vmo, {props.phys, props.len});
-            }
+    if (not vmoCap.isRoot()) {
+        auto vmo = try$(self.domain().get<Vmo>(vmoCap));
+        auto object = try$(Vmo::makeSlice(vmo, {phys, len}));
+        auto cap = try$(self.domain().add(dest, object));
+        return out.store(self.space(), cap);
+    }
 
-            bool isDma = props.flags.has(Hj::VmoFlags::DMA);
-            if (isDma) {
-                try$(self.ensure(Hj::Pledge::HW));
-                return Vmo::makeDma({props.phys, props.len});
-            }
+    bool isDma = flags.has(Hj::VmoFlags::DMA);
+    if (isDma) {
+        try$(self.ensure(Hj::Pledge::HW));
+        auto object = try$(Vmo::makeDma({phys, len}));
+        auto cap = try$(self.domain().add(dest, object));
+        return out.store(self.space(), cap);
+    }
 
-            if (props.len > 2_GiB)
-                return Error::invalidInput("Vmo size too large");
+    if (len > 2_GiB)
+        return Error::invalidInput("Vmo size too large");
 
-            return Vmo::alloc(props.len, props.flags);
-        },
-        [&](Hj::IopProps& props) -> Res<Arc<Object>> {
-            try$(self.ensure(Hj::Pledge::HW));
-            return Iop::create({props.base, props.len});
-        },
-        [&](Hj::ChannelProps& props) -> Res<Arc<Object>> {
-            return Channel::create(props.bufCap, props.capsCap);
-        },
-        [&](Hj::IrqProps& props) -> Res<Arc<Object>> {
-            try$(self.ensure(Hj::Pledge::HW));
-            return Irq::create(props.irq);
-        },
-        [&](Hj::ListenerProps&) -> Res<Arc<Object>> {
-            return Listener::create();
-        },
-        [&](Hj::PipeProps& props) -> Res<Arc<Object>> {
-            return Pipe::create(props.bufCap);
-        },
-        [&](Hj::ClockProps&) -> Res<Arc<Object>> {
-            return Clock::create();
-        },
-        [&](Hj::JobProps& props) -> Res<Arc<Object>> {
-            try$(self.ensure(Hj::Pledge::TASK));
-            auto parent = props.parent.isRoot()
-                              ? self._job
-                              : try$(self.domain().get<Job>(props.parent));
-            return Job::create(parent);
-        }
-    ));
+    auto object = try$(Vmo::alloc(len, flags));
+    auto cap = try$(self.domain().add(dest, object));
+    return out.store(self.space(), cap);
+}
 
-    return out.store(self.space(), try$(self.domain().add(dest, obj)));
+Res<> doCreateIop(Task& self, Hj::Cap dest, User<Hj::Cap> out, usize base, usize len) {
+    try$(self.ensure(Hj::Pledge::HW));
+    auto object = try$(Iop::create({base, len}));
+    auto cap = try$(self.domain().add(dest, object));
+    return out.store(self.space(), cap);
+}
+
+Res<> doCreateChannel(Task& self, Hj::Cap dest, User<Hj::Cap> out, usize bufCap, usize capsCap) {
+    auto object = try$(Channel::create(bufCap, capsCap));
+    auto cap = try$(self.domain().add(dest, object));
+    return out.store(self.space(), cap);
+}
+
+Res<> doCreateIrq(Task& self, Hj::Cap dest, User<Hj::Cap> out, usize irq) {
+    try$(self.ensure(Hj::Pledge::HW));
+    auto object = try$(Irq::create(irq));
+    auto cap = try$(self.domain().add(dest, object));
+    return out.store(self.space(), cap);
+}
+
+Res<> doCreateListener(Task& self, Hj::Cap dest, User<Hj::Cap> out) {
+    auto object = try$(Listener::create());
+    auto cap = try$(self.domain().add(dest, object));
+    return out.store(self.space(), cap);
+}
+
+Res<> doCreatePipe(Task& self, Hj::Cap dest, User<Hj::Cap> out, usize bufCap) {
+    auto object = try$(Pipe::create(bufCap));
+    auto cap = try$(self.domain().add(dest, object));
+    return out.store(self.space(), cap);
+}
+
+Res<> doCreateClock(Task& self, Hj::Cap dest, User<Hj::Cap> out) {
+    auto object = try$(Clock::create());
+    auto cap = try$(self.domain().add(dest, object));
+    return out.store(self.space(), cap);
+}
+
+Res<> doCreateJob(Task& self, Hj::Cap dest, User<Hj::Cap> out, Hj::Cap parentCap) {
+    try$(self.ensure(Hj::Pledge::TASK));
+
+    auto parent = parentCap.isRoot()
+                      ? self._job
+                      : try$(self.domain().get<Job>(parentCap));
+
+    auto object = try$(Job::create(parent));
+    auto cap = try$(self.domain().add(dest, object));
+    return out.store(self.space(), cap);
 }
 
 Res<> doLabel(Task& self, Hj::Cap cap, UserSlice<Str> label) {
@@ -341,8 +365,38 @@ Res<> dispatchSyscall(Task& self, Hj::Syscall id, Hj::Args args) {
     case Hj::Syscall::LOG:
         return doLog(self, {args[0], args[1]});
 
-    case Hj::Syscall::CREATE:
-        return doCreate(self, Hj::Cap{args[0]}, args[1], args[2]);
+    case Hj::Syscall::CREATE_DOMAIN:
+        return doCreateDomain(self, Hj::Cap{args[0]}, args[1]);
+
+    case Hj::Syscall::CREATE_TASK:
+        return doCreateTask(self, Hj::Cap{args[0]}, args[1], Hj::Cap{args[2]}, Hj::Cap{args[3]}, Hj::Cap{args[4]});
+
+    case Hj::Syscall::CREATE_SPACE:
+        return doCreateSpace(self, Hj::Cap{args[0]}, args[1]);
+
+    case Hj::Syscall::CREATE_VMO:
+        return doCreateVmo(self, Hj::Cap{args[0]}, args[1], args[2], args[3], Flags<Hj::VmoFlags>::fromUnderlying(args[4]), Hj::Cap{args[5]});
+
+    case Hj::Syscall::CREATE_IOP:
+        return doCreateIop(self, Hj::Cap{args[0]}, args[1], args[2], args[3]);
+
+    case Hj::Syscall::CREATE_CHANNEL:
+        return doCreateChannel(self, Hj::Cap{args[0]}, args[1], args[2], args[3]);
+
+    case Hj::Syscall::CREATE_IRQ:
+        return doCreateIrq(self, Hj::Cap{args[0]}, args[1], args[2]);
+
+    case Hj::Syscall::CREATE_LISTENER:
+        return doCreateListener(self, Hj::Cap{args[0]}, args[1]);
+
+    case Hj::Syscall::CREATE_PIPE:
+        return doCreatePipe(self, Hj::Cap{args[0]}, args[1], args[2]);
+
+    case Hj::Syscall::CREATE_CLOCK:
+        return doCreateClock(self, Hj::Cap{args[0]}, args[1]);
+
+    case Hj::Syscall::CREATE_JOB:
+        return doCreateJob(self, Hj::Cap{args[0]}, args[1], Hj::Cap{args[2]});
 
     case Hj::Syscall::LABEL:
         return doLabel(self, Hj::Cap{args[0]}, {args[1], args[2]});

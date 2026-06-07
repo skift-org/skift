@@ -237,10 +237,11 @@ export struct Io : Object {
 export struct Channel : Object {
     using Object::Object;
 
-    static Res<Channel> create(Cap dest, usize bufLen, usize capLen) {
-        Cap cap;
-        try$(_createChannel(dest, &cap, bufLen, capLen));
-        return Ok(Channel{cap});
+    static Res<Pair<Channel>> create(Cap dest, usize bufLen, usize capLen) {
+        Cap cap0;
+        Cap cap1;
+        try$(_createChannel(dest, &cap0, &cap1, bufLen, capLen));
+        return Ok(Pair<Channel>{cap0, cap1});
     }
 
     Res<SentRecv> send(Bytes buf, Slice<Cap> caps) {

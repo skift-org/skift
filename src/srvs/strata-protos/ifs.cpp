@@ -8,25 +8,11 @@ using namespace Karm;
 
 namespace Strata::IFs {
 
-export using Fid = usize;
-
-export struct Open {
-    using Response = Fid;
-    Vec<String> path;
-    Flags<Sys::OpenOption> options;
-};
-
-export struct Close {
-    using Response = None;
-    Fid fid;
-};
-
 export struct Read {
     struct Response {
         Vec<u8> buf;
     };
 
-    Fid fid;
     usize off;
     usize len;
 };
@@ -34,27 +20,23 @@ export struct Read {
 export struct Write {
     using Response = usize;
 
-    Fid fid;
-
     usize off;
     Vec<u8> buf;
 };
 
 export struct ReadDir {
     using Response = Vec<Sys::DirEntry>;
-
-    Fid fid;
+    u8 _unused;
 };
 
 export struct Stat {
     using Response = Sys::Stat;
-
-    Fid fid;
+    u8 _unused;
 };
 
 export struct Mmap {
     using Response = Rc<Sys::Fd>;
-    Fid fid;
+    u8 _unused;
 };
 
 } // namespace Strata::IFs

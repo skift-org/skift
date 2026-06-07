@@ -20,7 +20,6 @@ Res<> _syscall(Syscall s, Arg a0 = 0, Arg a1 = 0, Arg a2 = 0, Arg a3 = 0, Arg a4
 
     if (c != Error::Code::_OK)
         return Error(c, nullptr);
-
     return Ok();
 }
 
@@ -100,8 +99,8 @@ export Res<> _createIop(Cap dest, Cap* cap, usize base, usize len) {
     return _syscall(Syscall::CREATE_IOP, dest.raw(), (Arg)cap, base, len);
 }
 
-export Res<> _createChannel(Cap dest, Cap* cap, usize bufCap, usize capsCap) {
-    return _syscall(Syscall::CREATE_CHANNEL, dest.raw(), (Arg)cap, bufCap, capsCap);
+export Res<> _createChannel(Cap dest, Cap* cap0, Cap* cap1, usize bufCap, usize capsCap) {
+    return _syscall(Syscall::CREATE_CHANNEL, dest.raw(), (Arg)cap0, (Arg)cap1, bufCap, capsCap);
 }
 
 export Res<> _createIrq(Cap dest, Cap* cap, usize irq) {
@@ -166,10 +165,6 @@ export Res<> _send(Cap cap, u8 const* buf, usize bufLen, Cap const* caps, usize 
 
 export Res<> _recv(Cap cap, u8* buf, usize* bufLen, Cap* caps, usize* capLen) {
     return _syscall(Syscall::RECV, cap.raw(), (Arg)buf, (Arg)bufLen, (Arg)caps, (Arg)capLen);
-}
-
-export Res<> _close(Cap cap) {
-    return _syscall(Syscall::CLOSE, cap.raw());
 }
 
 export Res<> _signal(Cap cap, Flags<Sigs> set, Flags<Sigs> unset) {

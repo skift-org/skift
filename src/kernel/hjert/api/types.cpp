@@ -78,7 +78,6 @@ export Str toStr(Type type) {
     SYSCALL(OUT)                 \
     SYSCALL(SEND)                \
     SYSCALL(RECV)                \
-    SYSCALL(CLOSE)               \
     SYSCALL(SIGNAL)              \
     SYSCALL(LISTEN)              \
     SYSCALL(POLL)                \

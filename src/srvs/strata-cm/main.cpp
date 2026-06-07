@@ -24,7 +24,7 @@ static constexpr bool DEBUG_COMPONENT = false;
 
 namespace Strata::Bus {
 
-static Res<Hj::Task> loadElf(String id, Rc<Sys::Skift::DuplexFd> fd) {
+static Res<Hj::Task> loadElf(String id, Rc<Sys::Skift::ChannelFd> fd) {
     auto& handover = Sys::Skift::useHandover();
     auto bootfs = try$(Sys::Skift::Bootfs::ensure());
 
@@ -91,10 +91,8 @@ static Res<Hj::Task> loadElf(String id, Rc<Sys::Skift::DuplexFd> fd) {
         stackRange.end(),
         {
             handoverVrange.start,
-
-            // NOTE: In and out are intentionally swapped
-            outCap.slot(),
             inCap.slot(),
+            outCap.slot(),
         }
     ));
 
@@ -113,9 +111,9 @@ struct ComponentManager {
             : _cm(cm), _id(id), _conn(std::move(conn)), _task(std::move(task)) {}
 
         Res<> _handleConnect(Ipc::Message& msg) {
-            auto [fd, url] = try$(msg.unpack<ICm::Connect>());
-            logDebugIf(DEBUG_COMPONENT, "'{}' requested connection to '{}'", _id, url);
-            return _cm.connect(try$(fd.okOr(Error::invalidHandle("missing "))), url);
+            auto connect = try$(msg.unpack<ICm::Connect>());
+            logDebugIf(DEBUG_COMPONENT, "'{}' requested connection to '{}'", _id, connect.url);
+            return _cm.connect(connect);
         }
 
         Res<> _handleLaunch(Ipc::Message& msg) {
@@ -143,9 +141,9 @@ struct ComponentManager {
             return Ipc::send<T>(_conn, Ipc::SEQ_EVENT, payload);
         }
 
-        Res<> incoming(Rc<Sys::Fd> fd) {
+        Res<> incoming(ICm::Connect const& connect) {
             logDebugIf(DEBUG_COMPONENT, "notifying '{}' of incoming connection", _id);
-            return notify(ICm::Incoming{fd});
+            return notify(connect);
         }
 
         bool operator==(Component const& other) const {
@@ -179,10 +177,10 @@ struct ComponentManager {
     Res<> start(Str id, bool exported) {
         logDebugIf(DEBUG_COMPONENT, "starting '{}' (exported: {})...", id, exported);
 
-        auto fd = try$(Sys::Skift::DuplexFd::create(id));
-        auto task = try$(loadElf(id, fd));
+        auto [fd0, fd1] = try$(Sys::Skift::ChannelFd::create(id));
+        auto task = try$(loadElf(id, fd0));
 
-        auto component = makeRc<Component>(*this, id, Sys::IpcConnection{fd, "ipc:"_url}, std::move(task));
+        auto component = makeRc<Component>(*this, id, Sys::IpcConnection{{fd1, "ipc:"_url}}, std::move(task));
         _active.pushBack(component);
 
         if (exported) {
@@ -197,12 +195,13 @@ struct ComponentManager {
         return Ok();
     }
 
-    Res<> connect(Rc<Sys::Fd> fd, Ref::Url url) {
+    Res<> connect(ICm::Connect const& connect) {
+        logDebug("connect: {:#} {}", connect.url.scheme, connect.url);
         auto component = try$(
-            _exported.lookup(url.host.str())
+            _exported.lookup(connect.url.scheme == "file" ? "strata-fs"s : connect.url.host.str())
                 .okOr(Error::notFound("component not found"))
         );
-        return component->incoming(fd);
+        return component->incoming(connect);
     }
 
     Async::Task<> runAsync() {
@@ -224,11 +223,11 @@ Async::Task<> entryPointAsync(Sys::Env&, Async::CancellationToken) {
     co_return co_await cm.runAsync();
 }
 
-void __panicHandler(Karm::PanicKind kind, char const* msg, usize len);
+void __panicHandler(PanicKind kind, char const* msg, usize len);
 
 extern "C" void __entryPoint(usize rawHandover) {
     Abi::SysV::init();
-    Karm::registerPanicHandler(__panicHandler);
+    registerPanicHandler(__panicHandler);
 
     Sys::Skift::globalPayload = reinterpret_cast<Handover::Payload*>(rawHandover);
 

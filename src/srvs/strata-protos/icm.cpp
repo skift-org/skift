@@ -15,10 +15,6 @@ export struct Connect {
     Ref::Url url;
 };
 
-export struct Incoming {
-    Opt<Rc<Sys::Fd>> fd;
-};
-
 export struct Launch {
     Ref::Url url;
 };

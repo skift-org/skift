@@ -262,10 +262,8 @@ extern "C" usize _sysDispatch(usize sp) {
         }
     );
 
-    if (not result) {
+    if (not result)
         return (usize)result.none().code();
-    }
-
     return (usize)Error::_OK;
 }
 

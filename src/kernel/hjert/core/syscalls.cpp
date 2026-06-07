@@ -117,10 +117,25 @@ Res<> doCreateIop(Task& self, Hj::Cap dest, User<Hj::Cap> out, usize base, usize
     return out.store(self.space(), cap);
 }
 
-Res<> doCreateChannel(Task& self, Hj::Cap dest, User<Hj::Cap> out, usize bufCap, usize capsCap) {
-    auto object = try$(Channel::create(bufCap, capsCap));
-    auto cap = try$(self.domain().add(dest, object));
-    return out.store(self.space(), cap);
+Res<> doCreateChannel(Task& self, Hj::Cap dest, User<Hj::Cap> out0, User<Hj::Cap> out1, usize bufCap, usize capsCap) {
+    auto [o0, o1] = try$(Channel::create(bufCap, capsCap));
+
+    auto cap0 = try$(self.domain().add(dest, o0));
+    Defer d0 = [&] {
+        (void)self.domain().drop(cap0);
+    };
+    try$(out0.store(self.space(), cap0));
+
+    auto cap1 = try$(self.domain().add(dest, o1));
+    Defer d1 = [&] {
+        (void)self.domain().drop(cap1);
+    };
+    try$(out1.store(self.space(), cap1));
+
+    d0.disarm();
+    d1.disarm();
+
+    return Ok();
 }
 
 Res<> doCreateIrq(Task& self, Hj::Cap dest, User<Hj::Cap> out, usize irq) {
@@ -272,11 +287,6 @@ Res<> doRecv(Task& self, Hj::Cap cap, UserSlice<MutBytes> buf, User<Hj::Arg> buf
     );
 }
 
-Res<> doClose(Task& self, Hj::Cap cap) {
-    auto obj = try$(self.domain().get<Channel>(cap));
-    return obj->close();
-}
-
 Res<> doSignal(Task& self, Hj::Cap cap, Hj::Sigs set, Hj::Sigs unset) {
     if (cap.isRoot()) {
         self.signal(set, unset);
@@ -381,7 +391,7 @@ Res<> dispatchSyscall(Task& self, Hj::Syscall id, Hj::Args args) {
         return doCreateIop(self, Hj::Cap{args[0]}, args[1], args[2], args[3]);
 
     case Hj::Syscall::CREATE_CHANNEL:
-        return doCreateChannel(self, Hj::Cap{args[0]}, args[1], args[2], args[3]);
+        return doCreateChannel(self, Hj::Cap{args[0]}, args[1], args[2], args[3], args[4]);
 
     case Hj::Syscall::CREATE_IRQ:
         return doCreateIrq(self, Hj::Cap{args[0]}, args[1], args[2]);
@@ -446,9 +456,6 @@ Res<> dispatchSyscall(Task& self, Hj::Syscall id, Hj::Args args) {
         );
     }
 
-    case Hj::Syscall::CLOSE:
-        return doClose(self, Hj::Cap{args[0]});
-
     case Hj::Syscall::SIGNAL:
         return doSignal(self, Hj::Cap{args[0]}, (Hj::Sigs)args[1], (Hj::Sigs)args[2]);
 
@@ -507,7 +514,7 @@ export Res<> doSyscall(Hj::Syscall syscall, Hj::Args args) {
     logDebugIf(DEBUG_SYSCALLS, "{}: Syscall {}({}) with params {:#x}", self, Hj::toStr(syscall), (Hj::Arg)syscall, args);
     auto res = dispatchSyscall(self, syscall, args);
     if (not res)
-        logError("{}: Syscall {}({}) with params {:#x} failed: {}", self, Hj::toStr(syscall), (Hj::Arg)syscall, args, res.none().msg());
+        logWarn("{}: Syscall {}({}) with params {:#x} failed: {}", self, Hj::toStr(syscall), (Hj::Arg)syscall, args, res.none().msg());
 
     self.leave();
     return res;

@@ -12,8 +12,8 @@ using namespace Karm;
 namespace Hjert::Core {
 
 export struct Pipe : BaseObject<Pipe, Hj::Type::PIPE> {
-    bool _closed;
     Ring<u8> _bytes;
+    bool _closed;
 
     static Res<Arc<Pipe>> create(usize bufCap = 4096) {
         return Ok(makeArc<Pipe>(bufCap));
@@ -75,13 +75,6 @@ export struct Pipe : BaseObject<Pipe, Hj::Type::PIPE> {
         _updateSignalsUnlock();
 
         return Ok(read);
-    }
-
-    Res<> close() {
-        ObjectLockScope _{*this};
-        _closed = true;
-        _updateSignalsUnlock();
-        return Ok();
     }
 };
 

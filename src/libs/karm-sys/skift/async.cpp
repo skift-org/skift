@@ -44,7 +44,7 @@ struct SkiftSched : Sys::Sched {
         } else if (auto ipc = fd.is<Skift::PipeFd>()) {
             auto& chan = ipc->_pipe;
 
-            co_trya$(waitFor(chan.cap(), Hj::Sigs::READABLE, Hj::Sigs::NONE));
+            co_trya$(waitFor(chan.cap(), {Hj::Sigs::READABLE, Hj::Sigs::CLOSED}, Hj::Sigs::NONE));
             static_assert(sizeof(Handle) == sizeof(Hj::Cap) and alignof(Handle) == alignof(Hj::Cap));
             co_return chan.read(buf);
         } else if (auto vmo = fd.is<Skift::VmoFd>()) {
@@ -60,7 +60,7 @@ struct SkiftSched : Sys::Sched {
         } else if (auto ipc = fd.is<Skift::PipeFd>()) {
             auto& chan = ipc->_pipe;
 
-            co_trya$(waitFor(chan.cap(), Hj::Sigs::WRITABLE, Hj::Sigs::NONE));
+            co_trya$(waitFor(chan.cap(), {Hj::Sigs::WRITABLE, Hj::Sigs::CLOSED}, Hj::Sigs::NONE));
             static_assert(sizeof(Handle) == sizeof(Hj::Cap) and alignof(Handle) == alignof(Hj::Cap));
             co_return chan.write(buf);
         }
@@ -79,20 +79,20 @@ struct SkiftSched : Sys::Sched {
 
         while (true) {
             auto msg = co_trya$(Skift::globalClient().recvAsync(ct));
-            auto incomming = co_try$(msg->unpack<Strata::ICm::Incoming>());
+            auto incoming = co_try$(msg->unpack<Strata::ICm::Connect>());
 
-            if (not incomming.fd)
+            if (not incoming.fd)
                 continue;
 
-            co_return Ok<_Accepted>(incomming.fd.take(), Ip4::unspecified(0));
+            co_return Ok<_Accepted>(incoming.fd.take(), std::move(incoming.url));
         }
     }
 
     Async::Task<_Sent> sendAsync(Rc<Fd> fd, Bytes buf, Slice<Handle> hnds, SocketAddr, Async::CancellationToken) override {
-        if (auto ipc = fd.is<Skift::DuplexFd>()) {
+        if (auto ipc = fd.is<Skift::ChannelFd>()) {
             auto& chan = ipc->_out;
 
-            co_trya$(waitFor(chan.cap(), Hj::Sigs::WRITABLE, Hj::Sigs::NONE));
+            co_trya$(waitFor(chan.cap(), {Hj::Sigs::WRITABLE, Hj::Sigs::CLOSED}, Hj::Sigs::NONE));
             static_assert(sizeof(Handle) == sizeof(Hj::Cap) and alignof(Handle) == alignof(Hj::Cap));
             co_try$(chan.send(buf, hnds.cast<Hj::Cap>()));
 
@@ -103,10 +103,10 @@ struct SkiftSched : Sys::Sched {
     }
 
     Async::Task<_Received> recvAsync(Rc<Fd> fd, MutBytes buf, MutSlice<Handle> hnds, Async::CancellationToken) override {
-        if (auto ipc = fd.is<Skift::DuplexFd>()) {
+        if (auto ipc = fd.is<Skift::ChannelFd>()) {
             auto& chan = ipc->_in;
 
-            co_trya$(waitFor(chan.cap(), Hj::Sigs::READABLE, Hj::Sigs::NONE));
+            co_trya$(waitFor(chan.cap(), {Hj::Sigs::READABLE, Hj::Sigs::CLOSED}, Hj::Sigs::NONE));
             static_assert(sizeof(Handle) == sizeof(Hj::Cap) and alignof(Handle) == alignof(Hj::Cap));
             auto [len, hndsLen] = co_try$(chan.recv(buf, hnds.cast<Hj::Cap>()));
 

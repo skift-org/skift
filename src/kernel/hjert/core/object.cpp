@@ -38,7 +38,7 @@ export struct Object : Meta::Pinned {
         _signals &= ~unset;
     }
 
-    Flags<Hj::Sigs> _pollUnlock() {
+    virtual Flags<Hj::Sigs> _pollUnlock() {
         return _signals;
     }
 

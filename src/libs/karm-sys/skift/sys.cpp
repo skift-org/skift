@@ -8,6 +8,7 @@ module Karm.Sys;
 import Karm.Ref;
 import Karm.Logger;
 import Karm.Sys.Skift;
+import Karm.Ipc;
 import Strata.Protos;
 import Hjert.Api;
 
@@ -24,7 +25,7 @@ Res<Rc<Fd>> deserializeFd(Serde::Deserializer& de) {
     } else if (type == Skift::FdType::DUPLEX) {
         auto [_, in] = try$(scope.deserializeUnit<Hj::Channel>({.kind = Serde::Type::OBJECT_ITEM}));
         auto [_, out] = try$(scope.deserializeUnit<Hj::Channel>({.kind = Serde::Type::OBJECT_ITEM}));
-        result = Ok(makeRc<Skift::DuplexFd>(std::move(in), std::move(out)));
+        result = Ok(makeRc<Skift::ChannelFd>(std::move(in), std::move(out)));
     } else if (type == Skift::FdType::PIPE) {
         auto [_, pipe] = try$(scope.deserializeUnit<Hj::Pipe>({.kind = Serde::Type::OBJECT_ITEM}));
         result = Ok(makeRc<Skift::PipeFd>(std::move(pipe)));
@@ -57,21 +58,10 @@ static Res<Ref::Path> _resolveUrl(Ref::Url const& url) {
     }
 }
 
-Res<Rc<Fd>> openFile(Ref::Url const& url, Flags<OpenOption> options) {
+Res<Rc<Fd>> openFile(Ref::Url const& url, Flags<OpenOption>) {
     auto path = try$(_resolveUrl(url));
-    auto fid = try$(
-        Sys::run(
-            Skift::globalFsClient()
-                .callAsync<Strata::IFs::Open>(
-                    {
-                        path._segs,
-                        options,
-                    },
-                    Async::CancellationToken::uninterruptible()
-                )
-        )
-    );
-    return Ok(makeRc<Skift::FsFd>(fid));
+    auto file = try$(Async::run(Ipc::Client::connectAsync("file:"_url / path, Async::CancellationToken::uninterruptible())));
+    return Ok(makeRc<Skift::FsFd>(std::move(file)));
 }
 
 Res<Pair<Rc<Fd>, Rc<Fd>>> createPipe() {
@@ -92,16 +82,8 @@ Res<Rc<Fd>> createErr() {
 
 Async::Task<Vec<DirEntry>> readDirAsync(Ref::Url const& url, Async::CancellationToken ct) {
     auto path = co_try$(_resolveUrl(url));
-    auto& fs = Skift::globalFsClient();
-    auto fid = co_trya$(fs.callAsync<Strata::IFs::Open>(
-        {
-            path._segs,
-            {OpenOption::READ},
-        },
-        ct
-    ));
-    auto result = co_await fs.callAsync<Strata::IFs::ReadDir>({fid}, ct);
-    co_trya$(fs.callAsync<Strata::IFs::Close>({fid}, ct));
+    auto dir = co_trya$(Ipc::Client::connectAsync("file:"_url / path, ct));
+    auto result = co_trya$(dir.callAsync<Strata::IFs::ReadDir>({}, ct));
     co_return result;
 }
 
@@ -159,9 +141,9 @@ Res<Rc<Fd>> listenUdp(SocketAddr) {
 }
 
 Res<Rc<Fd>> connectIpc(Ref::Url url) {
-    auto fd = try$(Skift::DuplexFd::create(url.host.str()));
-    try$(Skift::globalClient().notify(Strata::ICm::Connect{try$(fd->swap()), url}));
-    return Ok(fd);
+    auto [chan0, chan1] = try$(Skift::ChannelFd::create(url.host.str()));
+    try$(Skift::globalClient().notify(Strata::ICm::Connect{chan1, url}));
+    return Ok(chan0);
 }
 
 Res<Rc<Fd>> listenIpc(Ref::Url) {
@@ -194,11 +176,9 @@ Res<MmapResult> memMap(MmapProps const& props, Rc<Fd> fd) {
     if (auto it = fd.is<Skift::FsFd>()) {
         auto vmoFd = try$(
             Sys::run(
-                Skift::globalFsClient()
+                it->_client
                     .callAsync<Strata::IFs::Mmap>(
-                        {
-                            it->_fid,
-                        },
+                        {},
                         Async::CancellationToken::uninterruptible()
                     )
             )

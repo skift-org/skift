@@ -67,21 +67,26 @@ export struct VmoFd : NullFd {
     }
 };
 
-export struct DuplexFd : NullFd {
+export struct ChannelFd : NullFd {
     Hj::Channel _in;
     Hj::Channel _out;
 
-    static Res<Rc<DuplexFd>> create(Str label) {
-        auto in = try$(Hj::Channel::create(Hj::Domain::self(), 64_KiB, 128));
-        try$(in.label(Io::format("{}-in", label)));
+    static Res<Pair<Rc<ChannelFd>, Rc<ChannelFd>>> create(Str label) {
+        auto [in0, out0] = try$(Hj::Channel::create(Hj::Domain::self(), 64_KiB, 128));
+        try$(in0.label(Io::format("{}-in0", label)));
+        try$(out0.label(Io::format("{}-out0", label)));
 
-        auto out = try$(Hj::Channel::create(Hj::Domain::self(), 64_KiB, 128));
-        try$(out.label(Io::format("{}-out", label)));
+        auto [in1, out1] = try$(Hj::Channel::create(Hj::Domain::self(), 64_KiB, 128));
+        try$(in1.label(Io::format("{}-in1", label)));
+        try$(out1.label(Io::format("{}-out1", label)));
 
-        return Ok(makeRc<DuplexFd>(std::move(in), std::move(out)));
+        return Ok(Pair{
+            makeRc<ChannelFd>(std::move(in0), std::move(out1)),
+            makeRc<ChannelFd>(std::move(in1), std::move(out0)),
+        });
     }
 
-    DuplexFd(Hj::Channel in, Hj::Channel out)
+    ChannelFd(Hj::Channel in, Hj::Channel out)
         : _in(std::move(in)), _out(std::move(out)) {}
 
     Res<_Sent> send(Bytes buf, Slice<Handle> hnds, SocketAddr) override {
@@ -92,15 +97,6 @@ export struct DuplexFd : NullFd {
     Res<_Received> recv(MutBytes buf, MutSlice<Handle> hnds) override {
         auto [bytes, caps] = try$(_in.recv(buf, hnds.cast<Hj::Cap>()));
         return Ok<_Received>(bytes, caps, Ip4::unspecified(0)); // FIXME: Placeholder address
-    }
-
-    Res<Rc<DuplexFd>> swap() {
-        return Ok(
-            makeRc<DuplexFd>(
-                try$(_out.dup(Hj::ROOT)),
-                try$(_in.dup(Hj::ROOT))
-            )
-        );
     }
 
     Res<> serialize(Serde::Serializer& ser) const override {
@@ -132,17 +128,10 @@ export struct PipeFd : NullFd {
 };
 
 export struct FsFd : Fd {
-    Strata::IFs::Fid _fid;
+    Ipc::Client _client;
     usize _off = 0;
 
-    FsFd(Strata::IFs::Fid fid) : _fid(fid) {}
-
-    ~FsFd() {
-        (void)Sys::run(
-            globalFsClient().callAsync<Strata::IFs::Close>({_fid}, Async::CancellationToken::uninterruptible())
-        )
-            .unwrap();
-    }
+    FsFd(Ipc::Client client) : _client(std::move(client)) {}
 
     Async::Task<usize> readAsync(MutBytes buf, Async::CancellationToken ct) {
         usize total = 0;
@@ -150,9 +139,8 @@ export struct FsFd : Fd {
         while (total < buf.len()) {
             auto chunk = min(buf.len() - total, Ipc::MAX_TRANSFER_SIZE);
             auto response = co_trya$(
-                globalFsClient().callAsync(
+                _client.callAsync(
                     Strata::IFs::Read{
-                        _fid,
                         _off,
                         chunk,
                     },
@@ -181,9 +169,8 @@ export struct FsFd : Fd {
         while (total < buf.len()) {
             auto chunk = min(buf.len() - total, Ipc::MAX_TRANSFER_SIZE);
             auto written = co_trya$(
-                globalFsClient().callAsync(
+                _client.callAsync(
                     Strata::IFs::Write{
-                        _fid,
                         _off,
                         sub(buf, total, total + chunk),
                     },
@@ -233,7 +220,7 @@ export struct FsFd : Fd {
     }
 
     Async::Task<Stat> statAsync(Async::CancellationToken ct) {
-        co_return co_await globalFsClient().callAsync(Strata::IFs::Stat{_fid}, ct);
+        co_return co_await _client.callAsync<Strata::IFs::Stat>({}, ct);
     }
 
     Res<Stat> stat() override {

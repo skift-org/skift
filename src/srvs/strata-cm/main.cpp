@@ -2,7 +2,6 @@
 #include <karm/macros>
 #include <vaerk-handover/spec.h>
 
-import Karm.Dl.Elf;
 import Karm.Ipc;
 import Karm.Logger;
 import Karm.Ref;
@@ -13,91 +12,15 @@ import Abi.SysV;
 import Hjert.Api;
 
 import Strata.Protos;
+import Strata.Cm;
 
 using namespace Karm;
 using namespace Karm::Literals;
 using namespace Karm::Ref::Literals;
 
-static constexpr bool DEBUG_TASK = false;
-static constexpr bool DEBUG_ELF = false;
 static constexpr bool DEBUG_COMPONENT = false;
 
-namespace Strata::Bus {
-
-static Res<Hj::Task> loadElf(String id, Rc<Sys::Skift::ChannelFd> fd) {
-    auto& handover = Sys::Skift::useHandover();
-    auto bootfs = try$(Sys::Skift::Bootfs::ensure());
-
-    logDebugIf(DEBUG_ELF, "mapping elf...");
-    auto elfPath = Io::format("bundles/{}/bin/{}.elf", id, id);
-    auto [elfVmo, _] = try$(bootfs->openVmo(elfPath.str()));
-    auto elfRange = try$(Hj::map(elfVmo, Hj::MapFlags::READ));
-
-    logDebugIf(DEBUG_ELF, "creating address space...");
-    auto elfSpace = try$(Hj::Space::create(Hj::ROOT));
-
-    logDebugIf(DEBUG_ELF, "validating elf...");
-    Elf::ElfObject<Elf::CurrentAbi> object{elfRange.bytes()};
-    try$(object.validate());
-
-    logDebugIf(DEBUG_ELF, "mapping the elf...");
-    for (Elf::ElfProgram prog : object.iterProgram()) {
-        if (prog.type() != Elf::ElfPhdrType::PT_LOAD)
-            continue;
-
-        usize size = alignUp(max(prog.p_memsz, prog.p_filesz), Hal::PAGE_SIZE);
-        logDebugIf(DEBUG_ELF, "mapping section: {x}-{x}", prog.p_vaddr, prog.p_vaddr + size);
-
-        if (prog.p_flags.has(Elf::ElfPhdrFlags::PF_W)) {
-            auto sectionVmo = try$(Hj::Vmo::create(Hj::ROOT, 0, size, Hj::VmoFlags::UPPER));
-            try$(sectionVmo.label("elf-writeable"));
-            auto sectionRange = try$(Hj::map(sectionVmo, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
-            auto sectionBytes = sectionRange.mutBytes();
-            copy(prog.data, sectionBytes);
-            if (prog.p_memsz > prog.p_filesz) {
-                auto bss = mutNext(sectionBytes, prog.p_filesz);
-                zeroFill(bss);
-            }
-            try$(elfSpace.map(prog.p_vaddr, sectionVmo, 0, size, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
-        } else {
-            try$(elfSpace.map(prog.p_vaddr, elfVmo, prog.p_offset, size, {Hj::MapFlags::READ, Hj::MapFlags::EXEC}));
-        }
-    }
-
-    logDebugIf(DEBUG_ELF, "mapping the stack...");
-    auto stackVmo = try$(Hj::Vmo::create(Hj::ROOT, 0, 64_KiB, Hj::VmoFlags::UPPER));
-    try$(stackVmo.label("stack"));
-    auto stackRange = try$(elfSpace.map(0, stackVmo, 0, 0, {Hj::MapFlags::READ, Hj::MapFlags::WRITE}));
-
-    logDebugIf(DEBUG_TASK, "creating the task...");
-    auto domain = try$(Hj::Domain::create(Hj::ROOT));
-    auto job = try$(Hj::Job::create(Hj::ROOT, Hj::ROOT));
-    auto task = try$(Hj::Task::create(Hj::ROOT, job, domain, elfSpace));
-    try$(task.label(id));
-
-    logDebugIf(DEBUG_TASK, "mapping handover...");
-    auto const* handoverRecord = handover.findTag(Handover::Tag::SELF);
-    auto handoverVmo = try$(Hj::Vmo::create(Hj::ROOT, handoverRecord->start, handoverRecord->size, Hj::VmoFlags::DMA));
-    try$(handoverVmo.label("handover"));
-    auto handoverVrange = try$(elfSpace.map(0, handoverVmo, 0, 0, Hj::MapFlags::READ));
-
-    logDebugIf(DEBUG_TASK, "attaching channels...");
-    auto inCap = try$(domain.attach(fd->_in));
-    auto outCap = try$(domain.attach(fd->_out));
-
-    logDebugIf(DEBUG_TASK, "starting the task...");
-    try$(task.start(
-        object.header().e_entry,
-        stackRange.end(),
-        {
-            handoverVrange.start,
-            inCap.slot(),
-            outCap.slot(),
-        }
-    ));
-
-    return Ok(std::move(task));
-}
+namespace Strata::Cm {
 
 struct ComponentManager {
     struct Component {
@@ -105,10 +28,10 @@ struct ComponentManager {
 
         String _id;
         Sys::IpcConnection _conn;
-        Hj::Task _task;
+        Hj::Job _job;
 
-        Component(ComponentManager& cm, String id, Sys::IpcConnection conn, Hj::Task task)
-            : _cm(cm), _id(id), _conn(std::move(conn)), _task(std::move(task)) {}
+        Component(ComponentManager& cm, String id, Sys::IpcConnection conn, Hj::Job job)
+            : _cm(cm), _id(id), _conn(std::move(conn)), _job(std::move(job)) {}
 
         Res<> _handleConnect(Ipc::Message& msg) {
             auto connect = try$(msg.unpack<ICm::Connect>());
@@ -178,9 +101,9 @@ struct ComponentManager {
         logDebugIf(DEBUG_COMPONENT, "starting '{}' (exported: {})...", id, exported);
 
         auto [fd0, fd1] = try$(Sys::Skift::ChannelFd::create(id));
-        auto task = try$(loadElf(id, fd0));
+        auto job = try$(runElf(id, fd0));
 
-        auto component = makeRc<Component>(*this, id, Sys::IpcConnection{{fd1, "ipc:"_url}}, std::move(task));
+        auto component = makeRc<Component>(*this, id, Sys::IpcConnection{{fd1, "ipc:"_url}}, std::move(job));
         _active.pushBack(component);
 
         if (exported) {
@@ -196,7 +119,6 @@ struct ComponentManager {
     }
 
     Res<> connect(ICm::Connect const& connect) {
-        logDebug("connect: {:#} {}", connect.url.scheme, connect.url);
         auto component = try$(
             _exported.lookup(connect.url.scheme == "file" ? "strata-fs"s : connect.url.host.str())
                 .okOr(Error::notFound("component not found"))
@@ -215,11 +137,11 @@ struct ComponentManager {
     }
 };
 
-} // namespace Strata::Bus
+} // namespace Strata::Cm
 
 Async::Task<> entryPointAsync(Sys::Env&, Async::CancellationToken) {
     co_try$(Hj::Task::self().label("strata-cm"));
-    Strata::Bus::ComponentManager cm{};
+    Strata::Cm::ComponentManager cm{};
     co_return co_await cm.runAsync();
 }
 

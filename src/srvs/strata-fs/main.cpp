@@ -71,9 +71,7 @@ struct FsHandler : Ipc::Handler {
         : _root(root) {}
 
     Async::Task<Rc<Ipc::Session>> acceptSessionAsync(Sys::IpcConnection conn, Async::CancellationToken) override {
-        logDebug("open: {}", conn._url);
         auto node = co_trya$(_root->lookupAsync(conn.url().path));
-        debug("ok");
         co_return Ok(makeRc<FsNodeHandler>(std::move(conn), node));
     }
 };

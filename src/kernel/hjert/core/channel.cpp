@@ -87,13 +87,13 @@ export struct Channel : BaseObject<Channel, Hj::Type::CHANNEL> {
         Res<Hj::SentRecv> recv(Domain& dom, MutBytes bytes, MutSlice<Hj::Cap> caps) {
             LockScope _{_lock};
 
-            try$(ensureOpen());
-
             ObjectLockScope domScope{dom};
 
-            // Make sure everything is ready for the message
-            if (_sr.len() == 0)
+            if (_sr.len() == 0) {
+                if (_out == 0)
+                    return Error::brokenPipe("channel closed");
                 return Error::wouldBlock("no messages available");
+            }
 
             auto& [expectedBytes, expectedCaps] = _sr.peekFront(0);
             if (bytes.len() < expectedBytes)
@@ -119,13 +119,29 @@ export struct Channel : BaseObject<Channel, Hj::Type::CHANNEL> {
             return Ok<Hj::SentRecv>(expectedBytes, expectedCaps);
         }
 
-        Flags<Hj::Sigs> poll() {
+        Flags<Hj::Sigs> poll(Side side) {
             LockScope _{_lock};
-            return {
-                (_sr.len() > 0 ? Hj::Sigs::READABLE : Hj::Sigs::NONE),
-                (_sr.rem() > 0 ? Hj::Sigs::WRITABLE : Hj::Sigs::NONE),
-                (closed() ? Hj::Sigs::CLOSED : Hj::Sigs::NONE),
-            };
+
+            bool readable = _sr.len() > 0;
+            bool writable = _sr.rem() > 0;
+
+            Flags sigs = Hj::Sigs::NONE;
+
+            if (readable)
+                sigs |= Hj::Sigs::READABLE;
+
+            if (writable)
+                sigs |= Hj::Sigs::WRITABLE;
+
+            if (side == IN) {
+                if (_out == 0 and not readable)
+                    sigs |= Hj::Sigs::CLOSED;
+            } else {
+                if (_in == 0)
+                    sigs |= Hj::Sigs::CLOSED;
+            }
+
+            return sigs;
         }
     };
 
@@ -159,7 +175,7 @@ export struct Channel : BaseObject<Channel, Hj::Type::CHANNEL> {
 
     Flags<Hj::Sigs> _pollUnlock() override {
         auto base = _signals & ~Flags{Hj::Sigs::READABLE, Hj::Sigs::WRITABLE, Hj::Sigs::CLOSED};
-        return _state->poll() | base;
+        return _state->poll(_side) | base;
     }
 };
 

@@ -8,6 +8,7 @@ import Karm.Ipc;
 import Karm.Logger;
 import Karm.Math;
 import Karm.Ui;
+import Karm.Kira;
 
 import Strata.Protos;
 import Hideo.Shell;
@@ -253,6 +254,10 @@ struct Compositor {
         Ui::event<Hideo::Shell::WindowFlipEvent>(*_root, window, region);
     }
 
+    void sessionCrashed() {
+        Ui::showDialog(*_root, Karm::Kira::alertDialog("Application Crashed!"s, "An application crashed"s));
+    }
+
     void shouldRepaint() {
         Ui::shouldRepaint(*_root);
     }
@@ -266,6 +271,14 @@ struct CompositorSession : Ipc::Session {
         : Session(std::move(conn)),
           _compositor(compositor) {}
 
+    ~CompositorSession() {
+        bool forcedClosed = _windows.len();
+        for (auto& window : _windows.iterValue())
+            _compositor->destroyWindow(window);
+        if (forcedClosed)
+            _compositor->sessionCrashed();
+    }
+
     Res<IShell::WindowCreate::Response> _handleWindowCreate(Ipc::Message& message) {
         auto [want] = try$(message.unpack<IShell::WindowCreate>());
 
@@ -277,13 +290,13 @@ struct CompositorSession : Ipc::Session {
         return Ok<IShell::WindowCreate::Response>(id, offer);
     }
 
-    Res<IShell::WindowDestroy::Response> _handleWindowDestroy(Ipc::Message& message) {
+    Res<> _handleWindowDestroy(Ipc::Message& message) {
         auto [windowId] = try$(message.unpack<IShell::WindowDestroy>());
         _compositor->destroyWindow(try$(_windows.remove(windowId).okOr(Error::invalidInput("invalid window id"))));
         return Ok();
     }
 
-    Res<IShell::WindowAttach::Response> _handleWindowAttach(Ipc::Message& message) {
+    Res<> _handleWindowAttach(Ipc::Message& message) {
         auto [windowId, buffer] = try$(message.unpack<IShell::WindowAttach>());
 
         auto window = try$(_windows.lookup(windowId).okOr(Error::invalidInput("invalid window id")));
@@ -345,7 +358,7 @@ struct CompositorHandler : Ipc::Handler {
     explicit CompositorHandler(Rc<Compositor> compositor)
         : _compositor(compositor) {}
 
-    Async::Task<Rc<Ipc::Session>> acceptSessionAsync(Sys::IpcConnection conn, Async::CancellationToken) override {
+    Async::Task<Rc<Ipc::Session>> acceptSessionAsync(Sys::IpcConnection conn, Ref::Url const&, Async::CancellationToken) override {
         co_return Ok(makeRc<CompositorSession>(std::move(conn), _compositor));
     }
 };

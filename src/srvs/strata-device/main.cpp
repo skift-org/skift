@@ -25,8 +25,8 @@ struct DeviceSession : Ipc::Session {
 };
 
 struct DeviceHandler : Ipc::Handler {
-    Async::Task<Rc<Ipc::Session>> acceptSessionAsync(Sys::IpcConnection conn, Async::CancellationToken) override {
-        co_return Ok(makeRc<DeviceSession>(std::move(conn)));
+    Async::Task<Rc<Ipc::Session>> acceptSessionAsync(Sys::IpcConnection connection, Ref::Url const&, Async::CancellationToken) override {
+        co_return Ok(makeRc<DeviceSession>(std::move(connection)));
     }
 };
 

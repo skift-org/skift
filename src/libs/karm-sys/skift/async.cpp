@@ -79,12 +79,16 @@ struct SkiftSched : Sys::Sched {
 
         while (true) {
             auto msg = co_trya$(Skift::globalClient().recvAsync(ct));
-            auto incoming = co_try$(msg->unpack<Strata::ICm::Connect>());
 
+            // Other cm events are not ours to handle, skip them.
+            if (not msg->is<Strata::ICm::Incoming>())
+                continue;
+
+            auto incoming = co_try$(msg->unpack<Strata::ICm::Incoming>());
             if (not incoming.fd)
                 continue;
 
-            co_return Ok<_Accepted>(incoming.fd.take(), std::move(incoming.url));
+            co_return Ok<_Accepted>(incoming.fd.take(), Ip4::unspecified(0), std::move(incoming.url));
         }
     }
 

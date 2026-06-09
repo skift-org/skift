@@ -33,12 +33,7 @@ extern "C" [[gnu::weak]] void __entryPoint(usize rawHandover, usize rawIn, usize
     };
     Sys::Skift::globalPayload = reinterpret_cast<Handover::Payload*>(rawHandover);
 
-    Sys::IpcConnection conn = {
-        {
-            makeRc<Sys::Skift::ChannelFd>(Hj::Cap{rawIn}, Hj::Cap{rawOut}),
-            "ipc:strata-cm"_url,
-        }
-    };
+    Sys::IpcConnection conn{makeRc<Sys::Skift::ChannelFd>(Hj::Cap{rawIn}, Hj::Cap{rawOut})};
     Sys::Skift::setupClient(std::move(conn));
 
     Async::Cancellation cancellation;

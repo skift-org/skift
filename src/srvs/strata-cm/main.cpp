@@ -34,9 +34,17 @@ struct ComponentManager {
             : _cm(cm), _id(id), _conn(std::move(conn)), _job(std::move(job)) {}
 
         Res<> _handleConnect(Ipc::Message& msg) {
-            auto connect = try$(msg.unpack<ICm::Connect>());
-            logDebugIf(DEBUG_COMPONENT, "'{}' requested connection to '{}'", _id, connect.url);
-            return _cm.connect(connect);
+            auto [maybeFd, url] = try$(msg.unpack<ICm::Connect>());
+            logDebugIf(DEBUG_COMPONENT, "'{}' requested connection to '{}'", _id, url);
+            auto fd = try$(maybeFd.okOr(Error::invalidData("connect without fd")));
+            
+            auto res = _cm.connect(fd, url);
+            if (not res) {
+                Sys::IpcConnection conn{fd};
+                (void)Ipc::send(conn, Ipc::SEQ_HELLO, res.none());
+            }
+
+            return res;
         }
 
         Res<> _handleLaunch(Ipc::Message& msg) {
@@ -64,9 +72,9 @@ struct ComponentManager {
             return Ipc::send<T>(_conn, Ipc::SEQ_EVENT, payload);
         }
 
-        Res<> incoming(ICm::Connect const& connect) {
+        Res<> incoming(ICm::Incoming const& incoming) {
             logDebugIf(DEBUG_COMPONENT, "notifying '{}' of incoming connection", _id);
-            return notify(connect);
+            return notify(incoming);
         }
 
         bool operator==(Component const& other) const {
@@ -103,7 +111,7 @@ struct ComponentManager {
         auto [fd0, fd1] = try$(Sys::Skift::ChannelFd::create(id));
         auto job = try$(runElf(id, fd0));
 
-        auto component = makeRc<Component>(*this, id, Sys::IpcConnection{{fd1, "ipc:"_url}}, std::move(job));
+        auto component = makeRc<Component>(*this, id, Sys::IpcConnection{fd1}, std::move(job));
         _active.pushBack(component);
 
         if (exported) {
@@ -118,12 +126,21 @@ struct ComponentManager {
         return Ok();
     }
 
-    Res<> connect(ICm::Connect const& connect) {
+    Res<Ref::Url> resolve(Ref::Url url) {
+        // TODO: Resolve through the requesting component's namespace and
+        //       rewrite the url, plan9 style. For now everyone shares a
+        //       single namespace and urls pass through untranslated.
+        url.path.normalize();
+        return Ok(url);
+    }
+
+    Res<> connect(Rc<Sys::Fd> fd, Ref::Url url) {
+        url = try$(resolve(url));
         auto component = try$(
-            _exported.lookup(connect.url.scheme == "file" ? "strata-fs"s : connect.url.host.str())
+            _exported.lookup(url.scheme == "file" ? "strata-fs"s : url.host.str())
                 .okOr(Error::notFound("component not found"))
         );
-        return component->incoming(connect);
+        return component->incoming({std::move(fd), url});
     }
 
     Async::Task<> runAsync() {

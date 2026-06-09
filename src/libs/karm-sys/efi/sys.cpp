@@ -223,7 +223,7 @@ Res<Rc<Fd>> listenUdp(SocketAddr) {
     return Error::notImplemented();
 }
 
-Res<Rc<Fd>> connectIpc(Ref::Url) {
+Res<_Connected> connectIpc(Ref::Url) {
     return Error::notImplemented();
 }
 

@@ -60,7 +60,7 @@ static Res<Ref::Path> _resolveUrl(Ref::Url const& url) {
 
 Res<Rc<Fd>> openFile(Ref::Url const& url, Flags<OpenOption>) {
     auto path = try$(_resolveUrl(url));
-    auto file = try$(Async::run(Ipc::Client::connectAsync("file:"_url / path, Async::CancellationToken::uninterruptible())));
+    auto file = try$(Sys::run(Ipc::Client::connectAsync("file:"_url / path, Async::CancellationToken::uninterruptible())));
     return Ok(makeRc<Skift::FsFd>(std::move(file)));
 }
 
@@ -140,10 +140,10 @@ Res<Rc<Fd>> listenUdp(SocketAddr) {
     return Error::notImplemented("listenUdp() not implemented");
 }
 
-Res<Rc<Fd>> connectIpc(Ref::Url url) {
+Res<_Connected> connectIpc(Ref::Url url) {
     auto [chan0, chan1] = try$(Skift::ChannelFd::create(url.host.str()));
     try$(Skift::globalClient().notify(Strata::ICm::Connect{chan1, url}));
-    return Ok(chan0);
+    return Ok<_Connected>(chan0, true);
 }
 
 Res<Rc<Fd>> listenIpc(Ref::Url) {

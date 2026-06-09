@@ -70,9 +70,9 @@ struct FsHandler : Ipc::Handler {
     FsHandler(Rc<Karm::Fs::Node> root)
         : _root(root) {}
 
-    Async::Task<Rc<Ipc::Session>> acceptSessionAsync(Sys::IpcConnection conn, Async::CancellationToken) override {
-        auto node = co_trya$(_root->lookupAsync(conn.url().path));
-        co_return Ok(makeRc<FsNodeHandler>(std::move(conn), node));
+    Async::Task<Rc<Ipc::Session>> acceptSessionAsync(Sys::IpcConnection connection, Ref::Url const& url, Async::CancellationToken) override {
+        auto node = co_trya$(_root->lookupAsync(url.path));
+        co_return Ok(makeRc<FsNodeHandler>(std::move(connection), node));
     }
 };
 

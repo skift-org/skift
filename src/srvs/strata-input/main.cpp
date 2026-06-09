@@ -21,7 +21,7 @@ struct InputSession : Ipc::Session {
 };
 
 struct InputHandler : Ipc::Handler {
-    Async::Task<Rc<Ipc::Session>> acceptSessionAsync(Sys::IpcConnection conn, Async::CancellationToken) override {
+    Async::Task<Rc<Ipc::Session>> acceptSessionAsync(Sys::IpcConnection conn, Ref::Url const&, Async::CancellationToken) override {
         co_return Ok(makeRc<InputSession>(std::move(conn)));
     }
 };

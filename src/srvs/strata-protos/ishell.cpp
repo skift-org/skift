@@ -54,6 +54,16 @@ export struct WindowMove {
     WindowId window;
 };
 
+export struct WindowResize {
+    WindowId window;
+    App::Direction dir;
+};
+
+export struct WindowCursor {
+    WindowId window;
+    App::CursorStyle style;
+};
+
 export struct WindowSnap {
     WindowId window;
     App::Snap snap;

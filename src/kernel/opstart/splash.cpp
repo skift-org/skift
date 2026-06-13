@@ -19,7 +19,7 @@ void drawSplash(Gfx::Canvas& g, Opstart::Entry const& e, Math::Recti size) {
     if (auto it = e.icon.is<Rc<Gfx::Surface>>()) {
         g.clear(Gfx::ZINC950);
         auto dest = (*it)->bound().center(size);
-        g.blit(dest, (*it)->pixels());
+        g.blit(dest, (*it));
     }
 }
 

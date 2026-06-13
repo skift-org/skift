@@ -146,8 +146,16 @@ struct SessionWindow : Hideo::Shell::Window {
     }
 
     void resize(App::Snap snap, Math::Vec2i size) override {
-        if (size != activeBound().wh) {
-            _frontbuffer = Gfx::Surface::alloc(size);
+        if (not resizing and size != _frontbuffer->bound().wh) {
+            auto frontbuffer = Gfx::Surface::alloc(size);
+
+            auto common = Math::Recti{size.min(_frontbuffer->bound().wh)};
+            Gfx::blitUnsafe(
+                frontbuffer->mutPixels().clip(common),
+                _frontbuffer->pixels().clip(common)
+            );
+
+            _frontbuffer = frontbuffer;
             (void)_session.notify(
                 IShell::WindowUpdate{
                     _id,
@@ -323,6 +331,44 @@ struct CompositorSession : Ipc::Session {
         return Ok();
     }
 
+    static Math::Vec2i _resizeDir(App::Direction dir) {
+        switch (dir) {
+        case App::Direction::EAST:
+            return {1, 0};
+        case App::Direction::WEST:
+            return {-1, 0};
+        case App::Direction::NORTH:
+            return {0, -1};
+        case App::Direction::SOUTH:
+            return {0, 1};
+        case App::Direction::NORTH_EAST:
+            return {1, -1};
+        case App::Direction::NORTH_WEST:
+            return {-1, -1};
+        case App::Direction::SOUTH_EAST:
+            return {1, 1};
+        case App::Direction::SOUTH_WEST:
+            return {-1, 1};
+        default:
+            return {};
+        }
+    }
+
+    Res<> _handleWindowResize(Ipc::Message& message) {
+        auto [windowId, dir] = try$(message.unpack<IShell::WindowResize>());
+        auto window = try$(_windows.lookup(windowId).okOr(Error::invalidInput("invalid window id")));
+        window->resizing = true;
+        window->resizeDir = _resizeDir(dir);
+        return Ok();
+    }
+
+    Res<> _handleWindowCursor(Ipc::Message& message) {
+        auto [windowId, style] = try$(message.unpack<IShell::WindowCursor>());
+        auto window = try$(_windows.lookup(windowId).okOr(Error::invalidInput("invalid window id")));
+        window->cursor = style;
+        return Ok();
+    }
+
     Res<> _handleWindowSnap(Ipc::Message& message) {
         auto [windowId, snap] = try$(message.unpack<IShell::WindowSnap>());
 
@@ -343,6 +389,10 @@ struct CompositorSession : Ipc::Session {
             co_try$(resp<IShell::WindowFlip>(msg, _handleWindowFlip(msg)));
         else if (msg.is<IShell::WindowMove>())
             co_try$(_handleWindowMove(msg));
+        else if (msg.is<IShell::WindowResize>())
+            co_try$(_handleWindowResize(msg));
+        else if (msg.is<IShell::WindowCursor>())
+            co_try$(_handleWindowCursor(msg));
         else if (msg.is<IShell::WindowSnap>())
             co_try$(_handleWindowSnap(msg));
         else

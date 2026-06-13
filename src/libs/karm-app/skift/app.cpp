@@ -58,6 +58,10 @@ struct SkiftWindow : Window {
 
     void drag() override;
 
+    void resize(Direction dir) override;
+
+    void cursor(CursorStyle style) override;
+
     void snap(Snap snap) override;
 
     void minimize() override {}
@@ -222,6 +226,14 @@ SkiftWindow::~SkiftWindow() {
 
 void SkiftWindow::drag() {
     (void)_application._shell.notify(Strata::IShell::WindowMove{_id});
+}
+
+void SkiftWindow::resize(Direction dir) {
+    (void)_application._shell.notify(Strata::IShell::WindowResize{_id, dir});
+}
+
+void SkiftWindow::cursor(CursorStyle style) {
+    (void)_application._shell.notify(Strata::IShell::WindowCursor{_id, style});
 }
 
 void SkiftWindow::snap(Snap s) {

@@ -107,20 +107,72 @@ struct RoundedCursor : Cursor {
     }
 };
 
+struct ResizeCursor : Cursor {
+    Gfx::Color _fill = Gfx::BLACK;
+    Gfx::Color _stroke = Gfx::WHITE;
+    f64 _angle;
+    Math::Path _path = Math::Path::fromSvg(
+        "M-11 0L-5 -5L-5 -2L5 -2L5 -5L11 0L5 5L5 2L-5 2L-5 5Z"
+    );
+
+    ResizeCursor(f64 angle) : _angle(angle) {}
+
+    Math::Recti bound(Math::Vec2i pos) const override {
+        return Math::Recti::fromCenter(pos, {32, 32}).grow(1);
+    }
+
+    void paint(Math::Vec2i pos, Gfx::Canvas& g) const override {
+        g.push();
+        g.translate(pos.cast<f64>());
+        g.rotate(_angle);
+        g.beginPath();
+        g.path(_path);
+        g.fill(_fill);
+        g.stroke({
+            .fill = _stroke,
+            .width = 1.6,
+            .align = Gfx::CENTER_ALIGN,
+            .join = Gfx::MITER_JOIN,
+        });
+        g.pop();
+    }
+};
+
 struct InputTranslator : Ui::ProxyNode<InputTranslator> {
     App::MouseEvent _mousePrev = {};
     Math::Vec2i _mousePos = {};
     bool _mouseDirty = false;
     Box<Cursor> _cursor;
+    App::CursorStyle _cursorStyle = App::CursorStyle::DEFAULT;
+    App::CursorStyle _cursorRequest = App::CursorStyle::DEFAULT;
+    ResizeCursor _resizeEW{0};
+    ResizeCursor _resizeNS{Math::PI / 2};
+    ResizeCursor _resizeNWSE{Math::PI / 4};
+    ResizeCursor _resizeNESW{-Math::PI / 4};
 
     InputTranslator(Ui::Child child, Math::Vec2i mousePos, Box<Cursor> cursor)
         : Ui::ProxyNode<InputTranslator>(std::move(child)), _mousePos(mousePos), _cursor(std::move(cursor)) {}
+
+    Cursor const& _activeCursor() const {
+        switch (_cursorStyle) {
+        case App::CursorStyle::RESIZE_EW:
+            return _resizeEW;
+        case App::CursorStyle::RESIZE_NS:
+            return _resizeNS;
+        case App::CursorStyle::RESIZE_NWSE:
+            return _resizeNWSE;
+        case App::CursorStyle::RESIZE_NESW:
+            return _resizeNESW;
+        default:
+            return *_cursor;
+        }
+    }
 
     void event(App::Event& e) override {
         if (auto m = e.is<App::MouseEvent>()) {
             if (not _mouseDirty) {
                 _mouseDirty = true;
-                Ui::shouldRepaint(*this, _cursor->bound(_mousePos));
+                Ui::shouldRepaint(*this, _activeCursor().bound(_mousePos));
                 Ui::shouldAnimate(*this);
             }
 
@@ -130,10 +182,18 @@ struct InputTranslator : Ui::ProxyNode<InputTranslator> {
             e.accept();
 
             if (m->delta != Math::Vec2i{}) {
+                _cursorRequest = App::CursorStyle::DEFAULT;
+
                 App::MouseEvent mouseMove = *m;
                 mouseMove.type = App::MouseEvent::MOVE;
                 mouseMove.pos = _mousePos;
                 Ui::event<App::MouseEvent>(child(), mouseMove);
+
+                if (_cursorRequest != _cursorStyle) {
+                    Ui::shouldRepaint(*this, _activeCursor().bound(_mousePos));
+                    _cursorStyle = _cursorRequest;
+                    Ui::shouldRepaint(*this, _activeCursor().bound(_mousePos));
+                }
             }
 
             if (not Math::epsilonEq(m->scroll, {0, 0})) {
@@ -183,18 +243,28 @@ struct InputTranslator : Ui::ProxyNode<InputTranslator> {
         } else if (auto k = e.is<Node::AnimateEvent>()) {
             if (_mouseDirty) {
                 _mouseDirty = false;
-                Ui::shouldRepaint(*this, _cursor->bound(_mousePos));
+                Ui::shouldRepaint(*this, _activeCursor().bound(_mousePos));
             }
         }
 
         Ui::ProxyNode<InputTranslator>::event(e);
     }
 
+    void bubble(App::Event& e) override {
+        if (auto it = e.is<App::RequestCursorEvent>()) {
+            _cursorRequest = it->style;
+            e.accept();
+            return;
+        }
+
+        Ui::ProxyNode<InputTranslator>::bubble(e);
+    }
+
     void paint(Gfx::Canvas& g, Math::Recti r) override {
         child().paint(g, r);
 
-        if (_cursor->bound(_mousePos).colide(r)) {
-            _cursor->paint(_mousePos, g);
+        if (_activeCursor().bound(_mousePos).colide(r)) {
+            _activeCursor().paint(_mousePos, g);
         }
     }
 };
